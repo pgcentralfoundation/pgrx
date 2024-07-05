@@ -2442,6 +2442,13 @@ pub const XLOG_OVERWRITE_CONTRECORD: u32 = 208;
 pub const FLOATFORMAT_VALUE: f64 = 1234567.0;
 pub const PG_CONTROL_MAX_SAFE_SIZE: u32 = 512;
 pub const PG_CONTROL_FILE_SIZE: u32 = 8192;
+pub const OLD_SNAPSHOT_PADDING_ENTRIES: u32 = 10;
+pub const DEFAULT_EFFECTIVE_IO_CONCURRENCY: u32 = 1;
+pub const DEFAULT_MAINTENANCE_IO_CONCURRENCY: u32 = 10;
+pub const MAX_IO_CONCURRENCY: u32 = 1000;
+pub const BUFFER_LOCK_UNLOCK: u32 = 0;
+pub const BUFFER_LOCK_SHARE: u32 = 1;
+pub const BUFFER_LOCK_EXCLUSIVE: u32 = 2;
 pub const PERFORM_DELETION_INTERNAL: u32 = 1;
 pub const PERFORM_DELETION_CONCURRENTLY: u32 = 2;
 pub const PERFORM_DELETION_QUIETLY: u32 = 4;
@@ -2955,6 +2962,14 @@ pub const TRIGGER_TYPE_STATEMENT: u32 = 0;
 pub const TRIGGER_TYPE_TIMING_MASK: u32 = 66;
 pub const TRIGGER_TYPE_AFTER: u32 = 0;
 pub const TRIGGER_TYPE_EVENT_MASK: u32 = 60;
+pub const UserMappingRelationId: Oid = Oid(1418);
+pub const UserMappingOidIndexId: u32 = 174;
+pub const UserMappingUserServerIndexId: u32 = 175;
+pub const Anum_pg_user_mapping_oid: u32 = 1;
+pub const Anum_pg_user_mapping_umuser: u32 = 2;
+pub const Anum_pg_user_mapping_umserver: u32 = 3;
+pub const Anum_pg_user_mapping_umoptions: u32 = 4;
+pub const Natts_pg_user_mapping: u32 = 4;
 pub const EOH_HEADER_MAGIC: i32 = -1;
 pub const MAXDIM: u32 = 6;
 pub const EA_MAGIC: u32 = 689375833;
@@ -3340,13 +3355,6 @@ pub const LOGICALREP_COLUMN_UNCHANGED: u8 = 117u8;
 pub const LOGICALREP_COLUMN_TEXT: u8 = 116u8;
 pub const LOGICALREP_COLUMN_BINARY: u8 = 98u8;
 pub const MAXCONNINFO: u32 = 1024;
-pub const OLD_SNAPSHOT_PADDING_ENTRIES: u32 = 10;
-pub const DEFAULT_EFFECTIVE_IO_CONCURRENCY: u32 = 1;
-pub const DEFAULT_MAINTENANCE_IO_CONCURRENCY: u32 = 10;
-pub const MAX_IO_CONCURRENCY: u32 = 1000;
-pub const BUFFER_LOCK_UNLOCK: u32 = 0;
-pub const BUFFER_LOCK_SHARE: u32 = 1;
-pub const BUFFER_LOCK_EXCLUSIVE: u32 = 2;
 pub const XLOG_STANDBY_LOCK: u32 = 0;
 pub const XLOG_RUNNING_XACTS: u32 = 16;
 pub const XLOG_INVALIDATIONS: u32 = 32;
@@ -3502,6 +3510,3289 @@ pub const TZNAME_FIXED_OFFSET: u32 = 0;
 pub const TZNAME_DYNTZ: u32 = 1;
 pub const TZNAME_ZONE: u32 = 2;
 pub const RADIANS_PER_DEGREE: f64 = 0.017453292519943295;
+pub const F_HEAP_TABLEAM_HANDLER: u32 = 3;
+pub const F_BYTEAOUT: u32 = 31;
+pub const F_CHAROUT: u32 = 33;
+pub const F_NAMEIN: u32 = 34;
+pub const F_NAMEOUT: u32 = 35;
+pub const F_INT2IN: u32 = 38;
+pub const F_INT2OUT: u32 = 39;
+pub const F_INT2VECTORIN: u32 = 40;
+pub const F_INT2VECTOROUT: u32 = 41;
+pub const F_INT4IN: u32 = 42;
+pub const F_INT4OUT: u32 = 43;
+pub const F_REGPROCIN: u32 = 44;
+pub const F_REGPROCOUT: u32 = 45;
+pub const F_TEXTIN: u32 = 46;
+pub const F_TEXTOUT: u32 = 47;
+pub const F_TIDIN: u32 = 48;
+pub const F_TIDOUT: u32 = 49;
+pub const F_XIDIN: u32 = 50;
+pub const F_XIDOUT: u32 = 51;
+pub const F_CIDIN: u32 = 52;
+pub const F_CIDOUT: u32 = 53;
+pub const F_OIDVECTORIN: u32 = 54;
+pub const F_OIDVECTOROUT: u32 = 55;
+pub const F_BOOLLT: u32 = 56;
+pub const F_BOOLGT: u32 = 57;
+pub const F_BOOLEQ: u32 = 60;
+pub const F_CHAREQ: u32 = 61;
+pub const F_NAMEEQ: u32 = 62;
+pub const F_INT2EQ: u32 = 63;
+pub const F_INT2LT: u32 = 64;
+pub const F_INT4EQ: u32 = 65;
+pub const F_INT4LT: u32 = 66;
+pub const F_TEXTEQ: u32 = 67;
+pub const F_XIDEQ: u32 = 68;
+pub const F_CIDEQ: u32 = 69;
+pub const F_CHARNE: u32 = 70;
+pub const F_CHARLE: u32 = 72;
+pub const F_CHARGT: u32 = 73;
+pub const F_CHARGE: u32 = 74;
+pub const F_INT4_CHAR: u32 = 77;
+pub const F_CHAR_INT4: u32 = 78;
+pub const F_NAMEREGEXEQ: u32 = 79;
+pub const F_BOOLNE: u32 = 84;
+pub const F_PG_DDL_COMMAND_IN: u32 = 86;
+pub const F_PG_DDL_COMMAND_OUT: u32 = 87;
+pub const F_PG_DDL_COMMAND_RECV: u32 = 88;
+pub const F_VERSION: u32 = 89;
+pub const F_PG_DDL_COMMAND_SEND: u32 = 90;
+pub const F_EQSEL: u32 = 101;
+pub const F_NEQSEL: u32 = 102;
+pub const F_SCALARLTSEL: u32 = 103;
+pub const F_SCALARGTSEL: u32 = 104;
+pub const F_EQJOINSEL: u32 = 105;
+pub const F_NEQJOINSEL: u32 = 106;
+pub const F_SCALARLTJOINSEL: u32 = 107;
+pub const F_SCALARGTJOINSEL: u32 = 108;
+pub const F_UNKNOWNIN: u32 = 109;
+pub const F_UNKNOWNOUT: u32 = 110;
+pub const F_BOX_ABOVE_EQ: u32 = 115;
+pub const F_BOX_BELOW_EQ: u32 = 116;
+pub const F_POINT_IN: u32 = 117;
+pub const F_POINT_OUT: u32 = 118;
+pub const F_LSEG_IN: u32 = 119;
+pub const F_LSEG_OUT: u32 = 120;
+pub const F_PATH_IN: u32 = 121;
+pub const F_PATH_OUT: u32 = 122;
+pub const F_BOX_IN: u32 = 123;
+pub const F_BOX_OUT: u32 = 124;
+pub const F_BOX_OVERLAP: u32 = 125;
+pub const F_BOX_GE: u32 = 126;
+pub const F_BOX_GT: u32 = 127;
+pub const F_BOX_EQ: u32 = 128;
+pub const F_BOX_LT: u32 = 129;
+pub const F_BOX_LE: u32 = 130;
+pub const F_POINT_ABOVE: u32 = 131;
+pub const F_POINT_LEFT: u32 = 132;
+pub const F_POINT_RIGHT: u32 = 133;
+pub const F_POINT_BELOW: u32 = 134;
+pub const F_POINT_EQ: u32 = 135;
+pub const F_ON_PB: u32 = 136;
+pub const F_ON_PPATH: u32 = 137;
+pub const F_BOX_CENTER: u32 = 138;
+pub const F_AREASEL: u32 = 139;
+pub const F_AREAJOINSEL: u32 = 140;
+pub const F_INT4MUL: u32 = 141;
+pub const F_INT4NE: u32 = 144;
+pub const F_INT2NE: u32 = 145;
+pub const F_INT2GT: u32 = 146;
+pub const F_INT4GT: u32 = 147;
+pub const F_INT2LE: u32 = 148;
+pub const F_INT4LE: u32 = 149;
+pub const F_INT4GE: u32 = 150;
+pub const F_INT2GE: u32 = 151;
+pub const F_INT2MUL: u32 = 152;
+pub const F_INT2DIV: u32 = 153;
+pub const F_INT4DIV: u32 = 154;
+pub const F_INT2MOD: u32 = 155;
+pub const F_INT4MOD: u32 = 156;
+pub const F_TEXTNE: u32 = 157;
+pub const F_INT24EQ: u32 = 158;
+pub const F_INT42EQ: u32 = 159;
+pub const F_INT24LT: u32 = 160;
+pub const F_INT42LT: u32 = 161;
+pub const F_INT24GT: u32 = 162;
+pub const F_INT42GT: u32 = 163;
+pub const F_INT24NE: u32 = 164;
+pub const F_INT42NE: u32 = 165;
+pub const F_INT24LE: u32 = 166;
+pub const F_INT42LE: u32 = 167;
+pub const F_INT24GE: u32 = 168;
+pub const F_INT42GE: u32 = 169;
+pub const F_INT24MUL: u32 = 170;
+pub const F_INT42MUL: u32 = 171;
+pub const F_INT24DIV: u32 = 172;
+pub const F_INT42DIV: u32 = 173;
+pub const F_INT2PL: u32 = 176;
+pub const F_INT4PL: u32 = 177;
+pub const F_INT24PL: u32 = 178;
+pub const F_INT42PL: u32 = 179;
+pub const F_INT2MI: u32 = 180;
+pub const F_INT4MI: u32 = 181;
+pub const F_INT24MI: u32 = 182;
+pub const F_INT42MI: u32 = 183;
+pub const F_OIDEQ: u32 = 184;
+pub const F_OIDNE: u32 = 185;
+pub const F_BOX_SAME: u32 = 186;
+pub const F_BOX_CONTAIN: u32 = 187;
+pub const F_BOX_LEFT: u32 = 188;
+pub const F_BOX_OVERLEFT: u32 = 189;
+pub const F_BOX_OVERRIGHT: u32 = 190;
+pub const F_BOX_RIGHT: u32 = 191;
+pub const F_BOX_CONTAINED: u32 = 192;
+pub const F_BOX_CONTAIN_PT: u32 = 193;
+pub const F_PG_NODE_TREE_IN: u32 = 195;
+pub const F_PG_NODE_TREE_OUT: u32 = 196;
+pub const F_PG_NODE_TREE_RECV: u32 = 197;
+pub const F_PG_NODE_TREE_SEND: u32 = 198;
+pub const F_FLOAT4IN: u32 = 200;
+pub const F_FLOAT4OUT: u32 = 201;
+pub const F_FLOAT4MUL: u32 = 202;
+pub const F_FLOAT4DIV: u32 = 203;
+pub const F_FLOAT4PL: u32 = 204;
+pub const F_FLOAT4MI: u32 = 205;
+pub const F_FLOAT4UM: u32 = 206;
+pub const F_FLOAT4ABS: u32 = 207;
+pub const F_FLOAT4_ACCUM: u32 = 208;
+pub const F_FLOAT4LARGER: u32 = 209;
+pub const F_FLOAT4SMALLER: u32 = 211;
+pub const F_INT4UM: u32 = 212;
+pub const F_INT2UM: u32 = 213;
+pub const F_FLOAT8IN: u32 = 214;
+pub const F_FLOAT8OUT: u32 = 215;
+pub const F_FLOAT8MUL: u32 = 216;
+pub const F_FLOAT8DIV: u32 = 217;
+pub const F_FLOAT8PL: u32 = 218;
+pub const F_FLOAT8MI: u32 = 219;
+pub const F_FLOAT8UM: u32 = 220;
+pub const F_FLOAT8ABS: u32 = 221;
+pub const F_FLOAT8_ACCUM: u32 = 222;
+pub const F_FLOAT8LARGER: u32 = 223;
+pub const F_FLOAT8SMALLER: u32 = 224;
+pub const F_LSEG_CENTER: u32 = 225;
+pub const F_POLY_CENTER: u32 = 227;
+pub const F_DROUND: u32 = 228;
+pub const F_DTRUNC: u32 = 229;
+pub const F_DSQRT: u32 = 230;
+pub const F_DCBRT: u32 = 231;
+pub const F_DPOW: u32 = 232;
+pub const F_DEXP: u32 = 233;
+pub const F_DLOG1: u32 = 234;
+pub const F_FLOAT8_INT2: u32 = 235;
+pub const F_FLOAT4_INT2: u32 = 236;
+pub const F_INT2_FLOAT8: u32 = 237;
+pub const F_INT2_FLOAT4: u32 = 238;
+pub const F_LINE_DISTANCE: u32 = 239;
+pub const F_NAMEEQTEXT: u32 = 240;
+pub const F_NAMELTTEXT: u32 = 241;
+pub const F_NAMELETEXT: u32 = 242;
+pub const F_NAMEGETEXT: u32 = 243;
+pub const F_NAMEGTTEXT: u32 = 244;
+pub const F_NAMENETEXT: u32 = 245;
+pub const F_BTNAMETEXTCMP: u32 = 246;
+pub const F_TEXTEQNAME: u32 = 247;
+pub const F_TEXTLTNAME: u32 = 248;
+pub const F_TEXTLENAME: u32 = 249;
+pub const F_TEXTGENAME: u32 = 250;
+pub const F_TEXTGTNAME: u32 = 251;
+pub const F_TEXTNENAME: u32 = 252;
+pub const F_BTTEXTNAMECMP: u32 = 253;
+pub const F_NAMECONCATOID: Oid = Oid(266);
+pub const F_TABLE_AM_HANDLER_IN: u32 = 267;
+pub const F_TABLE_AM_HANDLER_OUT: u32 = 268;
+pub const F_TIMEOFDAY: u32 = 274;
+pub const F_PG_NEXTOID: Oid = Oid(275);
+pub const F_FLOAT8_COMBINE: u32 = 276;
+pub const F_INTER_SL: u32 = 277;
+pub const F_INTER_LB: u32 = 278;
+pub const F_FLOAT48MUL: u32 = 279;
+pub const F_FLOAT48DIV: u32 = 280;
+pub const F_FLOAT48PL: u32 = 281;
+pub const F_FLOAT48MI: u32 = 282;
+pub const F_FLOAT84MUL: u32 = 283;
+pub const F_FLOAT84DIV: u32 = 284;
+pub const F_FLOAT84PL: u32 = 285;
+pub const F_FLOAT84MI: u32 = 286;
+pub const F_FLOAT4EQ: u32 = 287;
+pub const F_FLOAT4NE: u32 = 288;
+pub const F_FLOAT4LT: u32 = 289;
+pub const F_FLOAT4LE: u32 = 290;
+pub const F_FLOAT4GT: u32 = 291;
+pub const F_FLOAT4GE: u32 = 292;
+pub const F_FLOAT8EQ: u32 = 293;
+pub const F_FLOAT8NE: u32 = 294;
+pub const F_FLOAT8LT: u32 = 295;
+pub const F_FLOAT8LE: u32 = 296;
+pub const F_FLOAT8GT: u32 = 297;
+pub const F_FLOAT8GE: u32 = 298;
+pub const F_FLOAT48EQ: u32 = 299;
+pub const F_FLOAT48NE: u32 = 300;
+pub const F_FLOAT48LT: u32 = 301;
+pub const F_FLOAT48LE: u32 = 302;
+pub const F_FLOAT48GT: u32 = 303;
+pub const F_FLOAT48GE: u32 = 304;
+pub const F_FLOAT84EQ: u32 = 305;
+pub const F_FLOAT84NE: u32 = 306;
+pub const F_FLOAT84LT: u32 = 307;
+pub const F_FLOAT84LE: u32 = 308;
+pub const F_FLOAT84GT: u32 = 309;
+pub const F_FLOAT84GE: u32 = 310;
+pub const F_FLOAT8_FLOAT4: u32 = 311;
+pub const F_FLOAT4_FLOAT8: u32 = 312;
+pub const F_INT4_INT2: u32 = 313;
+pub const F_INT2_INT4: u32 = 314;
+pub const F_PG_JIT_AVAILABLE: u32 = 315;
+pub const F_FLOAT8_INT4: u32 = 316;
+pub const F_INT4_FLOAT8: u32 = 317;
+pub const F_FLOAT4_INT4: u32 = 318;
+pub const F_INT4_FLOAT4: u32 = 319;
+pub const F_WIDTH_BUCKET_FLOAT8_FLOAT8_FLOAT8_INT4: u32 = 320;
+pub const F_JSON_IN: u32 = 321;
+pub const F_JSON_OUT: u32 = 322;
+pub const F_JSON_RECV: u32 = 323;
+pub const F_JSON_SEND: u32 = 324;
+pub const F_INDEX_AM_HANDLER_IN: u32 = 326;
+pub const F_INDEX_AM_HANDLER_OUT: u32 = 327;
+pub const F_HASHMACADDR8: u32 = 328;
+pub const F_HASH_ACLITEM: u32 = 329;
+pub const F_BTHANDLER: u32 = 330;
+pub const F_HASHHANDLER: u32 = 331;
+pub const F_GISTHANDLER: u32 = 332;
+pub const F_GINHANDLER: u32 = 333;
+pub const F_SPGHANDLER: u32 = 334;
+pub const F_BRINHANDLER: u32 = 335;
+pub const F_SCALARLESEL: u32 = 336;
+pub const F_SCALARGESEL: u32 = 337;
+pub const F_AMVALIDATE: u32 = 338;
+pub const F_POLY_SAME: u32 = 339;
+pub const F_POLY_CONTAIN: u32 = 340;
+pub const F_POLY_LEFT: u32 = 341;
+pub const F_POLY_OVERLEFT: u32 = 342;
+pub const F_POLY_OVERRIGHT: u32 = 343;
+pub const F_POLY_RIGHT: u32 = 344;
+pub const F_POLY_CONTAINED: u32 = 345;
+pub const F_POLY_OVERLAP: u32 = 346;
+pub const F_POLY_IN: u32 = 347;
+pub const F_POLY_OUT: u32 = 348;
+pub const F_BTINT2CMP: u32 = 350;
+pub const F_BTINT4CMP: u32 = 351;
+pub const F_BTFLOAT4CMP: u32 = 354;
+pub const F_BTFLOAT8CMP: u32 = 355;
+pub const F_BTOIDCMP: u32 = 356;
+pub const F_DIST_BP: u32 = 357;
+pub const F_BTCHARCMP: u32 = 358;
+pub const F_BTNAMECMP: u32 = 359;
+pub const F_BTTEXTCMP: u32 = 360;
+pub const F_LSEG_DISTANCE: u32 = 361;
+pub const F_LSEG_INTERPT: u32 = 362;
+pub const F_DIST_PS: u32 = 363;
+pub const F_DIST_PB: u32 = 364;
+pub const F_DIST_SB: u32 = 365;
+pub const F_CLOSE_PS: u32 = 366;
+pub const F_CLOSE_PB: u32 = 367;
+pub const F_CLOSE_SB: u32 = 368;
+pub const F_ON_PS: u32 = 369;
+pub const F_PATH_DISTANCE: u32 = 370;
+pub const F_DIST_PPATH: u32 = 371;
+pub const F_ON_SB: u32 = 372;
+pub const F_INTER_SB: u32 = 373;
+pub const F_STRING_TO_ARRAY_TEXT_TEXT_TEXT: u32 = 376;
+pub const F_CASH_CMP: u32 = 377;
+pub const F_ARRAY_APPEND: u32 = 378;
+pub const F_ARRAY_PREPEND: u32 = 379;
+pub const F_DIST_SP: u32 = 380;
+pub const F_DIST_BS: u32 = 381;
+pub const F_BTARRAYCMP: u32 = 382;
+pub const F_ARRAY_CAT: u32 = 383;
+pub const F_ARRAY_TO_STRING_ANYARRAY_TEXT_TEXT: u32 = 384;
+pub const F_SCALARLEJOINSEL: u32 = 386;
+pub const F_ARRAY_NE: u32 = 390;
+pub const F_ARRAY_LT: u32 = 391;
+pub const F_ARRAY_GT: u32 = 392;
+pub const F_ARRAY_LE: u32 = 393;
+pub const F_STRING_TO_ARRAY_TEXT_TEXT: u32 = 394;
+pub const F_ARRAY_TO_STRING_ANYARRAY_TEXT: u32 = 395;
+pub const F_ARRAY_GE: u32 = 396;
+pub const F_SCALARGEJOINSEL: u32 = 398;
+pub const F_HASHMACADDR: u32 = 399;
+pub const F_HASHTEXT: u32 = 400;
+pub const F_TEXT_BPCHAR: u32 = 401;
+pub const F_BTOIDVECTORCMP: u32 = 404;
+pub const F_TEXT_NAME: u32 = 406;
+pub const F_NAME_TEXT: u32 = 407;
+pub const F_BPCHAR_NAME: u32 = 408;
+pub const F_NAME_BPCHAR: u32 = 409;
+pub const F_DIST_PATHP: u32 = 421;
+pub const F_HASHINET: u32 = 422;
+pub const F_HASHINT4EXTENDED: u32 = 425;
+pub const F_HASH_NUMERIC: u32 = 432;
+pub const F_MACADDR_IN: u32 = 436;
+pub const F_MACADDR_OUT: u32 = 437;
+pub const F_NUM_NULLS: u32 = 438;
+pub const F_NUM_NONNULLS: u32 = 440;
+pub const F_HASHINT2EXTENDED: u32 = 441;
+pub const F_HASHINT8EXTENDED: u32 = 442;
+pub const F_HASHFLOAT4EXTENDED: u32 = 443;
+pub const F_HASHFLOAT8EXTENDED: u32 = 444;
+pub const F_HASHOIDEXTENDED: u32 = 445;
+pub const F_HASHCHAREXTENDED: u32 = 446;
+pub const F_HASHNAMEEXTENDED: u32 = 447;
+pub const F_HASHTEXTEXTENDED: u32 = 448;
+pub const F_HASHINT2: u32 = 449;
+pub const F_HASHINT4: u32 = 450;
+pub const F_HASHFLOAT4: u32 = 451;
+pub const F_HASHFLOAT8: u32 = 452;
+pub const F_HASHOID: Oid = Oid(453);
+pub const F_HASHCHAR: u32 = 454;
+pub const F_HASHNAME: u32 = 455;
+pub const F_HASHVARLENA: u32 = 456;
+pub const F_HASHOIDVECTOR: u32 = 457;
+pub const F_TEXT_LARGER: u32 = 458;
+pub const F_TEXT_SMALLER: u32 = 459;
+pub const F_INT8IN: u32 = 460;
+pub const F_INT8OUT: u32 = 461;
+pub const F_INT8UM: u32 = 462;
+pub const F_INT8PL: u32 = 463;
+pub const F_INT8MI: u32 = 464;
+pub const F_INT8MUL: u32 = 465;
+pub const F_INT8DIV: u32 = 466;
+pub const F_INT8EQ: u32 = 467;
+pub const F_INT8NE: u32 = 468;
+pub const F_INT8LT: u32 = 469;
+pub const F_INT8GT: u32 = 470;
+pub const F_INT8LE: u32 = 471;
+pub const F_INT8GE: u32 = 472;
+pub const F_INT84EQ: u32 = 474;
+pub const F_INT84NE: u32 = 475;
+pub const F_INT84LT: u32 = 476;
+pub const F_INT84GT: u32 = 477;
+pub const F_INT84LE: u32 = 478;
+pub const F_INT84GE: u32 = 479;
+pub const F_INT4_INT8: u32 = 480;
+pub const F_INT8_INT4: u32 = 481;
+pub const F_FLOAT8_INT8: u32 = 482;
+pub const F_INT8_FLOAT8: u32 = 483;
+pub const F_ARRAY_LARGER: u32 = 515;
+pub const F_ARRAY_SMALLER: u32 = 516;
+pub const F_ABBREV_INET: u32 = 598;
+pub const F_ABBREV_CIDR: u32 = 599;
+pub const F_SET_MASKLEN_INET_INT4: u32 = 605;
+pub const F_OIDVECTORNE: u32 = 619;
+pub const F_HASH_ARRAY: u32 = 626;
+pub const F_SET_MASKLEN_CIDR_INT4: u32 = 635;
+pub const F_PG_INDEXAM_HAS_PROPERTY: u32 = 636;
+pub const F_PG_INDEX_HAS_PROPERTY: u32 = 637;
+pub const F_PG_INDEX_COLUMN_HAS_PROPERTY: u32 = 638;
+pub const F_FLOAT4_INT8: u32 = 652;
+pub const F_INT8_FLOAT4: u32 = 653;
+pub const F_NAMELT: u32 = 655;
+pub const F_NAMELE: u32 = 656;
+pub const F_NAMEGT: u32 = 657;
+pub const F_NAMEGE: u32 = 658;
+pub const F_NAMENE: u32 = 659;
+pub const F_BPCHAR_BPCHAR_INT4_BOOL: u32 = 668;
+pub const F_VARCHAR_VARCHAR_INT4_BOOL: u32 = 669;
+pub const F_PG_INDEXAM_PROGRESS_PHASENAME: u32 = 676;
+pub const F_OIDVECTORLT: u32 = 677;
+pub const F_OIDVECTORLE: u32 = 678;
+pub const F_OIDVECTOREQ: u32 = 679;
+pub const F_OIDVECTORGE: u32 = 680;
+pub const F_OIDVECTORGT: u32 = 681;
+pub const F_NETWORK: u32 = 683;
+pub const F_NETMASK: u32 = 696;
+pub const F_MASKLEN: u32 = 697;
+pub const F_BROADCAST: u32 = 698;
+pub const F_HOST: u32 = 699;
+pub const F_DIST_LP: u32 = 702;
+pub const F_DIST_LS: u32 = 704;
+pub const F_GETPGUSERNAME: u32 = 710;
+pub const F_FAMILY: u32 = 711;
+pub const F_INT2_INT8: u32 = 714;
+pub const F_LO_CREATE: u32 = 715;
+pub const F_OIDLT: u32 = 716;
+pub const F_OIDLE: u32 = 717;
+pub const F_OCTET_LENGTH_BYTEA: u32 = 720;
+pub const F_GET_BYTE: u32 = 721;
+pub const F_SET_BYTE: u32 = 722;
+pub const F_GET_BIT_BYTEA_INT8: u32 = 723;
+pub const F_SET_BIT_BYTEA_INT8_INT4: u32 = 724;
+pub const F_DIST_PL: u32 = 725;
+pub const F_DIST_SL: u32 = 727;
+pub const F_DIST_CPOLY: u32 = 728;
+pub const F_POLY_DISTANCE: u32 = 729;
+pub const F_TEXT_INET: u32 = 730;
+pub const F_TEXT_LT: u32 = 740;
+pub const F_TEXT_LE: u32 = 741;
+pub const F_TEXT_GT: u32 = 742;
+pub const F_TEXT_GE: u32 = 743;
+pub const F_ARRAY_EQ: u32 = 744;
+pub const F_CURRENT_USER: u32 = 745;
+pub const F_SESSION_USER: u32 = 746;
+pub const F_ARRAY_DIMS: u32 = 747;
+pub const F_ARRAY_NDIMS: u32 = 748;
+pub const F_OVERLAY_BYTEA_BYTEA_INT4_INT4: u32 = 749;
+pub const F_ARRAY_IN: u32 = 750;
+pub const F_ARRAY_OUT: u32 = 751;
+pub const F_OVERLAY_BYTEA_BYTEA_INT4: u32 = 752;
+pub const F_TRUNC_MACADDR: u32 = 753;
+pub const F_INT8_INT2: u32 = 754;
+pub const F_LO_IMPORT_TEXT: u32 = 764;
+pub const F_LO_EXPORT: u32 = 765;
+pub const F_INT4INC: u32 = 766;
+pub const F_LO_IMPORT_TEXT_OID: Oid = Oid(767);
+pub const F_INT4LARGER: u32 = 768;
+pub const F_INT4SMALLER: u32 = 769;
+pub const F_INT2LARGER: u32 = 770;
+pub const F_INT2SMALLER: u32 = 771;
+pub const F_HASHVARLENAEXTENDED: u32 = 772;
+pub const F_HASHOIDVECTOREXTENDED: u32 = 776;
+pub const F_HASH_ACLITEM_EXTENDED: u32 = 777;
+pub const F_HASHMACADDREXTENDED: u32 = 778;
+pub const F_HASHINETEXTENDED: u32 = 779;
+pub const F_HASH_NUMERIC_EXTENDED: u32 = 780;
+pub const F_HASHMACADDR8EXTENDED: u32 = 781;
+pub const F_HASH_ARRAY_EXTENDED: u32 = 782;
+pub const F_DIST_POLYC: u32 = 785;
+pub const F_PG_CLIENT_ENCODING: u32 = 810;
+pub const F_CURRENT_QUERY: u32 = 817;
+pub const F_MACADDR_EQ: u32 = 830;
+pub const F_MACADDR_LT: u32 = 831;
+pub const F_MACADDR_LE: u32 = 832;
+pub const F_MACADDR_GT: u32 = 833;
+pub const F_MACADDR_GE: u32 = 834;
+pub const F_MACADDR_NE: u32 = 835;
+pub const F_MACADDR_CMP: u32 = 836;
+pub const F_INT82PL: u32 = 837;
+pub const F_INT82MI: u32 = 838;
+pub const F_INT82MUL: u32 = 839;
+pub const F_INT82DIV: u32 = 840;
+pub const F_INT28PL: u32 = 841;
+pub const F_BTINT8CMP: u32 = 842;
+pub const F_CASH_MUL_FLT4: u32 = 846;
+pub const F_CASH_DIV_FLT4: u32 = 847;
+pub const F_FLT4_MUL_CASH: u32 = 848;
+pub const F_POSITION_TEXT_TEXT: u32 = 849;
+pub const F_TEXTLIKE: u32 = 850;
+pub const F_TEXTNLIKE: u32 = 851;
+pub const F_INT48EQ: u32 = 852;
+pub const F_INT48NE: u32 = 853;
+pub const F_INT48LT: u32 = 854;
+pub const F_INT48GT: u32 = 855;
+pub const F_INT48LE: u32 = 856;
+pub const F_INT48GE: u32 = 857;
+pub const F_NAMELIKE: u32 = 858;
+pub const F_NAMENLIKE: u32 = 859;
+pub const F_BPCHAR_CHAR: u32 = 860;
+pub const F_CURRENT_DATABASE: u32 = 861;
+pub const F_INT4_MUL_CASH: u32 = 862;
+pub const F_INT2_MUL_CASH: u32 = 863;
+pub const F_CASH_MUL_INT4: u32 = 864;
+pub const F_CASH_DIV_INT4: u32 = 865;
+pub const F_CASH_MUL_INT2: u32 = 866;
+pub const F_CASH_DIV_INT2: u32 = 867;
+pub const F_STRPOS: u32 = 868;
+pub const F_LOWER_TEXT: u32 = 870;
+pub const F_UPPER_TEXT: u32 = 871;
+pub const F_INITCAP: u32 = 872;
+pub const F_LPAD_TEXT_INT4_TEXT: u32 = 873;
+pub const F_RPAD_TEXT_INT4_TEXT: u32 = 874;
+pub const F_LTRIM_TEXT_TEXT: u32 = 875;
+pub const F_RTRIM_TEXT_TEXT: u32 = 876;
+pub const F_SUBSTR_TEXT_INT4_INT4: u32 = 877;
+pub const F_TRANSLATE: u32 = 878;
+pub const F_LPAD_TEXT_INT4: u32 = 879;
+pub const F_RPAD_TEXT_INT4: u32 = 880;
+pub const F_LTRIM_TEXT: u32 = 881;
+pub const F_RTRIM_TEXT: u32 = 882;
+pub const F_SUBSTR_TEXT_INT4: u32 = 883;
+pub const F_BTRIM_TEXT_TEXT: u32 = 884;
+pub const F_BTRIM_TEXT: u32 = 885;
+pub const F_CASH_IN: u32 = 886;
+pub const F_CASH_OUT: u32 = 887;
+pub const F_CASH_EQ: u32 = 888;
+pub const F_CASH_NE: u32 = 889;
+pub const F_CASH_LT: u32 = 890;
+pub const F_CASH_LE: u32 = 891;
+pub const F_CASH_GT: u32 = 892;
+pub const F_CASH_GE: u32 = 893;
+pub const F_CASH_PL: u32 = 894;
+pub const F_CASH_MI: u32 = 895;
+pub const F_CASH_MUL_FLT8: u32 = 896;
+pub const F_CASH_DIV_FLT8: u32 = 897;
+pub const F_CASHLARGER: u32 = 898;
+pub const F_CASHSMALLER: u32 = 899;
+pub const F_INET_IN: u32 = 910;
+pub const F_INET_OUT: u32 = 911;
+pub const F_FLT8_MUL_CASH: u32 = 919;
+pub const F_NETWORK_EQ: u32 = 920;
+pub const F_NETWORK_LT: u32 = 921;
+pub const F_NETWORK_LE: u32 = 922;
+pub const F_NETWORK_GT: u32 = 923;
+pub const F_NETWORK_GE: u32 = 924;
+pub const F_NETWORK_NE: u32 = 925;
+pub const F_NETWORK_CMP: u32 = 926;
+pub const F_NETWORK_SUB: u32 = 927;
+pub const F_NETWORK_SUBEQ: u32 = 928;
+pub const F_NETWORK_SUP: u32 = 929;
+pub const F_NETWORK_SUPEQ: u32 = 930;
+pub const F_CASH_WORDS: u32 = 935;
+pub const F_SUBSTRING_TEXT_INT4_INT4: u32 = 936;
+pub const F_SUBSTRING_TEXT_INT4: u32 = 937;
+pub const F_GENERATE_SERIES_TIMESTAMP_TIMESTAMP_INTERVAL: u32 = 938;
+pub const F_GENERATE_SERIES_TIMESTAMPTZ_TIMESTAMPTZ_INTERVAL: u32 = 939;
+pub const F_MOD_INT2_INT2: u32 = 940;
+pub const F_MOD_INT4_INT4: u32 = 941;
+pub const F_INT28MI: u32 = 942;
+pub const F_INT28MUL: u32 = 943;
+pub const F_CHAR_TEXT: u32 = 944;
+pub const F_INT8MOD: u32 = 945;
+pub const F_TEXT_CHAR: u32 = 946;
+pub const F_MOD_INT8_INT8: u32 = 947;
+pub const F_INT28DIV: u32 = 948;
+pub const F_HASHINT8: u32 = 949;
+pub const F_LO_OPEN: u32 = 952;
+pub const F_LO_CLOSE: u32 = 953;
+pub const F_LOREAD: u32 = 954;
+pub const F_LOWRITE: u32 = 955;
+pub const F_LO_LSEEK: u32 = 956;
+pub const F_LO_CREAT: u32 = 957;
+pub const F_LO_TELL: u32 = 958;
+pub const F_ON_PL: u32 = 959;
+pub const F_ON_SL: u32 = 960;
+pub const F_CLOSE_PL: u32 = 961;
+pub const F_LO_UNLINK: u32 = 964;
+pub const F_HASHBPCHAREXTENDED: u32 = 972;
+pub const F_PATH_INTER: u32 = 973;
+pub const F_AREA_BOX: u32 = 975;
+pub const F_WIDTH: u32 = 976;
+pub const F_HEIGHT: u32 = 977;
+pub const F_BOX_DISTANCE: u32 = 978;
+pub const F_AREA_PATH: u32 = 979;
+pub const F_BOX_INTERSECT: u32 = 980;
+pub const F_DIAGONAL: u32 = 981;
+pub const F_PATH_N_LT: u32 = 982;
+pub const F_PATH_N_GT: u32 = 983;
+pub const F_PATH_N_EQ: u32 = 984;
+pub const F_PATH_N_LE: u32 = 985;
+pub const F_PATH_N_GE: u32 = 986;
+pub const F_PATH_LENGTH: u32 = 987;
+pub const F_POINT_NE: u32 = 988;
+pub const F_POINT_VERT: u32 = 989;
+pub const F_POINT_HORIZ: u32 = 990;
+pub const F_POINT_DISTANCE: u32 = 991;
+pub const F_SLOPE: u32 = 992;
+pub const F_LSEG_POINT_POINT: u32 = 993;
+pub const F_LSEG_INTERSECT: u32 = 994;
+pub const F_LSEG_PARALLEL: u32 = 995;
+pub const F_LSEG_PERP: u32 = 996;
+pub const F_LSEG_VERTICAL: u32 = 997;
+pub const F_LSEG_HORIZONTAL: u32 = 998;
+pub const F_LSEG_EQ: u32 = 999;
+pub const F_LO_TRUNCATE: u32 = 1004;
+pub const F_TEXTLIKE_SUPPORT: u32 = 1023;
+pub const F_TEXTICREGEXEQ_SUPPORT: u32 = 1024;
+pub const F_TEXTICLIKE_SUPPORT: u32 = 1025;
+pub const F_TIMEZONE_INTERVAL_TIMESTAMPTZ: u32 = 1026;
+pub const F_GIST_POINT_COMPRESS: u32 = 1030;
+pub const F_ACLITEMIN: u32 = 1031;
+pub const F_ACLITEMOUT: u32 = 1032;
+pub const F_ACLINSERT: u32 = 1035;
+pub const F_ACLREMOVE: u32 = 1036;
+pub const F_ACLCONTAINS: u32 = 1037;
+pub const F_GETDATABASEENCODING: u32 = 1039;
+pub const F_BPCHARIN: u32 = 1044;
+pub const F_BPCHAROUT: u32 = 1045;
+pub const F_VARCHARIN: u32 = 1046;
+pub const F_VARCHAROUT: u32 = 1047;
+pub const F_BPCHAREQ: u32 = 1048;
+pub const F_BPCHARLT: u32 = 1049;
+pub const F_BPCHARLE: u32 = 1050;
+pub const F_BPCHARGT: u32 = 1051;
+pub const F_BPCHARGE: u32 = 1052;
+pub const F_BPCHARNE: u32 = 1053;
+pub const F_ACLITEMEQ: u32 = 1062;
+pub const F_BPCHAR_LARGER: u32 = 1063;
+pub const F_BPCHAR_SMALLER: u32 = 1064;
+pub const F_PG_PREPARED_XACT: u32 = 1065;
+pub const F_GENERATE_SERIES_INT4_INT4_INT4: u32 = 1066;
+pub const F_GENERATE_SERIES_INT4_INT4: u32 = 1067;
+pub const F_GENERATE_SERIES_INT8_INT8_INT8: u32 = 1068;
+pub const F_GENERATE_SERIES_INT8_INT8: u32 = 1069;
+pub const F_BPCHARCMP: u32 = 1078;
+pub const F_REGCLASS: u32 = 1079;
+pub const F_HASHBPCHAR: u32 = 1080;
+pub const F_FORMAT_TYPE: u32 = 1081;
+pub const F_DATE_IN: u32 = 1084;
+pub const F_DATE_OUT: u32 = 1085;
+pub const F_DATE_EQ: u32 = 1086;
+pub const F_DATE_LT: u32 = 1087;
+pub const F_DATE_LE: u32 = 1088;
+pub const F_DATE_GT: u32 = 1089;
+pub const F_DATE_GE: u32 = 1090;
+pub const F_DATE_NE: u32 = 1091;
+pub const F_DATE_CMP: u32 = 1092;
+pub const F_TIME_LT: u32 = 1102;
+pub const F_TIME_LE: u32 = 1103;
+pub const F_TIME_GT: u32 = 1104;
+pub const F_TIME_GE: u32 = 1105;
+pub const F_TIME_NE: u32 = 1106;
+pub const F_TIME_CMP: u32 = 1107;
+pub const F_PG_STAT_GET_WAL: u32 = 1136;
+pub const F_PG_GET_WAL_REPLAY_PAUSE_STATE: u32 = 1137;
+pub const F_DATE_LARGER: u32 = 1138;
+pub const F_DATE_SMALLER: u32 = 1139;
+pub const F_DATE_MI: u32 = 1140;
+pub const F_DATE_PLI: u32 = 1141;
+pub const F_DATE_MII: u32 = 1142;
+pub const F_TIME_IN: u32 = 1143;
+pub const F_TIME_OUT: u32 = 1144;
+pub const F_TIME_EQ: u32 = 1145;
+pub const F_CIRCLE_ADD_PT: u32 = 1146;
+pub const F_CIRCLE_SUB_PT: u32 = 1147;
+pub const F_CIRCLE_MUL_PT: u32 = 1148;
+pub const F_CIRCLE_DIV_PT: u32 = 1149;
+pub const F_TIMESTAMPTZ_IN: u32 = 1150;
+pub const F_TIMESTAMPTZ_OUT: u32 = 1151;
+pub const F_TIMESTAMPTZ_EQ: u32 = 1152;
+pub const F_TIMESTAMPTZ_NE: u32 = 1153;
+pub const F_TIMESTAMPTZ_LT: u32 = 1154;
+pub const F_TIMESTAMPTZ_LE: u32 = 1155;
+pub const F_TIMESTAMPTZ_GE: u32 = 1156;
+pub const F_TIMESTAMPTZ_GT: u32 = 1157;
+pub const F_TO_TIMESTAMP_FLOAT8: u32 = 1158;
+pub const F_TIMEZONE_TEXT_TIMESTAMPTZ: u32 = 1159;
+pub const F_INTERVAL_IN: u32 = 1160;
+pub const F_INTERVAL_OUT: u32 = 1161;
+pub const F_INTERVAL_EQ: u32 = 1162;
+pub const F_INTERVAL_NE: u32 = 1163;
+pub const F_INTERVAL_LT: u32 = 1164;
+pub const F_INTERVAL_LE: u32 = 1165;
+pub const F_INTERVAL_GE: u32 = 1166;
+pub const F_INTERVAL_GT: u32 = 1167;
+pub const F_INTERVAL_UM: u32 = 1168;
+pub const F_INTERVAL_PL: u32 = 1169;
+pub const F_INTERVAL_MI: u32 = 1170;
+pub const F_DATE_PART_TEXT_TIMESTAMPTZ: u32 = 1171;
+pub const F_DATE_PART_TEXT_INTERVAL: u32 = 1172;
+pub const F_NETWORK_SUBSET_SUPPORT: u32 = 1173;
+pub const F_TIMESTAMPTZ_DATE: u32 = 1174;
+pub const F_JUSTIFY_HOURS: u32 = 1175;
+pub const F_TIMESTAMPTZ_DATE_TIME: u32 = 1176;
+pub const F_JSONB_PATH_EXISTS_TZ: u32 = 1177;
+pub const F_DATE_TIMESTAMPTZ: u32 = 1178;
+pub const F_JSONB_PATH_QUERY_TZ: u32 = 1179;
+pub const F_JSONB_PATH_QUERY_ARRAY_TZ: u32 = 1180;
+pub const F_AGE_XID: u32 = 1181;
+pub const F_TIMESTAMPTZ_MI: u32 = 1188;
+pub const F_TIMESTAMPTZ_PL_INTERVAL: u32 = 1189;
+pub const F_TIMESTAMPTZ_MI_INTERVAL: u32 = 1190;
+pub const F_GENERATE_SUBSCRIPTS_ANYARRAY_INT4_BOOL: u32 = 1191;
+pub const F_GENERATE_SUBSCRIPTS_ANYARRAY_INT4: u32 = 1192;
+pub const F_ARRAY_FILL_ANYELEMENT__INT4: u32 = 1193;
+pub const F_LOG10_FLOAT8: u32 = 1194;
+pub const F_TIMESTAMPTZ_SMALLER: u32 = 1195;
+pub const F_TIMESTAMPTZ_LARGER: u32 = 1196;
+pub const F_INTERVAL_SMALLER: u32 = 1197;
+pub const F_INTERVAL_LARGER: u32 = 1198;
+pub const F_AGE_TIMESTAMPTZ_TIMESTAMPTZ: u32 = 1199;
+pub const F_INTERVAL_INTERVAL_INT4: u32 = 1200;
+pub const F_OBJ_DESCRIPTION_OID_NAME: u32 = 1215;
+pub const F_COL_DESCRIPTION: u32 = 1216;
+pub const F_DATE_TRUNC_TEXT_TIMESTAMPTZ: u32 = 1217;
+pub const F_DATE_TRUNC_TEXT_INTERVAL: u32 = 1218;
+pub const F_INT8INC: u32 = 1219;
+pub const F_INT8ABS: u32 = 1230;
+pub const F_INT8LARGER: u32 = 1236;
+pub const F_INT8SMALLER: u32 = 1237;
+pub const F_TEXTICREGEXEQ: u32 = 1238;
+pub const F_TEXTICREGEXNE: u32 = 1239;
+pub const F_NAMEICREGEXEQ: u32 = 1240;
+pub const F_NAMEICREGEXNE: u32 = 1241;
+pub const F_BOOLIN: u32 = 1242;
+pub const F_BOOLOUT: u32 = 1243;
+pub const F_BYTEAIN: u32 = 1244;
+pub const F_CHARIN: u32 = 1245;
+pub const F_CHARLT: u32 = 1246;
+pub const F_UNIQUE_KEY_RECHECK: u32 = 1250;
+pub const F_INT4ABS: u32 = 1251;
+pub const F_NAMEREGEXNE: u32 = 1252;
+pub const F_INT2ABS: u32 = 1253;
+pub const F_TEXTREGEXEQ: u32 = 1254;
+pub const F_TEXTREGEXNE: u32 = 1256;
+pub const F_TEXTLEN: u32 = 1257;
+pub const F_TEXTCAT: u32 = 1258;
+pub const F_PG_CHAR_TO_ENCODING: u32 = 1264;
+pub const F_TIDNE: u32 = 1265;
+pub const F_CIDR_IN: u32 = 1267;
+pub const F_PARSE_IDENT: u32 = 1268;
+pub const F_PG_COLUMN_SIZE: u32 = 1269;
+pub const F_OVERLAPS_TIMETZ_TIMETZ_TIMETZ_TIMETZ: u32 = 1271;
+pub const F_DATETIME_PL: u32 = 1272;
+pub const F_DATE_PART_TEXT_TIMETZ: u32 = 1273;
+pub const F_INT84PL: u32 = 1274;
+pub const F_INT84MI: u32 = 1275;
+pub const F_INT84MUL: u32 = 1276;
+pub const F_INT84DIV: u32 = 1277;
+pub const F_INT48PL: u32 = 1278;
+pub const F_INT48MI: u32 = 1279;
+pub const F_INT48MUL: u32 = 1280;
+pub const F_INT48DIV: u32 = 1281;
+pub const F_QUOTE_IDENT: u32 = 1282;
+pub const F_QUOTE_LITERAL_TEXT: u32 = 1283;
+pub const F_DATE_TRUNC_TEXT_TIMESTAMPTZ_TEXT: u32 = 1284;
+pub const F_QUOTE_LITERAL_ANYELEMENT: u32 = 1285;
+pub const F_ARRAY_FILL_ANYELEMENT__INT4__INT4: u32 = 1286;
+pub const F_OID: Oid = Oid(1287);
+pub const F_INT8_OID: Oid = Oid(1288);
+pub const F_QUOTE_NULLABLE_TEXT: u32 = 1289;
+pub const F_QUOTE_NULLABLE_ANYELEMENT: u32 = 1290;
+pub const F_SUPPRESS_REDUNDANT_UPDATES_TRIGGER: u32 = 1291;
+pub const F_TIDEQ: u32 = 1292;
+pub const F_UNNEST_ANYMULTIRANGE: u32 = 1293;
+pub const F_CURRTID2: u32 = 1294;
+pub const F_JUSTIFY_DAYS: u32 = 1295;
+pub const F_TIMEDATE_PL: u32 = 1296;
+pub const F_DATETIMETZ_PL: u32 = 1297;
+pub const F_TIMETZDATE_PL: u32 = 1298;
+pub const F_NOW: u32 = 1299;
+pub const F_POSITIONSEL: u32 = 1300;
+pub const F_POSITIONJOINSEL: u32 = 1301;
+pub const F_CONTSEL: u32 = 1302;
+pub const F_CONTJOINSEL: u32 = 1303;
+pub const F_OVERLAPS_TIMESTAMPTZ_TIMESTAMPTZ_TIMESTAMPTZ_TIMESTAMPTZ: u32 = 1304;
+pub const F_OVERLAPS_TIMESTAMPTZ_INTERVAL_TIMESTAMPTZ_INTERVAL: u32 = 1305;
+pub const F_OVERLAPS_TIMESTAMPTZ_TIMESTAMPTZ_TIMESTAMPTZ_INTERVAL: u32 = 1306;
+pub const F_OVERLAPS_TIMESTAMPTZ_INTERVAL_TIMESTAMPTZ_TIMESTAMPTZ: u32 = 1307;
+pub const F_OVERLAPS_TIME_TIME_TIME_TIME: u32 = 1308;
+pub const F_OVERLAPS_TIME_INTERVAL_TIME_INTERVAL: u32 = 1309;
+pub const F_OVERLAPS_TIME_TIME_TIME_INTERVAL: u32 = 1310;
+pub const F_OVERLAPS_TIME_INTERVAL_TIME_TIME: u32 = 1311;
+pub const F_TIMESTAMP_IN: u32 = 1312;
+pub const F_TIMESTAMP_OUT: u32 = 1313;
+pub const F_TIMESTAMPTZ_CMP: u32 = 1314;
+pub const F_INTERVAL_CMP: u32 = 1315;
+pub const F_TIME_TIMESTAMP: u32 = 1316;
+pub const F_LENGTH_TEXT: u32 = 1317;
+pub const F_LENGTH_BPCHAR: u32 = 1318;
+pub const F_XIDEQINT4: u32 = 1319;
+pub const F_INTERVAL_DIV: u32 = 1326;
+pub const F_DLOG10: u32 = 1339;
+pub const F_LOG_FLOAT8: u32 = 1340;
+pub const F_LN_FLOAT8: u32 = 1341;
+pub const F_ROUND_FLOAT8: u32 = 1342;
+pub const F_TRUNC_FLOAT8: u32 = 1343;
+pub const F_SQRT_FLOAT8: u32 = 1344;
+pub const F_CBRT: u32 = 1345;
+pub const F_POW_FLOAT8_FLOAT8: u32 = 1346;
+pub const F_EXP_FLOAT8: u32 = 1347;
+pub const F_OBJ_DESCRIPTION_OID: Oid = Oid(1348);
+pub const F_OIDVECTORTYPES: u32 = 1349;
+pub const F_TIMETZ_IN: u32 = 1350;
+pub const F_TIMETZ_OUT: u32 = 1351;
+pub const F_TIMETZ_EQ: u32 = 1352;
+pub const F_TIMETZ_NE: u32 = 1353;
+pub const F_TIMETZ_LT: u32 = 1354;
+pub const F_TIMETZ_LE: u32 = 1355;
+pub const F_TIMETZ_GE: u32 = 1356;
+pub const F_TIMETZ_GT: u32 = 1357;
+pub const F_TIMETZ_CMP: u32 = 1358;
+pub const F_TIMESTAMPTZ_DATE_TIMETZ: u32 = 1359;
+pub const F_HOSTMASK: u32 = 1362;
+pub const F_TEXTREGEXEQ_SUPPORT: u32 = 1364;
+pub const F_MAKEACLITEM: u32 = 1365;
+pub const F_CHARACTER_LENGTH_BPCHAR: u32 = 1367;
+pub const F_POWER_FLOAT8_FLOAT8: u32 = 1368;
+pub const F_CHARACTER_LENGTH_TEXT: u32 = 1369;
+pub const F_INTERVAL_TIME: u32 = 1370;
+pub const F_PG_LOCK_STATUS: u32 = 1371;
+pub const F_CHAR_LENGTH_BPCHAR: u32 = 1372;
+pub const F_ISFINITE_DATE: u32 = 1373;
+pub const F_OCTET_LENGTH_TEXT: u32 = 1374;
+pub const F_OCTET_LENGTH_BPCHAR: u32 = 1375;
+pub const F_FACTORIAL: u32 = 1376;
+pub const F_TIME_LARGER: u32 = 1377;
+pub const F_TIME_SMALLER: u32 = 1378;
+pub const F_TIMETZ_LARGER: u32 = 1379;
+pub const F_TIMETZ_SMALLER: u32 = 1380;
+pub const F_CHAR_LENGTH_TEXT: u32 = 1381;
+pub const F_DATE_PART_TEXT_DATE: u32 = 1384;
+pub const F_DATE_PART_TEXT_TIME: u32 = 1385;
+pub const F_AGE_TIMESTAMPTZ: u32 = 1386;
+pub const F_PG_GET_CONSTRAINTDEF_OID: Oid = Oid(1387);
+pub const F_TIMETZ_TIMESTAMPTZ: u32 = 1388;
+pub const F_ISFINITE_TIMESTAMPTZ: u32 = 1389;
+pub const F_ISFINITE_INTERVAL: u32 = 1390;
+pub const F_PG_STAT_GET_BACKEND_START: u32 = 1391;
+pub const F_PG_STAT_GET_BACKEND_CLIENT_ADDR: u32 = 1392;
+pub const F_PG_STAT_GET_BACKEND_CLIENT_PORT: u32 = 1393;
+pub const F_ABS_FLOAT4: u32 = 1394;
+pub const F_ABS_FLOAT8: u32 = 1395;
+pub const F_ABS_INT8: u32 = 1396;
+pub const F_ABS_INT4: u32 = 1397;
+pub const F_ABS_INT2: u32 = 1398;
+pub const F_NAME_VARCHAR: u32 = 1400;
+pub const F_VARCHAR_NAME: u32 = 1401;
+pub const F_CURRENT_SCHEMA: u32 = 1402;
+pub const F_CURRENT_SCHEMAS: u32 = 1403;
+pub const F_OVERLAY_TEXT_TEXT_INT4_INT4: u32 = 1404;
+pub const F_OVERLAY_TEXT_TEXT_INT4: u32 = 1405;
+pub const F_ISVERTICAL_POINT_POINT: u32 = 1406;
+pub const F_ISHORIZONTAL_POINT_POINT: u32 = 1407;
+pub const F_ISPARALLEL_LSEG_LSEG: u32 = 1408;
+pub const F_ISPERP_LSEG_LSEG: u32 = 1409;
+pub const F_ISVERTICAL_LSEG: u32 = 1410;
+pub const F_ISHORIZONTAL_LSEG: u32 = 1411;
+pub const F_ISPARALLEL_LINE_LINE: u32 = 1412;
+pub const F_ISPERP_LINE_LINE: u32 = 1413;
+pub const F_ISVERTICAL_LINE: u32 = 1414;
+pub const F_ISHORIZONTAL_LINE: u32 = 1415;
+pub const F_POINT_CIRCLE: u32 = 1416;
+pub const F_TIME_INTERVAL: u32 = 1419;
+pub const F_BOX_POINT_POINT: u32 = 1421;
+pub const F_BOX_ADD: u32 = 1422;
+pub const F_BOX_SUB: u32 = 1423;
+pub const F_BOX_MUL: u32 = 1424;
+pub const F_BOX_DIV: u32 = 1425;
+pub const F_PATH_CONTAIN_PT: u32 = 1426;
+pub const F_CIDR_OUT: u32 = 1427;
+pub const F_POLY_CONTAIN_PT: u32 = 1428;
+pub const F_PT_CONTAINED_POLY: u32 = 1429;
+pub const F_ISCLOSED: u32 = 1430;
+pub const F_ISOPEN: u32 = 1431;
+pub const F_PATH_NPOINTS: u32 = 1432;
+pub const F_PCLOSE: u32 = 1433;
+pub const F_POPEN: u32 = 1434;
+pub const F_PATH_ADD: u32 = 1435;
+pub const F_PATH_ADD_PT: u32 = 1436;
+pub const F_PATH_SUB_PT: u32 = 1437;
+pub const F_PATH_MUL_PT: u32 = 1438;
+pub const F_PATH_DIV_PT: u32 = 1439;
+pub const F_POINT_FLOAT8_FLOAT8: u32 = 1440;
+pub const F_POINT_ADD: u32 = 1441;
+pub const F_POINT_SUB: u32 = 1442;
+pub const F_POINT_MUL: u32 = 1443;
+pub const F_POINT_DIV: u32 = 1444;
+pub const F_POLY_NPOINTS: u32 = 1445;
+pub const F_BOX_POLYGON: u32 = 1446;
+pub const F_PATH: u32 = 1447;
+pub const F_POLYGON_BOX: u32 = 1448;
+pub const F_POLYGON_PATH: u32 = 1449;
+pub const F_CIRCLE_IN: u32 = 1450;
+pub const F_CIRCLE_OUT: u32 = 1451;
+pub const F_CIRCLE_SAME: u32 = 1452;
+pub const F_CIRCLE_CONTAIN: u32 = 1453;
+pub const F_CIRCLE_LEFT: u32 = 1454;
+pub const F_CIRCLE_OVERLEFT: u32 = 1455;
+pub const F_CIRCLE_OVERRIGHT: u32 = 1456;
+pub const F_CIRCLE_RIGHT: u32 = 1457;
+pub const F_CIRCLE_CONTAINED: u32 = 1458;
+pub const F_CIRCLE_OVERLAP: u32 = 1459;
+pub const F_CIRCLE_BELOW: u32 = 1460;
+pub const F_CIRCLE_ABOVE: u32 = 1461;
+pub const F_CIRCLE_EQ: u32 = 1462;
+pub const F_CIRCLE_NE: u32 = 1463;
+pub const F_CIRCLE_LT: u32 = 1464;
+pub const F_CIRCLE_GT: u32 = 1465;
+pub const F_CIRCLE_LE: u32 = 1466;
+pub const F_CIRCLE_GE: u32 = 1467;
+pub const F_AREA_CIRCLE: u32 = 1468;
+pub const F_DIAMETER: u32 = 1469;
+pub const F_RADIUS: u32 = 1470;
+pub const F_CIRCLE_DISTANCE: u32 = 1471;
+pub const F_CIRCLE_CENTER: u32 = 1472;
+pub const F_CIRCLE_POINT_FLOAT8: u32 = 1473;
+pub const F_CIRCLE_POLYGON: u32 = 1474;
+pub const F_POLYGON_INT4_CIRCLE: u32 = 1475;
+pub const F_DIST_PC: u32 = 1476;
+pub const F_CIRCLE_CONTAIN_PT: u32 = 1477;
+pub const F_PT_CONTAINED_CIRCLE: u32 = 1478;
+pub const F_CIRCLE_BOX: u32 = 1479;
+pub const F_BOX_CIRCLE: u32 = 1480;
+pub const F_LOG10_NUMERIC: u32 = 1481;
+pub const F_LSEG_NE: u32 = 1482;
+pub const F_LSEG_LT: u32 = 1483;
+pub const F_LSEG_LE: u32 = 1484;
+pub const F_LSEG_GT: u32 = 1485;
+pub const F_LSEG_GE: u32 = 1486;
+pub const F_LSEG_LENGTH: u32 = 1487;
+pub const F_CLOSE_LS: u32 = 1488;
+pub const F_CLOSE_LSEG: u32 = 1489;
+pub const F_LINE_IN: u32 = 1490;
+pub const F_LINE_OUT: u32 = 1491;
+pub const F_LINE_EQ: u32 = 1492;
+pub const F_LINE: u32 = 1493;
+pub const F_LINE_INTERPT: u32 = 1494;
+pub const F_LINE_INTERSECT: u32 = 1495;
+pub const F_LINE_PARALLEL: u32 = 1496;
+pub const F_LINE_PERP: u32 = 1497;
+pub const F_LINE_VERTICAL: u32 = 1498;
+pub const F_LINE_HORIZONTAL: u32 = 1499;
+pub const F_LENGTH_LSEG: u32 = 1530;
+pub const F_LENGTH_PATH: u32 = 1531;
+pub const F_POINT_LSEG: u32 = 1532;
+pub const F_POINT_BOX: u32 = 1534;
+pub const F_POINT_POLYGON: u32 = 1540;
+pub const F_LSEG_BOX: u32 = 1541;
+pub const F_CENTER_BOX: u32 = 1542;
+pub const F_CENTER_CIRCLE: u32 = 1543;
+pub const F_POLYGON_CIRCLE: u32 = 1544;
+pub const F_NPOINTS_PATH: u32 = 1545;
+pub const F_NPOINTS_POLYGON: u32 = 1556;
+pub const F_BIT_IN: u32 = 1564;
+pub const F_BIT_OUT: u32 = 1565;
+pub const F_LIKE_TEXT_TEXT: u32 = 1569;
+pub const F_NOTLIKE_TEXT_TEXT: u32 = 1570;
+pub const F_LIKE_NAME_TEXT: u32 = 1571;
+pub const F_NOTLIKE_NAME_TEXT: u32 = 1572;
+pub const F_PG_GET_RULEDEF_OID: Oid = Oid(1573);
+pub const F_NEXTVAL: u32 = 1574;
+pub const F_CURRVAL: u32 = 1575;
+pub const F_SETVAL_REGCLASS_INT8: u32 = 1576;
+pub const F_VARBIT_IN: u32 = 1579;
+pub const F_VARBIT_OUT: u32 = 1580;
+pub const F_BITEQ: u32 = 1581;
+pub const F_BITNE: u32 = 1582;
+pub const F_BITGE: u32 = 1592;
+pub const F_BITGT: u32 = 1593;
+pub const F_BITLE: u32 = 1594;
+pub const F_BITLT: u32 = 1595;
+pub const F_BITCMP: u32 = 1596;
+pub const F_PG_ENCODING_TO_CHAR: u32 = 1597;
+pub const F_RANDOM: u32 = 1598;
+pub const F_SETSEED: u32 = 1599;
+pub const F_ASIN: u32 = 1600;
+pub const F_ACOS: u32 = 1601;
+pub const F_ATAN: u32 = 1602;
+pub const F_ATAN2: u32 = 1603;
+pub const F_SIN: u32 = 1604;
+pub const F_COS: u32 = 1605;
+pub const F_TAN: u32 = 1606;
+pub const F_COT: u32 = 1607;
+pub const F_DEGREES: u32 = 1608;
+pub const F_RADIANS: u32 = 1609;
+pub const F_PI: u32 = 1610;
+pub const F_INTERVAL_MUL: u32 = 1618;
+pub const F_PG_TYPEOF: u32 = 1619;
+pub const F_ASCII: u32 = 1620;
+pub const F_CHR: u32 = 1621;
+pub const F_REPEAT: u32 = 1622;
+pub const F_SIMILAR_ESCAPE: u32 = 1623;
+pub const F_MUL_D_INTERVAL: u32 = 1624;
+pub const F_BPCHARLIKE: u32 = 1631;
+pub const F_BPCHARNLIKE: u32 = 1632;
+pub const F_TEXTICLIKE: u32 = 1633;
+pub const F_TEXTICNLIKE: u32 = 1634;
+pub const F_NAMEICLIKE: u32 = 1635;
+pub const F_NAMEICNLIKE: u32 = 1636;
+pub const F_LIKE_ESCAPE_TEXT_TEXT: u32 = 1637;
+pub const F_OIDGT: u32 = 1638;
+pub const F_OIDGE: u32 = 1639;
+pub const F_PG_GET_VIEWDEF_TEXT: u32 = 1640;
+pub const F_PG_GET_VIEWDEF_OID: Oid = Oid(1641);
+pub const F_PG_GET_USERBYID: u32 = 1642;
+pub const F_PG_GET_INDEXDEF_OID: Oid = Oid(1643);
+pub const F_RI_FKEY_CHECK_INS: u32 = 1644;
+pub const F_RI_FKEY_CHECK_UPD: u32 = 1645;
+pub const F_RI_FKEY_CASCADE_DEL: u32 = 1646;
+pub const F_RI_FKEY_CASCADE_UPD: u32 = 1647;
+pub const F_RI_FKEY_RESTRICT_DEL: u32 = 1648;
+pub const F_RI_FKEY_RESTRICT_UPD: u32 = 1649;
+pub const F_RI_FKEY_SETNULL_DEL: u32 = 1650;
+pub const F_RI_FKEY_SETNULL_UPD: u32 = 1651;
+pub const F_RI_FKEY_SETDEFAULT_DEL: u32 = 1652;
+pub const F_RI_FKEY_SETDEFAULT_UPD: u32 = 1653;
+pub const F_RI_FKEY_NOACTION_DEL: u32 = 1654;
+pub const F_RI_FKEY_NOACTION_UPD: u32 = 1655;
+pub const F_BPCHARICREGEXEQ: u32 = 1656;
+pub const F_BPCHARICREGEXNE: u32 = 1657;
+pub const F_BPCHARREGEXEQ: u32 = 1658;
+pub const F_BPCHARREGEXNE: u32 = 1659;
+pub const F_BPCHARICLIKE: u32 = 1660;
+pub const F_BPCHARICNLIKE: u32 = 1661;
+pub const F_PG_GET_TRIGGERDEF_OID: Oid = Oid(1662);
+pub const F_PG_GET_SERIAL_SEQUENCE: u32 = 1665;
+pub const F_VARBITEQ: u32 = 1666;
+pub const F_VARBITNE: u32 = 1667;
+pub const F_VARBITGE: u32 = 1668;
+pub const F_VARBITGT: u32 = 1669;
+pub const F_VARBITLE: u32 = 1670;
+pub const F_VARBITLT: u32 = 1671;
+pub const F_VARBITCMP: u32 = 1672;
+pub const F_BITAND: u32 = 1673;
+pub const F_BITOR: u32 = 1674;
+pub const F_BITXOR: u32 = 1675;
+pub const F_BITNOT: u32 = 1676;
+pub const F_BITSHIFTLEFT: u32 = 1677;
+pub const F_BITSHIFTRIGHT: u32 = 1678;
+pub const F_BITCAT: u32 = 1679;
+pub const F_SUBSTRING_BIT_INT4_INT4: u32 = 1680;
+pub const F_LENGTH_BIT: u32 = 1681;
+pub const F_OCTET_LENGTH_BIT: u32 = 1682;
+pub const F_BIT_INT4_INT4: u32 = 1683;
+pub const F_INT4_BIT: u32 = 1684;
+pub const F_BIT_BIT_INT4_BOOL: u32 = 1685;
+pub const F_PG_GET_KEYWORDS: u32 = 1686;
+pub const F_VARBIT: u32 = 1687;
+pub const F_TIME_HASH: u32 = 1688;
+pub const F_ACLEXPLODE: u32 = 1689;
+pub const F_TIME_MI_TIME: u32 = 1690;
+pub const F_BOOLLE: u32 = 1691;
+pub const F_BOOLGE: u32 = 1692;
+pub const F_BTBOOLCMP: u32 = 1693;
+pub const F_TIMETZ_HASH: u32 = 1696;
+pub const F_INTERVAL_HASH: u32 = 1697;
+pub const F_POSITION_BIT_BIT: u32 = 1698;
+pub const F_SUBSTRING_BIT_INT4: u32 = 1699;
+pub const F_NUMERIC_IN: u32 = 1701;
+pub const F_NUMERIC_OUT: u32 = 1702;
+pub const F_NUMERIC_NUMERIC_INT4: u32 = 1703;
+pub const F_NUMERIC_ABS: u32 = 1704;
+pub const F_ABS_NUMERIC: u32 = 1705;
+pub const F_SIGN_NUMERIC: u32 = 1706;
+pub const F_ROUND_NUMERIC_INT4: u32 = 1707;
+pub const F_ROUND_NUMERIC: u32 = 1708;
+pub const F_TRUNC_NUMERIC_INT4: u32 = 1709;
+pub const F_TRUNC_NUMERIC: u32 = 1710;
+pub const F_CEIL_NUMERIC: u32 = 1711;
+pub const F_FLOOR_NUMERIC: u32 = 1712;
+pub const F_LENGTH_BYTEA_NAME: u32 = 1713;
+pub const F_CONVERT_FROM: u32 = 1714;
+pub const F_CIDR: u32 = 1715;
+pub const F_PG_GET_EXPR_PG_NODE_TREE_OID: Oid = Oid(1716);
+pub const F_CONVERT_TO: u32 = 1717;
+pub const F_NUMERIC_EQ: u32 = 1718;
+pub const F_NUMERIC_NE: u32 = 1719;
+pub const F_NUMERIC_GT: u32 = 1720;
+pub const F_NUMERIC_GE: u32 = 1721;
+pub const F_NUMERIC_LT: u32 = 1722;
+pub const F_NUMERIC_LE: u32 = 1723;
+pub const F_NUMERIC_ADD: u32 = 1724;
+pub const F_NUMERIC_SUB: u32 = 1725;
+pub const F_NUMERIC_MUL: u32 = 1726;
+pub const F_NUMERIC_DIV: u32 = 1727;
+pub const F_MOD_NUMERIC_NUMERIC: u32 = 1728;
+pub const F_NUMERIC_MOD: u32 = 1729;
+pub const F_SQRT_NUMERIC: u32 = 1730;
+pub const F_NUMERIC_SQRT: u32 = 1731;
+pub const F_EXP_NUMERIC: u32 = 1732;
+pub const F_NUMERIC_EXP: u32 = 1733;
+pub const F_LN_NUMERIC: u32 = 1734;
+pub const F_NUMERIC_LN: u32 = 1735;
+pub const F_LOG_NUMERIC_NUMERIC: u32 = 1736;
+pub const F_NUMERIC_LOG: u32 = 1737;
+pub const F_POW_NUMERIC_NUMERIC: u32 = 1738;
+pub const F_NUMERIC_POWER: u32 = 1739;
+pub const F_NUMERIC_INT4: u32 = 1740;
+pub const F_LOG_NUMERIC: u32 = 1741;
+pub const F_NUMERIC_FLOAT4: u32 = 1742;
+pub const F_NUMERIC_FLOAT8: u32 = 1743;
+pub const F_INT4_NUMERIC: u32 = 1744;
+pub const F_FLOAT4_NUMERIC: u32 = 1745;
+pub const F_FLOAT8_NUMERIC: u32 = 1746;
+pub const F_TIME_PL_INTERVAL: u32 = 1747;
+pub const F_TIME_MI_INTERVAL: u32 = 1748;
+pub const F_TIMETZ_PL_INTERVAL: u32 = 1749;
+pub const F_TIMETZ_MI_INTERVAL: u32 = 1750;
+pub const F_NUMERIC_INC: u32 = 1764;
+pub const F_SETVAL_REGCLASS_INT8_BOOL: u32 = 1765;
+pub const F_NUMERIC_SMALLER: u32 = 1766;
+pub const F_NUMERIC_LARGER: u32 = 1767;
+pub const F_TO_CHAR_INTERVAL_TEXT: u32 = 1768;
+pub const F_NUMERIC_CMP: u32 = 1769;
+pub const F_TO_CHAR_TIMESTAMPTZ_TEXT: u32 = 1770;
+pub const F_NUMERIC_UMINUS: u32 = 1771;
+pub const F_TO_CHAR_NUMERIC_TEXT: u32 = 1772;
+pub const F_TO_CHAR_INT4_TEXT: u32 = 1773;
+pub const F_TO_CHAR_INT8_TEXT: u32 = 1774;
+pub const F_TO_CHAR_FLOAT4_TEXT: u32 = 1775;
+pub const F_TO_CHAR_FLOAT8_TEXT: u32 = 1776;
+pub const F_TO_NUMBER: u32 = 1777;
+pub const F_TO_TIMESTAMP_TEXT_TEXT: u32 = 1778;
+pub const F_INT8_NUMERIC: u32 = 1779;
+pub const F_TO_DATE: u32 = 1780;
+pub const F_NUMERIC_INT8: u32 = 1781;
+pub const F_NUMERIC_INT2: u32 = 1782;
+pub const F_INT2_NUMERIC: u32 = 1783;
+pub const F_OIDIN: u32 = 1798;
+pub const F_OIDOUT: u32 = 1799;
+pub const F_BIT_LENGTH_BYTEA: u32 = 1810;
+pub const F_BIT_LENGTH_TEXT: u32 = 1811;
+pub const F_BIT_LENGTH_BIT: u32 = 1812;
+pub const F_CONVERT: u32 = 1813;
+pub const F_ICLIKESEL: u32 = 1814;
+pub const F_ICNLIKESEL: u32 = 1815;
+pub const F_ICLIKEJOINSEL: u32 = 1816;
+pub const F_ICNLIKEJOINSEL: u32 = 1817;
+pub const F_REGEXEQSEL: u32 = 1818;
+pub const F_LIKESEL: u32 = 1819;
+pub const F_ICREGEXEQSEL: u32 = 1820;
+pub const F_REGEXNESEL: u32 = 1821;
+pub const F_NLIKESEL: u32 = 1822;
+pub const F_ICREGEXNESEL: u32 = 1823;
+pub const F_REGEXEQJOINSEL: u32 = 1824;
+pub const F_LIKEJOINSEL: u32 = 1825;
+pub const F_ICREGEXEQJOINSEL: u32 = 1826;
+pub const F_REGEXNEJOINSEL: u32 = 1827;
+pub const F_NLIKEJOINSEL: u32 = 1828;
+pub const F_ICREGEXNEJOINSEL: u32 = 1829;
+pub const F_FLOAT8_AVG: u32 = 1830;
+pub const F_FLOAT8_VAR_SAMP: u32 = 1831;
+pub const F_FLOAT8_STDDEV_SAMP: u32 = 1832;
+pub const F_NUMERIC_ACCUM: u32 = 1833;
+pub const F_INT2_ACCUM: u32 = 1834;
+pub const F_INT4_ACCUM: u32 = 1835;
+pub const F_INT8_ACCUM: u32 = 1836;
+pub const F_NUMERIC_AVG: u32 = 1837;
+pub const F_NUMERIC_VAR_SAMP: u32 = 1838;
+pub const F_NUMERIC_STDDEV_SAMP: u32 = 1839;
+pub const F_INT2_SUM: u32 = 1840;
+pub const F_INT4_SUM: u32 = 1841;
+pub const F_INT8_SUM: u32 = 1842;
+pub const F_INTERVAL_ACCUM: u32 = 1843;
+pub const F_INTERVAL_AVG: u32 = 1844;
+pub const F_TO_ASCII_TEXT: u32 = 1845;
+pub const F_TO_ASCII_TEXT_INT4: u32 = 1846;
+pub const F_TO_ASCII_TEXT_NAME: u32 = 1847;
+pub const F_INTERVAL_PL_TIME: u32 = 1848;
+pub const F_INT28EQ: u32 = 1850;
+pub const F_INT28NE: u32 = 1851;
+pub const F_INT28LT: u32 = 1852;
+pub const F_INT28GT: u32 = 1853;
+pub const F_INT28LE: u32 = 1854;
+pub const F_INT28GE: u32 = 1855;
+pub const F_INT82EQ: u32 = 1856;
+pub const F_INT82NE: u32 = 1857;
+pub const F_INT82LT: u32 = 1858;
+pub const F_INT82GT: u32 = 1859;
+pub const F_INT82LE: u32 = 1860;
+pub const F_INT82GE: u32 = 1861;
+pub const F_INT2AND: u32 = 1892;
+pub const F_INT2OR: u32 = 1893;
+pub const F_INT2XOR: u32 = 1894;
+pub const F_INT2NOT: u32 = 1895;
+pub const F_INT2SHL: u32 = 1896;
+pub const F_INT2SHR: u32 = 1897;
+pub const F_INT4AND: u32 = 1898;
+pub const F_INT4OR: u32 = 1899;
+pub const F_INT4XOR: u32 = 1900;
+pub const F_INT4NOT: u32 = 1901;
+pub const F_INT4SHL: u32 = 1902;
+pub const F_INT4SHR: u32 = 1903;
+pub const F_INT8AND: u32 = 1904;
+pub const F_INT8OR: u32 = 1905;
+pub const F_INT8XOR: u32 = 1906;
+pub const F_INT8NOT: u32 = 1907;
+pub const F_INT8SHL: u32 = 1908;
+pub const F_INT8SHR: u32 = 1909;
+pub const F_INT8UP: u32 = 1910;
+pub const F_INT2UP: u32 = 1911;
+pub const F_INT4UP: u32 = 1912;
+pub const F_FLOAT4UP: u32 = 1913;
+pub const F_FLOAT8UP: u32 = 1914;
+pub const F_NUMERIC_UPLUS: u32 = 1915;
+pub const F_HAS_TABLE_PRIVILEGE_NAME_TEXT_TEXT: u32 = 1922;
+pub const F_HAS_TABLE_PRIVILEGE_NAME_OID_TEXT: u32 = 1923;
+pub const F_HAS_TABLE_PRIVILEGE_OID_TEXT_TEXT: u32 = 1924;
+pub const F_HAS_TABLE_PRIVILEGE_OID_OID_TEXT: u32 = 1925;
+pub const F_HAS_TABLE_PRIVILEGE_TEXT_TEXT: u32 = 1926;
+pub const F_HAS_TABLE_PRIVILEGE_OID_TEXT: u32 = 1927;
+pub const F_PG_STAT_GET_NUMSCANS: u32 = 1928;
+pub const F_PG_STAT_GET_TUPLES_RETURNED: u32 = 1929;
+pub const F_PG_STAT_GET_TUPLES_FETCHED: u32 = 1930;
+pub const F_PG_STAT_GET_TUPLES_INSERTED: u32 = 1931;
+pub const F_PG_STAT_GET_TUPLES_UPDATED: u32 = 1932;
+pub const F_PG_STAT_GET_TUPLES_DELETED: u32 = 1933;
+pub const F_PG_STAT_GET_BLOCKS_FETCHED: u32 = 1934;
+pub const F_PG_STAT_GET_BLOCKS_HIT: u32 = 1935;
+pub const F_PG_STAT_GET_BACKEND_IDSET: u32 = 1936;
+pub const F_PG_STAT_GET_BACKEND_PID: u32 = 1937;
+pub const F_PG_STAT_GET_BACKEND_DBID: u32 = 1938;
+pub const F_PG_STAT_GET_BACKEND_USERID: u32 = 1939;
+pub const F_PG_STAT_GET_BACKEND_ACTIVITY: u32 = 1940;
+pub const F_PG_STAT_GET_DB_NUMBACKENDS: u32 = 1941;
+pub const F_PG_STAT_GET_DB_XACT_COMMIT: u32 = 1942;
+pub const F_PG_STAT_GET_DB_XACT_ROLLBACK: u32 = 1943;
+pub const F_PG_STAT_GET_DB_BLOCKS_FETCHED: u32 = 1944;
+pub const F_PG_STAT_GET_DB_BLOCKS_HIT: u32 = 1945;
+pub const F_ENCODE: u32 = 1946;
+pub const F_DECODE: u32 = 1947;
+pub const F_BYTEAEQ: u32 = 1948;
+pub const F_BYTEALT: u32 = 1949;
+pub const F_BYTEALE: u32 = 1950;
+pub const F_BYTEAGT: u32 = 1951;
+pub const F_BYTEAGE: u32 = 1952;
+pub const F_BYTEANE: u32 = 1953;
+pub const F_BYTEACMP: u32 = 1954;
+pub const F_TIMESTAMP_TIMESTAMP_INT4: u32 = 1961;
+pub const F_INT2_AVG_ACCUM: u32 = 1962;
+pub const F_INT4_AVG_ACCUM: u32 = 1963;
+pub const F_INT8_AVG: u32 = 1964;
+pub const F_OIDLARGER: u32 = 1965;
+pub const F_OIDSMALLER: u32 = 1966;
+pub const F_TIMESTAMPTZ_TIMESTAMPTZ_INT4: u32 = 1967;
+pub const F_TIME_TIME_INT4: u32 = 1968;
+pub const F_TIMETZ_TIMETZ_INT4: u32 = 1969;
+pub const F_PG_STAT_GET_TUPLES_HOT_UPDATED: u32 = 1972;
+pub const F_DIV: u32 = 1973;
+pub const F_NUMERIC_DIV_TRUNC: u32 = 1980;
+pub const F_SIMILAR_TO_ESCAPE_TEXT_TEXT: u32 = 1986;
+pub const F_SIMILAR_TO_ESCAPE_TEXT: u32 = 1987;
+pub const F_SHOBJ_DESCRIPTION: u32 = 1993;
+pub const F_TEXTANYCAT: u32 = 2003;
+pub const F_ANYTEXTCAT: u32 = 2004;
+pub const F_BYTEALIKE: u32 = 2005;
+pub const F_BYTEANLIKE: u32 = 2006;
+pub const F_LIKE_BYTEA_BYTEA: u32 = 2007;
+pub const F_NOTLIKE_BYTEA_BYTEA: u32 = 2008;
+pub const F_LIKE_ESCAPE_BYTEA_BYTEA: u32 = 2009;
+pub const F_LENGTH_BYTEA: u32 = 2010;
+pub const F_BYTEACAT: u32 = 2011;
+pub const F_SUBSTRING_BYTEA_INT4_INT4: u32 = 2012;
+pub const F_SUBSTRING_BYTEA_INT4: u32 = 2013;
+pub const F_POSITION_BYTEA_BYTEA: u32 = 2014;
+pub const F_BTRIM_BYTEA_BYTEA: u32 = 2015;
+pub const F_TIME_TIMESTAMPTZ: u32 = 2019;
+pub const F_DATE_TRUNC_TEXT_TIMESTAMP: u32 = 2020;
+pub const F_DATE_PART_TEXT_TIMESTAMP: u32 = 2021;
+pub const F_PG_STAT_GET_ACTIVITY: u32 = 2022;
+pub const F_JSONB_PATH_QUERY_FIRST_TZ: u32 = 2023;
+pub const F_TIMESTAMP_DATE: u32 = 2024;
+pub const F_TIMESTAMP_DATE_TIME: u32 = 2025;
+pub const F_PG_BACKEND_PID: u32 = 2026;
+pub const F_TIMESTAMP_TIMESTAMPTZ: u32 = 2027;
+pub const F_TIMESTAMPTZ_TIMESTAMP: u32 = 2028;
+pub const F_DATE_TIMESTAMP: u32 = 2029;
+pub const F_JSONB_PATH_MATCH_TZ: u32 = 2030;
+pub const F_TIMESTAMP_MI: u32 = 2031;
+pub const F_TIMESTAMP_PL_INTERVAL: u32 = 2032;
+pub const F_TIMESTAMP_MI_INTERVAL: u32 = 2033;
+pub const F_PG_CONF_LOAD_TIME: u32 = 2034;
+pub const F_TIMESTAMP_SMALLER: u32 = 2035;
+pub const F_TIMESTAMP_LARGER: u32 = 2036;
+pub const F_TIMEZONE_TEXT_TIMETZ: u32 = 2037;
+pub const F_TIMEZONE_INTERVAL_TIMETZ: u32 = 2038;
+pub const F_TIMESTAMP_HASH: u32 = 2039;
+pub const F_OVERLAPS_TIMESTAMP_TIMESTAMP_TIMESTAMP_TIMESTAMP: u32 = 2041;
+pub const F_OVERLAPS_TIMESTAMP_INTERVAL_TIMESTAMP_INTERVAL: u32 = 2042;
+pub const F_OVERLAPS_TIMESTAMP_TIMESTAMP_TIMESTAMP_INTERVAL: u32 = 2043;
+pub const F_OVERLAPS_TIMESTAMP_INTERVAL_TIMESTAMP_TIMESTAMP: u32 = 2044;
+pub const F_TIMESTAMP_CMP: u32 = 2045;
+pub const F_TIME_TIMETZ: u32 = 2046;
+pub const F_TIMETZ_TIME: u32 = 2047;
+pub const F_ISFINITE_TIMESTAMP: u32 = 2048;
+pub const F_TO_CHAR_TIMESTAMP_TEXT: u32 = 2049;
+pub const F_MAX_ANYARRAY: u32 = 2050;
+pub const F_MIN_ANYARRAY: u32 = 2051;
+pub const F_TIMESTAMP_EQ: u32 = 2052;
+pub const F_TIMESTAMP_NE: u32 = 2053;
+pub const F_TIMESTAMP_LT: u32 = 2054;
+pub const F_TIMESTAMP_LE: u32 = 2055;
+pub const F_TIMESTAMP_GE: u32 = 2056;
+pub const F_TIMESTAMP_GT: u32 = 2057;
+pub const F_AGE_TIMESTAMP_TIMESTAMP: u32 = 2058;
+pub const F_AGE_TIMESTAMP: u32 = 2059;
+pub const F_TIMEZONE_TEXT_TIMESTAMP: u32 = 2069;
+pub const F_TIMEZONE_INTERVAL_TIMESTAMP: u32 = 2070;
+pub const F_DATE_PL_INTERVAL: u32 = 2071;
+pub const F_DATE_MI_INTERVAL: u32 = 2072;
+pub const F_SUBSTRING_TEXT_TEXT: u32 = 2073;
+pub const F_SUBSTRING_TEXT_TEXT_TEXT: u32 = 2074;
+pub const F_BIT_INT8_INT4: u32 = 2075;
+pub const F_INT8_BIT: u32 = 2076;
+pub const F_CURRENT_SETTING_TEXT: u32 = 2077;
+pub const F_SET_CONFIG: u32 = 2078;
+pub const F_PG_TABLE_IS_VISIBLE: u32 = 2079;
+pub const F_PG_TYPE_IS_VISIBLE: u32 = 2080;
+pub const F_PG_FUNCTION_IS_VISIBLE: u32 = 2081;
+pub const F_PG_OPERATOR_IS_VISIBLE: u32 = 2082;
+pub const F_PG_OPCLASS_IS_VISIBLE: u32 = 2083;
+pub const F_PG_SHOW_ALL_SETTINGS: u32 = 2084;
+pub const F_SUBSTR_BYTEA_INT4_INT4: u32 = 2085;
+pub const F_SUBSTR_BYTEA_INT4: u32 = 2086;
+pub const F_REPLACE: u32 = 2087;
+pub const F_SPLIT_PART: u32 = 2088;
+pub const F_TO_HEX_INT4: u32 = 2089;
+pub const F_TO_HEX_INT8: u32 = 2090;
+pub const F_ARRAY_LOWER: u32 = 2091;
+pub const F_ARRAY_UPPER: u32 = 2092;
+pub const F_PG_CONVERSION_IS_VISIBLE: u32 = 2093;
+pub const F_PG_STAT_GET_BACKEND_ACTIVITY_START: u32 = 2094;
+pub const F_PG_TERMINATE_BACKEND: u32 = 2096;
+pub const F_PG_GET_FUNCTIONDEF: u32 = 2098;
+pub const F_AVG_INT8: u32 = 2100;
+pub const F_AVG_INT4: u32 = 2101;
+pub const F_AVG_INT2: u32 = 2102;
+pub const F_AVG_NUMERIC: u32 = 2103;
+pub const F_AVG_FLOAT4: u32 = 2104;
+pub const F_AVG_FLOAT8: u32 = 2105;
+pub const F_AVG_INTERVAL: u32 = 2106;
+pub const F_SUM_INT8: u32 = 2107;
+pub const F_SUM_INT4: u32 = 2108;
+pub const F_SUM_INT2: u32 = 2109;
+pub const F_SUM_FLOAT4: u32 = 2110;
+pub const F_SUM_FLOAT8: u32 = 2111;
+pub const F_SUM_MONEY: u32 = 2112;
+pub const F_SUM_INTERVAL: u32 = 2113;
+pub const F_SUM_NUMERIC: u32 = 2114;
+pub const F_MAX_INT8: u32 = 2115;
+pub const F_MAX_INT4: u32 = 2116;
+pub const F_MAX_INT2: u32 = 2117;
+pub const F_MAX_OID: Oid = Oid(2118);
+pub const F_MAX_FLOAT4: u32 = 2119;
+pub const F_MAX_FLOAT8: u32 = 2120;
+pub const F_PG_COLUMN_COMPRESSION: u32 = 2121;
+pub const F_MAX_DATE: u32 = 2122;
+pub const F_MAX_TIME: u32 = 2123;
+pub const F_MAX_TIMETZ: u32 = 2124;
+pub const F_MAX_MONEY: u32 = 2125;
+pub const F_MAX_TIMESTAMP: u32 = 2126;
+pub const F_MAX_TIMESTAMPTZ: u32 = 2127;
+pub const F_MAX_INTERVAL: u32 = 2128;
+pub const F_MAX_TEXT: u32 = 2129;
+pub const F_MAX_NUMERIC: u32 = 2130;
+pub const F_MIN_INT8: u32 = 2131;
+pub const F_MIN_INT4: u32 = 2132;
+pub const F_MIN_INT2: u32 = 2133;
+pub const F_MIN_OID: Oid = Oid(2134);
+pub const F_MIN_FLOAT4: u32 = 2135;
+pub const F_MIN_FLOAT8: u32 = 2136;
+pub const F_PG_STAT_FORCE_NEXT_FLUSH: u32 = 2137;
+pub const F_MIN_DATE: u32 = 2138;
+pub const F_MIN_TIME: u32 = 2139;
+pub const F_MIN_TIMETZ: u32 = 2140;
+pub const F_MIN_MONEY: u32 = 2141;
+pub const F_MIN_TIMESTAMP: u32 = 2142;
+pub const F_MIN_TIMESTAMPTZ: u32 = 2143;
+pub const F_MIN_INTERVAL: u32 = 2144;
+pub const F_MIN_TEXT: u32 = 2145;
+pub const F_MIN_NUMERIC: u32 = 2146;
+pub const F_COUNT_ANY: u32 = 2147;
+pub const F_VARIANCE_INT8: u32 = 2148;
+pub const F_VARIANCE_INT4: u32 = 2149;
+pub const F_VARIANCE_INT2: u32 = 2150;
+pub const F_VARIANCE_FLOAT4: u32 = 2151;
+pub const F_VARIANCE_FLOAT8: u32 = 2152;
+pub const F_VARIANCE_NUMERIC: u32 = 2153;
+pub const F_STDDEV_INT8: u32 = 2154;
+pub const F_STDDEV_INT4: u32 = 2155;
+pub const F_STDDEV_INT2: u32 = 2156;
+pub const F_STDDEV_FLOAT4: u32 = 2157;
+pub const F_STDDEV_FLOAT8: u32 = 2158;
+pub const F_STDDEV_NUMERIC: u32 = 2159;
+pub const F_TEXT_PATTERN_LT: u32 = 2160;
+pub const F_TEXT_PATTERN_LE: u32 = 2161;
+pub const F_PG_GET_FUNCTION_ARGUMENTS: u32 = 2162;
+pub const F_TEXT_PATTERN_GE: u32 = 2163;
+pub const F_TEXT_PATTERN_GT: u32 = 2164;
+pub const F_PG_GET_FUNCTION_RESULT: u32 = 2165;
+pub const F_BTTEXT_PATTERN_CMP: u32 = 2166;
+pub const F_CEILING_NUMERIC: u32 = 2167;
+pub const F_PG_DATABASE_SIZE_NAME: u32 = 2168;
+pub const F_POWER_NUMERIC_NUMERIC: u32 = 2169;
+pub const F_WIDTH_BUCKET_NUMERIC_NUMERIC_NUMERIC_INT4: u32 = 2170;
+pub const F_PG_CANCEL_BACKEND: u32 = 2171;
+pub const F_PG_BACKUP_START: u32 = 2172;
+pub const F_BPCHAR_PATTERN_LT: u32 = 2174;
+pub const F_BPCHAR_PATTERN_LE: u32 = 2175;
+pub const F_ARRAY_LENGTH: u32 = 2176;
+pub const F_BPCHAR_PATTERN_GE: u32 = 2177;
+pub const F_BPCHAR_PATTERN_GT: u32 = 2178;
+pub const F_GIST_POINT_CONSISTENT: u32 = 2179;
+pub const F_BTBPCHAR_PATTERN_CMP: u32 = 2180;
+pub const F_HAS_SEQUENCE_PRIVILEGE_NAME_TEXT_TEXT: u32 = 2181;
+pub const F_HAS_SEQUENCE_PRIVILEGE_NAME_OID_TEXT: u32 = 2182;
+pub const F_HAS_SEQUENCE_PRIVILEGE_OID_TEXT_TEXT: u32 = 2183;
+pub const F_HAS_SEQUENCE_PRIVILEGE_OID_OID_TEXT: u32 = 2184;
+pub const F_HAS_SEQUENCE_PRIVILEGE_TEXT_TEXT: u32 = 2185;
+pub const F_HAS_SEQUENCE_PRIVILEGE_OID_TEXT: u32 = 2186;
+pub const F_BTINT48CMP: u32 = 2188;
+pub const F_BTINT84CMP: u32 = 2189;
+pub const F_BTINT24CMP: u32 = 2190;
+pub const F_BTINT42CMP: u32 = 2191;
+pub const F_BTINT28CMP: u32 = 2192;
+pub const F_BTINT82CMP: u32 = 2193;
+pub const F_BTFLOAT48CMP: u32 = 2194;
+pub const F_BTFLOAT84CMP: u32 = 2195;
+pub const F_INET_CLIENT_ADDR: u32 = 2196;
+pub const F_INET_CLIENT_PORT: u32 = 2197;
+pub const F_INET_SERVER_ADDR: u32 = 2198;
+pub const F_INET_SERVER_PORT: u32 = 2199;
+pub const F_REGPROCEDUREIN: u32 = 2212;
+pub const F_REGPROCEDUREOUT: u32 = 2213;
+pub const F_REGOPERIN: u32 = 2214;
+pub const F_REGOPEROUT: u32 = 2215;
+pub const F_REGOPERATORIN: u32 = 2216;
+pub const F_REGOPERATOROUT: u32 = 2217;
+pub const F_REGCLASSIN: u32 = 2218;
+pub const F_REGCLASSOUT: u32 = 2219;
+pub const F_REGTYPEIN: u32 = 2220;
+pub const F_REGTYPEOUT: u32 = 2221;
+pub const F_PG_STAT_CLEAR_SNAPSHOT: u32 = 2230;
+pub const F_PG_GET_FUNCTION_IDENTITY_ARGUMENTS: u32 = 2232;
+pub const F_HASHTID: u32 = 2233;
+pub const F_HASHTIDEXTENDED: u32 = 2234;
+pub const F_BIT_AND_INT2: u32 = 2236;
+pub const F_BIT_OR_INT2: u32 = 2237;
+pub const F_BIT_AND_INT4: u32 = 2238;
+pub const F_BIT_OR_INT4: u32 = 2239;
+pub const F_BIT_AND_INT8: u32 = 2240;
+pub const F_BIT_OR_INT8: u32 = 2241;
+pub const F_BIT_AND_BIT: u32 = 2242;
+pub const F_BIT_OR_BIT: u32 = 2243;
+pub const F_MAX_BPCHAR: u32 = 2244;
+pub const F_MIN_BPCHAR: u32 = 2245;
+pub const F_FMGR_INTERNAL_VALIDATOR: u32 = 2246;
+pub const F_FMGR_C_VALIDATOR: u32 = 2247;
+pub const F_FMGR_SQL_VALIDATOR: u32 = 2248;
+pub const F_HAS_DATABASE_PRIVILEGE_NAME_TEXT_TEXT: u32 = 2250;
+pub const F_HAS_DATABASE_PRIVILEGE_NAME_OID_TEXT: u32 = 2251;
+pub const F_HAS_DATABASE_PRIVILEGE_OID_TEXT_TEXT: u32 = 2252;
+pub const F_HAS_DATABASE_PRIVILEGE_OID_OID_TEXT: u32 = 2253;
+pub const F_HAS_DATABASE_PRIVILEGE_TEXT_TEXT: u32 = 2254;
+pub const F_HAS_DATABASE_PRIVILEGE_OID_TEXT: u32 = 2255;
+pub const F_HAS_FUNCTION_PRIVILEGE_NAME_TEXT_TEXT: u32 = 2256;
+pub const F_HAS_FUNCTION_PRIVILEGE_NAME_OID_TEXT: u32 = 2257;
+pub const F_HAS_FUNCTION_PRIVILEGE_OID_TEXT_TEXT: u32 = 2258;
+pub const F_HAS_FUNCTION_PRIVILEGE_OID_OID_TEXT: u32 = 2259;
+pub const F_HAS_FUNCTION_PRIVILEGE_TEXT_TEXT: u32 = 2260;
+pub const F_HAS_FUNCTION_PRIVILEGE_OID_TEXT: u32 = 2261;
+pub const F_HAS_LANGUAGE_PRIVILEGE_NAME_TEXT_TEXT: u32 = 2262;
+pub const F_HAS_LANGUAGE_PRIVILEGE_NAME_OID_TEXT: u32 = 2263;
+pub const F_HAS_LANGUAGE_PRIVILEGE_OID_TEXT_TEXT: u32 = 2264;
+pub const F_HAS_LANGUAGE_PRIVILEGE_OID_OID_TEXT: u32 = 2265;
+pub const F_HAS_LANGUAGE_PRIVILEGE_TEXT_TEXT: u32 = 2266;
+pub const F_HAS_LANGUAGE_PRIVILEGE_OID_TEXT: u32 = 2267;
+pub const F_HAS_SCHEMA_PRIVILEGE_NAME_TEXT_TEXT: u32 = 2268;
+pub const F_HAS_SCHEMA_PRIVILEGE_NAME_OID_TEXT: u32 = 2269;
+pub const F_HAS_SCHEMA_PRIVILEGE_OID_TEXT_TEXT: u32 = 2270;
+pub const F_HAS_SCHEMA_PRIVILEGE_OID_OID_TEXT: u32 = 2271;
+pub const F_HAS_SCHEMA_PRIVILEGE_TEXT_TEXT: u32 = 2272;
+pub const F_HAS_SCHEMA_PRIVILEGE_OID_TEXT: u32 = 2273;
+pub const F_PG_STAT_RESET: u32 = 2274;
+pub const F_PG_GET_BACKEND_MEMORY_CONTEXTS: u32 = 2282;
+pub const F_REGEXP_REPLACE_TEXT_TEXT_TEXT: u32 = 2284;
+pub const F_REGEXP_REPLACE_TEXT_TEXT_TEXT_TEXT: u32 = 2285;
+pub const F_PG_TOTAL_RELATION_SIZE: u32 = 2286;
+pub const F_PG_SIZE_PRETTY_INT8: u32 = 2288;
+pub const F_PG_OPTIONS_TO_TABLE: u32 = 2289;
+pub const F_RECORD_IN: u32 = 2290;
+pub const F_RECORD_OUT: u32 = 2291;
+pub const F_CSTRING_IN: u32 = 2292;
+pub const F_CSTRING_OUT: u32 = 2293;
+pub const F_ANY_IN: u32 = 2294;
+pub const F_ANY_OUT: u32 = 2295;
+pub const F_ANYARRAY_IN: u32 = 2296;
+pub const F_ANYARRAY_OUT: u32 = 2297;
+pub const F_VOID_IN: u32 = 2298;
+pub const F_VOID_OUT: u32 = 2299;
+pub const F_TRIGGER_IN: u32 = 2300;
+pub const F_TRIGGER_OUT: u32 = 2301;
+pub const F_LANGUAGE_HANDLER_IN: u32 = 2302;
+pub const F_LANGUAGE_HANDLER_OUT: u32 = 2303;
+pub const F_INTERNAL_IN: u32 = 2304;
+pub const F_INTERNAL_OUT: u32 = 2305;
+pub const F_PG_STAT_GET_SLRU: u32 = 2306;
+pub const F_PG_STAT_RESET_SLRU: u32 = 2307;
+pub const F_CEIL_FLOAT8: u32 = 2308;
+pub const F_FLOOR_FLOAT8: u32 = 2309;
+pub const F_SIGN_FLOAT8: u32 = 2310;
+pub const F_MD5_TEXT: u32 = 2311;
+pub const F_ANYELEMENT_IN: u32 = 2312;
+pub const F_ANYELEMENT_OUT: u32 = 2313;
+pub const F_POSTGRESQL_FDW_VALIDATOR: u32 = 2316;
+pub const F_PG_ENCODING_MAX_LENGTH: u32 = 2319;
+pub const F_CEILING_FLOAT8: u32 = 2320;
+pub const F_MD5_BYTEA: u32 = 2321;
+pub const F_PG_TABLESPACE_SIZE_OID: Oid = Oid(2322);
+pub const F_PG_TABLESPACE_SIZE_NAME: u32 = 2323;
+pub const F_PG_DATABASE_SIZE_OID: Oid = Oid(2324);
+pub const F_PG_RELATION_SIZE_REGCLASS: u32 = 2325;
+pub const F_UNNEST_ANYARRAY: u32 = 2331;
+pub const F_PG_RELATION_SIZE_REGCLASS_TEXT: u32 = 2332;
+pub const F_ARRAY_AGG_TRANSFN: u32 = 2333;
+pub const F_ARRAY_AGG_FINALFN: u32 = 2334;
+pub const F_ARRAY_AGG_ANYNONARRAY: u32 = 2335;
+pub const F_DATE_LT_TIMESTAMP: u32 = 2338;
+pub const F_DATE_LE_TIMESTAMP: u32 = 2339;
+pub const F_DATE_EQ_TIMESTAMP: u32 = 2340;
+pub const F_DATE_GT_TIMESTAMP: u32 = 2341;
+pub const F_DATE_GE_TIMESTAMP: u32 = 2342;
+pub const F_DATE_NE_TIMESTAMP: u32 = 2343;
+pub const F_DATE_CMP_TIMESTAMP: u32 = 2344;
+pub const F_DATE_LT_TIMESTAMPTZ: u32 = 2351;
+pub const F_DATE_LE_TIMESTAMPTZ: u32 = 2352;
+pub const F_DATE_EQ_TIMESTAMPTZ: u32 = 2353;
+pub const F_DATE_GT_TIMESTAMPTZ: u32 = 2354;
+pub const F_DATE_GE_TIMESTAMPTZ: u32 = 2355;
+pub const F_DATE_NE_TIMESTAMPTZ: u32 = 2356;
+pub const F_DATE_CMP_TIMESTAMPTZ: u32 = 2357;
+pub const F_TIMESTAMP_LT_DATE: u32 = 2364;
+pub const F_TIMESTAMP_LE_DATE: u32 = 2365;
+pub const F_TIMESTAMP_EQ_DATE: u32 = 2366;
+pub const F_TIMESTAMP_GT_DATE: u32 = 2367;
+pub const F_TIMESTAMP_GE_DATE: u32 = 2368;
+pub const F_TIMESTAMP_NE_DATE: u32 = 2369;
+pub const F_TIMESTAMP_CMP_DATE: u32 = 2370;
+pub const F_TIMESTAMPTZ_LT_DATE: u32 = 2377;
+pub const F_TIMESTAMPTZ_LE_DATE: u32 = 2378;
+pub const F_TIMESTAMPTZ_EQ_DATE: u32 = 2379;
+pub const F_TIMESTAMPTZ_GT_DATE: u32 = 2380;
+pub const F_TIMESTAMPTZ_GE_DATE: u32 = 2381;
+pub const F_TIMESTAMPTZ_NE_DATE: u32 = 2382;
+pub const F_TIMESTAMPTZ_CMP_DATE: u32 = 2383;
+pub const F_HAS_TABLESPACE_PRIVILEGE_NAME_TEXT_TEXT: u32 = 2390;
+pub const F_HAS_TABLESPACE_PRIVILEGE_NAME_OID_TEXT: u32 = 2391;
+pub const F_HAS_TABLESPACE_PRIVILEGE_OID_TEXT_TEXT: u32 = 2392;
+pub const F_HAS_TABLESPACE_PRIVILEGE_OID_OID_TEXT: u32 = 2393;
+pub const F_HAS_TABLESPACE_PRIVILEGE_TEXT_TEXT: u32 = 2394;
+pub const F_HAS_TABLESPACE_PRIVILEGE_OID_TEXT: u32 = 2395;
+pub const F_SHELL_IN: u32 = 2398;
+pub const F_SHELL_OUT: u32 = 2399;
+pub const F_ARRAY_RECV: u32 = 2400;
+pub const F_ARRAY_SEND: u32 = 2401;
+pub const F_RECORD_RECV: u32 = 2402;
+pub const F_RECORD_SEND: u32 = 2403;
+pub const F_INT2RECV: u32 = 2404;
+pub const F_INT2SEND: u32 = 2405;
+pub const F_INT4RECV: u32 = 2406;
+pub const F_INT4SEND: u32 = 2407;
+pub const F_INT8RECV: u32 = 2408;
+pub const F_INT8SEND: u32 = 2409;
+pub const F_INT2VECTORRECV: u32 = 2410;
+pub const F_INT2VECTORSEND: u32 = 2411;
+pub const F_BYTEARECV: u32 = 2412;
+pub const F_BYTEASEND: u32 = 2413;
+pub const F_TEXTRECV: u32 = 2414;
+pub const F_TEXTSEND: u32 = 2415;
+pub const F_UNKNOWNRECV: u32 = 2416;
+pub const F_UNKNOWNSEND: u32 = 2417;
+pub const F_OIDRECV: u32 = 2418;
+pub const F_OIDSEND: u32 = 2419;
+pub const F_OIDVECTORRECV: u32 = 2420;
+pub const F_OIDVECTORSEND: u32 = 2421;
+pub const F_NAMERECV: u32 = 2422;
+pub const F_NAMESEND: u32 = 2423;
+pub const F_FLOAT4RECV: u32 = 2424;
+pub const F_FLOAT4SEND: u32 = 2425;
+pub const F_FLOAT8RECV: u32 = 2426;
+pub const F_FLOAT8SEND: u32 = 2427;
+pub const F_POINT_RECV: u32 = 2428;
+pub const F_POINT_SEND: u32 = 2429;
+pub const F_BPCHARRECV: u32 = 2430;
+pub const F_BPCHARSEND: u32 = 2431;
+pub const F_VARCHARRECV: u32 = 2432;
+pub const F_VARCHARSEND: u32 = 2433;
+pub const F_CHARRECV: u32 = 2434;
+pub const F_CHARSEND: u32 = 2435;
+pub const F_BOOLRECV: u32 = 2436;
+pub const F_BOOLSEND: u32 = 2437;
+pub const F_TIDRECV: u32 = 2438;
+pub const F_TIDSEND: u32 = 2439;
+pub const F_XIDRECV: u32 = 2440;
+pub const F_XIDSEND: u32 = 2441;
+pub const F_CIDRECV: u32 = 2442;
+pub const F_CIDSEND: u32 = 2443;
+pub const F_REGPROCRECV: u32 = 2444;
+pub const F_REGPROCSEND: u32 = 2445;
+pub const F_REGPROCEDURERECV: u32 = 2446;
+pub const F_REGPROCEDURESEND: u32 = 2447;
+pub const F_REGOPERRECV: u32 = 2448;
+pub const F_REGOPERSEND: u32 = 2449;
+pub const F_REGOPERATORRECV: u32 = 2450;
+pub const F_REGOPERATORSEND: u32 = 2451;
+pub const F_REGCLASSRECV: u32 = 2452;
+pub const F_REGCLASSSEND: u32 = 2453;
+pub const F_REGTYPERECV: u32 = 2454;
+pub const F_REGTYPESEND: u32 = 2455;
+pub const F_BIT_RECV: u32 = 2456;
+pub const F_BIT_SEND: u32 = 2457;
+pub const F_VARBIT_RECV: u32 = 2458;
+pub const F_VARBIT_SEND: u32 = 2459;
+pub const F_NUMERIC_RECV: u32 = 2460;
+pub const F_NUMERIC_SEND: u32 = 2461;
+pub const F_SINH: u32 = 2462;
+pub const F_COSH: u32 = 2463;
+pub const F_TANH: u32 = 2464;
+pub const F_ASINH: u32 = 2465;
+pub const F_ACOSH: u32 = 2466;
+pub const F_ATANH: u32 = 2467;
+pub const F_DATE_RECV: u32 = 2468;
+pub const F_DATE_SEND: u32 = 2469;
+pub const F_TIME_RECV: u32 = 2470;
+pub const F_TIME_SEND: u32 = 2471;
+pub const F_TIMETZ_RECV: u32 = 2472;
+pub const F_TIMETZ_SEND: u32 = 2473;
+pub const F_TIMESTAMP_RECV: u32 = 2474;
+pub const F_TIMESTAMP_SEND: u32 = 2475;
+pub const F_TIMESTAMPTZ_RECV: u32 = 2476;
+pub const F_TIMESTAMPTZ_SEND: u32 = 2477;
+pub const F_INTERVAL_RECV: u32 = 2478;
+pub const F_INTERVAL_SEND: u32 = 2479;
+pub const F_LSEG_RECV: u32 = 2480;
+pub const F_LSEG_SEND: u32 = 2481;
+pub const F_PATH_RECV: u32 = 2482;
+pub const F_PATH_SEND: u32 = 2483;
+pub const F_BOX_RECV: u32 = 2484;
+pub const F_BOX_SEND: u32 = 2485;
+pub const F_POLY_RECV: u32 = 2486;
+pub const F_POLY_SEND: u32 = 2487;
+pub const F_LINE_RECV: u32 = 2488;
+pub const F_LINE_SEND: u32 = 2489;
+pub const F_CIRCLE_RECV: u32 = 2490;
+pub const F_CIRCLE_SEND: u32 = 2491;
+pub const F_CASH_RECV: u32 = 2492;
+pub const F_CASH_SEND: u32 = 2493;
+pub const F_MACADDR_RECV: u32 = 2494;
+pub const F_MACADDR_SEND: u32 = 2495;
+pub const F_INET_RECV: u32 = 2496;
+pub const F_INET_SEND: u32 = 2497;
+pub const F_CIDR_RECV: u32 = 2498;
+pub const F_CIDR_SEND: u32 = 2499;
+pub const F_CSTRING_RECV: u32 = 2500;
+pub const F_CSTRING_SEND: u32 = 2501;
+pub const F_ANYARRAY_RECV: u32 = 2502;
+pub const F_ANYARRAY_SEND: u32 = 2503;
+pub const F_PG_GET_RULEDEF_OID_BOOL: u32 = 2504;
+pub const F_PG_GET_VIEWDEF_TEXT_BOOL: u32 = 2505;
+pub const F_PG_GET_VIEWDEF_OID_BOOL: u32 = 2506;
+pub const F_PG_GET_INDEXDEF_OID_INT4_BOOL: u32 = 2507;
+pub const F_PG_GET_CONSTRAINTDEF_OID_BOOL: u32 = 2508;
+pub const F_PG_GET_EXPR_PG_NODE_TREE_OID_BOOL: u32 = 2509;
+pub const F_PG_PREPARED_STATEMENT: u32 = 2510;
+pub const F_PG_CURSOR: u32 = 2511;
+pub const F_FLOAT8_VAR_POP: u32 = 2512;
+pub const F_FLOAT8_STDDEV_POP: u32 = 2513;
+pub const F_NUMERIC_VAR_POP: u32 = 2514;
+pub const F_BOOLAND_STATEFUNC: u32 = 2515;
+pub const F_BOOLOR_STATEFUNC: u32 = 2516;
+pub const F_BOOL_AND: u32 = 2517;
+pub const F_BOOL_OR: u32 = 2518;
+pub const F_EVERY: u32 = 2519;
+pub const F_TIMESTAMP_LT_TIMESTAMPTZ: u32 = 2520;
+pub const F_TIMESTAMP_LE_TIMESTAMPTZ: u32 = 2521;
+pub const F_TIMESTAMP_EQ_TIMESTAMPTZ: u32 = 2522;
+pub const F_TIMESTAMP_GT_TIMESTAMPTZ: u32 = 2523;
+pub const F_TIMESTAMP_GE_TIMESTAMPTZ: u32 = 2524;
+pub const F_TIMESTAMP_NE_TIMESTAMPTZ: u32 = 2525;
+pub const F_TIMESTAMP_CMP_TIMESTAMPTZ: u32 = 2526;
+pub const F_TIMESTAMPTZ_LT_TIMESTAMP: u32 = 2527;
+pub const F_TIMESTAMPTZ_LE_TIMESTAMP: u32 = 2528;
+pub const F_TIMESTAMPTZ_EQ_TIMESTAMP: u32 = 2529;
+pub const F_TIMESTAMPTZ_GT_TIMESTAMP: u32 = 2530;
+pub const F_TIMESTAMPTZ_GE_TIMESTAMP: u32 = 2531;
+pub const F_TIMESTAMPTZ_NE_TIMESTAMP: u32 = 2532;
+pub const F_TIMESTAMPTZ_CMP_TIMESTAMP: u32 = 2533;
+pub const F_INTERVAL_PL_DATE: u32 = 2546;
+pub const F_INTERVAL_PL_TIMETZ: u32 = 2547;
+pub const F_INTERVAL_PL_TIMESTAMP: u32 = 2548;
+pub const F_INTERVAL_PL_TIMESTAMPTZ: u32 = 2549;
+pub const F_INTEGER_PL_DATE: u32 = 2550;
+pub const F_PG_TABLESPACE_DATABASES: u32 = 2556;
+pub const F_BOOL_INT4: u32 = 2557;
+pub const F_INT4_BOOL: u32 = 2558;
+pub const F_LASTVAL: u32 = 2559;
+pub const F_PG_POSTMASTER_START_TIME: u32 = 2560;
+pub const F_PG_BLOCKING_PIDS: u32 = 2561;
+pub const F_BOX_BELOW: u32 = 2562;
+pub const F_BOX_OVERBELOW: u32 = 2563;
+pub const F_BOX_OVERABOVE: u32 = 2564;
+pub const F_BOX_ABOVE: u32 = 2565;
+pub const F_POLY_BELOW: u32 = 2566;
+pub const F_POLY_OVERBELOW: u32 = 2567;
+pub const F_POLY_OVERABOVE: u32 = 2568;
+pub const F_POLY_ABOVE: u32 = 2569;
+pub const F_GIST_BOX_CONSISTENT: u32 = 2578;
+pub const F_FLOAT8_JSONB: u32 = 2580;
+pub const F_GIST_BOX_PENALTY: u32 = 2581;
+pub const F_GIST_BOX_PICKSPLIT: u32 = 2582;
+pub const F_GIST_BOX_UNION: u32 = 2583;
+pub const F_GIST_BOX_SAME: u32 = 2584;
+pub const F_GIST_POLY_CONSISTENT: u32 = 2585;
+pub const F_GIST_POLY_COMPRESS: u32 = 2586;
+pub const F_CIRCLE_OVERBELOW: u32 = 2587;
+pub const F_CIRCLE_OVERABOVE: u32 = 2588;
+pub const F_GIST_CIRCLE_CONSISTENT: u32 = 2591;
+pub const F_GIST_CIRCLE_COMPRESS: u32 = 2592;
+pub const F_NUMERIC_STDDEV_POP: u32 = 2596;
+pub const F_DOMAIN_IN: u32 = 2597;
+pub const F_DOMAIN_RECV: u32 = 2598;
+pub const F_PG_TIMEZONE_ABBREVS: u32 = 2599;
+pub const F_XMLEXISTS: u32 = 2614;
+pub const F_PG_RELOAD_CONF: u32 = 2621;
+pub const F_PG_ROTATE_LOGFILE: u32 = 2622;
+pub const F_PG_STAT_FILE_TEXT: u32 = 2623;
+pub const F_PG_READ_FILE_TEXT_INT8_INT8: u32 = 2624;
+pub const F_PG_LS_DIR_TEXT: u32 = 2625;
+pub const F_PG_SLEEP: u32 = 2626;
+pub const F_INETNOT: u32 = 2627;
+pub const F_INETAND: u32 = 2628;
+pub const F_INETOR: u32 = 2629;
+pub const F_INETPL: u32 = 2630;
+pub const F_INT8PL_INET: u32 = 2631;
+pub const F_INETMI_INT8: u32 = 2632;
+pub const F_INETMI: u32 = 2633;
+pub const F_VAR_SAMP_INT8: u32 = 2641;
+pub const F_VAR_SAMP_INT4: u32 = 2642;
+pub const F_VAR_SAMP_INT2: u32 = 2643;
+pub const F_VAR_SAMP_FLOAT4: u32 = 2644;
+pub const F_VAR_SAMP_FLOAT8: u32 = 2645;
+pub const F_VAR_SAMP_NUMERIC: u32 = 2646;
+pub const F_TRANSACTION_TIMESTAMP: u32 = 2647;
+pub const F_STATEMENT_TIMESTAMP: u32 = 2648;
+pub const F_CLOCK_TIMESTAMP: u32 = 2649;
+pub const F_GIN_CMP_PREFIX: u32 = 2700;
+pub const F_PG_HAS_ROLE_NAME_NAME_TEXT: u32 = 2705;
+pub const F_PG_HAS_ROLE_NAME_OID_TEXT: u32 = 2706;
+pub const F_PG_HAS_ROLE_OID_NAME_TEXT: u32 = 2707;
+pub const F_PG_HAS_ROLE_OID_OID_TEXT: u32 = 2708;
+pub const F_PG_HAS_ROLE_NAME_TEXT: u32 = 2709;
+pub const F_PG_HAS_ROLE_OID_TEXT: u32 = 2710;
+pub const F_JUSTIFY_INTERVAL: u32 = 2711;
+pub const F_STDDEV_SAMP_INT8: u32 = 2712;
+pub const F_STDDEV_SAMP_INT4: u32 = 2713;
+pub const F_STDDEV_SAMP_INT2: u32 = 2714;
+pub const F_STDDEV_SAMP_FLOAT4: u32 = 2715;
+pub const F_STDDEV_SAMP_FLOAT8: u32 = 2716;
+pub const F_STDDEV_SAMP_NUMERIC: u32 = 2717;
+pub const F_VAR_POP_INT8: u32 = 2718;
+pub const F_VAR_POP_INT4: u32 = 2719;
+pub const F_VAR_POP_INT2: u32 = 2720;
+pub const F_VAR_POP_FLOAT4: u32 = 2721;
+pub const F_VAR_POP_FLOAT8: u32 = 2722;
+pub const F_VAR_POP_NUMERIC: u32 = 2723;
+pub const F_STDDEV_POP_INT8: u32 = 2724;
+pub const F_STDDEV_POP_INT4: u32 = 2725;
+pub const F_STDDEV_POP_INT2: u32 = 2726;
+pub const F_STDDEV_POP_FLOAT4: u32 = 2727;
+pub const F_STDDEV_POP_FLOAT8: u32 = 2728;
+pub const F_STDDEV_POP_NUMERIC: u32 = 2729;
+pub const F_PG_GET_TRIGGERDEF_OID_BOOL: u32 = 2730;
+pub const F_ASIND: u32 = 2731;
+pub const F_ACOSD: u32 = 2732;
+pub const F_ATAND: u32 = 2733;
+pub const F_ATAN2D: u32 = 2734;
+pub const F_SIND: u32 = 2735;
+pub const F_COSD: u32 = 2736;
+pub const F_TAND: u32 = 2737;
+pub const F_COTD: u32 = 2738;
+pub const F_PG_BACKUP_STOP: u32 = 2739;
+pub const F_NUMERIC_AVG_SERIALIZE: u32 = 2740;
+pub const F_NUMERIC_AVG_DESERIALIZE: u32 = 2741;
+pub const F_GINARRAYEXTRACT_ANYARRAY_INTERNAL_INTERNAL: u32 = 2743;
+pub const F_GINARRAYCONSISTENT: u32 = 2744;
+pub const F_INT8_AVG_ACCUM: u32 = 2746;
+pub const F_ARRAYOVERLAP: u32 = 2747;
+pub const F_ARRAYCONTAINS: u32 = 2748;
+pub const F_ARRAYCONTAINED: u32 = 2749;
+pub const F_PG_STAT_GET_DB_TUPLES_RETURNED: u32 = 2758;
+pub const F_PG_STAT_GET_DB_TUPLES_FETCHED: u32 = 2759;
+pub const F_PG_STAT_GET_DB_TUPLES_INSERTED: u32 = 2760;
+pub const F_PG_STAT_GET_DB_TUPLES_UPDATED: u32 = 2761;
+pub const F_PG_STAT_GET_DB_TUPLES_DELETED: u32 = 2762;
+pub const F_REGEXP_MATCHES_TEXT_TEXT: u32 = 2763;
+pub const F_REGEXP_MATCHES_TEXT_TEXT_TEXT: u32 = 2764;
+pub const F_REGEXP_SPLIT_TO_TABLE_TEXT_TEXT: u32 = 2765;
+pub const F_REGEXP_SPLIT_TO_TABLE_TEXT_TEXT_TEXT: u32 = 2766;
+pub const F_REGEXP_SPLIT_TO_ARRAY_TEXT_TEXT: u32 = 2767;
+pub const F_REGEXP_SPLIT_TO_ARRAY_TEXT_TEXT_TEXT: u32 = 2768;
+pub const F_PG_STAT_GET_BGWRITER_TIMED_CHECKPOINTS: u32 = 2769;
+pub const F_PG_STAT_GET_BGWRITER_REQUESTED_CHECKPOINTS: u32 = 2770;
+pub const F_PG_STAT_GET_BGWRITER_BUF_WRITTEN_CHECKPOINTS: u32 = 2771;
+pub const F_PG_STAT_GET_BGWRITER_BUF_WRITTEN_CLEAN: u32 = 2772;
+pub const F_PG_STAT_GET_BGWRITER_MAXWRITTEN_CLEAN: u32 = 2773;
+pub const F_GINQUERYARRAYEXTRACT: u32 = 2774;
+pub const F_PG_STAT_GET_BUF_WRITTEN_BACKEND: u32 = 2775;
+pub const F_ANYNONARRAY_IN: u32 = 2777;
+pub const F_ANYNONARRAY_OUT: u32 = 2778;
+pub const F_PG_STAT_GET_LAST_VACUUM_TIME: u32 = 2781;
+pub const F_PG_STAT_GET_LAST_AUTOVACUUM_TIME: u32 = 2782;
+pub const F_PG_STAT_GET_LAST_ANALYZE_TIME: u32 = 2783;
+pub const F_PG_STAT_GET_LAST_AUTOANALYZE_TIME: u32 = 2784;
+pub const F_INT8_AVG_COMBINE: u32 = 2785;
+pub const F_INT8_AVG_SERIALIZE: u32 = 2786;
+pub const F_INT8_AVG_DESERIALIZE: u32 = 2787;
+pub const F_PG_STAT_GET_BACKEND_WAIT_EVENT_TYPE: u32 = 2788;
+pub const F_TIDGT: u32 = 2790;
+pub const F_TIDLT: u32 = 2791;
+pub const F_TIDGE: u32 = 2792;
+pub const F_TIDLE: u32 = 2793;
+pub const F_BTTIDCMP: u32 = 2794;
+pub const F_TIDLARGER: u32 = 2795;
+pub const F_TIDSMALLER: u32 = 2796;
+pub const F_MAX_TID: u32 = 2797;
+pub const F_MIN_TID: u32 = 2798;
+pub const F_COUNT_: u32 = 2803;
+pub const F_INT8INC_ANY: u32 = 2804;
+pub const F_INT8INC_FLOAT8_FLOAT8: u32 = 2805;
+pub const F_FLOAT8_REGR_ACCUM: u32 = 2806;
+pub const F_FLOAT8_REGR_SXX: u32 = 2807;
+pub const F_FLOAT8_REGR_SYY: u32 = 2808;
+pub const F_FLOAT8_REGR_SXY: u32 = 2809;
+pub const F_FLOAT8_REGR_AVGX: u32 = 2810;
+pub const F_FLOAT8_REGR_AVGY: u32 = 2811;
+pub const F_FLOAT8_REGR_R2: u32 = 2812;
+pub const F_FLOAT8_REGR_SLOPE: u32 = 2813;
+pub const F_FLOAT8_REGR_INTERCEPT: u32 = 2814;
+pub const F_FLOAT8_COVAR_POP: u32 = 2815;
+pub const F_FLOAT8_COVAR_SAMP: u32 = 2816;
+pub const F_FLOAT8_CORR: u32 = 2817;
+pub const F_REGR_COUNT: u32 = 2818;
+pub const F_REGR_SXX: u32 = 2819;
+pub const F_REGR_SYY: u32 = 2820;
+pub const F_REGR_SXY: u32 = 2821;
+pub const F_REGR_AVGX: u32 = 2822;
+pub const F_REGR_AVGY: u32 = 2823;
+pub const F_REGR_R2: u32 = 2824;
+pub const F_REGR_SLOPE: u32 = 2825;
+pub const F_REGR_INTERCEPT: u32 = 2826;
+pub const F_COVAR_POP: u32 = 2827;
+pub const F_COVAR_SAMP: u32 = 2828;
+pub const F_CORR: u32 = 2829;
+pub const F_PG_STAT_GET_DB_BLK_READ_TIME: u32 = 2844;
+pub const F_PG_STAT_GET_DB_BLK_WRITE_TIME: u32 = 2845;
+pub const F_PG_SWITCH_WAL: u32 = 2848;
+pub const F_PG_CURRENT_WAL_LSN: u32 = 2849;
+pub const F_PG_WALFILE_NAME_OFFSET: u32 = 2850;
+pub const F_PG_WALFILE_NAME: u32 = 2851;
+pub const F_PG_CURRENT_WAL_INSERT_LSN: u32 = 2852;
+pub const F_PG_STAT_GET_BACKEND_WAIT_EVENT: u32 = 2853;
+pub const F_PG_MY_TEMP_SCHEMA: u32 = 2854;
+pub const F_PG_IS_OTHER_TEMP_SCHEMA: u32 = 2855;
+pub const F_PG_TIMEZONE_NAMES: u32 = 2856;
+pub const F_PG_STAT_GET_BACKEND_XACT_START: u32 = 2857;
+pub const F_NUMERIC_AVG_ACCUM: u32 = 2858;
+pub const F_PG_STAT_GET_BUF_ALLOC: u32 = 2859;
+pub const F_PG_STAT_GET_LIVE_TUPLES: u32 = 2878;
+pub const F_PG_STAT_GET_DEAD_TUPLES: u32 = 2879;
+pub const F_PG_ADVISORY_LOCK_INT8: u32 = 2880;
+pub const F_PG_ADVISORY_LOCK_SHARED_INT8: u32 = 2881;
+pub const F_PG_TRY_ADVISORY_LOCK_INT8: u32 = 2882;
+pub const F_PG_TRY_ADVISORY_LOCK_SHARED_INT8: u32 = 2883;
+pub const F_PG_ADVISORY_UNLOCK_INT8: u32 = 2884;
+pub const F_PG_ADVISORY_UNLOCK_SHARED_INT8: u32 = 2885;
+pub const F_PG_ADVISORY_LOCK_INT4_INT4: u32 = 2886;
+pub const F_PG_ADVISORY_LOCK_SHARED_INT4_INT4: u32 = 2887;
+pub const F_PG_TRY_ADVISORY_LOCK_INT4_INT4: u32 = 2888;
+pub const F_PG_TRY_ADVISORY_LOCK_SHARED_INT4_INT4: u32 = 2889;
+pub const F_PG_ADVISORY_UNLOCK_INT4_INT4: u32 = 2890;
+pub const F_PG_ADVISORY_UNLOCK_SHARED_INT4_INT4: u32 = 2891;
+pub const F_PG_ADVISORY_UNLOCK_ALL: u32 = 2892;
+pub const F_XML_IN: u32 = 2893;
+pub const F_XML_OUT: u32 = 2894;
+pub const F_XMLCOMMENT: u32 = 2895;
+pub const F_XML: u32 = 2896;
+pub const F_XMLVALIDATE: u32 = 2897;
+pub const F_XML_RECV: u32 = 2898;
+pub const F_XML_SEND: u32 = 2899;
+pub const F_XMLCONCAT2: u32 = 2900;
+pub const F_XMLAGG: u32 = 2901;
+pub const F_VARBITTYPMODIN: u32 = 2902;
+pub const F_INTERVALTYPMODIN: u32 = 2903;
+pub const F_INTERVALTYPMODOUT: u32 = 2904;
+pub const F_TIMESTAMPTYPMODIN: u32 = 2905;
+pub const F_TIMESTAMPTYPMODOUT: u32 = 2906;
+pub const F_TIMESTAMPTZTYPMODIN: u32 = 2907;
+pub const F_TIMESTAMPTZTYPMODOUT: u32 = 2908;
+pub const F_TIMETYPMODIN: u32 = 2909;
+pub const F_TIMETYPMODOUT: u32 = 2910;
+pub const F_TIMETZTYPMODIN: u32 = 2911;
+pub const F_TIMETZTYPMODOUT: u32 = 2912;
+pub const F_BPCHARTYPMODIN: u32 = 2913;
+pub const F_BPCHARTYPMODOUT: u32 = 2914;
+pub const F_VARCHARTYPMODIN: u32 = 2915;
+pub const F_VARCHARTYPMODOUT: u32 = 2916;
+pub const F_NUMERICTYPMODIN: u32 = 2917;
+pub const F_NUMERICTYPMODOUT: u32 = 2918;
+pub const F_BITTYPMODIN: u32 = 2919;
+pub const F_BITTYPMODOUT: u32 = 2920;
+pub const F_VARBITTYPMODOUT: u32 = 2921;
+pub const F_TEXT_XML: u32 = 2922;
+pub const F_TABLE_TO_XML: u32 = 2923;
+pub const F_QUERY_TO_XML: u32 = 2924;
+pub const F_CURSOR_TO_XML: u32 = 2925;
+pub const F_TABLE_TO_XMLSCHEMA: u32 = 2926;
+pub const F_QUERY_TO_XMLSCHEMA: u32 = 2927;
+pub const F_CURSOR_TO_XMLSCHEMA: u32 = 2928;
+pub const F_TABLE_TO_XML_AND_XMLSCHEMA: u32 = 2929;
+pub const F_QUERY_TO_XML_AND_XMLSCHEMA: u32 = 2930;
+pub const F_XPATH_TEXT_XML__TEXT: u32 = 2931;
+pub const F_XPATH_TEXT_XML: u32 = 2932;
+pub const F_SCHEMA_TO_XML: u32 = 2933;
+pub const F_SCHEMA_TO_XMLSCHEMA: u32 = 2934;
+pub const F_SCHEMA_TO_XML_AND_XMLSCHEMA: u32 = 2935;
+pub const F_DATABASE_TO_XML: u32 = 2936;
+pub const F_DATABASE_TO_XMLSCHEMA: u32 = 2937;
+pub const F_DATABASE_TO_XML_AND_XMLSCHEMA: u32 = 2938;
+pub const F_TXID_SNAPSHOT_IN: u32 = 2939;
+pub const F_TXID_SNAPSHOT_OUT: u32 = 2940;
+pub const F_TXID_SNAPSHOT_RECV: u32 = 2941;
+pub const F_TXID_SNAPSHOT_SEND: u32 = 2942;
+pub const F_TXID_CURRENT: u32 = 2943;
+pub const F_TXID_CURRENT_SNAPSHOT: u32 = 2944;
+pub const F_TXID_SNAPSHOT_XMIN: u32 = 2945;
+pub const F_TXID_SNAPSHOT_XMAX: u32 = 2946;
+pub const F_TXID_SNAPSHOT_XIP: u32 = 2947;
+pub const F_TXID_VISIBLE_IN_SNAPSHOT: u32 = 2948;
+pub const F_UUID_IN: u32 = 2952;
+pub const F_UUID_OUT: u32 = 2953;
+pub const F_UUID_LT: u32 = 2954;
+pub const F_UUID_LE: u32 = 2955;
+pub const F_UUID_EQ: u32 = 2956;
+pub const F_UUID_GE: u32 = 2957;
+pub const F_UUID_GT: u32 = 2958;
+pub const F_UUID_NE: u32 = 2959;
+pub const F_UUID_CMP: u32 = 2960;
+pub const F_UUID_RECV: u32 = 2961;
+pub const F_UUID_SEND: u32 = 2962;
+pub const F_UUID_HASH: u32 = 2963;
+pub const F_TEXT_BOOL: u32 = 2971;
+pub const F_PG_STAT_GET_FUNCTION_CALLS: u32 = 2978;
+pub const F_PG_STAT_GET_FUNCTION_TOTAL_TIME: u32 = 2979;
+pub const F_PG_STAT_GET_FUNCTION_SELF_TIME: u32 = 2980;
+pub const F_RECORD_EQ: u32 = 2981;
+pub const F_RECORD_NE: u32 = 2982;
+pub const F_RECORD_LT: u32 = 2983;
+pub const F_RECORD_GT: u32 = 2984;
+pub const F_RECORD_LE: u32 = 2985;
+pub const F_RECORD_GE: u32 = 2986;
+pub const F_BTRECORDCMP: u32 = 2987;
+pub const F_PG_TABLE_SIZE: u32 = 2997;
+pub const F_PG_INDEXES_SIZE: u32 = 2998;
+pub const F_PG_RELATION_FILENODE: u32 = 2999;
+pub const F_HAS_FOREIGN_DATA_WRAPPER_PRIVILEGE_NAME_TEXT_TEXT: u32 = 3000;
+pub const F_HAS_FOREIGN_DATA_WRAPPER_PRIVILEGE_NAME_OID_TEXT: u32 = 3001;
+pub const F_HAS_FOREIGN_DATA_WRAPPER_PRIVILEGE_OID_TEXT_TEXT: u32 = 3002;
+pub const F_HAS_FOREIGN_DATA_WRAPPER_PRIVILEGE_OID_OID_TEXT: u32 = 3003;
+pub const F_HAS_FOREIGN_DATA_WRAPPER_PRIVILEGE_TEXT_TEXT: u32 = 3004;
+pub const F_HAS_FOREIGN_DATA_WRAPPER_PRIVILEGE_OID_TEXT: u32 = 3005;
+pub const F_HAS_SERVER_PRIVILEGE_NAME_TEXT_TEXT: u32 = 3006;
+pub const F_HAS_SERVER_PRIVILEGE_NAME_OID_TEXT: u32 = 3007;
+pub const F_HAS_SERVER_PRIVILEGE_OID_TEXT_TEXT: u32 = 3008;
+pub const F_HAS_SERVER_PRIVILEGE_OID_OID_TEXT: u32 = 3009;
+pub const F_HAS_SERVER_PRIVILEGE_TEXT_TEXT: u32 = 3010;
+pub const F_HAS_SERVER_PRIVILEGE_OID_TEXT: u32 = 3011;
+pub const F_HAS_COLUMN_PRIVILEGE_NAME_TEXT_TEXT_TEXT: u32 = 3012;
+pub const F_HAS_COLUMN_PRIVILEGE_NAME_TEXT_INT2_TEXT: u32 = 3013;
+pub const F_HAS_COLUMN_PRIVILEGE_NAME_OID_TEXT_TEXT: u32 = 3014;
+pub const F_HAS_COLUMN_PRIVILEGE_NAME_OID_INT2_TEXT: u32 = 3015;
+pub const F_HAS_COLUMN_PRIVILEGE_OID_TEXT_TEXT_TEXT: u32 = 3016;
+pub const F_HAS_COLUMN_PRIVILEGE_OID_TEXT_INT2_TEXT: u32 = 3017;
+pub const F_HAS_COLUMN_PRIVILEGE_OID_OID_TEXT_TEXT: u32 = 3018;
+pub const F_HAS_COLUMN_PRIVILEGE_OID_OID_INT2_TEXT: u32 = 3019;
+pub const F_HAS_COLUMN_PRIVILEGE_TEXT_TEXT_TEXT: u32 = 3020;
+pub const F_HAS_COLUMN_PRIVILEGE_TEXT_INT2_TEXT: u32 = 3021;
+pub const F_HAS_COLUMN_PRIVILEGE_OID_TEXT_TEXT: u32 = 3022;
+pub const F_HAS_COLUMN_PRIVILEGE_OID_INT2_TEXT: u32 = 3023;
+pub const F_HAS_ANY_COLUMN_PRIVILEGE_NAME_TEXT_TEXT: u32 = 3024;
+pub const F_HAS_ANY_COLUMN_PRIVILEGE_NAME_OID_TEXT: u32 = 3025;
+pub const F_HAS_ANY_COLUMN_PRIVILEGE_OID_TEXT_TEXT: u32 = 3026;
+pub const F_HAS_ANY_COLUMN_PRIVILEGE_OID_OID_TEXT: u32 = 3027;
+pub const F_HAS_ANY_COLUMN_PRIVILEGE_TEXT_TEXT: u32 = 3028;
+pub const F_HAS_ANY_COLUMN_PRIVILEGE_OID_TEXT: u32 = 3029;
+pub const F_OVERLAY_BIT_BIT_INT4_INT4: u32 = 3030;
+pub const F_OVERLAY_BIT_BIT_INT4: u32 = 3031;
+pub const F_GET_BIT_BIT_INT4: u32 = 3032;
+pub const F_SET_BIT_BIT_INT4_INT4: u32 = 3033;
+pub const F_PG_RELATION_FILEPATH: u32 = 3034;
+pub const F_PG_LISTENING_CHANNELS: u32 = 3035;
+pub const F_PG_NOTIFY: u32 = 3036;
+pub const F_PG_STAT_GET_XACT_NUMSCANS: u32 = 3037;
+pub const F_PG_STAT_GET_XACT_TUPLES_RETURNED: u32 = 3038;
+pub const F_PG_STAT_GET_XACT_TUPLES_FETCHED: u32 = 3039;
+pub const F_PG_STAT_GET_XACT_TUPLES_INSERTED: u32 = 3040;
+pub const F_PG_STAT_GET_XACT_TUPLES_UPDATED: u32 = 3041;
+pub const F_PG_STAT_GET_XACT_TUPLES_DELETED: u32 = 3042;
+pub const F_PG_STAT_GET_XACT_TUPLES_HOT_UPDATED: u32 = 3043;
+pub const F_PG_STAT_GET_XACT_BLOCKS_FETCHED: u32 = 3044;
+pub const F_PG_STAT_GET_XACT_BLOCKS_HIT: u32 = 3045;
+pub const F_PG_STAT_GET_XACT_FUNCTION_CALLS: u32 = 3046;
+pub const F_PG_STAT_GET_XACT_FUNCTION_TOTAL_TIME: u32 = 3047;
+pub const F_PG_STAT_GET_XACT_FUNCTION_SELF_TIME: u32 = 3048;
+pub const F_XPATH_EXISTS_TEXT_XML__TEXT: u32 = 3049;
+pub const F_XPATH_EXISTS_TEXT_XML: u32 = 3050;
+pub const F_XML_IS_WELL_FORMED: u32 = 3051;
+pub const F_XML_IS_WELL_FORMED_DOCUMENT: u32 = 3052;
+pub const F_XML_IS_WELL_FORMED_CONTENT: u32 = 3053;
+pub const F_PG_STAT_GET_VACUUM_COUNT: u32 = 3054;
+pub const F_PG_STAT_GET_AUTOVACUUM_COUNT: u32 = 3055;
+pub const F_PG_STAT_GET_ANALYZE_COUNT: u32 = 3056;
+pub const F_PG_STAT_GET_AUTOANALYZE_COUNT: u32 = 3057;
+pub const F_CONCAT: u32 = 3058;
+pub const F_CONCAT_WS: u32 = 3059;
+pub const F_LEFT: u32 = 3060;
+pub const F_RIGHT: u32 = 3061;
+pub const F_REVERSE: u32 = 3062;
+pub const F_PG_STAT_GET_BUF_FSYNC_BACKEND: u32 = 3063;
+pub const F_GIST_POINT_DISTANCE: u32 = 3064;
+pub const F_PG_STAT_GET_DB_CONFLICT_TABLESPACE: u32 = 3065;
+pub const F_PG_STAT_GET_DB_CONFLICT_LOCK: u32 = 3066;
+pub const F_PG_STAT_GET_DB_CONFLICT_SNAPSHOT: u32 = 3067;
+pub const F_PG_STAT_GET_DB_CONFLICT_BUFFERPIN: u32 = 3068;
+pub const F_PG_STAT_GET_DB_CONFLICT_STARTUP_DEADLOCK: u32 = 3069;
+pub const F_PG_STAT_GET_DB_CONFLICT_ALL: u32 = 3070;
+pub const F_PG_WAL_REPLAY_PAUSE: u32 = 3071;
+pub const F_PG_WAL_REPLAY_RESUME: u32 = 3072;
+pub const F_PG_IS_WAL_REPLAY_PAUSED: u32 = 3073;
+pub const F_PG_STAT_GET_DB_STAT_RESET_TIME: u32 = 3074;
+pub const F_PG_STAT_GET_BGWRITER_STAT_RESET_TIME: u32 = 3075;
+pub const F_GINARRAYEXTRACT_ANYARRAY_INTERNAL: u32 = 3076;
+pub const F_GIN_EXTRACT_TSVECTOR_TSVECTOR_INTERNAL: u32 = 3077;
+pub const F_PG_SEQUENCE_PARAMETERS: u32 = 3078;
+pub const F_PG_AVAILABLE_EXTENSIONS: u32 = 3082;
+pub const F_PG_AVAILABLE_EXTENSION_VERSIONS: u32 = 3083;
+pub const F_PG_EXTENSION_UPDATE_PATHS: u32 = 3084;
+pub const F_PG_EXTENSION_CONFIG_DUMP: u32 = 3086;
+pub const F_GIN_EXTRACT_TSQUERY_TSQUERY_INTERNAL_INT2_INTERNAL_INTERNAL: u32 = 3087;
+pub const F_GIN_TSQUERY_CONSISTENT_INTERNAL_INT2_TSQUERY_INT4_INTERNAL_INTERNAL: u32 = 3088;
+pub const F_PG_ADVISORY_XACT_LOCK_INT8: u32 = 3089;
+pub const F_PG_ADVISORY_XACT_LOCK_SHARED_INT8: u32 = 3090;
+pub const F_PG_TRY_ADVISORY_XACT_LOCK_INT8: u32 = 3091;
+pub const F_PG_TRY_ADVISORY_XACT_LOCK_SHARED_INT8: u32 = 3092;
+pub const F_PG_ADVISORY_XACT_LOCK_INT4_INT4: u32 = 3093;
+pub const F_PG_ADVISORY_XACT_LOCK_SHARED_INT4_INT4: u32 = 3094;
+pub const F_PG_TRY_ADVISORY_XACT_LOCK_INT4_INT4: u32 = 3095;
+pub const F_PG_TRY_ADVISORY_XACT_LOCK_SHARED_INT4_INT4: u32 = 3096;
+pub const F_VARCHAR_SUPPORT: u32 = 3097;
+pub const F_PG_CREATE_RESTORE_POINT: u32 = 3098;
+pub const F_PG_STAT_GET_WAL_SENDERS: u32 = 3099;
+pub const F_ROW_NUMBER: u32 = 3100;
+pub const F_RANK_: u32 = 3101;
+pub const F_DENSE_RANK_: u32 = 3102;
+pub const F_PERCENT_RANK_: u32 = 3103;
+pub const F_CUME_DIST_: u32 = 3104;
+pub const F_NTILE: u32 = 3105;
+pub const F_LAG_ANYELEMENT: u32 = 3106;
+pub const F_LAG_ANYELEMENT_INT4: u32 = 3107;
+pub const F_LAG_ANYCOMPATIBLE_INT4_ANYCOMPATIBLE: u32 = 3108;
+pub const F_LEAD_ANYELEMENT: u32 = 3109;
+pub const F_LEAD_ANYELEMENT_INT4: u32 = 3110;
+pub const F_LEAD_ANYCOMPATIBLE_INT4_ANYCOMPATIBLE: u32 = 3111;
+pub const F_FIRST_VALUE: u32 = 3112;
+pub const F_LAST_VALUE: u32 = 3113;
+pub const F_NTH_VALUE: u32 = 3114;
+pub const F_FDW_HANDLER_IN: u32 = 3116;
+pub const F_FDW_HANDLER_OUT: u32 = 3117;
+pub const F_VOID_RECV: u32 = 3120;
+pub const F_VOID_SEND: u32 = 3121;
+pub const F_BTINT2SORTSUPPORT: u32 = 3129;
+pub const F_BTINT4SORTSUPPORT: u32 = 3130;
+pub const F_BTINT8SORTSUPPORT: u32 = 3131;
+pub const F_BTFLOAT4SORTSUPPORT: u32 = 3132;
+pub const F_BTFLOAT8SORTSUPPORT: u32 = 3133;
+pub const F_BTOIDSORTSUPPORT: u32 = 3134;
+pub const F_BTNAMESORTSUPPORT: u32 = 3135;
+pub const F_DATE_SORTSUPPORT: u32 = 3136;
+pub const F_TIMESTAMP_SORTSUPPORT: u32 = 3137;
+pub const F_HAS_TYPE_PRIVILEGE_NAME_TEXT_TEXT: u32 = 3138;
+pub const F_HAS_TYPE_PRIVILEGE_NAME_OID_TEXT: u32 = 3139;
+pub const F_HAS_TYPE_PRIVILEGE_OID_TEXT_TEXT: u32 = 3140;
+pub const F_HAS_TYPE_PRIVILEGE_OID_OID_TEXT: u32 = 3141;
+pub const F_HAS_TYPE_PRIVILEGE_TEXT_TEXT: u32 = 3142;
+pub const F_HAS_TYPE_PRIVILEGE_OID_TEXT: u32 = 3143;
+pub const F_MACADDR_NOT: u32 = 3144;
+pub const F_MACADDR_AND: u32 = 3145;
+pub const F_MACADDR_OR: u32 = 3146;
+pub const F_PG_STAT_GET_DB_TEMP_FILES: u32 = 3150;
+pub const F_PG_STAT_GET_DB_TEMP_BYTES: u32 = 3151;
+pub const F_PG_STAT_GET_DB_DEADLOCKS: u32 = 3152;
+pub const F_ARRAY_TO_JSON_ANYARRAY: u32 = 3153;
+pub const F_ARRAY_TO_JSON_ANYARRAY_BOOL: u32 = 3154;
+pub const F_ROW_TO_JSON_RECORD: u32 = 3155;
+pub const F_ROW_TO_JSON_RECORD_BOOL: u32 = 3156;
+pub const F_NUMERIC_SUPPORT: u32 = 3157;
+pub const F_VARBIT_SUPPORT: u32 = 3158;
+pub const F_PG_GET_VIEWDEF_OID_INT4: u32 = 3159;
+pub const F_PG_STAT_GET_CHECKPOINT_WRITE_TIME: u32 = 3160;
+pub const F_PG_STAT_GET_CHECKPOINT_SYNC_TIME: u32 = 3161;
+pub const F_PG_COLLATION_FOR: u32 = 3162;
+pub const F_PG_TRIGGER_DEPTH: u32 = 3163;
+pub const F_PG_WAL_LSN_DIFF: u32 = 3165;
+pub const F_PG_SIZE_PRETTY_NUMERIC: u32 = 3166;
+pub const F_ARRAY_REMOVE: u32 = 3167;
+pub const F_ARRAY_REPLACE: u32 = 3168;
+pub const F_RANGESEL: u32 = 3169;
+pub const F_LO_LSEEK64: u32 = 3170;
+pub const F_LO_TELL64: u32 = 3171;
+pub const F_LO_TRUNCATE64: u32 = 3172;
+pub const F_JSON_AGG_TRANSFN: u32 = 3173;
+pub const F_JSON_AGG_FINALFN: u32 = 3174;
+pub const F_JSON_AGG: u32 = 3175;
+pub const F_TO_JSON: u32 = 3176;
+pub const F_PG_STAT_GET_MOD_SINCE_ANALYZE: u32 = 3177;
+pub const F_NUMERIC_SUM: u32 = 3178;
+pub const F_CARDINALITY: u32 = 3179;
+pub const F_JSON_OBJECT_AGG_TRANSFN: u32 = 3180;
+pub const F_RECORD_IMAGE_EQ: u32 = 3181;
+pub const F_RECORD_IMAGE_NE: u32 = 3182;
+pub const F_RECORD_IMAGE_LT: u32 = 3183;
+pub const F_RECORD_IMAGE_GT: u32 = 3184;
+pub const F_RECORD_IMAGE_LE: u32 = 3185;
+pub const F_RECORD_IMAGE_GE: u32 = 3186;
+pub const F_BTRECORDIMAGECMP: u32 = 3187;
+pub const F_PG_STAT_GET_ARCHIVER: u32 = 3195;
+pub const F_JSON_OBJECT_AGG_FINALFN: u32 = 3196;
+pub const F_JSON_OBJECT_AGG: u32 = 3197;
+pub const F_JSON_BUILD_ARRAY_ANY: u32 = 3198;
+pub const F_JSON_BUILD_ARRAY_: u32 = 3199;
+pub const F_JSON_BUILD_OBJECT_ANY: u32 = 3200;
+pub const F_JSON_BUILD_OBJECT_: u32 = 3201;
+pub const F_JSON_OBJECT__TEXT: u32 = 3202;
+pub const F_JSON_OBJECT__TEXT__TEXT: u32 = 3203;
+pub const F_JSON_TO_RECORD: u32 = 3204;
+pub const F_JSON_TO_RECORDSET: u32 = 3205;
+pub const F_JSONB_ARRAY_LENGTH: u32 = 3207;
+pub const F_JSONB_EACH: u32 = 3208;
+pub const F_JSONB_POPULATE_RECORD: u32 = 3209;
+pub const F_JSONB_TYPEOF: u32 = 3210;
+pub const F_JSONB_OBJECT_FIELD_TEXT: u32 = 3214;
+pub const F_JSONB_ARRAY_ELEMENT: u32 = 3215;
+pub const F_JSONB_ARRAY_ELEMENT_TEXT: u32 = 3216;
+pub const F_JSONB_EXTRACT_PATH: u32 = 3217;
+pub const F_WIDTH_BUCKET_ANYCOMPATIBLE_ANYCOMPATIBLEARRAY: u32 = 3218;
+pub const F_JSONB_ARRAY_ELEMENTS: u32 = 3219;
+pub const F_PG_LSN_IN: u32 = 3229;
+pub const F_PG_LSN_OUT: u32 = 3230;
+pub const F_PG_LSN_LT: u32 = 3231;
+pub const F_PG_LSN_LE: u32 = 3232;
+pub const F_PG_LSN_EQ: u32 = 3233;
+pub const F_PG_LSN_GE: u32 = 3234;
+pub const F_PG_LSN_GT: u32 = 3235;
+pub const F_PG_LSN_NE: u32 = 3236;
+pub const F_PG_LSN_MI: u32 = 3237;
+pub const F_PG_LSN_RECV: u32 = 3238;
+pub const F_PG_LSN_SEND: u32 = 3239;
+pub const F_PG_LSN_CMP: u32 = 3251;
+pub const F_PG_LSN_HASH: u32 = 3252;
+pub const F_BTTEXTSORTSUPPORT: u32 = 3255;
+pub const F_GENERATE_SERIES_NUMERIC_NUMERIC_NUMERIC: u32 = 3259;
+pub const F_GENERATE_SERIES_NUMERIC_NUMERIC: u32 = 3260;
+pub const F_JSON_STRIP_NULLS: u32 = 3261;
+pub const F_JSONB_STRIP_NULLS: u32 = 3262;
+pub const F_JSONB_OBJECT__TEXT: u32 = 3263;
+pub const F_JSONB_OBJECT__TEXT__TEXT: u32 = 3264;
+pub const F_JSONB_AGG_TRANSFN: u32 = 3265;
+pub const F_JSONB_AGG_FINALFN: u32 = 3266;
+pub const F_JSONB_AGG: u32 = 3267;
+pub const F_JSONB_OBJECT_AGG_TRANSFN: u32 = 3268;
+pub const F_JSONB_OBJECT_AGG_FINALFN: u32 = 3269;
+pub const F_JSONB_OBJECT_AGG: u32 = 3270;
+pub const F_JSONB_BUILD_ARRAY_ANY: u32 = 3271;
+pub const F_JSONB_BUILD_ARRAY_: u32 = 3272;
+pub const F_JSONB_BUILD_OBJECT_ANY: u32 = 3273;
+pub const F_JSONB_BUILD_OBJECT_: u32 = 3274;
+pub const F_DIST_PPOLY: u32 = 3275;
+pub const F_ARRAY_POSITION_ANYCOMPATIBLEARRAY_ANYCOMPATIBLE: u32 = 3277;
+pub const F_ARRAY_POSITION_ANYCOMPATIBLEARRAY_ANYCOMPATIBLE_INT4: u32 = 3278;
+pub const F_ARRAY_POSITIONS: u32 = 3279;
+pub const F_GIST_CIRCLE_DISTANCE: u32 = 3280;
+pub const F_SCALE: u32 = 3281;
+pub const F_GIST_POINT_FETCH: u32 = 3282;
+pub const F_NUMERIC_SORTSUPPORT: u32 = 3283;
+pub const F_GIST_POLY_DISTANCE: u32 = 3288;
+pub const F_DIST_CPOINT: u32 = 3290;
+pub const F_DIST_POLYP: u32 = 3292;
+pub const F_PG_READ_FILE_TEXT_INT8_INT8_BOOL: u32 = 3293;
+pub const F_CURRENT_SETTING_TEXT_BOOL: u32 = 3294;
+pub const F_PG_READ_BINARY_FILE_TEXT_INT8_INT8_BOOL: u32 = 3295;
+pub const F_PG_NOTIFICATION_QUEUE_USAGE: u32 = 3296;
+pub const F_PG_LS_DIR_TEXT_BOOL_BOOL: u32 = 3297;
+pub const F_ROW_SECURITY_ACTIVE_OID: Oid = Oid(3298);
+pub const F_ROW_SECURITY_ACTIVE_TEXT: u32 = 3299;
+pub const F_UUID_SORTSUPPORT: u32 = 3300;
+pub const F_JSONB_CONCAT: u32 = 3301;
+pub const F_JSONB_DELETE_JSONB_TEXT: u32 = 3302;
+pub const F_JSONB_DELETE_JSONB_INT4: u32 = 3303;
+pub const F_JSONB_DELETE_PATH: u32 = 3304;
+pub const F_JSONB_SET: u32 = 3305;
+pub const F_JSONB_PRETTY: u32 = 3306;
+pub const F_PG_STAT_FILE_TEXT_BOOL: u32 = 3307;
+pub const F_XIDNEQ: u32 = 3308;
+pub const F_XIDNEQINT4: u32 = 3309;
+pub const F_TSM_HANDLER_IN: u32 = 3311;
+pub const F_TSM_HANDLER_OUT: u32 = 3312;
+pub const F_BERNOULLI: u32 = 3313;
+pub const F_SYSTEM: u32 = 3314;
+pub const F_PG_STAT_GET_WAL_RECEIVER: u32 = 3317;
+pub const F_PG_STAT_GET_PROGRESS_INFO: u32 = 3318;
+pub const F_TS_FILTER: u32 = 3319;
+pub const F_SETWEIGHT_TSVECTOR_CHAR__TEXT: u32 = 3320;
+pub const F_TS_DELETE_TSVECTOR_TEXT: u32 = 3321;
+pub const F_UNNEST_TSVECTOR: u32 = 3322;
+pub const F_TS_DELETE_TSVECTOR__TEXT: u32 = 3323;
+pub const F_INT4_AVG_COMBINE: u32 = 3324;
+pub const F_INTERVAL_COMBINE: u32 = 3325;
+pub const F_TSVECTOR_TO_ARRAY: u32 = 3326;
+pub const F_ARRAY_TO_TSVECTOR: u32 = 3327;
+pub const F_BPCHAR_SORTSUPPORT: u32 = 3328;
+pub const F_PG_SHOW_ALL_FILE_SETTINGS: u32 = 3329;
+pub const F_PG_CURRENT_WAL_FLUSH_LSN: u32 = 3330;
+pub const F_BYTEA_SORTSUPPORT: u32 = 3331;
+pub const F_BTTEXT_PATTERN_SORTSUPPORT: u32 = 3332;
+pub const F_BTBPCHAR_PATTERN_SORTSUPPORT: u32 = 3333;
+pub const F_PG_SIZE_BYTES: u32 = 3334;
+pub const F_NUMERIC_SERIALIZE: u32 = 3335;
+pub const F_NUMERIC_DESERIALIZE: u32 = 3336;
+pub const F_NUMERIC_AVG_COMBINE: u32 = 3337;
+pub const F_NUMERIC_POLY_COMBINE: u32 = 3338;
+pub const F_NUMERIC_POLY_SERIALIZE: u32 = 3339;
+pub const F_NUMERIC_POLY_DESERIALIZE: u32 = 3340;
+pub const F_NUMERIC_COMBINE: u32 = 3341;
+pub const F_FLOAT8_REGR_COMBINE: u32 = 3342;
+pub const F_JSONB_DELETE_JSONB__TEXT: u32 = 3343;
+pub const F_CASH_MUL_INT8: u32 = 3344;
+pub const F_CASH_DIV_INT8: u32 = 3345;
+pub const F_TXID_CURRENT_IF_ASSIGNED: u32 = 3348;
+pub const F_PG_GET_PARTKEYDEF: u32 = 3352;
+pub const F_PG_LS_LOGDIR: u32 = 3353;
+pub const F_PG_LS_WALDIR: u32 = 3354;
+pub const F_PG_NDISTINCT_IN: u32 = 3355;
+pub const F_PG_NDISTINCT_OUT: u32 = 3356;
+pub const F_PG_NDISTINCT_RECV: u32 = 3357;
+pub const F_PG_NDISTINCT_SEND: u32 = 3358;
+pub const F_MACADDR_SORTSUPPORT: u32 = 3359;
+pub const F_TXID_STATUS: u32 = 3360;
+pub const F_PG_SAFE_SNAPSHOT_BLOCKING_PIDS: u32 = 3376;
+pub const F_PG_ISOLATION_TEST_SESSION_IS_BLOCKED: u32 = 3378;
+pub const F_PG_IDENTIFY_OBJECT_AS_ADDRESS: u32 = 3382;
+pub const F_BRIN_MINMAX_OPCINFO: u32 = 3383;
+pub const F_BRIN_MINMAX_ADD_VALUE: u32 = 3384;
+pub const F_BRIN_MINMAX_CONSISTENT: u32 = 3385;
+pub const F_BRIN_MINMAX_UNION: u32 = 3386;
+pub const F_INT8_AVG_ACCUM_INV: u32 = 3387;
+pub const F_NUMERIC_POLY_SUM: u32 = 3388;
+pub const F_NUMERIC_POLY_AVG: u32 = 3389;
+pub const F_NUMERIC_POLY_VAR_POP: u32 = 3390;
+pub const F_NUMERIC_POLY_VAR_SAMP: u32 = 3391;
+pub const F_NUMERIC_POLY_STDDEV_POP: u32 = 3392;
+pub const F_NUMERIC_POLY_STDDEV_SAMP: u32 = 3393;
+pub const F_REGEXP_MATCH_TEXT_TEXT: u32 = 3396;
+pub const F_REGEXP_MATCH_TEXT_TEXT_TEXT: u32 = 3397;
+pub const F_INT8_MUL_CASH: u32 = 3399;
+pub const F_PG_CONFIG: u32 = 3400;
+pub const F_PG_HBA_FILE_RULES: u32 = 3401;
+pub const F_PG_STATISTICS_OBJ_IS_VISIBLE: u32 = 3403;
+pub const F_PG_DEPENDENCIES_IN: u32 = 3404;
+pub const F_PG_DEPENDENCIES_OUT: u32 = 3405;
+pub const F_PG_DEPENDENCIES_RECV: u32 = 3406;
+pub const F_PG_DEPENDENCIES_SEND: u32 = 3407;
+pub const F_PG_GET_PARTITION_CONSTRAINTDEF: u32 = 3408;
+pub const F_TIME_HASH_EXTENDED: u32 = 3409;
+pub const F_TIMETZ_HASH_EXTENDED: u32 = 3410;
+pub const F_TIMESTAMP_HASH_EXTENDED: u32 = 3411;
+pub const F_UUID_HASH_EXTENDED: u32 = 3412;
+pub const F_PG_LSN_HASH_EXTENDED: u32 = 3413;
+pub const F_HASHENUMEXTENDED: u32 = 3414;
+pub const F_PG_GET_STATISTICSOBJDEF: u32 = 3415;
+pub const F_JSONB_HASH_EXTENDED: u32 = 3416;
+pub const F_HASH_RANGE_EXTENDED: u32 = 3417;
+pub const F_INTERVAL_HASH_EXTENDED: u32 = 3418;
+pub const F_SHA224: u32 = 3419;
+pub const F_SHA256: u32 = 3420;
+pub const F_SHA384: u32 = 3421;
+pub const F_SHA512: u32 = 3422;
+pub const F_PG_PARTITION_TREE: u32 = 3423;
+pub const F_PG_PARTITION_ROOT: u32 = 3424;
+pub const F_PG_PARTITION_ANCESTORS: u32 = 3425;
+pub const F_PG_STAT_GET_DB_CHECKSUM_FAILURES: u32 = 3426;
+pub const F_PG_MCV_LIST_ITEMS: u32 = 3427;
+pub const F_PG_STAT_GET_DB_CHECKSUM_LAST_FAILURE: u32 = 3428;
+pub const F_GEN_RANDOM_UUID: u32 = 3432;
+pub const F_GTSVECTOR_OPTIONS: u32 = 3434;
+pub const F_GIST_POINT_SORTSUPPORT: u32 = 3435;
+pub const F_PG_PROMOTE: u32 = 3436;
+pub const F_PREFIXSEL: u32 = 3437;
+pub const F_PREFIXJOINSEL: u32 = 3438;
+pub const F_PG_CONTROL_SYSTEM: u32 = 3441;
+pub const F_PG_CONTROL_CHECKPOINT: u32 = 3442;
+pub const F_PG_CONTROL_RECOVERY: u32 = 3443;
+pub const F_PG_CONTROL_INIT: u32 = 3444;
+pub const F_PG_IMPORT_SYSTEM_COLLATIONS: u32 = 3445;
+pub const F_MACADDR8_RECV: u32 = 3446;
+pub const F_MACADDR8_SEND: u32 = 3447;
+pub const F_PG_COLLATION_ACTUAL_VERSION: u32 = 3448;
+pub const F_NUMERIC_JSONB: u32 = 3449;
+pub const F_INT2_JSONB: u32 = 3450;
+pub const F_INT4_JSONB: u32 = 3451;
+pub const F_INT8_JSONB: u32 = 3452;
+pub const F_FLOAT4_JSONB: u32 = 3453;
+pub const F_PG_FILENODE_RELATION: u32 = 3454;
+pub const F_LO_FROM_BYTEA: u32 = 3457;
+pub const F_LO_GET_OID: Oid = Oid(3458);
+pub const F_LO_GET_OID_INT8_INT4: u32 = 3459;
+pub const F_LO_PUT: u32 = 3460;
+pub const F_MAKE_TIMESTAMP: u32 = 3461;
+pub const F_MAKE_TIMESTAMPTZ_INT4_INT4_INT4_INT4_INT4_FLOAT8: u32 = 3462;
+pub const F_MAKE_TIMESTAMPTZ_INT4_INT4_INT4_INT4_INT4_FLOAT8_TEXT: u32 = 3463;
+pub const F_MAKE_INTERVAL: u32 = 3464;
+pub const F_JSONB_ARRAY_ELEMENTS_TEXT: u32 = 3465;
+pub const F_SPG_RANGE_QUAD_CONFIG: u32 = 3469;
+pub const F_SPG_RANGE_QUAD_CHOOSE: u32 = 3470;
+pub const F_SPG_RANGE_QUAD_PICKSPLIT: u32 = 3471;
+pub const F_SPG_RANGE_QUAD_INNER_CONSISTENT: u32 = 3472;
+pub const F_SPG_RANGE_QUAD_LEAF_CONSISTENT: u32 = 3473;
+pub const F_JSONB_POPULATE_RECORDSET: u32 = 3475;
+pub const F_TO_REGOPERATOR: u32 = 3476;
+pub const F_JSONB_OBJECT_FIELD: u32 = 3478;
+pub const F_TO_REGPROCEDURE: u32 = 3479;
+pub const F_GIN_COMPARE_JSONB: u32 = 3480;
+pub const F_GIN_EXTRACT_JSONB: u32 = 3482;
+pub const F_GIN_EXTRACT_JSONB_QUERY: u32 = 3483;
+pub const F_GIN_CONSISTENT_JSONB: u32 = 3484;
+pub const F_GIN_EXTRACT_JSONB_PATH: u32 = 3485;
+pub const F_GIN_EXTRACT_JSONB_QUERY_PATH: u32 = 3486;
+pub const F_GIN_CONSISTENT_JSONB_PATH: u32 = 3487;
+pub const F_GIN_TRICONSISTENT_JSONB: u32 = 3488;
+pub const F_GIN_TRICONSISTENT_JSONB_PATH: u32 = 3489;
+pub const F_JSONB_TO_RECORD: u32 = 3490;
+pub const F_JSONB_TO_RECORDSET: u32 = 3491;
+pub const F_TO_REGOPER: u32 = 3492;
+pub const F_TO_REGTYPE: u32 = 3493;
+pub const F_TO_REGPROC: u32 = 3494;
+pub const F_TO_REGCLASS: u32 = 3495;
+pub const F_BOOL_ACCUM: u32 = 3496;
+pub const F_BOOL_ACCUM_INV: u32 = 3497;
+pub const F_BOOL_ALLTRUE: u32 = 3498;
+pub const F_BOOL_ANYTRUE: u32 = 3499;
+pub const F_ANYENUM_IN: u32 = 3504;
+pub const F_ANYENUM_OUT: u32 = 3505;
+pub const F_ENUM_IN: u32 = 3506;
+pub const F_ENUM_OUT: u32 = 3507;
+pub const F_ENUM_EQ: u32 = 3508;
+pub const F_ENUM_NE: u32 = 3509;
+pub const F_ENUM_LT: u32 = 3510;
+pub const F_ENUM_GT: u32 = 3511;
+pub const F_ENUM_LE: u32 = 3512;
+pub const F_ENUM_GE: u32 = 3513;
+pub const F_ENUM_CMP: u32 = 3514;
+pub const F_HASHENUM: u32 = 3515;
+pub const F_ENUM_SMALLER: u32 = 3524;
+pub const F_ENUM_LARGER: u32 = 3525;
+pub const F_MAX_ANYENUM: u32 = 3526;
+pub const F_MIN_ANYENUM: u32 = 3527;
+pub const F_ENUM_FIRST: u32 = 3528;
+pub const F_ENUM_LAST: u32 = 3529;
+pub const F_ENUM_RANGE_ANYENUM_ANYENUM: u32 = 3530;
+pub const F_ENUM_RANGE_ANYENUM: u32 = 3531;
+pub const F_ENUM_RECV: u32 = 3532;
+pub const F_ENUM_SEND: u32 = 3533;
+pub const F_STRING_AGG_TRANSFN: u32 = 3535;
+pub const F_STRING_AGG_FINALFN: u32 = 3536;
+pub const F_PG_DESCRIBE_OBJECT: u32 = 3537;
+pub const F_STRING_AGG_TEXT_TEXT: u32 = 3538;
+pub const F_FORMAT_TEXT_ANY: u32 = 3539;
+pub const F_FORMAT_TEXT: u32 = 3540;
+pub const F_BYTEA_STRING_AGG_TRANSFN: u32 = 3543;
+pub const F_BYTEA_STRING_AGG_FINALFN: u32 = 3544;
+pub const F_STRING_AGG_BYTEA_BYTEA: u32 = 3545;
+pub const F_INT8DEC: u32 = 3546;
+pub const F_INT8DEC_ANY: u32 = 3547;
+pub const F_NUMERIC_ACCUM_INV: u32 = 3548;
+pub const F_INTERVAL_ACCUM_INV: u32 = 3549;
+pub const F_NETWORK_OVERLAP: u32 = 3551;
+pub const F_INET_GIST_CONSISTENT: u32 = 3553;
+pub const F_INET_GIST_UNION: u32 = 3554;
+pub const F_INET_GIST_COMPRESS: u32 = 3555;
+pub const F_BOOL_JSONB: u32 = 3556;
+pub const F_INET_GIST_PENALTY: u32 = 3557;
+pub const F_INET_GIST_PICKSPLIT: u32 = 3558;
+pub const F_INET_GIST_SAME: u32 = 3559;
+pub const F_NETWORKSEL: u32 = 3560;
+pub const F_NETWORKJOINSEL: u32 = 3561;
+pub const F_NETWORK_LARGER: u32 = 3562;
+pub const F_NETWORK_SMALLER: u32 = 3563;
+pub const F_MAX_INET: u32 = 3564;
+pub const F_MIN_INET: u32 = 3565;
+pub const F_PG_EVENT_TRIGGER_DROPPED_OBJECTS: u32 = 3566;
+pub const F_INT2_ACCUM_INV: u32 = 3567;
+pub const F_INT4_ACCUM_INV: u32 = 3568;
+pub const F_INT8_ACCUM_INV: u32 = 3569;
+pub const F_INT2_AVG_ACCUM_INV: u32 = 3570;
+pub const F_INT4_AVG_ACCUM_INV: u32 = 3571;
+pub const F_INT2INT4_SUM: u32 = 3572;
+pub const F_INET_GIST_FETCH: u32 = 3573;
+pub const F_PG_LOGICAL_EMIT_MESSAGE_BOOL_TEXT_TEXT: u32 = 3577;
+pub const F_PG_LOGICAL_EMIT_MESSAGE_BOOL_TEXT_BYTEA: u32 = 3578;
+pub const F_JSONB_INSERT: u32 = 3579;
+pub const F_PG_XACT_COMMIT_TIMESTAMP: u32 = 3581;
+pub const F_BINARY_UPGRADE_SET_NEXT_PG_TYPE_OID: Oid = Oid(3582);
+pub const F_PG_LAST_COMMITTED_XACT: u32 = 3583;
+pub const F_BINARY_UPGRADE_SET_NEXT_ARRAY_PG_TYPE_OID: Oid = Oid(3584);
+pub const F_BINARY_UPGRADE_SET_NEXT_HEAP_PG_CLASS_OID: Oid = Oid(3586);
+pub const F_BINARY_UPGRADE_SET_NEXT_INDEX_PG_CLASS_OID: Oid = Oid(3587);
+pub const F_BINARY_UPGRADE_SET_NEXT_TOAST_PG_CLASS_OID: Oid = Oid(3588);
+pub const F_BINARY_UPGRADE_SET_NEXT_PG_ENUM_OID: Oid = Oid(3589);
+pub const F_BINARY_UPGRADE_SET_NEXT_PG_AUTHID_OID: Oid = Oid(3590);
+pub const F_BINARY_UPGRADE_CREATE_EMPTY_EXTENSION: u32 = 3591;
+pub const F_EVENT_TRIGGER_IN: u32 = 3594;
+pub const F_EVENT_TRIGGER_OUT: u32 = 3595;
+pub const F_TSVECTORIN: u32 = 3610;
+pub const F_TSVECTOROUT: u32 = 3611;
+pub const F_TSQUERYIN: u32 = 3612;
+pub const F_TSQUERYOUT: u32 = 3613;
+pub const F_TSVECTOR_LT: u32 = 3616;
+pub const F_TSVECTOR_LE: u32 = 3617;
+pub const F_TSVECTOR_EQ: u32 = 3618;
+pub const F_TSVECTOR_NE: u32 = 3619;
+pub const F_TSVECTOR_GE: u32 = 3620;
+pub const F_TSVECTOR_GT: u32 = 3621;
+pub const F_TSVECTOR_CMP: u32 = 3622;
+pub const F_STRIP: u32 = 3623;
+pub const F_SETWEIGHT_TSVECTOR_CHAR: u32 = 3624;
+pub const F_TSVECTOR_CONCAT: u32 = 3625;
+pub const F_TS_MATCH_VQ: u32 = 3634;
+pub const F_TS_MATCH_QV: u32 = 3635;
+pub const F_TSVECTORSEND: u32 = 3638;
+pub const F_TSVECTORRECV: u32 = 3639;
+pub const F_TSQUERYSEND: u32 = 3640;
+pub const F_TSQUERYRECV: u32 = 3641;
+pub const F_GTSVECTORIN: u32 = 3646;
+pub const F_GTSVECTOROUT: u32 = 3647;
+pub const F_GTSVECTOR_COMPRESS: u32 = 3648;
+pub const F_GTSVECTOR_DECOMPRESS: u32 = 3649;
+pub const F_GTSVECTOR_PICKSPLIT: u32 = 3650;
+pub const F_GTSVECTOR_UNION: u32 = 3651;
+pub const F_GTSVECTOR_SAME: u32 = 3652;
+pub const F_GTSVECTOR_PENALTY: u32 = 3653;
+pub const F_GTSVECTOR_CONSISTENT_INTERNAL_TSVECTOR_INT2_OID_INTERNAL: u32 = 3654;
+pub const F_GIN_EXTRACT_TSVECTOR_TSVECTOR_INTERNAL_INTERNAL: u32 = 3656;
+pub const F_GIN_EXTRACT_TSQUERY_TSVECTOR_INTERNAL_INT2_INTERNAL_INTERNAL_INTERNAL_INTERNAL: u32 =
+    3657;
+pub const F_GIN_TSQUERY_CONSISTENT_INTERNAL_INT2_TSVECTOR_INT4_INTERNAL_INTERNAL_INTERNAL_INTERNAL : u32 = 3658 ;
+pub const F_TSQUERY_LT: u32 = 3662;
+pub const F_TSQUERY_LE: u32 = 3663;
+pub const F_TSQUERY_EQ: u32 = 3664;
+pub const F_TSQUERY_NE: u32 = 3665;
+pub const F_TSQUERY_GE: u32 = 3666;
+pub const F_TSQUERY_GT: u32 = 3667;
+pub const F_TSQUERY_CMP: u32 = 3668;
+pub const F_TSQUERY_AND: u32 = 3669;
+pub const F_TSQUERY_OR: u32 = 3670;
+pub const F_TSQUERY_NOT: u32 = 3671;
+pub const F_NUMNODE: u32 = 3672;
+pub const F_QUERYTREE: u32 = 3673;
+pub const F_TS_REWRITE_TSQUERY_TSQUERY_TSQUERY: u32 = 3684;
+pub const F_TS_REWRITE_TSQUERY_TEXT: u32 = 3685;
+pub const F_TSMATCHSEL: u32 = 3686;
+pub const F_TSMATCHJOINSEL: u32 = 3687;
+pub const F_TS_TYPANALYZE: u32 = 3688;
+pub const F_TS_STAT_TEXT: u32 = 3689;
+pub const F_TS_STAT_TEXT_TEXT: u32 = 3690;
+pub const F_TSQ_MCONTAINS: u32 = 3691;
+pub const F_TSQ_MCONTAINED: u32 = 3692;
+pub const F_GTSQUERY_COMPRESS: u32 = 3695;
+pub const F_STARTS_WITH: u32 = 3696;
+pub const F_GTSQUERY_PICKSPLIT: u32 = 3697;
+pub const F_GTSQUERY_UNION: u32 = 3698;
+pub const F_GTSQUERY_SAME: u32 = 3699;
+pub const F_GTSQUERY_PENALTY: u32 = 3700;
+pub const F_GTSQUERY_CONSISTENT_INTERNAL_TSQUERY_INT2_OID_INTERNAL: u32 = 3701;
+pub const F_TS_RANK__FLOAT4_TSVECTOR_TSQUERY_INT4: u32 = 3703;
+pub const F_TS_RANK__FLOAT4_TSVECTOR_TSQUERY: u32 = 3704;
+pub const F_TS_RANK_TSVECTOR_TSQUERY_INT4: u32 = 3705;
+pub const F_TS_RANK_TSVECTOR_TSQUERY: u32 = 3706;
+pub const F_TS_RANK_CD__FLOAT4_TSVECTOR_TSQUERY_INT4: u32 = 3707;
+pub const F_TS_RANK_CD__FLOAT4_TSVECTOR_TSQUERY: u32 = 3708;
+pub const F_TS_RANK_CD_TSVECTOR_TSQUERY_INT4: u32 = 3709;
+pub const F_TS_RANK_CD_TSVECTOR_TSQUERY: u32 = 3710;
+pub const F_LENGTH_TSVECTOR: u32 = 3711;
+pub const F_TS_TOKEN_TYPE_OID: Oid = Oid(3713);
+pub const F_TS_TOKEN_TYPE_TEXT: u32 = 3714;
+pub const F_TS_PARSE_OID_TEXT: u32 = 3715;
+pub const F_TS_PARSE_TEXT_TEXT: u32 = 3716;
+pub const F_PRSD_START: u32 = 3717;
+pub const F_PRSD_NEXTTOKEN: u32 = 3718;
+pub const F_PRSD_END: u32 = 3719;
+pub const F_PRSD_HEADLINE: u32 = 3720;
+pub const F_PRSD_LEXTYPE: u32 = 3721;
+pub const F_TS_LEXIZE: u32 = 3723;
+pub const F_GIN_CMP_TSLEXEME: u32 = 3724;
+pub const F_DSIMPLE_INIT: u32 = 3725;
+pub const F_DSIMPLE_LEXIZE: u32 = 3726;
+pub const F_DSYNONYM_INIT: u32 = 3728;
+pub const F_DSYNONYM_LEXIZE: u32 = 3729;
+pub const F_DISPELL_INIT: u32 = 3731;
+pub const F_DISPELL_LEXIZE: u32 = 3732;
+pub const F_REGCONFIGIN: u32 = 3736;
+pub const F_REGCONFIGOUT: u32 = 3737;
+pub const F_REGCONFIGRECV: u32 = 3738;
+pub const F_REGCONFIGSEND: u32 = 3739;
+pub const F_THESAURUS_INIT: u32 = 3740;
+pub const F_THESAURUS_LEXIZE: u32 = 3741;
+pub const F_TS_HEADLINE_REGCONFIG_TEXT_TSQUERY_TEXT: u32 = 3743;
+pub const F_TS_HEADLINE_REGCONFIG_TEXT_TSQUERY: u32 = 3744;
+pub const F_TO_TSVECTOR_REGCONFIG_TEXT: u32 = 3745;
+pub const F_TO_TSQUERY_REGCONFIG_TEXT: u32 = 3746;
+pub const F_PLAINTO_TSQUERY_REGCONFIG_TEXT: u32 = 3747;
+pub const F_TO_TSVECTOR_TEXT: u32 = 3749;
+pub const F_TO_TSQUERY_TEXT: u32 = 3750;
+pub const F_PLAINTO_TSQUERY_TEXT: u32 = 3751;
+pub const F_TSVECTOR_UPDATE_TRIGGER: u32 = 3752;
+pub const F_TSVECTOR_UPDATE_TRIGGER_COLUMN: u32 = 3753;
+pub const F_TS_HEADLINE_TEXT_TSQUERY_TEXT: u32 = 3754;
+pub const F_TS_HEADLINE_TEXT_TSQUERY: u32 = 3755;
+pub const F_PG_TS_PARSER_IS_VISIBLE: u32 = 3756;
+pub const F_PG_TS_DICT_IS_VISIBLE: u32 = 3757;
+pub const F_PG_TS_CONFIG_IS_VISIBLE: u32 = 3758;
+pub const F_GET_CURRENT_TS_CONFIG: u32 = 3759;
+pub const F_TS_MATCH_TT: u32 = 3760;
+pub const F_TS_MATCH_TQ: u32 = 3761;
+pub const F_PG_TS_TEMPLATE_IS_VISIBLE: u32 = 3768;
+pub const F_REGDICTIONARYIN: u32 = 3771;
+pub const F_REGDICTIONARYOUT: u32 = 3772;
+pub const F_REGDICTIONARYRECV: u32 = 3773;
+pub const F_REGDICTIONARYSEND: u32 = 3774;
+pub const F_PG_STAT_RESET_SHARED: u32 = 3775;
+pub const F_PG_STAT_RESET_SINGLE_TABLE_COUNTERS: u32 = 3776;
+pub const F_PG_STAT_RESET_SINGLE_FUNCTION_COUNTERS: u32 = 3777;
+pub const F_PG_TABLESPACE_LOCATION: u32 = 3778;
+pub const F_PG_CREATE_PHYSICAL_REPLICATION_SLOT: u32 = 3779;
+pub const F_PG_DROP_REPLICATION_SLOT: u32 = 3780;
+pub const F_PG_GET_REPLICATION_SLOTS: u32 = 3781;
+pub const F_PG_LOGICAL_SLOT_GET_CHANGES: u32 = 3782;
+pub const F_PG_LOGICAL_SLOT_GET_BINARY_CHANGES: u32 = 3783;
+pub const F_PG_LOGICAL_SLOT_PEEK_CHANGES: u32 = 3784;
+pub const F_PG_LOGICAL_SLOT_PEEK_BINARY_CHANGES: u32 = 3785;
+pub const F_PG_CREATE_LOGICAL_REPLICATION_SLOT: u32 = 3786;
+pub const F_TO_JSONB: u32 = 3787;
+pub const F_PG_STAT_GET_SNAPSHOT_TIMESTAMP: u32 = 3788;
+pub const F_GIN_CLEAN_PENDING_LIST: u32 = 3789;
+pub const F_GTSVECTOR_CONSISTENT_INTERNAL_GTSVECTOR_INT4_OID_INTERNAL: u32 = 3790;
+pub const F_GIN_EXTRACT_TSQUERY_TSQUERY_INTERNAL_INT2_INTERNAL_INTERNAL_INTERNAL_INTERNAL: u32 =
+    3791;
+pub const F_GIN_TSQUERY_CONSISTENT_INTERNAL_INT2_TSQUERY_INT4_INTERNAL_INTERNAL_INTERNAL_INTERNAL : u32 = 3792 ;
+pub const F_GTSQUERY_CONSISTENT_INTERNAL_INTERNAL_INT4_OID_INTERNAL: u32 = 3793;
+pub const F_INET_SPG_CONFIG: u32 = 3795;
+pub const F_INET_SPG_CHOOSE: u32 = 3796;
+pub const F_INET_SPG_PICKSPLIT: u32 = 3797;
+pub const F_INET_SPG_INNER_CONSISTENT: u32 = 3798;
+pub const F_INET_SPG_LEAF_CONSISTENT: u32 = 3799;
+pub const F_PG_CURRENT_LOGFILE_: u32 = 3800;
+pub const F_PG_CURRENT_LOGFILE_TEXT: u32 = 3801;
+pub const F_JSONB_SEND: u32 = 3803;
+pub const F_JSONB_OUT: u32 = 3804;
+pub const F_JSONB_RECV: u32 = 3805;
+pub const F_JSONB_IN: u32 = 3806;
+pub const F_PG_GET_FUNCTION_ARG_DEFAULT: u32 = 3808;
+pub const F_PG_EXPORT_SNAPSHOT: u32 = 3809;
+pub const F_PG_IS_IN_RECOVERY: u32 = 3810;
+pub const F_MONEY_INT4: u32 = 3811;
+pub const F_MONEY_INT8: u32 = 3812;
+pub const F_PG_COLLATION_IS_VISIBLE: u32 = 3815;
+pub const F_ARRAY_TYPANALYZE: u32 = 3816;
+pub const F_ARRAYCONTSEL: u32 = 3817;
+pub const F_ARRAYCONTJOINSEL: u32 = 3818;
+pub const F_PG_GET_MULTIXACT_MEMBERS: u32 = 3819;
+pub const F_PG_LAST_WAL_RECEIVE_LSN: u32 = 3820;
+pub const F_PG_LAST_WAL_REPLAY_LSN: u32 = 3821;
+pub const F_CASH_DIV_CASH: u32 = 3822;
+pub const F_NUMERIC_MONEY: u32 = 3823;
+pub const F_MONEY_NUMERIC: u32 = 3824;
+pub const F_PG_READ_FILE_TEXT: u32 = 3826;
+pub const F_PG_READ_BINARY_FILE_TEXT_INT8_INT8: u32 = 3827;
+pub const F_PG_READ_BINARY_FILE_TEXT: u32 = 3828;
+pub const F_PG_OPFAMILY_IS_VISIBLE: u32 = 3829;
+pub const F_PG_LAST_XACT_REPLAY_TIMESTAMP: u32 = 3830;
+pub const F_ANYRANGE_IN: u32 = 3832;
+pub const F_ANYRANGE_OUT: u32 = 3833;
+pub const F_RANGE_IN: u32 = 3834;
+pub const F_RANGE_OUT: u32 = 3835;
+pub const F_RANGE_RECV: u32 = 3836;
+pub const F_RANGE_SEND: u32 = 3837;
+pub const F_PG_IDENTIFY_OBJECT: u32 = 3839;
+pub const F_INT4RANGE_INT4_INT4: u32 = 3840;
+pub const F_INT4RANGE_INT4_INT4_TEXT: u32 = 3841;
+pub const F_PG_RELATION_IS_UPDATABLE: u32 = 3842;
+pub const F_PG_COLUMN_IS_UPDATABLE: u32 = 3843;
+pub const F_NUMRANGE_NUMERIC_NUMERIC: u32 = 3844;
+pub const F_NUMRANGE_NUMERIC_NUMERIC_TEXT: u32 = 3845;
+pub const F_MAKE_DATE: u32 = 3846;
+pub const F_MAKE_TIME: u32 = 3847;
+pub const F_LOWER_ANYRANGE: u32 = 3848;
+pub const F_UPPER_ANYRANGE: u32 = 3849;
+pub const F_ISEMPTY_ANYRANGE: u32 = 3850;
+pub const F_LOWER_INC_ANYRANGE: u32 = 3851;
+pub const F_UPPER_INC_ANYRANGE: u32 = 3852;
+pub const F_LOWER_INF_ANYRANGE: u32 = 3853;
+pub const F_UPPER_INF_ANYRANGE: u32 = 3854;
+pub const F_RANGE_EQ: u32 = 3855;
+pub const F_RANGE_NE: u32 = 3856;
+pub const F_RANGE_OVERLAPS: u32 = 3857;
+pub const F_RANGE_CONTAINS_ELEM: u32 = 3858;
+pub const F_RANGE_CONTAINS: u32 = 3859;
+pub const F_ELEM_CONTAINED_BY_RANGE: u32 = 3860;
+pub const F_RANGE_CONTAINED_BY: u32 = 3861;
+pub const F_RANGE_ADJACENT: u32 = 3862;
+pub const F_RANGE_BEFORE: u32 = 3863;
+pub const F_RANGE_AFTER: u32 = 3864;
+pub const F_RANGE_OVERLEFT: u32 = 3865;
+pub const F_RANGE_OVERRIGHT: u32 = 3866;
+pub const F_RANGE_UNION: u32 = 3867;
+pub const F_RANGE_INTERSECT: u32 = 3868;
+pub const F_RANGE_MINUS: u32 = 3869;
+pub const F_RANGE_CMP: u32 = 3870;
+pub const F_RANGE_LT: u32 = 3871;
+pub const F_RANGE_LE: u32 = 3872;
+pub const F_RANGE_GE: u32 = 3873;
+pub const F_RANGE_GT: u32 = 3874;
+pub const F_RANGE_GIST_CONSISTENT: u32 = 3875;
+pub const F_RANGE_GIST_UNION: u32 = 3876;
+pub const F_PG_REPLICATION_SLOT_ADVANCE: u32 = 3878;
+pub const F_RANGE_GIST_PENALTY: u32 = 3879;
+pub const F_RANGE_GIST_PICKSPLIT: u32 = 3880;
+pub const F_RANGE_GIST_SAME: u32 = 3881;
+pub const F_HASH_RANGE: u32 = 3902;
+pub const F_INT4RANGE_CANONICAL: u32 = 3914;
+pub const F_DATERANGE_CANONICAL: u32 = 3915;
+pub const F_RANGE_TYPANALYZE: u32 = 3916;
+pub const F_TIMESTAMP_SUPPORT: u32 = 3917;
+pub const F_INTERVAL_SUPPORT: u32 = 3918;
+pub const F_GINARRAYTRICONSISTENT: u32 = 3920;
+pub const F_GIN_TSQUERY_TRICONSISTENT: u32 = 3921;
+pub const F_INT4RANGE_SUBDIFF: u32 = 3922;
+pub const F_INT8RANGE_SUBDIFF: u32 = 3923;
+pub const F_NUMRANGE_SUBDIFF: u32 = 3924;
+pub const F_DATERANGE_SUBDIFF: u32 = 3925;
+pub const F_INT8RANGE_CANONICAL: u32 = 3928;
+pub const F_TSRANGE_SUBDIFF: u32 = 3929;
+pub const F_TSTZRANGE_SUBDIFF: u32 = 3930;
+pub const F_JSONB_OBJECT_KEYS: u32 = 3931;
+pub const F_JSONB_EACH_TEXT: u32 = 3932;
+pub const F_TSRANGE_TIMESTAMP_TIMESTAMP: u32 = 3933;
+pub const F_TSRANGE_TIMESTAMP_TIMESTAMP_TEXT: u32 = 3934;
+pub const F_PG_SLEEP_FOR: u32 = 3935;
+pub const F_PG_SLEEP_UNTIL: u32 = 3936;
+pub const F_TSTZRANGE_TIMESTAMPTZ_TIMESTAMPTZ: u32 = 3937;
+pub const F_TSTZRANGE_TIMESTAMPTZ_TIMESTAMPTZ_TEXT: u32 = 3938;
+pub const F_MXID_AGE: u32 = 3939;
+pub const F_JSONB_EXTRACT_PATH_TEXT: u32 = 3940;
+pub const F_DATERANGE_DATE_DATE: u32 = 3941;
+pub const F_DATERANGE_DATE_DATE_TEXT: u32 = 3942;
+pub const F_ACLDEFAULT: u32 = 3943;
+pub const F_TIME_SUPPORT: u32 = 3944;
+pub const F_INT8RANGE_INT8_INT8: u32 = 3945;
+pub const F_INT8RANGE_INT8_INT8_TEXT: u32 = 3946;
+pub const F_JSON_OBJECT_FIELD: u32 = 3947;
+pub const F_JSON_OBJECT_FIELD_TEXT: u32 = 3948;
+pub const F_JSON_ARRAY_ELEMENT: u32 = 3949;
+pub const F_JSON_ARRAY_ELEMENT_TEXT: u32 = 3950;
+pub const F_JSON_EXTRACT_PATH: u32 = 3951;
+pub const F_BRIN_SUMMARIZE_NEW_VALUES: u32 = 3952;
+pub const F_JSON_EXTRACT_PATH_TEXT: u32 = 3953;
+pub const F_PG_GET_OBJECT_ADDRESS: u32 = 3954;
+pub const F_JSON_ARRAY_ELEMENTS: u32 = 3955;
+pub const F_JSON_ARRAY_LENGTH: u32 = 3956;
+pub const F_JSON_OBJECT_KEYS: u32 = 3957;
+pub const F_JSON_EACH: u32 = 3958;
+pub const F_JSON_EACH_TEXT: u32 = 3959;
+pub const F_JSON_POPULATE_RECORD: u32 = 3960;
+pub const F_JSON_POPULATE_RECORDSET: u32 = 3961;
+pub const F_JSON_TYPEOF: u32 = 3968;
+pub const F_JSON_ARRAY_ELEMENTS_TEXT: u32 = 3969;
+pub const F_ORDERED_SET_TRANSITION: u32 = 3970;
+pub const F_ORDERED_SET_TRANSITION_MULTI: u32 = 3971;
+pub const F_PERCENTILE_DISC_FLOAT8_ANYELEMENT: u32 = 3972;
+pub const F_PERCENTILE_DISC_FINAL: u32 = 3973;
+pub const F_PERCENTILE_CONT_FLOAT8_FLOAT8: u32 = 3974;
+pub const F_PERCENTILE_CONT_FLOAT8_FINAL: u32 = 3975;
+pub const F_PERCENTILE_CONT_FLOAT8_INTERVAL: u32 = 3976;
+pub const F_PERCENTILE_CONT_INTERVAL_FINAL: u32 = 3977;
+pub const F_PERCENTILE_DISC__FLOAT8_ANYELEMENT: u32 = 3978;
+pub const F_PERCENTILE_DISC_MULTI_FINAL: u32 = 3979;
+pub const F_PERCENTILE_CONT__FLOAT8_FLOAT8: u32 = 3980;
+pub const F_PERCENTILE_CONT_FLOAT8_MULTI_FINAL: u32 = 3981;
+pub const F_PERCENTILE_CONT__FLOAT8_INTERVAL: u32 = 3982;
+pub const F_PERCENTILE_CONT_INTERVAL_MULTI_FINAL: u32 = 3983;
+pub const F_MODE: u32 = 3984;
+pub const F_MODE_FINAL: u32 = 3985;
+pub const F_RANK_ANY: u32 = 3986;
+pub const F_RANK_FINAL: u32 = 3987;
+pub const F_PERCENT_RANK_ANY: u32 = 3988;
+pub const F_PERCENT_RANK_FINAL: u32 = 3989;
+pub const F_CUME_DIST_ANY: u32 = 3990;
+pub const F_CUME_DIST_FINAL: u32 = 3991;
+pub const F_DENSE_RANK_ANY: u32 = 3992;
+pub const F_DENSE_RANK_FINAL: u32 = 3993;
+pub const F_GENERATE_SERIES_INT4_SUPPORT: u32 = 3994;
+pub const F_GENERATE_SERIES_INT8_SUPPORT: u32 = 3995;
+pub const F_ARRAY_UNNEST_SUPPORT: u32 = 3996;
+pub const F_GIST_BOX_DISTANCE: u32 = 3998;
+pub const F_BRIN_SUMMARIZE_RANGE: u32 = 3999;
+pub const F_JSONPATH_IN: u32 = 4001;
+pub const F_JSONPATH_RECV: u32 = 4002;
+pub const F_JSONPATH_OUT: u32 = 4003;
+pub const F_JSONPATH_SEND: u32 = 4004;
+pub const F_JSONB_PATH_EXISTS: u32 = 4005;
+pub const F_JSONB_PATH_QUERY: u32 = 4006;
+pub const F_JSONB_PATH_QUERY_ARRAY: u32 = 4007;
+pub const F_JSONB_PATH_QUERY_FIRST: u32 = 4008;
+pub const F_JSONB_PATH_MATCH: u32 = 4009;
+pub const F_JSONB_PATH_EXISTS_OPR: u32 = 4010;
+pub const F_JSONB_PATH_MATCH_OPR: u32 = 4011;
+pub const F_BRIN_DESUMMARIZE_RANGE: u32 = 4014;
+pub const F_SPG_QUAD_CONFIG: u32 = 4018;
+pub const F_SPG_QUAD_CHOOSE: u32 = 4019;
+pub const F_SPG_QUAD_PICKSPLIT: u32 = 4020;
+pub const F_SPG_QUAD_INNER_CONSISTENT: u32 = 4021;
+pub const F_SPG_QUAD_LEAF_CONSISTENT: u32 = 4022;
+pub const F_SPG_KD_CONFIG: u32 = 4023;
+pub const F_SPG_KD_CHOOSE: u32 = 4024;
+pub const F_SPG_KD_PICKSPLIT: u32 = 4025;
+pub const F_SPG_KD_INNER_CONSISTENT: u32 = 4026;
+pub const F_SPG_TEXT_CONFIG: u32 = 4027;
+pub const F_SPG_TEXT_CHOOSE: u32 = 4028;
+pub const F_SPG_TEXT_PICKSPLIT: u32 = 4029;
+pub const F_SPG_TEXT_INNER_CONSISTENT: u32 = 4030;
+pub const F_SPG_TEXT_LEAF_CONSISTENT: u32 = 4031;
+pub const F_PG_SEQUENCE_LAST_VALUE: u32 = 4032;
+pub const F_JSONB_NE: u32 = 4038;
+pub const F_JSONB_LT: u32 = 4039;
+pub const F_JSONB_GT: u32 = 4040;
+pub const F_JSONB_LE: u32 = 4041;
+pub const F_JSONB_GE: u32 = 4042;
+pub const F_JSONB_EQ: u32 = 4043;
+pub const F_JSONB_CMP: u32 = 4044;
+pub const F_JSONB_HASH: u32 = 4045;
+pub const F_JSONB_CONTAINS: u32 = 4046;
+pub const F_JSONB_EXISTS: u32 = 4047;
+pub const F_JSONB_EXISTS_ANY: u32 = 4048;
+pub const F_JSONB_EXISTS_ALL: u32 = 4049;
+pub const F_JSONB_CONTAINED: u32 = 4050;
+pub const F_ARRAY_AGG_ARRAY_TRANSFN: u32 = 4051;
+pub const F_ARRAY_AGG_ARRAY_FINALFN: u32 = 4052;
+pub const F_ARRAY_AGG_ANYARRAY: u32 = 4053;
+pub const F_RANGE_MERGE_ANYRANGE_ANYRANGE: u32 = 4057;
+pub const F_INET_MERGE: u32 = 4063;
+pub const F_BOUND_BOX: u32 = 4067;
+pub const F_INET_SAME_FAMILY: u32 = 4071;
+pub const F_BINARY_UPGRADE_SET_RECORD_INIT_PRIVS: u32 = 4083;
+pub const F_REGNAMESPACEIN: u32 = 4084;
+pub const F_REGNAMESPACEOUT: u32 = 4085;
+pub const F_TO_REGNAMESPACE: u32 = 4086;
+pub const F_REGNAMESPACERECV: u32 = 4087;
+pub const F_REGNAMESPACESEND: u32 = 4088;
+pub const F_BOX_POINT: u32 = 4091;
+pub const F_REGROLEOUT: u32 = 4092;
+pub const F_TO_REGROLE: u32 = 4093;
+pub const F_REGROLERECV: u32 = 4094;
+pub const F_REGROLESEND: u32 = 4095;
+pub const F_REGROLEIN: u32 = 4098;
+pub const F_PG_ROTATE_LOGFILE_OLD: u32 = 4099;
+pub const F_PG_READ_FILE_OLD: u32 = 4100;
+pub const F_BINARY_UPGRADE_SET_MISSING_VALUE: u32 = 4101;
+pub const F_BRIN_INCLUSION_OPCINFO: u32 = 4105;
+pub const F_BRIN_INCLUSION_ADD_VALUE: u32 = 4106;
+pub const F_BRIN_INCLUSION_CONSISTENT: u32 = 4107;
+pub const F_BRIN_INCLUSION_UNION: u32 = 4108;
+pub const F_MACADDR8_IN: u32 = 4110;
+pub const F_MACADDR8_OUT: u32 = 4111;
+pub const F_TRUNC_MACADDR8: u32 = 4112;
+pub const F_MACADDR8_EQ: u32 = 4113;
+pub const F_MACADDR8_LT: u32 = 4114;
+pub const F_MACADDR8_LE: u32 = 4115;
+pub const F_MACADDR8_GT: u32 = 4116;
+pub const F_MACADDR8_GE: u32 = 4117;
+pub const F_MACADDR8_NE: u32 = 4118;
+pub const F_MACADDR8_CMP: u32 = 4119;
+pub const F_MACADDR8_NOT: u32 = 4120;
+pub const F_MACADDR8_AND: u32 = 4121;
+pub const F_MACADDR8_OR: u32 = 4122;
+pub const F_MACADDR8: u32 = 4123;
+pub const F_MACADDR: u32 = 4124;
+pub const F_MACADDR8_SET7BIT: u32 = 4125;
+pub const F_IN_RANGE_INT8_INT8_INT8_BOOL_BOOL: u32 = 4126;
+pub const F_IN_RANGE_INT4_INT4_INT8_BOOL_BOOL: u32 = 4127;
+pub const F_IN_RANGE_INT4_INT4_INT4_BOOL_BOOL: u32 = 4128;
+pub const F_IN_RANGE_INT4_INT4_INT2_BOOL_BOOL: u32 = 4129;
+pub const F_IN_RANGE_INT2_INT2_INT8_BOOL_BOOL: u32 = 4130;
+pub const F_IN_RANGE_INT2_INT2_INT4_BOOL_BOOL: u32 = 4131;
+pub const F_IN_RANGE_INT2_INT2_INT2_BOOL_BOOL: u32 = 4132;
+pub const F_IN_RANGE_DATE_DATE_INTERVAL_BOOL_BOOL: u32 = 4133;
+pub const F_IN_RANGE_TIMESTAMP_TIMESTAMP_INTERVAL_BOOL_BOOL: u32 = 4134;
+pub const F_IN_RANGE_TIMESTAMPTZ_TIMESTAMPTZ_INTERVAL_BOOL_BOOL: u32 = 4135;
+pub const F_IN_RANGE_INTERVAL_INTERVAL_INTERVAL_BOOL_BOOL: u32 = 4136;
+pub const F_IN_RANGE_TIME_TIME_INTERVAL_BOOL_BOOL: u32 = 4137;
+pub const F_IN_RANGE_TIMETZ_TIMETZ_INTERVAL_BOOL_BOOL: u32 = 4138;
+pub const F_IN_RANGE_FLOAT8_FLOAT8_FLOAT8_BOOL_BOOL: u32 = 4139;
+pub const F_IN_RANGE_FLOAT4_FLOAT4_FLOAT8_BOOL_BOOL: u32 = 4140;
+pub const F_IN_RANGE_NUMERIC_NUMERIC_NUMERIC_BOOL_BOOL: u32 = 4141;
+pub const F_PG_LSN_LARGER: u32 = 4187;
+pub const F_PG_LSN_SMALLER: u32 = 4188;
+pub const F_MAX_PG_LSN: u32 = 4189;
+pub const F_MIN_PG_LSN: u32 = 4190;
+pub const F_REGCOLLATIONIN: u32 = 4193;
+pub const F_REGCOLLATIONOUT: u32 = 4194;
+pub const F_TO_REGCOLLATION: u32 = 4195;
+pub const F_REGCOLLATIONRECV: u32 = 4196;
+pub const F_REGCOLLATIONSEND: u32 = 4197;
+pub const F_TS_HEADLINE_REGCONFIG_JSONB_TSQUERY_TEXT: u32 = 4201;
+pub const F_TS_HEADLINE_REGCONFIG_JSONB_TSQUERY: u32 = 4202;
+pub const F_TS_HEADLINE_JSONB_TSQUERY_TEXT: u32 = 4203;
+pub const F_TS_HEADLINE_JSONB_TSQUERY: u32 = 4204;
+pub const F_TS_HEADLINE_REGCONFIG_JSON_TSQUERY_TEXT: u32 = 4205;
+pub const F_TS_HEADLINE_REGCONFIG_JSON_TSQUERY: u32 = 4206;
+pub const F_TS_HEADLINE_JSON_TSQUERY_TEXT: u32 = 4207;
+pub const F_TS_HEADLINE_JSON_TSQUERY: u32 = 4208;
+pub const F_TO_TSVECTOR_JSONB: u32 = 4209;
+pub const F_TO_TSVECTOR_JSON: u32 = 4210;
+pub const F_TO_TSVECTOR_REGCONFIG_JSONB: u32 = 4211;
+pub const F_TO_TSVECTOR_REGCONFIG_JSON: u32 = 4212;
+pub const F_JSONB_TO_TSVECTOR_JSONB_JSONB: u32 = 4213;
+pub const F_JSONB_TO_TSVECTOR_REGCONFIG_JSONB_JSONB: u32 = 4214;
+pub const F_JSON_TO_TSVECTOR_JSON_JSONB: u32 = 4215;
+pub const F_JSON_TO_TSVECTOR_REGCONFIG_JSON_JSONB: u32 = 4216;
+pub const F_PG_COPY_PHYSICAL_REPLICATION_SLOT_NAME_NAME_BOOL: u32 = 4220;
+pub const F_PG_COPY_PHYSICAL_REPLICATION_SLOT_NAME_NAME: u32 = 4221;
+pub const F_PG_COPY_LOGICAL_REPLICATION_SLOT_NAME_NAME_BOOL_NAME: u32 = 4222;
+pub const F_PG_COPY_LOGICAL_REPLICATION_SLOT_NAME_NAME_BOOL: u32 = 4223;
+pub const F_PG_COPY_LOGICAL_REPLICATION_SLOT_NAME_NAME: u32 = 4224;
+pub const F_ANYCOMPATIBLEMULTIRANGE_IN: u32 = 4226;
+pub const F_ANYCOMPATIBLEMULTIRANGE_OUT: u32 = 4227;
+pub const F_RANGE_MERGE_ANYMULTIRANGE: u32 = 4228;
+pub const F_ANYMULTIRANGE_IN: u32 = 4229;
+pub const F_ANYMULTIRANGE_OUT: u32 = 4230;
+pub const F_MULTIRANGE_IN: u32 = 4231;
+pub const F_MULTIRANGE_OUT: u32 = 4232;
+pub const F_MULTIRANGE_RECV: u32 = 4233;
+pub const F_MULTIRANGE_SEND: u32 = 4234;
+pub const F_LOWER_ANYMULTIRANGE: u32 = 4235;
+pub const F_UPPER_ANYMULTIRANGE: u32 = 4236;
+pub const F_ISEMPTY_ANYMULTIRANGE: u32 = 4237;
+pub const F_LOWER_INC_ANYMULTIRANGE: u32 = 4238;
+pub const F_UPPER_INC_ANYMULTIRANGE: u32 = 4239;
+pub const F_LOWER_INF_ANYMULTIRANGE: u32 = 4240;
+pub const F_UPPER_INF_ANYMULTIRANGE: u32 = 4241;
+pub const F_MULTIRANGE_TYPANALYZE: u32 = 4242;
+pub const F_MULTIRANGESEL: u32 = 4243;
+pub const F_MULTIRANGE_EQ: u32 = 4244;
+pub const F_MULTIRANGE_NE: u32 = 4245;
+pub const F_RANGE_OVERLAPS_MULTIRANGE: u32 = 4246;
+pub const F_MULTIRANGE_OVERLAPS_RANGE: u32 = 4247;
+pub const F_MULTIRANGE_OVERLAPS_MULTIRANGE: u32 = 4248;
+pub const F_MULTIRANGE_CONTAINS_ELEM: u32 = 4249;
+pub const F_MULTIRANGE_CONTAINS_RANGE: u32 = 4250;
+pub const F_MULTIRANGE_CONTAINS_MULTIRANGE: u32 = 4251;
+pub const F_ELEM_CONTAINED_BY_MULTIRANGE: u32 = 4252;
+pub const F_RANGE_CONTAINED_BY_MULTIRANGE: u32 = 4253;
+pub const F_MULTIRANGE_CONTAINED_BY_MULTIRANGE: u32 = 4254;
+pub const F_RANGE_ADJACENT_MULTIRANGE: u32 = 4255;
+pub const F_MULTIRANGE_ADJACENT_MULTIRANGE: u32 = 4256;
+pub const F_MULTIRANGE_ADJACENT_RANGE: u32 = 4257;
+pub const F_RANGE_BEFORE_MULTIRANGE: u32 = 4258;
+pub const F_MULTIRANGE_BEFORE_RANGE: u32 = 4259;
+pub const F_MULTIRANGE_BEFORE_MULTIRANGE: u32 = 4260;
+pub const F_RANGE_AFTER_MULTIRANGE: u32 = 4261;
+pub const F_MULTIRANGE_AFTER_RANGE: u32 = 4262;
+pub const F_MULTIRANGE_AFTER_MULTIRANGE: u32 = 4263;
+pub const F_RANGE_OVERLEFT_MULTIRANGE: u32 = 4264;
+pub const F_MULTIRANGE_OVERLEFT_RANGE: u32 = 4265;
+pub const F_MULTIRANGE_OVERLEFT_MULTIRANGE: u32 = 4266;
+pub const F_RANGE_OVERRIGHT_MULTIRANGE: u32 = 4267;
+pub const F_MULTIRANGE_OVERRIGHT_RANGE: u32 = 4268;
+pub const F_MULTIRANGE_OVERRIGHT_MULTIRANGE: u32 = 4269;
+pub const F_MULTIRANGE_UNION: u32 = 4270;
+pub const F_MULTIRANGE_MINUS: u32 = 4271;
+pub const F_MULTIRANGE_INTERSECT: u32 = 4272;
+pub const F_MULTIRANGE_CMP: u32 = 4273;
+pub const F_MULTIRANGE_LT: u32 = 4274;
+pub const F_MULTIRANGE_LE: u32 = 4275;
+pub const F_MULTIRANGE_GE: u32 = 4276;
+pub const F_MULTIRANGE_GT: u32 = 4277;
+pub const F_HASH_MULTIRANGE: u32 = 4278;
+pub const F_HASH_MULTIRANGE_EXTENDED: u32 = 4279;
+pub const F_INT4MULTIRANGE_: u32 = 4280;
+pub const F_INT4MULTIRANGE_INT4RANGE: u32 = 4281;
+pub const F_INT4MULTIRANGE__INT4RANGE: u32 = 4282;
+pub const F_NUMMULTIRANGE_: u32 = 4283;
+pub const F_NUMMULTIRANGE_NUMRANGE: u32 = 4284;
+pub const F_NUMMULTIRANGE__NUMRANGE: u32 = 4285;
+pub const F_TSMULTIRANGE_: u32 = 4286;
+pub const F_TSMULTIRANGE_TSRANGE: u32 = 4287;
+pub const F_TSMULTIRANGE__TSRANGE: u32 = 4288;
+pub const F_TSTZMULTIRANGE_: u32 = 4289;
+pub const F_TSTZMULTIRANGE_TSTZRANGE: u32 = 4290;
+pub const F_TSTZMULTIRANGE__TSTZRANGE: u32 = 4291;
+pub const F_DATEMULTIRANGE_: u32 = 4292;
+pub const F_DATEMULTIRANGE_DATERANGE: u32 = 4293;
+pub const F_DATEMULTIRANGE__DATERANGE: u32 = 4294;
+pub const F_INT8MULTIRANGE_: u32 = 4295;
+pub const F_INT8MULTIRANGE_INT8RANGE: u32 = 4296;
+pub const F_INT8MULTIRANGE__INT8RANGE: u32 = 4297;
+pub const F_MULTIRANGE: u32 = 4298;
+pub const F_RANGE_AGG_TRANSFN: u32 = 4299;
+pub const F_RANGE_AGG_FINALFN: u32 = 4300;
+pub const F_RANGE_AGG_ANYRANGE: u32 = 4301;
+pub const F_KOI8R_TO_MIC: u32 = 4302;
+pub const F_MIC_TO_KOI8R: u32 = 4303;
+pub const F_ISO_TO_MIC: u32 = 4304;
+pub const F_MIC_TO_ISO: u32 = 4305;
+pub const F_WIN1251_TO_MIC: u32 = 4306;
+pub const F_MIC_TO_WIN1251: u32 = 4307;
+pub const F_WIN866_TO_MIC: u32 = 4308;
+pub const F_MIC_TO_WIN866: u32 = 4309;
+pub const F_KOI8R_TO_WIN1251: u32 = 4310;
+pub const F_WIN1251_TO_KOI8R: u32 = 4311;
+pub const F_KOI8R_TO_WIN866: u32 = 4312;
+pub const F_WIN866_TO_KOI8R: u32 = 4313;
+pub const F_WIN866_TO_WIN1251: u32 = 4314;
+pub const F_WIN1251_TO_WIN866: u32 = 4315;
+pub const F_ISO_TO_KOI8R: u32 = 4316;
+pub const F_KOI8R_TO_ISO: u32 = 4317;
+pub const F_ISO_TO_WIN1251: u32 = 4318;
+pub const F_WIN1251_TO_ISO: u32 = 4319;
+pub const F_ISO_TO_WIN866: u32 = 4320;
+pub const F_WIN866_TO_ISO: u32 = 4321;
+pub const F_EUC_CN_TO_MIC: u32 = 4322;
+pub const F_MIC_TO_EUC_CN: u32 = 4323;
+pub const F_EUC_JP_TO_SJIS: u32 = 4324;
+pub const F_SJIS_TO_EUC_JP: u32 = 4325;
+pub const F_EUC_JP_TO_MIC: u32 = 4326;
+pub const F_SJIS_TO_MIC: u32 = 4327;
+pub const F_MIC_TO_EUC_JP: u32 = 4328;
+pub const F_MIC_TO_SJIS: u32 = 4329;
+pub const F_EUC_KR_TO_MIC: u32 = 4330;
+pub const F_MIC_TO_EUC_KR: u32 = 4331;
+pub const F_EUC_TW_TO_BIG5: u32 = 4332;
+pub const F_BIG5_TO_EUC_TW: u32 = 4333;
+pub const F_EUC_TW_TO_MIC: u32 = 4334;
+pub const F_BIG5_TO_MIC: u32 = 4335;
+pub const F_MIC_TO_EUC_TW: u32 = 4336;
+pub const F_MIC_TO_BIG5: u32 = 4337;
+pub const F_LATIN2_TO_MIC: u32 = 4338;
+pub const F_MIC_TO_LATIN2: u32 = 4339;
+pub const F_WIN1250_TO_MIC: u32 = 4340;
+pub const F_MIC_TO_WIN1250: u32 = 4341;
+pub const F_LATIN2_TO_WIN1250: u32 = 4342;
+pub const F_WIN1250_TO_LATIN2: u32 = 4343;
+pub const F_LATIN1_TO_MIC: u32 = 4344;
+pub const F_MIC_TO_LATIN1: u32 = 4345;
+pub const F_LATIN3_TO_MIC: u32 = 4346;
+pub const F_MIC_TO_LATIN3: u32 = 4347;
+pub const F_LATIN4_TO_MIC: u32 = 4348;
+pub const F_MIC_TO_LATIN4: u32 = 4349;
+pub const F_NORMALIZE: u32 = 4350;
+pub const F_IS_NORMALIZED: u32 = 4351;
+pub const F_BIG5_TO_UTF8: u32 = 4352;
+pub const F_UTF8_TO_BIG5: u32 = 4353;
+pub const F_UTF8_TO_KOI8R: u32 = 4354;
+pub const F_KOI8R_TO_UTF8: u32 = 4355;
+pub const F_UTF8_TO_KOI8U: u32 = 4356;
+pub const F_KOI8U_TO_UTF8: u32 = 4357;
+pub const F_UTF8_TO_WIN: u32 = 4358;
+pub const F_WIN_TO_UTF8: u32 = 4359;
+pub const F_EUC_CN_TO_UTF8: u32 = 4360;
+pub const F_UTF8_TO_EUC_CN: u32 = 4361;
+pub const F_EUC_JP_TO_UTF8: u32 = 4362;
+pub const F_UTF8_TO_EUC_JP: u32 = 4363;
+pub const F_EUC_KR_TO_UTF8: u32 = 4364;
+pub const F_UTF8_TO_EUC_KR: u32 = 4365;
+pub const F_EUC_TW_TO_UTF8: u32 = 4366;
+pub const F_UTF8_TO_EUC_TW: u32 = 4367;
+pub const F_GB18030_TO_UTF8: u32 = 4368;
+pub const F_UTF8_TO_GB18030: u32 = 4369;
+pub const F_GBK_TO_UTF8: u32 = 4370;
+pub const F_UTF8_TO_GBK: u32 = 4371;
+pub const F_UTF8_TO_ISO8859: u32 = 4372;
+pub const F_ISO8859_TO_UTF8: u32 = 4373;
+pub const F_ISO8859_1_TO_UTF8: u32 = 4374;
+pub const F_UTF8_TO_ISO8859_1: u32 = 4375;
+pub const F_JOHAB_TO_UTF8: u32 = 4376;
+pub const F_UTF8_TO_JOHAB: u32 = 4377;
+pub const F_SJIS_TO_UTF8: u32 = 4378;
+pub const F_UTF8_TO_SJIS: u32 = 4379;
+pub const F_UHC_TO_UTF8: u32 = 4380;
+pub const F_UTF8_TO_UHC: u32 = 4381;
+pub const F_EUC_JIS_2004_TO_UTF8: u32 = 4382;
+pub const F_UTF8_TO_EUC_JIS_2004: u32 = 4383;
+pub const F_SHIFT_JIS_2004_TO_UTF8: u32 = 4384;
+pub const F_UTF8_TO_SHIFT_JIS_2004: u32 = 4385;
+pub const F_EUC_JIS_2004_TO_SHIFT_JIS_2004: u32 = 4386;
+pub const F_SHIFT_JIS_2004_TO_EUC_JIS_2004: u32 = 4387;
+pub const F_MULTIRANGE_INTERSECT_AGG_TRANSFN: u32 = 4388;
+pub const F_RANGE_INTERSECT_AGG_ANYMULTIRANGE: u32 = 4389;
+pub const F_BINARY_UPGRADE_SET_NEXT_MULTIRANGE_PG_TYPE_OID: Oid = Oid(4390);
+pub const F_BINARY_UPGRADE_SET_NEXT_MULTIRANGE_ARRAY_PG_TYPE_OID: Oid = Oid(4391);
+pub const F_RANGE_INTERSECT_AGG_TRANSFN: u32 = 4401;
+pub const F_RANGE_INTERSECT_AGG_ANYRANGE: u32 = 4450;
+pub const F_RANGE_CONTAINS_MULTIRANGE: u32 = 4541;
+pub const F_MULTIRANGE_CONTAINED_BY_RANGE: u32 = 4542;
+pub const F_PG_LOG_BACKEND_MEMORY_CONTEXTS: u32 = 4543;
+pub const F_BINARY_UPGRADE_SET_NEXT_HEAP_RELFILENODE: u32 = 4545;
+pub const F_BINARY_UPGRADE_SET_NEXT_INDEX_RELFILENODE: u32 = 4546;
+pub const F_BINARY_UPGRADE_SET_NEXT_TOAST_RELFILENODE: u32 = 4547;
+pub const F_BINARY_UPGRADE_SET_NEXT_PG_TABLESPACE_OID: Oid = Oid(4548);
+pub const F_PG_EVENT_TRIGGER_TABLE_REWRITE_OID: Oid = Oid(4566);
+pub const F_PG_EVENT_TRIGGER_TABLE_REWRITE_REASON: u32 = 4567;
+pub const F_PG_EVENT_TRIGGER_DDL_COMMANDS: u32 = 4568;
+pub const F_BRIN_BLOOM_OPCINFO: u32 = 4591;
+pub const F_BRIN_BLOOM_ADD_VALUE: u32 = 4592;
+pub const F_BRIN_BLOOM_CONSISTENT: u32 = 4593;
+pub const F_BRIN_BLOOM_UNION: u32 = 4594;
+pub const F_BRIN_BLOOM_OPTIONS: u32 = 4595;
+pub const F_BRIN_BLOOM_SUMMARY_IN: u32 = 4596;
+pub const F_BRIN_BLOOM_SUMMARY_OUT: u32 = 4597;
+pub const F_BRIN_BLOOM_SUMMARY_RECV: u32 = 4598;
+pub const F_BRIN_BLOOM_SUMMARY_SEND: u32 = 4599;
+pub const F_BRIN_MINMAX_MULTI_OPCINFO: u32 = 4616;
+pub const F_BRIN_MINMAX_MULTI_ADD_VALUE: u32 = 4617;
+pub const F_BRIN_MINMAX_MULTI_CONSISTENT: u32 = 4618;
+pub const F_BRIN_MINMAX_MULTI_UNION: u32 = 4619;
+pub const F_BRIN_MINMAX_MULTI_OPTIONS: u32 = 4620;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_INT2: u32 = 4621;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_INT4: u32 = 4622;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_INT8: u32 = 4623;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_FLOAT4: u32 = 4624;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_FLOAT8: u32 = 4625;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_NUMERIC: u32 = 4626;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_TID: u32 = 4627;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_UUID: u32 = 4628;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_DATE: u32 = 4629;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_TIME: u32 = 4630;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_INTERVAL: u32 = 4631;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_TIMETZ: u32 = 4632;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_PG_LSN: u32 = 4633;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_MACADDR: u32 = 4634;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_MACADDR8: u32 = 4635;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_INET: u32 = 4636;
+pub const F_BRIN_MINMAX_MULTI_DISTANCE_TIMESTAMP: u32 = 4637;
+pub const F_BRIN_MINMAX_MULTI_SUMMARY_IN: u32 = 4638;
+pub const F_BRIN_MINMAX_MULTI_SUMMARY_OUT: u32 = 4639;
+pub const F_BRIN_MINMAX_MULTI_SUMMARY_RECV: u32 = 4640;
+pub const F_BRIN_MINMAX_MULTI_SUMMARY_SEND: u32 = 4641;
+pub const F_PHRASETO_TSQUERY_TEXT: u32 = 5001;
+pub const F_TSQUERY_PHRASE_TSQUERY_TSQUERY: u32 = 5003;
+pub const F_TSQUERY_PHRASE_TSQUERY_TSQUERY_INT4: u32 = 5004;
+pub const F_PHRASETO_TSQUERY_REGCONFIG_TEXT: u32 = 5006;
+pub const F_WEBSEARCH_TO_TSQUERY_REGCONFIG_TEXT: u32 = 5007;
+pub const F_WEBSEARCH_TO_TSQUERY_TEXT: u32 = 5009;
+pub const F_SPG_BBOX_QUAD_CONFIG: u32 = 5010;
+pub const F_SPG_POLY_QUAD_COMPRESS: u32 = 5011;
+pub const F_SPG_BOX_QUAD_CONFIG: u32 = 5012;
+pub const F_SPG_BOX_QUAD_CHOOSE: u32 = 5013;
+pub const F_SPG_BOX_QUAD_PICKSPLIT: u32 = 5014;
+pub const F_SPG_BOX_QUAD_INNER_CONSISTENT: u32 = 5015;
+pub const F_SPG_BOX_QUAD_LEAF_CONSISTENT: u32 = 5016;
+pub const F_PG_MCV_LIST_IN: u32 = 5018;
+pub const F_PG_MCV_LIST_OUT: u32 = 5019;
+pub const F_PG_MCV_LIST_RECV: u32 = 5020;
+pub const F_PG_MCV_LIST_SEND: u32 = 5021;
+pub const F_PG_LSN_PLI: u32 = 5022;
+pub const F_NUMERIC_PL_PG_LSN: u32 = 5023;
+pub const F_PG_LSN_MII: u32 = 5024;
+pub const F_SATISFIES_HASH_PARTITION: u32 = 5028;
+pub const F_PG_LS_TMPDIR_: u32 = 5029;
+pub const F_PG_LS_TMPDIR_OID: Oid = Oid(5030);
+pub const F_PG_LS_ARCHIVE_STATUSDIR: u32 = 5031;
+pub const F_NETWORK_SORTSUPPORT: u32 = 5033;
+pub const F_XID8LT: u32 = 5034;
+pub const F_XID8GT: u32 = 5035;
+pub const F_XID8LE: u32 = 5036;
+pub const F_XID8GE: u32 = 5037;
+pub const F_MATCHINGSEL: u32 = 5040;
+pub const F_MATCHINGJOINSEL: u32 = 5041;
+pub const F_MIN_SCALE: u32 = 5042;
+pub const F_TRIM_SCALE: u32 = 5043;
+pub const F_GCD_INT4_INT4: u32 = 5044;
+pub const F_GCD_INT8_INT8: u32 = 5045;
+pub const F_LCM_INT4_INT4: u32 = 5046;
+pub const F_LCM_INT8_INT8: u32 = 5047;
+pub const F_GCD_NUMERIC_NUMERIC: u32 = 5048;
+pub const F_LCM_NUMERIC_NUMERIC: u32 = 5049;
+pub const F_BTVARSTREQUALIMAGE: u32 = 5050;
+pub const F_BTEQUALIMAGE: u32 = 5051;
+pub const F_PG_GET_SHMEM_ALLOCATIONS: u32 = 5052;
+pub const F_PG_STAT_GET_INS_SINCE_VACUUM: u32 = 5053;
+pub const F_JSONB_SET_LAX: u32 = 5054;
+pub const F_PG_SNAPSHOT_IN: u32 = 5055;
+pub const F_PG_SNAPSHOT_OUT: u32 = 5056;
+pub const F_PG_SNAPSHOT_RECV: u32 = 5057;
+pub const F_PG_SNAPSHOT_SEND: u32 = 5058;
+pub const F_PG_CURRENT_XACT_ID: u32 = 5059;
+pub const F_PG_CURRENT_XACT_ID_IF_ASSIGNED: u32 = 5060;
+pub const F_PG_CURRENT_SNAPSHOT: u32 = 5061;
+pub const F_PG_SNAPSHOT_XMIN: u32 = 5062;
+pub const F_PG_SNAPSHOT_XMAX: u32 = 5063;
+pub const F_PG_SNAPSHOT_XIP: u32 = 5064;
+pub const F_PG_VISIBLE_IN_SNAPSHOT: u32 = 5065;
+pub const F_PG_XACT_STATUS: u32 = 5066;
+pub const F_XID8IN: u32 = 5070;
+pub const F_XID: u32 = 5071;
+pub const F_XID8OUT: u32 = 5081;
+pub const F_XID8RECV: u32 = 5082;
+pub const F_XID8SEND: u32 = 5083;
+pub const F_XID8EQ: u32 = 5084;
+pub const F_XID8NE: u32 = 5085;
+pub const F_ANYCOMPATIBLE_IN: u32 = 5086;
+pub const F_ANYCOMPATIBLE_OUT: u32 = 5087;
+pub const F_ANYCOMPATIBLEARRAY_IN: u32 = 5088;
+pub const F_ANYCOMPATIBLEARRAY_OUT: u32 = 5089;
+pub const F_ANYCOMPATIBLEARRAY_RECV: u32 = 5090;
+pub const F_ANYCOMPATIBLEARRAY_SEND: u32 = 5091;
+pub const F_ANYCOMPATIBLENONARRAY_IN: u32 = 5092;
+pub const F_ANYCOMPATIBLENONARRAY_OUT: u32 = 5093;
+pub const F_ANYCOMPATIBLERANGE_IN: u32 = 5094;
+pub const F_ANYCOMPATIBLERANGE_OUT: u32 = 5095;
+pub const F_XID8CMP: u32 = 5096;
+pub const F_XID8_LARGER: u32 = 5097;
+pub const F_XID8_SMALLER: u32 = 5098;
+pub const F_MAX_XID8: u32 = 5099;
+pub const F_MIN_XID8: u32 = 5100;
+pub const F_PG_REPLICATION_ORIGIN_CREATE: u32 = 6003;
+pub const F_PG_REPLICATION_ORIGIN_DROP: u32 = 6004;
+pub const F_PG_REPLICATION_ORIGIN_OID: Oid = Oid(6005);
+pub const F_PG_REPLICATION_ORIGIN_SESSION_SETUP: u32 = 6006;
+pub const F_PG_REPLICATION_ORIGIN_SESSION_RESET: u32 = 6007;
+pub const F_PG_REPLICATION_ORIGIN_SESSION_IS_SETUP: u32 = 6008;
+pub const F_PG_REPLICATION_ORIGIN_SESSION_PROGRESS: u32 = 6009;
+pub const F_PG_REPLICATION_ORIGIN_XACT_SETUP: u32 = 6010;
+pub const F_PG_REPLICATION_ORIGIN_XACT_RESET: u32 = 6011;
+pub const F_PG_REPLICATION_ORIGIN_ADVANCE: u32 = 6012;
+pub const F_PG_REPLICATION_ORIGIN_PROGRESS: u32 = 6013;
+pub const F_PG_SHOW_REPLICATION_ORIGIN_STATUS: u32 = 6014;
+pub const F_JSONB_SUBSCRIPT_HANDLER: u32 = 6098;
+pub const F_PG_LSN: u32 = 6103;
+pub const F_PG_STAT_GET_BACKEND_SUBXACT: u32 = 6107;
+pub const F_PG_STAT_GET_SUBSCRIPTION: u32 = 6118;
+pub const F_PG_GET_PUBLICATION_TABLES: u32 = 6119;
+pub const F_PG_GET_REPLICA_IDENTITY_INDEX: u32 = 6120;
+pub const F_PG_RELATION_IS_PUBLISHABLE: u32 = 6121;
+pub const F_MULTIRANGE_GIST_CONSISTENT: u32 = 6154;
+pub const F_MULTIRANGE_GIST_COMPRESS: u32 = 6156;
+pub const F_PG_GET_CATALOG_FOREIGN_KEYS: u32 = 6159;
+pub const F_STRING_TO_TABLE_TEXT_TEXT: u32 = 6160;
+pub const F_STRING_TO_TABLE_TEXT_TEXT_TEXT: u32 = 6161;
+pub const F_BIT_COUNT_BIT: u32 = 6162;
+pub const F_BIT_COUNT_BYTEA: u32 = 6163;
+pub const F_BIT_XOR_INT2: u32 = 6164;
+pub const F_BIT_XOR_INT4: u32 = 6165;
+pub const F_BIT_XOR_INT8: u32 = 6166;
+pub const F_BIT_XOR_BIT: u32 = 6167;
+pub const F_PG_XACT_COMMIT_TIMESTAMP_ORIGIN: u32 = 6168;
+pub const F_PG_STAT_GET_REPLICATION_SLOT: u32 = 6169;
+pub const F_PG_STAT_RESET_REPLICATION_SLOT: u32 = 6170;
+pub const F_TRIM_ARRAY: u32 = 6172;
+pub const F_PG_GET_STATISTICSOBJDEF_EXPRESSIONS: u32 = 6173;
+pub const F_PG_GET_STATISTICSOBJDEF_COLUMNS: u32 = 6174;
+pub const F_DATE_BIN_INTERVAL_TIMESTAMP_TIMESTAMP: u32 = 6177;
+pub const F_DATE_BIN_INTERVAL_TIMESTAMPTZ_TIMESTAMPTZ: u32 = 6178;
+pub const F_ARRAY_SUBSCRIPT_HANDLER: u32 = 6179;
+pub const F_RAW_ARRAY_SUBSCRIPT_HANDLER: u32 = 6180;
+pub const F_TS_DEBUG_REGCONFIG_TEXT: u32 = 6183;
+pub const F_TS_DEBUG_TEXT: u32 = 6184;
+pub const F_PG_STAT_GET_DB_SESSION_TIME: u32 = 6185;
+pub const F_PG_STAT_GET_DB_ACTIVE_TIME: u32 = 6186;
+pub const F_PG_STAT_GET_DB_IDLE_IN_TRANSACTION_TIME: u32 = 6187;
+pub const F_PG_STAT_GET_DB_SESSIONS: u32 = 6188;
+pub const F_PG_STAT_GET_DB_SESSIONS_ABANDONED: u32 = 6189;
+pub const F_PG_STAT_GET_DB_SESSIONS_FATAL: u32 = 6190;
+pub const F_PG_STAT_GET_DB_SESSIONS_KILLED: u32 = 6191;
+pub const F_HASH_RECORD: u32 = 6192;
+pub const F_HASH_RECORD_EXTENDED: u32 = 6193;
+pub const F_LTRIM_BYTEA_BYTEA: u32 = 6195;
+pub const F_RTRIM_BYTEA_BYTEA: u32 = 6196;
+pub const F_PG_GET_FUNCTION_SQLBODY: u32 = 6197;
+pub const F_UNISTR: u32 = 6198;
+pub const F_EXTRACT_TEXT_DATE: u32 = 6199;
+pub const F_EXTRACT_TEXT_TIME: u32 = 6200;
+pub const F_EXTRACT_TEXT_TIMETZ: u32 = 6201;
+pub const F_EXTRACT_TEXT_TIMESTAMP: u32 = 6202;
+pub const F_EXTRACT_TEXT_TIMESTAMPTZ: u32 = 6203;
+pub const F_EXTRACT_TEXT_INTERVAL: u32 = 6204;
+pub const F_HAS_PARAMETER_PRIVILEGE_NAME_TEXT_TEXT: u32 = 6205;
+pub const F_HAS_PARAMETER_PRIVILEGE_OID_TEXT_TEXT: u32 = 6206;
+pub const F_HAS_PARAMETER_PRIVILEGE_TEXT_TEXT: u32 = 6207;
+pub const F_PG_READ_FILE_TEXT_BOOL: u32 = 6208;
+pub const F_PG_READ_BINARY_FILE_TEXT_BOOL: u32 = 6209;
+pub const F_PG_INPUT_IS_VALID: u32 = 6210;
+pub const F_PG_INPUT_ERROR_INFO: u32 = 6211;
+pub const F_RANDOM_NORMAL: u32 = 6212;
+pub const F_PG_SPLIT_WALFILE_NAME: u32 = 6213;
+pub const F_PG_STAT_GET_IO: u32 = 6214;
+pub const F_ARRAY_SHUFFLE: u32 = 6215;
+pub const F_ARRAY_SAMPLE: u32 = 6216;
+pub const F_PG_STAT_GET_TUPLES_NEWPAGE_UPDATED: u32 = 6217;
+pub const F_PG_STAT_GET_XACT_TUPLES_NEWPAGE_UPDATED: u32 = 6218;
+pub const F_ERF: u32 = 6219;
+pub const F_ERFC: u32 = 6220;
+pub const F_DATE_ADD_TIMESTAMPTZ_INTERVAL: u32 = 6221;
+pub const F_DATE_ADD_TIMESTAMPTZ_INTERVAL_TEXT: u32 = 6222;
+pub const F_DATE_SUBTRACT_TIMESTAMPTZ_INTERVAL: u32 = 6223;
+pub const F_PG_GET_WAL_RESOURCE_MANAGERS: u32 = 6224;
+pub const F_MULTIRANGE_AGG_TRANSFN: u32 = 6225;
+pub const F_MULTIRANGE_AGG_FINALFN: u32 = 6226;
+pub const F_RANGE_AGG_ANYMULTIRANGE: u32 = 6227;
+pub const F_PG_STAT_HAVE_STATS: u32 = 6230;
+pub const F_PG_STAT_GET_SUBSCRIPTION_STATS: u32 = 6231;
+pub const F_PG_STAT_RESET_SUBSCRIPTION_STATS: u32 = 6232;
+pub const F_WINDOW_ROW_NUMBER_SUPPORT: u32 = 6233;
+pub const F_WINDOW_RANK_SUPPORT: u32 = 6234;
+pub const F_WINDOW_DENSE_RANK_SUPPORT: u32 = 6235;
+pub const F_INT8INC_SUPPORT: u32 = 6236;
+pub const F_PG_SETTINGS_GET_FLAGS: u32 = 6240;
+pub const F_PG_STOP_MAKING_PINNED_OBJECTS: u32 = 6241;
+pub const F_TEXT_STARTS_WITH_SUPPORT: u32 = 6242;
+pub const F_PG_STAT_GET_RECOVERY_PREFETCH: u32 = 6248;
+pub const F_PG_DATABASE_COLLATION_ACTUAL_VERSION: u32 = 6249;
+pub const F_PG_IDENT_FILE_MAPPINGS: u32 = 6250;
+pub const F_REGEXP_REPLACE_TEXT_TEXT_TEXT_INT4_INT4_TEXT: u32 = 6251;
+pub const F_REGEXP_REPLACE_TEXT_TEXT_TEXT_INT4_INT4: u32 = 6252;
+pub const F_REGEXP_REPLACE_TEXT_TEXT_TEXT_INT4: u32 = 6253;
+pub const F_REGEXP_COUNT_TEXT_TEXT: u32 = 6254;
+pub const F_REGEXP_COUNT_TEXT_TEXT_INT4: u32 = 6255;
+pub const F_REGEXP_COUNT_TEXT_TEXT_INT4_TEXT: u32 = 6256;
+pub const F_REGEXP_INSTR_TEXT_TEXT: u32 = 6257;
+pub const F_REGEXP_INSTR_TEXT_TEXT_INT4: u32 = 6258;
+pub const F_REGEXP_INSTR_TEXT_TEXT_INT4_INT4: u32 = 6259;
+pub const F_REGEXP_INSTR_TEXT_TEXT_INT4_INT4_INT4: u32 = 6260;
+pub const F_REGEXP_INSTR_TEXT_TEXT_INT4_INT4_INT4_TEXT: u32 = 6261;
+pub const F_REGEXP_INSTR_TEXT_TEXT_INT4_INT4_INT4_TEXT_INT4: u32 = 6262;
+pub const F_REGEXP_LIKE_TEXT_TEXT: u32 = 6263;
+pub const F_REGEXP_LIKE_TEXT_TEXT_TEXT: u32 = 6264;
+pub const F_REGEXP_SUBSTR_TEXT_TEXT: u32 = 6265;
+pub const F_REGEXP_SUBSTR_TEXT_TEXT_INT4: u32 = 6266;
+pub const F_REGEXP_SUBSTR_TEXT_TEXT_INT4_INT4: u32 = 6267;
+pub const F_REGEXP_SUBSTR_TEXT_TEXT_INT4_INT4_TEXT: u32 = 6268;
+pub const F_REGEXP_SUBSTR_TEXT_TEXT_INT4_INT4_TEXT_INT4: u32 = 6269;
+pub const F_PG_LS_LOGICALSNAPDIR: u32 = 6270;
+pub const F_PG_LS_LOGICALMAPDIR: u32 = 6271;
+pub const F_PG_LS_REPLSLOTDIR: u32 = 6272;
+pub const F_DATE_SUBTRACT_TIMESTAMPTZ_INTERVAL_TEXT: u32 = 6273;
+pub const F_GENERATE_SERIES_TIMESTAMPTZ_TIMESTAMPTZ_INTERVAL_TEXT: u32 = 6274;
+pub const F_JSON_AGG_STRICT_TRANSFN: u32 = 6275;
+pub const F_JSON_AGG_STRICT: u32 = 6276;
+pub const F_JSON_OBJECT_AGG_STRICT_TRANSFN: u32 = 6277;
+pub const F_JSON_OBJECT_AGG_UNIQUE_TRANSFN: u32 = 6278;
+pub const F_JSON_OBJECT_AGG_UNIQUE_STRICT_TRANSFN: u32 = 6279;
+pub const F_JSON_OBJECT_AGG_STRICT: u32 = 6280;
+pub const F_JSON_OBJECT_AGG_UNIQUE: u32 = 6281;
+pub const F_JSON_OBJECT_AGG_UNIQUE_STRICT: u32 = 6282;
+pub const F_JSONB_AGG_STRICT_TRANSFN: u32 = 6283;
+pub const F_JSONB_AGG_STRICT: u32 = 6284;
+pub const F_JSONB_OBJECT_AGG_STRICT_TRANSFN: u32 = 6285;
+pub const F_JSONB_OBJECT_AGG_UNIQUE_TRANSFN: u32 = 6286;
+pub const F_JSONB_OBJECT_AGG_UNIQUE_STRICT_TRANSFN: u32 = 6287;
+pub const F_JSONB_OBJECT_AGG_STRICT: u32 = 6288;
+pub const F_JSONB_OBJECT_AGG_UNIQUE: u32 = 6289;
+pub const F_JSONB_OBJECT_AGG_UNIQUE_STRICT: u32 = 6290;
+pub const F_ANY_VALUE: u32 = 6291;
+pub const F_ANY_VALUE_TRANSFN: u32 = 6292;
+pub const F_ARRAY_AGG_COMBINE: u32 = 6293;
+pub const F_ARRAY_AGG_SERIALIZE: u32 = 6294;
+pub const F_ARRAY_AGG_DESERIALIZE: u32 = 6295;
+pub const F_ARRAY_AGG_ARRAY_COMBINE: u32 = 6296;
+pub const F_ARRAY_AGG_ARRAY_SERIALIZE: u32 = 6297;
+pub const F_ARRAY_AGG_ARRAY_DESERIALIZE: u32 = 6298;
+pub const F_STRING_AGG_COMBINE: u32 = 6299;
+pub const F_STRING_AGG_SERIALIZE: u32 = 6300;
+pub const F_STRING_AGG_DESERIALIZE: u32 = 6301;
+pub const F_PG_LOG_STANDBY_SNAPSHOT: u32 = 6305;
+pub const F_WINDOW_PERCENT_RANK_SUPPORT: u32 = 6306;
+pub const F_WINDOW_CUME_DIST_SUPPORT: u32 = 6307;
+pub const F_WINDOW_NTILE_SUPPORT: u32 = 6308;
+pub const F_PG_STAT_GET_DB_CONFLICT_LOGICALSLOT: u32 = 6309;
+pub const F_PG_STAT_GET_LASTSCAN: u32 = 6310;
+pub const F_SYSTEM_USER: u32 = 6311;
 pub const NUMERIC_MAX_PRECISION: u32 = 1000;
 pub const NUMERIC_MIN_SCALE: i32 = -1000;
 pub const NUMERIC_MAX_SCALE: u32 = 1000;
@@ -4407,28 +7698,32 @@ impl Default for PGAlignedXLogBlock {
         }
     }
 }
-pub const _ISupper: _bindgen_ty_1 = 256;
-pub const _ISlower: _bindgen_ty_1 = 512;
-pub const _ISalpha: _bindgen_ty_1 = 1024;
-pub const _ISdigit: _bindgen_ty_1 = 2048;
-pub const _ISxdigit: _bindgen_ty_1 = 4096;
-pub const _ISspace: _bindgen_ty_1 = 8192;
-pub const _ISprint: _bindgen_ty_1 = 16384;
-pub const _ISgraph: _bindgen_ty_1 = 32768;
-pub const _ISblank: _bindgen_ty_1 = 1;
-pub const _IScntrl: _bindgen_ty_1 = 2;
-pub const _ISpunct: _bindgen_ty_1 = 4;
-pub const _ISalnum: _bindgen_ty_1 = 8;
-pub type _bindgen_ty_1 = ::std::os::raw::c_uint;
+pub mod _bindgen_ty_1 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const _ISupper: Type = 256;
+    pub const _ISlower: Type = 512;
+    pub const _ISalpha: Type = 1024;
+    pub const _ISdigit: Type = 2048;
+    pub const _ISxdigit: Type = 4096;
+    pub const _ISspace: Type = 8192;
+    pub const _ISprint: Type = 16384;
+    pub const _ISgraph: Type = 32768;
+    pub const _ISblank: Type = 1;
+    pub const _IScntrl: Type = 2;
+    pub const _ISpunct: Type = 4;
+    pub const _ISalnum: Type = 8;
+}
 pub type pgsocket = ::std::os::raw::c_int;
 pub type float_t = f32;
 pub type double_t = f64;
-pub const FP_NAN: _bindgen_ty_2 = 0;
-pub const FP_INFINITE: _bindgen_ty_2 = 1;
-pub const FP_ZERO: _bindgen_ty_2 = 2;
-pub const FP_SUBNORMAL: _bindgen_ty_2 = 3;
-pub const FP_NORMAL: _bindgen_ty_2 = 4;
-pub type _bindgen_ty_2 = ::std::os::raw::c_uint;
+pub mod _bindgen_ty_2 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const FP_NAN: Type = 0;
+    pub const FP_INFINITE: Type = 1;
+    pub const FP_ZERO: Type = 2;
+    pub const FP_SUBNORMAL: Type = 3;
+    pub const FP_NORMAL: Type = 4;
+}
 pub type qsort_arg_comparator = ::std::option::Option<
     unsafe extern "C" fn(
         a: *const ::std::os::raw::c_void,
@@ -4524,10 +7819,12 @@ impl Default for ErrorData {
     }
 }
 pub type emit_log_hook_type = ::std::option::Option<unsafe extern "C" fn(edata: *mut ErrorData)>;
-pub const PGErrorVerbosity_PGERROR_TERSE: PGErrorVerbosity = 0;
-pub const PGErrorVerbosity_PGERROR_DEFAULT: PGErrorVerbosity = 1;
-pub const PGErrorVerbosity_PGERROR_VERBOSE: PGErrorVerbosity = 2;
-pub type PGErrorVerbosity = ::std::os::raw::c_uint;
+pub mod PGErrorVerbosity {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PGERROR_TERSE: Type = 0;
+    pub const PGERROR_DEFAULT: Type = 1;
+    pub const PGERROR_VERBOSE: Type = 2;
+}
 pub type MemoryContext = *mut MemoryContextData;
 pub type MemoryContextCallbackFunction =
     ::std::option::Option<unsafe extern "C" fn(arg: *mut ::std::os::raw::c_void)>;
@@ -5076,50 +8373,66 @@ impl Default for Node {
 pub type Selectivity = f64;
 pub type Cost = f64;
 pub type Cardinality = f64;
-pub const CmdType_CMD_UNKNOWN: CmdType = 0;
-pub const CmdType_CMD_SELECT: CmdType = 1;
-pub const CmdType_CMD_UPDATE: CmdType = 2;
-pub const CmdType_CMD_INSERT: CmdType = 3;
-pub const CmdType_CMD_DELETE: CmdType = 4;
-pub const CmdType_CMD_MERGE: CmdType = 5;
-pub const CmdType_CMD_UTILITY: CmdType = 6;
-pub const CmdType_CMD_NOTHING: CmdType = 7;
-pub type CmdType = ::std::os::raw::c_uint;
-pub const JoinType_JOIN_INNER: JoinType = 0;
-pub const JoinType_JOIN_LEFT: JoinType = 1;
-pub const JoinType_JOIN_FULL: JoinType = 2;
-pub const JoinType_JOIN_RIGHT: JoinType = 3;
-pub const JoinType_JOIN_SEMI: JoinType = 4;
-pub const JoinType_JOIN_ANTI: JoinType = 5;
-pub const JoinType_JOIN_RIGHT_ANTI: JoinType = 6;
-pub const JoinType_JOIN_UNIQUE_OUTER: JoinType = 7;
-pub const JoinType_JOIN_UNIQUE_INNER: JoinType = 8;
-pub type JoinType = ::std::os::raw::c_uint;
-pub const AggStrategy_AGG_PLAIN: AggStrategy = 0;
-pub const AggStrategy_AGG_SORTED: AggStrategy = 1;
-pub const AggStrategy_AGG_HASHED: AggStrategy = 2;
-pub const AggStrategy_AGG_MIXED: AggStrategy = 3;
-pub type AggStrategy = ::std::os::raw::c_uint;
-pub const AggSplit_AGGSPLIT_SIMPLE: AggSplit = 0;
-pub const AggSplit_AGGSPLIT_INITIAL_SERIAL: AggSplit = 6;
-pub const AggSplit_AGGSPLIT_FINAL_DESERIAL: AggSplit = 9;
-pub type AggSplit = ::std::os::raw::c_uint;
-pub const SetOpCmd_SETOPCMD_INTERSECT: SetOpCmd = 0;
-pub const SetOpCmd_SETOPCMD_INTERSECT_ALL: SetOpCmd = 1;
-pub const SetOpCmd_SETOPCMD_EXCEPT: SetOpCmd = 2;
-pub const SetOpCmd_SETOPCMD_EXCEPT_ALL: SetOpCmd = 3;
-pub type SetOpCmd = ::std::os::raw::c_uint;
-pub const SetOpStrategy_SETOP_SORTED: SetOpStrategy = 0;
-pub const SetOpStrategy_SETOP_HASHED: SetOpStrategy = 1;
-pub type SetOpStrategy = ::std::os::raw::c_uint;
-pub const OnConflictAction_ONCONFLICT_NONE: OnConflictAction = 0;
-pub const OnConflictAction_ONCONFLICT_NOTHING: OnConflictAction = 1;
-pub const OnConflictAction_ONCONFLICT_UPDATE: OnConflictAction = 2;
-pub type OnConflictAction = ::std::os::raw::c_uint;
-pub const LimitOption_LIMIT_OPTION_COUNT: LimitOption = 0;
-pub const LimitOption_LIMIT_OPTION_WITH_TIES: LimitOption = 1;
-pub const LimitOption_LIMIT_OPTION_DEFAULT: LimitOption = 2;
-pub type LimitOption = ::std::os::raw::c_uint;
+pub mod CmdType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const CMD_UNKNOWN: Type = 0;
+    pub const CMD_SELECT: Type = 1;
+    pub const CMD_UPDATE: Type = 2;
+    pub const CMD_INSERT: Type = 3;
+    pub const CMD_DELETE: Type = 4;
+    pub const CMD_MERGE: Type = 5;
+    pub const CMD_UTILITY: Type = 6;
+    pub const CMD_NOTHING: Type = 7;
+}
+pub mod JoinType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const JOIN_INNER: Type = 0;
+    pub const JOIN_LEFT: Type = 1;
+    pub const JOIN_FULL: Type = 2;
+    pub const JOIN_RIGHT: Type = 3;
+    pub const JOIN_SEMI: Type = 4;
+    pub const JOIN_ANTI: Type = 5;
+    pub const JOIN_RIGHT_ANTI: Type = 6;
+    pub const JOIN_UNIQUE_OUTER: Type = 7;
+    pub const JOIN_UNIQUE_INNER: Type = 8;
+}
+pub mod AggStrategy {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const AGG_PLAIN: Type = 0;
+    pub const AGG_SORTED: Type = 1;
+    pub const AGG_HASHED: Type = 2;
+    pub const AGG_MIXED: Type = 3;
+}
+pub mod AggSplit {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const AGGSPLIT_SIMPLE: Type = 0;
+    pub const AGGSPLIT_INITIAL_SERIAL: Type = 6;
+    pub const AGGSPLIT_FINAL_DESERIAL: Type = 9;
+}
+pub mod SetOpCmd {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SETOPCMD_INTERSECT: Type = 0;
+    pub const SETOPCMD_INTERSECT_ALL: Type = 1;
+    pub const SETOPCMD_EXCEPT: Type = 2;
+    pub const SETOPCMD_EXCEPT_ALL: Type = 3;
+}
+pub mod SetOpStrategy {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SETOP_SORTED: Type = 0;
+    pub const SETOP_HASHED: Type = 1;
+}
+pub mod OnConflictAction {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const ONCONFLICT_NONE: Type = 0;
+    pub const ONCONFLICT_NOTHING: Type = 1;
+    pub const ONCONFLICT_UPDATE: Type = 2;
+}
+pub mod LimitOption {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const LIMIT_OPTION_COUNT: Type = 0;
+    pub const LIMIT_OPTION_WITH_TIES: Type = 1;
+    pub const LIMIT_OPTION_DEFAULT: Type = 2;
+}
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union ListCell {
@@ -5581,11 +8894,13 @@ impl Default for varatt_expanded {
         }
     }
 }
-pub const vartag_external_VARTAG_INDIRECT: vartag_external = 1;
-pub const vartag_external_VARTAG_EXPANDED_RO: vartag_external = 2;
-pub const vartag_external_VARTAG_EXPANDED_RW: vartag_external = 3;
-pub const vartag_external_VARTAG_ONDISK: vartag_external = 18;
-pub type vartag_external = ::std::os::raw::c_uint;
+pub mod vartag_external {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const VARTAG_INDIRECT: Type = 1;
+    pub const VARTAG_EXPANDED_RO: Type = 2;
+    pub const VARTAG_EXPANDED_RW: Type = 3;
+    pub const VARTAG_ONDISK: Type = 18;
+}
 #[repr(C)]
 pub union varattrib_4b {
     pub va_4byte: ::std::mem::ManuallyDrop<varattrib_4b__bindgen_ty_1>,
@@ -5859,15 +9174,19 @@ impl Default for Bitmapset {
         }
     }
 }
-pub const BMS_Comparison_BMS_EQUAL: BMS_Comparison = 0;
-pub const BMS_Comparison_BMS_SUBSET1: BMS_Comparison = 1;
-pub const BMS_Comparison_BMS_SUBSET2: BMS_Comparison = 2;
-pub const BMS_Comparison_BMS_DIFFERENT: BMS_Comparison = 3;
-pub type BMS_Comparison = ::std::os::raw::c_uint;
-pub const BMS_Membership_BMS_EMPTY_SET: BMS_Membership = 0;
-pub const BMS_Membership_BMS_SINGLETON: BMS_Membership = 1;
-pub const BMS_Membership_BMS_MULTIPLE: BMS_Membership = 2;
-pub type BMS_Membership = ::std::os::raw::c_uint;
+pub mod BMS_Comparison {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const BMS_EQUAL: Type = 0;
+    pub const BMS_SUBSET1: Type = 1;
+    pub const BMS_SUBSET2: Type = 2;
+    pub const BMS_DIFFERENT: Type = 3;
+}
+pub mod BMS_Membership {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const BMS_EMPTY_SET: Type = 0;
+    pub const BMS_SINGLETON: Type = 1;
+    pub const BMS_MULTIPLE: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct TupleConversionMap {
@@ -5948,12 +9267,14 @@ pub struct WalUsage {
     pub wal_fpi: int64,
     pub wal_bytes: uint64,
 }
-pub const InstrumentOption_INSTRUMENT_TIMER: InstrumentOption = 1;
-pub const InstrumentOption_INSTRUMENT_BUFFERS: InstrumentOption = 2;
-pub const InstrumentOption_INSTRUMENT_ROWS: InstrumentOption = 4;
-pub const InstrumentOption_INSTRUMENT_WAL: InstrumentOption = 8;
-pub const InstrumentOption_INSTRUMENT_ALL: InstrumentOption = 2147483647;
-pub type InstrumentOption = ::std::os::raw::c_uint;
+pub mod InstrumentOption {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const INSTRUMENT_TIMER: Type = 1;
+    pub const INSTRUMENT_BUFFERS: Type = 2;
+    pub const INSTRUMENT_ROWS: Type = 4;
+    pub const INSTRUMENT_WAL: Type = 8;
+    pub const INSTRUMENT_ALL: Type = 2147483647;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct Instrumentation {
@@ -6052,13 +9373,15 @@ pub struct Pg_magic_struct {
 }
 pub type PGModuleMagicFunction =
     ::std::option::Option<unsafe extern "C" fn() -> *const Pg_magic_struct>;
-pub const FmgrHookEventType_FHET_START: FmgrHookEventType = 0;
-pub const FmgrHookEventType_FHET_END: FmgrHookEventType = 1;
-pub const FmgrHookEventType_FHET_ABORT: FmgrHookEventType = 2;
-pub type FmgrHookEventType = ::std::os::raw::c_uint;
+pub mod FmgrHookEventType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const FHET_START: Type = 0;
+    pub const FHET_END: Type = 1;
+    pub const FHET_ABORT: Type = 2;
+}
 pub type needs_fmgr_hook_type = ::std::option::Option<unsafe extern "C" fn(fn_oid: Oid) -> bool>;
 pub type fmgr_hook_type = ::std::option::Option<
-    unsafe extern "C" fn(event: FmgrHookEventType, flinfo: *mut FmgrInfo, arg: *mut Datum),
+    unsafe extern "C" fn(event: FmgrHookEventType::Type, flinfo: *mut FmgrInfo, arg: *mut Datum),
 >;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -6323,33 +9646,43 @@ impl Default for ParamsErrorCbData {
         }
     }
 }
-pub const ScanDirection_BackwardScanDirection: ScanDirection = -1;
-pub const ScanDirection_NoMovementScanDirection: ScanDirection = 0;
-pub const ScanDirection_ForwardScanDirection: ScanDirection = 1;
-pub type ScanDirection = ::std::os::raw::c_int;
+pub mod ScanDirection {
+    pub type Type = ::std::os::raw::c_int;
+    pub const BackwardScanDirection: Type = -1;
+    pub const NoMovementScanDirection: Type = 0;
+    pub const ForwardScanDirection: Type = 1;
+}
 pub type StrategyNumber = uint16;
 pub type RelFileNumber = Oid;
-pub const ForkNumber_InvalidForkNumber: ForkNumber = -1;
-pub const ForkNumber_MAIN_FORKNUM: ForkNumber = 0;
-pub const ForkNumber_FSM_FORKNUM: ForkNumber = 1;
-pub const ForkNumber_VISIBILITYMAP_FORKNUM: ForkNumber = 2;
-pub const ForkNumber_INIT_FORKNUM: ForkNumber = 3;
-pub type ForkNumber = ::std::os::raw::c_int;
-pub const LockClauseStrength_LCS_NONE: LockClauseStrength = 0;
-pub const LockClauseStrength_LCS_FORKEYSHARE: LockClauseStrength = 1;
-pub const LockClauseStrength_LCS_FORSHARE: LockClauseStrength = 2;
-pub const LockClauseStrength_LCS_FORNOKEYUPDATE: LockClauseStrength = 3;
-pub const LockClauseStrength_LCS_FORUPDATE: LockClauseStrength = 4;
-pub type LockClauseStrength = ::std::os::raw::c_uint;
-pub const LockWaitPolicy_LockWaitBlock: LockWaitPolicy = 0;
-pub const LockWaitPolicy_LockWaitSkip: LockWaitPolicy = 1;
-pub const LockWaitPolicy_LockWaitError: LockWaitPolicy = 2;
-pub type LockWaitPolicy = ::std::os::raw::c_uint;
-pub const LockTupleMode_LockTupleKeyShare: LockTupleMode = 0;
-pub const LockTupleMode_LockTupleShare: LockTupleMode = 1;
-pub const LockTupleMode_LockTupleNoKeyExclusive: LockTupleMode = 2;
-pub const LockTupleMode_LockTupleExclusive: LockTupleMode = 3;
-pub type LockTupleMode = ::std::os::raw::c_uint;
+pub mod ForkNumber {
+    pub type Type = ::std::os::raw::c_int;
+    pub const InvalidForkNumber: Type = -1;
+    pub const MAIN_FORKNUM: Type = 0;
+    pub const FSM_FORKNUM: Type = 1;
+    pub const VISIBILITYMAP_FORKNUM: Type = 2;
+    pub const INIT_FORKNUM: Type = 3;
+}
+pub mod LockClauseStrength {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const LCS_NONE: Type = 0;
+    pub const LCS_FORKEYSHARE: Type = 1;
+    pub const LCS_FORSHARE: Type = 2;
+    pub const LCS_FORNOKEYUPDATE: Type = 3;
+    pub const LCS_FORUPDATE: Type = 4;
+}
+pub mod LockWaitPolicy {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const LockWaitBlock: Type = 0;
+    pub const LockWaitSkip: Type = 1;
+    pub const LockWaitError: Type = 2;
+}
+pub mod LockTupleMode {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const LockTupleKeyShare: Type = 0;
+    pub const LockTupleShare: Type = 1;
+    pub const LockTupleNoKeyExclusive: Type = 2;
+    pub const LockTupleExclusive: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Alias {
@@ -6366,11 +9699,13 @@ impl Default for Alias {
         }
     }
 }
-pub const OnCommitAction_ONCOMMIT_NOOP: OnCommitAction = 0;
-pub const OnCommitAction_ONCOMMIT_PRESERVE_ROWS: OnCommitAction = 1;
-pub const OnCommitAction_ONCOMMIT_DELETE_ROWS: OnCommitAction = 2;
-pub const OnCommitAction_ONCOMMIT_DROP: OnCommitAction = 3;
-pub type OnCommitAction = ::std::os::raw::c_uint;
+pub mod OnCommitAction {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const ONCOMMIT_NOOP: Type = 0;
+    pub const ONCOMMIT_PRESERVE_ROWS: Type = 1;
+    pub const ONCOMMIT_DELETE_ROWS: Type = 2;
+    pub const ONCOMMIT_DROP: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct RangeVar {
@@ -6427,7 +9762,7 @@ pub struct IntoClause {
     pub colNames: *mut List,
     pub accessMethod: *mut ::std::os::raw::c_char,
     pub options: *mut List,
-    pub onCommit: OnCommitAction,
+    pub onCommit: OnCommitAction::Type,
     pub tableSpaceName: *mut ::std::os::raw::c_char,
     pub viewQuery: *mut Node,
     pub skipData: bool,
@@ -6501,16 +9836,18 @@ impl Default for Const {
         }
     }
 }
-pub const ParamKind_PARAM_EXTERN: ParamKind = 0;
-pub const ParamKind_PARAM_EXEC: ParamKind = 1;
-pub const ParamKind_PARAM_SUBLINK: ParamKind = 2;
-pub const ParamKind_PARAM_MULTIEXPR: ParamKind = 3;
-pub type ParamKind = ::std::os::raw::c_uint;
+pub mod ParamKind {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PARAM_EXTERN: Type = 0;
+    pub const PARAM_EXEC: Type = 1;
+    pub const PARAM_SUBLINK: Type = 2;
+    pub const PARAM_MULTIEXPR: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Param {
     pub xpr: Expr,
-    pub paramkind: ParamKind,
+    pub paramkind: ParamKind::Type,
     pub paramid: ::std::os::raw::c_int,
     pub paramtype: Oid,
     pub paramtypmod: int32,
@@ -6546,7 +9883,7 @@ pub struct Aggref {
     pub aggkind: ::std::os::raw::c_char,
     pub aggpresorted: bool,
     pub agglevelsup: Index,
-    pub aggsplit: AggSplit,
+    pub aggsplit: AggSplit::Type,
     pub aggno: ::std::os::raw::c_int,
     pub aggtransno: ::std::os::raw::c_int,
     pub location: ::std::os::raw::c_int,
@@ -6626,16 +9963,20 @@ impl Default for SubscriptingRef {
         }
     }
 }
-pub const CoercionContext_COERCION_IMPLICIT: CoercionContext = 0;
-pub const CoercionContext_COERCION_ASSIGNMENT: CoercionContext = 1;
-pub const CoercionContext_COERCION_PLPGSQL: CoercionContext = 2;
-pub const CoercionContext_COERCION_EXPLICIT: CoercionContext = 3;
-pub type CoercionContext = ::std::os::raw::c_uint;
-pub const CoercionForm_COERCE_EXPLICIT_CALL: CoercionForm = 0;
-pub const CoercionForm_COERCE_EXPLICIT_CAST: CoercionForm = 1;
-pub const CoercionForm_COERCE_IMPLICIT_CAST: CoercionForm = 2;
-pub const CoercionForm_COERCE_SQL_SYNTAX: CoercionForm = 3;
-pub type CoercionForm = ::std::os::raw::c_uint;
+pub mod CoercionContext {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const COERCION_IMPLICIT: Type = 0;
+    pub const COERCION_ASSIGNMENT: Type = 1;
+    pub const COERCION_PLPGSQL: Type = 2;
+    pub const COERCION_EXPLICIT: Type = 3;
+}
+pub mod CoercionForm {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const COERCE_EXPLICIT_CALL: Type = 0;
+    pub const COERCE_EXPLICIT_CAST: Type = 1;
+    pub const COERCE_IMPLICIT_CAST: Type = 2;
+    pub const COERCE_SQL_SYNTAX: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct FuncExpr {
@@ -6644,7 +9985,7 @@ pub struct FuncExpr {
     pub funcresulttype: Oid,
     pub funcretset: bool,
     pub funcvariadic: bool,
-    pub funcformat: CoercionForm,
+    pub funcformat: CoercionForm::Type,
     pub funccollid: Oid,
     pub inputcollid: Oid,
     pub args: *mut List,
@@ -6723,15 +10064,17 @@ impl Default for ScalarArrayOpExpr {
         }
     }
 }
-pub const BoolExprType_AND_EXPR: BoolExprType = 0;
-pub const BoolExprType_OR_EXPR: BoolExprType = 1;
-pub const BoolExprType_NOT_EXPR: BoolExprType = 2;
-pub type BoolExprType = ::std::os::raw::c_uint;
+pub mod BoolExprType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const AND_EXPR: Type = 0;
+    pub const OR_EXPR: Type = 1;
+    pub const NOT_EXPR: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct BoolExpr {
     pub xpr: Expr,
-    pub boolop: BoolExprType,
+    pub boolop: BoolExprType::Type,
     pub args: *mut List,
     pub location: ::std::os::raw::c_int,
 }
@@ -6744,20 +10087,22 @@ impl Default for BoolExpr {
         }
     }
 }
-pub const SubLinkType_EXISTS_SUBLINK: SubLinkType = 0;
-pub const SubLinkType_ALL_SUBLINK: SubLinkType = 1;
-pub const SubLinkType_ANY_SUBLINK: SubLinkType = 2;
-pub const SubLinkType_ROWCOMPARE_SUBLINK: SubLinkType = 3;
-pub const SubLinkType_EXPR_SUBLINK: SubLinkType = 4;
-pub const SubLinkType_MULTIEXPR_SUBLINK: SubLinkType = 5;
-pub const SubLinkType_ARRAY_SUBLINK: SubLinkType = 6;
-pub const SubLinkType_CTE_SUBLINK: SubLinkType = 7;
-pub type SubLinkType = ::std::os::raw::c_uint;
+pub mod SubLinkType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const EXISTS_SUBLINK: Type = 0;
+    pub const ALL_SUBLINK: Type = 1;
+    pub const ANY_SUBLINK: Type = 2;
+    pub const ROWCOMPARE_SUBLINK: Type = 3;
+    pub const EXPR_SUBLINK: Type = 4;
+    pub const MULTIEXPR_SUBLINK: Type = 5;
+    pub const ARRAY_SUBLINK: Type = 6;
+    pub const CTE_SUBLINK: Type = 7;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct SubLink {
     pub xpr: Expr,
-    pub subLinkType: SubLinkType,
+    pub subLinkType: SubLinkType::Type,
     pub subLinkId: ::std::os::raw::c_int,
     pub testexpr: *mut Node,
     pub operName: *mut List,
@@ -6777,7 +10122,7 @@ impl Default for SubLink {
 #[derive(Debug, Copy, Clone)]
 pub struct SubPlan {
     pub xpr: Expr,
-    pub subLinkType: SubLinkType,
+    pub subLinkType: SubLinkType::Type,
     pub testexpr: *mut Node,
     pub paramIds: *mut List,
     pub plan_id: ::std::os::raw::c_int,
@@ -6863,7 +10208,7 @@ pub struct RelabelType {
     pub resulttype: Oid,
     pub resulttypmod: int32,
     pub resultcollid: Oid,
-    pub relabelformat: CoercionForm,
+    pub relabelformat: CoercionForm::Type,
     pub location: ::std::os::raw::c_int,
 }
 impl Default for RelabelType {
@@ -6882,7 +10227,7 @@ pub struct CoerceViaIO {
     pub arg: *mut Expr,
     pub resulttype: Oid,
     pub resultcollid: Oid,
-    pub coerceformat: CoercionForm,
+    pub coerceformat: CoercionForm::Type,
     pub location: ::std::os::raw::c_int,
 }
 impl Default for CoerceViaIO {
@@ -6903,7 +10248,7 @@ pub struct ArrayCoerceExpr {
     pub resulttype: Oid,
     pub resulttypmod: int32,
     pub resultcollid: Oid,
-    pub coerceformat: CoercionForm,
+    pub coerceformat: CoercionForm::Type,
     pub location: ::std::os::raw::c_int,
 }
 impl Default for ArrayCoerceExpr {
@@ -6921,7 +10266,7 @@ pub struct ConvertRowtypeExpr {
     pub xpr: Expr,
     pub arg: *mut Expr,
     pub resulttype: Oid,
-    pub convertformat: CoercionForm,
+    pub convertformat: CoercionForm::Type,
     pub location: ::std::os::raw::c_int,
 }
 impl Default for ConvertRowtypeExpr {
@@ -7030,7 +10375,7 @@ pub struct RowExpr {
     pub xpr: Expr,
     pub args: *mut List,
     pub row_typeid: Oid,
-    pub row_format: CoercionForm,
+    pub row_format: CoercionForm::Type,
     pub colnames: *mut List,
     pub location: ::std::os::raw::c_int,
 }
@@ -7043,18 +10388,20 @@ impl Default for RowExpr {
         }
     }
 }
-pub const RowCompareType_ROWCOMPARE_LT: RowCompareType = 1;
-pub const RowCompareType_ROWCOMPARE_LE: RowCompareType = 2;
-pub const RowCompareType_ROWCOMPARE_EQ: RowCompareType = 3;
-pub const RowCompareType_ROWCOMPARE_GE: RowCompareType = 4;
-pub const RowCompareType_ROWCOMPARE_GT: RowCompareType = 5;
-pub const RowCompareType_ROWCOMPARE_NE: RowCompareType = 6;
-pub type RowCompareType = ::std::os::raw::c_uint;
+pub mod RowCompareType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const ROWCOMPARE_LT: Type = 1;
+    pub const ROWCOMPARE_LE: Type = 2;
+    pub const ROWCOMPARE_EQ: Type = 3;
+    pub const ROWCOMPARE_GE: Type = 4;
+    pub const ROWCOMPARE_GT: Type = 5;
+    pub const ROWCOMPARE_NE: Type = 6;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct RowCompareExpr {
     pub xpr: Expr,
-    pub rctype: RowCompareType,
+    pub rctype: RowCompareType::Type,
     pub opnos: *mut List,
     pub opfamilies: *mut List,
     pub inputcollids: *mut List,
@@ -7088,9 +10435,11 @@ impl Default for CoalesceExpr {
         }
     }
 }
-pub const MinMaxOp_IS_GREATEST: MinMaxOp = 0;
-pub const MinMaxOp_IS_LEAST: MinMaxOp = 1;
-pub type MinMaxOp = ::std::os::raw::c_uint;
+pub mod MinMaxOp {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const IS_GREATEST: Type = 0;
+    pub const IS_LEAST: Type = 1;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct MinMaxExpr {
@@ -7098,7 +10447,7 @@ pub struct MinMaxExpr {
     pub minmaxtype: Oid,
     pub minmaxcollid: Oid,
     pub inputcollid: Oid,
-    pub op: MinMaxOp,
+    pub op: MinMaxOp::Type,
     pub args: *mut List,
     pub location: ::std::os::raw::c_int,
 }
@@ -7111,27 +10460,29 @@ impl Default for MinMaxExpr {
         }
     }
 }
-pub const SQLValueFunctionOp_SVFOP_CURRENT_DATE: SQLValueFunctionOp = 0;
-pub const SQLValueFunctionOp_SVFOP_CURRENT_TIME: SQLValueFunctionOp = 1;
-pub const SQLValueFunctionOp_SVFOP_CURRENT_TIME_N: SQLValueFunctionOp = 2;
-pub const SQLValueFunctionOp_SVFOP_CURRENT_TIMESTAMP: SQLValueFunctionOp = 3;
-pub const SQLValueFunctionOp_SVFOP_CURRENT_TIMESTAMP_N: SQLValueFunctionOp = 4;
-pub const SQLValueFunctionOp_SVFOP_LOCALTIME: SQLValueFunctionOp = 5;
-pub const SQLValueFunctionOp_SVFOP_LOCALTIME_N: SQLValueFunctionOp = 6;
-pub const SQLValueFunctionOp_SVFOP_LOCALTIMESTAMP: SQLValueFunctionOp = 7;
-pub const SQLValueFunctionOp_SVFOP_LOCALTIMESTAMP_N: SQLValueFunctionOp = 8;
-pub const SQLValueFunctionOp_SVFOP_CURRENT_ROLE: SQLValueFunctionOp = 9;
-pub const SQLValueFunctionOp_SVFOP_CURRENT_USER: SQLValueFunctionOp = 10;
-pub const SQLValueFunctionOp_SVFOP_USER: SQLValueFunctionOp = 11;
-pub const SQLValueFunctionOp_SVFOP_SESSION_USER: SQLValueFunctionOp = 12;
-pub const SQLValueFunctionOp_SVFOP_CURRENT_CATALOG: SQLValueFunctionOp = 13;
-pub const SQLValueFunctionOp_SVFOP_CURRENT_SCHEMA: SQLValueFunctionOp = 14;
-pub type SQLValueFunctionOp = ::std::os::raw::c_uint;
+pub mod SQLValueFunctionOp {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SVFOP_CURRENT_DATE: Type = 0;
+    pub const SVFOP_CURRENT_TIME: Type = 1;
+    pub const SVFOP_CURRENT_TIME_N: Type = 2;
+    pub const SVFOP_CURRENT_TIMESTAMP: Type = 3;
+    pub const SVFOP_CURRENT_TIMESTAMP_N: Type = 4;
+    pub const SVFOP_LOCALTIME: Type = 5;
+    pub const SVFOP_LOCALTIME_N: Type = 6;
+    pub const SVFOP_LOCALTIMESTAMP: Type = 7;
+    pub const SVFOP_LOCALTIMESTAMP_N: Type = 8;
+    pub const SVFOP_CURRENT_ROLE: Type = 9;
+    pub const SVFOP_CURRENT_USER: Type = 10;
+    pub const SVFOP_USER: Type = 11;
+    pub const SVFOP_SESSION_USER: Type = 12;
+    pub const SVFOP_CURRENT_CATALOG: Type = 13;
+    pub const SVFOP_CURRENT_SCHEMA: Type = 14;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct SQLValueFunction {
     pub xpr: Expr,
-    pub op: SQLValueFunctionOp,
+    pub op: SQLValueFunctionOp::Type,
     pub type_: Oid,
     pub typmod: int32,
     pub location: ::std::os::raw::c_int,
@@ -7145,28 +10496,32 @@ impl Default for SQLValueFunction {
         }
     }
 }
-pub const XmlExprOp_IS_XMLCONCAT: XmlExprOp = 0;
-pub const XmlExprOp_IS_XMLELEMENT: XmlExprOp = 1;
-pub const XmlExprOp_IS_XMLFOREST: XmlExprOp = 2;
-pub const XmlExprOp_IS_XMLPARSE: XmlExprOp = 3;
-pub const XmlExprOp_IS_XMLPI: XmlExprOp = 4;
-pub const XmlExprOp_IS_XMLROOT: XmlExprOp = 5;
-pub const XmlExprOp_IS_XMLSERIALIZE: XmlExprOp = 6;
-pub const XmlExprOp_IS_DOCUMENT: XmlExprOp = 7;
-pub type XmlExprOp = ::std::os::raw::c_uint;
-pub const XmlOptionType_XMLOPTION_DOCUMENT: XmlOptionType = 0;
-pub const XmlOptionType_XMLOPTION_CONTENT: XmlOptionType = 1;
-pub type XmlOptionType = ::std::os::raw::c_uint;
+pub mod XmlExprOp {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const IS_XMLCONCAT: Type = 0;
+    pub const IS_XMLELEMENT: Type = 1;
+    pub const IS_XMLFOREST: Type = 2;
+    pub const IS_XMLPARSE: Type = 3;
+    pub const IS_XMLPI: Type = 4;
+    pub const IS_XMLROOT: Type = 5;
+    pub const IS_XMLSERIALIZE: Type = 6;
+    pub const IS_DOCUMENT: Type = 7;
+}
+pub mod XmlOptionType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const XMLOPTION_DOCUMENT: Type = 0;
+    pub const XMLOPTION_CONTENT: Type = 1;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct XmlExpr {
     pub xpr: Expr,
-    pub op: XmlExprOp,
+    pub op: XmlExprOp::Type,
     pub name: *mut ::std::os::raw::c_char,
     pub named_args: *mut List,
     pub arg_names: *mut List,
     pub args: *mut List,
-    pub xmloption: XmlOptionType,
+    pub xmloption: XmlOptionType::Type,
     pub indent: bool,
     pub type_: Oid,
     pub typmod: int32,
@@ -7181,21 +10536,25 @@ impl Default for XmlExpr {
         }
     }
 }
-pub const JsonEncoding_JS_ENC_DEFAULT: JsonEncoding = 0;
-pub const JsonEncoding_JS_ENC_UTF8: JsonEncoding = 1;
-pub const JsonEncoding_JS_ENC_UTF16: JsonEncoding = 2;
-pub const JsonEncoding_JS_ENC_UTF32: JsonEncoding = 3;
-pub type JsonEncoding = ::std::os::raw::c_uint;
-pub const JsonFormatType_JS_FORMAT_DEFAULT: JsonFormatType = 0;
-pub const JsonFormatType_JS_FORMAT_JSON: JsonFormatType = 1;
-pub const JsonFormatType_JS_FORMAT_JSONB: JsonFormatType = 2;
-pub type JsonFormatType = ::std::os::raw::c_uint;
+pub mod JsonEncoding {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const JS_ENC_DEFAULT: Type = 0;
+    pub const JS_ENC_UTF8: Type = 1;
+    pub const JS_ENC_UTF16: Type = 2;
+    pub const JS_ENC_UTF32: Type = 3;
+}
+pub mod JsonFormatType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const JS_FORMAT_DEFAULT: Type = 0;
+    pub const JS_FORMAT_JSON: Type = 1;
+    pub const JS_FORMAT_JSONB: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct JsonFormat {
     pub type_: NodeTag,
-    pub format_type: JsonFormatType,
-    pub encoding: JsonEncoding,
+    pub format_type: JsonFormatType::Type,
+    pub encoding: JsonEncoding::Type,
     pub location: ::std::os::raw::c_int,
 }
 impl Default for JsonFormat {
@@ -7241,16 +10600,18 @@ impl Default for JsonValueExpr {
         }
     }
 }
-pub const JsonConstructorType_JSCTOR_JSON_OBJECT: JsonConstructorType = 1;
-pub const JsonConstructorType_JSCTOR_JSON_ARRAY: JsonConstructorType = 2;
-pub const JsonConstructorType_JSCTOR_JSON_OBJECTAGG: JsonConstructorType = 3;
-pub const JsonConstructorType_JSCTOR_JSON_ARRAYAGG: JsonConstructorType = 4;
-pub type JsonConstructorType = ::std::os::raw::c_uint;
+pub mod JsonConstructorType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const JSCTOR_JSON_OBJECT: Type = 1;
+    pub const JSCTOR_JSON_ARRAY: Type = 2;
+    pub const JSCTOR_JSON_OBJECTAGG: Type = 3;
+    pub const JSCTOR_JSON_ARRAYAGG: Type = 4;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct JsonConstructorExpr {
     pub xpr: Expr,
-    pub type_: JsonConstructorType,
+    pub type_: JsonConstructorType::Type,
     pub args: *mut List,
     pub func: *mut Expr,
     pub coercion: *mut Expr,
@@ -7268,18 +10629,20 @@ impl Default for JsonConstructorExpr {
         }
     }
 }
-pub const JsonValueType_JS_TYPE_ANY: JsonValueType = 0;
-pub const JsonValueType_JS_TYPE_OBJECT: JsonValueType = 1;
-pub const JsonValueType_JS_TYPE_ARRAY: JsonValueType = 2;
-pub const JsonValueType_JS_TYPE_SCALAR: JsonValueType = 3;
-pub type JsonValueType = ::std::os::raw::c_uint;
+pub mod JsonValueType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const JS_TYPE_ANY: Type = 0;
+    pub const JS_TYPE_OBJECT: Type = 1;
+    pub const JS_TYPE_ARRAY: Type = 2;
+    pub const JS_TYPE_SCALAR: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct JsonIsPredicate {
     pub type_: NodeTag,
     pub expr: *mut Node,
     pub format: *mut JsonFormat,
-    pub item_type: JsonValueType,
+    pub item_type: JsonValueType::Type,
     pub unique_keys: bool,
     pub location: ::std::os::raw::c_int,
 }
@@ -7292,15 +10655,17 @@ impl Default for JsonIsPredicate {
         }
     }
 }
-pub const NullTestType_IS_NULL: NullTestType = 0;
-pub const NullTestType_IS_NOT_NULL: NullTestType = 1;
-pub type NullTestType = ::std::os::raw::c_uint;
+pub mod NullTestType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const IS_NULL: Type = 0;
+    pub const IS_NOT_NULL: Type = 1;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct NullTest {
     pub xpr: Expr,
     pub arg: *mut Expr,
-    pub nulltesttype: NullTestType,
+    pub nulltesttype: NullTestType::Type,
     pub argisrow: bool,
     pub location: ::std::os::raw::c_int,
 }
@@ -7313,19 +10678,21 @@ impl Default for NullTest {
         }
     }
 }
-pub const BoolTestType_IS_TRUE: BoolTestType = 0;
-pub const BoolTestType_IS_NOT_TRUE: BoolTestType = 1;
-pub const BoolTestType_IS_FALSE: BoolTestType = 2;
-pub const BoolTestType_IS_NOT_FALSE: BoolTestType = 3;
-pub const BoolTestType_IS_UNKNOWN: BoolTestType = 4;
-pub const BoolTestType_IS_NOT_UNKNOWN: BoolTestType = 5;
-pub type BoolTestType = ::std::os::raw::c_uint;
+pub mod BoolTestType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const IS_TRUE: Type = 0;
+    pub const IS_NOT_TRUE: Type = 1;
+    pub const IS_FALSE: Type = 2;
+    pub const IS_NOT_FALSE: Type = 3;
+    pub const IS_UNKNOWN: Type = 4;
+    pub const IS_NOT_UNKNOWN: Type = 5;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct BooleanTest {
     pub xpr: Expr,
     pub arg: *mut Expr,
-    pub booltesttype: BoolTestType,
+    pub booltesttype: BoolTestType::Type,
     pub location: ::std::os::raw::c_int,
 }
 impl Default for BooleanTest {
@@ -7345,7 +10712,7 @@ pub struct CoerceToDomain {
     pub resulttype: Oid,
     pub resulttypmod: int32,
     pub resultcollid: Oid,
-    pub coercionformat: CoercionForm,
+    pub coercionformat: CoercionForm::Type,
     pub location: ::std::os::raw::c_int,
 }
 impl Default for CoerceToDomain {
@@ -7483,7 +10850,7 @@ impl Default for RangeTblRef {
 #[derive(Debug, Copy, Clone)]
 pub struct JoinExpr {
     pub type_: NodeTag,
-    pub jointype: JoinType,
+    pub jointype: JoinType::Type,
     pub isNatural: bool,
     pub larg: *mut Node,
     pub rarg: *mut Node,
@@ -7522,7 +10889,7 @@ impl Default for FromExpr {
 #[derive(Debug, Copy, Clone)]
 pub struct OnConflictExpr {
     pub type_: NodeTag,
-    pub action: OnConflictAction,
+    pub action: OnConflictAction::Type,
     pub arbiterElems: *mut List,
     pub arbiterWhere: *mut Node,
     pub constraint: Oid,
@@ -7639,37 +11006,47 @@ pub struct PartitionDirectoryData {
     _unused: [u8; 0],
 }
 pub type PartitionDirectory = *mut PartitionDirectoryData;
-pub const OverridingKind_OVERRIDING_NOT_SET: OverridingKind = 0;
-pub const OverridingKind_OVERRIDING_USER_VALUE: OverridingKind = 1;
-pub const OverridingKind_OVERRIDING_SYSTEM_VALUE: OverridingKind = 2;
-pub type OverridingKind = ::std::os::raw::c_uint;
-pub const QuerySource_QSRC_ORIGINAL: QuerySource = 0;
-pub const QuerySource_QSRC_PARSER: QuerySource = 1;
-pub const QuerySource_QSRC_INSTEAD_RULE: QuerySource = 2;
-pub const QuerySource_QSRC_QUAL_INSTEAD_RULE: QuerySource = 3;
-pub const QuerySource_QSRC_NON_INSTEAD_RULE: QuerySource = 4;
-pub type QuerySource = ::std::os::raw::c_uint;
-pub const SortByDir_SORTBY_DEFAULT: SortByDir = 0;
-pub const SortByDir_SORTBY_ASC: SortByDir = 1;
-pub const SortByDir_SORTBY_DESC: SortByDir = 2;
-pub const SortByDir_SORTBY_USING: SortByDir = 3;
-pub type SortByDir = ::std::os::raw::c_uint;
-pub const SortByNulls_SORTBY_NULLS_DEFAULT: SortByNulls = 0;
-pub const SortByNulls_SORTBY_NULLS_FIRST: SortByNulls = 1;
-pub const SortByNulls_SORTBY_NULLS_LAST: SortByNulls = 2;
-pub type SortByNulls = ::std::os::raw::c_uint;
-pub const SetQuantifier_SET_QUANTIFIER_DEFAULT: SetQuantifier = 0;
-pub const SetQuantifier_SET_QUANTIFIER_ALL: SetQuantifier = 1;
-pub const SetQuantifier_SET_QUANTIFIER_DISTINCT: SetQuantifier = 2;
-pub type SetQuantifier = ::std::os::raw::c_uint;
+pub mod OverridingKind {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const OVERRIDING_NOT_SET: Type = 0;
+    pub const OVERRIDING_USER_VALUE: Type = 1;
+    pub const OVERRIDING_SYSTEM_VALUE: Type = 2;
+}
+pub mod QuerySource {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const QSRC_ORIGINAL: Type = 0;
+    pub const QSRC_PARSER: Type = 1;
+    pub const QSRC_INSTEAD_RULE: Type = 2;
+    pub const QSRC_QUAL_INSTEAD_RULE: Type = 3;
+    pub const QSRC_NON_INSTEAD_RULE: Type = 4;
+}
+pub mod SortByDir {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SORTBY_DEFAULT: Type = 0;
+    pub const SORTBY_ASC: Type = 1;
+    pub const SORTBY_DESC: Type = 2;
+    pub const SORTBY_USING: Type = 3;
+}
+pub mod SortByNulls {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SORTBY_NULLS_DEFAULT: Type = 0;
+    pub const SORTBY_NULLS_FIRST: Type = 1;
+    pub const SORTBY_NULLS_LAST: Type = 2;
+}
+pub mod SetQuantifier {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SET_QUANTIFIER_DEFAULT: Type = 0;
+    pub const SET_QUANTIFIER_ALL: Type = 1;
+    pub const SET_QUANTIFIER_DISTINCT: Type = 2;
+}
 pub type AclMode = uint64;
 #[doc = "\tQuery Tree"]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Query {
     pub type_: NodeTag,
-    pub commandType: CmdType,
-    pub querySource: QuerySource,
+    pub commandType: CmdType::Type,
+    pub querySource: QuerySource::Type,
     pub queryId: uint64,
     pub canSetTag: bool,
     pub utilityStmt: *mut Node,
@@ -7691,7 +11068,7 @@ pub struct Query {
     pub mergeActionList: *mut List,
     pub mergeUseOuterJoin: bool,
     pub targetList: *mut List,
-    pub override_: OverridingKind,
+    pub override_: OverridingKind::Type,
     pub onConflict: *mut OnConflictExpr,
     pub returningList: *mut List,
     pub groupClause: *mut List,
@@ -7703,7 +11080,7 @@ pub struct Query {
     pub sortClause: *mut List,
     pub limitOffset: *mut Node,
     pub limitCount: *mut Node,
-    pub limitOption: LimitOption,
+    pub limitOption: LimitOption::Type,
     pub rowMarks: *mut List,
     pub setOperations: *mut Node,
     pub constraintDeps: *mut List,
@@ -7775,26 +11152,28 @@ impl Default for ParamRef {
         }
     }
 }
-pub const A_Expr_Kind_AEXPR_OP: A_Expr_Kind = 0;
-pub const A_Expr_Kind_AEXPR_OP_ANY: A_Expr_Kind = 1;
-pub const A_Expr_Kind_AEXPR_OP_ALL: A_Expr_Kind = 2;
-pub const A_Expr_Kind_AEXPR_DISTINCT: A_Expr_Kind = 3;
-pub const A_Expr_Kind_AEXPR_NOT_DISTINCT: A_Expr_Kind = 4;
-pub const A_Expr_Kind_AEXPR_NULLIF: A_Expr_Kind = 5;
-pub const A_Expr_Kind_AEXPR_IN: A_Expr_Kind = 6;
-pub const A_Expr_Kind_AEXPR_LIKE: A_Expr_Kind = 7;
-pub const A_Expr_Kind_AEXPR_ILIKE: A_Expr_Kind = 8;
-pub const A_Expr_Kind_AEXPR_SIMILAR: A_Expr_Kind = 9;
-pub const A_Expr_Kind_AEXPR_BETWEEN: A_Expr_Kind = 10;
-pub const A_Expr_Kind_AEXPR_NOT_BETWEEN: A_Expr_Kind = 11;
-pub const A_Expr_Kind_AEXPR_BETWEEN_SYM: A_Expr_Kind = 12;
-pub const A_Expr_Kind_AEXPR_NOT_BETWEEN_SYM: A_Expr_Kind = 13;
-pub type A_Expr_Kind = ::std::os::raw::c_uint;
+pub mod A_Expr_Kind {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const AEXPR_OP: Type = 0;
+    pub const AEXPR_OP_ANY: Type = 1;
+    pub const AEXPR_OP_ALL: Type = 2;
+    pub const AEXPR_DISTINCT: Type = 3;
+    pub const AEXPR_NOT_DISTINCT: Type = 4;
+    pub const AEXPR_NULLIF: Type = 5;
+    pub const AEXPR_IN: Type = 6;
+    pub const AEXPR_LIKE: Type = 7;
+    pub const AEXPR_ILIKE: Type = 8;
+    pub const AEXPR_SIMILAR: Type = 9;
+    pub const AEXPR_BETWEEN: Type = 10;
+    pub const AEXPR_NOT_BETWEEN: Type = 11;
+    pub const AEXPR_BETWEEN_SYM: Type = 12;
+    pub const AEXPR_NOT_BETWEEN_SYM: Type = 13;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct A_Expr {
     pub type_: NodeTag,
-    pub kind: A_Expr_Kind,
+    pub kind: A_Expr_Kind::Type,
     pub name: *mut List,
     pub lexpr: *mut Node,
     pub rexpr: *mut Node,
@@ -7879,17 +11258,19 @@ impl Default for CollateClause {
         }
     }
 }
-pub const RoleSpecType_ROLESPEC_CSTRING: RoleSpecType = 0;
-pub const RoleSpecType_ROLESPEC_CURRENT_ROLE: RoleSpecType = 1;
-pub const RoleSpecType_ROLESPEC_CURRENT_USER: RoleSpecType = 2;
-pub const RoleSpecType_ROLESPEC_SESSION_USER: RoleSpecType = 3;
-pub const RoleSpecType_ROLESPEC_PUBLIC: RoleSpecType = 4;
-pub type RoleSpecType = ::std::os::raw::c_uint;
+pub mod RoleSpecType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const ROLESPEC_CSTRING: Type = 0;
+    pub const ROLESPEC_CURRENT_ROLE: Type = 1;
+    pub const ROLESPEC_CURRENT_USER: Type = 2;
+    pub const ROLESPEC_SESSION_USER: Type = 3;
+    pub const ROLESPEC_PUBLIC: Type = 4;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct RoleSpec {
     pub type_: NodeTag,
-    pub roletype: RoleSpecType,
+    pub roletype: RoleSpecType::Type,
     pub rolename: *mut ::std::os::raw::c_char,
     pub location: ::std::os::raw::c_int,
 }
@@ -7915,7 +11296,7 @@ pub struct FuncCall {
     pub agg_star: bool,
     pub agg_distinct: bool,
     pub func_variadic: bool,
-    pub funcformat: CoercionForm,
+    pub funcformat: CoercionForm::Type,
     pub location: ::std::os::raw::c_int,
 }
 impl Default for FuncCall {
@@ -8030,8 +11411,8 @@ impl Default for MultiAssignRef {
 pub struct SortBy {
     pub type_: NodeTag,
     pub node: *mut Node,
-    pub sortby_dir: SortByDir,
-    pub sortby_nulls: SortByNulls,
+    pub sortby_dir: SortByDir::Type,
+    pub sortby_nulls: SortByNulls::Type,
     pub useOp: *mut List,
     pub location: ::std::os::raw::c_int,
 }
@@ -8214,17 +11595,19 @@ impl Default for TableLikeClause {
         }
     }
 }
-pub const TableLikeOption_CREATE_TABLE_LIKE_COMMENTS: TableLikeOption = 1;
-pub const TableLikeOption_CREATE_TABLE_LIKE_COMPRESSION: TableLikeOption = 2;
-pub const TableLikeOption_CREATE_TABLE_LIKE_CONSTRAINTS: TableLikeOption = 4;
-pub const TableLikeOption_CREATE_TABLE_LIKE_DEFAULTS: TableLikeOption = 8;
-pub const TableLikeOption_CREATE_TABLE_LIKE_GENERATED: TableLikeOption = 16;
-pub const TableLikeOption_CREATE_TABLE_LIKE_IDENTITY: TableLikeOption = 32;
-pub const TableLikeOption_CREATE_TABLE_LIKE_INDEXES: TableLikeOption = 64;
-pub const TableLikeOption_CREATE_TABLE_LIKE_STATISTICS: TableLikeOption = 128;
-pub const TableLikeOption_CREATE_TABLE_LIKE_STORAGE: TableLikeOption = 256;
-pub const TableLikeOption_CREATE_TABLE_LIKE_ALL: TableLikeOption = 2147483647;
-pub type TableLikeOption = ::std::os::raw::c_uint;
+pub mod TableLikeOption {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const CREATE_TABLE_LIKE_COMMENTS: Type = 1;
+    pub const CREATE_TABLE_LIKE_COMPRESSION: Type = 2;
+    pub const CREATE_TABLE_LIKE_CONSTRAINTS: Type = 4;
+    pub const CREATE_TABLE_LIKE_DEFAULTS: Type = 8;
+    pub const CREATE_TABLE_LIKE_GENERATED: Type = 16;
+    pub const CREATE_TABLE_LIKE_IDENTITY: Type = 32;
+    pub const CREATE_TABLE_LIKE_INDEXES: Type = 64;
+    pub const CREATE_TABLE_LIKE_STATISTICS: Type = 128;
+    pub const CREATE_TABLE_LIKE_STORAGE: Type = 256;
+    pub const CREATE_TABLE_LIKE_ALL: Type = 2147483647;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct IndexElem {
@@ -8235,8 +11618,8 @@ pub struct IndexElem {
     pub collation: *mut List,
     pub opclass: *mut List,
     pub opclassopts: *mut List,
-    pub ordering: SortByDir,
-    pub nulls_ordering: SortByNulls,
+    pub ordering: SortByDir::Type,
+    pub nulls_ordering: SortByNulls::Type,
 }
 impl Default for IndexElem {
     fn default() -> Self {
@@ -8247,11 +11630,13 @@ impl Default for IndexElem {
         }
     }
 }
-pub const DefElemAction_DEFELEM_UNSPEC: DefElemAction = 0;
-pub const DefElemAction_DEFELEM_SET: DefElemAction = 1;
-pub const DefElemAction_DEFELEM_ADD: DefElemAction = 2;
-pub const DefElemAction_DEFELEM_DROP: DefElemAction = 3;
-pub type DefElemAction = ::std::os::raw::c_uint;
+pub mod DefElemAction {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const DEFELEM_UNSPEC: Type = 0;
+    pub const DEFELEM_SET: Type = 1;
+    pub const DEFELEM_ADD: Type = 2;
+    pub const DEFELEM_DROP: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct DefElem {
@@ -8259,7 +11644,7 @@ pub struct DefElem {
     pub defnamespace: *mut ::std::os::raw::c_char,
     pub defname: *mut ::std::os::raw::c_char,
     pub arg: *mut Node,
-    pub defaction: DefElemAction,
+    pub defaction: DefElemAction::Type,
     pub location: ::std::os::raw::c_int,
 }
 impl Default for DefElem {
@@ -8276,8 +11661,8 @@ impl Default for DefElem {
 pub struct LockingClause {
     pub type_: NodeTag,
     pub lockedRels: *mut List,
-    pub strength: LockClauseStrength,
-    pub waitPolicy: LockWaitPolicy,
+    pub strength: LockClauseStrength::Type,
+    pub waitPolicy: LockWaitPolicy::Type,
 }
 impl Default for LockingClause {
     fn default() -> Self {
@@ -8292,7 +11677,7 @@ impl Default for LockingClause {
 #[derive(Debug, Copy, Clone)]
 pub struct XmlSerialize {
     pub type_: NodeTag,
-    pub xmloption: XmlOptionType,
+    pub xmloption: XmlOptionType::Type,
     pub expr: *mut Node,
     pub typeName: *mut TypeName,
     pub indent: bool,
@@ -8326,15 +11711,17 @@ impl Default for PartitionElem {
         }
     }
 }
-pub const PartitionStrategy_PARTITION_STRATEGY_LIST: PartitionStrategy = 108;
-pub const PartitionStrategy_PARTITION_STRATEGY_RANGE: PartitionStrategy = 114;
-pub const PartitionStrategy_PARTITION_STRATEGY_HASH: PartitionStrategy = 104;
-pub type PartitionStrategy = ::std::os::raw::c_uint;
+pub mod PartitionStrategy {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PARTITION_STRATEGY_LIST: Type = 108;
+    pub const PARTITION_STRATEGY_RANGE: Type = 114;
+    pub const PARTITION_STRATEGY_HASH: Type = 104;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PartitionSpec {
     pub type_: NodeTag,
-    pub strategy: PartitionStrategy,
+    pub strategy: PartitionStrategy::Type,
     pub partParams: *mut List,
     pub location: ::std::os::raw::c_int,
 }
@@ -8369,15 +11756,17 @@ impl Default for PartitionBoundSpec {
         }
     }
 }
-pub const PartitionRangeDatumKind_PARTITION_RANGE_DATUM_MINVALUE: PartitionRangeDatumKind = -1;
-pub const PartitionRangeDatumKind_PARTITION_RANGE_DATUM_VALUE: PartitionRangeDatumKind = 0;
-pub const PartitionRangeDatumKind_PARTITION_RANGE_DATUM_MAXVALUE: PartitionRangeDatumKind = 1;
-pub type PartitionRangeDatumKind = ::std::os::raw::c_int;
+pub mod PartitionRangeDatumKind {
+    pub type Type = ::std::os::raw::c_int;
+    pub const PARTITION_RANGE_DATUM_MINVALUE: Type = -1;
+    pub const PARTITION_RANGE_DATUM_VALUE: Type = 0;
+    pub const PARTITION_RANGE_DATUM_MAXVALUE: Type = 1;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PartitionRangeDatum {
     pub type_: NodeTag,
-    pub kind: PartitionRangeDatumKind,
+    pub kind: PartitionRangeDatumKind::Type,
     pub value: *mut Node,
     pub location: ::std::os::raw::c_int,
 }
@@ -8407,21 +11796,23 @@ impl Default for PartitionCmd {
         }
     }
 }
-pub const RTEKind_RTE_RELATION: RTEKind = 0;
-pub const RTEKind_RTE_SUBQUERY: RTEKind = 1;
-pub const RTEKind_RTE_JOIN: RTEKind = 2;
-pub const RTEKind_RTE_FUNCTION: RTEKind = 3;
-pub const RTEKind_RTE_TABLEFUNC: RTEKind = 4;
-pub const RTEKind_RTE_VALUES: RTEKind = 5;
-pub const RTEKind_RTE_CTE: RTEKind = 6;
-pub const RTEKind_RTE_NAMEDTUPLESTORE: RTEKind = 7;
-pub const RTEKind_RTE_RESULT: RTEKind = 8;
-pub type RTEKind = ::std::os::raw::c_uint;
+pub mod RTEKind {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RTE_RELATION: Type = 0;
+    pub const RTE_SUBQUERY: Type = 1;
+    pub const RTE_JOIN: Type = 2;
+    pub const RTE_FUNCTION: Type = 3;
+    pub const RTE_TABLEFUNC: Type = 4;
+    pub const RTE_VALUES: Type = 5;
+    pub const RTE_CTE: Type = 6;
+    pub const RTE_NAMEDTUPLESTORE: Type = 7;
+    pub const RTE_RESULT: Type = 8;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct RangeTblEntry {
     pub type_: NodeTag,
-    pub rtekind: RTEKind,
+    pub rtekind: RTEKind::Type,
     pub relid: Oid,
     pub relkind: ::std::os::raw::c_char,
     pub rellockmode: ::std::os::raw::c_int,
@@ -8429,7 +11820,7 @@ pub struct RangeTblEntry {
     pub perminfoindex: Index,
     pub subquery: *mut Query,
     pub security_barrier: bool,
-    pub jointype: JoinType,
+    pub jointype: JoinType::Type,
     pub joinmergedcols: ::std::os::raw::c_int,
     pub joinaliasvars: *mut List,
     pub joinleftcols: *mut List,
@@ -8522,18 +11913,20 @@ impl Default for TableSampleClause {
         }
     }
 }
-pub const WCOKind_WCO_VIEW_CHECK: WCOKind = 0;
-pub const WCOKind_WCO_RLS_INSERT_CHECK: WCOKind = 1;
-pub const WCOKind_WCO_RLS_UPDATE_CHECK: WCOKind = 2;
-pub const WCOKind_WCO_RLS_CONFLICT_CHECK: WCOKind = 3;
-pub const WCOKind_WCO_RLS_MERGE_UPDATE_CHECK: WCOKind = 4;
-pub const WCOKind_WCO_RLS_MERGE_DELETE_CHECK: WCOKind = 5;
-pub type WCOKind = ::std::os::raw::c_uint;
+pub mod WCOKind {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const WCO_VIEW_CHECK: Type = 0;
+    pub const WCO_RLS_INSERT_CHECK: Type = 1;
+    pub const WCO_RLS_UPDATE_CHECK: Type = 2;
+    pub const WCO_RLS_CONFLICT_CHECK: Type = 3;
+    pub const WCO_RLS_MERGE_UPDATE_CHECK: Type = 4;
+    pub const WCO_RLS_MERGE_DELETE_CHECK: Type = 5;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct WithCheckOption {
     pub type_: NodeTag,
-    pub kind: WCOKind,
+    pub kind: WCOKind::Type,
     pub relname: *mut ::std::os::raw::c_char,
     pub polname: *mut ::std::os::raw::c_char,
     pub qual: *mut Node,
@@ -8567,17 +11960,19 @@ impl Default for SortGroupClause {
         }
     }
 }
-pub const GroupingSetKind_GROUPING_SET_EMPTY: GroupingSetKind = 0;
-pub const GroupingSetKind_GROUPING_SET_SIMPLE: GroupingSetKind = 1;
-pub const GroupingSetKind_GROUPING_SET_ROLLUP: GroupingSetKind = 2;
-pub const GroupingSetKind_GROUPING_SET_CUBE: GroupingSetKind = 3;
-pub const GroupingSetKind_GROUPING_SET_SETS: GroupingSetKind = 4;
-pub type GroupingSetKind = ::std::os::raw::c_uint;
+pub mod GroupingSetKind {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const GROUPING_SET_EMPTY: Type = 0;
+    pub const GROUPING_SET_SIMPLE: Type = 1;
+    pub const GROUPING_SET_ROLLUP: Type = 2;
+    pub const GROUPING_SET_CUBE: Type = 3;
+    pub const GROUPING_SET_SETS: Type = 4;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct GroupingSet {
     pub type_: NodeTag,
-    pub kind: GroupingSetKind,
+    pub kind: GroupingSetKind::Type,
     pub content: *mut List,
     pub location: ::std::os::raw::c_int,
 }
@@ -8624,8 +12019,8 @@ impl Default for WindowClause {
 pub struct RowMarkClause {
     pub type_: NodeTag,
     pub rti: Index,
-    pub strength: LockClauseStrength,
-    pub waitPolicy: LockWaitPolicy,
+    pub strength: LockClauseStrength::Type,
+    pub waitPolicy: LockWaitPolicy::Type,
     pub pushedDown: bool,
 }
 impl Default for RowMarkClause {
@@ -8676,7 +12071,7 @@ impl Default for InferClause {
 #[derive(Debug, Copy, Clone)]
 pub struct OnConflictClause {
     pub type_: NodeTag,
-    pub action: OnConflictAction,
+    pub action: OnConflictAction::Type,
     pub infer: *mut InferClause,
     pub targetList: *mut List,
     pub whereClause: *mut Node,
@@ -8691,10 +12086,12 @@ impl Default for OnConflictClause {
         }
     }
 }
-pub const CTEMaterialize_CTEMaterializeDefault: CTEMaterialize = 0;
-pub const CTEMaterialize_CTEMaterializeAlways: CTEMaterialize = 1;
-pub const CTEMaterialize_CTEMaterializeNever: CTEMaterialize = 2;
-pub type CTEMaterialize = ::std::os::raw::c_uint;
+pub mod CTEMaterialize {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const CTEMaterializeDefault: Type = 0;
+    pub const CTEMaterializeAlways: Type = 1;
+    pub const CTEMaterializeNever: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct CTESearchClause {
@@ -8743,7 +12140,7 @@ pub struct CommonTableExpr {
     pub type_: NodeTag,
     pub ctename: *mut ::std::os::raw::c_char,
     pub aliascolnames: *mut List,
-    pub ctematerialized: CTEMaterialize,
+    pub ctematerialized: CTEMaterialize::Type,
     pub ctequery: *mut Node,
     pub search_clause: *mut CTESearchClause,
     pub cycle_clause: *mut CTECycleClause,
@@ -8769,8 +12166,8 @@ impl Default for CommonTableExpr {
 pub struct MergeWhenClause {
     pub type_: NodeTag,
     pub matched: bool,
-    pub commandType: CmdType,
-    pub override_: OverridingKind,
+    pub commandType: CmdType::Type,
+    pub override_: OverridingKind::Type,
     pub condition: *mut Node,
     pub targetList: *mut List,
     pub values: *mut List,
@@ -8789,8 +12186,8 @@ impl Default for MergeWhenClause {
 pub struct MergeAction {
     pub type_: NodeTag,
     pub matched: bool,
-    pub commandType: CmdType,
-    pub override_: OverridingKind,
+    pub commandType: CmdType::Type,
+    pub override_: OverridingKind::Type,
     pub qual: *mut Node,
     pub targetList: *mut List,
     pub updateColnos: *mut List,
@@ -8992,7 +12389,7 @@ pub struct InsertStmt {
     pub onConflictClause: *mut OnConflictClause,
     pub returningList: *mut List,
     pub withClause: *mut WithClause,
-    pub override_: OverridingKind,
+    pub override_: OverridingKind::Type,
 }
 impl Default for InsertStmt {
     fn default() -> Self {
@@ -9061,11 +12458,13 @@ impl Default for MergeStmt {
         }
     }
 }
-pub const SetOperation_SETOP_NONE: SetOperation = 0;
-pub const SetOperation_SETOP_UNION: SetOperation = 1;
-pub const SetOperation_SETOP_INTERSECT: SetOperation = 2;
-pub const SetOperation_SETOP_EXCEPT: SetOperation = 3;
-pub type SetOperation = ::std::os::raw::c_uint;
+pub mod SetOperation {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SETOP_NONE: Type = 0;
+    pub const SETOP_UNION: Type = 1;
+    pub const SETOP_INTERSECT: Type = 2;
+    pub const SETOP_EXCEPT: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct SelectStmt {
@@ -9083,10 +12482,10 @@ pub struct SelectStmt {
     pub sortClause: *mut List,
     pub limitOffset: *mut Node,
     pub limitCount: *mut Node,
-    pub limitOption: LimitOption,
+    pub limitOption: LimitOption::Type,
     pub lockingClause: *mut List,
     pub withClause: *mut WithClause,
-    pub op: SetOperation,
+    pub op: SetOperation::Type,
     pub all: bool,
     pub larg: *mut SelectStmt,
     pub rarg: *mut SelectStmt,
@@ -9104,7 +12503,7 @@ impl Default for SelectStmt {
 #[derive(Debug, Copy, Clone)]
 pub struct SetOperationStmt {
     pub type_: NodeTag,
-    pub op: SetOperation,
+    pub op: SetOperation::Type,
     pub all: bool,
     pub larg: *mut Node,
     pub rarg: *mut Node,
@@ -9156,60 +12555,62 @@ impl Default for PLAssignStmt {
         }
     }
 }
-pub const ObjectType_OBJECT_ACCESS_METHOD: ObjectType = 0;
-pub const ObjectType_OBJECT_AGGREGATE: ObjectType = 1;
-pub const ObjectType_OBJECT_AMOP: ObjectType = 2;
-pub const ObjectType_OBJECT_AMPROC: ObjectType = 3;
-pub const ObjectType_OBJECT_ATTRIBUTE: ObjectType = 4;
-pub const ObjectType_OBJECT_CAST: ObjectType = 5;
-pub const ObjectType_OBJECT_COLUMN: ObjectType = 6;
-pub const ObjectType_OBJECT_COLLATION: ObjectType = 7;
-pub const ObjectType_OBJECT_CONVERSION: ObjectType = 8;
-pub const ObjectType_OBJECT_DATABASE: ObjectType = 9;
-pub const ObjectType_OBJECT_DEFAULT: ObjectType = 10;
-pub const ObjectType_OBJECT_DEFACL: ObjectType = 11;
-pub const ObjectType_OBJECT_DOMAIN: ObjectType = 12;
-pub const ObjectType_OBJECT_DOMCONSTRAINT: ObjectType = 13;
-pub const ObjectType_OBJECT_EVENT_TRIGGER: ObjectType = 14;
-pub const ObjectType_OBJECT_EXTENSION: ObjectType = 15;
-pub const ObjectType_OBJECT_FDW: ObjectType = 16;
-pub const ObjectType_OBJECT_FOREIGN_SERVER: ObjectType = 17;
-pub const ObjectType_OBJECT_FOREIGN_TABLE: ObjectType = 18;
-pub const ObjectType_OBJECT_FUNCTION: ObjectType = 19;
-pub const ObjectType_OBJECT_INDEX: ObjectType = 20;
-pub const ObjectType_OBJECT_LANGUAGE: ObjectType = 21;
-pub const ObjectType_OBJECT_LARGEOBJECT: ObjectType = 22;
-pub const ObjectType_OBJECT_MATVIEW: ObjectType = 23;
-pub const ObjectType_OBJECT_OPCLASS: ObjectType = 24;
-pub const ObjectType_OBJECT_OPERATOR: ObjectType = 25;
-pub const ObjectType_OBJECT_OPFAMILY: ObjectType = 26;
-pub const ObjectType_OBJECT_PARAMETER_ACL: ObjectType = 27;
-pub const ObjectType_OBJECT_POLICY: ObjectType = 28;
-pub const ObjectType_OBJECT_PROCEDURE: ObjectType = 29;
-pub const ObjectType_OBJECT_PUBLICATION: ObjectType = 30;
-pub const ObjectType_OBJECT_PUBLICATION_NAMESPACE: ObjectType = 31;
-pub const ObjectType_OBJECT_PUBLICATION_REL: ObjectType = 32;
-pub const ObjectType_OBJECT_ROLE: ObjectType = 33;
-pub const ObjectType_OBJECT_ROUTINE: ObjectType = 34;
-pub const ObjectType_OBJECT_RULE: ObjectType = 35;
-pub const ObjectType_OBJECT_SCHEMA: ObjectType = 36;
-pub const ObjectType_OBJECT_SEQUENCE: ObjectType = 37;
-pub const ObjectType_OBJECT_SUBSCRIPTION: ObjectType = 38;
-pub const ObjectType_OBJECT_STATISTIC_EXT: ObjectType = 39;
-pub const ObjectType_OBJECT_TABCONSTRAINT: ObjectType = 40;
-pub const ObjectType_OBJECT_TABLE: ObjectType = 41;
-pub const ObjectType_OBJECT_TABLESPACE: ObjectType = 42;
-pub const ObjectType_OBJECT_TRANSFORM: ObjectType = 43;
-pub const ObjectType_OBJECT_TRIGGER: ObjectType = 44;
-pub const ObjectType_OBJECT_TSCONFIGURATION: ObjectType = 45;
-pub const ObjectType_OBJECT_TSDICTIONARY: ObjectType = 46;
-pub const ObjectType_OBJECT_TSPARSER: ObjectType = 47;
-pub const ObjectType_OBJECT_TSTEMPLATE: ObjectType = 48;
-pub const ObjectType_OBJECT_TYPE: ObjectType = 49;
-pub const ObjectType_OBJECT_USER_MAPPING: ObjectType = 50;
-pub const ObjectType_OBJECT_VIEW: ObjectType = 51;
-#[doc = "\t\tOther Statements (no optimizations required)\n\n\t\tThese are not touched by parser/analyze.c except to put them into\n\t\tthe utilityStmt field of a Query.  This is eventually passed to\n\t\tProcessUtility (by-passing rewriting and planning).  Some of the\n\t\tstatements do need attention from parse analysis, and this is\n\t\tdone by routines in parser/parse_utilcmd.c after ProcessUtility\n\t\treceives the command for execution.\n\t\tDECLARE CURSOR, EXPLAIN, and CREATE TABLE AS are special cases:\n\t\tthey contain optimizable statements, which get processed normally\n\t\tby parser/analyze.c."]
-pub type ObjectType = ::std::os::raw::c_uint;
+pub mod ObjectType {
+    #[doc = "\t\tOther Statements (no optimizations required)\n\n\t\tThese are not touched by parser/analyze.c except to put them into\n\t\tthe utilityStmt field of a Query.  This is eventually passed to\n\t\tProcessUtility (by-passing rewriting and planning).  Some of the\n\t\tstatements do need attention from parse analysis, and this is\n\t\tdone by routines in parser/parse_utilcmd.c after ProcessUtility\n\t\treceives the command for execution.\n\t\tDECLARE CURSOR, EXPLAIN, and CREATE TABLE AS are special cases:\n\t\tthey contain optimizable statements, which get processed normally\n\t\tby parser/analyze.c."]
+    pub type Type = ::std::os::raw::c_uint;
+    pub const OBJECT_ACCESS_METHOD: Type = 0;
+    pub const OBJECT_AGGREGATE: Type = 1;
+    pub const OBJECT_AMOP: Type = 2;
+    pub const OBJECT_AMPROC: Type = 3;
+    pub const OBJECT_ATTRIBUTE: Type = 4;
+    pub const OBJECT_CAST: Type = 5;
+    pub const OBJECT_COLUMN: Type = 6;
+    pub const OBJECT_COLLATION: Type = 7;
+    pub const OBJECT_CONVERSION: Type = 8;
+    pub const OBJECT_DATABASE: Type = 9;
+    pub const OBJECT_DEFAULT: Type = 10;
+    pub const OBJECT_DEFACL: Type = 11;
+    pub const OBJECT_DOMAIN: Type = 12;
+    pub const OBJECT_DOMCONSTRAINT: Type = 13;
+    pub const OBJECT_EVENT_TRIGGER: Type = 14;
+    pub const OBJECT_EXTENSION: Type = 15;
+    pub const OBJECT_FDW: Type = 16;
+    pub const OBJECT_FOREIGN_SERVER: Type = 17;
+    pub const OBJECT_FOREIGN_TABLE: Type = 18;
+    pub const OBJECT_FUNCTION: Type = 19;
+    pub const OBJECT_INDEX: Type = 20;
+    pub const OBJECT_LANGUAGE: Type = 21;
+    pub const OBJECT_LARGEOBJECT: Type = 22;
+    pub const OBJECT_MATVIEW: Type = 23;
+    pub const OBJECT_OPCLASS: Type = 24;
+    pub const OBJECT_OPERATOR: Type = 25;
+    pub const OBJECT_OPFAMILY: Type = 26;
+    pub const OBJECT_PARAMETER_ACL: Type = 27;
+    pub const OBJECT_POLICY: Type = 28;
+    pub const OBJECT_PROCEDURE: Type = 29;
+    pub const OBJECT_PUBLICATION: Type = 30;
+    pub const OBJECT_PUBLICATION_NAMESPACE: Type = 31;
+    pub const OBJECT_PUBLICATION_REL: Type = 32;
+    pub const OBJECT_ROLE: Type = 33;
+    pub const OBJECT_ROUTINE: Type = 34;
+    pub const OBJECT_RULE: Type = 35;
+    pub const OBJECT_SCHEMA: Type = 36;
+    pub const OBJECT_SEQUENCE: Type = 37;
+    pub const OBJECT_SUBSCRIPTION: Type = 38;
+    pub const OBJECT_STATISTIC_EXT: Type = 39;
+    pub const OBJECT_TABCONSTRAINT: Type = 40;
+    pub const OBJECT_TABLE: Type = 41;
+    pub const OBJECT_TABLESPACE: Type = 42;
+    pub const OBJECT_TRANSFORM: Type = 43;
+    pub const OBJECT_TRIGGER: Type = 44;
+    pub const OBJECT_TSCONFIGURATION: Type = 45;
+    pub const OBJECT_TSDICTIONARY: Type = 46;
+    pub const OBJECT_TSPARSER: Type = 47;
+    pub const OBJECT_TSTEMPLATE: Type = 48;
+    pub const OBJECT_TYPE: Type = 49;
+    pub const OBJECT_USER_MAPPING: Type = 50;
+    pub const OBJECT_VIEW: Type = 51;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct CreateSchemaStmt {
@@ -9228,16 +12629,18 @@ impl Default for CreateSchemaStmt {
         }
     }
 }
-pub const DropBehavior_DROP_RESTRICT: DropBehavior = 0;
-pub const DropBehavior_DROP_CASCADE: DropBehavior = 1;
-pub type DropBehavior = ::std::os::raw::c_uint;
+pub mod DropBehavior {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const DROP_RESTRICT: Type = 0;
+    pub const DROP_CASCADE: Type = 1;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct AlterTableStmt {
     pub type_: NodeTag,
     pub relation: *mut RangeVar,
     pub cmds: *mut List,
-    pub objtype: ObjectType,
+    pub objtype: ObjectType::Type,
     pub missing_ok: bool,
 }
 impl Default for AlterTableStmt {
@@ -9249,73 +12652,75 @@ impl Default for AlterTableStmt {
         }
     }
 }
-pub const AlterTableType_AT_AddColumn: AlterTableType = 0;
-pub const AlterTableType_AT_AddColumnToView: AlterTableType = 1;
-pub const AlterTableType_AT_ColumnDefault: AlterTableType = 2;
-pub const AlterTableType_AT_CookedColumnDefault: AlterTableType = 3;
-pub const AlterTableType_AT_DropNotNull: AlterTableType = 4;
-pub const AlterTableType_AT_SetNotNull: AlterTableType = 5;
-pub const AlterTableType_AT_DropExpression: AlterTableType = 6;
-pub const AlterTableType_AT_CheckNotNull: AlterTableType = 7;
-pub const AlterTableType_AT_SetStatistics: AlterTableType = 8;
-pub const AlterTableType_AT_SetOptions: AlterTableType = 9;
-pub const AlterTableType_AT_ResetOptions: AlterTableType = 10;
-pub const AlterTableType_AT_SetStorage: AlterTableType = 11;
-pub const AlterTableType_AT_SetCompression: AlterTableType = 12;
-pub const AlterTableType_AT_DropColumn: AlterTableType = 13;
-pub const AlterTableType_AT_AddIndex: AlterTableType = 14;
-pub const AlterTableType_AT_ReAddIndex: AlterTableType = 15;
-pub const AlterTableType_AT_AddConstraint: AlterTableType = 16;
-pub const AlterTableType_AT_ReAddConstraint: AlterTableType = 17;
-pub const AlterTableType_AT_ReAddDomainConstraint: AlterTableType = 18;
-pub const AlterTableType_AT_AlterConstraint: AlterTableType = 19;
-pub const AlterTableType_AT_ValidateConstraint: AlterTableType = 20;
-pub const AlterTableType_AT_AddIndexConstraint: AlterTableType = 21;
-pub const AlterTableType_AT_DropConstraint: AlterTableType = 22;
-pub const AlterTableType_AT_ReAddComment: AlterTableType = 23;
-pub const AlterTableType_AT_AlterColumnType: AlterTableType = 24;
-pub const AlterTableType_AT_AlterColumnGenericOptions: AlterTableType = 25;
-pub const AlterTableType_AT_ChangeOwner: AlterTableType = 26;
-pub const AlterTableType_AT_ClusterOn: AlterTableType = 27;
-pub const AlterTableType_AT_DropCluster: AlterTableType = 28;
-pub const AlterTableType_AT_SetLogged: AlterTableType = 29;
-pub const AlterTableType_AT_SetUnLogged: AlterTableType = 30;
-pub const AlterTableType_AT_DropOids: AlterTableType = 31;
-pub const AlterTableType_AT_SetAccessMethod: AlterTableType = 32;
-pub const AlterTableType_AT_SetTableSpace: AlterTableType = 33;
-pub const AlterTableType_AT_SetRelOptions: AlterTableType = 34;
-pub const AlterTableType_AT_ResetRelOptions: AlterTableType = 35;
-pub const AlterTableType_AT_ReplaceRelOptions: AlterTableType = 36;
-pub const AlterTableType_AT_EnableTrig: AlterTableType = 37;
-pub const AlterTableType_AT_EnableAlwaysTrig: AlterTableType = 38;
-pub const AlterTableType_AT_EnableReplicaTrig: AlterTableType = 39;
-pub const AlterTableType_AT_DisableTrig: AlterTableType = 40;
-pub const AlterTableType_AT_EnableTrigAll: AlterTableType = 41;
-pub const AlterTableType_AT_DisableTrigAll: AlterTableType = 42;
-pub const AlterTableType_AT_EnableTrigUser: AlterTableType = 43;
-pub const AlterTableType_AT_DisableTrigUser: AlterTableType = 44;
-pub const AlterTableType_AT_EnableRule: AlterTableType = 45;
-pub const AlterTableType_AT_EnableAlwaysRule: AlterTableType = 46;
-pub const AlterTableType_AT_EnableReplicaRule: AlterTableType = 47;
-pub const AlterTableType_AT_DisableRule: AlterTableType = 48;
-pub const AlterTableType_AT_AddInherit: AlterTableType = 49;
-pub const AlterTableType_AT_DropInherit: AlterTableType = 50;
-pub const AlterTableType_AT_AddOf: AlterTableType = 51;
-pub const AlterTableType_AT_DropOf: AlterTableType = 52;
-pub const AlterTableType_AT_ReplicaIdentity: AlterTableType = 53;
-pub const AlterTableType_AT_EnableRowSecurity: AlterTableType = 54;
-pub const AlterTableType_AT_DisableRowSecurity: AlterTableType = 55;
-pub const AlterTableType_AT_ForceRowSecurity: AlterTableType = 56;
-pub const AlterTableType_AT_NoForceRowSecurity: AlterTableType = 57;
-pub const AlterTableType_AT_GenericOptions: AlterTableType = 58;
-pub const AlterTableType_AT_AttachPartition: AlterTableType = 59;
-pub const AlterTableType_AT_DetachPartition: AlterTableType = 60;
-pub const AlterTableType_AT_DetachPartitionFinalize: AlterTableType = 61;
-pub const AlterTableType_AT_AddIdentity: AlterTableType = 62;
-pub const AlterTableType_AT_SetIdentity: AlterTableType = 63;
-pub const AlterTableType_AT_DropIdentity: AlterTableType = 64;
-pub const AlterTableType_AT_ReAddStatistics: AlterTableType = 65;
-pub type AlterTableType = ::std::os::raw::c_uint;
+pub mod AlterTableType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const AT_AddColumn: Type = 0;
+    pub const AT_AddColumnToView: Type = 1;
+    pub const AT_ColumnDefault: Type = 2;
+    pub const AT_CookedColumnDefault: Type = 3;
+    pub const AT_DropNotNull: Type = 4;
+    pub const AT_SetNotNull: Type = 5;
+    pub const AT_DropExpression: Type = 6;
+    pub const AT_CheckNotNull: Type = 7;
+    pub const AT_SetStatistics: Type = 8;
+    pub const AT_SetOptions: Type = 9;
+    pub const AT_ResetOptions: Type = 10;
+    pub const AT_SetStorage: Type = 11;
+    pub const AT_SetCompression: Type = 12;
+    pub const AT_DropColumn: Type = 13;
+    pub const AT_AddIndex: Type = 14;
+    pub const AT_ReAddIndex: Type = 15;
+    pub const AT_AddConstraint: Type = 16;
+    pub const AT_ReAddConstraint: Type = 17;
+    pub const AT_ReAddDomainConstraint: Type = 18;
+    pub const AT_AlterConstraint: Type = 19;
+    pub const AT_ValidateConstraint: Type = 20;
+    pub const AT_AddIndexConstraint: Type = 21;
+    pub const AT_DropConstraint: Type = 22;
+    pub const AT_ReAddComment: Type = 23;
+    pub const AT_AlterColumnType: Type = 24;
+    pub const AT_AlterColumnGenericOptions: Type = 25;
+    pub const AT_ChangeOwner: Type = 26;
+    pub const AT_ClusterOn: Type = 27;
+    pub const AT_DropCluster: Type = 28;
+    pub const AT_SetLogged: Type = 29;
+    pub const AT_SetUnLogged: Type = 30;
+    pub const AT_DropOids: Type = 31;
+    pub const AT_SetAccessMethod: Type = 32;
+    pub const AT_SetTableSpace: Type = 33;
+    pub const AT_SetRelOptions: Type = 34;
+    pub const AT_ResetRelOptions: Type = 35;
+    pub const AT_ReplaceRelOptions: Type = 36;
+    pub const AT_EnableTrig: Type = 37;
+    pub const AT_EnableAlwaysTrig: Type = 38;
+    pub const AT_EnableReplicaTrig: Type = 39;
+    pub const AT_DisableTrig: Type = 40;
+    pub const AT_EnableTrigAll: Type = 41;
+    pub const AT_DisableTrigAll: Type = 42;
+    pub const AT_EnableTrigUser: Type = 43;
+    pub const AT_DisableTrigUser: Type = 44;
+    pub const AT_EnableRule: Type = 45;
+    pub const AT_EnableAlwaysRule: Type = 46;
+    pub const AT_EnableReplicaRule: Type = 47;
+    pub const AT_DisableRule: Type = 48;
+    pub const AT_AddInherit: Type = 49;
+    pub const AT_DropInherit: Type = 50;
+    pub const AT_AddOf: Type = 51;
+    pub const AT_DropOf: Type = 52;
+    pub const AT_ReplicaIdentity: Type = 53;
+    pub const AT_EnableRowSecurity: Type = 54;
+    pub const AT_DisableRowSecurity: Type = 55;
+    pub const AT_ForceRowSecurity: Type = 56;
+    pub const AT_NoForceRowSecurity: Type = 57;
+    pub const AT_GenericOptions: Type = 58;
+    pub const AT_AttachPartition: Type = 59;
+    pub const AT_DetachPartition: Type = 60;
+    pub const AT_DetachPartitionFinalize: Type = 61;
+    pub const AT_AddIdentity: Type = 62;
+    pub const AT_SetIdentity: Type = 63;
+    pub const AT_DropIdentity: Type = 64;
+    pub const AT_ReAddStatistics: Type = 65;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ReplicaIdentityStmt {
@@ -9336,12 +12741,12 @@ impl Default for ReplicaIdentityStmt {
 #[derive(Debug, Copy, Clone)]
 pub struct AlterTableCmd {
     pub type_: NodeTag,
-    pub subtype: AlterTableType,
+    pub subtype: AlterTableType::Type,
     pub name: *mut ::std::os::raw::c_char,
     pub num: int16,
     pub newowner: *mut RoleSpec,
     pub def: *mut Node,
-    pub behavior: DropBehavior,
+    pub behavior: DropBehavior::Type,
     pub missing_ok: bool,
     pub recurse: bool,
 }
@@ -9377,7 +12782,7 @@ pub struct AlterDomainStmt {
     pub typeName: *mut List,
     pub name: *mut ::std::os::raw::c_char,
     pub def: *mut Node,
-    pub behavior: DropBehavior,
+    pub behavior: DropBehavior::Type,
     pub missing_ok: bool,
 }
 impl Default for AlterDomainStmt {
@@ -9389,23 +12794,25 @@ impl Default for AlterDomainStmt {
         }
     }
 }
-pub const GrantTargetType_ACL_TARGET_OBJECT: GrantTargetType = 0;
-pub const GrantTargetType_ACL_TARGET_ALL_IN_SCHEMA: GrantTargetType = 1;
-pub const GrantTargetType_ACL_TARGET_DEFAULTS: GrantTargetType = 2;
-pub type GrantTargetType = ::std::os::raw::c_uint;
+pub mod GrantTargetType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const ACL_TARGET_OBJECT: Type = 0;
+    pub const ACL_TARGET_ALL_IN_SCHEMA: Type = 1;
+    pub const ACL_TARGET_DEFAULTS: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct GrantStmt {
     pub type_: NodeTag,
     pub is_grant: bool,
-    pub targtype: GrantTargetType,
-    pub objtype: ObjectType,
+    pub targtype: GrantTargetType::Type,
+    pub objtype: ObjectType::Type,
     pub objects: *mut List,
     pub privileges: *mut List,
     pub grantees: *mut List,
     pub grant_option: bool,
     pub grantor: *mut RoleSpec,
-    pub behavior: DropBehavior,
+    pub behavior: DropBehavior::Type,
 }
 impl Default for GrantStmt {
     fn default() -> Self {
@@ -9459,7 +12866,7 @@ pub struct GrantRoleStmt {
     pub is_grant: bool,
     pub opt: *mut List,
     pub grantor: *mut RoleSpec,
-    pub behavior: DropBehavior,
+    pub behavior: DropBehavior::Type,
 }
 impl Default for GrantRoleStmt {
     fn default() -> Self {
@@ -9508,18 +12915,20 @@ impl Default for CopyStmt {
         }
     }
 }
-pub const VariableSetKind_VAR_SET_VALUE: VariableSetKind = 0;
-pub const VariableSetKind_VAR_SET_DEFAULT: VariableSetKind = 1;
-pub const VariableSetKind_VAR_SET_CURRENT: VariableSetKind = 2;
-pub const VariableSetKind_VAR_SET_MULTI: VariableSetKind = 3;
-pub const VariableSetKind_VAR_RESET: VariableSetKind = 4;
-pub const VariableSetKind_VAR_RESET_ALL: VariableSetKind = 5;
-pub type VariableSetKind = ::std::os::raw::c_uint;
+pub mod VariableSetKind {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const VAR_SET_VALUE: Type = 0;
+    pub const VAR_SET_DEFAULT: Type = 1;
+    pub const VAR_SET_CURRENT: Type = 2;
+    pub const VAR_SET_MULTI: Type = 3;
+    pub const VAR_RESET: Type = 4;
+    pub const VAR_RESET_ALL: Type = 5;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct VariableSetStmt {
     pub type_: NodeTag,
-    pub kind: VariableSetKind,
+    pub kind: VariableSetKind::Type,
     pub name: *mut ::std::os::raw::c_char,
     pub args: *mut List,
     pub is_local: bool,
@@ -9560,7 +12969,7 @@ pub struct CreateStmt {
     pub ofTypename: *mut TypeName,
     pub constraints: *mut List,
     pub options: *mut List,
-    pub oncommit: OnCommitAction,
+    pub oncommit: OnCommitAction::Type,
     pub tablespacename: *mut ::std::os::raw::c_char,
     pub accessMethod: *mut ::std::os::raw::c_char,
     pub if_not_exists: bool,
@@ -9574,26 +12983,28 @@ impl Default for CreateStmt {
         }
     }
 }
-pub const ConstrType_CONSTR_NULL: ConstrType = 0;
-pub const ConstrType_CONSTR_NOTNULL: ConstrType = 1;
-pub const ConstrType_CONSTR_DEFAULT: ConstrType = 2;
-pub const ConstrType_CONSTR_IDENTITY: ConstrType = 3;
-pub const ConstrType_CONSTR_GENERATED: ConstrType = 4;
-pub const ConstrType_CONSTR_CHECK: ConstrType = 5;
-pub const ConstrType_CONSTR_PRIMARY: ConstrType = 6;
-pub const ConstrType_CONSTR_UNIQUE: ConstrType = 7;
-pub const ConstrType_CONSTR_EXCLUSION: ConstrType = 8;
-pub const ConstrType_CONSTR_FOREIGN: ConstrType = 9;
-pub const ConstrType_CONSTR_ATTR_DEFERRABLE: ConstrType = 10;
-pub const ConstrType_CONSTR_ATTR_NOT_DEFERRABLE: ConstrType = 11;
-pub const ConstrType_CONSTR_ATTR_DEFERRED: ConstrType = 12;
-pub const ConstrType_CONSTR_ATTR_IMMEDIATE: ConstrType = 13;
-pub type ConstrType = ::std::os::raw::c_uint;
+pub mod ConstrType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const CONSTR_NULL: Type = 0;
+    pub const CONSTR_NOTNULL: Type = 1;
+    pub const CONSTR_DEFAULT: Type = 2;
+    pub const CONSTR_IDENTITY: Type = 3;
+    pub const CONSTR_GENERATED: Type = 4;
+    pub const CONSTR_CHECK: Type = 5;
+    pub const CONSTR_PRIMARY: Type = 6;
+    pub const CONSTR_UNIQUE: Type = 7;
+    pub const CONSTR_EXCLUSION: Type = 8;
+    pub const CONSTR_FOREIGN: Type = 9;
+    pub const CONSTR_ATTR_DEFERRABLE: Type = 10;
+    pub const CONSTR_ATTR_NOT_DEFERRABLE: Type = 11;
+    pub const CONSTR_ATTR_DEFERRED: Type = 12;
+    pub const CONSTR_ATTR_IMMEDIATE: Type = 13;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Constraint {
     pub type_: NodeTag,
-    pub contype: ConstrType,
+    pub contype: ConstrType::Type,
     pub conname: *mut ::std::os::raw::c_char,
     pub deferrable: bool,
     pub initdeferred: bool,
@@ -9689,7 +13100,7 @@ impl Default for AlterTableSpaceOptionsStmt {
 pub struct AlterTableMoveAllStmt {
     pub type_: NodeTag,
     pub orig_tablespacename: *mut ::std::os::raw::c_char,
-    pub objtype: ObjectType,
+    pub objtype: ObjectType::Type,
     pub roles: *mut List,
     pub new_tablespacename: *mut ::std::os::raw::c_char,
     pub nowait: bool,
@@ -9742,7 +13153,7 @@ pub struct AlterExtensionContentsStmt {
     pub type_: NodeTag,
     pub extname: *mut ::std::os::raw::c_char,
     pub action: ::std::os::raw::c_int,
-    pub objtype: ObjectType,
+    pub objtype: ObjectType::Type,
     pub object: *mut Node,
 }
 impl Default for AlterExtensionContentsStmt {
@@ -9894,10 +13305,12 @@ impl Default for DropUserMappingStmt {
         }
     }
 }
-pub const ImportForeignSchemaType_FDW_IMPORT_SCHEMA_ALL: ImportForeignSchemaType = 0;
-pub const ImportForeignSchemaType_FDW_IMPORT_SCHEMA_LIMIT_TO: ImportForeignSchemaType = 1;
-pub const ImportForeignSchemaType_FDW_IMPORT_SCHEMA_EXCEPT: ImportForeignSchemaType = 2;
-pub type ImportForeignSchemaType = ::std::os::raw::c_uint;
+pub mod ImportForeignSchemaType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const FDW_IMPORT_SCHEMA_ALL: Type = 0;
+    pub const FDW_IMPORT_SCHEMA_LIMIT_TO: Type = 1;
+    pub const FDW_IMPORT_SCHEMA_EXCEPT: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ImportForeignSchemaStmt {
@@ -9905,7 +13318,7 @@ pub struct ImportForeignSchemaStmt {
     pub server_name: *mut ::std::os::raw::c_char,
     pub remote_schema: *mut ::std::os::raw::c_char,
     pub local_schema: *mut ::std::os::raw::c_char,
-    pub list_type: ImportForeignSchemaType,
+    pub list_type: ImportForeignSchemaType::Type,
     pub table_list: *mut List,
     pub options: *mut List,
 }
@@ -10058,15 +13471,17 @@ impl Default for CreatePLangStmt {
         }
     }
 }
-pub const RoleStmtType_ROLESTMT_ROLE: RoleStmtType = 0;
-pub const RoleStmtType_ROLESTMT_USER: RoleStmtType = 1;
-pub const RoleStmtType_ROLESTMT_GROUP: RoleStmtType = 2;
-pub type RoleStmtType = ::std::os::raw::c_uint;
+pub mod RoleStmtType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const ROLESTMT_ROLE: Type = 0;
+    pub const ROLESTMT_USER: Type = 1;
+    pub const ROLESTMT_GROUP: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct CreateRoleStmt {
     pub type_: NodeTag,
-    pub stmt_type: RoleStmtType,
+    pub stmt_type: RoleStmtType::Type,
     pub role: *mut ::std::os::raw::c_char,
     pub options: *mut List,
 }
@@ -10170,7 +13585,7 @@ impl Default for AlterSeqStmt {
 #[derive(Debug, Copy, Clone)]
 pub struct DefineStmt {
     pub type_: NodeTag,
-    pub kind: ObjectType,
+    pub kind: ObjectType::Type,
     pub oldstyle: bool,
     pub defnames: *mut List,
     pub args: *mut List,
@@ -10284,8 +13699,8 @@ impl Default for AlterOpFamilyStmt {
 pub struct DropStmt {
     pub type_: NodeTag,
     pub objects: *mut List,
-    pub removeType: ObjectType,
-    pub behavior: DropBehavior,
+    pub removeType: ObjectType::Type,
+    pub behavior: DropBehavior::Type,
     pub missing_ok: bool,
     pub concurrent: bool,
 }
@@ -10304,7 +13719,7 @@ pub struct TruncateStmt {
     pub type_: NodeTag,
     pub relations: *mut List,
     pub restart_seqs: bool,
-    pub behavior: DropBehavior,
+    pub behavior: DropBehavior::Type,
 }
 impl Default for TruncateStmt {
     fn default() -> Self {
@@ -10319,7 +13734,7 @@ impl Default for TruncateStmt {
 #[derive(Debug, Copy, Clone)]
 pub struct CommentStmt {
     pub type_: NodeTag,
-    pub objtype: ObjectType,
+    pub objtype: ObjectType::Type,
     pub object: *mut Node,
     pub comment: *mut ::std::os::raw::c_char,
 }
@@ -10336,7 +13751,7 @@ impl Default for CommentStmt {
 #[derive(Debug, Copy, Clone)]
 pub struct SecLabelStmt {
     pub type_: NodeTag,
-    pub objtype: ObjectType,
+    pub objtype: ObjectType::Type,
     pub object: *mut Node,
     pub provider: *mut ::std::os::raw::c_char,
     pub label: *mut ::std::os::raw::c_char,
@@ -10382,16 +13797,18 @@ impl Default for ClosePortalStmt {
         }
     }
 }
-pub const FetchDirection_FETCH_FORWARD: FetchDirection = 0;
-pub const FetchDirection_FETCH_BACKWARD: FetchDirection = 1;
-pub const FetchDirection_FETCH_ABSOLUTE: FetchDirection = 2;
-pub const FetchDirection_FETCH_RELATIVE: FetchDirection = 3;
-pub type FetchDirection = ::std::os::raw::c_uint;
+pub mod FetchDirection {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const FETCH_FORWARD: Type = 0;
+    pub const FETCH_BACKWARD: Type = 1;
+    pub const FETCH_ABSOLUTE: Type = 2;
+    pub const FETCH_RELATIVE: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct FetchStmt {
     pub type_: NodeTag,
-    pub direction: FetchDirection,
+    pub direction: FetchDirection::Type,
     pub howMany: ::std::os::raw::c_long,
     pub portalname: *mut ::std::os::raw::c_char,
     pub ismove: bool,
@@ -10518,20 +13935,22 @@ impl Default for CreateFunctionStmt {
         }
     }
 }
-pub const FunctionParameterMode_FUNC_PARAM_IN: FunctionParameterMode = 105;
-pub const FunctionParameterMode_FUNC_PARAM_OUT: FunctionParameterMode = 111;
-pub const FunctionParameterMode_FUNC_PARAM_INOUT: FunctionParameterMode = 98;
-pub const FunctionParameterMode_FUNC_PARAM_VARIADIC: FunctionParameterMode = 118;
-pub const FunctionParameterMode_FUNC_PARAM_TABLE: FunctionParameterMode = 116;
-pub const FunctionParameterMode_FUNC_PARAM_DEFAULT: FunctionParameterMode = 100;
-pub type FunctionParameterMode = ::std::os::raw::c_uint;
+pub mod FunctionParameterMode {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const FUNC_PARAM_IN: Type = 105;
+    pub const FUNC_PARAM_OUT: Type = 111;
+    pub const FUNC_PARAM_INOUT: Type = 98;
+    pub const FUNC_PARAM_VARIADIC: Type = 118;
+    pub const FUNC_PARAM_TABLE: Type = 116;
+    pub const FUNC_PARAM_DEFAULT: Type = 100;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct FunctionParameter {
     pub type_: NodeTag,
     pub name: *mut ::std::os::raw::c_char,
     pub argType: *mut TypeName,
-    pub mode: FunctionParameterMode,
+    pub mode: FunctionParameterMode::Type,
     pub defexpr: *mut Node,
 }
 impl Default for FunctionParameter {
@@ -10547,7 +13966,7 @@ impl Default for FunctionParameter {
 #[derive(Debug, Copy, Clone)]
 pub struct AlterFunctionStmt {
     pub type_: NodeTag,
-    pub objtype: ObjectType,
+    pub objtype: ObjectType::Type,
     pub func: *mut ObjectWithArgs,
     pub actions: *mut List,
 }
@@ -10629,13 +14048,13 @@ impl Default for CallContext {
 #[derive(Debug, Copy, Clone)]
 pub struct RenameStmt {
     pub type_: NodeTag,
-    pub renameType: ObjectType,
-    pub relationType: ObjectType,
+    pub renameType: ObjectType::Type,
+    pub relationType: ObjectType::Type,
     pub relation: *mut RangeVar,
     pub object: *mut Node,
     pub subname: *mut ::std::os::raw::c_char,
     pub newname: *mut ::std::os::raw::c_char,
-    pub behavior: DropBehavior,
+    pub behavior: DropBehavior::Type,
     pub missing_ok: bool,
 }
 impl Default for RenameStmt {
@@ -10651,7 +14070,7 @@ impl Default for RenameStmt {
 #[derive(Debug, Copy, Clone)]
 pub struct AlterObjectDependsStmt {
     pub type_: NodeTag,
-    pub objectType: ObjectType,
+    pub objectType: ObjectType::Type,
     pub relation: *mut RangeVar,
     pub object: *mut Node,
     pub extname: *mut String,
@@ -10670,7 +14089,7 @@ impl Default for AlterObjectDependsStmt {
 #[derive(Debug, Copy, Clone)]
 pub struct AlterObjectSchemaStmt {
     pub type_: NodeTag,
-    pub objectType: ObjectType,
+    pub objectType: ObjectType::Type,
     pub relation: *mut RangeVar,
     pub object: *mut Node,
     pub newschema: *mut ::std::os::raw::c_char,
@@ -10689,7 +14108,7 @@ impl Default for AlterObjectSchemaStmt {
 #[derive(Debug, Copy, Clone)]
 pub struct AlterOwnerStmt {
     pub type_: NodeTag,
-    pub objectType: ObjectType,
+    pub objectType: ObjectType::Type,
     pub relation: *mut RangeVar,
     pub object: *mut Node,
     pub newowner: *mut RoleSpec,
@@ -10742,7 +14161,7 @@ pub struct RuleStmt {
     pub relation: *mut RangeVar,
     pub rulename: *mut ::std::os::raw::c_char,
     pub whereClause: *mut Node,
-    pub event: CmdType,
+    pub event: CmdType::Type,
     pub instead: bool,
     pub actions: *mut List,
     pub replace: bool,
@@ -10802,22 +14221,24 @@ impl Default for UnlistenStmt {
         }
     }
 }
-pub const TransactionStmtKind_TRANS_STMT_BEGIN: TransactionStmtKind = 0;
-pub const TransactionStmtKind_TRANS_STMT_START: TransactionStmtKind = 1;
-pub const TransactionStmtKind_TRANS_STMT_COMMIT: TransactionStmtKind = 2;
-pub const TransactionStmtKind_TRANS_STMT_ROLLBACK: TransactionStmtKind = 3;
-pub const TransactionStmtKind_TRANS_STMT_SAVEPOINT: TransactionStmtKind = 4;
-pub const TransactionStmtKind_TRANS_STMT_RELEASE: TransactionStmtKind = 5;
-pub const TransactionStmtKind_TRANS_STMT_ROLLBACK_TO: TransactionStmtKind = 6;
-pub const TransactionStmtKind_TRANS_STMT_PREPARE: TransactionStmtKind = 7;
-pub const TransactionStmtKind_TRANS_STMT_COMMIT_PREPARED: TransactionStmtKind = 8;
-pub const TransactionStmtKind_TRANS_STMT_ROLLBACK_PREPARED: TransactionStmtKind = 9;
-pub type TransactionStmtKind = ::std::os::raw::c_uint;
+pub mod TransactionStmtKind {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const TRANS_STMT_BEGIN: Type = 0;
+    pub const TRANS_STMT_START: Type = 1;
+    pub const TRANS_STMT_COMMIT: Type = 2;
+    pub const TRANS_STMT_ROLLBACK: Type = 3;
+    pub const TRANS_STMT_SAVEPOINT: Type = 4;
+    pub const TRANS_STMT_RELEASE: Type = 5;
+    pub const TRANS_STMT_ROLLBACK_TO: Type = 6;
+    pub const TRANS_STMT_PREPARE: Type = 7;
+    pub const TRANS_STMT_COMMIT_PREPARED: Type = 8;
+    pub const TRANS_STMT_ROLLBACK_PREPARED: Type = 9;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct TransactionStmt {
     pub type_: NodeTag,
-    pub kind: TransactionStmtKind,
+    pub kind: TransactionStmtKind::Type,
     pub options: *mut List,
     pub savepoint_name: *mut ::std::os::raw::c_char,
     pub gid: *mut ::std::os::raw::c_char,
@@ -10900,10 +14321,12 @@ impl Default for AlterEnumStmt {
         }
     }
 }
-pub const ViewCheckOption_NO_CHECK_OPTION: ViewCheckOption = 0;
-pub const ViewCheckOption_LOCAL_CHECK_OPTION: ViewCheckOption = 1;
-pub const ViewCheckOption_CASCADED_CHECK_OPTION: ViewCheckOption = 2;
-pub type ViewCheckOption = ::std::os::raw::c_uint;
+pub mod ViewCheckOption {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const NO_CHECK_OPTION: Type = 0;
+    pub const LOCAL_CHECK_OPTION: Type = 1;
+    pub const CASCADED_CHECK_OPTION: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ViewStmt {
@@ -10913,7 +14336,7 @@ pub struct ViewStmt {
     pub query: *mut Node,
     pub replace: bool,
     pub options: *mut List,
-    pub withCheckOption: ViewCheckOption,
+    pub withCheckOption: ViewCheckOption::Type,
 }
 impl Default for ViewStmt {
     fn default() -> Self {
@@ -11107,7 +14530,7 @@ pub struct CreateTableAsStmt {
     pub type_: NodeTag,
     pub query: *mut Node,
     pub into: *mut IntoClause,
-    pub objtype: ObjectType,
+    pub objtype: ObjectType::Type,
     pub is_select_into: bool,
     pub if_not_exists: bool,
 }
@@ -11151,16 +14574,18 @@ impl Default for CheckPointStmt {
         }
     }
 }
-pub const DiscardMode_DISCARD_ALL: DiscardMode = 0;
-pub const DiscardMode_DISCARD_PLANS: DiscardMode = 1;
-pub const DiscardMode_DISCARD_SEQUENCES: DiscardMode = 2;
-pub const DiscardMode_DISCARD_TEMP: DiscardMode = 3;
-pub type DiscardMode = ::std::os::raw::c_uint;
+pub mod DiscardMode {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const DISCARD_ALL: Type = 0;
+    pub const DISCARD_PLANS: Type = 1;
+    pub const DISCARD_SEQUENCES: Type = 2;
+    pub const DISCARD_TEMP: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct DiscardStmt {
     pub type_: NodeTag,
-    pub target: DiscardMode,
+    pub target: DiscardMode::Type,
 }
 impl Default for DiscardStmt {
     fn default() -> Self {
@@ -11204,17 +14629,19 @@ impl Default for ConstraintsSetStmt {
         }
     }
 }
-pub const ReindexObjectType_REINDEX_OBJECT_INDEX: ReindexObjectType = 0;
-pub const ReindexObjectType_REINDEX_OBJECT_TABLE: ReindexObjectType = 1;
-pub const ReindexObjectType_REINDEX_OBJECT_SCHEMA: ReindexObjectType = 2;
-pub const ReindexObjectType_REINDEX_OBJECT_SYSTEM: ReindexObjectType = 3;
-pub const ReindexObjectType_REINDEX_OBJECT_DATABASE: ReindexObjectType = 4;
-pub type ReindexObjectType = ::std::os::raw::c_uint;
+pub mod ReindexObjectType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const REINDEX_OBJECT_INDEX: Type = 0;
+    pub const REINDEX_OBJECT_TABLE: Type = 1;
+    pub const REINDEX_OBJECT_SCHEMA: Type = 2;
+    pub const REINDEX_OBJECT_SYSTEM: Type = 3;
+    pub const REINDEX_OBJECT_DATABASE: Type = 4;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ReindexStmt {
     pub type_: NodeTag,
-    pub kind: ReindexObjectType,
+    pub kind: ReindexObjectType::Type,
     pub relation: *mut RangeVar,
     pub name: *const ::std::os::raw::c_char,
     pub params: *mut List,
@@ -11254,7 +14681,7 @@ pub struct CreateCastStmt {
     pub sourcetype: *mut TypeName,
     pub targettype: *mut TypeName,
     pub func: *mut ObjectWithArgs,
-    pub context: CoercionContext,
+    pub context: CoercionContext::Type,
     pub inout: bool,
 }
 impl Default for CreateCastStmt {
@@ -11338,7 +14765,7 @@ impl Default for DeallocateStmt {
 pub struct DropOwnedStmt {
     pub type_: NodeTag,
     pub roles: *mut List,
-    pub behavior: DropBehavior,
+    pub behavior: DropBehavior::Type,
 }
 impl Default for DropOwnedStmt {
     fn default() -> Self {
@@ -11381,17 +14808,19 @@ impl Default for AlterTSDictionaryStmt {
         }
     }
 }
-pub const AlterTSConfigType_ALTER_TSCONFIG_ADD_MAPPING: AlterTSConfigType = 0;
-pub const AlterTSConfigType_ALTER_TSCONFIG_ALTER_MAPPING_FOR_TOKEN: AlterTSConfigType = 1;
-pub const AlterTSConfigType_ALTER_TSCONFIG_REPLACE_DICT: AlterTSConfigType = 2;
-pub const AlterTSConfigType_ALTER_TSCONFIG_REPLACE_DICT_FOR_TOKEN: AlterTSConfigType = 3;
-pub const AlterTSConfigType_ALTER_TSCONFIG_DROP_MAPPING: AlterTSConfigType = 4;
-pub type AlterTSConfigType = ::std::os::raw::c_uint;
+pub mod AlterTSConfigType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const ALTER_TSCONFIG_ADD_MAPPING: Type = 0;
+    pub const ALTER_TSCONFIG_ALTER_MAPPING_FOR_TOKEN: Type = 1;
+    pub const ALTER_TSCONFIG_REPLACE_DICT: Type = 2;
+    pub const ALTER_TSCONFIG_REPLACE_DICT_FOR_TOKEN: Type = 3;
+    pub const ALTER_TSCONFIG_DROP_MAPPING: Type = 4;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct AlterTSConfigurationStmt {
     pub type_: NodeTag,
-    pub kind: AlterTSConfigType,
+    pub kind: AlterTSConfigType::Type,
     pub cfgname: *mut List,
     pub tokentype: *mut List,
     pub dicts: *mut List,
@@ -11425,16 +14854,18 @@ impl Default for PublicationTable {
         }
     }
 }
-pub const PublicationObjSpecType_PUBLICATIONOBJ_TABLE: PublicationObjSpecType = 0;
-pub const PublicationObjSpecType_PUBLICATIONOBJ_TABLES_IN_SCHEMA: PublicationObjSpecType = 1;
-pub const PublicationObjSpecType_PUBLICATIONOBJ_TABLES_IN_CUR_SCHEMA: PublicationObjSpecType = 2;
-pub const PublicationObjSpecType_PUBLICATIONOBJ_CONTINUATION: PublicationObjSpecType = 3;
-pub type PublicationObjSpecType = ::std::os::raw::c_uint;
+pub mod PublicationObjSpecType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PUBLICATIONOBJ_TABLE: Type = 0;
+    pub const PUBLICATIONOBJ_TABLES_IN_SCHEMA: Type = 1;
+    pub const PUBLICATIONOBJ_TABLES_IN_CUR_SCHEMA: Type = 2;
+    pub const PUBLICATIONOBJ_CONTINUATION: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PublicationObjSpec {
     pub type_: NodeTag,
-    pub pubobjtype: PublicationObjSpecType,
+    pub pubobjtype: PublicationObjSpecType::Type,
     pub name: *mut ::std::os::raw::c_char,
     pub pubtable: *mut PublicationTable,
     pub location: ::std::os::raw::c_int,
@@ -11466,10 +14897,12 @@ impl Default for CreatePublicationStmt {
         }
     }
 }
-pub const AlterPublicationAction_AP_AddObjects: AlterPublicationAction = 0;
-pub const AlterPublicationAction_AP_DropObjects: AlterPublicationAction = 1;
-pub const AlterPublicationAction_AP_SetObjects: AlterPublicationAction = 2;
-pub type AlterPublicationAction = ::std::os::raw::c_uint;
+pub mod AlterPublicationAction {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const AP_AddObjects: Type = 0;
+    pub const AP_DropObjects: Type = 1;
+    pub const AP_SetObjects: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct AlterPublicationStmt {
@@ -11478,7 +14911,7 @@ pub struct AlterPublicationStmt {
     pub options: *mut List,
     pub pubobjects: *mut List,
     pub for_all_tables: bool,
-    pub action: AlterPublicationAction,
+    pub action: AlterPublicationAction::Type,
 }
 impl Default for AlterPublicationStmt {
     fn default() -> Self {
@@ -11507,20 +14940,22 @@ impl Default for CreateSubscriptionStmt {
         }
     }
 }
-pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_OPTIONS: AlterSubscriptionType = 0;
-pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_CONNECTION: AlterSubscriptionType = 1;
-pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_SET_PUBLICATION: AlterSubscriptionType = 2;
-pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_ADD_PUBLICATION: AlterSubscriptionType = 3;
-pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_DROP_PUBLICATION: AlterSubscriptionType = 4;
-pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_REFRESH: AlterSubscriptionType = 5;
-pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_ENABLED: AlterSubscriptionType = 6;
-pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_SKIP: AlterSubscriptionType = 7;
-pub type AlterSubscriptionType = ::std::os::raw::c_uint;
+pub mod AlterSubscriptionType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const ALTER_SUBSCRIPTION_OPTIONS: Type = 0;
+    pub const ALTER_SUBSCRIPTION_CONNECTION: Type = 1;
+    pub const ALTER_SUBSCRIPTION_SET_PUBLICATION: Type = 2;
+    pub const ALTER_SUBSCRIPTION_ADD_PUBLICATION: Type = 3;
+    pub const ALTER_SUBSCRIPTION_DROP_PUBLICATION: Type = 4;
+    pub const ALTER_SUBSCRIPTION_REFRESH: Type = 5;
+    pub const ALTER_SUBSCRIPTION_ENABLED: Type = 6;
+    pub const ALTER_SUBSCRIPTION_SKIP: Type = 7;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct AlterSubscriptionStmt {
     pub type_: NodeTag,
-    pub kind: AlterSubscriptionType,
+    pub kind: AlterSubscriptionType::Type,
     pub subname: *mut ::std::os::raw::c_char,
     pub conninfo: *mut ::std::os::raw::c_char,
     pub publication: *mut List,
@@ -11541,7 +14976,7 @@ pub struct DropSubscriptionStmt {
     pub type_: NodeTag,
     pub subname: *mut ::std::os::raw::c_char,
     pub missing_ok: bool,
-    pub behavior: DropBehavior,
+    pub behavior: DropBehavior::Type,
 }
 impl Default for DropSubscriptionStmt {
     fn default() -> Self {
@@ -11556,7 +14991,7 @@ impl Default for DropSubscriptionStmt {
 #[derive(Debug, Copy, Clone)]
 pub struct PlannedStmt {
     pub type_: NodeTag,
-    pub commandType: CmdType,
+    pub commandType: CmdType::Type,
     pub queryId: uint64,
     pub hasReturning: bool,
     pub hasModifyingCTE: bool,
@@ -11651,7 +15086,7 @@ impl Default for ProjectSet {
 #[derive(Debug, Copy, Clone)]
 pub struct ModifyTable {
     pub plan: Plan,
-    pub operation: CmdType,
+    pub operation: CmdType::Type,
     pub canSetTag: bool,
     pub nominalRelation: Index,
     pub rootRelation: Index,
@@ -11664,7 +15099,7 @@ pub struct ModifyTable {
     pub fdwDirectModifyPlans: *mut Bitmapset,
     pub rowMarks: *mut List,
     pub epqParam: ::std::os::raw::c_int,
-    pub onConflictAction: OnConflictAction,
+    pub onConflictAction: OnConflictAction::Type,
     pub arbiterIndexes: *mut List,
     pub onConflictSet: *mut List,
     pub onConflictCols: *mut List,
@@ -11828,7 +15263,7 @@ pub struct IndexScan {
     pub indexorderby: *mut List,
     pub indexorderbyorig: *mut List,
     pub indexorderbyops: *mut List,
-    pub indexorderdir: ScanDirection,
+    pub indexorderdir: ScanDirection::Type,
 }
 impl Default for IndexScan {
     fn default() -> Self {
@@ -11848,7 +15283,7 @@ pub struct IndexOnlyScan {
     pub recheckqual: *mut List,
     pub indexorderby: *mut List,
     pub indextlist: *mut List,
-    pub indexorderdir: ScanDirection,
+    pub indexorderdir: ScanDirection::Type,
 }
 impl Default for IndexOnlyScan {
     fn default() -> Self {
@@ -11922,16 +15357,18 @@ impl Default for TidRangeScan {
         }
     }
 }
-pub const SubqueryScanStatus_SUBQUERY_SCAN_UNKNOWN: SubqueryScanStatus = 0;
-pub const SubqueryScanStatus_SUBQUERY_SCAN_TRIVIAL: SubqueryScanStatus = 1;
-pub const SubqueryScanStatus_SUBQUERY_SCAN_NONTRIVIAL: SubqueryScanStatus = 2;
-pub type SubqueryScanStatus = ::std::os::raw::c_uint;
+pub mod SubqueryScanStatus {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SUBQUERY_SCAN_UNKNOWN: Type = 0;
+    pub const SUBQUERY_SCAN_TRIVIAL: Type = 1;
+    pub const SUBQUERY_SCAN_NONTRIVIAL: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct SubqueryScan {
     pub scan: Scan,
     pub subplan: *mut Plan,
-    pub scanstatus: SubqueryScanStatus,
+    pub scanstatus: SubqueryScanStatus::Type,
 }
 impl Default for SubqueryScan {
     fn default() -> Self {
@@ -12038,7 +15475,7 @@ impl Default for WorkTableScan {
 #[derive(Debug, Copy, Clone)]
 pub struct ForeignScan {
     pub scan: Scan,
-    pub operation: CmdType,
+    pub operation: CmdType::Type,
     pub resultRelation: Index,
     pub checkAsUser: Oid,
     pub fs_server: Oid,
@@ -12084,7 +15521,7 @@ impl Default for CustomScan {
 #[derive(Debug, Copy, Clone)]
 pub struct Join {
     pub plan: Plan,
-    pub jointype: JoinType,
+    pub jointype: JoinType::Type,
     pub inner_unique: bool,
     pub joinqual: *mut List,
 }
@@ -12258,8 +15695,8 @@ impl Default for Group {
 #[derive(Debug, Copy, Clone)]
 pub struct Agg {
     pub plan: Plan,
-    pub aggstrategy: AggStrategy,
-    pub aggsplit: AggSplit,
+    pub aggstrategy: AggStrategy::Type,
+    pub aggsplit: AggSplit::Type,
     pub numCols: ::std::os::raw::c_int,
     pub grpColIdx: *mut AttrNumber,
     pub grpOperators: *mut Oid,
@@ -12395,8 +15832,8 @@ impl Default for Hash {
 #[derive(Debug, Copy, Clone)]
 pub struct SetOp {
     pub plan: Plan,
-    pub cmd: SetOpCmd,
-    pub strategy: SetOpStrategy,
+    pub cmd: SetOpCmd::Type,
+    pub strategy: SetOpStrategy::Type,
     pub numCols: ::std::os::raw::c_int,
     pub dupColIdx: *mut AttrNumber,
     pub dupOperators: *mut Oid,
@@ -12436,7 +15873,7 @@ pub struct Limit {
     pub plan: Plan,
     pub limitOffset: *mut Node,
     pub limitCount: *mut Node,
-    pub limitOption: LimitOption,
+    pub limitOption: LimitOption::Type,
     pub uniqNumCols: ::std::os::raw::c_int,
     pub uniqColIdx: *mut AttrNumber,
     pub uniqOperators: *mut Oid,
@@ -12451,13 +15888,15 @@ impl Default for Limit {
         }
     }
 }
-pub const RowMarkType_ROW_MARK_EXCLUSIVE: RowMarkType = 0;
-pub const RowMarkType_ROW_MARK_NOKEYEXCLUSIVE: RowMarkType = 1;
-pub const RowMarkType_ROW_MARK_SHARE: RowMarkType = 2;
-pub const RowMarkType_ROW_MARK_KEYSHARE: RowMarkType = 3;
-pub const RowMarkType_ROW_MARK_REFERENCE: RowMarkType = 4;
-pub const RowMarkType_ROW_MARK_COPY: RowMarkType = 5;
-pub type RowMarkType = ::std::os::raw::c_uint;
+pub mod RowMarkType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const ROW_MARK_EXCLUSIVE: Type = 0;
+    pub const ROW_MARK_NOKEYEXCLUSIVE: Type = 1;
+    pub const ROW_MARK_SHARE: Type = 2;
+    pub const ROW_MARK_KEYSHARE: Type = 3;
+    pub const ROW_MARK_REFERENCE: Type = 4;
+    pub const ROW_MARK_COPY: Type = 5;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PlanRowMark {
@@ -12465,10 +15904,10 @@ pub struct PlanRowMark {
     pub rti: Index,
     pub prti: Index,
     pub rowmarkId: Index,
-    pub markType: RowMarkType,
+    pub markType: RowMarkType::Type,
     pub allMarkTypes: ::std::os::raw::c_int,
-    pub strength: LockClauseStrength,
-    pub waitPolicy: LockWaitPolicy,
+    pub strength: LockClauseStrength::Type,
+    pub waitPolicy: LockWaitPolicy::Type,
     pub isParent: bool,
 }
 impl Default for PlanRowMark {
@@ -12552,14 +15991,16 @@ impl Default for PartitionPruneStepOp {
         }
     }
 }
-pub const PartitionPruneCombineOp_PARTPRUNE_COMBINE_UNION: PartitionPruneCombineOp = 0;
-pub const PartitionPruneCombineOp_PARTPRUNE_COMBINE_INTERSECT: PartitionPruneCombineOp = 1;
-pub type PartitionPruneCombineOp = ::std::os::raw::c_uint;
+pub mod PartitionPruneCombineOp {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PARTPRUNE_COMBINE_UNION: Type = 0;
+    pub const PARTPRUNE_COMBINE_INTERSECT: Type = 1;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PartitionPruneStepCombine {
     pub step: PartitionPruneStep,
-    pub combineOp: PartitionPruneCombineOp,
+    pub combineOp: PartitionPruneCombineOp::Type,
     pub source_stepids: *mut List,
 }
 impl Default for PartitionPruneStepCombine {
@@ -12587,11 +16028,13 @@ impl Default for PlanInvalItem {
         }
     }
 }
-pub const MonotonicFunction_MONOTONICFUNC_NONE: MonotonicFunction = 0;
-pub const MonotonicFunction_MONOTONICFUNC_INCREASING: MonotonicFunction = 1;
-pub const MonotonicFunction_MONOTONICFUNC_DECREASING: MonotonicFunction = 2;
-pub const MonotonicFunction_MONOTONICFUNC_BOTH: MonotonicFunction = 3;
-pub type MonotonicFunction = ::std::os::raw::c_uint;
+pub mod MonotonicFunction {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const MONOTONICFUNC_NONE: Type = 0;
+    pub const MONOTONICFUNC_INCREASING: Type = 1;
+    pub const MONOTONICFUNC_DECREASING: Type = 2;
+    pub const MONOTONICFUNC_BOTH: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct pg_atomic_flag {
@@ -12608,11 +16051,13 @@ pub struct pg_atomic_uint64 {
     pub value: uint64,
 }
 pub type dsm_handle = uint32;
-pub const dsm_op_DSM_OP_CREATE: dsm_op = 0;
-pub const dsm_op_DSM_OP_ATTACH: dsm_op = 1;
-pub const dsm_op_DSM_OP_DETACH: dsm_op = 2;
-pub const dsm_op_DSM_OP_DESTROY: dsm_op = 3;
-pub type dsm_op = ::std::os::raw::c_uint;
+pub mod dsm_op {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const DSM_OP_CREATE: Type = 0;
+    pub const DSM_OP_ATTACH: Type = 1;
+    pub const DSM_OP_DETACH: Type = 2;
+    pub const DSM_OP_DESTROY: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct dsm_segment {
@@ -12784,11 +16229,13 @@ impl Default for HASHCTL {
         }
     }
 }
-pub const HASHACTION_HASH_FIND: HASHACTION = 0;
-pub const HASHACTION_HASH_ENTER: HASHACTION = 1;
-pub const HASHACTION_HASH_REMOVE: HASHACTION = 2;
-pub const HASHACTION_HASH_ENTER_NULL: HASHACTION = 3;
-pub type HASHACTION = ::std::os::raw::c_uint;
+pub mod HASHACTION {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const HASH_FIND: Type = 0;
+    pub const HASH_ENTER: Type = 1;
+    pub const HASH_REMOVE: Type = 2;
+    pub const HASH_ENTER_NULL: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct HASH_SEQ_STATUS {
@@ -12805,15 +16252,17 @@ impl Default for HASH_SEQ_STATUS {
         }
     }
 }
-pub const EphemeralNameRelationType_ENR_NAMED_TUPLESTORE: EphemeralNameRelationType = 0;
-pub type EphemeralNameRelationType = ::std::os::raw::c_uint;
+pub mod EphemeralNameRelationType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const ENR_NAMED_TUPLESTORE: Type = 0;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct EphemeralNamedRelationMetadataData {
     pub name: *mut ::std::os::raw::c_char,
     pub reliddesc: Oid,
     pub tupdesc: TupleDesc,
-    pub enrtype: EphemeralNameRelationType,
+    pub enrtype: EphemeralNameRelationType::Type,
     pub enrtuples: f64,
 }
 impl Default for EphemeralNamedRelationMetadataData {
@@ -12933,25 +16382,29 @@ impl Default for dirent {
         }
     }
 }
-pub const DT_UNKNOWN: _bindgen_ty_3 = 0;
-pub const DT_FIFO: _bindgen_ty_3 = 1;
-pub const DT_CHR: _bindgen_ty_3 = 2;
-pub const DT_DIR: _bindgen_ty_3 = 4;
-pub const DT_BLK: _bindgen_ty_3 = 6;
-pub const DT_REG: _bindgen_ty_3 = 8;
-pub const DT_LNK: _bindgen_ty_3 = 10;
-pub const DT_SOCK: _bindgen_ty_3 = 12;
-pub const DT_WHT: _bindgen_ty_3 = 14;
-pub type _bindgen_ty_3 = ::std::os::raw::c_uint;
+pub mod _bindgen_ty_3 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const DT_UNKNOWN: Type = 0;
+    pub const DT_FIFO: Type = 1;
+    pub const DT_CHR: Type = 2;
+    pub const DT_DIR: Type = 4;
+    pub const DT_BLK: Type = 6;
+    pub const DT_REG: Type = 8;
+    pub const DT_LNK: Type = 10;
+    pub const DT_SOCK: Type = 12;
+    pub const DT_WHT: Type = 14;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct __dirstream {
     _unused: [u8; 0],
 }
 pub type DIR = __dirstream;
-pub const RecoveryInitSyncMethod_RECOVERY_INIT_SYNC_METHOD_FSYNC: RecoveryInitSyncMethod = 0;
-pub const RecoveryInitSyncMethod_RECOVERY_INIT_SYNC_METHOD_SYNCFS: RecoveryInitSyncMethod = 1;
-pub type RecoveryInitSyncMethod = ::std::os::raw::c_uint;
+pub mod RecoveryInitSyncMethod {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RECOVERY_INIT_SYNC_METHOD_FSYNC: Type = 0;
+    pub const RECOVERY_INIT_SYNC_METHOD_SYNCFS: Type = 1;
+}
 pub type File = ::std::os::raw::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -13026,19 +16479,21 @@ pub struct pg_itm_in {
     pub tm_mon: ::std::os::raw::c_int,
     pub tm_year: ::std::os::raw::c_int,
 }
-pub const SnapshotType_SNAPSHOT_MVCC: SnapshotType = 0;
-pub const SnapshotType_SNAPSHOT_SELF: SnapshotType = 1;
-pub const SnapshotType_SNAPSHOT_ANY: SnapshotType = 2;
-pub const SnapshotType_SNAPSHOT_TOAST: SnapshotType = 3;
-pub const SnapshotType_SNAPSHOT_DIRTY: SnapshotType = 4;
-pub const SnapshotType_SNAPSHOT_HISTORIC_MVCC: SnapshotType = 5;
-pub const SnapshotType_SNAPSHOT_NON_VACUUMABLE: SnapshotType = 6;
-pub type SnapshotType = ::std::os::raw::c_uint;
+pub mod SnapshotType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SNAPSHOT_MVCC: Type = 0;
+    pub const SNAPSHOT_SELF: Type = 1;
+    pub const SNAPSHOT_ANY: Type = 2;
+    pub const SNAPSHOT_TOAST: Type = 3;
+    pub const SNAPSHOT_DIRTY: Type = 4;
+    pub const SNAPSHOT_HISTORIC_MVCC: Type = 5;
+    pub const SNAPSHOT_NON_VACUUMABLE: Type = 6;
+}
 pub type Snapshot = *mut SnapshotData;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct SnapshotData {
-    pub snapshot_type: SnapshotType,
+    pub snapshot_type: SnapshotType::Type,
     pub xmin: TransactionId,
     pub xmax: TransactionId,
     pub xip: *mut TransactionId,
@@ -13069,12 +16524,14 @@ impl Default for SnapshotData {
 }
 pub type Relation = *mut RelationData;
 pub type RelationPtr = *mut Relation;
-pub const IndexAttrBitmapKind_INDEX_ATTR_BITMAP_KEY: IndexAttrBitmapKind = 0;
-pub const IndexAttrBitmapKind_INDEX_ATTR_BITMAP_PRIMARY_KEY: IndexAttrBitmapKind = 1;
-pub const IndexAttrBitmapKind_INDEX_ATTR_BITMAP_IDENTITY_KEY: IndexAttrBitmapKind = 2;
-pub const IndexAttrBitmapKind_INDEX_ATTR_BITMAP_HOT_BLOCKING: IndexAttrBitmapKind = 3;
-pub const IndexAttrBitmapKind_INDEX_ATTR_BITMAP_SUMMARIZED: IndexAttrBitmapKind = 4;
-pub type IndexAttrBitmapKind = ::std::os::raw::c_uint;
+pub mod IndexAttrBitmapKind {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const INDEX_ATTR_BITMAP_KEY: Type = 0;
+    pub const INDEX_ATTR_BITMAP_PRIMARY_KEY: Type = 1;
+    pub const INDEX_ATTR_BITMAP_IDENTITY_KEY: Type = 2;
+    pub const INDEX_ATTR_BITMAP_HOT_BLOCKING: Type = 3;
+    pub const INDEX_ATTR_BITMAP_SUMMARIZED: Type = 4;
+}
 pub type SortSupport = *mut SortSupportData;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -13162,20 +16619,24 @@ impl Default for SortCoordinateData {
     }
 }
 pub type SortCoordinate = *mut SortCoordinateData;
-pub const TuplesortMethod_SORT_TYPE_STILL_IN_PROGRESS: TuplesortMethod = 0;
-pub const TuplesortMethod_SORT_TYPE_TOP_N_HEAPSORT: TuplesortMethod = 1;
-pub const TuplesortMethod_SORT_TYPE_QUICKSORT: TuplesortMethod = 2;
-pub const TuplesortMethod_SORT_TYPE_EXTERNAL_SORT: TuplesortMethod = 4;
-pub const TuplesortMethod_SORT_TYPE_EXTERNAL_MERGE: TuplesortMethod = 8;
-pub type TuplesortMethod = ::std::os::raw::c_uint;
-pub const TuplesortSpaceType_SORT_SPACE_TYPE_DISK: TuplesortSpaceType = 0;
-pub const TuplesortSpaceType_SORT_SPACE_TYPE_MEMORY: TuplesortSpaceType = 1;
-pub type TuplesortSpaceType = ::std::os::raw::c_uint;
+pub mod TuplesortMethod {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SORT_TYPE_STILL_IN_PROGRESS: Type = 0;
+    pub const SORT_TYPE_TOP_N_HEAPSORT: Type = 1;
+    pub const SORT_TYPE_QUICKSORT: Type = 2;
+    pub const SORT_TYPE_EXTERNAL_SORT: Type = 4;
+    pub const SORT_TYPE_EXTERNAL_MERGE: Type = 8;
+}
+pub mod TuplesortSpaceType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SORT_SPACE_TYPE_DISK: Type = 0;
+    pub const SORT_SPACE_TYPE_MEMORY: Type = 1;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct TuplesortInstrumentation {
-    pub sortMethod: TuplesortMethod,
-    pub spaceType: TuplesortSpaceType,
+    pub sortMethod: TuplesortMethod::Type,
+    pub spaceType: TuplesortSpaceType::Type,
     pub spaceUsed: int64,
 }
 impl Default for TuplesortInstrumentation {
@@ -13396,15 +16857,19 @@ impl Default for ExprContext {
         }
     }
 }
-pub const ExprDoneCond_ExprSingleResult: ExprDoneCond = 0;
-pub const ExprDoneCond_ExprMultipleResult: ExprDoneCond = 1;
-pub const ExprDoneCond_ExprEndResult: ExprDoneCond = 2;
-pub type ExprDoneCond = ::std::os::raw::c_uint;
-pub const SetFunctionReturnMode_SFRM_ValuePerCall: SetFunctionReturnMode = 1;
-pub const SetFunctionReturnMode_SFRM_Materialize: SetFunctionReturnMode = 2;
-pub const SetFunctionReturnMode_SFRM_Materialize_Random: SetFunctionReturnMode = 4;
-pub const SetFunctionReturnMode_SFRM_Materialize_Preferred: SetFunctionReturnMode = 8;
-pub type SetFunctionReturnMode = ::std::os::raw::c_uint;
+pub mod ExprDoneCond {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const ExprSingleResult: Type = 0;
+    pub const ExprMultipleResult: Type = 1;
+    pub const ExprEndResult: Type = 2;
+}
+pub mod SetFunctionReturnMode {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SFRM_ValuePerCall: Type = 1;
+    pub const SFRM_Materialize: Type = 2;
+    pub const SFRM_Materialize_Random: Type = 4;
+    pub const SFRM_Materialize_Preferred: Type = 8;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ReturnSetInfo {
@@ -13412,8 +16877,8 @@ pub struct ReturnSetInfo {
     pub econtext: *mut ExprContext,
     pub expectedDesc: TupleDesc,
     pub allowedModes: ::std::os::raw::c_int,
-    pub returnMode: SetFunctionReturnMode,
-    pub isDone: ExprDoneCond,
+    pub returnMode: SetFunctionReturnMode::Type,
+    pub isDone: ExprDoneCond::Type,
     pub setResult: *mut Tuplestorestate,
     pub setDesc: TupleDesc,
 }
@@ -13580,7 +17045,7 @@ impl Default for AsyncRequest {
 #[derive(Debug, Copy, Clone)]
 pub struct EState {
     pub type_: NodeTag,
-    pub es_direction: ScanDirection,
+    pub es_direction: ScanDirection::Type,
     pub es_snapshot: Snapshot,
     pub es_crosscheck_snapshot: Snapshot,
     pub es_range_table: *mut List,
@@ -13637,9 +17102,9 @@ pub struct ExecRowMark {
     pub rti: Index,
     pub prti: Index,
     pub rowmarkId: Index,
-    pub markType: RowMarkType,
-    pub strength: LockClauseStrength,
-    pub waitPolicy: LockWaitPolicy,
+    pub markType: RowMarkType::Type,
+    pub strength: LockClauseStrength::Type,
+    pub waitPolicy: LockWaitPolicy::Type,
     pub ermActive: bool,
     pub curCtid: ItemPointerData,
     pub ermExtra: *mut ::std::os::raw::c_void,
@@ -13709,9 +17174,11 @@ impl Default for tuplehash_hash {
         }
     }
 }
-pub const tuplehash_status_tuplehash_SH_EMPTY: tuplehash_status = 0;
-pub const tuplehash_status_tuplehash_SH_IN_USE: tuplehash_status = 1;
-pub type tuplehash_status = ::std::os::raw::c_uint;
+pub mod tuplehash_status {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const tuplehash_SH_EMPTY: Type = 0;
+    pub const tuplehash_SH_IN_USE: Type = 1;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct tuplehash_iterator {
@@ -13832,14 +17299,16 @@ impl Default for SubPlanState {
         }
     }
 }
-pub const DomainConstraintType_DOM_CONSTRAINT_NOTNULL: DomainConstraintType = 0;
-pub const DomainConstraintType_DOM_CONSTRAINT_CHECK: DomainConstraintType = 1;
-pub type DomainConstraintType = ::std::os::raw::c_uint;
+pub mod DomainConstraintType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const DOM_CONSTRAINT_NOTNULL: Type = 0;
+    pub const DOM_CONSTRAINT_CHECK: Type = 1;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct DomainConstraintState {
     pub type_: NodeTag,
-    pub constrainttype: DomainConstraintType,
+    pub constrainttype: DomainConstraintType::Type,
     pub name: *mut ::std::os::raw::c_char,
     pub check_expr: *mut Expr,
     pub check_exprstate: *mut ExprState,
@@ -13948,7 +17417,7 @@ impl Default for ResultState {
 pub struct ProjectSetState {
     pub ps: PlanState,
     pub elems: *mut *mut Node,
-    pub elemdone: *mut ExprDoneCond,
+    pub elemdone: *mut ExprDoneCond::Type,
     pub nelems: ::std::os::raw::c_int,
     pub pending_srf_tuples: bool,
     pub argcontext: MemoryContext,
@@ -13966,7 +17435,7 @@ impl Default for ProjectSetState {
 #[derive(Debug, Copy, Clone)]
 pub struct ModifyTableState {
     pub ps: PlanState,
-    pub operation: CmdType,
+    pub operation: CmdType::Type,
     pub canSetTag: bool,
     pub mt_done: bool,
     pub mt_nrels: ::std::os::raw::c_int,
@@ -14299,10 +17768,12 @@ impl Default for BitmapIndexScanState {
         }
     }
 }
-pub const SharedBitmapState_BM_INITIAL: SharedBitmapState = 0;
-pub const SharedBitmapState_BM_INPROGRESS: SharedBitmapState = 1;
-pub const SharedBitmapState_BM_FINISHED: SharedBitmapState = 2;
-pub type SharedBitmapState = ::std::os::raw::c_uint;
+pub mod SharedBitmapState {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const BM_INITIAL: Type = 0;
+    pub const BM_INPROGRESS: Type = 1;
+    pub const BM_FINISHED: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug)]
 pub struct ParallelBitmapHeapState {
@@ -14311,7 +17782,7 @@ pub struct ParallelBitmapHeapState {
     pub mutex: slock_t,
     pub prefetch_pages: ::std::os::raw::c_int,
     pub prefetch_target: ::std::os::raw::c_int,
-    pub state: SharedBitmapState,
+    pub state: SharedBitmapState::Type,
     pub cv: ConditionVariable,
     pub phs_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
 }
@@ -14577,7 +18048,7 @@ impl Default for CustomScanState {
 #[derive(Debug, Copy, Clone)]
 pub struct JoinState {
     pub ps: PlanState,
-    pub jointype: JoinType,
+    pub jointype: JoinType::Type,
     pub single_match: bool,
     pub joinqual: *mut ExprState,
 }
@@ -14846,11 +18317,13 @@ pub struct SharedIncrementalSortInfo {
     pub num_workers: ::std::os::raw::c_int,
     pub sinfo: __IncompleteArrayField<IncrementalSortInfo>,
 }
-pub const IncrementalSortExecutionStatus_INCSORT_LOADFULLSORT: IncrementalSortExecutionStatus = 0;
-pub const IncrementalSortExecutionStatus_INCSORT_LOADPREFIXSORT: IncrementalSortExecutionStatus = 1;
-pub const IncrementalSortExecutionStatus_INCSORT_READFULLSORT: IncrementalSortExecutionStatus = 2;
-pub const IncrementalSortExecutionStatus_INCSORT_READPREFIXSORT: IncrementalSortExecutionStatus = 3;
-pub type IncrementalSortExecutionStatus = ::std::os::raw::c_uint;
+pub mod IncrementalSortExecutionStatus {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const INCSORT_LOADFULLSORT: Type = 0;
+    pub const INCSORT_LOADPREFIXSORT: Type = 1;
+    pub const INCSORT_READFULLSORT: Type = 2;
+    pub const INCSORT_READPREFIXSORT: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct IncrementalSortState {
@@ -14859,7 +18332,7 @@ pub struct IncrementalSortState {
     pub bound: int64,
     pub outerNodeDone: bool,
     pub bound_Done: int64,
-    pub execution_status: IncrementalSortExecutionStatus,
+    pub execution_status: IncrementalSortExecutionStatus::Type,
     pub n_fullsort_remaining: int64,
     pub fullsort_state: *mut Tuplesortstate,
     pub prefixsort_state: *mut Tuplesortstate,
@@ -14920,8 +18393,8 @@ pub struct AggState {
     pub aggs: *mut List,
     pub numaggs: ::std::os::raw::c_int,
     pub numtrans: ::std::os::raw::c_int,
-    pub aggstrategy: AggStrategy,
-    pub aggsplit: AggSplit,
+    pub aggstrategy: AggStrategy::Type,
+    pub aggsplit: AggSplit::Type,
     pub phase: AggStatePerPhase,
     pub numphases: ::std::os::raw::c_int,
     pub current_phase: ::std::os::raw::c_int,
@@ -14994,11 +18467,13 @@ pub struct WindowStatePerAggData {
     _unused: [u8; 0],
 }
 pub type WindowStatePerAgg = *mut WindowStatePerAggData;
-pub const WindowAggStatus_WINDOWAGG_DONE: WindowAggStatus = 0;
-pub const WindowAggStatus_WINDOWAGG_RUN: WindowAggStatus = 1;
-pub const WindowAggStatus_WINDOWAGG_PASSTHROUGH: WindowAggStatus = 2;
-pub const WindowAggStatus_WINDOWAGG_PASSTHROUGH_STRICT: WindowAggStatus = 3;
-pub type WindowAggStatus = ::std::os::raw::c_uint;
+pub mod WindowAggStatus {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const WINDOWAGG_DONE: Type = 0;
+    pub const WINDOWAGG_RUN: Type = 1;
+    pub const WINDOWAGG_PASSTHROUGH: Type = 2;
+    pub const WINDOWAGG_PASSTHROUGH_STRICT: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct WindowAggState {
@@ -15022,7 +18497,7 @@ pub struct WindowAggState {
     pub agg_winobj: *mut WindowObjectData,
     pub aggregatedbase: int64,
     pub aggregatedupto: int64,
-    pub status: WindowAggStatus,
+    pub status: WindowAggStatus::Type,
     pub frameOptions: ::std::os::raw::c_int,
     pub startOffset: *mut ExprState,
     pub endOffset: *mut ExprState,
@@ -15219,26 +18694,28 @@ impl Default for LockRowsState {
         }
     }
 }
-pub const LimitStateCond_LIMIT_INITIAL: LimitStateCond = 0;
-pub const LimitStateCond_LIMIT_RESCAN: LimitStateCond = 1;
-pub const LimitStateCond_LIMIT_EMPTY: LimitStateCond = 2;
-pub const LimitStateCond_LIMIT_INWINDOW: LimitStateCond = 3;
-pub const LimitStateCond_LIMIT_WINDOWEND_TIES: LimitStateCond = 4;
-pub const LimitStateCond_LIMIT_SUBPLANEOF: LimitStateCond = 5;
-pub const LimitStateCond_LIMIT_WINDOWEND: LimitStateCond = 6;
-pub const LimitStateCond_LIMIT_WINDOWSTART: LimitStateCond = 7;
-pub type LimitStateCond = ::std::os::raw::c_uint;
+pub mod LimitStateCond {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const LIMIT_INITIAL: Type = 0;
+    pub const LIMIT_RESCAN: Type = 1;
+    pub const LIMIT_EMPTY: Type = 2;
+    pub const LIMIT_INWINDOW: Type = 3;
+    pub const LIMIT_WINDOWEND_TIES: Type = 4;
+    pub const LIMIT_SUBPLANEOF: Type = 5;
+    pub const LIMIT_WINDOWEND: Type = 6;
+    pub const LIMIT_WINDOWSTART: Type = 7;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct LimitState {
     pub ps: PlanState,
     pub limitOffset: *mut ExprState,
     pub limitCount: *mut ExprState,
-    pub limitOption: LimitOption,
+    pub limitOption: LimitOption::Type,
     pub offset: int64,
     pub count: int64,
     pub noCount: bool,
-    pub lstate: LimitStateCond,
+    pub lstate: LimitStateCond::Type,
     pub position: int64,
     pub subSlot: *mut TupleTableSlot,
     pub eqfunction: *mut ExprState,
@@ -15253,204 +18730,206 @@ impl Default for LimitState {
         }
     }
 }
-pub const CommandTag_CMDTAG_UNKNOWN: CommandTag = 0;
-pub const CommandTag_CMDTAG_ALTER_ACCESS_METHOD: CommandTag = 1;
-pub const CommandTag_CMDTAG_ALTER_AGGREGATE: CommandTag = 2;
-pub const CommandTag_CMDTAG_ALTER_CAST: CommandTag = 3;
-pub const CommandTag_CMDTAG_ALTER_COLLATION: CommandTag = 4;
-pub const CommandTag_CMDTAG_ALTER_CONSTRAINT: CommandTag = 5;
-pub const CommandTag_CMDTAG_ALTER_CONVERSION: CommandTag = 6;
-pub const CommandTag_CMDTAG_ALTER_DATABASE: CommandTag = 7;
-pub const CommandTag_CMDTAG_ALTER_DEFAULT_PRIVILEGES: CommandTag = 8;
-pub const CommandTag_CMDTAG_ALTER_DOMAIN: CommandTag = 9;
-pub const CommandTag_CMDTAG_ALTER_EVENT_TRIGGER: CommandTag = 10;
-pub const CommandTag_CMDTAG_ALTER_EXTENSION: CommandTag = 11;
-pub const CommandTag_CMDTAG_ALTER_FOREIGN_DATA_WRAPPER: CommandTag = 12;
-pub const CommandTag_CMDTAG_ALTER_FOREIGN_TABLE: CommandTag = 13;
-pub const CommandTag_CMDTAG_ALTER_FUNCTION: CommandTag = 14;
-pub const CommandTag_CMDTAG_ALTER_INDEX: CommandTag = 15;
-pub const CommandTag_CMDTAG_ALTER_LANGUAGE: CommandTag = 16;
-pub const CommandTag_CMDTAG_ALTER_LARGE_OBJECT: CommandTag = 17;
-pub const CommandTag_CMDTAG_ALTER_MATERIALIZED_VIEW: CommandTag = 18;
-pub const CommandTag_CMDTAG_ALTER_OPERATOR: CommandTag = 19;
-pub const CommandTag_CMDTAG_ALTER_OPERATOR_CLASS: CommandTag = 20;
-pub const CommandTag_CMDTAG_ALTER_OPERATOR_FAMILY: CommandTag = 21;
-pub const CommandTag_CMDTAG_ALTER_POLICY: CommandTag = 22;
-pub const CommandTag_CMDTAG_ALTER_PROCEDURE: CommandTag = 23;
-pub const CommandTag_CMDTAG_ALTER_PUBLICATION: CommandTag = 24;
-pub const CommandTag_CMDTAG_ALTER_ROLE: CommandTag = 25;
-pub const CommandTag_CMDTAG_ALTER_ROUTINE: CommandTag = 26;
-pub const CommandTag_CMDTAG_ALTER_RULE: CommandTag = 27;
-pub const CommandTag_CMDTAG_ALTER_SCHEMA: CommandTag = 28;
-pub const CommandTag_CMDTAG_ALTER_SEQUENCE: CommandTag = 29;
-pub const CommandTag_CMDTAG_ALTER_SERVER: CommandTag = 30;
-pub const CommandTag_CMDTAG_ALTER_STATISTICS: CommandTag = 31;
-pub const CommandTag_CMDTAG_ALTER_SUBSCRIPTION: CommandTag = 32;
-pub const CommandTag_CMDTAG_ALTER_SYSTEM: CommandTag = 33;
-pub const CommandTag_CMDTAG_ALTER_TABLE: CommandTag = 34;
-pub const CommandTag_CMDTAG_ALTER_TABLESPACE: CommandTag = 35;
-pub const CommandTag_CMDTAG_ALTER_TEXT_SEARCH_CONFIGURATION: CommandTag = 36;
-pub const CommandTag_CMDTAG_ALTER_TEXT_SEARCH_DICTIONARY: CommandTag = 37;
-pub const CommandTag_CMDTAG_ALTER_TEXT_SEARCH_PARSER: CommandTag = 38;
-pub const CommandTag_CMDTAG_ALTER_TEXT_SEARCH_TEMPLATE: CommandTag = 39;
-pub const CommandTag_CMDTAG_ALTER_TRANSFORM: CommandTag = 40;
-pub const CommandTag_CMDTAG_ALTER_TRIGGER: CommandTag = 41;
-pub const CommandTag_CMDTAG_ALTER_TYPE: CommandTag = 42;
-pub const CommandTag_CMDTAG_ALTER_USER_MAPPING: CommandTag = 43;
-pub const CommandTag_CMDTAG_ALTER_VIEW: CommandTag = 44;
-pub const CommandTag_CMDTAG_ANALYZE: CommandTag = 45;
-pub const CommandTag_CMDTAG_BEGIN: CommandTag = 46;
-pub const CommandTag_CMDTAG_CALL: CommandTag = 47;
-pub const CommandTag_CMDTAG_CHECKPOINT: CommandTag = 48;
-pub const CommandTag_CMDTAG_CLOSE: CommandTag = 49;
-pub const CommandTag_CMDTAG_CLOSE_CURSOR: CommandTag = 50;
-pub const CommandTag_CMDTAG_CLOSE_CURSOR_ALL: CommandTag = 51;
-pub const CommandTag_CMDTAG_CLUSTER: CommandTag = 52;
-pub const CommandTag_CMDTAG_COMMENT: CommandTag = 53;
-pub const CommandTag_CMDTAG_COMMIT: CommandTag = 54;
-pub const CommandTag_CMDTAG_COMMIT_PREPARED: CommandTag = 55;
-pub const CommandTag_CMDTAG_COPY: CommandTag = 56;
-pub const CommandTag_CMDTAG_COPY_FROM: CommandTag = 57;
-pub const CommandTag_CMDTAG_CREATE_ACCESS_METHOD: CommandTag = 58;
-pub const CommandTag_CMDTAG_CREATE_AGGREGATE: CommandTag = 59;
-pub const CommandTag_CMDTAG_CREATE_CAST: CommandTag = 60;
-pub const CommandTag_CMDTAG_CREATE_COLLATION: CommandTag = 61;
-pub const CommandTag_CMDTAG_CREATE_CONSTRAINT: CommandTag = 62;
-pub const CommandTag_CMDTAG_CREATE_CONVERSION: CommandTag = 63;
-pub const CommandTag_CMDTAG_CREATE_DATABASE: CommandTag = 64;
-pub const CommandTag_CMDTAG_CREATE_DOMAIN: CommandTag = 65;
-pub const CommandTag_CMDTAG_CREATE_EVENT_TRIGGER: CommandTag = 66;
-pub const CommandTag_CMDTAG_CREATE_EXTENSION: CommandTag = 67;
-pub const CommandTag_CMDTAG_CREATE_FOREIGN_DATA_WRAPPER: CommandTag = 68;
-pub const CommandTag_CMDTAG_CREATE_FOREIGN_TABLE: CommandTag = 69;
-pub const CommandTag_CMDTAG_CREATE_FUNCTION: CommandTag = 70;
-pub const CommandTag_CMDTAG_CREATE_INDEX: CommandTag = 71;
-pub const CommandTag_CMDTAG_CREATE_LANGUAGE: CommandTag = 72;
-pub const CommandTag_CMDTAG_CREATE_MATERIALIZED_VIEW: CommandTag = 73;
-pub const CommandTag_CMDTAG_CREATE_OPERATOR: CommandTag = 74;
-pub const CommandTag_CMDTAG_CREATE_OPERATOR_CLASS: CommandTag = 75;
-pub const CommandTag_CMDTAG_CREATE_OPERATOR_FAMILY: CommandTag = 76;
-pub const CommandTag_CMDTAG_CREATE_POLICY: CommandTag = 77;
-pub const CommandTag_CMDTAG_CREATE_PROCEDURE: CommandTag = 78;
-pub const CommandTag_CMDTAG_CREATE_PUBLICATION: CommandTag = 79;
-pub const CommandTag_CMDTAG_CREATE_ROLE: CommandTag = 80;
-pub const CommandTag_CMDTAG_CREATE_ROUTINE: CommandTag = 81;
-pub const CommandTag_CMDTAG_CREATE_RULE: CommandTag = 82;
-pub const CommandTag_CMDTAG_CREATE_SCHEMA: CommandTag = 83;
-pub const CommandTag_CMDTAG_CREATE_SEQUENCE: CommandTag = 84;
-pub const CommandTag_CMDTAG_CREATE_SERVER: CommandTag = 85;
-pub const CommandTag_CMDTAG_CREATE_STATISTICS: CommandTag = 86;
-pub const CommandTag_CMDTAG_CREATE_SUBSCRIPTION: CommandTag = 87;
-pub const CommandTag_CMDTAG_CREATE_TABLE: CommandTag = 88;
-pub const CommandTag_CMDTAG_CREATE_TABLE_AS: CommandTag = 89;
-pub const CommandTag_CMDTAG_CREATE_TABLESPACE: CommandTag = 90;
-pub const CommandTag_CMDTAG_CREATE_TEXT_SEARCH_CONFIGURATION: CommandTag = 91;
-pub const CommandTag_CMDTAG_CREATE_TEXT_SEARCH_DICTIONARY: CommandTag = 92;
-pub const CommandTag_CMDTAG_CREATE_TEXT_SEARCH_PARSER: CommandTag = 93;
-pub const CommandTag_CMDTAG_CREATE_TEXT_SEARCH_TEMPLATE: CommandTag = 94;
-pub const CommandTag_CMDTAG_CREATE_TRANSFORM: CommandTag = 95;
-pub const CommandTag_CMDTAG_CREATE_TRIGGER: CommandTag = 96;
-pub const CommandTag_CMDTAG_CREATE_TYPE: CommandTag = 97;
-pub const CommandTag_CMDTAG_CREATE_USER_MAPPING: CommandTag = 98;
-pub const CommandTag_CMDTAG_CREATE_VIEW: CommandTag = 99;
-pub const CommandTag_CMDTAG_DEALLOCATE: CommandTag = 100;
-pub const CommandTag_CMDTAG_DEALLOCATE_ALL: CommandTag = 101;
-pub const CommandTag_CMDTAG_DECLARE_CURSOR: CommandTag = 102;
-pub const CommandTag_CMDTAG_DELETE: CommandTag = 103;
-pub const CommandTag_CMDTAG_DISCARD: CommandTag = 104;
-pub const CommandTag_CMDTAG_DISCARD_ALL: CommandTag = 105;
-pub const CommandTag_CMDTAG_DISCARD_PLANS: CommandTag = 106;
-pub const CommandTag_CMDTAG_DISCARD_SEQUENCES: CommandTag = 107;
-pub const CommandTag_CMDTAG_DISCARD_TEMP: CommandTag = 108;
-pub const CommandTag_CMDTAG_DO: CommandTag = 109;
-pub const CommandTag_CMDTAG_DROP_ACCESS_METHOD: CommandTag = 110;
-pub const CommandTag_CMDTAG_DROP_AGGREGATE: CommandTag = 111;
-pub const CommandTag_CMDTAG_DROP_CAST: CommandTag = 112;
-pub const CommandTag_CMDTAG_DROP_COLLATION: CommandTag = 113;
-pub const CommandTag_CMDTAG_DROP_CONSTRAINT: CommandTag = 114;
-pub const CommandTag_CMDTAG_DROP_CONVERSION: CommandTag = 115;
-pub const CommandTag_CMDTAG_DROP_DATABASE: CommandTag = 116;
-pub const CommandTag_CMDTAG_DROP_DOMAIN: CommandTag = 117;
-pub const CommandTag_CMDTAG_DROP_EVENT_TRIGGER: CommandTag = 118;
-pub const CommandTag_CMDTAG_DROP_EXTENSION: CommandTag = 119;
-pub const CommandTag_CMDTAG_DROP_FOREIGN_DATA_WRAPPER: CommandTag = 120;
-pub const CommandTag_CMDTAG_DROP_FOREIGN_TABLE: CommandTag = 121;
-pub const CommandTag_CMDTAG_DROP_FUNCTION: CommandTag = 122;
-pub const CommandTag_CMDTAG_DROP_INDEX: CommandTag = 123;
-pub const CommandTag_CMDTAG_DROP_LANGUAGE: CommandTag = 124;
-pub const CommandTag_CMDTAG_DROP_MATERIALIZED_VIEW: CommandTag = 125;
-pub const CommandTag_CMDTAG_DROP_OPERATOR: CommandTag = 126;
-pub const CommandTag_CMDTAG_DROP_OPERATOR_CLASS: CommandTag = 127;
-pub const CommandTag_CMDTAG_DROP_OPERATOR_FAMILY: CommandTag = 128;
-pub const CommandTag_CMDTAG_DROP_OWNED: CommandTag = 129;
-pub const CommandTag_CMDTAG_DROP_POLICY: CommandTag = 130;
-pub const CommandTag_CMDTAG_DROP_PROCEDURE: CommandTag = 131;
-pub const CommandTag_CMDTAG_DROP_PUBLICATION: CommandTag = 132;
-pub const CommandTag_CMDTAG_DROP_ROLE: CommandTag = 133;
-pub const CommandTag_CMDTAG_DROP_ROUTINE: CommandTag = 134;
-pub const CommandTag_CMDTAG_DROP_RULE: CommandTag = 135;
-pub const CommandTag_CMDTAG_DROP_SCHEMA: CommandTag = 136;
-pub const CommandTag_CMDTAG_DROP_SEQUENCE: CommandTag = 137;
-pub const CommandTag_CMDTAG_DROP_SERVER: CommandTag = 138;
-pub const CommandTag_CMDTAG_DROP_STATISTICS: CommandTag = 139;
-pub const CommandTag_CMDTAG_DROP_SUBSCRIPTION: CommandTag = 140;
-pub const CommandTag_CMDTAG_DROP_TABLE: CommandTag = 141;
-pub const CommandTag_CMDTAG_DROP_TABLESPACE: CommandTag = 142;
-pub const CommandTag_CMDTAG_DROP_TEXT_SEARCH_CONFIGURATION: CommandTag = 143;
-pub const CommandTag_CMDTAG_DROP_TEXT_SEARCH_DICTIONARY: CommandTag = 144;
-pub const CommandTag_CMDTAG_DROP_TEXT_SEARCH_PARSER: CommandTag = 145;
-pub const CommandTag_CMDTAG_DROP_TEXT_SEARCH_TEMPLATE: CommandTag = 146;
-pub const CommandTag_CMDTAG_DROP_TRANSFORM: CommandTag = 147;
-pub const CommandTag_CMDTAG_DROP_TRIGGER: CommandTag = 148;
-pub const CommandTag_CMDTAG_DROP_TYPE: CommandTag = 149;
-pub const CommandTag_CMDTAG_DROP_USER_MAPPING: CommandTag = 150;
-pub const CommandTag_CMDTAG_DROP_VIEW: CommandTag = 151;
-pub const CommandTag_CMDTAG_EXECUTE: CommandTag = 152;
-pub const CommandTag_CMDTAG_EXPLAIN: CommandTag = 153;
-pub const CommandTag_CMDTAG_FETCH: CommandTag = 154;
-pub const CommandTag_CMDTAG_GRANT: CommandTag = 155;
-pub const CommandTag_CMDTAG_GRANT_ROLE: CommandTag = 156;
-pub const CommandTag_CMDTAG_IMPORT_FOREIGN_SCHEMA: CommandTag = 157;
-pub const CommandTag_CMDTAG_INSERT: CommandTag = 158;
-pub const CommandTag_CMDTAG_LISTEN: CommandTag = 159;
-pub const CommandTag_CMDTAG_LOAD: CommandTag = 160;
-pub const CommandTag_CMDTAG_LOCK_TABLE: CommandTag = 161;
-pub const CommandTag_CMDTAG_MERGE: CommandTag = 162;
-pub const CommandTag_CMDTAG_MOVE: CommandTag = 163;
-pub const CommandTag_CMDTAG_NOTIFY: CommandTag = 164;
-pub const CommandTag_CMDTAG_PREPARE: CommandTag = 165;
-pub const CommandTag_CMDTAG_PREPARE_TRANSACTION: CommandTag = 166;
-pub const CommandTag_CMDTAG_REASSIGN_OWNED: CommandTag = 167;
-pub const CommandTag_CMDTAG_REFRESH_MATERIALIZED_VIEW: CommandTag = 168;
-pub const CommandTag_CMDTAG_REINDEX: CommandTag = 169;
-pub const CommandTag_CMDTAG_RELEASE: CommandTag = 170;
-pub const CommandTag_CMDTAG_RESET: CommandTag = 171;
-pub const CommandTag_CMDTAG_REVOKE: CommandTag = 172;
-pub const CommandTag_CMDTAG_REVOKE_ROLE: CommandTag = 173;
-pub const CommandTag_CMDTAG_ROLLBACK: CommandTag = 174;
-pub const CommandTag_CMDTAG_ROLLBACK_PREPARED: CommandTag = 175;
-pub const CommandTag_CMDTAG_SAVEPOINT: CommandTag = 176;
-pub const CommandTag_CMDTAG_SECURITY_LABEL: CommandTag = 177;
-pub const CommandTag_CMDTAG_SELECT: CommandTag = 178;
-pub const CommandTag_CMDTAG_SELECT_FOR_KEY_SHARE: CommandTag = 179;
-pub const CommandTag_CMDTAG_SELECT_FOR_NO_KEY_UPDATE: CommandTag = 180;
-pub const CommandTag_CMDTAG_SELECT_FOR_SHARE: CommandTag = 181;
-pub const CommandTag_CMDTAG_SELECT_FOR_UPDATE: CommandTag = 182;
-pub const CommandTag_CMDTAG_SELECT_INTO: CommandTag = 183;
-pub const CommandTag_CMDTAG_SET: CommandTag = 184;
-pub const CommandTag_CMDTAG_SET_CONSTRAINTS: CommandTag = 185;
-pub const CommandTag_CMDTAG_SHOW: CommandTag = 186;
-pub const CommandTag_CMDTAG_START_TRANSACTION: CommandTag = 187;
-pub const CommandTag_CMDTAG_TRUNCATE_TABLE: CommandTag = 188;
-pub const CommandTag_CMDTAG_UNLISTEN: CommandTag = 189;
-pub const CommandTag_CMDTAG_UPDATE: CommandTag = 190;
-pub const CommandTag_CMDTAG_VACUUM: CommandTag = 191;
-pub const CommandTag_COMMAND_TAG_NEXTTAG: CommandTag = 192;
-pub type CommandTag = ::std::os::raw::c_uint;
+pub mod CommandTag {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const CMDTAG_UNKNOWN: Type = 0;
+    pub const CMDTAG_ALTER_ACCESS_METHOD: Type = 1;
+    pub const CMDTAG_ALTER_AGGREGATE: Type = 2;
+    pub const CMDTAG_ALTER_CAST: Type = 3;
+    pub const CMDTAG_ALTER_COLLATION: Type = 4;
+    pub const CMDTAG_ALTER_CONSTRAINT: Type = 5;
+    pub const CMDTAG_ALTER_CONVERSION: Type = 6;
+    pub const CMDTAG_ALTER_DATABASE: Type = 7;
+    pub const CMDTAG_ALTER_DEFAULT_PRIVILEGES: Type = 8;
+    pub const CMDTAG_ALTER_DOMAIN: Type = 9;
+    pub const CMDTAG_ALTER_EVENT_TRIGGER: Type = 10;
+    pub const CMDTAG_ALTER_EXTENSION: Type = 11;
+    pub const CMDTAG_ALTER_FOREIGN_DATA_WRAPPER: Type = 12;
+    pub const CMDTAG_ALTER_FOREIGN_TABLE: Type = 13;
+    pub const CMDTAG_ALTER_FUNCTION: Type = 14;
+    pub const CMDTAG_ALTER_INDEX: Type = 15;
+    pub const CMDTAG_ALTER_LANGUAGE: Type = 16;
+    pub const CMDTAG_ALTER_LARGE_OBJECT: Type = 17;
+    pub const CMDTAG_ALTER_MATERIALIZED_VIEW: Type = 18;
+    pub const CMDTAG_ALTER_OPERATOR: Type = 19;
+    pub const CMDTAG_ALTER_OPERATOR_CLASS: Type = 20;
+    pub const CMDTAG_ALTER_OPERATOR_FAMILY: Type = 21;
+    pub const CMDTAG_ALTER_POLICY: Type = 22;
+    pub const CMDTAG_ALTER_PROCEDURE: Type = 23;
+    pub const CMDTAG_ALTER_PUBLICATION: Type = 24;
+    pub const CMDTAG_ALTER_ROLE: Type = 25;
+    pub const CMDTAG_ALTER_ROUTINE: Type = 26;
+    pub const CMDTAG_ALTER_RULE: Type = 27;
+    pub const CMDTAG_ALTER_SCHEMA: Type = 28;
+    pub const CMDTAG_ALTER_SEQUENCE: Type = 29;
+    pub const CMDTAG_ALTER_SERVER: Type = 30;
+    pub const CMDTAG_ALTER_STATISTICS: Type = 31;
+    pub const CMDTAG_ALTER_SUBSCRIPTION: Type = 32;
+    pub const CMDTAG_ALTER_SYSTEM: Type = 33;
+    pub const CMDTAG_ALTER_TABLE: Type = 34;
+    pub const CMDTAG_ALTER_TABLESPACE: Type = 35;
+    pub const CMDTAG_ALTER_TEXT_SEARCH_CONFIGURATION: Type = 36;
+    pub const CMDTAG_ALTER_TEXT_SEARCH_DICTIONARY: Type = 37;
+    pub const CMDTAG_ALTER_TEXT_SEARCH_PARSER: Type = 38;
+    pub const CMDTAG_ALTER_TEXT_SEARCH_TEMPLATE: Type = 39;
+    pub const CMDTAG_ALTER_TRANSFORM: Type = 40;
+    pub const CMDTAG_ALTER_TRIGGER: Type = 41;
+    pub const CMDTAG_ALTER_TYPE: Type = 42;
+    pub const CMDTAG_ALTER_USER_MAPPING: Type = 43;
+    pub const CMDTAG_ALTER_VIEW: Type = 44;
+    pub const CMDTAG_ANALYZE: Type = 45;
+    pub const CMDTAG_BEGIN: Type = 46;
+    pub const CMDTAG_CALL: Type = 47;
+    pub const CMDTAG_CHECKPOINT: Type = 48;
+    pub const CMDTAG_CLOSE: Type = 49;
+    pub const CMDTAG_CLOSE_CURSOR: Type = 50;
+    pub const CMDTAG_CLOSE_CURSOR_ALL: Type = 51;
+    pub const CMDTAG_CLUSTER: Type = 52;
+    pub const CMDTAG_COMMENT: Type = 53;
+    pub const CMDTAG_COMMIT: Type = 54;
+    pub const CMDTAG_COMMIT_PREPARED: Type = 55;
+    pub const CMDTAG_COPY: Type = 56;
+    pub const CMDTAG_COPY_FROM: Type = 57;
+    pub const CMDTAG_CREATE_ACCESS_METHOD: Type = 58;
+    pub const CMDTAG_CREATE_AGGREGATE: Type = 59;
+    pub const CMDTAG_CREATE_CAST: Type = 60;
+    pub const CMDTAG_CREATE_COLLATION: Type = 61;
+    pub const CMDTAG_CREATE_CONSTRAINT: Type = 62;
+    pub const CMDTAG_CREATE_CONVERSION: Type = 63;
+    pub const CMDTAG_CREATE_DATABASE: Type = 64;
+    pub const CMDTAG_CREATE_DOMAIN: Type = 65;
+    pub const CMDTAG_CREATE_EVENT_TRIGGER: Type = 66;
+    pub const CMDTAG_CREATE_EXTENSION: Type = 67;
+    pub const CMDTAG_CREATE_FOREIGN_DATA_WRAPPER: Type = 68;
+    pub const CMDTAG_CREATE_FOREIGN_TABLE: Type = 69;
+    pub const CMDTAG_CREATE_FUNCTION: Type = 70;
+    pub const CMDTAG_CREATE_INDEX: Type = 71;
+    pub const CMDTAG_CREATE_LANGUAGE: Type = 72;
+    pub const CMDTAG_CREATE_MATERIALIZED_VIEW: Type = 73;
+    pub const CMDTAG_CREATE_OPERATOR: Type = 74;
+    pub const CMDTAG_CREATE_OPERATOR_CLASS: Type = 75;
+    pub const CMDTAG_CREATE_OPERATOR_FAMILY: Type = 76;
+    pub const CMDTAG_CREATE_POLICY: Type = 77;
+    pub const CMDTAG_CREATE_PROCEDURE: Type = 78;
+    pub const CMDTAG_CREATE_PUBLICATION: Type = 79;
+    pub const CMDTAG_CREATE_ROLE: Type = 80;
+    pub const CMDTAG_CREATE_ROUTINE: Type = 81;
+    pub const CMDTAG_CREATE_RULE: Type = 82;
+    pub const CMDTAG_CREATE_SCHEMA: Type = 83;
+    pub const CMDTAG_CREATE_SEQUENCE: Type = 84;
+    pub const CMDTAG_CREATE_SERVER: Type = 85;
+    pub const CMDTAG_CREATE_STATISTICS: Type = 86;
+    pub const CMDTAG_CREATE_SUBSCRIPTION: Type = 87;
+    pub const CMDTAG_CREATE_TABLE: Type = 88;
+    pub const CMDTAG_CREATE_TABLE_AS: Type = 89;
+    pub const CMDTAG_CREATE_TABLESPACE: Type = 90;
+    pub const CMDTAG_CREATE_TEXT_SEARCH_CONFIGURATION: Type = 91;
+    pub const CMDTAG_CREATE_TEXT_SEARCH_DICTIONARY: Type = 92;
+    pub const CMDTAG_CREATE_TEXT_SEARCH_PARSER: Type = 93;
+    pub const CMDTAG_CREATE_TEXT_SEARCH_TEMPLATE: Type = 94;
+    pub const CMDTAG_CREATE_TRANSFORM: Type = 95;
+    pub const CMDTAG_CREATE_TRIGGER: Type = 96;
+    pub const CMDTAG_CREATE_TYPE: Type = 97;
+    pub const CMDTAG_CREATE_USER_MAPPING: Type = 98;
+    pub const CMDTAG_CREATE_VIEW: Type = 99;
+    pub const CMDTAG_DEALLOCATE: Type = 100;
+    pub const CMDTAG_DEALLOCATE_ALL: Type = 101;
+    pub const CMDTAG_DECLARE_CURSOR: Type = 102;
+    pub const CMDTAG_DELETE: Type = 103;
+    pub const CMDTAG_DISCARD: Type = 104;
+    pub const CMDTAG_DISCARD_ALL: Type = 105;
+    pub const CMDTAG_DISCARD_PLANS: Type = 106;
+    pub const CMDTAG_DISCARD_SEQUENCES: Type = 107;
+    pub const CMDTAG_DISCARD_TEMP: Type = 108;
+    pub const CMDTAG_DO: Type = 109;
+    pub const CMDTAG_DROP_ACCESS_METHOD: Type = 110;
+    pub const CMDTAG_DROP_AGGREGATE: Type = 111;
+    pub const CMDTAG_DROP_CAST: Type = 112;
+    pub const CMDTAG_DROP_COLLATION: Type = 113;
+    pub const CMDTAG_DROP_CONSTRAINT: Type = 114;
+    pub const CMDTAG_DROP_CONVERSION: Type = 115;
+    pub const CMDTAG_DROP_DATABASE: Type = 116;
+    pub const CMDTAG_DROP_DOMAIN: Type = 117;
+    pub const CMDTAG_DROP_EVENT_TRIGGER: Type = 118;
+    pub const CMDTAG_DROP_EXTENSION: Type = 119;
+    pub const CMDTAG_DROP_FOREIGN_DATA_WRAPPER: Type = 120;
+    pub const CMDTAG_DROP_FOREIGN_TABLE: Type = 121;
+    pub const CMDTAG_DROP_FUNCTION: Type = 122;
+    pub const CMDTAG_DROP_INDEX: Type = 123;
+    pub const CMDTAG_DROP_LANGUAGE: Type = 124;
+    pub const CMDTAG_DROP_MATERIALIZED_VIEW: Type = 125;
+    pub const CMDTAG_DROP_OPERATOR: Type = 126;
+    pub const CMDTAG_DROP_OPERATOR_CLASS: Type = 127;
+    pub const CMDTAG_DROP_OPERATOR_FAMILY: Type = 128;
+    pub const CMDTAG_DROP_OWNED: Type = 129;
+    pub const CMDTAG_DROP_POLICY: Type = 130;
+    pub const CMDTAG_DROP_PROCEDURE: Type = 131;
+    pub const CMDTAG_DROP_PUBLICATION: Type = 132;
+    pub const CMDTAG_DROP_ROLE: Type = 133;
+    pub const CMDTAG_DROP_ROUTINE: Type = 134;
+    pub const CMDTAG_DROP_RULE: Type = 135;
+    pub const CMDTAG_DROP_SCHEMA: Type = 136;
+    pub const CMDTAG_DROP_SEQUENCE: Type = 137;
+    pub const CMDTAG_DROP_SERVER: Type = 138;
+    pub const CMDTAG_DROP_STATISTICS: Type = 139;
+    pub const CMDTAG_DROP_SUBSCRIPTION: Type = 140;
+    pub const CMDTAG_DROP_TABLE: Type = 141;
+    pub const CMDTAG_DROP_TABLESPACE: Type = 142;
+    pub const CMDTAG_DROP_TEXT_SEARCH_CONFIGURATION: Type = 143;
+    pub const CMDTAG_DROP_TEXT_SEARCH_DICTIONARY: Type = 144;
+    pub const CMDTAG_DROP_TEXT_SEARCH_PARSER: Type = 145;
+    pub const CMDTAG_DROP_TEXT_SEARCH_TEMPLATE: Type = 146;
+    pub const CMDTAG_DROP_TRANSFORM: Type = 147;
+    pub const CMDTAG_DROP_TRIGGER: Type = 148;
+    pub const CMDTAG_DROP_TYPE: Type = 149;
+    pub const CMDTAG_DROP_USER_MAPPING: Type = 150;
+    pub const CMDTAG_DROP_VIEW: Type = 151;
+    pub const CMDTAG_EXECUTE: Type = 152;
+    pub const CMDTAG_EXPLAIN: Type = 153;
+    pub const CMDTAG_FETCH: Type = 154;
+    pub const CMDTAG_GRANT: Type = 155;
+    pub const CMDTAG_GRANT_ROLE: Type = 156;
+    pub const CMDTAG_IMPORT_FOREIGN_SCHEMA: Type = 157;
+    pub const CMDTAG_INSERT: Type = 158;
+    pub const CMDTAG_LISTEN: Type = 159;
+    pub const CMDTAG_LOAD: Type = 160;
+    pub const CMDTAG_LOCK_TABLE: Type = 161;
+    pub const CMDTAG_MERGE: Type = 162;
+    pub const CMDTAG_MOVE: Type = 163;
+    pub const CMDTAG_NOTIFY: Type = 164;
+    pub const CMDTAG_PREPARE: Type = 165;
+    pub const CMDTAG_PREPARE_TRANSACTION: Type = 166;
+    pub const CMDTAG_REASSIGN_OWNED: Type = 167;
+    pub const CMDTAG_REFRESH_MATERIALIZED_VIEW: Type = 168;
+    pub const CMDTAG_REINDEX: Type = 169;
+    pub const CMDTAG_RELEASE: Type = 170;
+    pub const CMDTAG_RESET: Type = 171;
+    pub const CMDTAG_REVOKE: Type = 172;
+    pub const CMDTAG_REVOKE_ROLE: Type = 173;
+    pub const CMDTAG_ROLLBACK: Type = 174;
+    pub const CMDTAG_ROLLBACK_PREPARED: Type = 175;
+    pub const CMDTAG_SAVEPOINT: Type = 176;
+    pub const CMDTAG_SECURITY_LABEL: Type = 177;
+    pub const CMDTAG_SELECT: Type = 178;
+    pub const CMDTAG_SELECT_FOR_KEY_SHARE: Type = 179;
+    pub const CMDTAG_SELECT_FOR_NO_KEY_UPDATE: Type = 180;
+    pub const CMDTAG_SELECT_FOR_SHARE: Type = 181;
+    pub const CMDTAG_SELECT_FOR_UPDATE: Type = 182;
+    pub const CMDTAG_SELECT_INTO: Type = 183;
+    pub const CMDTAG_SET: Type = 184;
+    pub const CMDTAG_SET_CONSTRAINTS: Type = 185;
+    pub const CMDTAG_SHOW: Type = 186;
+    pub const CMDTAG_START_TRANSACTION: Type = 187;
+    pub const CMDTAG_TRUNCATE_TABLE: Type = 188;
+    pub const CMDTAG_UNLISTEN: Type = 189;
+    pub const CMDTAG_UPDATE: Type = 190;
+    pub const CMDTAG_VACUUM: Type = 191;
+    pub const COMMAND_TAG_NEXTTAG: Type = 192;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct QueryCompletion {
-    pub commandTag: CommandTag,
+    pub commandTag: CommandTag::Type,
     pub nprocessed: uint64,
 }
 impl Default for QueryCompletion {
@@ -15462,19 +18941,21 @@ impl Default for QueryCompletion {
         }
     }
 }
-pub const CommandDest_DestNone: CommandDest = 0;
-pub const CommandDest_DestDebug: CommandDest = 1;
-pub const CommandDest_DestRemote: CommandDest = 2;
-pub const CommandDest_DestRemoteExecute: CommandDest = 3;
-pub const CommandDest_DestRemoteSimple: CommandDest = 4;
-pub const CommandDest_DestSPI: CommandDest = 5;
-pub const CommandDest_DestTuplestore: CommandDest = 6;
-pub const CommandDest_DestIntoRel: CommandDest = 7;
-pub const CommandDest_DestCopyOut: CommandDest = 8;
-pub const CommandDest_DestSQLFunction: CommandDest = 9;
-pub const CommandDest_DestTransientRel: CommandDest = 10;
-pub const CommandDest_DestTupleQueue: CommandDest = 11;
-pub type CommandDest = ::std::os::raw::c_uint;
+pub mod CommandDest {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const DestNone: Type = 0;
+    pub const DestDebug: Type = 1;
+    pub const DestRemote: Type = 2;
+    pub const DestRemoteExecute: Type = 3;
+    pub const DestRemoteSimple: Type = 4;
+    pub const DestSPI: Type = 5;
+    pub const DestTuplestore: Type = 6;
+    pub const DestIntoRel: Type = 7;
+    pub const DestCopyOut: Type = 8;
+    pub const DestSQLFunction: Type = 9;
+    pub const DestTransientRel: Type = 10;
+    pub const DestTupleQueue: Type = 11;
+}
 pub type DestReceiver = _DestReceiver;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -15491,7 +18972,7 @@ pub struct _DestReceiver {
     >,
     pub rShutdown: ::std::option::Option<unsafe extern "C" fn(self_: *mut DestReceiver)>,
     pub rDestroy: ::std::option::Option<unsafe extern "C" fn(self_: *mut DestReceiver)>,
-    pub mydest: CommandDest,
+    pub mydest: CommandDest::Type,
 }
 impl Default for _DestReceiver {
     fn default() -> Self {
@@ -15505,7 +18986,7 @@ impl Default for _DestReceiver {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct QueryDesc {
-    pub operation: CmdType,
+    pub operation: CmdType::Type,
     pub plannedstmt: *mut PlannedStmt,
     pub sourceText: *const ::std::os::raw::c_char,
     pub snapshot: Snapshot,
@@ -15608,7 +19089,7 @@ pub type ExecutorStart_hook_type = ::std::option::Option<
 pub type ExecutorRun_hook_type = ::std::option::Option<
     unsafe extern "C" fn(
         queryDesc: *mut QueryDesc,
-        direction: ScanDirection,
+        direction: ScanDirection::Type,
         count: uint64,
         execute_once: bool,
     ),
@@ -15680,12 +19161,14 @@ impl Default for FuncCallContext {
         }
     }
 }
-pub const TypeFuncClass_TYPEFUNC_SCALAR: TypeFuncClass = 0;
-pub const TypeFuncClass_TYPEFUNC_COMPOSITE: TypeFuncClass = 1;
-pub const TypeFuncClass_TYPEFUNC_COMPOSITE_DOMAIN: TypeFuncClass = 2;
-pub const TypeFuncClass_TYPEFUNC_RECORD: TypeFuncClass = 3;
-pub const TypeFuncClass_TYPEFUNC_OTHER: TypeFuncClass = 4;
-pub type TypeFuncClass = ::std::os::raw::c_uint;
+pub mod TypeFuncClass {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const TYPEFUNC_SCALAR: Type = 0;
+    pub const TYPEFUNC_COMPOSITE: Type = 1;
+    pub const TYPEFUNC_COMPOSITE_DOMAIN: Type = 2;
+    pub const TYPEFUNC_RECORD: Type = 3;
+    pub const TYPEFUNC_OTHER: Type = 4;
+}
 pub type sig_atomic_t = __sig_atomic_t;
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -15857,69 +19340,83 @@ impl Default for siginfo_t {
         }
     }
 }
-pub const SI_ASYNCNL: _bindgen_ty_4 = -60;
-pub const SI_DETHREAD: _bindgen_ty_4 = -7;
-pub const SI_TKILL: _bindgen_ty_4 = -6;
-pub const SI_SIGIO: _bindgen_ty_4 = -5;
-pub const SI_ASYNCIO: _bindgen_ty_4 = -4;
-pub const SI_MESGQ: _bindgen_ty_4 = -3;
-pub const SI_TIMER: _bindgen_ty_4 = -2;
-pub const SI_QUEUE: _bindgen_ty_4 = -1;
-pub const SI_USER: _bindgen_ty_4 = 0;
-pub const SI_KERNEL: _bindgen_ty_4 = 128;
-pub type _bindgen_ty_4 = ::std::os::raw::c_int;
-pub const ILL_ILLOPC: _bindgen_ty_5 = 1;
-pub const ILL_ILLOPN: _bindgen_ty_5 = 2;
-pub const ILL_ILLADR: _bindgen_ty_5 = 3;
-pub const ILL_ILLTRP: _bindgen_ty_5 = 4;
-pub const ILL_PRVOPC: _bindgen_ty_5 = 5;
-pub const ILL_PRVREG: _bindgen_ty_5 = 6;
-pub const ILL_COPROC: _bindgen_ty_5 = 7;
-pub const ILL_BADSTK: _bindgen_ty_5 = 8;
-pub const ILL_BADIADDR: _bindgen_ty_5 = 9;
-pub type _bindgen_ty_5 = ::std::os::raw::c_uint;
-pub const FPE_INTDIV: _bindgen_ty_6 = 1;
-pub const FPE_INTOVF: _bindgen_ty_6 = 2;
-pub const FPE_FLTDIV: _bindgen_ty_6 = 3;
-pub const FPE_FLTOVF: _bindgen_ty_6 = 4;
-pub const FPE_FLTUND: _bindgen_ty_6 = 5;
-pub const FPE_FLTRES: _bindgen_ty_6 = 6;
-pub const FPE_FLTINV: _bindgen_ty_6 = 7;
-pub const FPE_FLTSUB: _bindgen_ty_6 = 8;
-pub const FPE_FLTUNK: _bindgen_ty_6 = 14;
-pub const FPE_CONDTRAP: _bindgen_ty_6 = 15;
-pub type _bindgen_ty_6 = ::std::os::raw::c_uint;
-pub const SEGV_MAPERR: _bindgen_ty_7 = 1;
-pub const SEGV_ACCERR: _bindgen_ty_7 = 2;
-pub const SEGV_BNDERR: _bindgen_ty_7 = 3;
-pub const SEGV_PKUERR: _bindgen_ty_7 = 4;
-pub const SEGV_ACCADI: _bindgen_ty_7 = 5;
-pub const SEGV_ADIDERR: _bindgen_ty_7 = 6;
-pub const SEGV_ADIPERR: _bindgen_ty_7 = 7;
-pub const SEGV_MTEAERR: _bindgen_ty_7 = 8;
-pub const SEGV_MTESERR: _bindgen_ty_7 = 9;
-pub const SEGV_CPERR: _bindgen_ty_7 = 10;
-pub type _bindgen_ty_7 = ::std::os::raw::c_uint;
-pub const BUS_ADRALN: _bindgen_ty_8 = 1;
-pub const BUS_ADRERR: _bindgen_ty_8 = 2;
-pub const BUS_OBJERR: _bindgen_ty_8 = 3;
-pub const BUS_MCEERR_AR: _bindgen_ty_8 = 4;
-pub const BUS_MCEERR_AO: _bindgen_ty_8 = 5;
-pub type _bindgen_ty_8 = ::std::os::raw::c_uint;
-pub const CLD_EXITED: _bindgen_ty_9 = 1;
-pub const CLD_KILLED: _bindgen_ty_9 = 2;
-pub const CLD_DUMPED: _bindgen_ty_9 = 3;
-pub const CLD_TRAPPED: _bindgen_ty_9 = 4;
-pub const CLD_STOPPED: _bindgen_ty_9 = 5;
-pub const CLD_CONTINUED: _bindgen_ty_9 = 6;
-pub type _bindgen_ty_9 = ::std::os::raw::c_uint;
-pub const POLL_IN: _bindgen_ty_10 = 1;
-pub const POLL_OUT: _bindgen_ty_10 = 2;
-pub const POLL_MSG: _bindgen_ty_10 = 3;
-pub const POLL_ERR: _bindgen_ty_10 = 4;
-pub const POLL_PRI: _bindgen_ty_10 = 5;
-pub const POLL_HUP: _bindgen_ty_10 = 6;
-pub type _bindgen_ty_10 = ::std::os::raw::c_uint;
+pub mod _bindgen_ty_4 {
+    pub type Type = ::std::os::raw::c_int;
+    pub const SI_ASYNCNL: Type = -60;
+    pub const SI_DETHREAD: Type = -7;
+    pub const SI_TKILL: Type = -6;
+    pub const SI_SIGIO: Type = -5;
+    pub const SI_ASYNCIO: Type = -4;
+    pub const SI_MESGQ: Type = -3;
+    pub const SI_TIMER: Type = -2;
+    pub const SI_QUEUE: Type = -1;
+    pub const SI_USER: Type = 0;
+    pub const SI_KERNEL: Type = 128;
+}
+pub mod _bindgen_ty_5 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const ILL_ILLOPC: Type = 1;
+    pub const ILL_ILLOPN: Type = 2;
+    pub const ILL_ILLADR: Type = 3;
+    pub const ILL_ILLTRP: Type = 4;
+    pub const ILL_PRVOPC: Type = 5;
+    pub const ILL_PRVREG: Type = 6;
+    pub const ILL_COPROC: Type = 7;
+    pub const ILL_BADSTK: Type = 8;
+    pub const ILL_BADIADDR: Type = 9;
+}
+pub mod _bindgen_ty_6 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const FPE_INTDIV: Type = 1;
+    pub const FPE_INTOVF: Type = 2;
+    pub const FPE_FLTDIV: Type = 3;
+    pub const FPE_FLTOVF: Type = 4;
+    pub const FPE_FLTUND: Type = 5;
+    pub const FPE_FLTRES: Type = 6;
+    pub const FPE_FLTINV: Type = 7;
+    pub const FPE_FLTSUB: Type = 8;
+    pub const FPE_FLTUNK: Type = 14;
+    pub const FPE_CONDTRAP: Type = 15;
+}
+pub mod _bindgen_ty_7 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SEGV_MAPERR: Type = 1;
+    pub const SEGV_ACCERR: Type = 2;
+    pub const SEGV_BNDERR: Type = 3;
+    pub const SEGV_PKUERR: Type = 4;
+    pub const SEGV_ACCADI: Type = 5;
+    pub const SEGV_ADIDERR: Type = 6;
+    pub const SEGV_ADIPERR: Type = 7;
+    pub const SEGV_MTEAERR: Type = 8;
+    pub const SEGV_MTESERR: Type = 9;
+    pub const SEGV_CPERR: Type = 10;
+}
+pub mod _bindgen_ty_8 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const BUS_ADRALN: Type = 1;
+    pub const BUS_ADRERR: Type = 2;
+    pub const BUS_OBJERR: Type = 3;
+    pub const BUS_MCEERR_AR: Type = 4;
+    pub const BUS_MCEERR_AO: Type = 5;
+}
+pub mod _bindgen_ty_9 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const CLD_EXITED: Type = 1;
+    pub const CLD_KILLED: Type = 2;
+    pub const CLD_DUMPED: Type = 3;
+    pub const CLD_TRAPPED: Type = 4;
+    pub const CLD_STOPPED: Type = 5;
+    pub const CLD_CONTINUED: Type = 6;
+}
+pub mod _bindgen_ty_10 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const POLL_IN: Type = 1;
+    pub const POLL_OUT: Type = 2;
+    pub const POLL_MSG: Type = 3;
+    pub const POLL_ERR: Type = 4;
+    pub const POLL_PRI: Type = 5;
+    pub const POLL_HUP: Type = 6;
+}
 pub type sigval_t = __sigval_t;
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -15970,11 +19467,13 @@ impl Default for sigevent {
     }
 }
 pub type sigevent_t = sigevent;
-pub const SIGEV_SIGNAL: _bindgen_ty_11 = 0;
-pub const SIGEV_NONE: _bindgen_ty_11 = 1;
-pub const SIGEV_THREAD: _bindgen_ty_11 = 2;
-pub const SIGEV_THREAD_ID: _bindgen_ty_11 = 4;
-pub type _bindgen_ty_11 = ::std::os::raw::c_uint;
+pub mod _bindgen_ty_11 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SIGEV_SIGNAL: Type = 0;
+    pub const SIGEV_NONE: Type = 1;
+    pub const SIGEV_THREAD: Type = 2;
+    pub const SIGEV_THREAD_ID: Type = 4;
+}
 pub type __sighandler_t = ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>;
 pub type sig_t = __sighandler_t;
 #[repr(C)]
@@ -16232,9 +19731,11 @@ impl Default for ucontext_t {
         }
     }
 }
-pub const SS_ONSTACK: _bindgen_ty_12 = 1;
-pub const SS_DISABLE: _bindgen_ty_12 = 2;
-pub type _bindgen_ty_12 = ::std::os::raw::c_uint;
+pub mod _bindgen_ty_12 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SS_ONSTACK: Type = 1;
+    pub const SS_DISABLE: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct sigstack {
@@ -16291,44 +19792,52 @@ pub struct Port {
     _unused: [u8; 0],
 }
 pub type pg_stack_base_t = *mut ::std::os::raw::c_char;
-pub const BackendType_B_INVALID: BackendType = 0;
-pub const BackendType_B_ARCHIVER: BackendType = 1;
-pub const BackendType_B_AUTOVAC_LAUNCHER: BackendType = 2;
-pub const BackendType_B_AUTOVAC_WORKER: BackendType = 3;
-pub const BackendType_B_BACKEND: BackendType = 4;
-pub const BackendType_B_BG_WORKER: BackendType = 5;
-pub const BackendType_B_BG_WRITER: BackendType = 6;
-pub const BackendType_B_CHECKPOINTER: BackendType = 7;
-pub const BackendType_B_LOGGER: BackendType = 8;
-pub const BackendType_B_STANDALONE_BACKEND: BackendType = 9;
-pub const BackendType_B_STARTUP: BackendType = 10;
-pub const BackendType_B_WAL_RECEIVER: BackendType = 11;
-pub const BackendType_B_WAL_SENDER: BackendType = 12;
-pub const BackendType_B_WAL_WRITER: BackendType = 13;
-pub type BackendType = ::std::os::raw::c_uint;
-pub const ProcessingMode_BootstrapProcessing: ProcessingMode = 0;
-pub const ProcessingMode_InitProcessing: ProcessingMode = 1;
-pub const ProcessingMode_NormalProcessing: ProcessingMode = 2;
-#[doc = "\t  pmod.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *\n\t\t\tPOSTGRES processing mode definitions.                            *"]
-pub type ProcessingMode = ::std::os::raw::c_uint;
-pub const AuxProcType_NotAnAuxProcess: AuxProcType = -1;
-pub const AuxProcType_StartupProcess: AuxProcType = 0;
-pub const AuxProcType_BgWriterProcess: AuxProcType = 1;
-pub const AuxProcType_ArchiverProcess: AuxProcType = 2;
-pub const AuxProcType_CheckpointerProcess: AuxProcType = 3;
-pub const AuxProcType_WalWriterProcess: AuxProcType = 4;
-pub const AuxProcType_WalReceiverProcess: AuxProcType = 5;
-pub const AuxProcType_NUM_AUXPROCTYPES: AuxProcType = 6;
-pub type AuxProcType = ::std::os::raw::c_int;
+pub mod BackendType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const B_INVALID: Type = 0;
+    pub const B_ARCHIVER: Type = 1;
+    pub const B_AUTOVAC_LAUNCHER: Type = 2;
+    pub const B_AUTOVAC_WORKER: Type = 3;
+    pub const B_BACKEND: Type = 4;
+    pub const B_BG_WORKER: Type = 5;
+    pub const B_BG_WRITER: Type = 6;
+    pub const B_CHECKPOINTER: Type = 7;
+    pub const B_LOGGER: Type = 8;
+    pub const B_STANDALONE_BACKEND: Type = 9;
+    pub const B_STARTUP: Type = 10;
+    pub const B_WAL_RECEIVER: Type = 11;
+    pub const B_WAL_SENDER: Type = 12;
+    pub const B_WAL_WRITER: Type = 13;
+}
+pub mod ProcessingMode {
+    #[doc = "\t  pmod.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *\n\t\t\tPOSTGRES processing mode definitions.                            *"]
+    pub type Type = ::std::os::raw::c_uint;
+    pub const BootstrapProcessing: Type = 0;
+    pub const InitProcessing: Type = 1;
+    pub const NormalProcessing: Type = 2;
+}
+pub mod AuxProcType {
+    pub type Type = ::std::os::raw::c_int;
+    pub const NotAnAuxProcess: Type = -1;
+    pub const StartupProcess: Type = 0;
+    pub const BgWriterProcess: Type = 1;
+    pub const ArchiverProcess: Type = 2;
+    pub const CheckpointerProcess: Type = 3;
+    pub const WalWriterProcess: Type = 4;
+    pub const WalReceiverProcess: Type = 5;
+    pub const NUM_AUXPROCTYPES: Type = 6;
+}
 pub type shmem_request_hook_type = ::std::option::Option<unsafe extern "C" fn()>;
-pub const ProgressCommandType_PROGRESS_COMMAND_INVALID: ProgressCommandType = 0;
-pub const ProgressCommandType_PROGRESS_COMMAND_VACUUM: ProgressCommandType = 1;
-pub const ProgressCommandType_PROGRESS_COMMAND_ANALYZE: ProgressCommandType = 2;
-pub const ProgressCommandType_PROGRESS_COMMAND_CLUSTER: ProgressCommandType = 3;
-pub const ProgressCommandType_PROGRESS_COMMAND_CREATE_INDEX: ProgressCommandType = 4;
-pub const ProgressCommandType_PROGRESS_COMMAND_BASEBACKUP: ProgressCommandType = 5;
-pub const ProgressCommandType_PROGRESS_COMMAND_COPY: ProgressCommandType = 6;
-pub type ProgressCommandType = ::std::os::raw::c_uint;
+pub mod ProgressCommandType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PROGRESS_COMMAND_INVALID: Type = 0;
+    pub const PROGRESS_COMMAND_VACUUM: Type = 1;
+    pub const PROGRESS_COMMAND_ANALYZE: Type = 2;
+    pub const PROGRESS_COMMAND_CLUSTER: Type = 3;
+    pub const PROGRESS_COMMAND_CREATE_INDEX: Type = 4;
+    pub const PROGRESS_COMMAND_BASEBACKUP: Type = 5;
+    pub const PROGRESS_COMMAND_COPY: Type = 6;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct iovec {
@@ -16345,16 +19854,18 @@ impl Default for iovec {
     }
 }
 pub type socklen_t = __socklen_t;
-pub const __socket_type_SOCK_STREAM: __socket_type = 1;
-pub const __socket_type_SOCK_DGRAM: __socket_type = 2;
-pub const __socket_type_SOCK_RAW: __socket_type = 3;
-pub const __socket_type_SOCK_RDM: __socket_type = 4;
-pub const __socket_type_SOCK_SEQPACKET: __socket_type = 5;
-pub const __socket_type_SOCK_DCCP: __socket_type = 6;
-pub const __socket_type_SOCK_PACKET: __socket_type = 10;
-pub const __socket_type_SOCK_CLOEXEC: __socket_type = 524288;
-pub const __socket_type_SOCK_NONBLOCK: __socket_type = 2048;
-pub type __socket_type = ::std::os::raw::c_uint;
+pub mod __socket_type {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SOCK_STREAM: Type = 1;
+    pub const SOCK_DGRAM: Type = 2;
+    pub const SOCK_RAW: Type = 3;
+    pub const SOCK_RDM: Type = 4;
+    pub const SOCK_SEQPACKET: Type = 5;
+    pub const SOCK_DCCP: Type = 6;
+    pub const SOCK_PACKET: Type = 10;
+    pub const SOCK_CLOEXEC: Type = 524288;
+    pub const SOCK_NONBLOCK: Type = 2048;
+}
 pub type sa_family_t = ::std::os::raw::c_ushort;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -16378,28 +19889,30 @@ impl Default for sockaddr_storage {
         }
     }
 }
-pub const MSG_OOB: _bindgen_ty_13 = 1;
-pub const MSG_PEEK: _bindgen_ty_13 = 2;
-pub const MSG_DONTROUTE: _bindgen_ty_13 = 4;
-pub const MSG_CTRUNC: _bindgen_ty_13 = 8;
-pub const MSG_PROXY: _bindgen_ty_13 = 16;
-pub const MSG_TRUNC: _bindgen_ty_13 = 32;
-pub const MSG_DONTWAIT: _bindgen_ty_13 = 64;
-pub const MSG_EOR: _bindgen_ty_13 = 128;
-pub const MSG_WAITALL: _bindgen_ty_13 = 256;
-pub const MSG_FIN: _bindgen_ty_13 = 512;
-pub const MSG_SYN: _bindgen_ty_13 = 1024;
-pub const MSG_CONFIRM: _bindgen_ty_13 = 2048;
-pub const MSG_RST: _bindgen_ty_13 = 4096;
-pub const MSG_ERRQUEUE: _bindgen_ty_13 = 8192;
-pub const MSG_NOSIGNAL: _bindgen_ty_13 = 16384;
-pub const MSG_MORE: _bindgen_ty_13 = 32768;
-pub const MSG_WAITFORONE: _bindgen_ty_13 = 65536;
-pub const MSG_BATCH: _bindgen_ty_13 = 262144;
-pub const MSG_ZEROCOPY: _bindgen_ty_13 = 67108864;
-pub const MSG_FASTOPEN: _bindgen_ty_13 = 536870912;
-pub const MSG_CMSG_CLOEXEC: _bindgen_ty_13 = 1073741824;
-pub type _bindgen_ty_13 = ::std::os::raw::c_uint;
+pub mod _bindgen_ty_13 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const MSG_OOB: Type = 1;
+    pub const MSG_PEEK: Type = 2;
+    pub const MSG_DONTROUTE: Type = 4;
+    pub const MSG_CTRUNC: Type = 8;
+    pub const MSG_PROXY: Type = 16;
+    pub const MSG_TRUNC: Type = 32;
+    pub const MSG_DONTWAIT: Type = 64;
+    pub const MSG_EOR: Type = 128;
+    pub const MSG_WAITALL: Type = 256;
+    pub const MSG_FIN: Type = 512;
+    pub const MSG_SYN: Type = 1024;
+    pub const MSG_CONFIRM: Type = 2048;
+    pub const MSG_RST: Type = 4096;
+    pub const MSG_ERRQUEUE: Type = 8192;
+    pub const MSG_NOSIGNAL: Type = 16384;
+    pub const MSG_MORE: Type = 32768;
+    pub const MSG_WAITFORONE: Type = 65536;
+    pub const MSG_BATCH: Type = 262144;
+    pub const MSG_ZEROCOPY: Type = 67108864;
+    pub const MSG_FASTOPEN: Type = 536870912;
+    pub const MSG_CMSG_CLOEXEC: Type = 1073741824;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct msghdr {
@@ -16428,8 +19941,10 @@ pub struct cmsghdr {
     pub cmsg_type: ::std::os::raw::c_int,
     pub __cmsg_data: __IncompleteArrayField<::std::os::raw::c_uchar>,
 }
-pub const SCM_RIGHTS: _bindgen_ty_14 = 1;
-pub type _bindgen_ty_14 = ::std::os::raw::c_uint;
+pub mod _bindgen_ty_14 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SCM_RIGHTS: Type = 1;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct __kernel_fd_set {
@@ -16485,10 +20000,12 @@ pub struct osockaddr {
     pub sa_family: ::std::os::raw::c_ushort,
     pub sa_data: [::std::os::raw::c_uchar; 14usize],
 }
-pub const SHUT_RD: _bindgen_ty_15 = 0;
-pub const SHUT_WR: _bindgen_ty_15 = 1;
-pub const SHUT_RDWR: _bindgen_ty_15 = 2;
-pub type _bindgen_ty_15 = ::std::os::raw::c_uint;
+pub mod _bindgen_ty_15 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SHUT_RD: Type = 0;
+    pub const SHUT_WR: Type = 1;
+    pub const SHUT_RDWR: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct sockaddr_un {
@@ -16532,72 +20049,78 @@ pub struct in_pktinfo {
     pub ipi_spec_dst: in_addr,
     pub ipi_addr: in_addr,
 }
-pub const IPPROTO_IP: _bindgen_ty_16 = 0;
-pub const IPPROTO_ICMP: _bindgen_ty_16 = 1;
-pub const IPPROTO_IGMP: _bindgen_ty_16 = 2;
-pub const IPPROTO_IPIP: _bindgen_ty_16 = 4;
-pub const IPPROTO_TCP: _bindgen_ty_16 = 6;
-pub const IPPROTO_EGP: _bindgen_ty_16 = 8;
-pub const IPPROTO_PUP: _bindgen_ty_16 = 12;
-pub const IPPROTO_UDP: _bindgen_ty_16 = 17;
-pub const IPPROTO_IDP: _bindgen_ty_16 = 22;
-pub const IPPROTO_TP: _bindgen_ty_16 = 29;
-pub const IPPROTO_DCCP: _bindgen_ty_16 = 33;
-pub const IPPROTO_IPV6: _bindgen_ty_16 = 41;
-pub const IPPROTO_RSVP: _bindgen_ty_16 = 46;
-pub const IPPROTO_GRE: _bindgen_ty_16 = 47;
-pub const IPPROTO_ESP: _bindgen_ty_16 = 50;
-pub const IPPROTO_AH: _bindgen_ty_16 = 51;
-pub const IPPROTO_MTP: _bindgen_ty_16 = 92;
-pub const IPPROTO_BEETPH: _bindgen_ty_16 = 94;
-pub const IPPROTO_ENCAP: _bindgen_ty_16 = 98;
-pub const IPPROTO_PIM: _bindgen_ty_16 = 103;
-pub const IPPROTO_COMP: _bindgen_ty_16 = 108;
-pub const IPPROTO_L2TP: _bindgen_ty_16 = 115;
-pub const IPPROTO_SCTP: _bindgen_ty_16 = 132;
-pub const IPPROTO_UDPLITE: _bindgen_ty_16 = 136;
-pub const IPPROTO_MPLS: _bindgen_ty_16 = 137;
-pub const IPPROTO_ETHERNET: _bindgen_ty_16 = 143;
-pub const IPPROTO_RAW: _bindgen_ty_16 = 255;
-pub const IPPROTO_MPTCP: _bindgen_ty_16 = 262;
-pub const IPPROTO_MAX: _bindgen_ty_16 = 263;
-pub type _bindgen_ty_16 = ::std::os::raw::c_uint;
-pub const IPPROTO_HOPOPTS: _bindgen_ty_17 = 0;
-pub const IPPROTO_ROUTING: _bindgen_ty_17 = 43;
-pub const IPPROTO_FRAGMENT: _bindgen_ty_17 = 44;
-pub const IPPROTO_ICMPV6: _bindgen_ty_17 = 58;
-pub const IPPROTO_NONE: _bindgen_ty_17 = 59;
-pub const IPPROTO_DSTOPTS: _bindgen_ty_17 = 60;
-pub const IPPROTO_MH: _bindgen_ty_17 = 135;
-pub type _bindgen_ty_17 = ::std::os::raw::c_uint;
+pub mod _bindgen_ty_16 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const IPPROTO_IP: Type = 0;
+    pub const IPPROTO_ICMP: Type = 1;
+    pub const IPPROTO_IGMP: Type = 2;
+    pub const IPPROTO_IPIP: Type = 4;
+    pub const IPPROTO_TCP: Type = 6;
+    pub const IPPROTO_EGP: Type = 8;
+    pub const IPPROTO_PUP: Type = 12;
+    pub const IPPROTO_UDP: Type = 17;
+    pub const IPPROTO_IDP: Type = 22;
+    pub const IPPROTO_TP: Type = 29;
+    pub const IPPROTO_DCCP: Type = 33;
+    pub const IPPROTO_IPV6: Type = 41;
+    pub const IPPROTO_RSVP: Type = 46;
+    pub const IPPROTO_GRE: Type = 47;
+    pub const IPPROTO_ESP: Type = 50;
+    pub const IPPROTO_AH: Type = 51;
+    pub const IPPROTO_MTP: Type = 92;
+    pub const IPPROTO_BEETPH: Type = 94;
+    pub const IPPROTO_ENCAP: Type = 98;
+    pub const IPPROTO_PIM: Type = 103;
+    pub const IPPROTO_COMP: Type = 108;
+    pub const IPPROTO_L2TP: Type = 115;
+    pub const IPPROTO_SCTP: Type = 132;
+    pub const IPPROTO_UDPLITE: Type = 136;
+    pub const IPPROTO_MPLS: Type = 137;
+    pub const IPPROTO_ETHERNET: Type = 143;
+    pub const IPPROTO_RAW: Type = 255;
+    pub const IPPROTO_MPTCP: Type = 262;
+    pub const IPPROTO_MAX: Type = 263;
+}
+pub mod _bindgen_ty_17 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const IPPROTO_HOPOPTS: Type = 0;
+    pub const IPPROTO_ROUTING: Type = 43;
+    pub const IPPROTO_FRAGMENT: Type = 44;
+    pub const IPPROTO_ICMPV6: Type = 58;
+    pub const IPPROTO_NONE: Type = 59;
+    pub const IPPROTO_DSTOPTS: Type = 60;
+    pub const IPPROTO_MH: Type = 135;
+}
 pub type in_port_t = u16;
-pub const IPPORT_ECHO: _bindgen_ty_18 = 7;
-pub const IPPORT_DISCARD: _bindgen_ty_18 = 9;
-pub const IPPORT_SYSTAT: _bindgen_ty_18 = 11;
-pub const IPPORT_DAYTIME: _bindgen_ty_18 = 13;
-pub const IPPORT_NETSTAT: _bindgen_ty_18 = 15;
-pub const IPPORT_FTP: _bindgen_ty_18 = 21;
-pub const IPPORT_TELNET: _bindgen_ty_18 = 23;
-pub const IPPORT_SMTP: _bindgen_ty_18 = 25;
-pub const IPPORT_TIMESERVER: _bindgen_ty_18 = 37;
-pub const IPPORT_NAMESERVER: _bindgen_ty_18 = 42;
-pub const IPPORT_WHOIS: _bindgen_ty_18 = 43;
-pub const IPPORT_MTP: _bindgen_ty_18 = 57;
-pub const IPPORT_TFTP: _bindgen_ty_18 = 69;
-pub const IPPORT_RJE: _bindgen_ty_18 = 77;
-pub const IPPORT_FINGER: _bindgen_ty_18 = 79;
-pub const IPPORT_TTYLINK: _bindgen_ty_18 = 87;
-pub const IPPORT_SUPDUP: _bindgen_ty_18 = 95;
-pub const IPPORT_EXECSERVER: _bindgen_ty_18 = 512;
-pub const IPPORT_LOGINSERVER: _bindgen_ty_18 = 513;
-pub const IPPORT_CMDSERVER: _bindgen_ty_18 = 514;
-pub const IPPORT_EFSSERVER: _bindgen_ty_18 = 520;
-pub const IPPORT_BIFFUDP: _bindgen_ty_18 = 512;
-pub const IPPORT_WHOSERVER: _bindgen_ty_18 = 513;
-pub const IPPORT_ROUTESERVER: _bindgen_ty_18 = 520;
-pub const IPPORT_RESERVED: _bindgen_ty_18 = 1024;
-pub const IPPORT_USERRESERVED: _bindgen_ty_18 = 5000;
-pub type _bindgen_ty_18 = ::std::os::raw::c_uint;
+pub mod _bindgen_ty_18 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const IPPORT_ECHO: Type = 7;
+    pub const IPPORT_DISCARD: Type = 9;
+    pub const IPPORT_SYSTAT: Type = 11;
+    pub const IPPORT_DAYTIME: Type = 13;
+    pub const IPPORT_NETSTAT: Type = 15;
+    pub const IPPORT_FTP: Type = 21;
+    pub const IPPORT_TELNET: Type = 23;
+    pub const IPPORT_SMTP: Type = 25;
+    pub const IPPORT_TIMESERVER: Type = 37;
+    pub const IPPORT_NAMESERVER: Type = 42;
+    pub const IPPORT_WHOIS: Type = 43;
+    pub const IPPORT_MTP: Type = 57;
+    pub const IPPORT_TFTP: Type = 69;
+    pub const IPPORT_RJE: Type = 77;
+    pub const IPPORT_FINGER: Type = 79;
+    pub const IPPORT_TTYLINK: Type = 87;
+    pub const IPPORT_SUPDUP: Type = 95;
+    pub const IPPORT_EXECSERVER: Type = 512;
+    pub const IPPORT_LOGINSERVER: Type = 513;
+    pub const IPPORT_CMDSERVER: Type = 514;
+    pub const IPPORT_EFSSERVER: Type = 520;
+    pub const IPPORT_BIFFUDP: Type = 512;
+    pub const IPPORT_WHOSERVER: Type = 513;
+    pub const IPPORT_ROUTESERVER: Type = 520;
+    pub const IPPORT_RESERVED: Type = 1024;
+    pub const IPPORT_USERRESERVED: Type = 5000;
+}
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct in6_addr {
@@ -16894,14 +20417,16 @@ pub struct CancelRequestPacket {
     pub cancelAuthCode: uint32,
 }
 pub type BackendId = ::std::os::raw::c_int;
-pub const BackendState_STATE_UNDEFINED: BackendState = 0;
-pub const BackendState_STATE_IDLE: BackendState = 1;
-pub const BackendState_STATE_RUNNING: BackendState = 2;
-pub const BackendState_STATE_IDLEINTRANSACTION: BackendState = 3;
-pub const BackendState_STATE_FASTPATH: BackendState = 4;
-pub const BackendState_STATE_IDLEINTRANSACTION_ABORTED: BackendState = 5;
-pub const BackendState_STATE_DISABLED: BackendState = 6;
-pub type BackendState = ::std::os::raw::c_uint;
+pub mod BackendState {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const STATE_UNDEFINED: Type = 0;
+    pub const STATE_IDLE: Type = 1;
+    pub const STATE_RUNNING: Type = 2;
+    pub const STATE_IDLEINTRANSACTION: Type = 3;
+    pub const STATE_FASTPATH: Type = 4;
+    pub const STATE_IDLEINTRANSACTION_ABORTED: Type = 5;
+    pub const STATE_DISABLED: Type = 6;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PgBackendSSLStatus {
@@ -16943,7 +20468,7 @@ impl Default for PgBackendGSSStatus {
 pub struct PgBackendStatus {
     pub st_changecount: ::std::os::raw::c_int,
     pub st_procpid: ::std::os::raw::c_int,
-    pub st_backendType: BackendType,
+    pub st_backendType: BackendType::Type,
     pub st_proc_start_timestamp: TimestampTz,
     pub st_xact_start_timestamp: TimestampTz,
     pub st_activity_start_timestamp: TimestampTz,
@@ -16956,10 +20481,10 @@ pub struct PgBackendStatus {
     pub st_sslstatus: *mut PgBackendSSLStatus,
     pub st_gss: bool,
     pub st_gssstatus: *mut PgBackendGSSStatus,
-    pub st_state: BackendState,
+    pub st_state: BackendState::Type,
     pub st_appname: *mut ::std::os::raw::c_char,
     pub st_activity_raw: *mut ::std::os::raw::c_char,
-    pub st_progress_command: ProgressCommandType,
+    pub st_progress_command: ProgressCommandType::Type,
     pub st_progress_command_target: Oid,
     pub st_progress_param: [int64; 20usize],
     pub st_query_id: uint64,
@@ -16992,196 +20517,213 @@ impl Default for LocalPgBackendStatus {
         }
     }
 }
-pub const WaitEventActivity_WAIT_EVENT_ARCHIVER_MAIN: WaitEventActivity = 83886080;
-pub const WaitEventActivity_WAIT_EVENT_AUTOVACUUM_MAIN: WaitEventActivity = 83886081;
-pub const WaitEventActivity_WAIT_EVENT_BGWRITER_HIBERNATE: WaitEventActivity = 83886082;
-pub const WaitEventActivity_WAIT_EVENT_BGWRITER_MAIN: WaitEventActivity = 83886083;
-pub const WaitEventActivity_WAIT_EVENT_CHECKPOINTER_MAIN: WaitEventActivity = 83886084;
-pub const WaitEventActivity_WAIT_EVENT_LOGICAL_APPLY_MAIN: WaitEventActivity = 83886085;
-pub const WaitEventActivity_WAIT_EVENT_LOGICAL_LAUNCHER_MAIN: WaitEventActivity = 83886086;
-pub const WaitEventActivity_WAIT_EVENT_LOGICAL_PARALLEL_APPLY_MAIN: WaitEventActivity = 83886087;
-pub const WaitEventActivity_WAIT_EVENT_RECOVERY_WAL_STREAM: WaitEventActivity = 83886088;
-pub const WaitEventActivity_WAIT_EVENT_SYSLOGGER_MAIN: WaitEventActivity = 83886089;
-pub const WaitEventActivity_WAIT_EVENT_WAL_RECEIVER_MAIN: WaitEventActivity = 83886090;
-pub const WaitEventActivity_WAIT_EVENT_WAL_SENDER_MAIN: WaitEventActivity = 83886091;
-pub const WaitEventActivity_WAIT_EVENT_WAL_WRITER_MAIN: WaitEventActivity = 83886092;
-pub type WaitEventActivity = ::std::os::raw::c_uint;
-pub const WaitEventClient_WAIT_EVENT_CLIENT_READ: WaitEventClient = 100663296;
-pub const WaitEventClient_WAIT_EVENT_CLIENT_WRITE: WaitEventClient = 100663297;
-pub const WaitEventClient_WAIT_EVENT_GSS_OPEN_SERVER: WaitEventClient = 100663298;
-pub const WaitEventClient_WAIT_EVENT_LIBPQWALRECEIVER_CONNECT: WaitEventClient = 100663299;
-pub const WaitEventClient_WAIT_EVENT_LIBPQWALRECEIVER_RECEIVE: WaitEventClient = 100663300;
-pub const WaitEventClient_WAIT_EVENT_SSL_OPEN_SERVER: WaitEventClient = 100663301;
-pub const WaitEventClient_WAIT_EVENT_WAL_SENDER_WAIT_WAL: WaitEventClient = 100663302;
-pub const WaitEventClient_WAIT_EVENT_WAL_SENDER_WRITE_DATA: WaitEventClient = 100663303;
-pub type WaitEventClient = ::std::os::raw::c_uint;
-pub const WaitEventIPC_WAIT_EVENT_APPEND_READY: WaitEventIPC = 134217728;
-pub const WaitEventIPC_WAIT_EVENT_ARCHIVE_CLEANUP_COMMAND: WaitEventIPC = 134217729;
-pub const WaitEventIPC_WAIT_EVENT_ARCHIVE_COMMAND: WaitEventIPC = 134217730;
-pub const WaitEventIPC_WAIT_EVENT_BACKEND_TERMINATION: WaitEventIPC = 134217731;
-pub const WaitEventIPC_WAIT_EVENT_BACKUP_WAIT_WAL_ARCHIVE: WaitEventIPC = 134217732;
-pub const WaitEventIPC_WAIT_EVENT_BGWORKER_SHUTDOWN: WaitEventIPC = 134217733;
-pub const WaitEventIPC_WAIT_EVENT_BGWORKER_STARTUP: WaitEventIPC = 134217734;
-pub const WaitEventIPC_WAIT_EVENT_BTREE_PAGE: WaitEventIPC = 134217735;
-pub const WaitEventIPC_WAIT_EVENT_BUFFER_IO: WaitEventIPC = 134217736;
-pub const WaitEventIPC_WAIT_EVENT_CHECKPOINT_DONE: WaitEventIPC = 134217737;
-pub const WaitEventIPC_WAIT_EVENT_CHECKPOINT_START: WaitEventIPC = 134217738;
-pub const WaitEventIPC_WAIT_EVENT_EXECUTE_GATHER: WaitEventIPC = 134217739;
-pub const WaitEventIPC_WAIT_EVENT_HASH_BATCH_ALLOCATE: WaitEventIPC = 134217740;
-pub const WaitEventIPC_WAIT_EVENT_HASH_BATCH_ELECT: WaitEventIPC = 134217741;
-pub const WaitEventIPC_WAIT_EVENT_HASH_BATCH_LOAD: WaitEventIPC = 134217742;
-pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_ALLOCATE: WaitEventIPC = 134217743;
-pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_ELECT: WaitEventIPC = 134217744;
-pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_HASH_INNER: WaitEventIPC = 134217745;
-pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_HASH_OUTER: WaitEventIPC = 134217746;
-pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_DECIDE: WaitEventIPC = 134217747;
-pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_ELECT: WaitEventIPC = 134217748;
-pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_FINISH: WaitEventIPC = 134217749;
-pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_REALLOCATE: WaitEventIPC = 134217750;
-pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_REPARTITION: WaitEventIPC = 134217751;
-pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BUCKETS_ELECT: WaitEventIPC = 134217752;
-pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BUCKETS_REALLOCATE: WaitEventIPC = 134217753;
-pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BUCKETS_REINSERT: WaitEventIPC = 134217754;
-pub const WaitEventIPC_WAIT_EVENT_LOGICAL_APPLY_SEND_DATA: WaitEventIPC = 134217755;
-pub const WaitEventIPC_WAIT_EVENT_LOGICAL_PARALLEL_APPLY_STATE_CHANGE: WaitEventIPC = 134217756;
-pub const WaitEventIPC_WAIT_EVENT_LOGICAL_SYNC_DATA: WaitEventIPC = 134217757;
-pub const WaitEventIPC_WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE: WaitEventIPC = 134217758;
-pub const WaitEventIPC_WAIT_EVENT_MQ_INTERNAL: WaitEventIPC = 134217759;
-pub const WaitEventIPC_WAIT_EVENT_MQ_PUT_MESSAGE: WaitEventIPC = 134217760;
-pub const WaitEventIPC_WAIT_EVENT_MQ_RECEIVE: WaitEventIPC = 134217761;
-pub const WaitEventIPC_WAIT_EVENT_MQ_SEND: WaitEventIPC = 134217762;
-pub const WaitEventIPC_WAIT_EVENT_PARALLEL_BITMAP_SCAN: WaitEventIPC = 134217763;
-pub const WaitEventIPC_WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN: WaitEventIPC = 134217764;
-pub const WaitEventIPC_WAIT_EVENT_PARALLEL_FINISH: WaitEventIPC = 134217765;
-pub const WaitEventIPC_WAIT_EVENT_PROCARRAY_GROUP_UPDATE: WaitEventIPC = 134217766;
-pub const WaitEventIPC_WAIT_EVENT_PROC_SIGNAL_BARRIER: WaitEventIPC = 134217767;
-pub const WaitEventIPC_WAIT_EVENT_PROMOTE: WaitEventIPC = 134217768;
-pub const WaitEventIPC_WAIT_EVENT_RECOVERY_CONFLICT_SNAPSHOT: WaitEventIPC = 134217769;
-pub const WaitEventIPC_WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE: WaitEventIPC = 134217770;
-pub const WaitEventIPC_WAIT_EVENT_RECOVERY_END_COMMAND: WaitEventIPC = 134217771;
-pub const WaitEventIPC_WAIT_EVENT_RECOVERY_PAUSE: WaitEventIPC = 134217772;
-pub const WaitEventIPC_WAIT_EVENT_REPLICATION_ORIGIN_DROP: WaitEventIPC = 134217773;
-pub const WaitEventIPC_WAIT_EVENT_REPLICATION_SLOT_DROP: WaitEventIPC = 134217774;
-pub const WaitEventIPC_WAIT_EVENT_RESTORE_COMMAND: WaitEventIPC = 134217775;
-pub const WaitEventIPC_WAIT_EVENT_SAFE_SNAPSHOT: WaitEventIPC = 134217776;
-pub const WaitEventIPC_WAIT_EVENT_SYNC_REP: WaitEventIPC = 134217777;
-pub const WaitEventIPC_WAIT_EVENT_WAL_RECEIVER_EXIT: WaitEventIPC = 134217778;
-pub const WaitEventIPC_WAIT_EVENT_WAL_RECEIVER_WAIT_START: WaitEventIPC = 134217779;
-pub const WaitEventIPC_WAIT_EVENT_XACT_GROUP_UPDATE: WaitEventIPC = 134217780;
-pub type WaitEventIPC = ::std::os::raw::c_uint;
-pub const WaitEventTimeout_WAIT_EVENT_BASE_BACKUP_THROTTLE: WaitEventTimeout = 150994944;
-pub const WaitEventTimeout_WAIT_EVENT_CHECKPOINT_WRITE_DELAY: WaitEventTimeout = 150994945;
-pub const WaitEventTimeout_WAIT_EVENT_PG_SLEEP: WaitEventTimeout = 150994946;
-pub const WaitEventTimeout_WAIT_EVENT_RECOVERY_APPLY_DELAY: WaitEventTimeout = 150994947;
-pub const WaitEventTimeout_WAIT_EVENT_RECOVERY_RETRIEVE_RETRY_INTERVAL: WaitEventTimeout =
-    150994948;
-pub const WaitEventTimeout_WAIT_EVENT_REGISTER_SYNC_REQUEST: WaitEventTimeout = 150994949;
-pub const WaitEventTimeout_WAIT_EVENT_SPIN_DELAY: WaitEventTimeout = 150994950;
-pub const WaitEventTimeout_WAIT_EVENT_VACUUM_DELAY: WaitEventTimeout = 150994951;
-pub const WaitEventTimeout_WAIT_EVENT_VACUUM_TRUNCATE: WaitEventTimeout = 150994952;
-pub type WaitEventTimeout = ::std::os::raw::c_uint;
-pub const WaitEventIO_WAIT_EVENT_BASEBACKUP_READ: WaitEventIO = 167772160;
-pub const WaitEventIO_WAIT_EVENT_BASEBACKUP_SYNC: WaitEventIO = 167772161;
-pub const WaitEventIO_WAIT_EVENT_BASEBACKUP_WRITE: WaitEventIO = 167772162;
-pub const WaitEventIO_WAIT_EVENT_BUFFILE_READ: WaitEventIO = 167772163;
-pub const WaitEventIO_WAIT_EVENT_BUFFILE_WRITE: WaitEventIO = 167772164;
-pub const WaitEventIO_WAIT_EVENT_BUFFILE_TRUNCATE: WaitEventIO = 167772165;
-pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_READ: WaitEventIO = 167772166;
-pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_SYNC: WaitEventIO = 167772167;
-pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_SYNC_UPDATE: WaitEventIO = 167772168;
-pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_WRITE: WaitEventIO = 167772169;
-pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_WRITE_UPDATE: WaitEventIO = 167772170;
-pub const WaitEventIO_WAIT_EVENT_COPY_FILE_READ: WaitEventIO = 167772171;
-pub const WaitEventIO_WAIT_EVENT_COPY_FILE_WRITE: WaitEventIO = 167772172;
-pub const WaitEventIO_WAIT_EVENT_DATA_FILE_EXTEND: WaitEventIO = 167772173;
-pub const WaitEventIO_WAIT_EVENT_DATA_FILE_FLUSH: WaitEventIO = 167772174;
-pub const WaitEventIO_WAIT_EVENT_DATA_FILE_IMMEDIATE_SYNC: WaitEventIO = 167772175;
-pub const WaitEventIO_WAIT_EVENT_DATA_FILE_PREFETCH: WaitEventIO = 167772176;
-pub const WaitEventIO_WAIT_EVENT_DATA_FILE_READ: WaitEventIO = 167772177;
-pub const WaitEventIO_WAIT_EVENT_DATA_FILE_SYNC: WaitEventIO = 167772178;
-pub const WaitEventIO_WAIT_EVENT_DATA_FILE_TRUNCATE: WaitEventIO = 167772179;
-pub const WaitEventIO_WAIT_EVENT_DATA_FILE_WRITE: WaitEventIO = 167772180;
-pub const WaitEventIO_WAIT_EVENT_DSM_ALLOCATE: WaitEventIO = 167772181;
-pub const WaitEventIO_WAIT_EVENT_DSM_FILL_ZERO_WRITE: WaitEventIO = 167772182;
-pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_ADDTODATADIR_READ: WaitEventIO = 167772183;
-pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_ADDTODATADIR_SYNC: WaitEventIO = 167772184;
-pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_ADDTODATADIR_WRITE: WaitEventIO = 167772185;
-pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_CREATE_READ: WaitEventIO = 167772186;
-pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_CREATE_SYNC: WaitEventIO = 167772187;
-pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_CREATE_WRITE: WaitEventIO = 167772188;
-pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_RECHECKDATADIR_READ: WaitEventIO = 167772189;
-pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_CHECKPOINT_SYNC: WaitEventIO = 167772190;
-pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_MAPPING_SYNC: WaitEventIO = 167772191;
-pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_MAPPING_WRITE: WaitEventIO = 167772192;
-pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_SYNC: WaitEventIO = 167772193;
-pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_TRUNCATE: WaitEventIO = 167772194;
-pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_WRITE: WaitEventIO = 167772195;
-pub const WaitEventIO_WAIT_EVENT_RELATION_MAP_READ: WaitEventIO = 167772196;
-pub const WaitEventIO_WAIT_EVENT_RELATION_MAP_REPLACE: WaitEventIO = 167772197;
-pub const WaitEventIO_WAIT_EVENT_RELATION_MAP_WRITE: WaitEventIO = 167772198;
-pub const WaitEventIO_WAIT_EVENT_REORDER_BUFFER_READ: WaitEventIO = 167772199;
-pub const WaitEventIO_WAIT_EVENT_REORDER_BUFFER_WRITE: WaitEventIO = 167772200;
-pub const WaitEventIO_WAIT_EVENT_REORDER_LOGICAL_MAPPING_READ: WaitEventIO = 167772201;
-pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_READ: WaitEventIO = 167772202;
-pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_RESTORE_SYNC: WaitEventIO = 167772203;
-pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_SYNC: WaitEventIO = 167772204;
-pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_WRITE: WaitEventIO = 167772205;
-pub const WaitEventIO_WAIT_EVENT_SLRU_FLUSH_SYNC: WaitEventIO = 167772206;
-pub const WaitEventIO_WAIT_EVENT_SLRU_READ: WaitEventIO = 167772207;
-pub const WaitEventIO_WAIT_EVENT_SLRU_SYNC: WaitEventIO = 167772208;
-pub const WaitEventIO_WAIT_EVENT_SLRU_WRITE: WaitEventIO = 167772209;
-pub const WaitEventIO_WAIT_EVENT_SNAPBUILD_READ: WaitEventIO = 167772210;
-pub const WaitEventIO_WAIT_EVENT_SNAPBUILD_SYNC: WaitEventIO = 167772211;
-pub const WaitEventIO_WAIT_EVENT_SNAPBUILD_WRITE: WaitEventIO = 167772212;
-pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_FILE_SYNC: WaitEventIO = 167772213;
-pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_FILE_WRITE: WaitEventIO = 167772214;
-pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_READ: WaitEventIO = 167772215;
-pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_SYNC: WaitEventIO = 167772216;
-pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_WRITE: WaitEventIO = 167772217;
-pub const WaitEventIO_WAIT_EVENT_TWOPHASE_FILE_READ: WaitEventIO = 167772218;
-pub const WaitEventIO_WAIT_EVENT_TWOPHASE_FILE_SYNC: WaitEventIO = 167772219;
-pub const WaitEventIO_WAIT_EVENT_TWOPHASE_FILE_WRITE: WaitEventIO = 167772220;
-pub const WaitEventIO_WAIT_EVENT_VERSION_FILE_WRITE: WaitEventIO = 167772221;
-pub const WaitEventIO_WAIT_EVENT_WALSENDER_TIMELINE_HISTORY_READ: WaitEventIO = 167772222;
-pub const WaitEventIO_WAIT_EVENT_WAL_BOOTSTRAP_SYNC: WaitEventIO = 167772223;
-pub const WaitEventIO_WAIT_EVENT_WAL_BOOTSTRAP_WRITE: WaitEventIO = 167772224;
-pub const WaitEventIO_WAIT_EVENT_WAL_COPY_READ: WaitEventIO = 167772225;
-pub const WaitEventIO_WAIT_EVENT_WAL_COPY_SYNC: WaitEventIO = 167772226;
-pub const WaitEventIO_WAIT_EVENT_WAL_COPY_WRITE: WaitEventIO = 167772227;
-pub const WaitEventIO_WAIT_EVENT_WAL_INIT_SYNC: WaitEventIO = 167772228;
-pub const WaitEventIO_WAIT_EVENT_WAL_INIT_WRITE: WaitEventIO = 167772229;
-pub const WaitEventIO_WAIT_EVENT_WAL_READ: WaitEventIO = 167772230;
-pub const WaitEventIO_WAIT_EVENT_WAL_SYNC: WaitEventIO = 167772231;
-pub const WaitEventIO_WAIT_EVENT_WAL_SYNC_METHOD_ASSIGN: WaitEventIO = 167772232;
-pub const WaitEventIO_WAIT_EVENT_WAL_WRITE: WaitEventIO = 167772233;
-pub type WaitEventIO = ::std::os::raw::c_uint;
-pub const PgStat_Kind_PGSTAT_KIND_INVALID: PgStat_Kind = 0;
-pub const PgStat_Kind_PGSTAT_KIND_DATABASE: PgStat_Kind = 1;
-pub const PgStat_Kind_PGSTAT_KIND_RELATION: PgStat_Kind = 2;
-pub const PgStat_Kind_PGSTAT_KIND_FUNCTION: PgStat_Kind = 3;
-pub const PgStat_Kind_PGSTAT_KIND_REPLSLOT: PgStat_Kind = 4;
-pub const PgStat_Kind_PGSTAT_KIND_SUBSCRIPTION: PgStat_Kind = 5;
-pub const PgStat_Kind_PGSTAT_KIND_ARCHIVER: PgStat_Kind = 6;
-pub const PgStat_Kind_PGSTAT_KIND_BGWRITER: PgStat_Kind = 7;
-pub const PgStat_Kind_PGSTAT_KIND_CHECKPOINTER: PgStat_Kind = 8;
-pub const PgStat_Kind_PGSTAT_KIND_IO: PgStat_Kind = 9;
-pub const PgStat_Kind_PGSTAT_KIND_SLRU: PgStat_Kind = 10;
-pub const PgStat_Kind_PGSTAT_KIND_WAL: PgStat_Kind = 11;
-pub type PgStat_Kind = ::std::os::raw::c_uint;
-pub const TrackFunctionsLevel_TRACK_FUNC_OFF: TrackFunctionsLevel = 0;
-pub const TrackFunctionsLevel_TRACK_FUNC_PL: TrackFunctionsLevel = 1;
-pub const TrackFunctionsLevel_TRACK_FUNC_ALL: TrackFunctionsLevel = 2;
-pub type TrackFunctionsLevel = ::std::os::raw::c_uint;
-pub const PgStat_FetchConsistency_PGSTAT_FETCH_CONSISTENCY_NONE: PgStat_FetchConsistency = 0;
-pub const PgStat_FetchConsistency_PGSTAT_FETCH_CONSISTENCY_CACHE: PgStat_FetchConsistency = 1;
-pub const PgStat_FetchConsistency_PGSTAT_FETCH_CONSISTENCY_SNAPSHOT: PgStat_FetchConsistency = 2;
-pub type PgStat_FetchConsistency = ::std::os::raw::c_uint;
-pub const SessionEndType_DISCONNECT_NOT_YET: SessionEndType = 0;
-pub const SessionEndType_DISCONNECT_NORMAL: SessionEndType = 1;
-pub const SessionEndType_DISCONNECT_CLIENT_EOF: SessionEndType = 2;
-pub const SessionEndType_DISCONNECT_FATAL: SessionEndType = 3;
-pub const SessionEndType_DISCONNECT_KILLED: SessionEndType = 4;
-pub type SessionEndType = ::std::os::raw::c_uint;
+pub mod WaitEventActivity {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const WAIT_EVENT_ARCHIVER_MAIN: Type = 83886080;
+    pub const WAIT_EVENT_AUTOVACUUM_MAIN: Type = 83886081;
+    pub const WAIT_EVENT_BGWRITER_HIBERNATE: Type = 83886082;
+    pub const WAIT_EVENT_BGWRITER_MAIN: Type = 83886083;
+    pub const WAIT_EVENT_CHECKPOINTER_MAIN: Type = 83886084;
+    pub const WAIT_EVENT_LOGICAL_APPLY_MAIN: Type = 83886085;
+    pub const WAIT_EVENT_LOGICAL_LAUNCHER_MAIN: Type = 83886086;
+    pub const WAIT_EVENT_LOGICAL_PARALLEL_APPLY_MAIN: Type = 83886087;
+    pub const WAIT_EVENT_RECOVERY_WAL_STREAM: Type = 83886088;
+    pub const WAIT_EVENT_SYSLOGGER_MAIN: Type = 83886089;
+    pub const WAIT_EVENT_WAL_RECEIVER_MAIN: Type = 83886090;
+    pub const WAIT_EVENT_WAL_SENDER_MAIN: Type = 83886091;
+    pub const WAIT_EVENT_WAL_WRITER_MAIN: Type = 83886092;
+}
+pub mod WaitEventClient {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const WAIT_EVENT_CLIENT_READ: Type = 100663296;
+    pub const WAIT_EVENT_CLIENT_WRITE: Type = 100663297;
+    pub const WAIT_EVENT_GSS_OPEN_SERVER: Type = 100663298;
+    pub const WAIT_EVENT_LIBPQWALRECEIVER_CONNECT: Type = 100663299;
+    pub const WAIT_EVENT_LIBPQWALRECEIVER_RECEIVE: Type = 100663300;
+    pub const WAIT_EVENT_SSL_OPEN_SERVER: Type = 100663301;
+    pub const WAIT_EVENT_WAL_SENDER_WAIT_WAL: Type = 100663302;
+    pub const WAIT_EVENT_WAL_SENDER_WRITE_DATA: Type = 100663303;
+}
+pub mod WaitEventIPC {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const WAIT_EVENT_APPEND_READY: Type = 134217728;
+    pub const WAIT_EVENT_ARCHIVE_CLEANUP_COMMAND: Type = 134217729;
+    pub const WAIT_EVENT_ARCHIVE_COMMAND: Type = 134217730;
+    pub const WAIT_EVENT_BACKEND_TERMINATION: Type = 134217731;
+    pub const WAIT_EVENT_BACKUP_WAIT_WAL_ARCHIVE: Type = 134217732;
+    pub const WAIT_EVENT_BGWORKER_SHUTDOWN: Type = 134217733;
+    pub const WAIT_EVENT_BGWORKER_STARTUP: Type = 134217734;
+    pub const WAIT_EVENT_BTREE_PAGE: Type = 134217735;
+    pub const WAIT_EVENT_BUFFER_IO: Type = 134217736;
+    pub const WAIT_EVENT_CHECKPOINT_DONE: Type = 134217737;
+    pub const WAIT_EVENT_CHECKPOINT_START: Type = 134217738;
+    pub const WAIT_EVENT_EXECUTE_GATHER: Type = 134217739;
+    pub const WAIT_EVENT_HASH_BATCH_ALLOCATE: Type = 134217740;
+    pub const WAIT_EVENT_HASH_BATCH_ELECT: Type = 134217741;
+    pub const WAIT_EVENT_HASH_BATCH_LOAD: Type = 134217742;
+    pub const WAIT_EVENT_HASH_BUILD_ALLOCATE: Type = 134217743;
+    pub const WAIT_EVENT_HASH_BUILD_ELECT: Type = 134217744;
+    pub const WAIT_EVENT_HASH_BUILD_HASH_INNER: Type = 134217745;
+    pub const WAIT_EVENT_HASH_BUILD_HASH_OUTER: Type = 134217746;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_DECIDE: Type = 134217747;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_ELECT: Type = 134217748;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_FINISH: Type = 134217749;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_REALLOCATE: Type = 134217750;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_REPARTITION: Type = 134217751;
+    pub const WAIT_EVENT_HASH_GROW_BUCKETS_ELECT: Type = 134217752;
+    pub const WAIT_EVENT_HASH_GROW_BUCKETS_REALLOCATE: Type = 134217753;
+    pub const WAIT_EVENT_HASH_GROW_BUCKETS_REINSERT: Type = 134217754;
+    pub const WAIT_EVENT_LOGICAL_APPLY_SEND_DATA: Type = 134217755;
+    pub const WAIT_EVENT_LOGICAL_PARALLEL_APPLY_STATE_CHANGE: Type = 134217756;
+    pub const WAIT_EVENT_LOGICAL_SYNC_DATA: Type = 134217757;
+    pub const WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE: Type = 134217758;
+    pub const WAIT_EVENT_MQ_INTERNAL: Type = 134217759;
+    pub const WAIT_EVENT_MQ_PUT_MESSAGE: Type = 134217760;
+    pub const WAIT_EVENT_MQ_RECEIVE: Type = 134217761;
+    pub const WAIT_EVENT_MQ_SEND: Type = 134217762;
+    pub const WAIT_EVENT_PARALLEL_BITMAP_SCAN: Type = 134217763;
+    pub const WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN: Type = 134217764;
+    pub const WAIT_EVENT_PARALLEL_FINISH: Type = 134217765;
+    pub const WAIT_EVENT_PROCARRAY_GROUP_UPDATE: Type = 134217766;
+    pub const WAIT_EVENT_PROC_SIGNAL_BARRIER: Type = 134217767;
+    pub const WAIT_EVENT_PROMOTE: Type = 134217768;
+    pub const WAIT_EVENT_RECOVERY_CONFLICT_SNAPSHOT: Type = 134217769;
+    pub const WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE: Type = 134217770;
+    pub const WAIT_EVENT_RECOVERY_END_COMMAND: Type = 134217771;
+    pub const WAIT_EVENT_RECOVERY_PAUSE: Type = 134217772;
+    pub const WAIT_EVENT_REPLICATION_ORIGIN_DROP: Type = 134217773;
+    pub const WAIT_EVENT_REPLICATION_SLOT_DROP: Type = 134217774;
+    pub const WAIT_EVENT_RESTORE_COMMAND: Type = 134217775;
+    pub const WAIT_EVENT_SAFE_SNAPSHOT: Type = 134217776;
+    pub const WAIT_EVENT_SYNC_REP: Type = 134217777;
+    pub const WAIT_EVENT_WAL_RECEIVER_EXIT: Type = 134217778;
+    pub const WAIT_EVENT_WAL_RECEIVER_WAIT_START: Type = 134217779;
+    pub const WAIT_EVENT_XACT_GROUP_UPDATE: Type = 134217780;
+}
+pub mod WaitEventTimeout {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const WAIT_EVENT_BASE_BACKUP_THROTTLE: Type = 150994944;
+    pub const WAIT_EVENT_CHECKPOINT_WRITE_DELAY: Type = 150994945;
+    pub const WAIT_EVENT_PG_SLEEP: Type = 150994946;
+    pub const WAIT_EVENT_RECOVERY_APPLY_DELAY: Type = 150994947;
+    pub const WAIT_EVENT_RECOVERY_RETRIEVE_RETRY_INTERVAL: Type = 150994948;
+    pub const WAIT_EVENT_REGISTER_SYNC_REQUEST: Type = 150994949;
+    pub const WAIT_EVENT_SPIN_DELAY: Type = 150994950;
+    pub const WAIT_EVENT_VACUUM_DELAY: Type = 150994951;
+    pub const WAIT_EVENT_VACUUM_TRUNCATE: Type = 150994952;
+}
+pub mod WaitEventIO {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const WAIT_EVENT_BASEBACKUP_READ: Type = 167772160;
+    pub const WAIT_EVENT_BASEBACKUP_SYNC: Type = 167772161;
+    pub const WAIT_EVENT_BASEBACKUP_WRITE: Type = 167772162;
+    pub const WAIT_EVENT_BUFFILE_READ: Type = 167772163;
+    pub const WAIT_EVENT_BUFFILE_WRITE: Type = 167772164;
+    pub const WAIT_EVENT_BUFFILE_TRUNCATE: Type = 167772165;
+    pub const WAIT_EVENT_CONTROL_FILE_READ: Type = 167772166;
+    pub const WAIT_EVENT_CONTROL_FILE_SYNC: Type = 167772167;
+    pub const WAIT_EVENT_CONTROL_FILE_SYNC_UPDATE: Type = 167772168;
+    pub const WAIT_EVENT_CONTROL_FILE_WRITE: Type = 167772169;
+    pub const WAIT_EVENT_CONTROL_FILE_WRITE_UPDATE: Type = 167772170;
+    pub const WAIT_EVENT_COPY_FILE_READ: Type = 167772171;
+    pub const WAIT_EVENT_COPY_FILE_WRITE: Type = 167772172;
+    pub const WAIT_EVENT_DATA_FILE_EXTEND: Type = 167772173;
+    pub const WAIT_EVENT_DATA_FILE_FLUSH: Type = 167772174;
+    pub const WAIT_EVENT_DATA_FILE_IMMEDIATE_SYNC: Type = 167772175;
+    pub const WAIT_EVENT_DATA_FILE_PREFETCH: Type = 167772176;
+    pub const WAIT_EVENT_DATA_FILE_READ: Type = 167772177;
+    pub const WAIT_EVENT_DATA_FILE_SYNC: Type = 167772178;
+    pub const WAIT_EVENT_DATA_FILE_TRUNCATE: Type = 167772179;
+    pub const WAIT_EVENT_DATA_FILE_WRITE: Type = 167772180;
+    pub const WAIT_EVENT_DSM_ALLOCATE: Type = 167772181;
+    pub const WAIT_EVENT_DSM_FILL_ZERO_WRITE: Type = 167772182;
+    pub const WAIT_EVENT_LOCK_FILE_ADDTODATADIR_READ: Type = 167772183;
+    pub const WAIT_EVENT_LOCK_FILE_ADDTODATADIR_SYNC: Type = 167772184;
+    pub const WAIT_EVENT_LOCK_FILE_ADDTODATADIR_WRITE: Type = 167772185;
+    pub const WAIT_EVENT_LOCK_FILE_CREATE_READ: Type = 167772186;
+    pub const WAIT_EVENT_LOCK_FILE_CREATE_SYNC: Type = 167772187;
+    pub const WAIT_EVENT_LOCK_FILE_CREATE_WRITE: Type = 167772188;
+    pub const WAIT_EVENT_LOCK_FILE_RECHECKDATADIR_READ: Type = 167772189;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_CHECKPOINT_SYNC: Type = 167772190;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_MAPPING_SYNC: Type = 167772191;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_MAPPING_WRITE: Type = 167772192;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_SYNC: Type = 167772193;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_TRUNCATE: Type = 167772194;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_WRITE: Type = 167772195;
+    pub const WAIT_EVENT_RELATION_MAP_READ: Type = 167772196;
+    pub const WAIT_EVENT_RELATION_MAP_REPLACE: Type = 167772197;
+    pub const WAIT_EVENT_RELATION_MAP_WRITE: Type = 167772198;
+    pub const WAIT_EVENT_REORDER_BUFFER_READ: Type = 167772199;
+    pub const WAIT_EVENT_REORDER_BUFFER_WRITE: Type = 167772200;
+    pub const WAIT_EVENT_REORDER_LOGICAL_MAPPING_READ: Type = 167772201;
+    pub const WAIT_EVENT_REPLICATION_SLOT_READ: Type = 167772202;
+    pub const WAIT_EVENT_REPLICATION_SLOT_RESTORE_SYNC: Type = 167772203;
+    pub const WAIT_EVENT_REPLICATION_SLOT_SYNC: Type = 167772204;
+    pub const WAIT_EVENT_REPLICATION_SLOT_WRITE: Type = 167772205;
+    pub const WAIT_EVENT_SLRU_FLUSH_SYNC: Type = 167772206;
+    pub const WAIT_EVENT_SLRU_READ: Type = 167772207;
+    pub const WAIT_EVENT_SLRU_SYNC: Type = 167772208;
+    pub const WAIT_EVENT_SLRU_WRITE: Type = 167772209;
+    pub const WAIT_EVENT_SNAPBUILD_READ: Type = 167772210;
+    pub const WAIT_EVENT_SNAPBUILD_SYNC: Type = 167772211;
+    pub const WAIT_EVENT_SNAPBUILD_WRITE: Type = 167772212;
+    pub const WAIT_EVENT_TIMELINE_HISTORY_FILE_SYNC: Type = 167772213;
+    pub const WAIT_EVENT_TIMELINE_HISTORY_FILE_WRITE: Type = 167772214;
+    pub const WAIT_EVENT_TIMELINE_HISTORY_READ: Type = 167772215;
+    pub const WAIT_EVENT_TIMELINE_HISTORY_SYNC: Type = 167772216;
+    pub const WAIT_EVENT_TIMELINE_HISTORY_WRITE: Type = 167772217;
+    pub const WAIT_EVENT_TWOPHASE_FILE_READ: Type = 167772218;
+    pub const WAIT_EVENT_TWOPHASE_FILE_SYNC: Type = 167772219;
+    pub const WAIT_EVENT_TWOPHASE_FILE_WRITE: Type = 167772220;
+    pub const WAIT_EVENT_VERSION_FILE_WRITE: Type = 167772221;
+    pub const WAIT_EVENT_WALSENDER_TIMELINE_HISTORY_READ: Type = 167772222;
+    pub const WAIT_EVENT_WAL_BOOTSTRAP_SYNC: Type = 167772223;
+    pub const WAIT_EVENT_WAL_BOOTSTRAP_WRITE: Type = 167772224;
+    pub const WAIT_EVENT_WAL_COPY_READ: Type = 167772225;
+    pub const WAIT_EVENT_WAL_COPY_SYNC: Type = 167772226;
+    pub const WAIT_EVENT_WAL_COPY_WRITE: Type = 167772227;
+    pub const WAIT_EVENT_WAL_INIT_SYNC: Type = 167772228;
+    pub const WAIT_EVENT_WAL_INIT_WRITE: Type = 167772229;
+    pub const WAIT_EVENT_WAL_READ: Type = 167772230;
+    pub const WAIT_EVENT_WAL_SYNC: Type = 167772231;
+    pub const WAIT_EVENT_WAL_SYNC_METHOD_ASSIGN: Type = 167772232;
+    pub const WAIT_EVENT_WAL_WRITE: Type = 167772233;
+}
+pub mod PgStat_Kind {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PGSTAT_KIND_INVALID: Type = 0;
+    pub const PGSTAT_KIND_DATABASE: Type = 1;
+    pub const PGSTAT_KIND_RELATION: Type = 2;
+    pub const PGSTAT_KIND_FUNCTION: Type = 3;
+    pub const PGSTAT_KIND_REPLSLOT: Type = 4;
+    pub const PGSTAT_KIND_SUBSCRIPTION: Type = 5;
+    pub const PGSTAT_KIND_ARCHIVER: Type = 6;
+    pub const PGSTAT_KIND_BGWRITER: Type = 7;
+    pub const PGSTAT_KIND_CHECKPOINTER: Type = 8;
+    pub const PGSTAT_KIND_IO: Type = 9;
+    pub const PGSTAT_KIND_SLRU: Type = 10;
+    pub const PGSTAT_KIND_WAL: Type = 11;
+}
+pub mod TrackFunctionsLevel {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const TRACK_FUNC_OFF: Type = 0;
+    pub const TRACK_FUNC_PL: Type = 1;
+    pub const TRACK_FUNC_ALL: Type = 2;
+}
+pub mod PgStat_FetchConsistency {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PGSTAT_FETCH_CONSISTENCY_NONE: Type = 0;
+    pub const PGSTAT_FETCH_CONSISTENCY_CACHE: Type = 1;
+    pub const PGSTAT_FETCH_CONSISTENCY_SNAPSHOT: Type = 2;
+}
+pub mod SessionEndType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const DISCONNECT_NOT_YET: Type = 0;
+    pub const DISCONNECT_NORMAL: Type = 1;
+    pub const DISCONNECT_CLIENT_EOF: Type = 2;
+    pub const DISCONNECT_FATAL: Type = 3;
+    pub const DISCONNECT_KILLED: Type = 4;
+}
 pub type PgStat_Counter = int64;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -17312,23 +20854,29 @@ pub struct PgStat_CheckpointerStats {
     pub buf_written_backend: PgStat_Counter,
     pub buf_fsync_backend: PgStat_Counter,
 }
-pub const IOObject_IOOBJECT_RELATION: IOObject = 0;
-pub const IOObject_IOOBJECT_TEMP_RELATION: IOObject = 1;
-pub type IOObject = ::std::os::raw::c_uint;
-pub const IOContext_IOCONTEXT_BULKREAD: IOContext = 0;
-pub const IOContext_IOCONTEXT_BULKWRITE: IOContext = 1;
-pub const IOContext_IOCONTEXT_NORMAL: IOContext = 2;
-pub const IOContext_IOCONTEXT_VACUUM: IOContext = 3;
-pub type IOContext = ::std::os::raw::c_uint;
-pub const IOOp_IOOP_EVICT: IOOp = 0;
-pub const IOOp_IOOP_EXTEND: IOOp = 1;
-pub const IOOp_IOOP_FSYNC: IOOp = 2;
-pub const IOOp_IOOP_HIT: IOOp = 3;
-pub const IOOp_IOOP_READ: IOOp = 4;
-pub const IOOp_IOOP_REUSE: IOOp = 5;
-pub const IOOp_IOOP_WRITE: IOOp = 6;
-pub const IOOp_IOOP_WRITEBACK: IOOp = 7;
-pub type IOOp = ::std::os::raw::c_uint;
+pub mod IOObject {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const IOOBJECT_RELATION: Type = 0;
+    pub const IOOBJECT_TEMP_RELATION: Type = 1;
+}
+pub mod IOContext {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const IOCONTEXT_BULKREAD: Type = 0;
+    pub const IOCONTEXT_BULKWRITE: Type = 1;
+    pub const IOCONTEXT_NORMAL: Type = 2;
+    pub const IOCONTEXT_VACUUM: Type = 3;
+}
+pub mod IOOp {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const IOOP_EVICT: Type = 0;
+    pub const IOOP_EXTEND: Type = 1;
+    pub const IOOP_FSYNC: Type = 2;
+    pub const IOOP_HIT: Type = 3;
+    pub const IOOP_READ: Type = 4;
+    pub const IOOP_REUSE: Type = 5;
+    pub const IOOP_WRITE: Type = 6;
+    pub const IOOP_WRITEBACK: Type = 7;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct PgStat_BktypeIO {
@@ -17547,37 +21095,41 @@ pub type IndexBulkDeleteCallback = ::std::option::Option<
 pub type IndexScanDesc = *mut IndexScanDescData;
 pub type SysScanDesc = *mut SysScanDescData;
 pub type ParallelIndexScanDesc = *mut ParallelIndexScanDescData;
-pub const IndexUniqueCheck_UNIQUE_CHECK_NO: IndexUniqueCheck = 0;
-pub const IndexUniqueCheck_UNIQUE_CHECK_YES: IndexUniqueCheck = 1;
-pub const IndexUniqueCheck_UNIQUE_CHECK_PARTIAL: IndexUniqueCheck = 2;
-pub const IndexUniqueCheck_UNIQUE_CHECK_EXISTING: IndexUniqueCheck = 3;
-pub type IndexUniqueCheck = ::std::os::raw::c_uint;
+pub mod IndexUniqueCheck {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const UNIQUE_CHECK_NO: Type = 0;
+    pub const UNIQUE_CHECK_YES: Type = 1;
+    pub const UNIQUE_CHECK_PARTIAL: Type = 2;
+    pub const UNIQUE_CHECK_EXISTING: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct IndexOrderByDistance {
     pub value: f64,
     pub isnull: bool,
 }
-pub const IndexAMProperty_AMPROP_UNKNOWN: IndexAMProperty = 0;
-pub const IndexAMProperty_AMPROP_ASC: IndexAMProperty = 1;
-pub const IndexAMProperty_AMPROP_DESC: IndexAMProperty = 2;
-pub const IndexAMProperty_AMPROP_NULLS_FIRST: IndexAMProperty = 3;
-pub const IndexAMProperty_AMPROP_NULLS_LAST: IndexAMProperty = 4;
-pub const IndexAMProperty_AMPROP_ORDERABLE: IndexAMProperty = 5;
-pub const IndexAMProperty_AMPROP_DISTANCE_ORDERABLE: IndexAMProperty = 6;
-pub const IndexAMProperty_AMPROP_RETURNABLE: IndexAMProperty = 7;
-pub const IndexAMProperty_AMPROP_SEARCH_ARRAY: IndexAMProperty = 8;
-pub const IndexAMProperty_AMPROP_SEARCH_NULLS: IndexAMProperty = 9;
-pub const IndexAMProperty_AMPROP_CLUSTERABLE: IndexAMProperty = 10;
-pub const IndexAMProperty_AMPROP_INDEX_SCAN: IndexAMProperty = 11;
-pub const IndexAMProperty_AMPROP_BITMAP_SCAN: IndexAMProperty = 12;
-pub const IndexAMProperty_AMPROP_BACKWARD_SCAN: IndexAMProperty = 13;
-pub const IndexAMProperty_AMPROP_CAN_ORDER: IndexAMProperty = 14;
-pub const IndexAMProperty_AMPROP_CAN_UNIQUE: IndexAMProperty = 15;
-pub const IndexAMProperty_AMPROP_CAN_MULTI_COL: IndexAMProperty = 16;
-pub const IndexAMProperty_AMPROP_CAN_EXCLUDE: IndexAMProperty = 17;
-pub const IndexAMProperty_AMPROP_CAN_INCLUDE: IndexAMProperty = 18;
-pub type IndexAMProperty = ::std::os::raw::c_uint;
+pub mod IndexAMProperty {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const AMPROP_UNKNOWN: Type = 0;
+    pub const AMPROP_ASC: Type = 1;
+    pub const AMPROP_DESC: Type = 2;
+    pub const AMPROP_NULLS_FIRST: Type = 3;
+    pub const AMPROP_NULLS_LAST: Type = 4;
+    pub const AMPROP_ORDERABLE: Type = 5;
+    pub const AMPROP_DISTANCE_ORDERABLE: Type = 6;
+    pub const AMPROP_RETURNABLE: Type = 7;
+    pub const AMPROP_SEARCH_ARRAY: Type = 8;
+    pub const AMPROP_SEARCH_NULLS: Type = 9;
+    pub const AMPROP_CLUSTERABLE: Type = 10;
+    pub const AMPROP_INDEX_SCAN: Type = 11;
+    pub const AMPROP_BITMAP_SCAN: Type = 12;
+    pub const AMPROP_BACKWARD_SCAN: Type = 13;
+    pub const AMPROP_CAN_ORDER: Type = 14;
+    pub const AMPROP_CAN_UNIQUE: Type = 15;
+    pub const AMPROP_CAN_MULTI_COL: Type = 16;
+    pub const AMPROP_CAN_EXCLUDE: Type = 17;
+    pub const AMPROP_CAN_INCLUDE: Type = 18;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct OpFamilyMember {
@@ -17616,7 +21168,7 @@ pub type aminsert_function = ::std::option::Option<
         isnull: *mut bool,
         heap_tid: ItemPointer,
         heapRelation: Relation,
-        checkUnique: IndexUniqueCheck,
+        checkUnique: IndexUniqueCheck::Type,
         indexUnchanged: bool,
         indexInfo: *mut IndexInfo,
     ) -> bool,
@@ -17656,7 +21208,7 @@ pub type amproperty_function = ::std::option::Option<
     unsafe extern "C" fn(
         index_oid: Oid,
         attno: ::std::os::raw::c_int,
-        prop: IndexAMProperty,
+        prop: IndexAMProperty::Type,
         propname: *const ::std::os::raw::c_char,
         res: *mut bool,
         isnull: *mut bool,
@@ -17690,7 +21242,7 @@ pub type amrescan_function = ::std::option::Option<
     ),
 >;
 pub type amgettuple_function = ::std::option::Option<
-    unsafe extern "C" fn(scan: IndexScanDesc, direction: ScanDirection) -> bool,
+    unsafe extern "C" fn(scan: IndexScanDesc, direction: ScanDirection::Type) -> bool,
 >;
 pub type amgetbitmap_function =
     ::std::option::Option<unsafe extern "C" fn(scan: IndexScanDesc, tbm: *mut TIDBitmap) -> int64>;
@@ -17780,23 +21332,31 @@ impl Default for BackupState {
         }
     }
 }
-pub const ArchiveMode_ARCHIVE_MODE_OFF: ArchiveMode = 0;
-pub const ArchiveMode_ARCHIVE_MODE_ON: ArchiveMode = 1;
-pub const ArchiveMode_ARCHIVE_MODE_ALWAYS: ArchiveMode = 2;
-pub type ArchiveMode = ::std::os::raw::c_uint;
-pub const WalLevel_WAL_LEVEL_MINIMAL: WalLevel = 0;
-pub const WalLevel_WAL_LEVEL_REPLICA: WalLevel = 1;
-pub const WalLevel_WAL_LEVEL_LOGICAL: WalLevel = 2;
-pub type WalLevel = ::std::os::raw::c_uint;
-pub const WalCompression_WAL_COMPRESSION_NONE: WalCompression = 0;
-pub const WalCompression_WAL_COMPRESSION_PGLZ: WalCompression = 1;
-pub const WalCompression_WAL_COMPRESSION_LZ4: WalCompression = 2;
-pub const WalCompression_WAL_COMPRESSION_ZSTD: WalCompression = 3;
-pub type WalCompression = ::std::os::raw::c_uint;
-pub const RecoveryState_RECOVERY_STATE_CRASH: RecoveryState = 0;
-pub const RecoveryState_RECOVERY_STATE_ARCHIVE: RecoveryState = 1;
-pub const RecoveryState_RECOVERY_STATE_DONE: RecoveryState = 2;
-pub type RecoveryState = ::std::os::raw::c_uint;
+pub mod ArchiveMode {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const ARCHIVE_MODE_OFF: Type = 0;
+    pub const ARCHIVE_MODE_ON: Type = 1;
+    pub const ARCHIVE_MODE_ALWAYS: Type = 2;
+}
+pub mod WalLevel {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const WAL_LEVEL_MINIMAL: Type = 0;
+    pub const WAL_LEVEL_REPLICA: Type = 1;
+    pub const WAL_LEVEL_LOGICAL: Type = 2;
+}
+pub mod WalCompression {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const WAL_COMPRESSION_NONE: Type = 0;
+    pub const WAL_COMPRESSION_PGLZ: Type = 1;
+    pub const WAL_COMPRESSION_LZ4: Type = 2;
+    pub const WAL_COMPRESSION_ZSTD: Type = 3;
+}
+pub mod RecoveryState {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RECOVERY_STATE_CRASH: Type = 0;
+    pub const RECOVERY_STATE_ARCHIVE: Type = 1;
+    pub const RECOVERY_STATE_DONE: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct CheckpointStatsData {
@@ -17813,40 +21373,46 @@ pub struct CheckpointStatsData {
     pub ckpt_longest_sync: uint64,
     pub ckpt_agg_sync_time: uint64,
 }
-pub const WALAvailability_WALAVAIL_INVALID_LSN: WALAvailability = 0;
-pub const WALAvailability_WALAVAIL_RESERVED: WALAvailability = 1;
-pub const WALAvailability_WALAVAIL_EXTENDED: WALAvailability = 2;
-pub const WALAvailability_WALAVAIL_UNRESERVED: WALAvailability = 3;
-pub const WALAvailability_WALAVAIL_REMOVED: WALAvailability = 4;
-pub type WALAvailability = ::std::os::raw::c_uint;
-pub const SessionBackupState_SESSION_BACKUP_NONE: SessionBackupState = 0;
-pub const SessionBackupState_SESSION_BACKUP_RUNNING: SessionBackupState = 1;
-pub type SessionBackupState = ::std::os::raw::c_uint;
+pub mod WALAvailability {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const WALAVAIL_INVALID_LSN: Type = 0;
+    pub const WALAVAIL_RESERVED: Type = 1;
+    pub const WALAVAIL_EXTENDED: Type = 2;
+    pub const WALAVAIL_UNRESERVED: Type = 3;
+    pub const WALAVAIL_REMOVED: Type = 4;
+}
+pub mod SessionBackupState {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SESSION_BACKUP_NONE: Type = 0;
+    pub const SESSION_BACKUP_RUNNING: Type = 1;
+}
 pub type RmgrId = uint8;
-pub const RmgrIds_RM_XLOG_ID: RmgrIds = 0;
-pub const RmgrIds_RM_XACT_ID: RmgrIds = 1;
-pub const RmgrIds_RM_SMGR_ID: RmgrIds = 2;
-pub const RmgrIds_RM_CLOG_ID: RmgrIds = 3;
-pub const RmgrIds_RM_DBASE_ID: RmgrIds = 4;
-pub const RmgrIds_RM_TBLSPC_ID: RmgrIds = 5;
-pub const RmgrIds_RM_MULTIXACT_ID: RmgrIds = 6;
-pub const RmgrIds_RM_RELMAP_ID: RmgrIds = 7;
-pub const RmgrIds_RM_STANDBY_ID: RmgrIds = 8;
-pub const RmgrIds_RM_HEAP2_ID: RmgrIds = 9;
-pub const RmgrIds_RM_HEAP_ID: RmgrIds = 10;
-pub const RmgrIds_RM_BTREE_ID: RmgrIds = 11;
-pub const RmgrIds_RM_HASH_ID: RmgrIds = 12;
-pub const RmgrIds_RM_GIN_ID: RmgrIds = 13;
-pub const RmgrIds_RM_GIST_ID: RmgrIds = 14;
-pub const RmgrIds_RM_SEQ_ID: RmgrIds = 15;
-pub const RmgrIds_RM_SPGIST_ID: RmgrIds = 16;
-pub const RmgrIds_RM_BRIN_ID: RmgrIds = 17;
-pub const RmgrIds_RM_COMMIT_TS_ID: RmgrIds = 18;
-pub const RmgrIds_RM_REPLORIGIN_ID: RmgrIds = 19;
-pub const RmgrIds_RM_GENERIC_ID: RmgrIds = 20;
-pub const RmgrIds_RM_LOGICALMSG_ID: RmgrIds = 21;
-pub const RmgrIds_RM_NEXT_ID: RmgrIds = 22;
-pub type RmgrIds = ::std::os::raw::c_uint;
+pub mod RmgrIds {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RM_XLOG_ID: Type = 0;
+    pub const RM_XACT_ID: Type = 1;
+    pub const RM_SMGR_ID: Type = 2;
+    pub const RM_CLOG_ID: Type = 3;
+    pub const RM_DBASE_ID: Type = 4;
+    pub const RM_TBLSPC_ID: Type = 5;
+    pub const RM_MULTIXACT_ID: Type = 6;
+    pub const RM_RELMAP_ID: Type = 7;
+    pub const RM_STANDBY_ID: Type = 8;
+    pub const RM_HEAP2_ID: Type = 9;
+    pub const RM_HEAP_ID: Type = 10;
+    pub const RM_BTREE_ID: Type = 11;
+    pub const RM_HASH_ID: Type = 12;
+    pub const RM_GIN_ID: Type = 13;
+    pub const RM_GIST_ID: Type = 14;
+    pub const RM_SEQ_ID: Type = 15;
+    pub const RM_SPGIST_ID: Type = 16;
+    pub const RM_BRIN_ID: Type = 17;
+    pub const RM_COMMIT_TS_ID: Type = 18;
+    pub const RM_REPLORIGIN_ID: Type = 19;
+    pub const RM_GENERIC_ID: Type = 20;
+    pub const RM_LOGICALMSG_ID: Type = 21;
+    pub const RM_NEXT_ID: Type = 22;
+}
 pub type pg_crc32c = uint32;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -17971,7 +21537,7 @@ pub struct XLogReaderRoutine {
 pub struct DecodedBkpBlock {
     pub in_use: bool,
     pub rlocator: RelFileLocator,
-    pub forknum: ForkNumber,
+    pub forknum: ForkNumber::Type,
     pub blkno: BlockNumber,
     pub prefetch_buffer: Buffer,
     pub flags: uint8,
@@ -18069,10 +21635,12 @@ impl Default for XLogReaderState {
         }
     }
 }
-pub const XLogPageReadResult_XLREAD_SUCCESS: XLogPageReadResult = 0;
-pub const XLogPageReadResult_XLREAD_FAIL: XLogPageReadResult = -1;
-pub const XLogPageReadResult_XLREAD_WOULDBLOCK: XLogPageReadResult = -2;
-pub type XLogPageReadResult = ::std::os::raw::c_int;
+pub mod XLogPageReadResult {
+    pub type Type = ::std::os::raw::c_int;
+    pub const XLREAD_SUCCESS: Type = 0;
+    pub const XLREAD_FAIL: Type = -1;
+    pub const XLREAD_WOULDBLOCK: Type = -2;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct WALReadError {
@@ -18157,10 +21725,12 @@ impl Default for XLogRecData {
         }
     }
 }
-pub const RecoveryTargetAction_RECOVERY_TARGET_ACTION_PAUSE: RecoveryTargetAction = 0;
-pub const RecoveryTargetAction_RECOVERY_TARGET_ACTION_PROMOTE: RecoveryTargetAction = 1;
-pub const RecoveryTargetAction_RECOVERY_TARGET_ACTION_SHUTDOWN: RecoveryTargetAction = 2;
-pub type RecoveryTargetAction = ::std::os::raw::c_uint;
+pub mod RecoveryTargetAction {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RECOVERY_TARGET_ACTION_PAUSE: Type = 0;
+    pub const RECOVERY_TARGET_ACTION_PROMOTE: Type = 1;
+    pub const RECOVERY_TARGET_ACTION_SHUTDOWN: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct XLogRecordBuffer {
@@ -18357,15 +21927,17 @@ impl Default for PublicationRelInfo {
         }
     }
 }
-pub const PublicationPartOpt_PUBLICATION_PART_ROOT: PublicationPartOpt = 0;
-pub const PublicationPartOpt_PUBLICATION_PART_LEAF: PublicationPartOpt = 1;
-pub const PublicationPartOpt_PUBLICATION_PART_ALL: PublicationPartOpt = 2;
-pub type PublicationPartOpt = ::std::os::raw::c_uint;
+pub mod PublicationPartOpt {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PUBLICATION_PART_ROOT: Type = 0;
+    pub const PUBLICATION_PART_LEAF: Type = 1;
+    pub const PUBLICATION_PART_ALL: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct RewriteRule {
     pub ruleId: Oid,
-    pub event: CmdType,
+    pub event: CmdType::Type,
     pub qual: *mut Node,
     pub actions: *mut List,
     pub enabled: ::std::os::raw::c_char,
@@ -18569,10 +22141,12 @@ pub struct AutoVacOpts {
     pub vacuum_ins_scale_factor: float8,
     pub analyze_scale_factor: float8,
 }
-pub const StdRdOptIndexCleanup_STDRD_OPTION_VACUUM_INDEX_CLEANUP_AUTO: StdRdOptIndexCleanup = 0;
-pub const StdRdOptIndexCleanup_STDRD_OPTION_VACUUM_INDEX_CLEANUP_OFF: StdRdOptIndexCleanup = 1;
-pub const StdRdOptIndexCleanup_STDRD_OPTION_VACUUM_INDEX_CLEANUP_ON: StdRdOptIndexCleanup = 2;
-pub type StdRdOptIndexCleanup = ::std::os::raw::c_uint;
+pub mod StdRdOptIndexCleanup {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const STDRD_OPTION_VACUUM_INDEX_CLEANUP_AUTO: Type = 0;
+    pub const STDRD_OPTION_VACUUM_INDEX_CLEANUP_OFF: Type = 1;
+    pub const STDRD_OPTION_VACUUM_INDEX_CLEANUP_ON: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct StdRdOptions {
@@ -18582,7 +22156,7 @@ pub struct StdRdOptions {
     pub autovacuum: AutoVacOpts,
     pub user_catalog_table: bool,
     pub parallel_workers: ::std::os::raw::c_int,
-    pub vacuum_index_cleanup: StdRdOptIndexCleanup,
+    pub vacuum_index_cleanup: StdRdOptIndexCleanup::Type,
     pub vacuum_truncate: bool,
 }
 impl Default for StdRdOptions {
@@ -18594,17 +22168,19 @@ impl Default for StdRdOptions {
         }
     }
 }
-pub const ViewOptCheckOption_VIEW_OPTION_CHECK_OPTION_NOT_SET: ViewOptCheckOption = 0;
-pub const ViewOptCheckOption_VIEW_OPTION_CHECK_OPTION_LOCAL: ViewOptCheckOption = 1;
-pub const ViewOptCheckOption_VIEW_OPTION_CHECK_OPTION_CASCADED: ViewOptCheckOption = 2;
-pub type ViewOptCheckOption = ::std::os::raw::c_uint;
+pub mod ViewOptCheckOption {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const VIEW_OPTION_CHECK_OPTION_NOT_SET: Type = 0;
+    pub const VIEW_OPTION_CHECK_OPTION_LOCAL: Type = 1;
+    pub const VIEW_OPTION_CHECK_OPTION_CASCADED: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ViewOptions {
     pub vl_len_: int32,
     pub security_barrier: bool,
     pub security_invoker: bool,
-    pub check_option: ViewOptCheckOption,
+    pub check_option: ViewOptCheckOption::Type,
 }
 impl Default for ViewOptions {
     fn default() -> Self {
@@ -18972,31 +22548,38 @@ impl Default for SharedInvalidationMessage {
         }
     }
 }
-pub const SyncCommitLevel_SYNCHRONOUS_COMMIT_OFF: SyncCommitLevel = 0;
-pub const SyncCommitLevel_SYNCHRONOUS_COMMIT_LOCAL_FLUSH: SyncCommitLevel = 1;
-pub const SyncCommitLevel_SYNCHRONOUS_COMMIT_REMOTE_WRITE: SyncCommitLevel = 2;
-pub const SyncCommitLevel_SYNCHRONOUS_COMMIT_REMOTE_FLUSH: SyncCommitLevel = 3;
-pub const SyncCommitLevel_SYNCHRONOUS_COMMIT_REMOTE_APPLY: SyncCommitLevel = 4;
-pub type SyncCommitLevel = ::std::os::raw::c_uint;
-pub const XactEvent_XACT_EVENT_COMMIT: XactEvent = 0;
-pub const XactEvent_XACT_EVENT_PARALLEL_COMMIT: XactEvent = 1;
-pub const XactEvent_XACT_EVENT_ABORT: XactEvent = 2;
-pub const XactEvent_XACT_EVENT_PARALLEL_ABORT: XactEvent = 3;
-pub const XactEvent_XACT_EVENT_PREPARE: XactEvent = 4;
-pub const XactEvent_XACT_EVENT_PRE_COMMIT: XactEvent = 5;
-pub const XactEvent_XACT_EVENT_PARALLEL_PRE_COMMIT: XactEvent = 6;
-pub const XactEvent_XACT_EVENT_PRE_PREPARE: XactEvent = 7;
-pub type XactEvent = ::std::os::raw::c_uint;
-pub type XactCallback =
-    ::std::option::Option<unsafe extern "C" fn(event: XactEvent, arg: *mut ::std::os::raw::c_void)>;
-pub const SubXactEvent_SUBXACT_EVENT_START_SUB: SubXactEvent = 0;
-pub const SubXactEvent_SUBXACT_EVENT_COMMIT_SUB: SubXactEvent = 1;
-pub const SubXactEvent_SUBXACT_EVENT_ABORT_SUB: SubXactEvent = 2;
-pub const SubXactEvent_SUBXACT_EVENT_PRE_COMMIT_SUB: SubXactEvent = 3;
-pub type SubXactEvent = ::std::os::raw::c_uint;
+pub mod SyncCommitLevel {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SYNCHRONOUS_COMMIT_OFF: Type = 0;
+    pub const SYNCHRONOUS_COMMIT_LOCAL_FLUSH: Type = 1;
+    pub const SYNCHRONOUS_COMMIT_REMOTE_WRITE: Type = 2;
+    pub const SYNCHRONOUS_COMMIT_REMOTE_FLUSH: Type = 3;
+    pub const SYNCHRONOUS_COMMIT_REMOTE_APPLY: Type = 4;
+}
+pub mod XactEvent {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const XACT_EVENT_COMMIT: Type = 0;
+    pub const XACT_EVENT_PARALLEL_COMMIT: Type = 1;
+    pub const XACT_EVENT_ABORT: Type = 2;
+    pub const XACT_EVENT_PARALLEL_ABORT: Type = 3;
+    pub const XACT_EVENT_PREPARE: Type = 4;
+    pub const XACT_EVENT_PRE_COMMIT: Type = 5;
+    pub const XACT_EVENT_PARALLEL_PRE_COMMIT: Type = 6;
+    pub const XACT_EVENT_PRE_PREPARE: Type = 7;
+}
+pub type XactCallback = ::std::option::Option<
+    unsafe extern "C" fn(event: XactEvent::Type, arg: *mut ::std::os::raw::c_void),
+>;
+pub mod SubXactEvent {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SUBXACT_EVENT_START_SUB: Type = 0;
+    pub const SUBXACT_EVENT_COMMIT_SUB: Type = 1;
+    pub const SUBXACT_EVENT_ABORT_SUB: Type = 2;
+    pub const SUBXACT_EVENT_PRE_COMMIT_SUB: Type = 3;
+}
 pub type SubXactCallback = ::std::option::Option<
     unsafe extern "C" fn(
-        event: SubXactEvent,
+        event: SubXactEvent::Type,
         mySubid: SubTransactionId,
         parentSubid: SubTransactionId,
         arg: *mut ::std::os::raw::c_void,
@@ -19218,29 +22801,35 @@ impl Default for xl_xact_parsed_abort {
 pub struct BulkInsertStateData {
     _unused: [u8; 0],
 }
-pub const ScanOptions_SO_TYPE_SEQSCAN: ScanOptions = 1;
-pub const ScanOptions_SO_TYPE_BITMAPSCAN: ScanOptions = 2;
-pub const ScanOptions_SO_TYPE_SAMPLESCAN: ScanOptions = 4;
-pub const ScanOptions_SO_TYPE_TIDSCAN: ScanOptions = 8;
-pub const ScanOptions_SO_TYPE_TIDRANGESCAN: ScanOptions = 16;
-pub const ScanOptions_SO_TYPE_ANALYZE: ScanOptions = 32;
-pub const ScanOptions_SO_ALLOW_STRAT: ScanOptions = 64;
-pub const ScanOptions_SO_ALLOW_SYNC: ScanOptions = 128;
-pub const ScanOptions_SO_ALLOW_PAGEMODE: ScanOptions = 256;
-pub const ScanOptions_SO_TEMP_SNAPSHOT: ScanOptions = 512;
-pub type ScanOptions = ::std::os::raw::c_uint;
-pub const TM_Result_TM_Ok: TM_Result = 0;
-pub const TM_Result_TM_Invisible: TM_Result = 1;
-pub const TM_Result_TM_SelfModified: TM_Result = 2;
-pub const TM_Result_TM_Updated: TM_Result = 3;
-pub const TM_Result_TM_Deleted: TM_Result = 4;
-pub const TM_Result_TM_BeingModified: TM_Result = 5;
-pub const TM_Result_TM_WouldBlock: TM_Result = 6;
-pub type TM_Result = ::std::os::raw::c_uint;
-pub const TU_UpdateIndexes_TU_None: TU_UpdateIndexes = 0;
-pub const TU_UpdateIndexes_TU_All: TU_UpdateIndexes = 1;
-pub const TU_UpdateIndexes_TU_Summarizing: TU_UpdateIndexes = 2;
-pub type TU_UpdateIndexes = ::std::os::raw::c_uint;
+pub mod ScanOptions {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SO_TYPE_SEQSCAN: Type = 1;
+    pub const SO_TYPE_BITMAPSCAN: Type = 2;
+    pub const SO_TYPE_SAMPLESCAN: Type = 4;
+    pub const SO_TYPE_TIDSCAN: Type = 8;
+    pub const SO_TYPE_TIDRANGESCAN: Type = 16;
+    pub const SO_TYPE_ANALYZE: Type = 32;
+    pub const SO_ALLOW_STRAT: Type = 64;
+    pub const SO_ALLOW_SYNC: Type = 128;
+    pub const SO_ALLOW_PAGEMODE: Type = 256;
+    pub const SO_TEMP_SNAPSHOT: Type = 512;
+}
+pub mod TM_Result {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const TM_Ok: Type = 0;
+    pub const TM_Invisible: Type = 1;
+    pub const TM_SelfModified: Type = 2;
+    pub const TM_Updated: Type = 3;
+    pub const TM_Deleted: Type = 4;
+    pub const TM_BeingModified: Type = 5;
+    pub const TM_WouldBlock: Type = 6;
+}
+pub mod TU_UpdateIndexes {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const TU_None: Type = 0;
+    pub const TU_All: Type = 1;
+    pub const TU_Summarizing: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct TM_FailureData {
@@ -19323,7 +22912,7 @@ pub struct TableAmRoutine {
     pub scan_getnextslot: ::std::option::Option<
         unsafe extern "C" fn(
             scan: TableScanDesc,
-            direction: ScanDirection,
+            direction: ScanDirection::Type,
             slot: *mut TupleTableSlot,
         ) -> bool,
     >,
@@ -19333,7 +22922,7 @@ pub struct TableAmRoutine {
     pub scan_getnextslot_tidrange: ::std::option::Option<
         unsafe extern "C" fn(
             scan: TableScanDesc,
-            direction: ScanDirection,
+            direction: ScanDirection::Type,
             slot: *mut TupleTableSlot,
         ) -> bool,
     >,
@@ -19424,7 +23013,7 @@ pub struct TableAmRoutine {
             wait: bool,
             tmfd: *mut TM_FailureData,
             changingPart: bool,
-        ) -> TM_Result,
+        ) -> TM_Result::Type,
     >,
     pub tuple_update: ::std::option::Option<
         unsafe extern "C" fn(
@@ -19436,9 +23025,9 @@ pub struct TableAmRoutine {
             crosscheck: Snapshot,
             wait: bool,
             tmfd: *mut TM_FailureData,
-            lockmode: *mut LockTupleMode,
-            update_indexes: *mut TU_UpdateIndexes,
-        ) -> TM_Result,
+            lockmode: *mut LockTupleMode::Type,
+            update_indexes: *mut TU_UpdateIndexes::Type,
+        ) -> TM_Result::Type,
     >,
     pub tuple_lock: ::std::option::Option<
         unsafe extern "C" fn(
@@ -19447,11 +23036,11 @@ pub struct TableAmRoutine {
             snapshot: Snapshot,
             slot: *mut TupleTableSlot,
             cid: CommandId,
-            mode: LockTupleMode,
-            wait_policy: LockWaitPolicy,
+            mode: LockTupleMode::Type,
+            wait_policy: LockWaitPolicy::Type,
             flags: uint8,
             tmfd: *mut TM_FailureData,
-        ) -> TM_Result,
+        ) -> TM_Result::Type,
     >,
     pub finish_bulk_insert:
         ::std::option::Option<unsafe extern "C" fn(rel: Relation, options: ::std::os::raw::c_int)>,
@@ -19531,7 +23120,7 @@ pub struct TableAmRoutine {
         ),
     >,
     pub relation_size: ::std::option::Option<
-        unsafe extern "C" fn(rel: Relation, forkNumber: ForkNumber) -> uint64,
+        unsafe extern "C" fn(rel: Relation, forkNumber: ForkNumber::Type) -> uint64,
     >,
     pub relation_needs_toast_table:
         ::std::option::Option<unsafe extern "C" fn(rel: Relation) -> bool>,
@@ -19657,12 +23246,14 @@ impl Default for IndexFetchHeapData {
         }
     }
 }
-pub const HTSV_Result_HEAPTUPLE_DEAD: HTSV_Result = 0;
-pub const HTSV_Result_HEAPTUPLE_LIVE: HTSV_Result = 1;
-pub const HTSV_Result_HEAPTUPLE_RECENTLY_DEAD: HTSV_Result = 2;
-pub const HTSV_Result_HEAPTUPLE_INSERT_IN_PROGRESS: HTSV_Result = 3;
-pub const HTSV_Result_HEAPTUPLE_DELETE_IN_PROGRESS: HTSV_Result = 4;
-pub type HTSV_Result = ::std::os::raw::c_uint;
+pub mod HTSV_Result {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const HEAPTUPLE_DEAD: Type = 0;
+    pub const HEAPTUPLE_LIVE: Type = 1;
+    pub const HEAPTUPLE_RECENTLY_DEAD: Type = 2;
+    pub const HEAPTUPLE_INSERT_IN_PROGRESS: Type = 3;
+    pub const HEAPTUPLE_DELETE_IN_PROGRESS: Type = 4;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct HeapTupleFreeze {
@@ -19687,18 +23278,22 @@ pub struct HeapPageFreeze {
 pub struct GlobalVisState {
     _unused: [u8; 0],
 }
-pub const SyncRequestType_SYNC_REQUEST: SyncRequestType = 0;
-pub const SyncRequestType_SYNC_UNLINK_REQUEST: SyncRequestType = 1;
-pub const SyncRequestType_SYNC_FORGET_REQUEST: SyncRequestType = 2;
-pub const SyncRequestType_SYNC_FILTER_REQUEST: SyncRequestType = 3;
-pub type SyncRequestType = ::std::os::raw::c_uint;
-pub const SyncRequestHandler_SYNC_HANDLER_MD: SyncRequestHandler = 0;
-pub const SyncRequestHandler_SYNC_HANDLER_CLOG: SyncRequestHandler = 1;
-pub const SyncRequestHandler_SYNC_HANDLER_COMMIT_TS: SyncRequestHandler = 2;
-pub const SyncRequestHandler_SYNC_HANDLER_MULTIXACT_OFFSET: SyncRequestHandler = 3;
-pub const SyncRequestHandler_SYNC_HANDLER_MULTIXACT_MEMBER: SyncRequestHandler = 4;
-pub const SyncRequestHandler_SYNC_HANDLER_NONE: SyncRequestHandler = 5;
-pub type SyncRequestHandler = ::std::os::raw::c_uint;
+pub mod SyncRequestType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SYNC_REQUEST: Type = 0;
+    pub const SYNC_UNLINK_REQUEST: Type = 1;
+    pub const SYNC_FORGET_REQUEST: Type = 2;
+    pub const SYNC_FILTER_REQUEST: Type = 3;
+}
+pub mod SyncRequestHandler {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SYNC_HANDLER_MD: Type = 0;
+    pub const SYNC_HANDLER_CLOG: Type = 1;
+    pub const SYNC_HANDLER_COMMIT_TS: Type = 2;
+    pub const SYNC_HANDLER_MULTIXACT_OFFSET: Type = 3;
+    pub const SYNC_HANDLER_MULTIXACT_MEMBER: Type = 4;
+    pub const SYNC_HANDLER_NONE: Type = 5;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct FileTag {
@@ -19716,18 +23311,20 @@ impl Default for FileTag {
         }
     }
 }
-pub const MultiXactStatus_MultiXactStatusForKeyShare: MultiXactStatus = 0;
-pub const MultiXactStatus_MultiXactStatusForShare: MultiXactStatus = 1;
-pub const MultiXactStatus_MultiXactStatusForNoKeyUpdate: MultiXactStatus = 2;
-pub const MultiXactStatus_MultiXactStatusForUpdate: MultiXactStatus = 3;
-pub const MultiXactStatus_MultiXactStatusNoKeyUpdate: MultiXactStatus = 4;
-pub const MultiXactStatus_MultiXactStatusUpdate: MultiXactStatus = 5;
-pub type MultiXactStatus = ::std::os::raw::c_uint;
+pub mod MultiXactStatus {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const MultiXactStatusForKeyShare: Type = 0;
+    pub const MultiXactStatusForShare: Type = 1;
+    pub const MultiXactStatusForNoKeyUpdate: Type = 2;
+    pub const MultiXactStatusForUpdate: Type = 3;
+    pub const MultiXactStatusNoKeyUpdate: Type = 4;
+    pub const MultiXactStatusUpdate: Type = 5;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct MultiXactMember {
     pub xid: TransactionId,
-    pub status: MultiXactStatus,
+    pub status: MultiXactStatus::Type,
 }
 impl Default for MultiXactMember {
     fn default() -> Self {
@@ -19773,10 +23370,12 @@ impl Default for xl_multixact_truncate {
         }
     }
 }
-pub const LWLockWaitState_LW_WS_NOT_WAITING: LWLockWaitState = 0;
-pub const LWLockWaitState_LW_WS_WAITING: LWLockWaitState = 1;
-pub const LWLockWaitState_LW_WS_PENDING_WAKEUP: LWLockWaitState = 2;
-pub type LWLockWaitState = ::std::os::raw::c_uint;
+pub mod LWLockWaitState {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const LW_WS_NOT_WAITING: Type = 0;
+    pub const LW_WS_WAITING: Type = 1;
+    pub const LW_WS_PENDING_WAKEUP: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct LWLock {
@@ -19814,41 +23413,45 @@ impl Default for NamedLWLockTranche {
         }
     }
 }
-pub const LWLockMode_LW_EXCLUSIVE: LWLockMode = 0;
-pub const LWLockMode_LW_SHARED: LWLockMode = 1;
-pub const LWLockMode_LW_WAIT_UNTIL_FREE: LWLockMode = 2;
-pub type LWLockMode = ::std::os::raw::c_uint;
-pub const BuiltinTrancheIds_LWTRANCHE_XACT_BUFFER: BuiltinTrancheIds = 48;
-pub const BuiltinTrancheIds_LWTRANCHE_COMMITTS_BUFFER: BuiltinTrancheIds = 49;
-pub const BuiltinTrancheIds_LWTRANCHE_SUBTRANS_BUFFER: BuiltinTrancheIds = 50;
-pub const BuiltinTrancheIds_LWTRANCHE_MULTIXACTOFFSET_BUFFER: BuiltinTrancheIds = 51;
-pub const BuiltinTrancheIds_LWTRANCHE_MULTIXACTMEMBER_BUFFER: BuiltinTrancheIds = 52;
-pub const BuiltinTrancheIds_LWTRANCHE_NOTIFY_BUFFER: BuiltinTrancheIds = 53;
-pub const BuiltinTrancheIds_LWTRANCHE_SERIAL_BUFFER: BuiltinTrancheIds = 54;
-pub const BuiltinTrancheIds_LWTRANCHE_WAL_INSERT: BuiltinTrancheIds = 55;
-pub const BuiltinTrancheIds_LWTRANCHE_BUFFER_CONTENT: BuiltinTrancheIds = 56;
-pub const BuiltinTrancheIds_LWTRANCHE_REPLICATION_ORIGIN_STATE: BuiltinTrancheIds = 57;
-pub const BuiltinTrancheIds_LWTRANCHE_REPLICATION_SLOT_IO: BuiltinTrancheIds = 58;
-pub const BuiltinTrancheIds_LWTRANCHE_LOCK_FASTPATH: BuiltinTrancheIds = 59;
-pub const BuiltinTrancheIds_LWTRANCHE_BUFFER_MAPPING: BuiltinTrancheIds = 60;
-pub const BuiltinTrancheIds_LWTRANCHE_LOCK_MANAGER: BuiltinTrancheIds = 61;
-pub const BuiltinTrancheIds_LWTRANCHE_PREDICATE_LOCK_MANAGER: BuiltinTrancheIds = 62;
-pub const BuiltinTrancheIds_LWTRANCHE_PARALLEL_HASH_JOIN: BuiltinTrancheIds = 63;
-pub const BuiltinTrancheIds_LWTRANCHE_PARALLEL_QUERY_DSA: BuiltinTrancheIds = 64;
-pub const BuiltinTrancheIds_LWTRANCHE_PER_SESSION_DSA: BuiltinTrancheIds = 65;
-pub const BuiltinTrancheIds_LWTRANCHE_PER_SESSION_RECORD_TYPE: BuiltinTrancheIds = 66;
-pub const BuiltinTrancheIds_LWTRANCHE_PER_SESSION_RECORD_TYPMOD: BuiltinTrancheIds = 67;
-pub const BuiltinTrancheIds_LWTRANCHE_SHARED_TUPLESTORE: BuiltinTrancheIds = 68;
-pub const BuiltinTrancheIds_LWTRANCHE_SHARED_TIDBITMAP: BuiltinTrancheIds = 69;
-pub const BuiltinTrancheIds_LWTRANCHE_PARALLEL_APPEND: BuiltinTrancheIds = 70;
-pub const BuiltinTrancheIds_LWTRANCHE_PER_XACT_PREDICATE_LIST: BuiltinTrancheIds = 71;
-pub const BuiltinTrancheIds_LWTRANCHE_PGSTATS_DSA: BuiltinTrancheIds = 72;
-pub const BuiltinTrancheIds_LWTRANCHE_PGSTATS_HASH: BuiltinTrancheIds = 73;
-pub const BuiltinTrancheIds_LWTRANCHE_PGSTATS_DATA: BuiltinTrancheIds = 74;
-pub const BuiltinTrancheIds_LWTRANCHE_LAUNCHER_DSA: BuiltinTrancheIds = 75;
-pub const BuiltinTrancheIds_LWTRANCHE_LAUNCHER_HASH: BuiltinTrancheIds = 76;
-pub const BuiltinTrancheIds_LWTRANCHE_FIRST_USER_DEFINED: BuiltinTrancheIds = 77;
-pub type BuiltinTrancheIds = ::std::os::raw::c_uint;
+pub mod LWLockMode {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const LW_EXCLUSIVE: Type = 0;
+    pub const LW_SHARED: Type = 1;
+    pub const LW_WAIT_UNTIL_FREE: Type = 2;
+}
+pub mod BuiltinTrancheIds {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const LWTRANCHE_XACT_BUFFER: Type = 48;
+    pub const LWTRANCHE_COMMITTS_BUFFER: Type = 49;
+    pub const LWTRANCHE_SUBTRANS_BUFFER: Type = 50;
+    pub const LWTRANCHE_MULTIXACTOFFSET_BUFFER: Type = 51;
+    pub const LWTRANCHE_MULTIXACTMEMBER_BUFFER: Type = 52;
+    pub const LWTRANCHE_NOTIFY_BUFFER: Type = 53;
+    pub const LWTRANCHE_SERIAL_BUFFER: Type = 54;
+    pub const LWTRANCHE_WAL_INSERT: Type = 55;
+    pub const LWTRANCHE_BUFFER_CONTENT: Type = 56;
+    pub const LWTRANCHE_REPLICATION_ORIGIN_STATE: Type = 57;
+    pub const LWTRANCHE_REPLICATION_SLOT_IO: Type = 58;
+    pub const LWTRANCHE_LOCK_FASTPATH: Type = 59;
+    pub const LWTRANCHE_BUFFER_MAPPING: Type = 60;
+    pub const LWTRANCHE_LOCK_MANAGER: Type = 61;
+    pub const LWTRANCHE_PREDICATE_LOCK_MANAGER: Type = 62;
+    pub const LWTRANCHE_PARALLEL_HASH_JOIN: Type = 63;
+    pub const LWTRANCHE_PARALLEL_QUERY_DSA: Type = 64;
+    pub const LWTRANCHE_PER_SESSION_DSA: Type = 65;
+    pub const LWTRANCHE_PER_SESSION_RECORD_TYPE: Type = 66;
+    pub const LWTRANCHE_PER_SESSION_RECORD_TYPMOD: Type = 67;
+    pub const LWTRANCHE_SHARED_TUPLESTORE: Type = 68;
+    pub const LWTRANCHE_SHARED_TIDBITMAP: Type = 69;
+    pub const LWTRANCHE_PARALLEL_APPEND: Type = 70;
+    pub const LWTRANCHE_PER_XACT_PREDICATE_LIST: Type = 71;
+    pub const LWTRANCHE_PGSTATS_DSA: Type = 72;
+    pub const LWTRANCHE_PGSTATS_HASH: Type = 73;
+    pub const LWTRANCHE_PGSTATS_DATA: Type = 74;
+    pub const LWTRANCHE_LAUNCHER_DSA: Type = 75;
+    pub const LWTRANCHE_LAUNCHER_HASH: Type = 76;
+    pub const LWTRANCHE_FIRST_USER_DEFINED: Type = 77;
+}
 pub type LWLockId = *mut LWLock;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -19875,19 +23478,21 @@ impl Default for LockMethodData {
 }
 pub type LockMethod = *const LockMethodData;
 pub type LOCKMETHODID = uint16;
-pub const LockTagType_LOCKTAG_RELATION: LockTagType = 0;
-pub const LockTagType_LOCKTAG_RELATION_EXTEND: LockTagType = 1;
-pub const LockTagType_LOCKTAG_DATABASE_FROZEN_IDS: LockTagType = 2;
-pub const LockTagType_LOCKTAG_PAGE: LockTagType = 3;
-pub const LockTagType_LOCKTAG_TUPLE: LockTagType = 4;
-pub const LockTagType_LOCKTAG_TRANSACTION: LockTagType = 5;
-pub const LockTagType_LOCKTAG_VIRTUALTRANSACTION: LockTagType = 6;
-pub const LockTagType_LOCKTAG_SPECULATIVE_TOKEN: LockTagType = 7;
-pub const LockTagType_LOCKTAG_OBJECT: LockTagType = 8;
-pub const LockTagType_LOCKTAG_USERLOCK: LockTagType = 9;
-pub const LockTagType_LOCKTAG_ADVISORY: LockTagType = 10;
-pub const LockTagType_LOCKTAG_APPLY_TRANSACTION: LockTagType = 11;
-pub type LockTagType = ::std::os::raw::c_uint;
+pub mod LockTagType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const LOCKTAG_RELATION: Type = 0;
+    pub const LOCKTAG_RELATION_EXTEND: Type = 1;
+    pub const LOCKTAG_DATABASE_FROZEN_IDS: Type = 2;
+    pub const LOCKTAG_PAGE: Type = 3;
+    pub const LOCKTAG_TUPLE: Type = 4;
+    pub const LOCKTAG_TRANSACTION: Type = 5;
+    pub const LOCKTAG_VIRTUALTRANSACTION: Type = 6;
+    pub const LOCKTAG_SPECULATIVE_TOKEN: Type = 7;
+    pub const LOCKTAG_OBJECT: Type = 8;
+    pub const LOCKTAG_USERLOCK: Type = 9;
+    pub const LOCKTAG_ADVISORY: Type = 10;
+    pub const LOCKTAG_APPLY_TRANSACTION: Type = 11;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct LOCKTAG {
@@ -20057,39 +23662,47 @@ impl Default for BlockedProcsData {
         }
     }
 }
-pub const LockAcquireResult_LOCKACQUIRE_NOT_AVAIL: LockAcquireResult = 0;
-pub const LockAcquireResult_LOCKACQUIRE_OK: LockAcquireResult = 1;
-pub const LockAcquireResult_LOCKACQUIRE_ALREADY_HELD: LockAcquireResult = 2;
-pub const LockAcquireResult_LOCKACQUIRE_ALREADY_CLEAR: LockAcquireResult = 3;
-pub type LockAcquireResult = ::std::os::raw::c_uint;
-pub const DeadLockState_DS_NOT_YET_CHECKED: DeadLockState = 0;
-pub const DeadLockState_DS_NO_DEADLOCK: DeadLockState = 1;
-pub const DeadLockState_DS_SOFT_DEADLOCK: DeadLockState = 2;
-pub const DeadLockState_DS_HARD_DEADLOCK: DeadLockState = 3;
-pub const DeadLockState_DS_BLOCKED_BY_AUTOVACUUM: DeadLockState = 4;
-pub type DeadLockState = ::std::os::raw::c_uint;
-pub const relopt_type_RELOPT_TYPE_BOOL: relopt_type = 0;
-pub const relopt_type_RELOPT_TYPE_INT: relopt_type = 1;
-pub const relopt_type_RELOPT_TYPE_REAL: relopt_type = 2;
-pub const relopt_type_RELOPT_TYPE_ENUM: relopt_type = 3;
-pub const relopt_type_RELOPT_TYPE_STRING: relopt_type = 4;
-pub type relopt_type = ::std::os::raw::c_uint;
-pub const relopt_kind_RELOPT_KIND_LOCAL: relopt_kind = 0;
-pub const relopt_kind_RELOPT_KIND_HEAP: relopt_kind = 1;
-pub const relopt_kind_RELOPT_KIND_TOAST: relopt_kind = 2;
-pub const relopt_kind_RELOPT_KIND_BTREE: relopt_kind = 4;
-pub const relopt_kind_RELOPT_KIND_HASH: relopt_kind = 8;
-pub const relopt_kind_RELOPT_KIND_GIN: relopt_kind = 16;
-pub const relopt_kind_RELOPT_KIND_GIST: relopt_kind = 32;
-pub const relopt_kind_RELOPT_KIND_ATTRIBUTE: relopt_kind = 64;
-pub const relopt_kind_RELOPT_KIND_TABLESPACE: relopt_kind = 128;
-pub const relopt_kind_RELOPT_KIND_SPGIST: relopt_kind = 256;
-pub const relopt_kind_RELOPT_KIND_VIEW: relopt_kind = 512;
-pub const relopt_kind_RELOPT_KIND_BRIN: relopt_kind = 1024;
-pub const relopt_kind_RELOPT_KIND_PARTITIONED: relopt_kind = 2048;
-pub const relopt_kind_RELOPT_KIND_LAST_DEFAULT: relopt_kind = 2048;
-pub const relopt_kind_RELOPT_KIND_MAX: relopt_kind = 1073741824;
-pub type relopt_kind = ::std::os::raw::c_uint;
+pub mod LockAcquireResult {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const LOCKACQUIRE_NOT_AVAIL: Type = 0;
+    pub const LOCKACQUIRE_OK: Type = 1;
+    pub const LOCKACQUIRE_ALREADY_HELD: Type = 2;
+    pub const LOCKACQUIRE_ALREADY_CLEAR: Type = 3;
+}
+pub mod DeadLockState {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const DS_NOT_YET_CHECKED: Type = 0;
+    pub const DS_NO_DEADLOCK: Type = 1;
+    pub const DS_SOFT_DEADLOCK: Type = 2;
+    pub const DS_HARD_DEADLOCK: Type = 3;
+    pub const DS_BLOCKED_BY_AUTOVACUUM: Type = 4;
+}
+pub mod relopt_type {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RELOPT_TYPE_BOOL: Type = 0;
+    pub const RELOPT_TYPE_INT: Type = 1;
+    pub const RELOPT_TYPE_REAL: Type = 2;
+    pub const RELOPT_TYPE_ENUM: Type = 3;
+    pub const RELOPT_TYPE_STRING: Type = 4;
+}
+pub mod relopt_kind {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RELOPT_KIND_LOCAL: Type = 0;
+    pub const RELOPT_KIND_HEAP: Type = 1;
+    pub const RELOPT_KIND_TOAST: Type = 2;
+    pub const RELOPT_KIND_BTREE: Type = 4;
+    pub const RELOPT_KIND_HASH: Type = 8;
+    pub const RELOPT_KIND_GIN: Type = 16;
+    pub const RELOPT_KIND_GIST: Type = 32;
+    pub const RELOPT_KIND_ATTRIBUTE: Type = 64;
+    pub const RELOPT_KIND_TABLESPACE: Type = 128;
+    pub const RELOPT_KIND_SPGIST: Type = 256;
+    pub const RELOPT_KIND_VIEW: Type = 512;
+    pub const RELOPT_KIND_BRIN: Type = 1024;
+    pub const RELOPT_KIND_PARTITIONED: Type = 2048;
+    pub const RELOPT_KIND_LAST_DEFAULT: Type = 2048;
+    pub const RELOPT_KIND_MAX: Type = 1073741824;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct relopt_gen {
@@ -20098,7 +23711,7 @@ pub struct relopt_gen {
     pub kinds: bits32,
     pub lockmode: LOCKMODE,
     pub namelen: ::std::os::raw::c_int,
-    pub type_: relopt_type,
+    pub type_: relopt_type::Type,
 }
 impl Default for relopt_gen {
     fn default() -> Self {
@@ -20262,7 +23875,7 @@ impl Default for relopt_string {
 #[derive(Debug, Copy, Clone)]
 pub struct relopt_parse_elt {
     pub optname: *const ::std::os::raw::c_char,
-    pub opttype: relopt_type,
+    pub opttype: relopt_type::Type,
     pub offset: ::std::os::raw::c_int,
 }
 impl Default for relopt_parse_elt {
@@ -20334,21 +23947,23 @@ impl Default for CheckPoint {
         }
     }
 }
-pub const DBState_DB_STARTUP: DBState = 0;
-pub const DBState_DB_SHUTDOWNED: DBState = 1;
-pub const DBState_DB_SHUTDOWNED_IN_RECOVERY: DBState = 2;
-pub const DBState_DB_SHUTDOWNING: DBState = 3;
-pub const DBState_DB_IN_CRASH_RECOVERY: DBState = 4;
-pub const DBState_DB_IN_ARCHIVE_RECOVERY: DBState = 5;
-pub const DBState_DB_IN_PRODUCTION: DBState = 6;
-pub type DBState = ::std::os::raw::c_uint;
+pub mod DBState {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const DB_STARTUP: Type = 0;
+    pub const DB_SHUTDOWNED: Type = 1;
+    pub const DB_SHUTDOWNED_IN_RECOVERY: Type = 2;
+    pub const DB_SHUTDOWNING: Type = 3;
+    pub const DB_IN_CRASH_RECOVERY: Type = 4;
+    pub const DB_IN_ARCHIVE_RECOVERY: Type = 5;
+    pub const DB_IN_PRODUCTION: Type = 6;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ControlFileData {
     pub system_identifier: uint64,
     pub pg_control_version: uint32,
     pub catalog_version_no: uint32,
-    pub state: DBState,
+    pub state: DBState::Type,
     pub time: pg_time_t,
     pub checkPoint: XLogRecPtr,
     pub checkPointCopy: CheckPoint,
@@ -20390,24 +24005,27 @@ impl Default for ControlFileData {
         }
     }
 }
-pub const RecoveryTargetType_RECOVERY_TARGET_UNSET: RecoveryTargetType = 0;
-pub const RecoveryTargetType_RECOVERY_TARGET_XID: RecoveryTargetType = 1;
-pub const RecoveryTargetType_RECOVERY_TARGET_TIME: RecoveryTargetType = 2;
-pub const RecoveryTargetType_RECOVERY_TARGET_NAME: RecoveryTargetType = 3;
-pub const RecoveryTargetType_RECOVERY_TARGET_LSN: RecoveryTargetType = 4;
-pub const RecoveryTargetType_RECOVERY_TARGET_IMMEDIATE: RecoveryTargetType = 5;
-pub type RecoveryTargetType = ::std::os::raw::c_uint;
-pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_CONTROLFILE:
-    RecoveryTargetTimeLineGoal = 0;
-pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_LATEST: RecoveryTargetTimeLineGoal =
-    1;
-pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_NUMERIC: RecoveryTargetTimeLineGoal =
-    2;
-pub type RecoveryTargetTimeLineGoal = ::std::os::raw::c_uint;
-pub const RecoveryPauseState_RECOVERY_NOT_PAUSED: RecoveryPauseState = 0;
-pub const RecoveryPauseState_RECOVERY_PAUSE_REQUESTED: RecoveryPauseState = 1;
-pub const RecoveryPauseState_RECOVERY_PAUSED: RecoveryPauseState = 2;
-pub type RecoveryPauseState = ::std::os::raw::c_uint;
+pub mod RecoveryTargetType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RECOVERY_TARGET_UNSET: Type = 0;
+    pub const RECOVERY_TARGET_XID: Type = 1;
+    pub const RECOVERY_TARGET_TIME: Type = 2;
+    pub const RECOVERY_TARGET_NAME: Type = 3;
+    pub const RECOVERY_TARGET_LSN: Type = 4;
+    pub const RECOVERY_TARGET_IMMEDIATE: Type = 5;
+}
+pub mod RecoveryTargetTimeLineGoal {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RECOVERY_TARGET_TIMELINE_CONTROLFILE: Type = 0;
+    pub const RECOVERY_TARGET_TIMELINE_LATEST: Type = 1;
+    pub const RECOVERY_TARGET_TIMELINE_NUMERIC: Type = 2;
+}
+pub mod RecoveryPauseState {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RECOVERY_NOT_PAUSED: Type = 0;
+    pub const RECOVERY_PAUSE_REQUESTED: Type = 1;
+    pub const RECOVERY_PAUSED: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct EndOfWalRecoveryInfo {
@@ -20432,72 +24050,166 @@ impl Default for EndOfWalRecoveryInfo {
         }
     }
 }
-pub const DependencyType_DEPENDENCY_NORMAL: DependencyType = 110;
-pub const DependencyType_DEPENDENCY_AUTO: DependencyType = 97;
-pub const DependencyType_DEPENDENCY_INTERNAL: DependencyType = 105;
-pub const DependencyType_DEPENDENCY_PARTITION_PRI: DependencyType = 80;
-pub const DependencyType_DEPENDENCY_PARTITION_SEC: DependencyType = 83;
-pub const DependencyType_DEPENDENCY_EXTENSION: DependencyType = 101;
-pub const DependencyType_DEPENDENCY_AUTO_EXTENSION: DependencyType = 120;
-pub type DependencyType = ::std::os::raw::c_uint;
-pub const SharedDependencyType_SHARED_DEPENDENCY_OWNER: SharedDependencyType = 111;
-pub const SharedDependencyType_SHARED_DEPENDENCY_ACL: SharedDependencyType = 97;
-pub const SharedDependencyType_SHARED_DEPENDENCY_POLICY: SharedDependencyType = 114;
-pub const SharedDependencyType_SHARED_DEPENDENCY_TABLESPACE: SharedDependencyType = 116;
-pub const SharedDependencyType_SHARED_DEPENDENCY_INVALID: SharedDependencyType = 0;
-pub type SharedDependencyType = ::std::os::raw::c_uint;
+pub type ResourceOwner = *mut ResourceOwnerData;
+pub mod ResourceReleasePhase {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RESOURCE_RELEASE_BEFORE_LOCKS: Type = 0;
+    pub const RESOURCE_RELEASE_LOCKS: Type = 1;
+    pub const RESOURCE_RELEASE_AFTER_LOCKS: Type = 2;
+}
+pub type ResourceReleaseCallback = ::std::option::Option<
+    unsafe extern "C" fn(
+        phase: ResourceReleasePhase::Type,
+        isCommit: bool,
+        isTopLevel: bool,
+        arg: *mut ::std::os::raw::c_void,
+    ),
+>;
+pub type Block = *mut ::std::os::raw::c_void;
+pub mod BufferAccessStrategyType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const BAS_NORMAL: Type = 0;
+    pub const BAS_BULKREAD: Type = 1;
+    pub const BAS_BULKWRITE: Type = 2;
+    pub const BAS_VACUUM: Type = 3;
+}
+pub mod ReadBufferMode {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RBM_NORMAL: Type = 0;
+    pub const RBM_ZERO_AND_LOCK: Type = 1;
+    pub const RBM_ZERO_AND_CLEANUP_LOCK: Type = 2;
+    pub const RBM_ZERO_ON_ERROR: Type = 3;
+    pub const RBM_NORMAL_NO_LOG: Type = 4;
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PrefetchBufferResult {
+    pub recent_buffer: Buffer,
+    pub initiated_io: bool,
+}
+pub mod ExtendBufferedFlags {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const EB_SKIP_EXTENSION_LOCK: Type = 1;
+    pub const EB_PERFORMING_RECOVERY: Type = 2;
+    pub const EB_CREATE_FORK_IF_NEEDED: Type = 4;
+    pub const EB_LOCK_FIRST: Type = 8;
+    pub const EB_CLEAR_SIZE_CACHE: Type = 16;
+    pub const EB_LOCK_TARGET: Type = 32;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct BufferManagerRelation {
+    pub rel: Relation,
+    pub smgr: *mut SMgrRelationData,
+    pub relpersistence: ::std::os::raw::c_char,
+}
+impl Default for BufferManagerRelation {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WritebackContext {
+    _unused: [u8; 0],
+}
+pub mod HotStandbyState {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const STANDBY_DISABLED: Type = 0;
+    pub const STANDBY_INITIALIZED: Type = 1;
+    pub const STANDBY_SNAPSHOT_PENDING: Type = 2;
+    pub const STANDBY_SNAPSHOT_READY: Type = 3;
+}
+pub mod XLogRedoAction {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const BLK_NEEDS_REDO: Type = 0;
+    pub const BLK_DONE: Type = 1;
+    pub const BLK_RESTORED: Type = 2;
+    pub const BLK_NOTFOUND: Type = 3;
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ReadLocalXLogPageNoWaitPrivate {
+    pub end_of_wal: bool,
+}
+pub mod DependencyType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const DEPENDENCY_NORMAL: Type = 110;
+    pub const DEPENDENCY_AUTO: Type = 97;
+    pub const DEPENDENCY_INTERNAL: Type = 105;
+    pub const DEPENDENCY_PARTITION_PRI: Type = 80;
+    pub const DEPENDENCY_PARTITION_SEC: Type = 83;
+    pub const DEPENDENCY_EXTENSION: Type = 101;
+    pub const DEPENDENCY_AUTO_EXTENSION: Type = 120;
+}
+pub mod SharedDependencyType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SHARED_DEPENDENCY_OWNER: Type = 111;
+    pub const SHARED_DEPENDENCY_ACL: Type = 97;
+    pub const SHARED_DEPENDENCY_POLICY: Type = 114;
+    pub const SHARED_DEPENDENCY_TABLESPACE: Type = 116;
+    pub const SHARED_DEPENDENCY_INVALID: Type = 0;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ObjectAddresses {
     _unused: [u8; 0],
 }
-pub const ObjectClass_OCLASS_CLASS: ObjectClass = 0;
-pub const ObjectClass_OCLASS_PROC: ObjectClass = 1;
-pub const ObjectClass_OCLASS_TYPE: ObjectClass = 2;
-pub const ObjectClass_OCLASS_CAST: ObjectClass = 3;
-pub const ObjectClass_OCLASS_COLLATION: ObjectClass = 4;
-pub const ObjectClass_OCLASS_CONSTRAINT: ObjectClass = 5;
-pub const ObjectClass_OCLASS_CONVERSION: ObjectClass = 6;
-pub const ObjectClass_OCLASS_DEFAULT: ObjectClass = 7;
-pub const ObjectClass_OCLASS_LANGUAGE: ObjectClass = 8;
-pub const ObjectClass_OCLASS_LARGEOBJECT: ObjectClass = 9;
-pub const ObjectClass_OCLASS_OPERATOR: ObjectClass = 10;
-pub const ObjectClass_OCLASS_OPCLASS: ObjectClass = 11;
-pub const ObjectClass_OCLASS_OPFAMILY: ObjectClass = 12;
-pub const ObjectClass_OCLASS_AM: ObjectClass = 13;
-pub const ObjectClass_OCLASS_AMOP: ObjectClass = 14;
-pub const ObjectClass_OCLASS_AMPROC: ObjectClass = 15;
-pub const ObjectClass_OCLASS_REWRITE: ObjectClass = 16;
-pub const ObjectClass_OCLASS_TRIGGER: ObjectClass = 17;
-pub const ObjectClass_OCLASS_SCHEMA: ObjectClass = 18;
-pub const ObjectClass_OCLASS_STATISTIC_EXT: ObjectClass = 19;
-pub const ObjectClass_OCLASS_TSPARSER: ObjectClass = 20;
-pub const ObjectClass_OCLASS_TSDICT: ObjectClass = 21;
-pub const ObjectClass_OCLASS_TSTEMPLATE: ObjectClass = 22;
-pub const ObjectClass_OCLASS_TSCONFIG: ObjectClass = 23;
-pub const ObjectClass_OCLASS_ROLE: ObjectClass = 24;
-pub const ObjectClass_OCLASS_ROLE_MEMBERSHIP: ObjectClass = 25;
-pub const ObjectClass_OCLASS_DATABASE: ObjectClass = 26;
-pub const ObjectClass_OCLASS_TBLSPACE: ObjectClass = 27;
-pub const ObjectClass_OCLASS_FDW: ObjectClass = 28;
-pub const ObjectClass_OCLASS_FOREIGN_SERVER: ObjectClass = 29;
-pub const ObjectClass_OCLASS_USER_MAPPING: ObjectClass = 30;
-pub const ObjectClass_OCLASS_DEFACL: ObjectClass = 31;
-pub const ObjectClass_OCLASS_EXTENSION: ObjectClass = 32;
-pub const ObjectClass_OCLASS_EVENT_TRIGGER: ObjectClass = 33;
-pub const ObjectClass_OCLASS_PARAMETER_ACL: ObjectClass = 34;
-pub const ObjectClass_OCLASS_POLICY: ObjectClass = 35;
-pub const ObjectClass_OCLASS_PUBLICATION: ObjectClass = 36;
-pub const ObjectClass_OCLASS_PUBLICATION_NAMESPACE: ObjectClass = 37;
-pub const ObjectClass_OCLASS_PUBLICATION_REL: ObjectClass = 38;
-pub const ObjectClass_OCLASS_SUBSCRIPTION: ObjectClass = 39;
-pub const ObjectClass_OCLASS_TRANSFORM: ObjectClass = 40;
-pub type ObjectClass = ::std::os::raw::c_uint;
-pub const IndexStateFlagsAction_INDEX_CREATE_SET_READY: IndexStateFlagsAction = 0;
-pub const IndexStateFlagsAction_INDEX_CREATE_SET_VALID: IndexStateFlagsAction = 1;
-pub const IndexStateFlagsAction_INDEX_DROP_CLEAR_VALID: IndexStateFlagsAction = 2;
-pub const IndexStateFlagsAction_INDEX_DROP_SET_DEAD: IndexStateFlagsAction = 3;
-pub type IndexStateFlagsAction = ::std::os::raw::c_uint;
+pub mod ObjectClass {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const OCLASS_CLASS: Type = 0;
+    pub const OCLASS_PROC: Type = 1;
+    pub const OCLASS_TYPE: Type = 2;
+    pub const OCLASS_CAST: Type = 3;
+    pub const OCLASS_COLLATION: Type = 4;
+    pub const OCLASS_CONSTRAINT: Type = 5;
+    pub const OCLASS_CONVERSION: Type = 6;
+    pub const OCLASS_DEFAULT: Type = 7;
+    pub const OCLASS_LANGUAGE: Type = 8;
+    pub const OCLASS_LARGEOBJECT: Type = 9;
+    pub const OCLASS_OPERATOR: Type = 10;
+    pub const OCLASS_OPCLASS: Type = 11;
+    pub const OCLASS_OPFAMILY: Type = 12;
+    pub const OCLASS_AM: Type = 13;
+    pub const OCLASS_AMOP: Type = 14;
+    pub const OCLASS_AMPROC: Type = 15;
+    pub const OCLASS_REWRITE: Type = 16;
+    pub const OCLASS_TRIGGER: Type = 17;
+    pub const OCLASS_SCHEMA: Type = 18;
+    pub const OCLASS_STATISTIC_EXT: Type = 19;
+    pub const OCLASS_TSPARSER: Type = 20;
+    pub const OCLASS_TSDICT: Type = 21;
+    pub const OCLASS_TSTEMPLATE: Type = 22;
+    pub const OCLASS_TSCONFIG: Type = 23;
+    pub const OCLASS_ROLE: Type = 24;
+    pub const OCLASS_ROLE_MEMBERSHIP: Type = 25;
+    pub const OCLASS_DATABASE: Type = 26;
+    pub const OCLASS_TBLSPACE: Type = 27;
+    pub const OCLASS_FDW: Type = 28;
+    pub const OCLASS_FOREIGN_SERVER: Type = 29;
+    pub const OCLASS_USER_MAPPING: Type = 30;
+    pub const OCLASS_DEFACL: Type = 31;
+    pub const OCLASS_EXTENSION: Type = 32;
+    pub const OCLASS_EVENT_TRIGGER: Type = 33;
+    pub const OCLASS_PARAMETER_ACL: Type = 34;
+    pub const OCLASS_POLICY: Type = 35;
+    pub const OCLASS_PUBLICATION: Type = 36;
+    pub const OCLASS_PUBLICATION_NAMESPACE: Type = 37;
+    pub const OCLASS_PUBLICATION_REL: Type = 38;
+    pub const OCLASS_SUBSCRIPTION: Type = 39;
+    pub const OCLASS_TRANSFORM: Type = 40;
+}
+pub mod IndexStateFlagsAction {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const INDEX_CREATE_SET_READY: Type = 0;
+    pub const INDEX_CREATE_SET_VALID: Type = 1;
+    pub const INDEX_DROP_CLEAR_VALID: Type = 2;
+    pub const INDEX_DROP_SET_DEAD: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ReindexParams {
@@ -20554,10 +24266,12 @@ impl Default for _FuncCandidateList {
     }
 }
 pub type FuncCandidateList = *mut _FuncCandidateList;
-pub const TempNamespaceStatus_TEMP_NAMESPACE_NOT_TEMP: TempNamespaceStatus = 0;
-pub const TempNamespaceStatus_TEMP_NAMESPACE_IDLE: TempNamespaceStatus = 1;
-pub const TempNamespaceStatus_TEMP_NAMESPACE_IN_USE: TempNamespaceStatus = 2;
-pub type TempNamespaceStatus = ::std::os::raw::c_uint;
+pub mod TempNamespaceStatus {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const TEMP_NAMESPACE_NOT_TEMP: Type = 0;
+    pub const TEMP_NAMESPACE_IDLE: Type = 1;
+    pub const TEMP_NAMESPACE_IN_USE: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct OverrideSearchPath {
@@ -20575,10 +24289,12 @@ impl Default for OverrideSearchPath {
         }
     }
 }
-pub const RVROption_RVR_MISSING_OK: RVROption = 1;
-pub const RVROption_RVR_NOWAIT: RVROption = 2;
-pub const RVROption_RVR_SKIP_LOCKED: RVROption = 4;
-pub type RVROption = ::std::os::raw::c_uint;
+pub mod RVROption {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RVR_MISSING_OK: Type = 1;
+    pub const RVR_NOWAIT: Type = 2;
+    pub const RVR_SKIP_LOCKED: Type = 4;
+}
 pub type RangeVarGetRelidCallback = ::std::option::Option<
     unsafe extern "C" fn(
         relation: *const RangeVar,
@@ -20587,13 +24303,15 @@ pub type RangeVarGetRelidCallback = ::std::option::Option<
         callback_arg: *mut ::std::os::raw::c_void,
     ),
 >;
-pub const ObjectAccessType_OAT_POST_CREATE: ObjectAccessType = 0;
-pub const ObjectAccessType_OAT_DROP: ObjectAccessType = 1;
-pub const ObjectAccessType_OAT_POST_ALTER: ObjectAccessType = 2;
-pub const ObjectAccessType_OAT_NAMESPACE_SEARCH: ObjectAccessType = 3;
-pub const ObjectAccessType_OAT_FUNCTION_EXECUTE: ObjectAccessType = 4;
-pub const ObjectAccessType_OAT_TRUNCATE: ObjectAccessType = 5;
-pub type ObjectAccessType = ::std::os::raw::c_uint;
+pub mod ObjectAccessType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const OAT_POST_CREATE: Type = 0;
+    pub const OAT_DROP: Type = 1;
+    pub const OAT_POST_ALTER: Type = 2;
+    pub const OAT_NAMESPACE_SEARCH: Type = 3;
+    pub const OAT_FUNCTION_EXECUTE: Type = 4;
+    pub const OAT_TRUNCATE: Type = 5;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct ObjectAccessPostCreate {
@@ -20627,7 +24345,7 @@ pub struct ObjectAccessNamespaceSearch {
 }
 pub type object_access_hook_type = ::std::option::Option<
     unsafe extern "C" fn(
-        access: ObjectAccessType,
+        access: ObjectAccessType::Type,
         classId: Oid,
         objectId: Oid,
         subId: ::std::os::raw::c_int,
@@ -20636,7 +24354,7 @@ pub type object_access_hook_type = ::std::option::Option<
 >;
 pub type object_access_hook_type_str = ::std::option::Option<
     unsafe extern "C" fn(
-        access: ObjectAccessType,
+        access: ObjectAccessType::Type,
         classId: Oid,
         objectStr: *const ::std::os::raw::c_char,
         subId: ::std::os::raw::c_int,
@@ -20969,51 +24687,53 @@ impl Default for FormData_pg_proc {
     }
 }
 pub type Form_pg_proc = *mut FormData_pg_proc;
-pub const ParseExprKind_EXPR_KIND_NONE: ParseExprKind = 0;
-pub const ParseExprKind_EXPR_KIND_OTHER: ParseExprKind = 1;
-pub const ParseExprKind_EXPR_KIND_JOIN_ON: ParseExprKind = 2;
-pub const ParseExprKind_EXPR_KIND_JOIN_USING: ParseExprKind = 3;
-pub const ParseExprKind_EXPR_KIND_FROM_SUBSELECT: ParseExprKind = 4;
-pub const ParseExprKind_EXPR_KIND_FROM_FUNCTION: ParseExprKind = 5;
-pub const ParseExprKind_EXPR_KIND_WHERE: ParseExprKind = 6;
-pub const ParseExprKind_EXPR_KIND_HAVING: ParseExprKind = 7;
-pub const ParseExprKind_EXPR_KIND_FILTER: ParseExprKind = 8;
-pub const ParseExprKind_EXPR_KIND_WINDOW_PARTITION: ParseExprKind = 9;
-pub const ParseExprKind_EXPR_KIND_WINDOW_ORDER: ParseExprKind = 10;
-pub const ParseExprKind_EXPR_KIND_WINDOW_FRAME_RANGE: ParseExprKind = 11;
-pub const ParseExprKind_EXPR_KIND_WINDOW_FRAME_ROWS: ParseExprKind = 12;
-pub const ParseExprKind_EXPR_KIND_WINDOW_FRAME_GROUPS: ParseExprKind = 13;
-pub const ParseExprKind_EXPR_KIND_SELECT_TARGET: ParseExprKind = 14;
-pub const ParseExprKind_EXPR_KIND_INSERT_TARGET: ParseExprKind = 15;
-pub const ParseExprKind_EXPR_KIND_UPDATE_SOURCE: ParseExprKind = 16;
-pub const ParseExprKind_EXPR_KIND_UPDATE_TARGET: ParseExprKind = 17;
-pub const ParseExprKind_EXPR_KIND_MERGE_WHEN: ParseExprKind = 18;
-pub const ParseExprKind_EXPR_KIND_GROUP_BY: ParseExprKind = 19;
-pub const ParseExprKind_EXPR_KIND_ORDER_BY: ParseExprKind = 20;
-pub const ParseExprKind_EXPR_KIND_DISTINCT_ON: ParseExprKind = 21;
-pub const ParseExprKind_EXPR_KIND_LIMIT: ParseExprKind = 22;
-pub const ParseExprKind_EXPR_KIND_OFFSET: ParseExprKind = 23;
-pub const ParseExprKind_EXPR_KIND_RETURNING: ParseExprKind = 24;
-pub const ParseExprKind_EXPR_KIND_VALUES: ParseExprKind = 25;
-pub const ParseExprKind_EXPR_KIND_VALUES_SINGLE: ParseExprKind = 26;
-pub const ParseExprKind_EXPR_KIND_CHECK_CONSTRAINT: ParseExprKind = 27;
-pub const ParseExprKind_EXPR_KIND_DOMAIN_CHECK: ParseExprKind = 28;
-pub const ParseExprKind_EXPR_KIND_COLUMN_DEFAULT: ParseExprKind = 29;
-pub const ParseExprKind_EXPR_KIND_FUNCTION_DEFAULT: ParseExprKind = 30;
-pub const ParseExprKind_EXPR_KIND_INDEX_EXPRESSION: ParseExprKind = 31;
-pub const ParseExprKind_EXPR_KIND_INDEX_PREDICATE: ParseExprKind = 32;
-pub const ParseExprKind_EXPR_KIND_STATS_EXPRESSION: ParseExprKind = 33;
-pub const ParseExprKind_EXPR_KIND_ALTER_COL_TRANSFORM: ParseExprKind = 34;
-pub const ParseExprKind_EXPR_KIND_EXECUTE_PARAMETER: ParseExprKind = 35;
-pub const ParseExprKind_EXPR_KIND_TRIGGER_WHEN: ParseExprKind = 36;
-pub const ParseExprKind_EXPR_KIND_POLICY: ParseExprKind = 37;
-pub const ParseExprKind_EXPR_KIND_PARTITION_BOUND: ParseExprKind = 38;
-pub const ParseExprKind_EXPR_KIND_PARTITION_EXPRESSION: ParseExprKind = 39;
-pub const ParseExprKind_EXPR_KIND_CALL_ARGUMENT: ParseExprKind = 40;
-pub const ParseExprKind_EXPR_KIND_COPY_WHERE: ParseExprKind = 41;
-pub const ParseExprKind_EXPR_KIND_GENERATED_COLUMN: ParseExprKind = 42;
-pub const ParseExprKind_EXPR_KIND_CYCLE_MARK: ParseExprKind = 43;
-pub type ParseExprKind = ::std::os::raw::c_uint;
+pub mod ParseExprKind {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const EXPR_KIND_NONE: Type = 0;
+    pub const EXPR_KIND_OTHER: Type = 1;
+    pub const EXPR_KIND_JOIN_ON: Type = 2;
+    pub const EXPR_KIND_JOIN_USING: Type = 3;
+    pub const EXPR_KIND_FROM_SUBSELECT: Type = 4;
+    pub const EXPR_KIND_FROM_FUNCTION: Type = 5;
+    pub const EXPR_KIND_WHERE: Type = 6;
+    pub const EXPR_KIND_HAVING: Type = 7;
+    pub const EXPR_KIND_FILTER: Type = 8;
+    pub const EXPR_KIND_WINDOW_PARTITION: Type = 9;
+    pub const EXPR_KIND_WINDOW_ORDER: Type = 10;
+    pub const EXPR_KIND_WINDOW_FRAME_RANGE: Type = 11;
+    pub const EXPR_KIND_WINDOW_FRAME_ROWS: Type = 12;
+    pub const EXPR_KIND_WINDOW_FRAME_GROUPS: Type = 13;
+    pub const EXPR_KIND_SELECT_TARGET: Type = 14;
+    pub const EXPR_KIND_INSERT_TARGET: Type = 15;
+    pub const EXPR_KIND_UPDATE_SOURCE: Type = 16;
+    pub const EXPR_KIND_UPDATE_TARGET: Type = 17;
+    pub const EXPR_KIND_MERGE_WHEN: Type = 18;
+    pub const EXPR_KIND_GROUP_BY: Type = 19;
+    pub const EXPR_KIND_ORDER_BY: Type = 20;
+    pub const EXPR_KIND_DISTINCT_ON: Type = 21;
+    pub const EXPR_KIND_LIMIT: Type = 22;
+    pub const EXPR_KIND_OFFSET: Type = 23;
+    pub const EXPR_KIND_RETURNING: Type = 24;
+    pub const EXPR_KIND_VALUES: Type = 25;
+    pub const EXPR_KIND_VALUES_SINGLE: Type = 26;
+    pub const EXPR_KIND_CHECK_CONSTRAINT: Type = 27;
+    pub const EXPR_KIND_DOMAIN_CHECK: Type = 28;
+    pub const EXPR_KIND_COLUMN_DEFAULT: Type = 29;
+    pub const EXPR_KIND_FUNCTION_DEFAULT: Type = 30;
+    pub const EXPR_KIND_INDEX_EXPRESSION: Type = 31;
+    pub const EXPR_KIND_INDEX_PREDICATE: Type = 32;
+    pub const EXPR_KIND_STATS_EXPRESSION: Type = 33;
+    pub const EXPR_KIND_ALTER_COL_TRANSFORM: Type = 34;
+    pub const EXPR_KIND_EXECUTE_PARAMETER: Type = 35;
+    pub const EXPR_KIND_TRIGGER_WHEN: Type = 36;
+    pub const EXPR_KIND_POLICY: Type = 37;
+    pub const EXPR_KIND_PARTITION_BOUND: Type = 38;
+    pub const EXPR_KIND_PARTITION_EXPRESSION: Type = 39;
+    pub const EXPR_KIND_CALL_ARGUMENT: Type = 40;
+    pub const EXPR_KIND_COPY_WHERE: Type = 41;
+    pub const EXPR_KIND_GENERATED_COLUMN: Type = 42;
+    pub const EXPR_KIND_CYCLE_MARK: Type = 43;
+}
 pub type PreParseColumnRefHook = ::std::option::Option<
     unsafe extern "C" fn(pstate: *mut ParseState, cref: *mut ColumnRef) -> *mut Node,
 >;
@@ -21055,7 +24775,7 @@ pub struct ParseState {
     pub p_target_nsitem: *mut ParseNamespaceItem,
     pub p_is_insert: bool,
     pub p_windowdefs: *mut List,
-    pub p_expr_kind: ParseExprKind,
+    pub p_expr_kind: ParseExprKind::Type,
     pub p_next_resno: ::std::os::raw::c_int,
     pub p_multiassign_exprs: *mut List,
     pub p_locking_clause: *mut List,
@@ -21159,13 +24879,17 @@ impl Default for AclItem {
     }
 }
 pub type Acl = ArrayType;
-pub const AclMaskHow_ACLMASK_ALL: AclMaskHow = 0;
-pub const AclMaskHow_ACLMASK_ANY: AclMaskHow = 1;
-pub type AclMaskHow = ::std::os::raw::c_uint;
-pub const AclResult_ACLCHECK_OK: AclResult = 0;
-pub const AclResult_ACLCHECK_NO_PRIV: AclResult = 1;
-pub const AclResult_ACLCHECK_NOT_OWNER: AclResult = 2;
-pub type AclResult = ::std::os::raw::c_uint;
+pub mod AclMaskHow {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const ACLMASK_ALL: Type = 0;
+    pub const ACLMASK_ANY: Type = 1;
+}
+pub mod AclResult {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const ACLCHECK_OK: Type = 0;
+    pub const ACLCHECK_NO_PRIV: Type = 1;
+    pub const ACLCHECK_NOT_OWNER: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct FormData_pg_namespace {
@@ -21272,6 +24996,23 @@ impl Default for FormData_pg_type {
     }
 }
 pub type Form_pg_type = *mut FormData_pg_type;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct FormData_pg_user_mapping {
+    pub oid: Oid,
+    pub umuser: Oid,
+    pub umserver: Oid,
+}
+impl Default for FormData_pg_user_mapping {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type Form_pg_user_mapping = *mut FormData_pg_user_mapping;
 pub type EOM_get_flat_size_method =
     ::std::option::Option<unsafe extern "C" fn(eohptr: *mut ExpandedObjectHeader) -> Size>;
 pub type EOM_flatten_into_method = ::std::option::Option<
@@ -21497,14 +25238,14 @@ pub type Form_pg_event_trigger = *mut FormData_pg_event_trigger;
 #[derive(Debug, Copy, Clone)]
 pub struct InternalGrant {
     pub is_grant: bool,
-    pub objtype: ObjectType,
+    pub objtype: ObjectType::Type,
     pub objects: *mut List,
     pub all_privs: bool,
     pub privileges: AclMode,
     pub col_privs: *mut List,
     pub grantees: *mut List,
     pub grant_option: bool,
-    pub behavior: DropBehavior,
+    pub behavior: DropBehavior::Type,
 }
 impl Default for InternalGrant {
     fn default() -> Self {
@@ -21515,14 +25256,16 @@ impl Default for InternalGrant {
         }
     }
 }
-pub const CollectedCommandType_SCT_Simple: CollectedCommandType = 0;
-pub const CollectedCommandType_SCT_AlterTable: CollectedCommandType = 1;
-pub const CollectedCommandType_SCT_Grant: CollectedCommandType = 2;
-pub const CollectedCommandType_SCT_AlterOpFamily: CollectedCommandType = 3;
-pub const CollectedCommandType_SCT_AlterDefaultPrivileges: CollectedCommandType = 4;
-pub const CollectedCommandType_SCT_CreateOpClass: CollectedCommandType = 5;
-pub const CollectedCommandType_SCT_AlterTSConfig: CollectedCommandType = 6;
-pub type CollectedCommandType = ::std::os::raw::c_uint;
+pub mod CollectedCommandType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SCT_Simple: Type = 0;
+    pub const SCT_AlterTable: Type = 1;
+    pub const SCT_Grant: Type = 2;
+    pub const SCT_AlterOpFamily: Type = 3;
+    pub const SCT_AlterDefaultPrivileges: Type = 4;
+    pub const SCT_CreateOpClass: Type = 5;
+    pub const SCT_AlterTSConfig: Type = 6;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct CollectedATSubcmd {
@@ -21541,7 +25284,7 @@ impl Default for CollectedATSubcmd {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct CollectedCommand {
-    pub type_: CollectedCommandType,
+    pub type_: CollectedCommandType::Type,
     pub in_extension: bool,
     pub parsetree: *mut Node,
     pub d: CollectedCommand__bindgen_ty_1,
@@ -21654,7 +25397,7 @@ impl Default for CollectedCommand__bindgen_ty_1__bindgen_ty_6 {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct CollectedCommand__bindgen_ty_1__bindgen_ty_7 {
-    pub objtype: ObjectType,
+    pub objtype: ObjectType::Type,
 }
 impl Default for CollectedCommand__bindgen_ty_1__bindgen_ty_7 {
     fn default() -> Self {
@@ -21689,7 +25432,7 @@ pub struct EventTriggerData {
     pub type_: NodeTag,
     pub event: *const ::std::os::raw::c_char,
     pub parsetree: *mut Node,
-    pub tag: CommandTag,
+    pub tag: CommandTag::Type,
 }
 impl Default for EventTriggerData {
     fn default() -> Self {
@@ -21700,11 +25443,13 @@ impl Default for EventTriggerData {
         }
     }
 }
-pub const ExplainFormat_EXPLAIN_FORMAT_TEXT: ExplainFormat = 0;
-pub const ExplainFormat_EXPLAIN_FORMAT_XML: ExplainFormat = 1;
-pub const ExplainFormat_EXPLAIN_FORMAT_JSON: ExplainFormat = 2;
-pub const ExplainFormat_EXPLAIN_FORMAT_YAML: ExplainFormat = 3;
-pub type ExplainFormat = ::std::os::raw::c_uint;
+pub mod ExplainFormat {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const EXPLAIN_FORMAT_TEXT: Type = 0;
+    pub const EXPLAIN_FORMAT_XML: Type = 1;
+    pub const EXPLAIN_FORMAT_JSON: Type = 2;
+    pub const EXPLAIN_FORMAT_YAML: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ExplainWorkersState {
@@ -21736,7 +25481,7 @@ pub struct ExplainState {
     pub summary: bool,
     pub settings: bool,
     pub generic: bool,
-    pub format: ExplainFormat,
+    pub format: ExplainFormat::Type,
     pub indent: ::std::os::raw::c_int,
     pub grouping_stack: *mut List,
     pub pstmt: *mut PlannedStmt,
@@ -21859,33 +25604,39 @@ impl Default for TransitionCaptureState {
         }
     }
 }
-pub const PasswordType_PASSWORD_TYPE_PLAINTEXT: PasswordType = 0;
-pub const PasswordType_PASSWORD_TYPE_MD5: PasswordType = 1;
-pub const PasswordType_PASSWORD_TYPE_SCRAM_SHA_256: PasswordType = 2;
-pub type PasswordType = ::std::os::raw::c_uint;
-pub const GucContext_PGC_INTERNAL: GucContext = 0;
-pub const GucContext_PGC_POSTMASTER: GucContext = 1;
-pub const GucContext_PGC_SIGHUP: GucContext = 2;
-pub const GucContext_PGC_SU_BACKEND: GucContext = 3;
-pub const GucContext_PGC_BACKEND: GucContext = 4;
-pub const GucContext_PGC_SUSET: GucContext = 5;
-pub const GucContext_PGC_USERSET: GucContext = 6;
-pub type GucContext = ::std::os::raw::c_uint;
-pub const GucSource_PGC_S_DEFAULT: GucSource = 0;
-pub const GucSource_PGC_S_DYNAMIC_DEFAULT: GucSource = 1;
-pub const GucSource_PGC_S_ENV_VAR: GucSource = 2;
-pub const GucSource_PGC_S_FILE: GucSource = 3;
-pub const GucSource_PGC_S_ARGV: GucSource = 4;
-pub const GucSource_PGC_S_GLOBAL: GucSource = 5;
-pub const GucSource_PGC_S_DATABASE: GucSource = 6;
-pub const GucSource_PGC_S_USER: GucSource = 7;
-pub const GucSource_PGC_S_DATABASE_USER: GucSource = 8;
-pub const GucSource_PGC_S_CLIENT: GucSource = 9;
-pub const GucSource_PGC_S_OVERRIDE: GucSource = 10;
-pub const GucSource_PGC_S_INTERACTIVE: GucSource = 11;
-pub const GucSource_PGC_S_TEST: GucSource = 12;
-pub const GucSource_PGC_S_SESSION: GucSource = 13;
-pub type GucSource = ::std::os::raw::c_uint;
+pub mod PasswordType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PASSWORD_TYPE_PLAINTEXT: Type = 0;
+    pub const PASSWORD_TYPE_MD5: Type = 1;
+    pub const PASSWORD_TYPE_SCRAM_SHA_256: Type = 2;
+}
+pub mod GucContext {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PGC_INTERNAL: Type = 0;
+    pub const PGC_POSTMASTER: Type = 1;
+    pub const PGC_SIGHUP: Type = 2;
+    pub const PGC_SU_BACKEND: Type = 3;
+    pub const PGC_BACKEND: Type = 4;
+    pub const PGC_SUSET: Type = 5;
+    pub const PGC_USERSET: Type = 6;
+}
+pub mod GucSource {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PGC_S_DEFAULT: Type = 0;
+    pub const PGC_S_DYNAMIC_DEFAULT: Type = 1;
+    pub const PGC_S_ENV_VAR: Type = 2;
+    pub const PGC_S_FILE: Type = 3;
+    pub const PGC_S_ARGV: Type = 4;
+    pub const PGC_S_GLOBAL: Type = 5;
+    pub const PGC_S_DATABASE: Type = 6;
+    pub const PGC_S_USER: Type = 7;
+    pub const PGC_S_DATABASE_USER: Type = 8;
+    pub const PGC_S_CLIENT: Type = 9;
+    pub const PGC_S_OVERRIDE: Type = 10;
+    pub const PGC_S_INTERACTIVE: Type = 11;
+    pub const PGC_S_TEST: Type = 12;
+    pub const PGC_S_SESSION: Type = 13;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ConfigVariable {
@@ -21927,35 +25678,35 @@ pub type GucBoolCheckHook = ::std::option::Option<
     unsafe extern "C" fn(
         newval: *mut bool,
         extra: *mut *mut ::std::os::raw::c_void,
-        source: GucSource,
+        source: GucSource::Type,
     ) -> bool,
 >;
 pub type GucIntCheckHook = ::std::option::Option<
     unsafe extern "C" fn(
         newval: *mut ::std::os::raw::c_int,
         extra: *mut *mut ::std::os::raw::c_void,
-        source: GucSource,
+        source: GucSource::Type,
     ) -> bool,
 >;
 pub type GucRealCheckHook = ::std::option::Option<
     unsafe extern "C" fn(
         newval: *mut f64,
         extra: *mut *mut ::std::os::raw::c_void,
-        source: GucSource,
+        source: GucSource::Type,
     ) -> bool,
 >;
 pub type GucStringCheckHook = ::std::option::Option<
     unsafe extern "C" fn(
         newval: *mut *mut ::std::os::raw::c_char,
         extra: *mut *mut ::std::os::raw::c_void,
-        source: GucSource,
+        source: GucSource::Type,
     ) -> bool,
 >;
 pub type GucEnumCheckHook = ::std::option::Option<
     unsafe extern "C" fn(
         newval: *mut ::std::os::raw::c_int,
         extra: *mut *mut ::std::os::raw::c_void,
-        source: GucSource,
+        source: GucSource::Type,
     ) -> bool,
 >;
 pub type GucBoolAssignHook =
@@ -21973,31 +25724,35 @@ pub type GucEnumAssignHook = ::std::option::Option<
 >;
 pub type GucShowHook =
     ::std::option::Option<unsafe extern "C" fn() -> *const ::std::os::raw::c_char>;
-pub const GucAction_GUC_ACTION_SET: GucAction = 0;
-pub const GucAction_GUC_ACTION_LOCAL: GucAction = 1;
-pub const GucAction_GUC_ACTION_SAVE: GucAction = 2;
-pub type GucAction = ::std::os::raw::c_uint;
+pub mod GucAction {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const GUC_ACTION_SET: Type = 0;
+    pub const GUC_ACTION_LOCAL: Type = 1;
+    pub const GUC_ACTION_SAVE: Type = 2;
+}
 pub type check_password_hook_type = ::std::option::Option<
     unsafe extern "C" fn(
         username: *const ::std::os::raw::c_char,
         shadow_pass: *const ::std::os::raw::c_char,
-        password_type: PasswordType,
+        password_type: PasswordType::Type,
         validuntil_time: Datum,
         validuntil_null: bool,
     ),
 >;
 pub type bgworker_main_type = ::std::option::Option<unsafe extern "C" fn(main_arg: Datum)>;
-pub const BgWorkerStartTime_BgWorkerStart_PostmasterStart: BgWorkerStartTime = 0;
-pub const BgWorkerStartTime_BgWorkerStart_ConsistentState: BgWorkerStartTime = 1;
-pub const BgWorkerStartTime_BgWorkerStart_RecoveryFinished: BgWorkerStartTime = 2;
-pub type BgWorkerStartTime = ::std::os::raw::c_uint;
+pub mod BgWorkerStartTime {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const BgWorkerStart_PostmasterStart: Type = 0;
+    pub const BgWorkerStart_ConsistentState: Type = 1;
+    pub const BgWorkerStart_RecoveryFinished: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct BackgroundWorker {
     pub bgw_name: [::std::os::raw::c_char; 96usize],
     pub bgw_type: [::std::os::raw::c_char; 96usize],
     pub bgw_flags: ::std::os::raw::c_int,
-    pub bgw_start_time: BgWorkerStartTime,
+    pub bgw_start_time: BgWorkerStartTime::Type,
     pub bgw_restart_time: ::std::os::raw::c_int,
     pub bgw_library_name: [::std::os::raw::c_char; 96usize],
     pub bgw_function_name: [::std::os::raw::c_char; 96usize],
@@ -22014,11 +25769,13 @@ impl Default for BackgroundWorker {
         }
     }
 }
-pub const BgwHandleStatus_BGWH_STARTED: BgwHandleStatus = 0;
-pub const BgwHandleStatus_BGWH_NOT_YET_STARTED: BgwHandleStatus = 1;
-pub const BgwHandleStatus_BGWH_STOPPED: BgwHandleStatus = 2;
-pub const BgwHandleStatus_BGWH_POSTMASTER_DIED: BgwHandleStatus = 3;
-pub type BgwHandleStatus = ::std::os::raw::c_uint;
+pub mod BgwHandleStatus {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const BGWH_STARTED: Type = 0;
+    pub const BGWH_NOT_YET_STARTED: Type = 1;
+    pub const BGWH_STOPPED: Type = 2;
+    pub const BGWH_POSTMASTER_DIED: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct BackgroundWorkerHandle {
@@ -22092,17 +25849,19 @@ impl Default for XidCache {
         }
     }
 }
-pub const ProcWaitStatus_PROC_WAIT_STATUS_OK: ProcWaitStatus = 0;
-pub const ProcWaitStatus_PROC_WAIT_STATUS_WAITING: ProcWaitStatus = 1;
-pub const ProcWaitStatus_PROC_WAIT_STATUS_ERROR: ProcWaitStatus = 2;
-pub type ProcWaitStatus = ::std::os::raw::c_uint;
+pub mod ProcWaitStatus {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PROC_WAIT_STATUS_OK: Type = 0;
+    pub const PROC_WAIT_STATUS_WAITING: Type = 1;
+    pub const PROC_WAIT_STATUS_ERROR: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PGPROC {
     pub links: dlist_node,
     pub procgloballist: *mut dlist_head,
     pub sem: PGSemaphore,
-    pub waitStatus: ProcWaitStatus,
+    pub waitStatus: ProcWaitStatus::Type,
     pub procLatch: Latch,
     pub xid: TransactionId,
     pub xmin: TransactionId,
@@ -22214,10 +25973,12 @@ impl Default for shm_mq_iovec {
         }
     }
 }
-pub const shm_mq_result_SHM_MQ_SUCCESS: shm_mq_result = 0;
-pub const shm_mq_result_SHM_MQ_WOULD_BLOCK: shm_mq_result = 1;
-pub const shm_mq_result_SHM_MQ_DETACHED: shm_mq_result = 2;
-pub type shm_mq_result = ::std::os::raw::c_uint;
+pub mod shm_mq_result {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const SHM_MQ_SUCCESS: Type = 0;
+    pub const SHM_MQ_WOULD_BLOCK: Type = 1;
+    pub const SHM_MQ_DETACHED: Type = 2;
+}
 pub type parallel_worker_main_type =
     ::std::option::Option<unsafe extern "C" fn(seg: *mut dsm_segment, toc: *mut shm_toc)>;
 #[repr(C)]
@@ -22378,11 +26139,13 @@ impl Default for VacAttrStats {
         }
     }
 }
-pub const VacOptValue_VACOPTVALUE_UNSPECIFIED: VacOptValue = 0;
-pub const VacOptValue_VACOPTVALUE_AUTO: VacOptValue = 1;
-pub const VacOptValue_VACOPTVALUE_DISABLED: VacOptValue = 2;
-pub const VacOptValue_VACOPTVALUE_ENABLED: VacOptValue = 3;
-pub type VacOptValue = ::std::os::raw::c_uint;
+pub mod VacOptValue {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const VACOPTVALUE_UNSPECIFIED: Type = 0;
+    pub const VACOPTVALUE_AUTO: Type = 1;
+    pub const VACOPTVALUE_DISABLED: Type = 2;
+    pub const VACOPTVALUE_ENABLED: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct VacuumParams {
@@ -22393,8 +26156,8 @@ pub struct VacuumParams {
     pub multixact_freeze_table_age: ::std::os::raw::c_int,
     pub is_wraparound: bool,
     pub log_min_duration: ::std::os::raw::c_int,
-    pub index_cleanup: VacOptValue,
-    pub truncate: VacOptValue,
+    pub index_cleanup: VacOptValue::Type,
+    pub truncate: VacOptValue::Type,
     pub nworkers: ::std::os::raw::c_int,
 }
 impl Default for VacuumParams {
@@ -22529,7 +26292,7 @@ impl Default for AggStatePerGroupData {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct AggStatePerPhaseData {
-    pub aggstrategy: AggStrategy,
+    pub aggstrategy: AggStrategy::Type,
     pub numsets: ::std::os::raw::c_int,
     pub gset_lengths: *mut ::std::os::raw::c_int,
     pub grouped_cols: *mut *mut Bitmapset,
@@ -22602,102 +26365,104 @@ impl Default for ExprEvalRowtypeCache {
         }
     }
 }
-pub const ExprEvalOp_EEOP_DONE: ExprEvalOp = 0;
-pub const ExprEvalOp_EEOP_INNER_FETCHSOME: ExprEvalOp = 1;
-pub const ExprEvalOp_EEOP_OUTER_FETCHSOME: ExprEvalOp = 2;
-pub const ExprEvalOp_EEOP_SCAN_FETCHSOME: ExprEvalOp = 3;
-pub const ExprEvalOp_EEOP_INNER_VAR: ExprEvalOp = 4;
-pub const ExprEvalOp_EEOP_OUTER_VAR: ExprEvalOp = 5;
-pub const ExprEvalOp_EEOP_SCAN_VAR: ExprEvalOp = 6;
-pub const ExprEvalOp_EEOP_INNER_SYSVAR: ExprEvalOp = 7;
-pub const ExprEvalOp_EEOP_OUTER_SYSVAR: ExprEvalOp = 8;
-pub const ExprEvalOp_EEOP_SCAN_SYSVAR: ExprEvalOp = 9;
-pub const ExprEvalOp_EEOP_WHOLEROW: ExprEvalOp = 10;
-pub const ExprEvalOp_EEOP_ASSIGN_INNER_VAR: ExprEvalOp = 11;
-pub const ExprEvalOp_EEOP_ASSIGN_OUTER_VAR: ExprEvalOp = 12;
-pub const ExprEvalOp_EEOP_ASSIGN_SCAN_VAR: ExprEvalOp = 13;
-pub const ExprEvalOp_EEOP_ASSIGN_TMP: ExprEvalOp = 14;
-pub const ExprEvalOp_EEOP_ASSIGN_TMP_MAKE_RO: ExprEvalOp = 15;
-pub const ExprEvalOp_EEOP_CONST: ExprEvalOp = 16;
-pub const ExprEvalOp_EEOP_FUNCEXPR: ExprEvalOp = 17;
-pub const ExprEvalOp_EEOP_FUNCEXPR_STRICT: ExprEvalOp = 18;
-pub const ExprEvalOp_EEOP_FUNCEXPR_FUSAGE: ExprEvalOp = 19;
-pub const ExprEvalOp_EEOP_FUNCEXPR_STRICT_FUSAGE: ExprEvalOp = 20;
-pub const ExprEvalOp_EEOP_BOOL_AND_STEP_FIRST: ExprEvalOp = 21;
-pub const ExprEvalOp_EEOP_BOOL_AND_STEP: ExprEvalOp = 22;
-pub const ExprEvalOp_EEOP_BOOL_AND_STEP_LAST: ExprEvalOp = 23;
-pub const ExprEvalOp_EEOP_BOOL_OR_STEP_FIRST: ExprEvalOp = 24;
-pub const ExprEvalOp_EEOP_BOOL_OR_STEP: ExprEvalOp = 25;
-pub const ExprEvalOp_EEOP_BOOL_OR_STEP_LAST: ExprEvalOp = 26;
-pub const ExprEvalOp_EEOP_BOOL_NOT_STEP: ExprEvalOp = 27;
-pub const ExprEvalOp_EEOP_QUAL: ExprEvalOp = 28;
-pub const ExprEvalOp_EEOP_JUMP: ExprEvalOp = 29;
-pub const ExprEvalOp_EEOP_JUMP_IF_NULL: ExprEvalOp = 30;
-pub const ExprEvalOp_EEOP_JUMP_IF_NOT_NULL: ExprEvalOp = 31;
-pub const ExprEvalOp_EEOP_JUMP_IF_NOT_TRUE: ExprEvalOp = 32;
-pub const ExprEvalOp_EEOP_NULLTEST_ISNULL: ExprEvalOp = 33;
-pub const ExprEvalOp_EEOP_NULLTEST_ISNOTNULL: ExprEvalOp = 34;
-pub const ExprEvalOp_EEOP_NULLTEST_ROWISNULL: ExprEvalOp = 35;
-pub const ExprEvalOp_EEOP_NULLTEST_ROWISNOTNULL: ExprEvalOp = 36;
-pub const ExprEvalOp_EEOP_BOOLTEST_IS_TRUE: ExprEvalOp = 37;
-pub const ExprEvalOp_EEOP_BOOLTEST_IS_NOT_TRUE: ExprEvalOp = 38;
-pub const ExprEvalOp_EEOP_BOOLTEST_IS_FALSE: ExprEvalOp = 39;
-pub const ExprEvalOp_EEOP_BOOLTEST_IS_NOT_FALSE: ExprEvalOp = 40;
-pub const ExprEvalOp_EEOP_PARAM_EXEC: ExprEvalOp = 41;
-pub const ExprEvalOp_EEOP_PARAM_EXTERN: ExprEvalOp = 42;
-pub const ExprEvalOp_EEOP_PARAM_CALLBACK: ExprEvalOp = 43;
-pub const ExprEvalOp_EEOP_CASE_TESTVAL: ExprEvalOp = 44;
-pub const ExprEvalOp_EEOP_MAKE_READONLY: ExprEvalOp = 45;
-pub const ExprEvalOp_EEOP_IOCOERCE: ExprEvalOp = 46;
-pub const ExprEvalOp_EEOP_DISTINCT: ExprEvalOp = 47;
-pub const ExprEvalOp_EEOP_NOT_DISTINCT: ExprEvalOp = 48;
-pub const ExprEvalOp_EEOP_NULLIF: ExprEvalOp = 49;
-pub const ExprEvalOp_EEOP_SQLVALUEFUNCTION: ExprEvalOp = 50;
-pub const ExprEvalOp_EEOP_CURRENTOFEXPR: ExprEvalOp = 51;
-pub const ExprEvalOp_EEOP_NEXTVALUEEXPR: ExprEvalOp = 52;
-pub const ExprEvalOp_EEOP_ARRAYEXPR: ExprEvalOp = 53;
-pub const ExprEvalOp_EEOP_ARRAYCOERCE: ExprEvalOp = 54;
-pub const ExprEvalOp_EEOP_ROW: ExprEvalOp = 55;
-pub const ExprEvalOp_EEOP_ROWCOMPARE_STEP: ExprEvalOp = 56;
-pub const ExprEvalOp_EEOP_ROWCOMPARE_FINAL: ExprEvalOp = 57;
-pub const ExprEvalOp_EEOP_MINMAX: ExprEvalOp = 58;
-pub const ExprEvalOp_EEOP_FIELDSELECT: ExprEvalOp = 59;
-pub const ExprEvalOp_EEOP_FIELDSTORE_DEFORM: ExprEvalOp = 60;
-pub const ExprEvalOp_EEOP_FIELDSTORE_FORM: ExprEvalOp = 61;
-pub const ExprEvalOp_EEOP_SBSREF_SUBSCRIPTS: ExprEvalOp = 62;
-pub const ExprEvalOp_EEOP_SBSREF_OLD: ExprEvalOp = 63;
-pub const ExprEvalOp_EEOP_SBSREF_ASSIGN: ExprEvalOp = 64;
-pub const ExprEvalOp_EEOP_SBSREF_FETCH: ExprEvalOp = 65;
-pub const ExprEvalOp_EEOP_DOMAIN_TESTVAL: ExprEvalOp = 66;
-pub const ExprEvalOp_EEOP_DOMAIN_NOTNULL: ExprEvalOp = 67;
-pub const ExprEvalOp_EEOP_DOMAIN_CHECK: ExprEvalOp = 68;
-pub const ExprEvalOp_EEOP_CONVERT_ROWTYPE: ExprEvalOp = 69;
-pub const ExprEvalOp_EEOP_SCALARARRAYOP: ExprEvalOp = 70;
-pub const ExprEvalOp_EEOP_HASHED_SCALARARRAYOP: ExprEvalOp = 71;
-pub const ExprEvalOp_EEOP_XMLEXPR: ExprEvalOp = 72;
-pub const ExprEvalOp_EEOP_JSON_CONSTRUCTOR: ExprEvalOp = 73;
-pub const ExprEvalOp_EEOP_IS_JSON: ExprEvalOp = 74;
-pub const ExprEvalOp_EEOP_AGGREF: ExprEvalOp = 75;
-pub const ExprEvalOp_EEOP_GROUPING_FUNC: ExprEvalOp = 76;
-pub const ExprEvalOp_EEOP_WINDOW_FUNC: ExprEvalOp = 77;
-pub const ExprEvalOp_EEOP_SUBPLAN: ExprEvalOp = 78;
-pub const ExprEvalOp_EEOP_AGG_STRICT_DESERIALIZE: ExprEvalOp = 79;
-pub const ExprEvalOp_EEOP_AGG_DESERIALIZE: ExprEvalOp = 80;
-pub const ExprEvalOp_EEOP_AGG_STRICT_INPUT_CHECK_ARGS: ExprEvalOp = 81;
-pub const ExprEvalOp_EEOP_AGG_STRICT_INPUT_CHECK_NULLS: ExprEvalOp = 82;
-pub const ExprEvalOp_EEOP_AGG_PLAIN_PERGROUP_NULLCHECK: ExprEvalOp = 83;
-pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_INIT_STRICT_BYVAL: ExprEvalOp = 84;
-pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_STRICT_BYVAL: ExprEvalOp = 85;
-pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_BYVAL: ExprEvalOp = 86;
-pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_INIT_STRICT_BYREF: ExprEvalOp = 87;
-pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_STRICT_BYREF: ExprEvalOp = 88;
-pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_BYREF: ExprEvalOp = 89;
-pub const ExprEvalOp_EEOP_AGG_PRESORTED_DISTINCT_SINGLE: ExprEvalOp = 90;
-pub const ExprEvalOp_EEOP_AGG_PRESORTED_DISTINCT_MULTI: ExprEvalOp = 91;
-pub const ExprEvalOp_EEOP_AGG_ORDERED_TRANS_DATUM: ExprEvalOp = 92;
-pub const ExprEvalOp_EEOP_AGG_ORDERED_TRANS_TUPLE: ExprEvalOp = 93;
-pub const ExprEvalOp_EEOP_LAST: ExprEvalOp = 94;
-pub type ExprEvalOp = ::std::os::raw::c_uint;
+pub mod ExprEvalOp {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const EEOP_DONE: Type = 0;
+    pub const EEOP_INNER_FETCHSOME: Type = 1;
+    pub const EEOP_OUTER_FETCHSOME: Type = 2;
+    pub const EEOP_SCAN_FETCHSOME: Type = 3;
+    pub const EEOP_INNER_VAR: Type = 4;
+    pub const EEOP_OUTER_VAR: Type = 5;
+    pub const EEOP_SCAN_VAR: Type = 6;
+    pub const EEOP_INNER_SYSVAR: Type = 7;
+    pub const EEOP_OUTER_SYSVAR: Type = 8;
+    pub const EEOP_SCAN_SYSVAR: Type = 9;
+    pub const EEOP_WHOLEROW: Type = 10;
+    pub const EEOP_ASSIGN_INNER_VAR: Type = 11;
+    pub const EEOP_ASSIGN_OUTER_VAR: Type = 12;
+    pub const EEOP_ASSIGN_SCAN_VAR: Type = 13;
+    pub const EEOP_ASSIGN_TMP: Type = 14;
+    pub const EEOP_ASSIGN_TMP_MAKE_RO: Type = 15;
+    pub const EEOP_CONST: Type = 16;
+    pub const EEOP_FUNCEXPR: Type = 17;
+    pub const EEOP_FUNCEXPR_STRICT: Type = 18;
+    pub const EEOP_FUNCEXPR_FUSAGE: Type = 19;
+    pub const EEOP_FUNCEXPR_STRICT_FUSAGE: Type = 20;
+    pub const EEOP_BOOL_AND_STEP_FIRST: Type = 21;
+    pub const EEOP_BOOL_AND_STEP: Type = 22;
+    pub const EEOP_BOOL_AND_STEP_LAST: Type = 23;
+    pub const EEOP_BOOL_OR_STEP_FIRST: Type = 24;
+    pub const EEOP_BOOL_OR_STEP: Type = 25;
+    pub const EEOP_BOOL_OR_STEP_LAST: Type = 26;
+    pub const EEOP_BOOL_NOT_STEP: Type = 27;
+    pub const EEOP_QUAL: Type = 28;
+    pub const EEOP_JUMP: Type = 29;
+    pub const EEOP_JUMP_IF_NULL: Type = 30;
+    pub const EEOP_JUMP_IF_NOT_NULL: Type = 31;
+    pub const EEOP_JUMP_IF_NOT_TRUE: Type = 32;
+    pub const EEOP_NULLTEST_ISNULL: Type = 33;
+    pub const EEOP_NULLTEST_ISNOTNULL: Type = 34;
+    pub const EEOP_NULLTEST_ROWISNULL: Type = 35;
+    pub const EEOP_NULLTEST_ROWISNOTNULL: Type = 36;
+    pub const EEOP_BOOLTEST_IS_TRUE: Type = 37;
+    pub const EEOP_BOOLTEST_IS_NOT_TRUE: Type = 38;
+    pub const EEOP_BOOLTEST_IS_FALSE: Type = 39;
+    pub const EEOP_BOOLTEST_IS_NOT_FALSE: Type = 40;
+    pub const EEOP_PARAM_EXEC: Type = 41;
+    pub const EEOP_PARAM_EXTERN: Type = 42;
+    pub const EEOP_PARAM_CALLBACK: Type = 43;
+    pub const EEOP_CASE_TESTVAL: Type = 44;
+    pub const EEOP_MAKE_READONLY: Type = 45;
+    pub const EEOP_IOCOERCE: Type = 46;
+    pub const EEOP_DISTINCT: Type = 47;
+    pub const EEOP_NOT_DISTINCT: Type = 48;
+    pub const EEOP_NULLIF: Type = 49;
+    pub const EEOP_SQLVALUEFUNCTION: Type = 50;
+    pub const EEOP_CURRENTOFEXPR: Type = 51;
+    pub const EEOP_NEXTVALUEEXPR: Type = 52;
+    pub const EEOP_ARRAYEXPR: Type = 53;
+    pub const EEOP_ARRAYCOERCE: Type = 54;
+    pub const EEOP_ROW: Type = 55;
+    pub const EEOP_ROWCOMPARE_STEP: Type = 56;
+    pub const EEOP_ROWCOMPARE_FINAL: Type = 57;
+    pub const EEOP_MINMAX: Type = 58;
+    pub const EEOP_FIELDSELECT: Type = 59;
+    pub const EEOP_FIELDSTORE_DEFORM: Type = 60;
+    pub const EEOP_FIELDSTORE_FORM: Type = 61;
+    pub const EEOP_SBSREF_SUBSCRIPTS: Type = 62;
+    pub const EEOP_SBSREF_OLD: Type = 63;
+    pub const EEOP_SBSREF_ASSIGN: Type = 64;
+    pub const EEOP_SBSREF_FETCH: Type = 65;
+    pub const EEOP_DOMAIN_TESTVAL: Type = 66;
+    pub const EEOP_DOMAIN_NOTNULL: Type = 67;
+    pub const EEOP_DOMAIN_CHECK: Type = 68;
+    pub const EEOP_CONVERT_ROWTYPE: Type = 69;
+    pub const EEOP_SCALARARRAYOP: Type = 70;
+    pub const EEOP_HASHED_SCALARARRAYOP: Type = 71;
+    pub const EEOP_XMLEXPR: Type = 72;
+    pub const EEOP_JSON_CONSTRUCTOR: Type = 73;
+    pub const EEOP_IS_JSON: Type = 74;
+    pub const EEOP_AGGREF: Type = 75;
+    pub const EEOP_GROUPING_FUNC: Type = 76;
+    pub const EEOP_WINDOW_FUNC: Type = 77;
+    pub const EEOP_SUBPLAN: Type = 78;
+    pub const EEOP_AGG_STRICT_DESERIALIZE: Type = 79;
+    pub const EEOP_AGG_DESERIALIZE: Type = 80;
+    pub const EEOP_AGG_STRICT_INPUT_CHECK_ARGS: Type = 81;
+    pub const EEOP_AGG_STRICT_INPUT_CHECK_NULLS: Type = 82;
+    pub const EEOP_AGG_PLAIN_PERGROUP_NULLCHECK: Type = 83;
+    pub const EEOP_AGG_PLAIN_TRANS_INIT_STRICT_BYVAL: Type = 84;
+    pub const EEOP_AGG_PLAIN_TRANS_STRICT_BYVAL: Type = 85;
+    pub const EEOP_AGG_PLAIN_TRANS_BYVAL: Type = 86;
+    pub const EEOP_AGG_PLAIN_TRANS_INIT_STRICT_BYREF: Type = 87;
+    pub const EEOP_AGG_PLAIN_TRANS_STRICT_BYREF: Type = 88;
+    pub const EEOP_AGG_PLAIN_TRANS_BYREF: Type = 89;
+    pub const EEOP_AGG_PRESORTED_DISTINCT_SINGLE: Type = 90;
+    pub const EEOP_AGG_PRESORTED_DISTINCT_MULTI: Type = 91;
+    pub const EEOP_AGG_ORDERED_TRANS_DATUM: Type = 92;
+    pub const EEOP_AGG_ORDERED_TRANS_TUPLE: Type = 93;
+    pub const EEOP_LAST: Type = 94;
+}
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct ExprEvalStep {
@@ -23068,7 +26833,7 @@ impl Default for ExprEvalStep__bindgen_ty_1__bindgen_ty_22 {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ExprEvalStep__bindgen_ty_1__bindgen_ty_23 {
-    pub rctype: RowCompareType,
+    pub rctype: RowCompareType::Type,
 }
 impl Default for ExprEvalStep__bindgen_ty_1__bindgen_ty_23 {
     fn default() -> Self {
@@ -23085,7 +26850,7 @@ pub struct ExprEvalStep__bindgen_ty_1__bindgen_ty_24 {
     pub values: *mut Datum,
     pub nulls: *mut bool,
     pub nelems: ::std::os::raw::c_int,
-    pub op: MinMaxOp,
+    pub op: MinMaxOp::Type,
     pub finfo: *mut FmgrInfo,
     pub fcinfo_data: FunctionCallInfo,
 }
@@ -23490,41 +27255,34 @@ impl Default for JsonConstructorExprState {
         }
     }
 }
-pub const RawParseMode_RAW_PARSE_DEFAULT: RawParseMode = 0;
-pub const RawParseMode_RAW_PARSE_TYPE_NAME: RawParseMode = 1;
-pub const RawParseMode_RAW_PARSE_PLPGSQL_EXPR: RawParseMode = 2;
-pub const RawParseMode_RAW_PARSE_PLPGSQL_ASSIGN1: RawParseMode = 3;
-pub const RawParseMode_RAW_PARSE_PLPGSQL_ASSIGN2: RawParseMode = 4;
-pub const RawParseMode_RAW_PARSE_PLPGSQL_ASSIGN3: RawParseMode = 5;
-pub type RawParseMode = ::std::os::raw::c_uint;
-pub const BackslashQuoteType_BACKSLASH_QUOTE_OFF: BackslashQuoteType = 0;
-pub const BackslashQuoteType_BACKSLASH_QUOTE_ON: BackslashQuoteType = 1;
-pub const BackslashQuoteType_BACKSLASH_QUOTE_SAFE_ENCODING: BackslashQuoteType = 2;
-pub type BackslashQuoteType = ::std::os::raw::c_uint;
-pub type ResourceOwner = *mut ResourceOwnerData;
-pub const ResourceReleasePhase_RESOURCE_RELEASE_BEFORE_LOCKS: ResourceReleasePhase = 0;
-pub const ResourceReleasePhase_RESOURCE_RELEASE_LOCKS: ResourceReleasePhase = 1;
-pub const ResourceReleasePhase_RESOURCE_RELEASE_AFTER_LOCKS: ResourceReleasePhase = 2;
-pub type ResourceReleasePhase = ::std::os::raw::c_uint;
-pub type ResourceReleaseCallback = ::std::option::Option<
-    unsafe extern "C" fn(
-        phase: ResourceReleasePhase,
-        isCommit: bool,
-        isTopLevel: bool,
-        arg: *mut ::std::os::raw::c_void,
-    ),
->;
-pub const PlanCacheMode_PLAN_CACHE_MODE_AUTO: PlanCacheMode = 0;
-pub const PlanCacheMode_PLAN_CACHE_MODE_FORCE_GENERIC_PLAN: PlanCacheMode = 1;
-pub const PlanCacheMode_PLAN_CACHE_MODE_FORCE_CUSTOM_PLAN: PlanCacheMode = 2;
-pub type PlanCacheMode = ::std::os::raw::c_uint;
+pub mod RawParseMode {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RAW_PARSE_DEFAULT: Type = 0;
+    pub const RAW_PARSE_TYPE_NAME: Type = 1;
+    pub const RAW_PARSE_PLPGSQL_EXPR: Type = 2;
+    pub const RAW_PARSE_PLPGSQL_ASSIGN1: Type = 3;
+    pub const RAW_PARSE_PLPGSQL_ASSIGN2: Type = 4;
+    pub const RAW_PARSE_PLPGSQL_ASSIGN3: Type = 5;
+}
+pub mod BackslashQuoteType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const BACKSLASH_QUOTE_OFF: Type = 0;
+    pub const BACKSLASH_QUOTE_ON: Type = 1;
+    pub const BACKSLASH_QUOTE_SAFE_ENCODING: Type = 2;
+}
+pub mod PlanCacheMode {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PLAN_CACHE_MODE_AUTO: Type = 0;
+    pub const PLAN_CACHE_MODE_FORCE_GENERIC_PLAN: Type = 1;
+    pub const PLAN_CACHE_MODE_FORCE_CUSTOM_PLAN: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct CachedPlanSource {
     pub magic: ::std::os::raw::c_int,
     pub raw_parse_tree: *mut RawStmt,
     pub query_string: *const ::std::os::raw::c_char,
-    pub commandTag: CommandTag,
+    pub commandTag: CommandTag::Type,
     pub param_types: *mut Oid,
     pub num_params: ::std::os::raw::c_int,
     pub parserSetup: ParserSetupHook,
@@ -23606,19 +27364,23 @@ impl Default for CachedExpression {
         }
     }
 }
-pub const PortalStrategy_PORTAL_ONE_SELECT: PortalStrategy = 0;
-pub const PortalStrategy_PORTAL_ONE_RETURNING: PortalStrategy = 1;
-pub const PortalStrategy_PORTAL_ONE_MOD_WITH: PortalStrategy = 2;
-pub const PortalStrategy_PORTAL_UTIL_SELECT: PortalStrategy = 3;
-pub const PortalStrategy_PORTAL_MULTI_QUERY: PortalStrategy = 4;
-pub type PortalStrategy = ::std::os::raw::c_uint;
-pub const PortalStatus_PORTAL_NEW: PortalStatus = 0;
-pub const PortalStatus_PORTAL_DEFINED: PortalStatus = 1;
-pub const PortalStatus_PORTAL_READY: PortalStatus = 2;
-pub const PortalStatus_PORTAL_ACTIVE: PortalStatus = 3;
-pub const PortalStatus_PORTAL_DONE: PortalStatus = 4;
-pub const PortalStatus_PORTAL_FAILED: PortalStatus = 5;
-pub type PortalStatus = ::std::os::raw::c_uint;
+pub mod PortalStrategy {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PORTAL_ONE_SELECT: Type = 0;
+    pub const PORTAL_ONE_RETURNING: Type = 1;
+    pub const PORTAL_ONE_MOD_WITH: Type = 2;
+    pub const PORTAL_UTIL_SELECT: Type = 3;
+    pub const PORTAL_MULTI_QUERY: Type = 4;
+}
+pub mod PortalStatus {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PORTAL_NEW: Type = 0;
+    pub const PORTAL_DEFINED: Type = 1;
+    pub const PORTAL_READY: Type = 2;
+    pub const PORTAL_ACTIVE: Type = 3;
+    pub const PORTAL_DONE: Type = 4;
+    pub const PORTAL_FAILED: Type = 5;
+}
 pub type Portal = *mut PortalData;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -23632,16 +27394,16 @@ pub struct PortalData {
     pub activeSubid: SubTransactionId,
     pub createLevel: ::std::os::raw::c_int,
     pub sourceText: *const ::std::os::raw::c_char,
-    pub commandTag: CommandTag,
+    pub commandTag: CommandTag::Type,
     pub qc: QueryCompletion,
     pub stmts: *mut List,
     pub cplan: *mut CachedPlan,
     pub portalParams: ParamListInfo,
     pub queryEnv: *mut QueryEnvironment,
-    pub strategy: PortalStrategy,
+    pub strategy: PortalStrategy::Type,
     pub cursorOptions: ::std::os::raw::c_int,
     pub run_once: bool,
-    pub status: PortalStatus,
+    pub status: PortalStatus::Type,
     pub portalPinned: bool,
     pub autoHeld: bool,
     pub queryDesc: *mut QueryDesc,
@@ -23691,7 +27453,7 @@ impl Default for SPITupleTable {
 pub struct SPIPrepareOptions {
     pub parserSetup: ParserSetupHook,
     pub parserSetupArg: *mut ::std::os::raw::c_void,
-    pub parseMode: RawParseMode,
+    pub parseMode: RawParseMode::Type,
     pub cursorOptions: ::std::os::raw::c_int,
 }
 impl Default for SPIPrepareOptions {
@@ -23746,9 +27508,11 @@ pub struct _SPI_plan {
 }
 pub type SPIPlanPtr = *mut _SPI_plan;
 pub type Relids = *mut Bitmapset;
-pub const CostSelector_STARTUP_COST: CostSelector = 0;
-pub const CostSelector_TOTAL_COST: CostSelector = 1;
-pub type CostSelector = ::std::os::raw::c_uint;
+pub mod CostSelector {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const STARTUP_COST: Type = 0;
+    pub const TOTAL_COST: Type = 1;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct QualCost {
@@ -23762,15 +27526,17 @@ pub struct AggClauseCosts {
     pub finalCost: QualCost,
     pub transitionSpace: Size,
 }
-pub const UpperRelationKind_UPPERREL_SETOP: UpperRelationKind = 0;
-pub const UpperRelationKind_UPPERREL_PARTIAL_GROUP_AGG: UpperRelationKind = 1;
-pub const UpperRelationKind_UPPERREL_GROUP_AGG: UpperRelationKind = 2;
-pub const UpperRelationKind_UPPERREL_WINDOW: UpperRelationKind = 3;
-pub const UpperRelationKind_UPPERREL_PARTIAL_DISTINCT: UpperRelationKind = 4;
-pub const UpperRelationKind_UPPERREL_DISTINCT: UpperRelationKind = 5;
-pub const UpperRelationKind_UPPERREL_ORDERED: UpperRelationKind = 6;
-pub const UpperRelationKind_UPPERREL_FINAL: UpperRelationKind = 7;
-pub type UpperRelationKind = ::std::os::raw::c_uint;
+pub mod UpperRelationKind {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const UPPERREL_SETOP: Type = 0;
+    pub const UPPERREL_PARTIAL_GROUP_AGG: Type = 1;
+    pub const UPPERREL_GROUP_AGG: Type = 2;
+    pub const UPPERREL_WINDOW: Type = 3;
+    pub const UPPERREL_PARTIAL_DISTINCT: Type = 4;
+    pub const UPPERREL_DISTINCT: Type = 5;
+    pub const UPPERREL_ORDERED: Type = 6;
+    pub const UPPERREL_FINAL: Type = 7;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PlannerGlobal {
@@ -23921,18 +27687,20 @@ impl Default for PartitionSchemeData {
     }
 }
 pub type PartitionScheme = *mut PartitionSchemeData;
-pub const RelOptKind_RELOPT_BASEREL: RelOptKind = 0;
-pub const RelOptKind_RELOPT_JOINREL: RelOptKind = 1;
-pub const RelOptKind_RELOPT_OTHER_MEMBER_REL: RelOptKind = 2;
-pub const RelOptKind_RELOPT_OTHER_JOINREL: RelOptKind = 3;
-pub const RelOptKind_RELOPT_UPPER_REL: RelOptKind = 4;
-pub const RelOptKind_RELOPT_OTHER_UPPER_REL: RelOptKind = 5;
-pub type RelOptKind = ::std::os::raw::c_uint;
+pub mod RelOptKind {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RELOPT_BASEREL: Type = 0;
+    pub const RELOPT_JOINREL: Type = 1;
+    pub const RELOPT_OTHER_MEMBER_REL: Type = 2;
+    pub const RELOPT_OTHER_JOINREL: Type = 3;
+    pub const RELOPT_UPPER_REL: Type = 4;
+    pub const RELOPT_OTHER_UPPER_REL: Type = 5;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct RelOptInfo {
     pub type_: NodeTag,
-    pub reloptkind: RelOptKind,
+    pub reloptkind: RelOptKind::Type,
     pub relids: Relids,
     pub rows: Cardinality,
     pub consider_startup: bool,
@@ -23950,7 +27718,7 @@ pub struct RelOptInfo {
     pub lateral_relids: Relids,
     pub relid: Index,
     pub reltablespace: Oid,
-    pub rtekind: RTEKind,
+    pub rtekind: RTEKind::Type,
     pub min_attr: AttrNumber,
     pub max_attr: AttrNumber,
     pub attr_needed: *mut Relids,
@@ -24181,10 +27949,12 @@ impl Default for PathKey {
         }
     }
 }
-pub const VolatileFunctionStatus_VOLATILITY_UNKNOWN: VolatileFunctionStatus = 0;
-pub const VolatileFunctionStatus_VOLATILITY_VOLATILE: VolatileFunctionStatus = 1;
-pub const VolatileFunctionStatus_VOLATILITY_NOVOLATILE: VolatileFunctionStatus = 2;
-pub type VolatileFunctionStatus = ::std::os::raw::c_uint;
+pub mod VolatileFunctionStatus {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const VOLATILITY_UNKNOWN: Type = 0;
+    pub const VOLATILITY_VOLATILE: Type = 1;
+    pub const VOLATILITY_NOVOLATILE: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PathTarget {
@@ -24193,7 +27963,7 @@ pub struct PathTarget {
     pub sortgrouprefs: *mut Index,
     pub cost: QualCost,
     pub width: ::std::os::raw::c_int,
-    pub has_volatile_expr: VolatileFunctionStatus,
+    pub has_volatile_expr: VolatileFunctionStatus::Type,
 }
 impl Default for PathTarget {
     fn default() -> Self {
@@ -24255,7 +28025,7 @@ pub struct IndexPath {
     pub indexclauses: *mut List,
     pub indexorderbys: *mut List,
     pub indexorderbycols: *mut List,
-    pub indexscandir: ScanDirection,
+    pub indexscandir: ScanDirection::Type,
     pub indextotalcost: Cost,
     pub indexselectivity: Selectivity,
 }
@@ -24497,16 +28267,18 @@ impl Default for MemoizePath {
         }
     }
 }
-pub const UniquePathMethod_UNIQUE_PATH_NOOP: UniquePathMethod = 0;
-pub const UniquePathMethod_UNIQUE_PATH_HASH: UniquePathMethod = 1;
-pub const UniquePathMethod_UNIQUE_PATH_SORT: UniquePathMethod = 2;
-pub type UniquePathMethod = ::std::os::raw::c_uint;
+pub mod UniquePathMethod {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const UNIQUE_PATH_NOOP: Type = 0;
+    pub const UNIQUE_PATH_HASH: Type = 1;
+    pub const UNIQUE_PATH_SORT: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct UniquePath {
     pub path: Path,
     pub subpath: *mut Path,
-    pub umethod: UniquePathMethod,
+    pub umethod: UniquePathMethod::Type,
     pub in_operators: *mut List,
     pub uniq_exprs: *mut List,
 }
@@ -24556,7 +28328,7 @@ impl Default for GatherMergePath {
 #[derive(Debug, Copy, Clone)]
 pub struct JoinPath {
     pub path: Path,
-    pub jointype: JoinType,
+    pub jointype: JoinType::Type,
     pub inner_unique: bool,
     pub outerjoinpath: *mut Path,
     pub innerjoinpath: *mut Path,
@@ -24720,8 +28492,8 @@ impl Default for UpperUniquePath {
 pub struct AggPath {
     pub path: Path,
     pub subpath: *mut Path,
-    pub aggstrategy: AggStrategy,
-    pub aggsplit: AggSplit,
+    pub aggstrategy: AggStrategy::Type,
+    pub aggsplit: AggSplit::Type,
     pub numGroups: Cardinality,
     pub transitionSpace: uint64,
     pub groupClause: *mut List,
@@ -24777,7 +28549,7 @@ impl Default for RollupData {
 pub struct GroupingSetsPath {
     pub path: Path,
     pub subpath: *mut Path,
-    pub aggstrategy: AggStrategy,
+    pub aggstrategy: AggStrategy::Type,
     pub rollups: *mut List,
     pub qual: *mut List,
     pub transitionSpace: uint64,
@@ -24830,8 +28602,8 @@ impl Default for WindowAggPath {
 pub struct SetOpPath {
     pub path: Path,
     pub subpath: *mut Path,
-    pub cmd: SetOpCmd,
-    pub strategy: SetOpStrategy,
+    pub cmd: SetOpCmd::Type,
+    pub strategy: SetOpStrategy::Type,
     pub distinctList: *mut List,
     pub flagColIdx: AttrNumber,
     pub firstFlag: ::std::os::raw::c_int,
@@ -24887,7 +28659,7 @@ impl Default for LockRowsPath {
 pub struct ModifyTablePath {
     pub path: Path,
     pub subpath: *mut Path,
-    pub operation: CmdType,
+    pub operation: CmdType::Type,
     pub canSetTag: bool,
     pub nominalRelation: Index,
     pub rootRelation: Index,
@@ -24917,7 +28689,7 @@ pub struct LimitPath {
     pub subpath: *mut Path,
     pub limitOffset: *mut Node,
     pub limitCount: *mut Node,
-    pub limitOption: LimitOption,
+    pub limitOption: LimitOption::Type,
 }
 impl Default for LimitPath {
     fn default() -> Self {
@@ -24939,7 +28711,7 @@ pub struct RestrictInfo {
     pub has_clone: bool,
     pub is_clone: bool,
     pub leakproof: bool,
-    pub has_volatile: VolatileFunctionStatus,
+    pub has_volatile: VolatileFunctionStatus::Type,
     pub security_level: Index,
     pub num_base_rels: ::std::os::raw::c_int,
     pub clause_relids: Relids,
@@ -25026,7 +28798,7 @@ pub struct SpecialJoinInfo {
     pub min_righthand: Relids,
     pub syn_lefthand: Relids,
     pub syn_righthand: Relids,
-    pub jointype: JoinType,
+    pub jointype: JoinType::Type,
     pub ojrelid: Index,
     pub commute_above_l: Relids,
     pub commute_above_r: Relids,
@@ -25185,11 +28957,12 @@ impl Default for JoinPathExtraData {
         }
     }
 }
-pub const PartitionwiseAggregateType_PARTITIONWISE_AGGREGATE_NONE: PartitionwiseAggregateType = 0;
-pub const PartitionwiseAggregateType_PARTITIONWISE_AGGREGATE_FULL: PartitionwiseAggregateType = 1;
-pub const PartitionwiseAggregateType_PARTITIONWISE_AGGREGATE_PARTIAL: PartitionwiseAggregateType =
-    2;
-pub type PartitionwiseAggregateType = ::std::os::raw::c_uint;
+pub mod PartitionwiseAggregateType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PARTITIONWISE_AGGREGATE_NONE: Type = 0;
+    pub const PARTITIONWISE_AGGREGATE_FULL: Type = 1;
+    pub const PARTITIONWISE_AGGREGATE_PARTIAL: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct GroupPathExtraData {
@@ -25200,7 +28973,7 @@ pub struct GroupPathExtraData {
     pub target_parallel_safe: bool,
     pub havingQual: *mut Node,
     pub targetList: *mut List,
-    pub patype: PartitionwiseAggregateType,
+    pub patype: PartitionwiseAggregateType::Type,
 }
 impl Default for GroupPathExtraData {
     fn default() -> Self {
@@ -25315,14 +29088,14 @@ pub type GetForeignJoinPaths_function = ::std::option::Option<
         joinrel: *mut RelOptInfo,
         outerrel: *mut RelOptInfo,
         innerrel: *mut RelOptInfo,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         extra: *mut JoinPathExtraData,
     ),
 >;
 pub type GetForeignUpperPaths_function = ::std::option::Option<
     unsafe extern "C" fn(
         root: *mut PlannerInfo,
-        stage: UpperRelationKind,
+        stage: UpperRelationKind::Type,
         input_rel: *mut RelOptInfo,
         output_rel: *mut RelOptInfo,
         extra: *mut ::std::os::raw::c_void,
@@ -25413,7 +29186,10 @@ pub type IterateDirectModify_function =
 pub type EndDirectModify_function =
     ::std::option::Option<unsafe extern "C" fn(node: *mut ForeignScanState)>;
 pub type GetForeignRowMarkType_function = ::std::option::Option<
-    unsafe extern "C" fn(rte: *mut RangeTblEntry, strength: LockClauseStrength) -> RowMarkType,
+    unsafe extern "C" fn(
+        rte: *mut RangeTblEntry,
+        strength: LockClauseStrength::Type,
+    ) -> RowMarkType::Type,
 >;
 pub type RefetchForeignRow_function = ::std::option::Option<
     unsafe extern "C" fn(
@@ -25458,7 +29234,7 @@ pub type ImportForeignSchema_function = ::std::option::Option<
     unsafe extern "C" fn(stmt: *mut ImportForeignSchemaStmt, serverOid: Oid) -> *mut List,
 >;
 pub type ExecForeignTruncate_function = ::std::option::Option<
-    unsafe extern "C" fn(rels: *mut List, behavior: DropBehavior, restart_seqs: bool),
+    unsafe extern "C" fn(rels: *mut List, behavior: DropBehavior::Type, restart_seqs: bool),
 >;
 pub type EstimateDSMForeignScan_function = ::std::option::Option<
     unsafe extern "C" fn(node: *mut ForeignScanState, pcxt: *mut ParallelContext) -> Size,
@@ -25669,55 +29445,57 @@ pub type __m128bh = u128;
 pub type Vector8 = __m128i;
 pub type Vector32 = __m128i;
 pub type pg_wchar = ::std::os::raw::c_uint;
-pub const pg_enc_PG_SQL_ASCII: pg_enc = 0;
-pub const pg_enc_PG_EUC_JP: pg_enc = 1;
-pub const pg_enc_PG_EUC_CN: pg_enc = 2;
-pub const pg_enc_PG_EUC_KR: pg_enc = 3;
-pub const pg_enc_PG_EUC_TW: pg_enc = 4;
-pub const pg_enc_PG_EUC_JIS_2004: pg_enc = 5;
-pub const pg_enc_PG_UTF8: pg_enc = 6;
-pub const pg_enc_PG_MULE_INTERNAL: pg_enc = 7;
-pub const pg_enc_PG_LATIN1: pg_enc = 8;
-pub const pg_enc_PG_LATIN2: pg_enc = 9;
-pub const pg_enc_PG_LATIN3: pg_enc = 10;
-pub const pg_enc_PG_LATIN4: pg_enc = 11;
-pub const pg_enc_PG_LATIN5: pg_enc = 12;
-pub const pg_enc_PG_LATIN6: pg_enc = 13;
-pub const pg_enc_PG_LATIN7: pg_enc = 14;
-pub const pg_enc_PG_LATIN8: pg_enc = 15;
-pub const pg_enc_PG_LATIN9: pg_enc = 16;
-pub const pg_enc_PG_LATIN10: pg_enc = 17;
-pub const pg_enc_PG_WIN1256: pg_enc = 18;
-pub const pg_enc_PG_WIN1258: pg_enc = 19;
-pub const pg_enc_PG_WIN866: pg_enc = 20;
-pub const pg_enc_PG_WIN874: pg_enc = 21;
-pub const pg_enc_PG_KOI8R: pg_enc = 22;
-pub const pg_enc_PG_WIN1251: pg_enc = 23;
-pub const pg_enc_PG_WIN1252: pg_enc = 24;
-pub const pg_enc_PG_ISO_8859_5: pg_enc = 25;
-pub const pg_enc_PG_ISO_8859_6: pg_enc = 26;
-pub const pg_enc_PG_ISO_8859_7: pg_enc = 27;
-pub const pg_enc_PG_ISO_8859_8: pg_enc = 28;
-pub const pg_enc_PG_WIN1250: pg_enc = 29;
-pub const pg_enc_PG_WIN1253: pg_enc = 30;
-pub const pg_enc_PG_WIN1254: pg_enc = 31;
-pub const pg_enc_PG_WIN1255: pg_enc = 32;
-pub const pg_enc_PG_WIN1257: pg_enc = 33;
-pub const pg_enc_PG_KOI8U: pg_enc = 34;
-pub const pg_enc_PG_SJIS: pg_enc = 35;
-pub const pg_enc_PG_BIG5: pg_enc = 36;
-pub const pg_enc_PG_GBK: pg_enc = 37;
-pub const pg_enc_PG_UHC: pg_enc = 38;
-pub const pg_enc_PG_GB18030: pg_enc = 39;
-pub const pg_enc_PG_JOHAB: pg_enc = 40;
-pub const pg_enc_PG_SHIFT_JIS_2004: pg_enc = 41;
-pub const pg_enc__PG_LAST_ENCODING_: pg_enc = 42;
-pub type pg_enc = ::std::os::raw::c_uint;
+pub mod pg_enc {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PG_SQL_ASCII: Type = 0;
+    pub const PG_EUC_JP: Type = 1;
+    pub const PG_EUC_CN: Type = 2;
+    pub const PG_EUC_KR: Type = 3;
+    pub const PG_EUC_TW: Type = 4;
+    pub const PG_EUC_JIS_2004: Type = 5;
+    pub const PG_UTF8: Type = 6;
+    pub const PG_MULE_INTERNAL: Type = 7;
+    pub const PG_LATIN1: Type = 8;
+    pub const PG_LATIN2: Type = 9;
+    pub const PG_LATIN3: Type = 10;
+    pub const PG_LATIN4: Type = 11;
+    pub const PG_LATIN5: Type = 12;
+    pub const PG_LATIN6: Type = 13;
+    pub const PG_LATIN7: Type = 14;
+    pub const PG_LATIN8: Type = 15;
+    pub const PG_LATIN9: Type = 16;
+    pub const PG_LATIN10: Type = 17;
+    pub const PG_WIN1256: Type = 18;
+    pub const PG_WIN1258: Type = 19;
+    pub const PG_WIN866: Type = 20;
+    pub const PG_WIN874: Type = 21;
+    pub const PG_KOI8R: Type = 22;
+    pub const PG_WIN1251: Type = 23;
+    pub const PG_WIN1252: Type = 24;
+    pub const PG_ISO_8859_5: Type = 25;
+    pub const PG_ISO_8859_6: Type = 26;
+    pub const PG_ISO_8859_7: Type = 27;
+    pub const PG_ISO_8859_8: Type = 28;
+    pub const PG_WIN1250: Type = 29;
+    pub const PG_WIN1253: Type = 30;
+    pub const PG_WIN1254: Type = 31;
+    pub const PG_WIN1255: Type = 32;
+    pub const PG_WIN1257: Type = 33;
+    pub const PG_KOI8U: Type = 34;
+    pub const PG_SJIS: Type = 35;
+    pub const PG_BIG5: Type = 36;
+    pub const PG_GBK: Type = 37;
+    pub const PG_UHC: Type = 38;
+    pub const PG_GB18030: Type = 39;
+    pub const PG_JOHAB: Type = 40;
+    pub const PG_SHIFT_JIS_2004: Type = 41;
+    pub const _PG_LAST_ENCODING_: Type = 42;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct pg_enc2name {
     pub name: *const ::std::os::raw::c_char,
-    pub encoding: pg_enc,
+    pub encoding: pg_enc::Type,
 }
 impl Default for pg_enc2name {
     fn default() -> Self {
@@ -25731,7 +29509,7 @@ impl Default for pg_enc2name {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct pg_enc2gettext {
-    pub encoding: pg_enc,
+    pub encoding: pg_enc::Type,
     pub name: *const ::std::os::raw::c_char,
 }
 impl Default for pg_enc2gettext {
@@ -26020,9 +29798,11 @@ pub type planstate_tree_walker_callback = ::std::option::Option<
 pub type tree_mutator_callback = ::std::option::Option<
     unsafe extern "C" fn(node: *mut Node, context: *mut ::std::os::raw::c_void) -> *mut Node,
 >;
-pub const ReplicationKind_REPLICATION_KIND_PHYSICAL: ReplicationKind = 0;
-pub const ReplicationKind_REPLICATION_KIND_LOGICAL: ReplicationKind = 1;
-pub type ReplicationKind = ::std::os::raw::c_uint;
+pub mod ReplicationKind {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const REPLICATION_KIND_PHYSICAL: Type = 0;
+    pub const REPLICATION_KIND_LOGICAL: Type = 1;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct IdentifySystemCmd {
@@ -26057,7 +29837,7 @@ impl Default for BaseBackupCmd {
 pub struct CreateReplicationSlotCmd {
     pub type_: NodeTag,
     pub slotname: *mut ::std::os::raw::c_char,
-    pub kind: ReplicationKind,
+    pub kind: ReplicationKind::Type,
     pub plugin: *mut ::std::os::raw::c_char,
     pub temporary: bool,
     pub options: *mut List,
@@ -26091,7 +29871,7 @@ impl Default for DropReplicationSlotCmd {
 #[derive(Debug, Copy, Clone)]
 pub struct StartReplicationCmd {
     pub type_: NodeTag,
-    pub kind: ReplicationKind,
+    pub kind: ReplicationKind::Type,
     pub slotname: *mut ::std::os::raw::c_char,
     pub timeline: TimeLineID,
     pub startpoint: XLogRecPtr,
@@ -26187,7 +29967,7 @@ pub struct SupportRequestSelectivity {
     pub inputcollid: Oid,
     pub is_join: bool,
     pub varRelid: ::std::os::raw::c_int,
-    pub jointype: JoinType,
+    pub jointype: JoinType::Type,
     pub sjinfo: *mut SpecialJoinInfo,
     pub selectivity: Selectivity,
 }
@@ -26266,7 +30046,7 @@ pub struct SupportRequestWFuncMonotonic {
     pub type_: NodeTag,
     pub window_func: *mut WindowFunc,
     pub window_clause: *mut WindowClause,
-    pub monotonic: MonotonicFunction,
+    pub monotonic: MonotonicFunction::Type,
 }
 impl Default for SupportRequestWFuncMonotonic {
     fn default() -> Self {
@@ -26310,14 +30090,18 @@ impl Default for WindowFuncLists {
         }
     }
 }
-pub const ConstraintExclusionType_CONSTRAINT_EXCLUSION_OFF: ConstraintExclusionType = 0;
-pub const ConstraintExclusionType_CONSTRAINT_EXCLUSION_ON: ConstraintExclusionType = 1;
-pub const ConstraintExclusionType_CONSTRAINT_EXCLUSION_PARTITION: ConstraintExclusionType = 2;
-pub type ConstraintExclusionType = ::std::os::raw::c_uint;
-pub const DebugParallelMode_DEBUG_PARALLEL_OFF: DebugParallelMode = 0;
-pub const DebugParallelMode_DEBUG_PARALLEL_ON: DebugParallelMode = 1;
-pub const DebugParallelMode_DEBUG_PARALLEL_REGRESS: DebugParallelMode = 2;
-pub type DebugParallelMode = ::std::os::raw::c_uint;
+pub mod ConstraintExclusionType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const CONSTRAINT_EXCLUSION_OFF: Type = 0;
+    pub const CONSTRAINT_EXCLUSION_ON: Type = 1;
+    pub const CONSTRAINT_EXCLUSION_PARTITION: Type = 2;
+}
+pub mod DebugParallelMode {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const DEBUG_PARALLEL_OFF: Type = 0;
+    pub const DEBUG_PARALLEL_ON: Type = 1;
+    pub const DEBUG_PARALLEL_REGRESS: Type = 2;
+}
 pub type set_rel_pathlist_hook_type = ::std::option::Option<
     unsafe extern "C" fn(
         root: *mut PlannerInfo,
@@ -26332,7 +30116,7 @@ pub type set_join_pathlist_hook_type = ::std::option::Option<
         joinrel: *mut RelOptInfo,
         outerrel: *mut RelOptInfo,
         innerrel: *mut RelOptInfo,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         extra: *mut JoinPathExtraData,
     ),
 >;
@@ -26352,11 +30136,13 @@ pub type ec_matches_callback_type = ::std::option::Option<
         arg: *mut ::std::os::raw::c_void,
     ) -> bool,
 >;
-pub const PathKeysComparison_PATHKEYS_EQUAL: PathKeysComparison = 0;
-pub const PathKeysComparison_PATHKEYS_BETTER1: PathKeysComparison = 1;
-pub const PathKeysComparison_PATHKEYS_BETTER2: PathKeysComparison = 2;
-pub const PathKeysComparison_PATHKEYS_DIFFERENT: PathKeysComparison = 3;
-pub type PathKeysComparison = ::std::os::raw::c_uint;
+pub mod PathKeysComparison {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PATHKEYS_EQUAL: Type = 0;
+    pub const PATHKEYS_BETTER1: Type = 1;
+    pub const PATHKEYS_BETTER2: Type = 2;
+    pub const PATHKEYS_DIFFERENT: Type = 3;
+}
 pub type get_relation_info_hook_type = ::std::option::Option<
     unsafe extern "C" fn(
         root: *mut PlannerInfo,
@@ -26379,7 +30165,7 @@ pub type planner_hook_type = ::std::option::Option<
 pub type create_upper_paths_hook_type = ::std::option::Option<
     unsafe extern "C" fn(
         root: *mut PlannerInfo,
-        stage: UpperRelationKind,
+        stage: UpperRelationKind::Type,
         input_rel: *mut RelOptInfo,
         output_rel: *mut RelOptInfo,
         extra: *mut ::std::os::raw::c_void,
@@ -26410,31 +30196,37 @@ impl Default for JumbleState {
         }
     }
 }
-pub const ComputeQueryIdType_COMPUTE_QUERY_ID_OFF: ComputeQueryIdType = 0;
-pub const ComputeQueryIdType_COMPUTE_QUERY_ID_ON: ComputeQueryIdType = 1;
-pub const ComputeQueryIdType_COMPUTE_QUERY_ID_AUTO: ComputeQueryIdType = 2;
-pub const ComputeQueryIdType_COMPUTE_QUERY_ID_REGRESS: ComputeQueryIdType = 3;
-pub type ComputeQueryIdType = ::std::os::raw::c_uint;
+pub mod ComputeQueryIdType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const COMPUTE_QUERY_ID_OFF: Type = 0;
+    pub const COMPUTE_QUERY_ID_ON: Type = 1;
+    pub const COMPUTE_QUERY_ID_AUTO: Type = 2;
+    pub const COMPUTE_QUERY_ID_REGRESS: Type = 3;
+}
 pub type post_parse_analyze_hook_type = ::std::option::Option<
     unsafe extern "C" fn(pstate: *mut ParseState, query: *mut Query, jstate: *mut JumbleState),
 >;
-pub const FuncDetailCode_FUNCDETAIL_NOTFOUND: FuncDetailCode = 0;
-pub const FuncDetailCode_FUNCDETAIL_MULTIPLE: FuncDetailCode = 1;
-pub const FuncDetailCode_FUNCDETAIL_NORMAL: FuncDetailCode = 2;
-pub const FuncDetailCode_FUNCDETAIL_PROCEDURE: FuncDetailCode = 3;
-pub const FuncDetailCode_FUNCDETAIL_AGGREGATE: FuncDetailCode = 4;
-pub const FuncDetailCode_FUNCDETAIL_WINDOWFUNC: FuncDetailCode = 5;
-pub const FuncDetailCode_FUNCDETAIL_COERCION: FuncDetailCode = 6;
-pub type FuncDetailCode = ::std::os::raw::c_uint;
+pub mod FuncDetailCode {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const FUNCDETAIL_NOTFOUND: Type = 0;
+    pub const FUNCDETAIL_MULTIPLE: Type = 1;
+    pub const FUNCDETAIL_NORMAL: Type = 2;
+    pub const FUNCDETAIL_PROCEDURE: Type = 3;
+    pub const FUNCDETAIL_AGGREGATE: Type = 4;
+    pub const FUNCDETAIL_WINDOWFUNC: Type = 5;
+    pub const FUNCDETAIL_COERCION: Type = 6;
+}
 pub type Operator = HeapTuple;
 pub type Type = HeapTuple;
 pub type TYPCATEGORY = ::std::os::raw::c_char;
-pub const CoercionPathType_COERCION_PATH_NONE: CoercionPathType = 0;
-pub const CoercionPathType_COERCION_PATH_FUNC: CoercionPathType = 1;
-pub const CoercionPathType_COERCION_PATH_RELABELTYPE: CoercionPathType = 2;
-pub const CoercionPathType_COERCION_PATH_ARRAYCOERCE: CoercionPathType = 3;
-pub const CoercionPathType_COERCION_PATH_COERCEVIAIO: CoercionPathType = 4;
-pub type CoercionPathType = ::std::os::raw::c_uint;
+pub mod CoercionPathType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const COERCION_PATH_NONE: Type = 0;
+    pub const COERCION_PATH_FUNC: Type = 1;
+    pub const COERCION_PATH_RELABELTYPE: Type = 2;
+    pub const COERCION_PATH_ARRAYCOERCE: Type = 3;
+    pub const COERCION_PATH_COERCEVIAIO: Type = 4;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ExpandedRecordHeader {
@@ -26573,105 +30365,125 @@ impl Default for DomainConstraintRef {
 pub struct SharedRecordTypmodRegistry {
     _unused: [u8; 0],
 }
-pub const PLpgSQL_nsitem_type_PLPGSQL_NSTYPE_LABEL: PLpgSQL_nsitem_type = 0;
-pub const PLpgSQL_nsitem_type_PLPGSQL_NSTYPE_VAR: PLpgSQL_nsitem_type = 1;
-pub const PLpgSQL_nsitem_type_PLPGSQL_NSTYPE_REC: PLpgSQL_nsitem_type = 2;
-pub type PLpgSQL_nsitem_type = ::std::os::raw::c_uint;
-pub const PLpgSQL_label_type_PLPGSQL_LABEL_BLOCK: PLpgSQL_label_type = 0;
-pub const PLpgSQL_label_type_PLPGSQL_LABEL_LOOP: PLpgSQL_label_type = 1;
-pub const PLpgSQL_label_type_PLPGSQL_LABEL_OTHER: PLpgSQL_label_type = 2;
-pub type PLpgSQL_label_type = ::std::os::raw::c_uint;
-pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_VAR: PLpgSQL_datum_type = 0;
-pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_ROW: PLpgSQL_datum_type = 1;
-pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_REC: PLpgSQL_datum_type = 2;
-pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_RECFIELD: PLpgSQL_datum_type = 3;
-pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_PROMISE: PLpgSQL_datum_type = 4;
-pub type PLpgSQL_datum_type = ::std::os::raw::c_uint;
-pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_NONE: PLpgSQL_promise_type = 0;
-pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_NAME: PLpgSQL_promise_type = 1;
-pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_WHEN: PLpgSQL_promise_type = 2;
-pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_LEVEL: PLpgSQL_promise_type = 3;
-pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_OP: PLpgSQL_promise_type = 4;
-pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_RELID: PLpgSQL_promise_type = 5;
-pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_TABLE_NAME: PLpgSQL_promise_type = 6;
-pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_TABLE_SCHEMA: PLpgSQL_promise_type = 7;
-pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_NARGS: PLpgSQL_promise_type = 8;
-pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_ARGV: PLpgSQL_promise_type = 9;
-pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_EVENT: PLpgSQL_promise_type = 10;
-pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_TAG: PLpgSQL_promise_type = 11;
-pub type PLpgSQL_promise_type = ::std::os::raw::c_uint;
-pub const PLpgSQL_type_type_PLPGSQL_TTYPE_SCALAR: PLpgSQL_type_type = 0;
-pub const PLpgSQL_type_type_PLPGSQL_TTYPE_REC: PLpgSQL_type_type = 1;
-pub const PLpgSQL_type_type_PLPGSQL_TTYPE_PSEUDO: PLpgSQL_type_type = 2;
-pub type PLpgSQL_type_type = ::std::os::raw::c_uint;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_BLOCK: PLpgSQL_stmt_type = 0;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_ASSIGN: PLpgSQL_stmt_type = 1;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_IF: PLpgSQL_stmt_type = 2;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_CASE: PLpgSQL_stmt_type = 3;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_LOOP: PLpgSQL_stmt_type = 4;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_WHILE: PLpgSQL_stmt_type = 5;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FORI: PLpgSQL_stmt_type = 6;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FORS: PLpgSQL_stmt_type = 7;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FORC: PLpgSQL_stmt_type = 8;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FOREACH_A: PLpgSQL_stmt_type = 9;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_EXIT: PLpgSQL_stmt_type = 10;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_RETURN: PLpgSQL_stmt_type = 11;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_RETURN_NEXT: PLpgSQL_stmt_type = 12;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_RETURN_QUERY: PLpgSQL_stmt_type = 13;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_RAISE: PLpgSQL_stmt_type = 14;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_ASSERT: PLpgSQL_stmt_type = 15;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_EXECSQL: PLpgSQL_stmt_type = 16;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_DYNEXECUTE: PLpgSQL_stmt_type = 17;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_DYNFORS: PLpgSQL_stmt_type = 18;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_GETDIAG: PLpgSQL_stmt_type = 19;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_OPEN: PLpgSQL_stmt_type = 20;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FETCH: PLpgSQL_stmt_type = 21;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_CLOSE: PLpgSQL_stmt_type = 22;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_PERFORM: PLpgSQL_stmt_type = 23;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_CALL: PLpgSQL_stmt_type = 24;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_COMMIT: PLpgSQL_stmt_type = 25;
-pub const PLpgSQL_stmt_type_PLPGSQL_STMT_ROLLBACK: PLpgSQL_stmt_type = 26;
-pub type PLpgSQL_stmt_type = ::std::os::raw::c_uint;
-pub const PLPGSQL_RC_OK: _bindgen_ty_19 = 0;
-pub const PLPGSQL_RC_EXIT: _bindgen_ty_19 = 1;
-pub const PLPGSQL_RC_RETURN: _bindgen_ty_19 = 2;
-pub const PLPGSQL_RC_CONTINUE: _bindgen_ty_19 = 3;
-pub type _bindgen_ty_19 = ::std::os::raw::c_uint;
-pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_ROW_COUNT: PLpgSQL_getdiag_kind = 0;
-pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_ROUTINE_OID: PLpgSQL_getdiag_kind = 1;
-pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_CONTEXT: PLpgSQL_getdiag_kind = 2;
-pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_ERROR_CONTEXT: PLpgSQL_getdiag_kind = 3;
-pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_ERROR_DETAIL: PLpgSQL_getdiag_kind = 4;
-pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_ERROR_HINT: PLpgSQL_getdiag_kind = 5;
-pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_RETURNED_SQLSTATE: PLpgSQL_getdiag_kind = 6;
-pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_COLUMN_NAME: PLpgSQL_getdiag_kind = 7;
-pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_CONSTRAINT_NAME: PLpgSQL_getdiag_kind = 8;
-pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_DATATYPE_NAME: PLpgSQL_getdiag_kind = 9;
-pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_MESSAGE_TEXT: PLpgSQL_getdiag_kind = 10;
-pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_TABLE_NAME: PLpgSQL_getdiag_kind = 11;
-pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_SCHEMA_NAME: PLpgSQL_getdiag_kind = 12;
-pub type PLpgSQL_getdiag_kind = ::std::os::raw::c_uint;
-pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_ERRCODE: PLpgSQL_raise_option_type = 0;
-pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_MESSAGE: PLpgSQL_raise_option_type = 1;
-pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_DETAIL: PLpgSQL_raise_option_type = 2;
-pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_HINT: PLpgSQL_raise_option_type = 3;
-pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_COLUMN: PLpgSQL_raise_option_type = 4;
-pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_CONSTRAINT: PLpgSQL_raise_option_type = 5;
-pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_DATATYPE: PLpgSQL_raise_option_type = 6;
-pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_TABLE: PLpgSQL_raise_option_type = 7;
-pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_SCHEMA: PLpgSQL_raise_option_type = 8;
-pub type PLpgSQL_raise_option_type = ::std::os::raw::c_uint;
-pub const PLpgSQL_resolve_option_PLPGSQL_RESOLVE_ERROR: PLpgSQL_resolve_option = 0;
-pub const PLpgSQL_resolve_option_PLPGSQL_RESOLVE_VARIABLE: PLpgSQL_resolve_option = 1;
-pub const PLpgSQL_resolve_option_PLPGSQL_RESOLVE_COLUMN: PLpgSQL_resolve_option = 2;
-pub type PLpgSQL_resolve_option = ::std::os::raw::c_uint;
+pub mod PLpgSQL_nsitem_type {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PLPGSQL_NSTYPE_LABEL: Type = 0;
+    pub const PLPGSQL_NSTYPE_VAR: Type = 1;
+    pub const PLPGSQL_NSTYPE_REC: Type = 2;
+}
+pub mod PLpgSQL_label_type {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PLPGSQL_LABEL_BLOCK: Type = 0;
+    pub const PLPGSQL_LABEL_LOOP: Type = 1;
+    pub const PLPGSQL_LABEL_OTHER: Type = 2;
+}
+pub mod PLpgSQL_datum_type {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PLPGSQL_DTYPE_VAR: Type = 0;
+    pub const PLPGSQL_DTYPE_ROW: Type = 1;
+    pub const PLPGSQL_DTYPE_REC: Type = 2;
+    pub const PLPGSQL_DTYPE_RECFIELD: Type = 3;
+    pub const PLPGSQL_DTYPE_PROMISE: Type = 4;
+}
+pub mod PLpgSQL_promise_type {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PLPGSQL_PROMISE_NONE: Type = 0;
+    pub const PLPGSQL_PROMISE_TG_NAME: Type = 1;
+    pub const PLPGSQL_PROMISE_TG_WHEN: Type = 2;
+    pub const PLPGSQL_PROMISE_TG_LEVEL: Type = 3;
+    pub const PLPGSQL_PROMISE_TG_OP: Type = 4;
+    pub const PLPGSQL_PROMISE_TG_RELID: Type = 5;
+    pub const PLPGSQL_PROMISE_TG_TABLE_NAME: Type = 6;
+    pub const PLPGSQL_PROMISE_TG_TABLE_SCHEMA: Type = 7;
+    pub const PLPGSQL_PROMISE_TG_NARGS: Type = 8;
+    pub const PLPGSQL_PROMISE_TG_ARGV: Type = 9;
+    pub const PLPGSQL_PROMISE_TG_EVENT: Type = 10;
+    pub const PLPGSQL_PROMISE_TG_TAG: Type = 11;
+}
+pub mod PLpgSQL_type_type {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PLPGSQL_TTYPE_SCALAR: Type = 0;
+    pub const PLPGSQL_TTYPE_REC: Type = 1;
+    pub const PLPGSQL_TTYPE_PSEUDO: Type = 2;
+}
+pub mod PLpgSQL_stmt_type {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PLPGSQL_STMT_BLOCK: Type = 0;
+    pub const PLPGSQL_STMT_ASSIGN: Type = 1;
+    pub const PLPGSQL_STMT_IF: Type = 2;
+    pub const PLPGSQL_STMT_CASE: Type = 3;
+    pub const PLPGSQL_STMT_LOOP: Type = 4;
+    pub const PLPGSQL_STMT_WHILE: Type = 5;
+    pub const PLPGSQL_STMT_FORI: Type = 6;
+    pub const PLPGSQL_STMT_FORS: Type = 7;
+    pub const PLPGSQL_STMT_FORC: Type = 8;
+    pub const PLPGSQL_STMT_FOREACH_A: Type = 9;
+    pub const PLPGSQL_STMT_EXIT: Type = 10;
+    pub const PLPGSQL_STMT_RETURN: Type = 11;
+    pub const PLPGSQL_STMT_RETURN_NEXT: Type = 12;
+    pub const PLPGSQL_STMT_RETURN_QUERY: Type = 13;
+    pub const PLPGSQL_STMT_RAISE: Type = 14;
+    pub const PLPGSQL_STMT_ASSERT: Type = 15;
+    pub const PLPGSQL_STMT_EXECSQL: Type = 16;
+    pub const PLPGSQL_STMT_DYNEXECUTE: Type = 17;
+    pub const PLPGSQL_STMT_DYNFORS: Type = 18;
+    pub const PLPGSQL_STMT_GETDIAG: Type = 19;
+    pub const PLPGSQL_STMT_OPEN: Type = 20;
+    pub const PLPGSQL_STMT_FETCH: Type = 21;
+    pub const PLPGSQL_STMT_CLOSE: Type = 22;
+    pub const PLPGSQL_STMT_PERFORM: Type = 23;
+    pub const PLPGSQL_STMT_CALL: Type = 24;
+    pub const PLPGSQL_STMT_COMMIT: Type = 25;
+    pub const PLPGSQL_STMT_ROLLBACK: Type = 26;
+}
+pub mod _bindgen_ty_19 {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PLPGSQL_RC_OK: Type = 0;
+    pub const PLPGSQL_RC_EXIT: Type = 1;
+    pub const PLPGSQL_RC_RETURN: Type = 2;
+    pub const PLPGSQL_RC_CONTINUE: Type = 3;
+}
+pub mod PLpgSQL_getdiag_kind {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PLPGSQL_GETDIAG_ROW_COUNT: Type = 0;
+    pub const PLPGSQL_GETDIAG_ROUTINE_OID: Type = 1;
+    pub const PLPGSQL_GETDIAG_CONTEXT: Type = 2;
+    pub const PLPGSQL_GETDIAG_ERROR_CONTEXT: Type = 3;
+    pub const PLPGSQL_GETDIAG_ERROR_DETAIL: Type = 4;
+    pub const PLPGSQL_GETDIAG_ERROR_HINT: Type = 5;
+    pub const PLPGSQL_GETDIAG_RETURNED_SQLSTATE: Type = 6;
+    pub const PLPGSQL_GETDIAG_COLUMN_NAME: Type = 7;
+    pub const PLPGSQL_GETDIAG_CONSTRAINT_NAME: Type = 8;
+    pub const PLPGSQL_GETDIAG_DATATYPE_NAME: Type = 9;
+    pub const PLPGSQL_GETDIAG_MESSAGE_TEXT: Type = 10;
+    pub const PLPGSQL_GETDIAG_TABLE_NAME: Type = 11;
+    pub const PLPGSQL_GETDIAG_SCHEMA_NAME: Type = 12;
+}
+pub mod PLpgSQL_raise_option_type {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PLPGSQL_RAISEOPTION_ERRCODE: Type = 0;
+    pub const PLPGSQL_RAISEOPTION_MESSAGE: Type = 1;
+    pub const PLPGSQL_RAISEOPTION_DETAIL: Type = 2;
+    pub const PLPGSQL_RAISEOPTION_HINT: Type = 3;
+    pub const PLPGSQL_RAISEOPTION_COLUMN: Type = 4;
+    pub const PLPGSQL_RAISEOPTION_CONSTRAINT: Type = 5;
+    pub const PLPGSQL_RAISEOPTION_DATATYPE: Type = 6;
+    pub const PLPGSQL_RAISEOPTION_TABLE: Type = 7;
+    pub const PLPGSQL_RAISEOPTION_SCHEMA: Type = 8;
+}
+pub mod PLpgSQL_resolve_option {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PLPGSQL_RESOLVE_ERROR: Type = 0;
+    pub const PLPGSQL_RESOLVE_VARIABLE: Type = 1;
+    pub const PLPGSQL_RESOLVE_COLUMN: Type = 2;
+}
 #[doc = " Node and structure definitions"]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_type {
     pub typname: *mut ::std::os::raw::c_char,
     pub typoid: Oid,
-    pub ttype: PLpgSQL_type_type,
+    pub ttype: PLpgSQL_type_type::Type,
     pub typlen: int16,
     pub typbyval: bool,
     pub typtype: ::std::os::raw::c_char,
@@ -26695,7 +30507,7 @@ impl Default for PLpgSQL_type {
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_expr {
     pub query: *mut ::std::os::raw::c_char,
-    pub parseMode: RawParseMode,
+    pub parseMode: RawParseMode::Type,
     pub plan: SPIPlanPtr,
     pub paramnos: *mut Bitmapset,
     pub func: *mut PLpgSQL_function,
@@ -26725,7 +30537,7 @@ impl Default for PLpgSQL_expr {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_datum {
-    pub dtype: PLpgSQL_datum_type,
+    pub dtype: PLpgSQL_datum_type::Type,
     pub dno: ::std::os::raw::c_int,
 }
 impl Default for PLpgSQL_datum {
@@ -26740,7 +30552,7 @@ impl Default for PLpgSQL_datum {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_variable {
-    pub dtype: PLpgSQL_datum_type,
+    pub dtype: PLpgSQL_datum_type::Type,
     pub dno: ::std::os::raw::c_int,
     pub refname: *mut ::std::os::raw::c_char,
     pub lineno: ::std::os::raw::c_int,
@@ -26760,7 +30572,7 @@ impl Default for PLpgSQL_variable {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_var {
-    pub dtype: PLpgSQL_datum_type,
+    pub dtype: PLpgSQL_datum_type::Type,
     pub dno: ::std::os::raw::c_int,
     pub refname: *mut ::std::os::raw::c_char,
     pub lineno: ::std::os::raw::c_int,
@@ -26774,7 +30586,7 @@ pub struct PLpgSQL_var {
     pub value: Datum,
     pub isnull: bool,
     pub freeval: bool,
-    pub promise: PLpgSQL_promise_type,
+    pub promise: PLpgSQL_promise_type::Type,
 }
 impl Default for PLpgSQL_var {
     fn default() -> Self {
@@ -26788,7 +30600,7 @@ impl Default for PLpgSQL_var {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_row {
-    pub dtype: PLpgSQL_datum_type,
+    pub dtype: PLpgSQL_datum_type::Type,
     pub dno: ::std::os::raw::c_int,
     pub refname: *mut ::std::os::raw::c_char,
     pub lineno: ::std::os::raw::c_int,
@@ -26812,7 +30624,7 @@ impl Default for PLpgSQL_row {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_rec {
-    pub dtype: PLpgSQL_datum_type,
+    pub dtype: PLpgSQL_datum_type::Type,
     pub dno: ::std::os::raw::c_int,
     pub refname: *mut ::std::os::raw::c_char,
     pub lineno: ::std::os::raw::c_int,
@@ -26836,7 +30648,7 @@ impl Default for PLpgSQL_rec {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_recfield {
-    pub dtype: PLpgSQL_datum_type,
+    pub dtype: PLpgSQL_datum_type::Type,
     pub dno: ::std::os::raw::c_int,
     pub fieldname: *mut ::std::os::raw::c_char,
     pub recparentno: ::std::os::raw::c_int,
@@ -26856,7 +30668,7 @@ impl Default for PLpgSQL_recfield {
 #[repr(C)]
 #[derive(Debug)]
 pub struct PLpgSQL_nsitem {
-    pub itemtype: PLpgSQL_nsitem_type,
+    pub itemtype: PLpgSQL_nsitem_type::Type,
     pub itemno: ::std::os::raw::c_int,
     pub prev: *mut PLpgSQL_nsitem,
     pub name: __IncompleteArrayField<::std::os::raw::c_char>,
@@ -26873,7 +30685,7 @@ impl Default for PLpgSQL_nsitem {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
 }
@@ -26937,7 +30749,7 @@ impl Default for PLpgSQL_exception {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_block {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub label: *mut ::std::os::raw::c_char,
@@ -26958,7 +30770,7 @@ impl Default for PLpgSQL_stmt_block {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_assign {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub varno: ::std::os::raw::c_int,
@@ -26976,7 +30788,7 @@ impl Default for PLpgSQL_stmt_assign {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_perform {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub expr: *mut PLpgSQL_expr,
@@ -26993,7 +30805,7 @@ impl Default for PLpgSQL_stmt_perform {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_call {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub expr: *mut PLpgSQL_expr,
@@ -27012,7 +30824,7 @@ impl Default for PLpgSQL_stmt_call {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_commit {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub chain: bool,
@@ -27029,7 +30841,7 @@ impl Default for PLpgSQL_stmt_commit {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_rollback {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub chain: bool,
@@ -27046,7 +30858,7 @@ impl Default for PLpgSQL_stmt_rollback {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_diag_item {
-    pub kind: PLpgSQL_getdiag_kind,
+    pub kind: PLpgSQL_getdiag_kind::Type,
     pub target: ::std::os::raw::c_int,
 }
 impl Default for PLpgSQL_diag_item {
@@ -27061,7 +30873,7 @@ impl Default for PLpgSQL_diag_item {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_getdiag {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub is_stacked: bool,
@@ -27079,7 +30891,7 @@ impl Default for PLpgSQL_stmt_getdiag {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_if {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub cond: *mut PLpgSQL_expr,
@@ -27115,7 +30927,7 @@ impl Default for PLpgSQL_if_elsif {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_case {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub t_expr: *mut PLpgSQL_expr,
@@ -27152,7 +30964,7 @@ impl Default for PLpgSQL_case_when {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_loop {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub label: *mut ::std::os::raw::c_char,
@@ -27170,7 +30982,7 @@ impl Default for PLpgSQL_stmt_loop {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_while {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub label: *mut ::std::os::raw::c_char,
@@ -27189,7 +31001,7 @@ impl Default for PLpgSQL_stmt_while {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_fori {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub label: *mut ::std::os::raw::c_char,
@@ -27212,7 +31024,7 @@ impl Default for PLpgSQL_stmt_fori {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_forq {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub label: *mut ::std::os::raw::c_char,
@@ -27231,7 +31043,7 @@ impl Default for PLpgSQL_stmt_forq {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_fors {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub label: *mut ::std::os::raw::c_char,
@@ -27251,7 +31063,7 @@ impl Default for PLpgSQL_stmt_fors {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_forc {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub label: *mut ::std::os::raw::c_char,
@@ -27272,7 +31084,7 @@ impl Default for PLpgSQL_stmt_forc {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_dynfors {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub label: *mut ::std::os::raw::c_char,
@@ -27293,7 +31105,7 @@ impl Default for PLpgSQL_stmt_dynfors {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_foreach_a {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub label: *mut ::std::os::raw::c_char,
@@ -27314,7 +31126,7 @@ impl Default for PLpgSQL_stmt_foreach_a {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_open {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub curvar: ::std::os::raw::c_int,
@@ -27336,12 +31148,12 @@ impl Default for PLpgSQL_stmt_open {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_fetch {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub target: *mut PLpgSQL_variable,
     pub curvar: ::std::os::raw::c_int,
-    pub direction: FetchDirection,
+    pub direction: FetchDirection::Type,
     pub how_many: ::std::os::raw::c_long,
     pub expr: *mut PLpgSQL_expr,
     pub is_move: bool,
@@ -27359,7 +31171,7 @@ impl Default for PLpgSQL_stmt_fetch {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_close {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub curvar: ::std::os::raw::c_int,
@@ -27376,7 +31188,7 @@ impl Default for PLpgSQL_stmt_close {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_exit {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub is_exit: bool,
@@ -27395,7 +31207,7 @@ impl Default for PLpgSQL_stmt_exit {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_return {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub expr: *mut PLpgSQL_expr,
@@ -27413,7 +31225,7 @@ impl Default for PLpgSQL_stmt_return {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_return_next {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub expr: *mut PLpgSQL_expr,
@@ -27431,7 +31243,7 @@ impl Default for PLpgSQL_stmt_return_next {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_return_query {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub query: *mut PLpgSQL_expr,
@@ -27450,7 +31262,7 @@ impl Default for PLpgSQL_stmt_return_query {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_raise {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub elog_level: ::std::os::raw::c_int,
@@ -27471,7 +31283,7 @@ impl Default for PLpgSQL_stmt_raise {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_raise_option {
-    pub opt_type: PLpgSQL_raise_option_type,
+    pub opt_type: PLpgSQL_raise_option_type::Type,
     pub expr: *mut PLpgSQL_expr,
 }
 impl Default for PLpgSQL_raise_option {
@@ -27486,7 +31298,7 @@ impl Default for PLpgSQL_raise_option {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_assert {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub cond: *mut PLpgSQL_expr,
@@ -27504,7 +31316,7 @@ impl Default for PLpgSQL_stmt_assert {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_execsql {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub sqlstmt: *mut PLpgSQL_expr,
@@ -27526,7 +31338,7 @@ impl Default for PLpgSQL_stmt_execsql {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_stmt_dynexecute {
-    pub cmd_type: PLpgSQL_stmt_type,
+    pub cmd_type: PLpgSQL_stmt_type::Type,
     pub lineno: ::std::os::raw::c_int,
     pub stmtid: ::std::os::raw::c_uint,
     pub query: *mut PLpgSQL_expr,
@@ -27563,10 +31375,12 @@ impl Default for PLpgSQL_func_hashkey {
         }
     }
 }
-pub const PLpgSQL_trigtype_PLPGSQL_DML_TRIGGER: PLpgSQL_trigtype = 0;
-pub const PLpgSQL_trigtype_PLPGSQL_EVENT_TRIGGER: PLpgSQL_trigtype = 1;
-pub const PLpgSQL_trigtype_PLPGSQL_NOT_TRIGGER: PLpgSQL_trigtype = 2;
-pub type PLpgSQL_trigtype = ::std::os::raw::c_uint;
+pub mod PLpgSQL_trigtype {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PLPGSQL_DML_TRIGGER: Type = 0;
+    pub const PLPGSQL_EVENT_TRIGGER: Type = 1;
+    pub const PLPGSQL_NOT_TRIGGER: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PLpgSQL_function {
@@ -27574,7 +31388,7 @@ pub struct PLpgSQL_function {
     pub fn_oid: Oid,
     pub fn_xmin: TransactionId,
     pub fn_tid: ItemPointerData,
-    pub fn_is_trigger: PLpgSQL_trigtype,
+    pub fn_is_trigger: PLpgSQL_trigtype::Type,
     pub fn_input_collation: Oid,
     pub fn_hashkey: *mut PLpgSQL_func_hashkey,
     pub fn_cxt: MemoryContext,
@@ -27592,7 +31406,7 @@ pub struct PLpgSQL_function {
     pub found_varno: ::std::os::raw::c_int,
     pub new_varno: ::std::os::raw::c_int,
     pub old_varno: ::std::os::raw::c_int,
-    pub resolve_option: PLpgSQL_resolve_option,
+    pub resolve_option: PLpgSQL_resolve_option::Type,
     pub print_strict_params: bool,
     pub extra_warnings: ::std::os::raw::c_int,
     pub extra_errors: ::std::os::raw::c_int,
@@ -27768,16 +31582,18 @@ impl Default for PLwdatum {
         }
     }
 }
-pub const IdentifierLookup_IDENTIFIER_LOOKUP_NORMAL: IdentifierLookup = 0;
-pub const IdentifierLookup_IDENTIFIER_LOOKUP_DECLARE: IdentifierLookup = 1;
-pub const IdentifierLookup_IDENTIFIER_LOOKUP_EXPR: IdentifierLookup = 2;
-#[doc = " Global variable declarations"]
-pub type IdentifierLookup = ::std::os::raw::c_uint;
-pub const DebugLogicalRepStreamingMode_DEBUG_LOGICAL_REP_STREAMING_BUFFERED:
-    DebugLogicalRepStreamingMode = 0;
-pub const DebugLogicalRepStreamingMode_DEBUG_LOGICAL_REP_STREAMING_IMMEDIATE:
-    DebugLogicalRepStreamingMode = 1;
-pub type DebugLogicalRepStreamingMode = ::std::os::raw::c_uint;
+pub mod IdentifierLookup {
+    #[doc = " Global variable declarations"]
+    pub type Type = ::std::os::raw::c_uint;
+    pub const IDENTIFIER_LOOKUP_NORMAL: Type = 0;
+    pub const IDENTIFIER_LOOKUP_DECLARE: Type = 1;
+    pub const IDENTIFIER_LOOKUP_EXPR: Type = 2;
+}
+pub mod DebugLogicalRepStreamingMode {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const DEBUG_LOGICAL_REP_STREAMING_BUFFERED: Type = 0;
+    pub const DEBUG_LOGICAL_REP_STREAMING_IMMEDIATE: Type = 1;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ReorderBufferTupleBuf {
@@ -27794,30 +31610,26 @@ impl Default for ReorderBufferTupleBuf {
         }
     }
 }
-pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INSERT: ReorderBufferChangeType = 0;
-pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_UPDATE: ReorderBufferChangeType = 1;
-pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_DELETE: ReorderBufferChangeType = 2;
-pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_MESSAGE: ReorderBufferChangeType = 3;
-pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INVALIDATION: ReorderBufferChangeType = 4;
-pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_SNAPSHOT: ReorderBufferChangeType =
-    5;
-pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_COMMAND_ID:
-    ReorderBufferChangeType = 6;
-pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_TUPLECID: ReorderBufferChangeType =
-    7;
-pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_SPEC_INSERT:
-    ReorderBufferChangeType = 8;
-pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_SPEC_CONFIRM:
-    ReorderBufferChangeType = 9;
-pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_SPEC_ABORT:
-    ReorderBufferChangeType = 10;
-pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_TRUNCATE: ReorderBufferChangeType = 11;
-pub type ReorderBufferChangeType = ::std::os::raw::c_uint;
+pub mod ReorderBufferChangeType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const REORDER_BUFFER_CHANGE_INSERT: Type = 0;
+    pub const REORDER_BUFFER_CHANGE_UPDATE: Type = 1;
+    pub const REORDER_BUFFER_CHANGE_DELETE: Type = 2;
+    pub const REORDER_BUFFER_CHANGE_MESSAGE: Type = 3;
+    pub const REORDER_BUFFER_CHANGE_INVALIDATION: Type = 4;
+    pub const REORDER_BUFFER_CHANGE_INTERNAL_SNAPSHOT: Type = 5;
+    pub const REORDER_BUFFER_CHANGE_INTERNAL_COMMAND_ID: Type = 6;
+    pub const REORDER_BUFFER_CHANGE_INTERNAL_TUPLECID: Type = 7;
+    pub const REORDER_BUFFER_CHANGE_INTERNAL_SPEC_INSERT: Type = 8;
+    pub const REORDER_BUFFER_CHANGE_INTERNAL_SPEC_CONFIRM: Type = 9;
+    pub const REORDER_BUFFER_CHANGE_INTERNAL_SPEC_ABORT: Type = 10;
+    pub const REORDER_BUFFER_CHANGE_TRUNCATE: Type = 11;
+}
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct ReorderBufferChange {
     pub lsn: XLogRecPtr,
-    pub action: ReorderBufferChangeType,
+    pub action: ReorderBufferChangeType::Type,
     pub txn: *mut ReorderBufferTXN,
     pub origin_id: RepOriginId,
     pub data: ReorderBufferChange__bindgen_ty_1,
@@ -28168,13 +31980,15 @@ impl Default for ReorderBuffer {
         }
     }
 }
-pub const OutputPluginOutputType_OUTPUT_PLUGIN_BINARY_OUTPUT: OutputPluginOutputType = 0;
-pub const OutputPluginOutputType_OUTPUT_PLUGIN_TEXTUAL_OUTPUT: OutputPluginOutputType = 1;
-pub type OutputPluginOutputType = ::std::os::raw::c_uint;
+pub mod OutputPluginOutputType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const OUTPUT_PLUGIN_BINARY_OUTPUT: Type = 0;
+    pub const OUTPUT_PLUGIN_TEXTUAL_OUTPUT: Type = 1;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct OutputPluginOptions {
-    pub output_type: OutputPluginOutputType,
+    pub output_type: OutputPluginOutputType::Type,
     pub receive_rewrites: bool,
 }
 impl Default for OutputPluginOptions {
@@ -28350,26 +32164,28 @@ pub struct OutputPluginCallbacks {
     pub stream_message_cb: LogicalDecodeStreamMessageCB,
     pub stream_truncate_cb: LogicalDecodeStreamTruncateCB,
 }
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_BEGIN: LogicalRepMsgType = 66;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_COMMIT: LogicalRepMsgType = 67;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_ORIGIN: LogicalRepMsgType = 79;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_INSERT: LogicalRepMsgType = 73;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_UPDATE: LogicalRepMsgType = 85;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_DELETE: LogicalRepMsgType = 68;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_TRUNCATE: LogicalRepMsgType = 84;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_RELATION: LogicalRepMsgType = 82;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_TYPE: LogicalRepMsgType = 89;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_MESSAGE: LogicalRepMsgType = 77;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_BEGIN_PREPARE: LogicalRepMsgType = 98;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_PREPARE: LogicalRepMsgType = 80;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_COMMIT_PREPARED: LogicalRepMsgType = 75;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_ROLLBACK_PREPARED: LogicalRepMsgType = 114;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_STREAM_START: LogicalRepMsgType = 83;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_STREAM_STOP: LogicalRepMsgType = 69;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_STREAM_COMMIT: LogicalRepMsgType = 99;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_STREAM_ABORT: LogicalRepMsgType = 65;
-pub const LogicalRepMsgType_LOGICAL_REP_MSG_STREAM_PREPARE: LogicalRepMsgType = 112;
-pub type LogicalRepMsgType = ::std::os::raw::c_uint;
+pub mod LogicalRepMsgType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const LOGICAL_REP_MSG_BEGIN: Type = 66;
+    pub const LOGICAL_REP_MSG_COMMIT: Type = 67;
+    pub const LOGICAL_REP_MSG_ORIGIN: Type = 79;
+    pub const LOGICAL_REP_MSG_INSERT: Type = 73;
+    pub const LOGICAL_REP_MSG_UPDATE: Type = 85;
+    pub const LOGICAL_REP_MSG_DELETE: Type = 68;
+    pub const LOGICAL_REP_MSG_TRUNCATE: Type = 84;
+    pub const LOGICAL_REP_MSG_RELATION: Type = 82;
+    pub const LOGICAL_REP_MSG_TYPE: Type = 89;
+    pub const LOGICAL_REP_MSG_MESSAGE: Type = 77;
+    pub const LOGICAL_REP_MSG_BEGIN_PREPARE: Type = 98;
+    pub const LOGICAL_REP_MSG_PREPARE: Type = 80;
+    pub const LOGICAL_REP_MSG_COMMIT_PREPARED: Type = 75;
+    pub const LOGICAL_REP_MSG_ROLLBACK_PREPARED: Type = 114;
+    pub const LOGICAL_REP_MSG_STREAM_START: Type = 83;
+    pub const LOGICAL_REP_MSG_STREAM_STOP: Type = 69;
+    pub const LOGICAL_REP_MSG_STREAM_COMMIT: Type = 99;
+    pub const LOGICAL_REP_MSG_STREAM_ABORT: Type = 65;
+    pub const LOGICAL_REP_MSG_STREAM_PREPARE: Type = 112;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct LogicalRepTupleData {
@@ -28502,22 +32318,26 @@ pub struct LogicalRepStreamAbortData {
     pub abort_lsn: XLogRecPtr,
     pub abort_time: TimestampTz,
 }
-pub const CRSSnapshotAction_CRS_EXPORT_SNAPSHOT: CRSSnapshotAction = 0;
-pub const CRSSnapshotAction_CRS_NOEXPORT_SNAPSHOT: CRSSnapshotAction = 1;
-pub const CRSSnapshotAction_CRS_USE_SNAPSHOT: CRSSnapshotAction = 2;
-pub type CRSSnapshotAction = ::std::os::raw::c_uint;
-pub const WalRcvState_WALRCV_STOPPED: WalRcvState = 0;
-pub const WalRcvState_WALRCV_STARTING: WalRcvState = 1;
-pub const WalRcvState_WALRCV_STREAMING: WalRcvState = 2;
-pub const WalRcvState_WALRCV_WAITING: WalRcvState = 3;
-pub const WalRcvState_WALRCV_RESTARTING: WalRcvState = 4;
-pub const WalRcvState_WALRCV_STOPPING: WalRcvState = 5;
-pub type WalRcvState = ::std::os::raw::c_uint;
+pub mod CRSSnapshotAction {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const CRS_EXPORT_SNAPSHOT: Type = 0;
+    pub const CRS_NOEXPORT_SNAPSHOT: Type = 1;
+    pub const CRS_USE_SNAPSHOT: Type = 2;
+}
+pub mod WalRcvState {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const WALRCV_STOPPED: Type = 0;
+    pub const WALRCV_STARTING: Type = 1;
+    pub const WALRCV_STREAMING: Type = 2;
+    pub const WALRCV_WAITING: Type = 3;
+    pub const WALRCV_RESTARTING: Type = 4;
+    pub const WALRCV_STOPPING: Type = 5;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct WalRcvData {
     pub pid: pid_t,
-    pub walRcvState: WalRcvState,
+    pub walRcvState: WalRcvState::Type,
     pub walRcvStoppedCV: ConditionVariable,
     pub startTime: pg_time_t,
     pub receiveStart: XLogRecPtr,
@@ -28610,17 +32430,19 @@ impl Default for WalRcvStreamOptions {
 pub struct WalReceiverConn {
     _unused: [u8; 0],
 }
-pub const WalRcvExecStatus_WALRCV_ERROR: WalRcvExecStatus = 0;
-pub const WalRcvExecStatus_WALRCV_OK_COMMAND: WalRcvExecStatus = 1;
-pub const WalRcvExecStatus_WALRCV_OK_TUPLES: WalRcvExecStatus = 2;
-pub const WalRcvExecStatus_WALRCV_OK_COPY_IN: WalRcvExecStatus = 3;
-pub const WalRcvExecStatus_WALRCV_OK_COPY_OUT: WalRcvExecStatus = 4;
-pub const WalRcvExecStatus_WALRCV_OK_COPY_BOTH: WalRcvExecStatus = 5;
-pub type WalRcvExecStatus = ::std::os::raw::c_uint;
+pub mod WalRcvExecStatus {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const WALRCV_ERROR: Type = 0;
+    pub const WALRCV_OK_COMMAND: Type = 1;
+    pub const WALRCV_OK_TUPLES: Type = 2;
+    pub const WALRCV_OK_COPY_IN: Type = 3;
+    pub const WALRCV_OK_COPY_OUT: Type = 4;
+    pub const WALRCV_OK_COPY_BOTH: Type = 5;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct WalRcvExecResult {
-    pub status: WalRcvExecStatus,
+    pub status: WalRcvExecStatus::Type,
     pub sqlstate: ::std::os::raw::c_int,
     pub err: *mut ::std::os::raw::c_char,
     pub tuplestore: *mut Tuplestorestate,
@@ -28701,7 +32523,7 @@ pub type walrcv_create_slot_fn = ::std::option::Option<
         slotname: *const ::std::os::raw::c_char,
         temporary: bool,
         two_phase: bool,
-        snapshot_action: CRSSnapshotAction,
+        snapshot_action: CRSSnapshotAction::Type,
         lsn: *mut XLogRecPtr,
     ) -> *mut ::std::os::raw::c_char,
 >;
@@ -28736,26 +32558,29 @@ pub struct WalReceiverFunctionsType {
     pub walrcv_exec: walrcv_exec_fn,
     pub walrcv_disconnect: walrcv_disconnect_fn,
 }
-pub const ReplicationSlotPersistency_RS_PERSISTENT: ReplicationSlotPersistency = 0;
-pub const ReplicationSlotPersistency_RS_EPHEMERAL: ReplicationSlotPersistency = 1;
-pub const ReplicationSlotPersistency_RS_TEMPORARY: ReplicationSlotPersistency = 2;
-pub type ReplicationSlotPersistency = ::std::os::raw::c_uint;
-pub const ReplicationSlotInvalidationCause_RS_INVAL_NONE: ReplicationSlotInvalidationCause = 0;
-pub const ReplicationSlotInvalidationCause_RS_INVAL_WAL_REMOVED: ReplicationSlotInvalidationCause =
-    1;
-pub const ReplicationSlotInvalidationCause_RS_INVAL_HORIZON: ReplicationSlotInvalidationCause = 2;
-pub const ReplicationSlotInvalidationCause_RS_INVAL_WAL_LEVEL: ReplicationSlotInvalidationCause = 3;
-pub type ReplicationSlotInvalidationCause = ::std::os::raw::c_uint;
+pub mod ReplicationSlotPersistency {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RS_PERSISTENT: Type = 0;
+    pub const RS_EPHEMERAL: Type = 1;
+    pub const RS_TEMPORARY: Type = 2;
+}
+pub mod ReplicationSlotInvalidationCause {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const RS_INVAL_NONE: Type = 0;
+    pub const RS_INVAL_WAL_REMOVED: Type = 1;
+    pub const RS_INVAL_HORIZON: Type = 2;
+    pub const RS_INVAL_WAL_LEVEL: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ReplicationSlotPersistentData {
     pub name: NameData,
     pub database: Oid,
-    pub persistency: ReplicationSlotPersistency,
+    pub persistency: ReplicationSlotPersistency::Type,
     pub xmin: TransactionId,
     pub catalog_xmin: TransactionId,
     pub restart_lsn: XLogRecPtr,
-    pub invalidated: ReplicationSlotInvalidationCause,
+    pub invalidated: ReplicationSlotInvalidationCause::Type,
     pub confirmed_flush: XLogRecPtr,
     pub two_phase_at: XLogRecPtr,
     pub two_phase: bool,
@@ -28899,54 +32724,9 @@ impl Default for RowSecurityDesc {
         }
     }
 }
-pub type row_security_policy_hook_type =
-    ::std::option::Option<unsafe extern "C" fn(cmdtype: CmdType, relation: Relation) -> *mut List>;
-pub type Block = *mut ::std::os::raw::c_void;
-pub const BufferAccessStrategyType_BAS_NORMAL: BufferAccessStrategyType = 0;
-pub const BufferAccessStrategyType_BAS_BULKREAD: BufferAccessStrategyType = 1;
-pub const BufferAccessStrategyType_BAS_BULKWRITE: BufferAccessStrategyType = 2;
-pub const BufferAccessStrategyType_BAS_VACUUM: BufferAccessStrategyType = 3;
-pub type BufferAccessStrategyType = ::std::os::raw::c_uint;
-pub const ReadBufferMode_RBM_NORMAL: ReadBufferMode = 0;
-pub const ReadBufferMode_RBM_ZERO_AND_LOCK: ReadBufferMode = 1;
-pub const ReadBufferMode_RBM_ZERO_AND_CLEANUP_LOCK: ReadBufferMode = 2;
-pub const ReadBufferMode_RBM_ZERO_ON_ERROR: ReadBufferMode = 3;
-pub const ReadBufferMode_RBM_NORMAL_NO_LOG: ReadBufferMode = 4;
-pub type ReadBufferMode = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PrefetchBufferResult {
-    pub recent_buffer: Buffer,
-    pub initiated_io: bool,
-}
-pub const ExtendBufferedFlags_EB_SKIP_EXTENSION_LOCK: ExtendBufferedFlags = 1;
-pub const ExtendBufferedFlags_EB_PERFORMING_RECOVERY: ExtendBufferedFlags = 2;
-pub const ExtendBufferedFlags_EB_CREATE_FORK_IF_NEEDED: ExtendBufferedFlags = 4;
-pub const ExtendBufferedFlags_EB_LOCK_FIRST: ExtendBufferedFlags = 8;
-pub const ExtendBufferedFlags_EB_CLEAR_SIZE_CACHE: ExtendBufferedFlags = 16;
-pub const ExtendBufferedFlags_EB_LOCK_TARGET: ExtendBufferedFlags = 32;
-pub type ExtendBufferedFlags = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct BufferManagerRelation {
-    pub rel: Relation,
-    pub smgr: *mut SMgrRelationData,
-    pub relpersistence: ::std::os::raw::c_char,
-}
-impl Default for BufferManagerRelation {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct WritebackContext {
-    _unused: [u8; 0],
-}
+pub type row_security_policy_hook_type = ::std::option::Option<
+    unsafe extern "C" fn(cmdtype: CmdType::Type, relation: Relation) -> *mut List,
+>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct BufFile {
@@ -28955,34 +32735,40 @@ pub struct BufFile {
 pub type pg_on_exit_callback =
     ::std::option::Option<unsafe extern "C" fn(code: ::std::os::raw::c_int, arg: Datum)>;
 pub type shmem_startup_hook_type = ::std::option::Option<unsafe extern "C" fn()>;
-pub const XLTW_Oper_XLTW_None: XLTW_Oper = 0;
-pub const XLTW_Oper_XLTW_Update: XLTW_Oper = 1;
-pub const XLTW_Oper_XLTW_Delete: XLTW_Oper = 2;
-pub const XLTW_Oper_XLTW_Lock: XLTW_Oper = 3;
-pub const XLTW_Oper_XLTW_LockUpdated: XLTW_Oper = 4;
-pub const XLTW_Oper_XLTW_InsertIndex: XLTW_Oper = 5;
-pub const XLTW_Oper_XLTW_InsertIndexUnique: XLTW_Oper = 6;
-pub const XLTW_Oper_XLTW_FetchUpdated: XLTW_Oper = 7;
-pub const XLTW_Oper_XLTW_RecheckExclusionConstr: XLTW_Oper = 8;
-pub type XLTW_Oper = ::std::os::raw::c_uint;
-pub const ProcSignalReason_PROCSIG_CATCHUP_INTERRUPT: ProcSignalReason = 0;
-pub const ProcSignalReason_PROCSIG_NOTIFY_INTERRUPT: ProcSignalReason = 1;
-pub const ProcSignalReason_PROCSIG_PARALLEL_MESSAGE: ProcSignalReason = 2;
-pub const ProcSignalReason_PROCSIG_WALSND_INIT_STOPPING: ProcSignalReason = 3;
-pub const ProcSignalReason_PROCSIG_BARRIER: ProcSignalReason = 4;
-pub const ProcSignalReason_PROCSIG_LOG_MEMORY_CONTEXT: ProcSignalReason = 5;
-pub const ProcSignalReason_PROCSIG_PARALLEL_APPLY_MESSAGE: ProcSignalReason = 6;
-pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_DATABASE: ProcSignalReason = 7;
-pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_TABLESPACE: ProcSignalReason = 8;
-pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_LOCK: ProcSignalReason = 9;
-pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_SNAPSHOT: ProcSignalReason = 10;
-pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_LOGICALSLOT: ProcSignalReason = 11;
-pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_BUFFERPIN: ProcSignalReason = 12;
-pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_STARTUP_DEADLOCK: ProcSignalReason = 13;
-pub const ProcSignalReason_NUM_PROCSIGNALS: ProcSignalReason = 14;
-pub type ProcSignalReason = ::std::os::raw::c_uint;
-pub const ProcSignalBarrierType_PROCSIGNAL_BARRIER_SMGRRELEASE: ProcSignalBarrierType = 0;
-pub type ProcSignalBarrierType = ::std::os::raw::c_uint;
+pub mod XLTW_Oper {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const XLTW_None: Type = 0;
+    pub const XLTW_Update: Type = 1;
+    pub const XLTW_Delete: Type = 2;
+    pub const XLTW_Lock: Type = 3;
+    pub const XLTW_LockUpdated: Type = 4;
+    pub const XLTW_InsertIndex: Type = 5;
+    pub const XLTW_InsertIndexUnique: Type = 6;
+    pub const XLTW_FetchUpdated: Type = 7;
+    pub const XLTW_RecheckExclusionConstr: Type = 8;
+}
+pub mod ProcSignalReason {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PROCSIG_CATCHUP_INTERRUPT: Type = 0;
+    pub const PROCSIG_NOTIFY_INTERRUPT: Type = 1;
+    pub const PROCSIG_PARALLEL_MESSAGE: Type = 2;
+    pub const PROCSIG_WALSND_INIT_STOPPING: Type = 3;
+    pub const PROCSIG_BARRIER: Type = 4;
+    pub const PROCSIG_LOG_MEMORY_CONTEXT: Type = 5;
+    pub const PROCSIG_PARALLEL_APPLY_MESSAGE: Type = 6;
+    pub const PROCSIG_RECOVERY_CONFLICT_DATABASE: Type = 7;
+    pub const PROCSIG_RECOVERY_CONFLICT_TABLESPACE: Type = 8;
+    pub const PROCSIG_RECOVERY_CONFLICT_LOCK: Type = 9;
+    pub const PROCSIG_RECOVERY_CONFLICT_SNAPSHOT: Type = 10;
+    pub const PROCSIG_RECOVERY_CONFLICT_LOGICALSLOT: Type = 11;
+    pub const PROCSIG_RECOVERY_CONFLICT_BUFFERPIN: Type = 12;
+    pub const PROCSIG_RECOVERY_CONFLICT_STARTUP_DEADLOCK: Type = 13;
+    pub const NUM_PROCSIGNALS: Type = 14;
+}
+pub mod ProcSignalBarrierType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PROCSIGNAL_BARRIER_SMGRRELEASE: Type = 0;
+}
 #[repr(C)]
 #[derive(Debug)]
 pub struct xl_standby_locks {
@@ -29047,16 +32833,20 @@ impl Default for RunningTransactionsData {
     }
 }
 pub type RunningTransactions = *mut RunningTransactionsData;
-pub const LogStmtLevel_LOGSTMT_NONE: LogStmtLevel = 0;
-pub const LogStmtLevel_LOGSTMT_DDL: LogStmtLevel = 1;
-pub const LogStmtLevel_LOGSTMT_MOD: LogStmtLevel = 2;
-pub const LogStmtLevel_LOGSTMT_ALL: LogStmtLevel = 3;
-pub type LogStmtLevel = ::std::os::raw::c_uint;
-pub const ProcessUtilityContext_PROCESS_UTILITY_TOPLEVEL: ProcessUtilityContext = 0;
-pub const ProcessUtilityContext_PROCESS_UTILITY_QUERY: ProcessUtilityContext = 1;
-pub const ProcessUtilityContext_PROCESS_UTILITY_QUERY_NONATOMIC: ProcessUtilityContext = 2;
-pub const ProcessUtilityContext_PROCESS_UTILITY_SUBCOMMAND: ProcessUtilityContext = 3;
-pub type ProcessUtilityContext = ::std::os::raw::c_uint;
+pub mod LogStmtLevel {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const LOGSTMT_NONE: Type = 0;
+    pub const LOGSTMT_DDL: Type = 1;
+    pub const LOGSTMT_MOD: Type = 2;
+    pub const LOGSTMT_ALL: Type = 3;
+}
+pub mod ProcessUtilityContext {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const PROCESS_UTILITY_TOPLEVEL: Type = 0;
+    pub const PROCESS_UTILITY_QUERY: Type = 1;
+    pub const PROCESS_UTILITY_QUERY_NONATOMIC: Type = 2;
+    pub const PROCESS_UTILITY_SUBCOMMAND: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct AlterTableUtilityContext {
@@ -29080,7 +32870,7 @@ pub type ProcessUtility_hook_type = ::std::option::Option<
         pstmt: *mut PlannedStmt,
         queryString: *const ::std::os::raw::c_char,
         readOnlyTree: bool,
-        context: ProcessUtilityContext,
+        context: ProcessUtilityContext::Type,
         params: ParamListInfo,
         queryEnv: *mut QueryEnvironment,
         dest: *mut DestReceiver,
@@ -29563,10 +33353,12 @@ impl Default for ParsedText {
         }
     }
 }
-pub const TSTernaryValue_TS_NO: TSTernaryValue = 0;
-pub const TSTernaryValue_TS_YES: TSTernaryValue = 1;
-pub const TSTernaryValue_TS_MAYBE: TSTernaryValue = 2;
-pub type TSTernaryValue = ::std::os::raw::c_uint;
+pub mod TSTernaryValue {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const TS_NO: Type = 0;
+    pub const TS_YES: Type = 1;
+    pub const TS_MAYBE: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ExecPhraseData {
@@ -29590,7 +33382,7 @@ pub type TSExecuteCallback = ::std::option::Option<
         arg: *mut ::std::os::raw::c_void,
         val: *mut QueryOperand,
         data: *mut ExecPhraseData,
-    ) -> TSTernaryValue,
+    ) -> TSTernaryValue::Type,
 >;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -29722,15 +33514,17 @@ pub struct NumericData {
     _unused: [u8; 0],
 }
 pub type Numeric = *mut NumericData;
-pub const JsonbIteratorToken_WJB_DONE: JsonbIteratorToken = 0;
-pub const JsonbIteratorToken_WJB_KEY: JsonbIteratorToken = 1;
-pub const JsonbIteratorToken_WJB_VALUE: JsonbIteratorToken = 2;
-pub const JsonbIteratorToken_WJB_ELEM: JsonbIteratorToken = 3;
-pub const JsonbIteratorToken_WJB_BEGIN_ARRAY: JsonbIteratorToken = 4;
-pub const JsonbIteratorToken_WJB_END_ARRAY: JsonbIteratorToken = 5;
-pub const JsonbIteratorToken_WJB_BEGIN_OBJECT: JsonbIteratorToken = 6;
-pub const JsonbIteratorToken_WJB_END_OBJECT: JsonbIteratorToken = 7;
-pub type JsonbIteratorToken = ::std::os::raw::c_uint;
+pub mod JsonbIteratorToken {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const WJB_DONE: Type = 0;
+    pub const WJB_KEY: Type = 1;
+    pub const WJB_VALUE: Type = 2;
+    pub const WJB_ELEM: Type = 3;
+    pub const WJB_BEGIN_ARRAY: Type = 4;
+    pub const WJB_END_ARRAY: Type = 5;
+    pub const WJB_BEGIN_OBJECT: Type = 6;
+    pub const WJB_END_OBJECT: Type = 7;
+}
 pub type JEntry = uint32;
 #[repr(C)]
 #[derive(Debug, Default)]
@@ -29744,19 +33538,21 @@ pub struct Jsonb {
     pub vl_len_: int32,
     pub root: JsonbContainer,
 }
-pub const jbvType_jbvNull: jbvType = 0;
-pub const jbvType_jbvString: jbvType = 1;
-pub const jbvType_jbvNumeric: jbvType = 2;
-pub const jbvType_jbvBool: jbvType = 3;
-pub const jbvType_jbvArray: jbvType = 16;
-pub const jbvType_jbvObject: jbvType = 17;
-pub const jbvType_jbvBinary: jbvType = 18;
-pub const jbvType_jbvDatetime: jbvType = 32;
-pub type jbvType = ::std::os::raw::c_uint;
+pub mod jbvType {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const jbvNull: Type = 0;
+    pub const jbvString: Type = 1;
+    pub const jbvNumeric: Type = 2;
+    pub const jbvBool: Type = 3;
+    pub const jbvArray: Type = 16;
+    pub const jbvObject: Type = 17;
+    pub const jbvBinary: Type = 18;
+    pub const jbvDatetime: Type = 32;
+}
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct JsonbValue {
-    pub type_: jbvType,
+    pub type_: jbvType::Type,
     pub val: JsonbValue__bindgen_ty_1,
 }
 #[repr(C)]
@@ -29900,12 +33696,14 @@ impl Default for JsonbParseState {
         }
     }
 }
-pub const JsonbIterState_JBI_ARRAY_START: JsonbIterState = 0;
-pub const JsonbIterState_JBI_ARRAY_ELEM: JsonbIterState = 1;
-pub const JsonbIterState_JBI_OBJECT_START: JsonbIterState = 2;
-pub const JsonbIterState_JBI_OBJECT_KEY: JsonbIterState = 3;
-pub const JsonbIterState_JBI_OBJECT_VALUE: JsonbIterState = 4;
-pub type JsonbIterState = ::std::os::raw::c_uint;
+pub mod JsonbIterState {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const JBI_ARRAY_START: Type = 0;
+    pub const JBI_ARRAY_ELEM: Type = 1;
+    pub const JBI_OBJECT_START: Type = 2;
+    pub const JBI_OBJECT_KEY: Type = 3;
+    pub const JBI_OBJECT_VALUE: Type = 4;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct JsonbIterator {
@@ -29917,7 +33715,7 @@ pub struct JsonbIterator {
     pub curIndex: ::std::os::raw::c_int,
     pub curDataOffset: uint32,
     pub curValueOffset: uint32,
-    pub state: JsonbIterState,
+    pub state: JsonbIterState::Type,
     pub parent: *mut JsonbIterator,
 }
 impl Default for JsonbIterator {
@@ -29946,11 +33744,13 @@ impl Default for OpBtreeInterpretation {
         }
     }
 }
-pub const IOFuncSelector_IOFunc_input: IOFuncSelector = 0;
-pub const IOFuncSelector_IOFunc_output: IOFuncSelector = 1;
-pub const IOFuncSelector_IOFunc_receive: IOFuncSelector = 2;
-pub const IOFuncSelector_IOFunc_send: IOFuncSelector = 3;
-pub type IOFuncSelector = ::std::os::raw::c_uint;
+pub mod IOFuncSelector {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const IOFunc_input: Type = 0;
+    pub const IOFunc_output: Type = 1;
+    pub const IOFunc_receive: Type = 2;
+    pub const IOFunc_send: Type = 3;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct AttStatsSlot {
@@ -30150,90 +33950,92 @@ impl Default for catcacheheader {
     }
 }
 pub type CatCacheHeader = catcacheheader;
-pub const SysCacheIdentifier_AGGFNOID: SysCacheIdentifier = 0;
-pub const SysCacheIdentifier_AMNAME: SysCacheIdentifier = 1;
-pub const SysCacheIdentifier_AMOID: SysCacheIdentifier = 2;
-pub const SysCacheIdentifier_AMOPOPID: SysCacheIdentifier = 3;
-pub const SysCacheIdentifier_AMOPSTRATEGY: SysCacheIdentifier = 4;
-pub const SysCacheIdentifier_AMPROCNUM: SysCacheIdentifier = 5;
-pub const SysCacheIdentifier_ATTNAME: SysCacheIdentifier = 6;
-pub const SysCacheIdentifier_ATTNUM: SysCacheIdentifier = 7;
-pub const SysCacheIdentifier_AUTHMEMMEMROLE: SysCacheIdentifier = 8;
-pub const SysCacheIdentifier_AUTHMEMROLEMEM: SysCacheIdentifier = 9;
-pub const SysCacheIdentifier_AUTHNAME: SysCacheIdentifier = 10;
-pub const SysCacheIdentifier_AUTHOID: SysCacheIdentifier = 11;
-pub const SysCacheIdentifier_CASTSOURCETARGET: SysCacheIdentifier = 12;
-pub const SysCacheIdentifier_CLAAMNAMENSP: SysCacheIdentifier = 13;
-pub const SysCacheIdentifier_CLAOID: SysCacheIdentifier = 14;
-pub const SysCacheIdentifier_COLLNAMEENCNSP: SysCacheIdentifier = 15;
-pub const SysCacheIdentifier_COLLOID: SysCacheIdentifier = 16;
-pub const SysCacheIdentifier_CONDEFAULT: SysCacheIdentifier = 17;
-pub const SysCacheIdentifier_CONNAMENSP: SysCacheIdentifier = 18;
-pub const SysCacheIdentifier_CONSTROID: SysCacheIdentifier = 19;
-pub const SysCacheIdentifier_CONVOID: SysCacheIdentifier = 20;
-pub const SysCacheIdentifier_DATABASEOID: SysCacheIdentifier = 21;
-pub const SysCacheIdentifier_DEFACLROLENSPOBJ: SysCacheIdentifier = 22;
-pub const SysCacheIdentifier_ENUMOID: SysCacheIdentifier = 23;
-pub const SysCacheIdentifier_ENUMTYPOIDNAME: SysCacheIdentifier = 24;
-pub const SysCacheIdentifier_EVENTTRIGGERNAME: SysCacheIdentifier = 25;
-pub const SysCacheIdentifier_EVENTTRIGGEROID: SysCacheIdentifier = 26;
-pub const SysCacheIdentifier_FOREIGNDATAWRAPPERNAME: SysCacheIdentifier = 27;
-pub const SysCacheIdentifier_FOREIGNDATAWRAPPEROID: SysCacheIdentifier = 28;
-pub const SysCacheIdentifier_FOREIGNSERVERNAME: SysCacheIdentifier = 29;
-pub const SysCacheIdentifier_FOREIGNSERVEROID: SysCacheIdentifier = 30;
-pub const SysCacheIdentifier_FOREIGNTABLEREL: SysCacheIdentifier = 31;
-pub const SysCacheIdentifier_INDEXRELID: SysCacheIdentifier = 32;
-pub const SysCacheIdentifier_LANGNAME: SysCacheIdentifier = 33;
-pub const SysCacheIdentifier_LANGOID: SysCacheIdentifier = 34;
-pub const SysCacheIdentifier_NAMESPACENAME: SysCacheIdentifier = 35;
-pub const SysCacheIdentifier_NAMESPACEOID: SysCacheIdentifier = 36;
-pub const SysCacheIdentifier_OPERNAMENSP: SysCacheIdentifier = 37;
-pub const SysCacheIdentifier_OPEROID: SysCacheIdentifier = 38;
-pub const SysCacheIdentifier_OPFAMILYAMNAMENSP: SysCacheIdentifier = 39;
-pub const SysCacheIdentifier_OPFAMILYOID: SysCacheIdentifier = 40;
-pub const SysCacheIdentifier_PARAMETERACLNAME: SysCacheIdentifier = 41;
-pub const SysCacheIdentifier_PARAMETERACLOID: SysCacheIdentifier = 42;
-pub const SysCacheIdentifier_PARTRELID: SysCacheIdentifier = 43;
-pub const SysCacheIdentifier_PROCNAMEARGSNSP: SysCacheIdentifier = 44;
-pub const SysCacheIdentifier_PROCOID: SysCacheIdentifier = 45;
-pub const SysCacheIdentifier_PUBLICATIONNAME: SysCacheIdentifier = 46;
-pub const SysCacheIdentifier_PUBLICATIONNAMESPACE: SysCacheIdentifier = 47;
-pub const SysCacheIdentifier_PUBLICATIONNAMESPACEMAP: SysCacheIdentifier = 48;
-pub const SysCacheIdentifier_PUBLICATIONOID: SysCacheIdentifier = 49;
-pub const SysCacheIdentifier_PUBLICATIONREL: SysCacheIdentifier = 50;
-pub const SysCacheIdentifier_PUBLICATIONRELMAP: SysCacheIdentifier = 51;
-pub const SysCacheIdentifier_RANGEMULTIRANGE: SysCacheIdentifier = 52;
-pub const SysCacheIdentifier_RANGETYPE: SysCacheIdentifier = 53;
-pub const SysCacheIdentifier_RELNAMENSP: SysCacheIdentifier = 54;
-pub const SysCacheIdentifier_RELOID: SysCacheIdentifier = 55;
-pub const SysCacheIdentifier_REPLORIGIDENT: SysCacheIdentifier = 56;
-pub const SysCacheIdentifier_REPLORIGNAME: SysCacheIdentifier = 57;
-pub const SysCacheIdentifier_RULERELNAME: SysCacheIdentifier = 58;
-pub const SysCacheIdentifier_SEQRELID: SysCacheIdentifier = 59;
-pub const SysCacheIdentifier_STATEXTDATASTXOID: SysCacheIdentifier = 60;
-pub const SysCacheIdentifier_STATEXTNAMENSP: SysCacheIdentifier = 61;
-pub const SysCacheIdentifier_STATEXTOID: SysCacheIdentifier = 62;
-pub const SysCacheIdentifier_STATRELATTINH: SysCacheIdentifier = 63;
-pub const SysCacheIdentifier_SUBSCRIPTIONNAME: SysCacheIdentifier = 64;
-pub const SysCacheIdentifier_SUBSCRIPTIONOID: SysCacheIdentifier = 65;
-pub const SysCacheIdentifier_SUBSCRIPTIONRELMAP: SysCacheIdentifier = 66;
-pub const SysCacheIdentifier_TABLESPACEOID: SysCacheIdentifier = 67;
-pub const SysCacheIdentifier_TRFOID: SysCacheIdentifier = 68;
-pub const SysCacheIdentifier_TRFTYPELANG: SysCacheIdentifier = 69;
-pub const SysCacheIdentifier_TSCONFIGMAP: SysCacheIdentifier = 70;
-pub const SysCacheIdentifier_TSCONFIGNAMENSP: SysCacheIdentifier = 71;
-pub const SysCacheIdentifier_TSCONFIGOID: SysCacheIdentifier = 72;
-pub const SysCacheIdentifier_TSDICTNAMENSP: SysCacheIdentifier = 73;
-pub const SysCacheIdentifier_TSDICTOID: SysCacheIdentifier = 74;
-pub const SysCacheIdentifier_TSPARSERNAMENSP: SysCacheIdentifier = 75;
-pub const SysCacheIdentifier_TSPARSEROID: SysCacheIdentifier = 76;
-pub const SysCacheIdentifier_TSTEMPLATENAMENSP: SysCacheIdentifier = 77;
-pub const SysCacheIdentifier_TSTEMPLATEOID: SysCacheIdentifier = 78;
-pub const SysCacheIdentifier_TYPENAMENSP: SysCacheIdentifier = 79;
-pub const SysCacheIdentifier_TYPEOID: SysCacheIdentifier = 80;
-pub const SysCacheIdentifier_USERMAPPINGOID: SysCacheIdentifier = 81;
-pub const SysCacheIdentifier_USERMAPPINGUSERSERVER: SysCacheIdentifier = 82;
-pub type SysCacheIdentifier = ::std::os::raw::c_uint;
+pub mod SysCacheIdentifier {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const AGGFNOID: Type = 0;
+    pub const AMNAME: Type = 1;
+    pub const AMOID: Type = 2;
+    pub const AMOPOPID: Type = 3;
+    pub const AMOPSTRATEGY: Type = 4;
+    pub const AMPROCNUM: Type = 5;
+    pub const ATTNAME: Type = 6;
+    pub const ATTNUM: Type = 7;
+    pub const AUTHMEMMEMROLE: Type = 8;
+    pub const AUTHMEMROLEMEM: Type = 9;
+    pub const AUTHNAME: Type = 10;
+    pub const AUTHOID: Type = 11;
+    pub const CASTSOURCETARGET: Type = 12;
+    pub const CLAAMNAMENSP: Type = 13;
+    pub const CLAOID: Type = 14;
+    pub const COLLNAMEENCNSP: Type = 15;
+    pub const COLLOID: Type = 16;
+    pub const CONDEFAULT: Type = 17;
+    pub const CONNAMENSP: Type = 18;
+    pub const CONSTROID: Type = 19;
+    pub const CONVOID: Type = 20;
+    pub const DATABASEOID: Type = 21;
+    pub const DEFACLROLENSPOBJ: Type = 22;
+    pub const ENUMOID: Type = 23;
+    pub const ENUMTYPOIDNAME: Type = 24;
+    pub const EVENTTRIGGERNAME: Type = 25;
+    pub const EVENTTRIGGEROID: Type = 26;
+    pub const FOREIGNDATAWRAPPERNAME: Type = 27;
+    pub const FOREIGNDATAWRAPPEROID: Type = 28;
+    pub const FOREIGNSERVERNAME: Type = 29;
+    pub const FOREIGNSERVEROID: Type = 30;
+    pub const FOREIGNTABLEREL: Type = 31;
+    pub const INDEXRELID: Type = 32;
+    pub const LANGNAME: Type = 33;
+    pub const LANGOID: Type = 34;
+    pub const NAMESPACENAME: Type = 35;
+    pub const NAMESPACEOID: Type = 36;
+    pub const OPERNAMENSP: Type = 37;
+    pub const OPEROID: Type = 38;
+    pub const OPFAMILYAMNAMENSP: Type = 39;
+    pub const OPFAMILYOID: Type = 40;
+    pub const PARAMETERACLNAME: Type = 41;
+    pub const PARAMETERACLOID: Type = 42;
+    pub const PARTRELID: Type = 43;
+    pub const PROCNAMEARGSNSP: Type = 44;
+    pub const PROCOID: Type = 45;
+    pub const PUBLICATIONNAME: Type = 46;
+    pub const PUBLICATIONNAMESPACE: Type = 47;
+    pub const PUBLICATIONNAMESPACEMAP: Type = 48;
+    pub const PUBLICATIONOID: Type = 49;
+    pub const PUBLICATIONREL: Type = 50;
+    pub const PUBLICATIONRELMAP: Type = 51;
+    pub const RANGEMULTIRANGE: Type = 52;
+    pub const RANGETYPE: Type = 53;
+    pub const RELNAMENSP: Type = 54;
+    pub const RELOID: Type = 55;
+    pub const REPLORIGIDENT: Type = 56;
+    pub const REPLORIGNAME: Type = 57;
+    pub const RULERELNAME: Type = 58;
+    pub const SEQRELID: Type = 59;
+    pub const STATEXTDATASTXOID: Type = 60;
+    pub const STATEXTNAMENSP: Type = 61;
+    pub const STATEXTOID: Type = 62;
+    pub const STATRELATTINH: Type = 63;
+    pub const SUBSCRIPTIONNAME: Type = 64;
+    pub const SUBSCRIPTIONOID: Type = 65;
+    pub const SUBSCRIPTIONRELMAP: Type = 66;
+    pub const TABLESPACEOID: Type = 67;
+    pub const TRFOID: Type = 68;
+    pub const TRFTYPELANG: Type = 69;
+    pub const TSCONFIGMAP: Type = 70;
+    pub const TSCONFIGNAMENSP: Type = 71;
+    pub const TSCONFIGOID: Type = 72;
+    pub const TSDICTNAMENSP: Type = 73;
+    pub const TSDICTOID: Type = 74;
+    pub const TSPARSERNAMENSP: Type = 75;
+    pub const TSPARSEROID: Type = 76;
+    pub const TSTEMPLATENAMENSP: Type = 77;
+    pub const TSTEMPLATEOID: Type = 78;
+    pub const TYPENAMENSP: Type = 79;
+    pub const TYPEOID: Type = 80;
+    pub const USERMAPPINGOID: Type = 81;
+    pub const USERMAPPINGUSERSERVER: Type = 82;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct RangeType {
@@ -31472,7 +35274,7 @@ extern "C" {
     pub fn bms_intersect(a: *const Bitmapset, b: *const Bitmapset) -> *mut Bitmapset;
     pub fn bms_difference(a: *const Bitmapset, b: *const Bitmapset) -> *mut Bitmapset;
     pub fn bms_is_subset(a: *const Bitmapset, b: *const Bitmapset) -> bool;
-    pub fn bms_subset_compare(a: *const Bitmapset, b: *const Bitmapset) -> BMS_Comparison;
+    pub fn bms_subset_compare(a: *const Bitmapset, b: *const Bitmapset) -> BMS_Comparison::Type;
     pub fn bms_is_member(x: ::std::os::raw::c_int, a: *const Bitmapset) -> bool;
     pub fn bms_member_index(a: *mut Bitmapset, x: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
     pub fn bms_overlap(a: *const Bitmapset, b: *const Bitmapset) -> bool;
@@ -31484,7 +35286,7 @@ extern "C" {
         member: *mut ::std::os::raw::c_int,
     ) -> bool;
     pub fn bms_num_members(a: *const Bitmapset) -> ::std::os::raw::c_int;
-    pub fn bms_membership(a: *const Bitmapset) -> BMS_Membership;
+    pub fn bms_membership(a: *const Bitmapset) -> BMS_Membership::Type;
     pub fn bms_add_member(a: *mut Bitmapset, x: ::std::os::raw::c_int) -> *mut Bitmapset;
     pub fn bms_del_member(a: *mut Bitmapset, x: ::std::os::raw::c_int) -> *mut Bitmapset;
     pub fn bms_add_members(a: *mut Bitmapset, b: *const Bitmapset) -> *mut Bitmapset;
@@ -31919,10 +35721,10 @@ extern "C" {
         maxlen: ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_char;
     pub fn ParamsErrorCallback(arg: *mut ::std::os::raw::c_void);
-    pub fn forkname_to_number(forkName: *const ::std::os::raw::c_char) -> ForkNumber;
+    pub fn forkname_to_number(forkName: *const ::std::os::raw::c_char) -> ForkNumber::Type;
     pub fn forkname_chars(
         str_: *const ::std::os::raw::c_char,
-        fork: *mut ForkNumber,
+        fork: *mut ForkNumber::Type,
     ) -> ::std::os::raw::c_int;
     pub fn GetDatabasePath(dbOid: Oid, spcOid: Oid) -> *mut ::std::os::raw::c_char;
     pub fn GetRelationPath(
@@ -31930,7 +35732,7 @@ extern "C" {
         spcOid: Oid,
         relNumber: RelFileNumber,
         backendId: ::std::os::raw::c_int,
-        forkNumber: ForkNumber,
+        forkNumber: ForkNumber::Type,
     ) -> *mut ::std::os::raw::c_char;
     pub fn makeInteger(i: ::std::os::raw::c_int) -> *mut Integer;
     pub fn makeFloat(numericStr: *mut ::std::os::raw::c_char) -> *mut Float;
@@ -31938,7 +35740,7 @@ extern "C" {
     pub fn makeString(str_: *mut ::std::os::raw::c_char) -> *mut String;
     pub fn makeBitString(str_: *mut ::std::os::raw::c_char) -> *mut BitString;
     pub fn dsm_impl_op(
-        op: dsm_op,
+        op: dsm_op::Type,
         handle: dsm_handle,
         request_size: Size,
         impl_private: *mut *mut ::std::os::raw::c_void,
@@ -32068,7 +35870,7 @@ extern "C" {
     pub fn hash_search(
         hashp: *mut HTAB,
         keyPtr: *const ::std::os::raw::c_void,
-        action: HASHACTION,
+        action: HASHACTION::Type,
         foundPtr: *mut bool,
     ) -> *mut ::std::os::raw::c_void;
     pub fn get_hash_value(hashp: *mut HTAB, keyPtr: *const ::std::os::raw::c_void) -> uint32;
@@ -32076,7 +35878,7 @@ extern "C" {
         hashp: *mut HTAB,
         keyPtr: *const ::std::os::raw::c_void,
         hashvalue: uint32,
-        action: HASHACTION,
+        action: HASHACTION::Type,
         foundPtr: *mut bool,
     ) -> *mut ::std::os::raw::c_void;
     pub fn hash_update_hash_key(
@@ -32327,7 +36129,7 @@ extern "C" {
     pub fn RelationGetIndexAttOptions(relation: Relation, copy: bool) -> *mut *mut bytea;
     pub fn RelationGetIndexAttrBitmap(
         relation: Relation,
-        attrKind: IndexAttrBitmapKind,
+        attrKind: IndexAttrBitmapKind::Type,
     ) -> *mut Bitmapset;
     pub fn RelationGetIdentityKeyBitmap(relation: Relation) -> *mut Bitmapset;
     pub fn RelationGetExclusionInfo(
@@ -32481,8 +36283,8 @@ extern "C" {
     pub fn tuplesort_end(state: *mut Tuplesortstate);
     pub fn tuplesort_reset(state: *mut Tuplesortstate);
     pub fn tuplesort_get_stats(state: *mut Tuplesortstate, stats: *mut TuplesortInstrumentation);
-    pub fn tuplesort_method_name(m: TuplesortMethod) -> *const ::std::os::raw::c_char;
-    pub fn tuplesort_space_type_name(t: TuplesortSpaceType) -> *const ::std::os::raw::c_char;
+    pub fn tuplesort_method_name(m: TuplesortMethod::Type) -> *const ::std::os::raw::c_char;
+    pub fn tuplesort_space_type_name(t: TuplesortSpaceType::Type) -> *const ::std::os::raw::c_char;
     pub fn tuplesort_merge_order(allowedMem: int64) -> ::std::os::raw::c_int;
     pub fn tuplesort_estimate_shared(nWorkers: ::std::os::raw::c_int) -> Size;
     pub fn tuplesort_initialize_shared(
@@ -32661,30 +36463,30 @@ extern "C" {
     ) -> *mut TupleHashEntryData;
     pub fn tuplehash_stat(tb: *mut tuplehash_hash);
     pub fn InitializeQueryCompletion(qc: *mut QueryCompletion);
-    pub fn GetCommandTagName(commandTag: CommandTag) -> *const ::std::os::raw::c_char;
+    pub fn GetCommandTagName(commandTag: CommandTag::Type) -> *const ::std::os::raw::c_char;
     pub fn GetCommandTagNameAndLen(
-        commandTag: CommandTag,
+        commandTag: CommandTag::Type,
         len: *mut Size,
     ) -> *const ::std::os::raw::c_char;
-    pub fn command_tag_display_rowcount(commandTag: CommandTag) -> bool;
-    pub fn command_tag_event_trigger_ok(commandTag: CommandTag) -> bool;
-    pub fn command_tag_table_rewrite_ok(commandTag: CommandTag) -> bool;
-    pub fn GetCommandTagEnum(commandname: *const ::std::os::raw::c_char) -> CommandTag;
+    pub fn command_tag_display_rowcount(commandTag: CommandTag::Type) -> bool;
+    pub fn command_tag_event_trigger_ok(commandTag: CommandTag::Type) -> bool;
+    pub fn command_tag_table_rewrite_ok(commandTag: CommandTag::Type) -> bool;
+    pub fn GetCommandTagEnum(commandname: *const ::std::os::raw::c_char) -> CommandTag::Type;
     pub fn BuildQueryCompletionString(
         buff: *mut ::std::os::raw::c_char,
         qc: *const QueryCompletion,
         nameonly: bool,
     ) -> Size;
-    pub fn BeginCommand(commandTag: CommandTag, dest: CommandDest);
-    pub fn CreateDestReceiver(dest: CommandDest) -> *mut DestReceiver;
+    pub fn BeginCommand(commandTag: CommandTag::Type, dest: CommandDest::Type);
+    pub fn CreateDestReceiver(dest: CommandDest::Type) -> *mut DestReceiver;
     pub fn EndCommand(
         qc: *const QueryCompletion,
-        dest: CommandDest,
+        dest: CommandDest::Type,
         force_undecorated_output: bool,
     );
     pub fn EndReplicationCommand(commandTag: *const ::std::os::raw::c_char);
-    pub fn NullCommand(dest: CommandDest);
-    pub fn ReadyForQuery(dest: CommandDest);
+    pub fn NullCommand(dest: CommandDest::Type);
+    pub fn ReadyForQuery(dest: CommandDest::Type);
     pub fn CreateQueryDesc(
         plannedstmt: *mut PlannedStmt,
         sourceText: *const ::std::os::raw::c_char,
@@ -32836,13 +36638,13 @@ extern "C" {
     pub fn standard_ExecutorStart(queryDesc: *mut QueryDesc, eflags: ::std::os::raw::c_int);
     pub fn ExecutorRun(
         queryDesc: *mut QueryDesc,
-        direction: ScanDirection,
+        direction: ScanDirection::Type,
         count: uint64,
         execute_once: bool,
     );
     pub fn standard_ExecutorRun(
         queryDesc: *mut QueryDesc,
-        direction: ScanDirection,
+        direction: ScanDirection::Type,
         count: uint64,
         execute_once: bool,
     );
@@ -32856,7 +36658,7 @@ extern "C" {
         rteperminfos: *mut List,
         ereport_on_violation: bool,
     ) -> bool;
-    pub fn CheckValidResultRel(resultRelInfo: *mut ResultRelInfo, operation: CmdType);
+    pub fn CheckValidResultRel(resultRelInfo: *mut ResultRelInfo, operation: CmdType::Type);
     pub fn InitResultRelInfo(
         resultRelInfo: *mut ResultRelInfo,
         resultRelationDesc: Relation,
@@ -32890,12 +36692,15 @@ extern "C" {
         estate: *mut EState,
     );
     pub fn ExecWithCheckOptions(
-        kind: WCOKind,
+        kind: WCOKind::Type,
         resultRelInfo: *mut ResultRelInfo,
         slot: *mut TupleTableSlot,
         estate: *mut EState,
     );
-    pub fn ExecUpdateLockMode(estate: *mut EState, relinfo: *mut ResultRelInfo) -> LockTupleMode;
+    pub fn ExecUpdateLockMode(
+        estate: *mut EState,
+        relinfo: *mut ResultRelInfo,
+    ) -> LockTupleMode::Type;
     pub fn ExecFindRowMark(estate: *mut EState, rti: Index, missing_ok: bool) -> *mut ExecRowMark;
     pub fn ExecBuildAuxRowMark(erm: *mut ExecRowMark, targetlist: *mut List)
         -> *mut ExecAuxRowMark;
@@ -33012,7 +36817,7 @@ extern "C" {
         econtext: *mut ExprContext,
         argContext: MemoryContext,
         isNull: *mut bool,
-        isDone: *mut ExprDoneCond,
+        isDone: *mut ExprDoneCond::Type,
     ) -> Datum;
     pub fn ExecScan(
         node: *mut ScanState,
@@ -33188,13 +36993,13 @@ extern "C" {
     pub fn RelationFindReplTupleByIndex(
         rel: Relation,
         idxoid: Oid,
-        lockmode: LockTupleMode,
+        lockmode: LockTupleMode::Type,
         searchslot: *mut TupleTableSlot,
         outslot: *mut TupleTableSlot,
     ) -> bool;
     pub fn RelationFindReplTupleSeq(
         rel: Relation,
-        lockmode: LockTupleMode,
+        lockmode: LockTupleMode::Type,
         searchslot: *mut TupleTableSlot,
         outslot: *mut TupleTableSlot,
     ) -> bool;
@@ -33216,7 +37021,7 @@ extern "C" {
         epqstate: *mut EPQState,
         searchslot: *mut TupleTableSlot,
     );
-    pub fn CheckCmdReplicaIdentity(rel: Relation, cmd: CmdType);
+    pub fn CheckCmdReplicaIdentity(rel: Relation, cmd: CmdType::Type);
     pub fn CheckSubscriptionRelkind(
         relkind: ::std::os::raw::c_char,
         nspname: *const ::std::os::raw::c_char,
@@ -33237,17 +37042,17 @@ extern "C" {
         fcinfo: FunctionCallInfo,
         resultTypeId: *mut Oid,
         resultTupleDesc: *mut TupleDesc,
-    ) -> TypeFuncClass;
+    ) -> TypeFuncClass::Type;
     pub fn get_expr_result_type(
         expr: *mut Node,
         resultTypeId: *mut Oid,
         resultTupleDesc: *mut TupleDesc,
-    ) -> TypeFuncClass;
+    ) -> TypeFuncClass::Type;
     pub fn get_func_result_type(
         functionId: Oid,
         resultTypeId: *mut Oid,
         resultTupleDesc: *mut TupleDesc,
-    ) -> TypeFuncClass;
+    ) -> TypeFuncClass::Type;
     pub fn get_expr_result_tupdesc(expr: *mut Node, noError: bool) -> TupleDesc;
     pub fn resolve_polymorphic_argtypes(
         numargs: ::std::os::raw::c_int,
@@ -33346,7 +37151,7 @@ extern "C" {
     pub fn InitProcessLocalLatch();
     pub fn SwitchToSharedLatch();
     pub fn SwitchBackToLocalLatch();
-    pub fn GetBackendTypeDesc(backendType: BackendType) -> *const ::std::os::raw::c_char;
+    pub fn GetBackendTypeDesc(backendType: BackendType::Type) -> *const ::std::os::raw::c_char;
     pub fn SetDatabasePath(path: *const ::std::os::raw::c_char);
     pub fn checkDataDir();
     pub fn SetDataDir(dir: *const ::std::os::raw::c_char);
@@ -33420,7 +37225,7 @@ extern "C" {
     pub fn PgArchiverMain() -> !;
     pub fn PgArchWakeup();
     pub fn PgArchForceDirScan();
-    pub fn pgstat_progress_start_command(cmdtype: ProgressCommandType, relid: Oid);
+    pub fn pgstat_progress_start_command(cmdtype: ProgressCommandType::Type, relid: Oid);
     pub fn pgstat_progress_update_param(index: ::std::os::raw::c_int, val: int64);
     pub fn pgstat_progress_incr_param(index: ::std::os::raw::c_int, incr: int64);
     pub fn pgstat_progress_update_multi_param(
@@ -33438,7 +37243,10 @@ extern "C" {
     pub fn pgstat_beinit();
     pub fn pgstat_bestart();
     pub fn pgstat_clear_backend_activity_snapshot();
-    pub fn pgstat_report_activity(state: BackendState, cmd_str: *const ::std::os::raw::c_char);
+    pub fn pgstat_report_activity(
+        state: BackendState::Type,
+        cmd_str: *const ::std::os::raw::c_char,
+    );
     pub fn pgstat_report_query_id(query_id: uint64, force: bool);
     pub fn pgstat_report_tempfile(filesize: usize);
     pub fn pgstat_report_appname(appname: *const ::std::os::raw::c_char);
@@ -33475,12 +37283,12 @@ extern "C" {
     pub fn pgstat_report_stat(force: bool) -> ::std::os::raw::c_long;
     pub fn pgstat_force_next_flush();
     pub fn pgstat_reset_counters();
-    pub fn pgstat_reset(kind: PgStat_Kind, dboid: Oid, objoid: Oid);
-    pub fn pgstat_reset_of_kind(kind: PgStat_Kind);
+    pub fn pgstat_reset(kind: PgStat_Kind::Type, dboid: Oid, objoid: Oid);
+    pub fn pgstat_reset_of_kind(kind: PgStat_Kind::Type);
     pub fn pgstat_clear_snapshot();
     pub fn pgstat_get_stat_snapshot_timestamp(have_snapshot: *mut bool) -> TimestampTz;
-    pub fn pgstat_get_kind_from_str(kind_str: *mut ::std::os::raw::c_char) -> PgStat_Kind;
-    pub fn pgstat_have_entry(kind: PgStat_Kind, dboid: Oid, objoid: Oid) -> bool;
+    pub fn pgstat_get_kind_from_str(kind_str: *mut ::std::os::raw::c_char) -> PgStat_Kind::Type;
+    pub fn pgstat_have_entry(kind: PgStat_Kind::Type, dboid: Oid, objoid: Oid) -> bool;
     pub fn pgstat_report_archiver(xlog: *const ::std::os::raw::c_char, failed: bool);
     pub fn pgstat_fetch_stat_archiver() -> *mut PgStat_ArchiverStats;
     pub fn pgstat_report_bgwriter();
@@ -33489,37 +37297,42 @@ extern "C" {
     pub fn pgstat_fetch_stat_checkpointer() -> *mut PgStat_CheckpointerStats;
     pub fn pgstat_bktype_io_stats_valid(
         backend_io: *mut PgStat_BktypeIO,
-        bktype: BackendType,
+        bktype: BackendType::Type,
     ) -> bool;
-    pub fn pgstat_count_io_op(io_object: IOObject, io_context: IOContext, io_op: IOOp);
+    pub fn pgstat_count_io_op(
+        io_object: IOObject::Type,
+        io_context: IOContext::Type,
+        io_op: IOOp::Type,
+    );
     pub fn pgstat_count_io_op_n(
-        io_object: IOObject,
-        io_context: IOContext,
-        io_op: IOOp,
+        io_object: IOObject::Type,
+        io_context: IOContext::Type,
+        io_op: IOOp::Type,
         cnt: uint32,
     );
     pub fn pgstat_prepare_io_time() -> instr_time;
     pub fn pgstat_count_io_op_time(
-        io_object: IOObject,
-        io_context: IOContext,
-        io_op: IOOp,
+        io_object: IOObject::Type,
+        io_context: IOContext::Type,
+        io_op: IOOp::Type,
         start_time: instr_time,
         cnt: uint32,
     );
     pub fn pgstat_fetch_stat_io() -> *mut PgStat_IO;
-    pub fn pgstat_get_io_context_name(io_context: IOContext) -> *const ::std::os::raw::c_char;
-    pub fn pgstat_get_io_object_name(io_object: IOObject) -> *const ::std::os::raw::c_char;
-    pub fn pgstat_tracks_io_bktype(bktype: BackendType) -> bool;
+    pub fn pgstat_get_io_context_name(io_context: IOContext::Type)
+        -> *const ::std::os::raw::c_char;
+    pub fn pgstat_get_io_object_name(io_object: IOObject::Type) -> *const ::std::os::raw::c_char;
+    pub fn pgstat_tracks_io_bktype(bktype: BackendType::Type) -> bool;
     pub fn pgstat_tracks_io_object(
-        bktype: BackendType,
-        io_object: IOObject,
-        io_context: IOContext,
+        bktype: BackendType::Type,
+        io_object: IOObject::Type,
+        io_context: IOContext::Type,
     ) -> bool;
     pub fn pgstat_tracks_io_op(
-        bktype: BackendType,
-        io_object: IOObject,
-        io_context: IOContext,
-        io_op: IOOp,
+        bktype: BackendType::Type,
+        io_object: IOObject::Type,
+        io_context: IOContext::Type,
+        io_op: IOOp::Type,
     ) -> bool;
     pub fn pgstat_drop_database(databaseid: Oid);
     pub fn pgstat_report_autovac(dboid: Oid);
@@ -33650,7 +37463,7 @@ extern "C" {
         isnull: *mut bool,
         heap_t_ctid: ItemPointer,
         heapRelation: Relation,
-        checkUnique: IndexUniqueCheck,
+        checkUnique: IndexUniqueCheck::Type,
         indexUnchanged: bool,
         indexInfo: *mut IndexInfo,
     ) -> bool;
@@ -33691,11 +37504,11 @@ extern "C" {
         norderbys: ::std::os::raw::c_int,
         pscan: ParallelIndexScanDesc,
     ) -> IndexScanDesc;
-    pub fn index_getnext_tid(scan: IndexScanDesc, direction: ScanDirection) -> ItemPointer;
+    pub fn index_getnext_tid(scan: IndexScanDesc, direction: ScanDirection::Type) -> ItemPointer;
     pub fn index_fetch_heap(scan: IndexScanDesc, slot: *mut TupleTableSlot) -> bool;
     pub fn index_getnext_slot(
         scan: IndexScanDesc,
-        direction: ScanDirection,
+        direction: ScanDirection::Type,
         slot: *mut TupleTableSlot,
     ) -> bool;
     pub fn index_getbitmap(scan: IndexScanDesc, bitmap: *mut TIDBitmap) -> int64;
@@ -33760,7 +37573,10 @@ extern "C" {
         nkeys: ::std::os::raw::c_int,
         key: ScanKey,
     ) -> SysScanDesc;
-    pub fn systable_getnext_ordered(sysscan: SysScanDesc, direction: ScanDirection) -> HeapTuple;
+    pub fn systable_getnext_ordered(
+        sysscan: SysScanDesc,
+        direction: ScanDirection::Type,
+    ) -> HeapTuple;
     pub fn systable_endscan_ordered(sysscan: SysScanDesc);
     pub fn GetIndexAmRoutine(amhandler: Oid) -> *mut IndexAmRoutine;
     pub fn GetIndexAmRoutineByAmId(amoid: Oid, noerror: bool) -> *mut IndexAmRoutine;
@@ -33789,7 +37605,7 @@ extern "C" {
     pub fn xlog_identify(info: uint8) -> *const ::std::os::raw::c_char;
     pub fn issue_xlog_fsync(fd: ::std::os::raw::c_int, segno: XLogSegNo, tli: TimeLineID);
     pub fn RecoveryInProgress() -> bool;
-    pub fn GetRecoveryState() -> RecoveryState;
+    pub fn GetRecoveryState() -> RecoveryState::Type;
     pub fn XLogInsertAllowed() -> bool;
     pub fn GetXLogInsertRecPtr() -> XLogRecPtr;
     pub fn GetXLogWriteRecPtr() -> XLogRecPtr;
@@ -33802,12 +37618,12 @@ extern "C" {
     pub fn BootStrapXLOG();
     pub fn InitializeWalConsistencyChecking();
     pub fn LocalProcessControlFile(reset: bool);
-    pub fn GetActiveWalLevelOnStandby() -> WalLevel;
+    pub fn GetActiveWalLevelOnStandby() -> WalLevel::Type;
     pub fn StartupXLOG();
     pub fn ShutdownXLOG(code: ::std::os::raw::c_int, arg: Datum);
     pub fn CreateCheckPoint(flags: ::std::os::raw::c_int);
     pub fn CreateRestartPoint(flags: ::std::os::raw::c_int) -> bool;
-    pub fn GetWALAvailability(targetLSN: XLogRecPtr) -> WALAvailability;
+    pub fn GetWALAvailability(targetLSN: XLogRecPtr) -> WALAvailability::Type;
     pub fn XLogPutNextOid(nextOid: Oid);
     pub fn XLogRestorePoint(rpName: *const ::std::os::raw::c_char) -> XLogRecPtr;
     pub fn UpdateFullPageWrites();
@@ -33835,7 +37651,7 @@ extern "C" {
     pub fn do_pg_backup_stop(state: *mut BackupState, waitforarchive: bool);
     pub fn do_pg_abort_backup(code: ::std::os::raw::c_int, arg: Datum);
     pub fn register_persistent_abort_backup_handler();
-    pub fn get_backup_status() -> SessionBackupState;
+    pub fn get_backup_status() -> SessionBackupState::Type;
     pub fn pg_comp_crc32c_sb8(
         crc: pg_crc32c,
         data: *const ::std::os::raw::c_void,
@@ -33907,14 +37723,14 @@ extern "C" {
         record: *mut XLogReaderState,
         block_id: uint8,
         rlocator: *mut RelFileLocator,
-        forknum: *mut ForkNumber,
+        forknum: *mut ForkNumber::Type,
         blknum: *mut BlockNumber,
     );
     pub fn XLogRecGetBlockTagExtended(
         record: *mut XLogReaderState,
         block_id: uint8,
         rlocator: *mut RelFileLocator,
-        forknum: *mut ForkNumber,
+        forknum: *mut ForkNumber::Type,
         blknum: *mut BlockNumber,
         prefetch_buffer: *mut Buffer,
     ) -> bool;
@@ -33944,7 +37760,7 @@ extern "C" {
     pub fn XLogRegisterBlock(
         block_id: uint8,
         rlocator: *mut RelFileLocator,
-        forknum: ForkNumber,
+        forknum: ForkNumber::Type,
         blknum: BlockNumber,
         page: *mut ::std::os::raw::c_char,
         flags: uint8,
@@ -33954,14 +37770,14 @@ extern "C" {
     pub fn XLogCheckBufferNeedsBackup(buffer: Buffer) -> bool;
     pub fn log_newpage(
         rlocator: *mut RelFileLocator,
-        forknum: ForkNumber,
+        forknum: ForkNumber::Type,
         blkno: BlockNumber,
         page: *mut ::std::os::raw::c_char,
         page_std: bool,
     ) -> XLogRecPtr;
     pub fn log_newpages(
         rlocator: *mut RelFileLocator,
-        forknum: ForkNumber,
+        forknum: ForkNumber::Type,
         num_pages: ::std::os::raw::c_int,
         blknos: *mut BlockNumber,
         pages: *mut *mut ::std::os::raw::c_char,
@@ -33970,7 +37786,7 @@ extern "C" {
     pub fn log_newpage_buffer(buffer: Buffer, page_std: bool) -> XLogRecPtr;
     pub fn log_newpage_range(
         rel: Relation,
-        forknum: ForkNumber,
+        forknum: ForkNumber::Type,
         startblk: BlockNumber,
         endblk: BlockNumber,
         page_std: bool,
@@ -33998,14 +37814,14 @@ extern "C" {
         relpersistence: ::std::os::raw::c_char,
     ) -> RelFileNumber;
     pub fn get_object_address(
-        objtype: ObjectType,
+        objtype: ObjectType::Type,
         object: *mut Node,
         relp: *mut Relation,
         lockmode: LOCKMODE,
         missing_ok: bool,
     ) -> ObjectAddress;
     pub fn get_object_address_rv(
-        objtype: ObjectType,
+        objtype: ObjectType::Type,
         rel: *mut RangeVar,
         object: *mut List,
         relp: *mut Relation,
@@ -34014,7 +37830,7 @@ extern "C" {
     ) -> ObjectAddress;
     pub fn check_object_ownership(
         roleid: Oid,
-        objtype: ObjectType,
+        objtype: ObjectType::Type,
         address: ObjectAddress,
         object: *mut Node,
         relation: Relation,
@@ -34030,7 +37846,7 @@ extern "C" {
     pub fn get_object_attnum_namespace(class_id: Oid) -> AttrNumber;
     pub fn get_object_attnum_owner(class_id: Oid) -> AttrNumber;
     pub fn get_object_attnum_acl(class_id: Oid) -> AttrNumber;
-    pub fn get_object_type(class_id: Oid, object_id: Oid) -> ObjectType;
+    pub fn get_object_type(class_id: Oid, object_id: Oid) -> ObjectType::Type;
     pub fn get_object_namensp_unique(class_id: Oid) -> bool;
     pub fn get_catalog_object_by_oid(
         catalog: Relation,
@@ -34060,29 +37876,29 @@ extern "C" {
         missing_ok: bool,
     ) -> *mut ::std::os::raw::c_char;
     pub fn strlist_to_textarray(list: *mut List) -> *mut ArrayType;
-    pub fn get_relkind_objtype(relkind: ::std::os::raw::c_char) -> ObjectType;
+    pub fn get_relkind_objtype(relkind: ::std::os::raw::c_char) -> ObjectType::Type;
     pub fn GetPublication(pubid: Oid) -> *mut Publication;
     pub fn GetPublicationByName(
         pubname: *const ::std::os::raw::c_char,
         missing_ok: bool,
     ) -> *mut Publication;
     pub fn GetRelationPublications(relid: Oid) -> *mut List;
-    pub fn GetPublicationRelations(pubid: Oid, pub_partopt: PublicationPartOpt) -> *mut List;
+    pub fn GetPublicationRelations(pubid: Oid, pub_partopt: PublicationPartOpt::Type) -> *mut List;
     pub fn GetAllTablesPublications() -> *mut List;
     pub fn GetAllTablesPublicationRelations(pubviaroot: bool) -> *mut List;
     pub fn GetPublicationSchemas(pubid: Oid) -> *mut List;
     pub fn GetSchemaPublications(schemaid: Oid) -> *mut List;
     pub fn GetSchemaPublicationRelations(
         schemaid: Oid,
-        pub_partopt: PublicationPartOpt,
+        pub_partopt: PublicationPartOpt::Type,
     ) -> *mut List;
     pub fn GetAllSchemaPublicationRelations(
         pubid: Oid,
-        pub_partopt: PublicationPartOpt,
+        pub_partopt: PublicationPartOpt::Type,
     ) -> *mut List;
     pub fn GetPubPartitionOptionRelations(
         result: *mut List,
-        pub_partopt: PublicationPartOpt,
+        pub_partopt: PublicationPartOpt::Type,
         relid: Oid,
     ) -> *mut List;
     pub fn GetTopMostAncestorInPublication(
@@ -34105,7 +37921,7 @@ extern "C" {
     ) -> *mut Bitmapset;
     pub fn smgrinit();
     pub fn smgropen(rlocator: RelFileLocator, backend: BackendId) -> SMgrRelation;
-    pub fn smgrexists(reln: SMgrRelation, forknum: ForkNumber) -> bool;
+    pub fn smgrexists(reln: SMgrRelation, forknum: ForkNumber::Type) -> bool;
     pub fn smgrsetowner(owner: *mut SMgrRelation, reln: SMgrRelation);
     pub fn smgrclearowner(owner: *mut SMgrRelation, reln: SMgrRelation);
     pub fn smgrclose(reln: SMgrRelation);
@@ -34113,52 +37929,56 @@ extern "C" {
     pub fn smgrcloserellocator(rlocator: RelFileLocatorBackend);
     pub fn smgrrelease(reln: SMgrRelation);
     pub fn smgrreleaseall();
-    pub fn smgrcreate(reln: SMgrRelation, forknum: ForkNumber, isRedo: bool);
+    pub fn smgrcreate(reln: SMgrRelation, forknum: ForkNumber::Type, isRedo: bool);
     pub fn smgrdosyncall(rels: *mut SMgrRelation, nrels: ::std::os::raw::c_int);
     pub fn smgrdounlinkall(rels: *mut SMgrRelation, nrels: ::std::os::raw::c_int, isRedo: bool);
     pub fn smgrextend(
         reln: SMgrRelation,
-        forknum: ForkNumber,
+        forknum: ForkNumber::Type,
         blocknum: BlockNumber,
         buffer: *const ::std::os::raw::c_void,
         skipFsync: bool,
     );
     pub fn smgrzeroextend(
         reln: SMgrRelation,
-        forknum: ForkNumber,
+        forknum: ForkNumber::Type,
         blocknum: BlockNumber,
         nblocks: ::std::os::raw::c_int,
         skipFsync: bool,
     );
-    pub fn smgrprefetch(reln: SMgrRelation, forknum: ForkNumber, blocknum: BlockNumber) -> bool;
+    pub fn smgrprefetch(
+        reln: SMgrRelation,
+        forknum: ForkNumber::Type,
+        blocknum: BlockNumber,
+    ) -> bool;
     pub fn smgrread(
         reln: SMgrRelation,
-        forknum: ForkNumber,
+        forknum: ForkNumber::Type,
         blocknum: BlockNumber,
         buffer: *mut ::std::os::raw::c_void,
     );
     pub fn smgrwrite(
         reln: SMgrRelation,
-        forknum: ForkNumber,
+        forknum: ForkNumber::Type,
         blocknum: BlockNumber,
         buffer: *const ::std::os::raw::c_void,
         skipFsync: bool,
     );
     pub fn smgrwriteback(
         reln: SMgrRelation,
-        forknum: ForkNumber,
+        forknum: ForkNumber::Type,
         blocknum: BlockNumber,
         nblocks: BlockNumber,
     );
-    pub fn smgrnblocks(reln: SMgrRelation, forknum: ForkNumber) -> BlockNumber;
-    pub fn smgrnblocks_cached(reln: SMgrRelation, forknum: ForkNumber) -> BlockNumber;
+    pub fn smgrnblocks(reln: SMgrRelation, forknum: ForkNumber::Type) -> BlockNumber;
+    pub fn smgrnblocks_cached(reln: SMgrRelation, forknum: ForkNumber::Type) -> BlockNumber;
     pub fn smgrtruncate(
         reln: SMgrRelation,
-        forknum: *mut ForkNumber,
+        forknum: *mut ForkNumber::Type,
         nforks: ::std::os::raw::c_int,
         nblocks: *mut BlockNumber,
     );
-    pub fn smgrimmedsync(reln: SMgrRelation, forknum: ForkNumber);
+    pub fn smgrimmedsync(reln: SMgrRelation, forknum: ForkNumber::Type);
     pub fn AtEOXact_SMgr();
     pub fn ProcessBarrierSmgrRelease() -> bool;
     pub fn RelationIncrementReferenceCount(rel: Relation);
@@ -34360,7 +38180,7 @@ extern "C" {
         otid: ItemPointer,
         slot: *mut TupleTableSlot,
         snapshot: Snapshot,
-        update_indexes: *mut TU_UpdateIndexes,
+        update_indexes: *mut TU_UpdateIndexes::Type,
     );
     pub fn table_block_parallelscan_estimate(rel: Relation) -> Size;
     pub fn table_block_parallelscan_initialize(rel: Relation, pscan: ParallelTableScanDesc)
@@ -34376,7 +38196,7 @@ extern "C" {
         pbscanwork: ParallelBlockTableScanWorker,
         pbscan: ParallelBlockTableScanDesc,
     );
-    pub fn table_block_relation_size(rel: Relation, forkNumber: ForkNumber) -> uint64;
+    pub fn table_block_relation_size(rel: Relation, forkNumber: ForkNumber::Type) -> uint64;
     pub fn table_block_relation_estimate_size(
         rel: Relation,
         attr_widths: *mut int32,
@@ -34444,16 +38264,16 @@ extern "C" {
         allow_pagemode: bool,
     );
     pub fn heap_endscan(sscan: TableScanDesc);
-    pub fn heap_getnext(sscan: TableScanDesc, direction: ScanDirection) -> HeapTuple;
+    pub fn heap_getnext(sscan: TableScanDesc, direction: ScanDirection::Type) -> HeapTuple;
     pub fn heap_getnextslot(
         sscan: TableScanDesc,
-        direction: ScanDirection,
+        direction: ScanDirection::Type,
         slot: *mut TupleTableSlot,
     ) -> bool;
     pub fn heap_set_tidrange(sscan: TableScanDesc, mintid: ItemPointer, maxtid: ItemPointer);
     pub fn heap_getnextslot_tidrange(
         sscan: TableScanDesc,
-        direction: ScanDirection,
+        direction: ScanDirection::Type,
         slot: *mut TupleTableSlot,
     ) -> bool;
     pub fn heap_fetch(
@@ -34499,7 +38319,7 @@ extern "C" {
         wait: bool,
         tmfd: *mut TM_FailureData,
         changingPart: bool,
-    ) -> TM_Result;
+    ) -> TM_Result::Type;
     pub fn heap_finish_speculative(relation: Relation, tid: ItemPointer);
     pub fn heap_abort_speculative(relation: Relation, tid: ItemPointer);
     pub fn heap_update(
@@ -34510,19 +38330,19 @@ extern "C" {
         crosscheck: Snapshot,
         wait: bool,
         tmfd: *mut TM_FailureData,
-        lockmode: *mut LockTupleMode,
-        update_indexes: *mut TU_UpdateIndexes,
-    ) -> TM_Result;
+        lockmode: *mut LockTupleMode::Type,
+        update_indexes: *mut TU_UpdateIndexes::Type,
+    ) -> TM_Result::Type;
     pub fn heap_lock_tuple(
         relation: Relation,
         tuple: HeapTuple,
         cid: CommandId,
-        mode: LockTupleMode,
-        wait_policy: LockWaitPolicy,
+        mode: LockTupleMode::Type,
+        wait_policy: LockWaitPolicy::Type,
         follow_updates: bool,
         buffer: *mut Buffer,
         tmfd: *mut TM_FailureData,
-    ) -> TM_Result;
+    ) -> TM_Result::Type;
     pub fn heap_inplace_update(relation: Relation, tuple: HeapTuple);
     pub fn heap_prepare_freeze_tuple(
         tuple: HeapTupleHeader,
@@ -34558,7 +38378,7 @@ extern "C" {
         relation: Relation,
         otid: ItemPointer,
         tup: HeapTuple,
-        update_indexes: *mut TU_UpdateIndexes,
+        update_indexes: *mut TU_UpdateIndexes::Type,
     );
     pub fn heap_index_delete_tuples(
         rel: Relation,
@@ -34598,17 +38418,17 @@ extern "C" {
         htup: HeapTuple,
         curcid: CommandId,
         buffer: Buffer,
-    ) -> TM_Result;
+    ) -> TM_Result::Type;
     pub fn HeapTupleSatisfiesVacuum(
         htup: HeapTuple,
         OldestXmin: TransactionId,
         buffer: Buffer,
-    ) -> HTSV_Result;
+    ) -> HTSV_Result::Type;
     pub fn HeapTupleSatisfiesVacuumHorizon(
         htup: HeapTuple,
         buffer: Buffer,
         dead_after: *mut TransactionId,
-    ) -> HTSV_Result;
+    ) -> HTSV_Result::Type;
     pub fn HeapTupleSetHintBits(
         tuple: HeapTupleHeader,
         buffer: Buffer,
@@ -34636,22 +38456,22 @@ extern "C" {
     pub fn SyncPreCheckpoint();
     pub fn SyncPostCheckpoint();
     pub fn ProcessSyncRequests();
-    pub fn RememberSyncRequest(ftag: *const FileTag, type_: SyncRequestType);
+    pub fn RememberSyncRequest(ftag: *const FileTag, type_: SyncRequestType::Type);
     pub fn RegisterSyncRequest(
         ftag: *const FileTag,
-        type_: SyncRequestType,
+        type_: SyncRequestType::Type,
         retryOnError: bool,
     ) -> bool;
     pub fn MultiXactIdCreate(
         xid1: TransactionId,
-        status1: MultiXactStatus,
+        status1: MultiXactStatus::Type,
         xid2: TransactionId,
-        status2: MultiXactStatus,
+        status2: MultiXactStatus::Type,
     ) -> MultiXactId;
     pub fn MultiXactIdExpand(
         multi: MultiXactId,
         xid: TransactionId,
-        status: MultiXactStatus,
+        status: MultiXactStatus::Type,
     ) -> MultiXactId;
     pub fn MultiXactIdCreateFromMembers(
         nmembers: ::std::os::raw::c_int,
@@ -34730,9 +38550,9 @@ extern "C" {
         nmembers: ::std::os::raw::c_int,
         members: *mut MultiXactMember,
     ) -> *mut ::std::os::raw::c_char;
-    pub fn LWLockAcquire(lock: *mut LWLock, mode: LWLockMode) -> bool;
-    pub fn LWLockConditionalAcquire(lock: *mut LWLock, mode: LWLockMode) -> bool;
-    pub fn LWLockAcquireOrWait(lock: *mut LWLock, mode: LWLockMode) -> bool;
+    pub fn LWLockAcquire(lock: *mut LWLock, mode: LWLockMode::Type) -> bool;
+    pub fn LWLockConditionalAcquire(lock: *mut LWLock, mode: LWLockMode::Type) -> bool;
+    pub fn LWLockAcquireOrWait(lock: *mut LWLock, mode: LWLockMode::Type) -> bool;
     pub fn LWLockRelease(lock: *mut LWLock);
     pub fn LWLockReleaseClearVar(lock: *mut LWLock, valptr: *mut uint64, val: uint64);
     pub fn LWLockReleaseAll();
@@ -34742,7 +38562,7 @@ extern "C" {
         nlocks: ::std::os::raw::c_int,
         stride: usize,
     ) -> bool;
-    pub fn LWLockHeldByMeInMode(lock: *mut LWLock, mode: LWLockMode) -> bool;
+    pub fn LWLockHeldByMeInMode(lock: *mut LWLock, mode: LWLockMode::Type) -> bool;
     pub fn LWLockWaitForVar(
         lock: *mut LWLock,
         valptr: *mut uint64,
@@ -34862,7 +38682,7 @@ extern "C" {
         lockmode: LOCKMODE,
         sessionLock: bool,
         dontWait: bool,
-    ) -> LockAcquireResult;
+    ) -> LockAcquireResult::Type;
     pub fn LockAcquireExtended(
         locktag: *const LOCKTAG,
         lockmode: LOCKMODE,
@@ -34870,7 +38690,7 @@ extern "C" {
         dontWait: bool,
         reportMemoryError: bool,
         locallockp: *mut *mut LOCALLOCK,
-    ) -> LockAcquireResult;
+    ) -> LockAcquireResult::Type;
     pub fn AbortStrongLockAcquire();
     pub fn MarkLockClear(locallock: *mut LOCALLOCK);
     pub fn LockRelease(locktag: *const LOCKTAG, lockmode: LOCKMODE, sessionLock: bool) -> bool;
@@ -34929,7 +38749,7 @@ extern "C" {
         recdata: *mut ::std::os::raw::c_void,
         len: uint32,
     );
-    pub fn DeadLockCheck(proc_: *mut PGPROC) -> DeadLockState;
+    pub fn DeadLockCheck(proc_: *mut PGPROC) -> DeadLockState::Type;
     pub fn GetBlockingAutoVacuumPgproc() -> *mut PGPROC;
     pub fn DeadLockReport() -> !;
     pub fn RememberSimpleDeadLock(
@@ -34943,7 +38763,7 @@ extern "C" {
     pub fn VirtualXactLockTableInsert(vxid: VirtualTransactionId);
     pub fn VirtualXactLockTableCleanup();
     pub fn VirtualXactLock(vxid: VirtualTransactionId, wait: bool) -> bool;
-    pub fn add_reloption_kind() -> relopt_kind;
+    pub fn add_reloption_kind() -> relopt_kind::Type;
     pub fn add_bool_reloption(
         kinds: bits32,
         name: *const ::std::os::raw::c_char,
@@ -35048,7 +38868,7 @@ extern "C" {
     pub fn build_reloptions(
         reloptions: Datum,
         validate: bool,
-        kind: relopt_kind,
+        kind: relopt_kind::Type,
         relopt_struct_size: Size,
         relopt_elems: *const relopt_parse_elt,
         num_relopt_elems: ::std::os::raw::c_int,
@@ -35058,7 +38878,11 @@ extern "C" {
         options: Datum,
         validate: bool,
     ) -> *mut ::std::os::raw::c_void;
-    pub fn default_reloptions(reloptions: Datum, validate: bool, kind: relopt_kind) -> *mut bytea;
+    pub fn default_reloptions(
+        reloptions: Datum,
+        validate: bool,
+        kind: relopt_kind::Type,
+    ) -> *mut bytea;
     pub fn heap_reloptions(
         relkind: ::std::os::raw::c_char,
         reloptions: Datum,
@@ -35088,7 +38912,7 @@ extern "C" {
     pub fn RemovePromoteSignalFiles();
     pub fn HotStandbyActive() -> bool;
     pub fn GetXLogReplayRecPtr(replayTLI: *mut TimeLineID) -> XLogRecPtr;
-    pub fn GetRecoveryPauseState() -> RecoveryPauseState;
+    pub fn GetRecoveryPauseState() -> RecoveryPauseState::Type;
     pub fn SetRecoveryPause(recoveryPause: bool);
     pub fn GetXLogReceiptTime(rtime: *mut TimestampTz, fromStream: *mut bool);
     pub fn GetLatestXTime() -> TimestampTz;
@@ -35105,33 +38929,305 @@ extern "C" {
         minValue: ::std::os::raw::c_int,
     );
     pub fn xlog_outdesc(buf: StringInfo, record: *mut XLogReaderState);
+    pub fn ResourceOwnerCreate(
+        parent: ResourceOwner,
+        name: *const ::std::os::raw::c_char,
+    ) -> ResourceOwner;
+    pub fn ResourceOwnerRelease(
+        owner: ResourceOwner,
+        phase: ResourceReleasePhase::Type,
+        isCommit: bool,
+        isTopLevel: bool,
+    );
+    pub fn ResourceOwnerReleaseAllPlanCacheRefs(owner: ResourceOwner);
+    pub fn ResourceOwnerDelete(owner: ResourceOwner);
+    pub fn ResourceOwnerGetParent(owner: ResourceOwner) -> ResourceOwner;
+    pub fn ResourceOwnerNewParent(owner: ResourceOwner, newparent: ResourceOwner);
+    pub fn RegisterResourceReleaseCallback(
+        callback: ResourceReleaseCallback,
+        arg: *mut ::std::os::raw::c_void,
+    );
+    pub fn UnregisterResourceReleaseCallback(
+        callback: ResourceReleaseCallback,
+        arg: *mut ::std::os::raw::c_void,
+    );
+    pub fn CreateAuxProcessResourceOwner();
+    pub fn ReleaseAuxProcessResources(isCommit: bool);
+    pub fn SnapMgrShmemSize() -> Size;
+    pub fn SnapMgrInit();
+    pub fn GetSnapshotCurrentTimestamp() -> TimestampTz;
+    pub fn GetOldSnapshotThresholdTimestamp() -> TimestampTz;
+    pub fn SnapshotTooOldMagicForTest();
+    pub fn GetTransactionSnapshot() -> Snapshot;
+    pub fn GetLatestSnapshot() -> Snapshot;
+    pub fn SnapshotSetCommandId(curcid: CommandId);
+    pub fn GetOldestSnapshot() -> Snapshot;
+    pub fn GetCatalogSnapshot(relid: Oid) -> Snapshot;
+    pub fn GetNonHistoricCatalogSnapshot(relid: Oid) -> Snapshot;
+    pub fn InvalidateCatalogSnapshot();
+    pub fn InvalidateCatalogSnapshotConditionally();
+    pub fn PushActiveSnapshot(snapshot: Snapshot);
+    pub fn PushActiveSnapshotWithLevel(snapshot: Snapshot, snap_level: ::std::os::raw::c_int);
+    pub fn PushCopiedSnapshot(snapshot: Snapshot);
+    pub fn UpdateActiveSnapshotCommandId();
+    pub fn PopActiveSnapshot();
+    pub fn GetActiveSnapshot() -> Snapshot;
+    pub fn ActiveSnapshotSet() -> bool;
+    pub fn RegisterSnapshot(snapshot: Snapshot) -> Snapshot;
+    pub fn UnregisterSnapshot(snapshot: Snapshot);
+    pub fn RegisterSnapshotOnOwner(snapshot: Snapshot, owner: ResourceOwner) -> Snapshot;
+    pub fn UnregisterSnapshotFromOwner(snapshot: Snapshot, owner: ResourceOwner);
+    pub fn AtSubCommit_Snapshot(level: ::std::os::raw::c_int);
+    pub fn AtSubAbort_Snapshot(level: ::std::os::raw::c_int);
+    pub fn AtEOXact_Snapshot(isCommit: bool, resetXmin: bool);
+    pub fn ImportSnapshot(idstr: *const ::std::os::raw::c_char);
+    pub fn XactHasExportedSnapshots() -> bool;
+    pub fn DeleteAllExportedSnapshotFiles();
+    pub fn WaitForOlderSnapshots(limitXmin: TransactionId, progress: bool);
+    pub fn ThereAreNoPriorRegisteredSnapshots() -> bool;
+    pub fn HaveRegisteredOrActiveSnapshot() -> bool;
+    pub fn TransactionIdLimitedForOldSnapshots(
+        recentXmin: TransactionId,
+        relation: Relation,
+        limit_xid: *mut TransactionId,
+        limit_ts: *mut TimestampTz,
+    ) -> bool;
+    pub fn SetOldSnapshotThresholdTimestamp(ts: TimestampTz, xlimit: TransactionId);
+    pub fn MaintainOldSnapshotTimeMapping(whenTaken: TimestampTz, xmin: TransactionId);
+    pub fn ExportSnapshot(snapshot: Snapshot) -> *mut ::std::os::raw::c_char;
+    pub fn GlobalVisTestFor(rel: Relation) -> *mut GlobalVisState;
+    pub fn GlobalVisTestIsRemovableXid(state: *mut GlobalVisState, xid: TransactionId) -> bool;
+    pub fn GlobalVisTestIsRemovableFullXid(
+        state: *mut GlobalVisState,
+        fxid: FullTransactionId,
+    ) -> bool;
+    pub fn GlobalVisTestNonRemovableFullHorizon(state: *mut GlobalVisState) -> FullTransactionId;
+    pub fn GlobalVisTestNonRemovableHorizon(state: *mut GlobalVisState) -> TransactionId;
+    pub fn GlobalVisCheckRemovableXid(rel: Relation, xid: TransactionId) -> bool;
+    pub fn GlobalVisCheckRemovableFullXid(rel: Relation, fxid: FullTransactionId) -> bool;
+    pub fn XidInMVCCSnapshot(xid: TransactionId, snapshot: Snapshot) -> bool;
+    pub fn HistoricSnapshotGetTupleCids() -> *mut HTAB;
+    pub fn SetupHistoricSnapshot(historic_snapshot: Snapshot, tuplecids: *mut HTAB);
+    pub fn TeardownHistoricSnapshot(is_error: bool);
+    pub fn HistoricSnapshotActive() -> bool;
+    pub fn EstimateSnapshotSpace(snapshot: Snapshot) -> Size;
+    pub fn SerializeSnapshot(snapshot: Snapshot, start_address: *mut ::std::os::raw::c_char);
+    pub fn RestoreSnapshot(start_address: *mut ::std::os::raw::c_char) -> Snapshot;
+    pub fn RestoreTransactionSnapshot(
+        snapshot: Snapshot,
+        source_pgproc: *mut ::std::os::raw::c_void,
+    );
+    pub fn PrefetchSharedBuffer(
+        smgr_reln: *mut SMgrRelationData,
+        forkNum: ForkNumber::Type,
+        blockNum: BlockNumber,
+    ) -> PrefetchBufferResult;
+    pub fn PrefetchBuffer(
+        reln: Relation,
+        forkNum: ForkNumber::Type,
+        blockNum: BlockNumber,
+    ) -> PrefetchBufferResult;
+    pub fn ReadRecentBuffer(
+        rlocator: RelFileLocator,
+        forkNum: ForkNumber::Type,
+        blockNum: BlockNumber,
+        recent_buffer: Buffer,
+    ) -> bool;
+    pub fn ReadBuffer(reln: Relation, blockNum: BlockNumber) -> Buffer;
+    pub fn ReadBufferExtended(
+        reln: Relation,
+        forkNum: ForkNumber::Type,
+        blockNum: BlockNumber,
+        mode: ReadBufferMode::Type,
+        strategy: BufferAccessStrategy,
+    ) -> Buffer;
+    pub fn ReadBufferWithoutRelcache(
+        rlocator: RelFileLocator,
+        forkNum: ForkNumber::Type,
+        blockNum: BlockNumber,
+        mode: ReadBufferMode::Type,
+        strategy: BufferAccessStrategy,
+        permanent: bool,
+    ) -> Buffer;
+    pub fn ReleaseBuffer(buffer: Buffer);
+    pub fn UnlockReleaseBuffer(buffer: Buffer);
+    pub fn MarkBufferDirty(buffer: Buffer);
+    pub fn IncrBufferRefCount(buffer: Buffer);
+    pub fn CheckBufferIsPinnedOnce(buffer: Buffer);
+    pub fn ReleaseAndReadBuffer(
+        buffer: Buffer,
+        relation: Relation,
+        blockNum: BlockNumber,
+    ) -> Buffer;
+    pub fn ExtendBufferedRel(
+        bmr: BufferManagerRelation,
+        forkNum: ForkNumber::Type,
+        strategy: BufferAccessStrategy,
+        flags: uint32,
+    ) -> Buffer;
+    pub fn ExtendBufferedRelBy(
+        bmr: BufferManagerRelation,
+        fork: ForkNumber::Type,
+        strategy: BufferAccessStrategy,
+        flags: uint32,
+        extend_by: uint32,
+        buffers: *mut Buffer,
+        extended_by: *mut uint32,
+    ) -> BlockNumber;
+    pub fn ExtendBufferedRelTo(
+        bmr: BufferManagerRelation,
+        fork: ForkNumber::Type,
+        strategy: BufferAccessStrategy,
+        flags: uint32,
+        extend_to: BlockNumber,
+        mode: ReadBufferMode::Type,
+    ) -> Buffer;
+    pub fn InitBufferPoolAccess();
+    pub fn AtEOXact_Buffers(isCommit: bool);
+    pub fn PrintBufferLeakWarning(buffer: Buffer);
+    pub fn CheckPointBuffers(flags: ::std::os::raw::c_int);
+    pub fn BufferGetBlockNumber(buffer: Buffer) -> BlockNumber;
+    pub fn RelationGetNumberOfBlocksInFork(
+        relation: Relation,
+        forkNum: ForkNumber::Type,
+    ) -> BlockNumber;
+    pub fn FlushOneBuffer(buffer: Buffer);
+    pub fn FlushRelationBuffers(rel: Relation);
+    pub fn FlushRelationsAllBuffers(
+        smgrs: *mut *mut SMgrRelationData,
+        nrels: ::std::os::raw::c_int,
+    );
+    pub fn CreateAndCopyRelationData(
+        src_rlocator: RelFileLocator,
+        dst_rlocator: RelFileLocator,
+        permanent: bool,
+    );
+    pub fn FlushDatabaseBuffers(dbid: Oid);
+    pub fn DropRelationBuffers(
+        smgr_reln: *mut SMgrRelationData,
+        forkNum: *mut ForkNumber::Type,
+        nforks: ::std::os::raw::c_int,
+        firstDelBlock: *mut BlockNumber,
+    );
+    pub fn DropRelationsAllBuffers(
+        smgr_reln: *mut *mut SMgrRelationData,
+        nlocators: ::std::os::raw::c_int,
+    );
+    pub fn DropDatabaseBuffers(dbid: Oid);
+    pub fn BufferIsPermanent(buffer: Buffer) -> bool;
+    pub fn BufferGetLSNAtomic(buffer: Buffer) -> XLogRecPtr;
+    pub fn BufferGetTag(
+        buffer: Buffer,
+        rlocator: *mut RelFileLocator,
+        forknum: *mut ForkNumber::Type,
+        blknum: *mut BlockNumber,
+    );
+    pub fn MarkBufferDirtyHint(buffer: Buffer, buffer_std: bool);
+    pub fn UnlockBuffers();
+    pub fn LockBuffer(buffer: Buffer, mode: ::std::os::raw::c_int);
+    pub fn ConditionalLockBuffer(buffer: Buffer) -> bool;
+    pub fn LockBufferForCleanup(buffer: Buffer);
+    pub fn ConditionalLockBufferForCleanup(buffer: Buffer) -> bool;
+    pub fn IsBufferCleanupOK(buffer: Buffer) -> bool;
+    pub fn HoldingBufferPinThatDelaysRecovery() -> bool;
+    pub fn AbortBufferIO(buffer: Buffer);
+    pub fn BgBufferSync(wb_context: *mut WritebackContext) -> bool;
+    pub fn TestForOldSnapshot_impl(snapshot: Snapshot, relation: Relation);
+    pub fn InitBufferPool();
+    pub fn BufferShmemSize() -> Size;
+    pub fn AtProcExit_LocalBuffers();
+    pub fn GetAccessStrategy(btype: BufferAccessStrategyType::Type) -> BufferAccessStrategy;
+    pub fn GetAccessStrategyWithSize(
+        btype: BufferAccessStrategyType::Type,
+        ring_size_kb: ::std::os::raw::c_int,
+    ) -> BufferAccessStrategy;
+    pub fn GetAccessStrategyBufferCount(strategy: BufferAccessStrategy) -> ::std::os::raw::c_int;
+    pub fn FreeAccessStrategy(strategy: BufferAccessStrategy);
+    pub fn XLogHaveInvalidPages() -> bool;
+    pub fn XLogCheckInvalidPages();
+    pub fn XLogDropRelation(rlocator: RelFileLocator, forknum: ForkNumber::Type);
+    pub fn XLogDropDatabase(dbid: Oid);
+    pub fn XLogTruncateRelation(
+        rlocator: RelFileLocator,
+        forkNum: ForkNumber::Type,
+        nblocks: BlockNumber,
+    );
+    pub fn XLogReadBufferForRedo(
+        record: *mut XLogReaderState,
+        block_id: uint8,
+        buf: *mut Buffer,
+    ) -> XLogRedoAction::Type;
+    pub fn XLogInitBufferForRedo(record: *mut XLogReaderState, block_id: uint8) -> Buffer;
+    pub fn XLogReadBufferForRedoExtended(
+        record: *mut XLogReaderState,
+        block_id: uint8,
+        mode: ReadBufferMode::Type,
+        get_cleanup_lock: bool,
+        buf: *mut Buffer,
+    ) -> XLogRedoAction::Type;
+    pub fn XLogReadBufferExtended(
+        rlocator: RelFileLocator,
+        forknum: ForkNumber::Type,
+        blkno: BlockNumber,
+        mode: ReadBufferMode::Type,
+        recent_buffer: Buffer,
+    ) -> Buffer;
+    pub fn CreateFakeRelcacheEntry(rlocator: RelFileLocator) -> Relation;
+    pub fn FreeFakeRelcacheEntry(fakerel: Relation);
+    pub fn read_local_xlog_page(
+        state: *mut XLogReaderState,
+        targetPagePtr: XLogRecPtr,
+        reqLen: ::std::os::raw::c_int,
+        targetRecPtr: XLogRecPtr,
+        cur_page: *mut ::std::os::raw::c_char,
+    ) -> ::std::os::raw::c_int;
+    pub fn read_local_xlog_page_no_wait(
+        state: *mut XLogReaderState,
+        targetPagePtr: XLogRecPtr,
+        reqLen: ::std::os::raw::c_int,
+        targetRecPtr: XLogRecPtr,
+        cur_page: *mut ::std::os::raw::c_char,
+    ) -> ::std::os::raw::c_int;
+    pub fn wal_segment_open(
+        state: *mut XLogReaderState,
+        nextSegNo: XLogSegNo,
+        tli_p: *mut TimeLineID,
+    );
+    pub fn wal_segment_close(state: *mut XLogReaderState);
+    pub fn XLogReadDetermineTimeline(
+        state: *mut XLogReaderState,
+        wantPage: XLogRecPtr,
+        wantLength: uint32,
+        currTLI: TimeLineID,
+    );
+    pub fn WALReadRaiseError(errinfo: *mut WALReadError);
     pub fn AcquireDeletionLock(object: *const ObjectAddress, flags: ::std::os::raw::c_int);
     pub fn ReleaseDeletionLock(object: *const ObjectAddress);
     pub fn performDeletion(
         object: *const ObjectAddress,
-        behavior: DropBehavior,
+        behavior: DropBehavior::Type,
         flags: ::std::os::raw::c_int,
     );
     pub fn performMultipleDeletions(
         objects: *const ObjectAddresses,
-        behavior: DropBehavior,
+        behavior: DropBehavior::Type,
         flags: ::std::os::raw::c_int,
     );
     pub fn recordDependencyOnExpr(
         depender: *const ObjectAddress,
         expr: *mut Node,
         rtable: *mut List,
-        behavior: DependencyType,
+        behavior: DependencyType::Type,
     );
     pub fn recordDependencyOnSingleRelExpr(
         depender: *const ObjectAddress,
         expr: *mut Node,
         relId: Oid,
-        behavior: DependencyType,
-        self_behavior: DependencyType,
+        behavior: DependencyType::Type,
+        self_behavior: DependencyType::Type,
         reverse_self: bool,
     );
-    pub fn getObjectClass(object: *const ObjectAddress) -> ObjectClass;
+    pub fn getObjectClass(object: *const ObjectAddress) -> ObjectClass::Type;
     pub fn new_object_addresses() -> *mut ObjectAddresses;
     pub fn add_exact_object_address(object: *const ObjectAddress, addrs: *mut ObjectAddresses);
     pub fn object_address_present(
@@ -35141,20 +39237,20 @@ extern "C" {
     pub fn record_object_address_dependencies(
         depender: *const ObjectAddress,
         referenced: *mut ObjectAddresses,
-        behavior: DependencyType,
+        behavior: DependencyType::Type,
     );
     pub fn sort_object_addresses(addrs: *mut ObjectAddresses);
     pub fn free_object_addresses(addrs: *mut ObjectAddresses);
     pub fn recordDependencyOn(
         depender: *const ObjectAddress,
         referenced: *const ObjectAddress,
-        behavior: DependencyType,
+        behavior: DependencyType::Type,
     );
     pub fn recordMultipleDependencies(
         depender: *const ObjectAddress,
         referenced: *const ObjectAddress,
         nreferenced: ::std::os::raw::c_int,
-        behavior: DependencyType,
+        behavior: DependencyType::Type,
     );
     pub fn recordDependencyOnCurrentExtension(object: *const ObjectAddress, isReplace: bool);
     pub fn checkMembershipInCurrentExtension(object: *const ObjectAddress);
@@ -35208,7 +39304,7 @@ extern "C" {
     pub fn recordSharedDependencyOn(
         depender: *mut ObjectAddress,
         referenced: *mut ObjectAddress,
-        deptype: SharedDependencyType,
+        deptype: SharedDependencyType::Type,
     );
     pub fn deleteSharedDependencyRecordsFor(classId: Oid, objectId: Oid, objectSubId: int32);
     pub fn recordDependencyOnOwner(classId: Oid, objectId: Oid, owner: Oid);
@@ -35234,7 +39330,7 @@ extern "C" {
     pub fn shdepLockAndCheckObject(classId: Oid, objectId: Oid);
     pub fn copyTemplateDependencies(templateDbId: Oid, newDbId: Oid);
     pub fn dropDatabaseDependencies(databaseId: Oid);
-    pub fn shdepDropOwned(roleids: *mut List, behavior: DropBehavior);
+    pub fn shdepDropOwned(roleids: *mut List, behavior: DropBehavior::Type);
     pub fn shdepReassignOwned(roleids: *mut List, newrole: Oid);
     pub fn index_check_primary_key(
         heapRel: Relation,
@@ -35315,7 +39411,7 @@ extern "C" {
         parallel: bool,
     );
     pub fn validate_index(heapId: Oid, indexId: Oid, snapshot: Snapshot);
-    pub fn index_set_state_flags(indexId: Oid, action: IndexStateFlagsAction);
+    pub fn index_set_state_flags(indexId: Oid, action: IndexStateFlagsAction::Type);
     pub fn IndexGetRelation(indexId: Oid, missing_ok: bool) -> Oid;
     pub fn reindex_index(
         indexId: Oid,
@@ -35434,7 +39530,7 @@ extern "C" {
     pub fn isTempOrTempToastNamespace(namespaceId: Oid) -> bool;
     pub fn isAnyTempNamespace(namespaceId: Oid) -> bool;
     pub fn isOtherTempNamespace(namespaceId: Oid) -> bool;
-    pub fn checkTempNamespaceStatus(namespaceId: Oid) -> TempNamespaceStatus;
+    pub fn checkTempNamespaceStatus(namespaceId: Oid) -> TempNamespaceStatus::Type;
     pub fn GetTempNamespaceBackendId(namespaceId: Oid) -> ::std::os::raw::c_int;
     pub fn GetTempToastNamespace() -> Oid;
     pub fn GetTempNamespaceState(tempNamespaceId: *mut Oid, tempToastNamespaceId: *mut Oid);
@@ -35615,8 +39711,8 @@ extern "C" {
         isAssignment: bool,
     ) -> *mut SubscriptingRef;
     pub fn make_const(pstate: *mut ParseState, aconst: *mut A_Const) -> *mut Const;
-    pub fn acldefault(objtype: ObjectType, ownerId: Oid) -> *mut Acl;
-    pub fn get_user_default_acl(objtype: ObjectType, ownerId: Oid, nsp_oid: Oid) -> *mut Acl;
+    pub fn acldefault(objtype: ObjectType::Type, ownerId: Oid) -> *mut Acl;
+    pub fn get_user_default_acl(objtype: ObjectType::Type, ownerId: Oid, nsp_oid: Oid) -> *mut Acl;
     pub fn recordDependencyOnNewAcl(
         classId: Oid,
         objectId: Oid,
@@ -35629,7 +39725,7 @@ extern "C" {
         mod_aip: *const AclItem,
         modechg: ::std::os::raw::c_int,
         ownerId: Oid,
-        behavior: DropBehavior,
+        behavior: DropBehavior::Type,
     ) -> *mut Acl;
     pub fn aclnewowner(old_acl: *const Acl, oldOwnerId: Oid, newOwnerId: Oid) -> *mut Acl;
     pub fn make_empty_acl() -> *mut Acl;
@@ -35643,7 +39739,7 @@ extern "C" {
         roleid: Oid,
         ownerId: Oid,
         mask: AclMode,
-        how: AclMaskHow,
+        how: AclMaskHow::Type,
     ) -> AclMode;
     pub fn aclmembers(acl: *const Acl, roleids: *mut *mut Oid) -> ::std::os::raw::c_int;
     pub fn has_privs_of_role(member: Oid, role: Oid) -> bool;
@@ -35674,58 +39770,67 @@ extern "C" {
         stmt: *mut AlterDefaultPrivilegesStmt,
     );
     pub fn RemoveRoleFromObjectACL(roleid: Oid, classid: Oid, objid: Oid);
-    pub fn pg_class_aclmask(table_oid: Oid, roleid: Oid, mask: AclMode, how: AclMaskHow)
-        -> AclMode;
-    pub fn object_aclcheck(classid: Oid, objectid: Oid, roleid: Oid, mode: AclMode) -> AclResult;
+    pub fn pg_class_aclmask(
+        table_oid: Oid,
+        roleid: Oid,
+        mask: AclMode,
+        how: AclMaskHow::Type,
+    ) -> AclMode;
+    pub fn object_aclcheck(
+        classid: Oid,
+        objectid: Oid,
+        roleid: Oid,
+        mode: AclMode,
+    ) -> AclResult::Type;
     pub fn pg_attribute_aclcheck(
         table_oid: Oid,
         attnum: AttrNumber,
         roleid: Oid,
         mode: AclMode,
-    ) -> AclResult;
+    ) -> AclResult::Type;
     pub fn pg_attribute_aclcheck_ext(
         table_oid: Oid,
         attnum: AttrNumber,
         roleid: Oid,
         mode: AclMode,
         is_missing: *mut bool,
-    ) -> AclResult;
+    ) -> AclResult::Type;
     pub fn pg_attribute_aclcheck_all(
         table_oid: Oid,
         roleid: Oid,
         mode: AclMode,
-        how: AclMaskHow,
-    ) -> AclResult;
-    pub fn pg_class_aclcheck(table_oid: Oid, roleid: Oid, mode: AclMode) -> AclResult;
+        how: AclMaskHow::Type,
+    ) -> AclResult::Type;
+    pub fn pg_class_aclcheck(table_oid: Oid, roleid: Oid, mode: AclMode) -> AclResult::Type;
     pub fn pg_class_aclcheck_ext(
         table_oid: Oid,
         roleid: Oid,
         mode: AclMode,
         is_missing: *mut bool,
-    ) -> AclResult;
+    ) -> AclResult::Type;
     pub fn pg_parameter_aclcheck(
         name: *const ::std::os::raw::c_char,
         roleid: Oid,
         mode: AclMode,
-    ) -> AclResult;
+    ) -> AclResult::Type;
     pub fn pg_largeobject_aclcheck_snapshot(
         lobj_oid: Oid,
         roleid: Oid,
         mode: AclMode,
         snapshot: Snapshot,
-    ) -> AclResult;
+    ) -> AclResult::Type;
     pub fn aclcheck_error(
-        aclerr: AclResult,
-        objtype: ObjectType,
+        aclerr: AclResult::Type,
+        objtype: ObjectType::Type,
         objectname: *const ::std::os::raw::c_char,
     );
     pub fn aclcheck_error_col(
-        aclerr: AclResult,
-        objtype: ObjectType,
+        aclerr: AclResult::Type,
+        objtype: ObjectType::Type,
         objectname: *const ::std::os::raw::c_char,
         colname: *const ::std::os::raw::c_char,
     );
-    pub fn aclcheck_error_type(aclerr: AclResult, typeOid: Oid);
+    pub fn aclcheck_error_type(aclerr: AclResult::Type, typeOid: Oid);
     pub fn recordExtObjInitPriv(objoid: Oid, classoid: Oid);
     pub fn removeExtObjInitPriv(objoid: Oid, classoid: Oid);
     pub fn object_ownercheck(classid: Oid, objectid: Oid, roleid: Oid) -> bool;
@@ -35816,7 +39921,7 @@ extern "C" {
     pub fn RelationCopyStorage(
         src: SMgrRelation,
         dst: SMgrRelation,
-        forkNum: ForkNumber,
+        forkNum: ForkNumber::Type,
         relpersistence: ::std::os::raw::c_char,
     );
     pub fn RelFileLocatorSkippingWAL(rlocator: RelFileLocator) -> bool;
@@ -36224,7 +40329,7 @@ extern "C" {
         pstate: *mut ParseState,
         parameters: *mut List,
         languageOid: Oid,
-        objtype: ObjectType,
+        objtype: ObjectType::Type,
         parameterTypes: *mut *mut oidvector,
         parameterTypes_list: *mut *mut List,
         allParameterTypes: *mut *mut ArrayType,
@@ -36334,8 +40439,8 @@ extern "C" {
         newOwnerId: Oid,
     ) -> ObjectAddress;
     pub fn AlterEventTriggerOwner_oid(arg1: Oid, newOwnerId: Oid);
-    pub fn EventTriggerSupportsObjectType(obtype: ObjectType) -> bool;
-    pub fn EventTriggerSupportsObjectClass(objclass: ObjectClass) -> bool;
+    pub fn EventTriggerSupportsObjectType(obtype: ObjectType::Type) -> bool;
+    pub fn EventTriggerSupportsObjectClass(objclass: ObjectClass::Type) -> bool;
     pub fn EventTriggerDDLCommandStart(parsetree: *mut Node);
     pub fn EventTriggerDDLCommandEnd(parsetree: *mut Node);
     pub fn EventTriggerSQLDrop(parsetree: *mut Node);
@@ -36553,7 +40658,7 @@ extern "C" {
         explicit_rels: *mut List,
         relids: *mut List,
         relids_logged: *mut List,
-        behavior: DropBehavior,
+        behavior: DropBehavior::Type,
         restart_seqs: bool,
         run_as_table_owner: bool,
     );
@@ -36580,7 +40685,7 @@ extern "C" {
         origTypeName: *const ::std::os::raw::c_char,
     );
     pub fn check_of_type(typetuple: HeapTuple);
-    pub fn register_on_commit_action(relid: Oid, action: OnCommitAction);
+    pub fn register_on_commit_action(relid: Oid, action: OnCommitAction::Type);
     pub fn remove_on_commit_action(relid: Oid);
     pub fn PreCommit_on_commit_actions();
     pub fn AtEOXact_on_commit_actions(isCommit: bool);
@@ -36662,7 +40767,7 @@ extern "C" {
     pub fn MakeTransitionCaptureState(
         trigdesc: *mut TriggerDesc,
         relid: Oid,
-        cmdType: CmdType,
+        cmdType: CmdType::Type,
     ) -> *mut TransitionCaptureState;
     pub fn FreeTriggerDesc(trigdesc: *mut TriggerDesc);
     pub fn ExecBSInsertTriggers(estate: *mut EState, relinfo: *mut ResultRelInfo);
@@ -36701,7 +40806,7 @@ extern "C" {
         tupleid: ItemPointer,
         fdw_trigtuple: HeapTuple,
         epqslot: *mut *mut TupleTableSlot,
-        tmresult: *mut TM_Result,
+        tmresult: *mut TM_Result::Type,
         tmfd: *mut TM_FailureData,
     ) -> bool;
     pub fn ExecARDeleteTriggers(
@@ -36730,7 +40835,7 @@ extern "C" {
         tupleid: ItemPointer,
         fdw_trigtuple: HeapTuple,
         newslot: *mut TupleTableSlot,
-        tmresult: *mut TM_Result,
+        tmresult: *mut TM_Result::Type,
         tmfd: *mut TM_FailureData,
     ) -> bool;
     pub fn ExecARUpdateTriggers(
@@ -36777,9 +40882,9 @@ extern "C" {
     pub fn RI_Initial_Check(trigger: *mut Trigger, fk_rel: Relation, pk_rel: Relation) -> bool;
     pub fn RI_PartitionRemove_Check(trigger: *mut Trigger, fk_rel: Relation, pk_rel: Relation);
     pub fn RI_FKey_trigger_type(tgfoid: Oid) -> ::std::os::raw::c_int;
-    pub fn get_password_type(shadow_pass: *const ::std::os::raw::c_char) -> PasswordType;
+    pub fn get_password_type(shadow_pass: *const ::std::os::raw::c_char) -> PasswordType::Type;
     pub fn encrypt_password(
-        target_type: PasswordType,
+        target_type: PasswordType::Type,
         role: *const ::std::os::raw::c_char,
         password: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
@@ -36833,8 +40938,8 @@ extern "C" {
     pub fn SetConfigOption(
         name: *const ::std::os::raw::c_char,
         value: *const ::std::os::raw::c_char,
-        context: GucContext,
-        source: GucSource,
+        context: GucContext::Type,
+        source: GucSource::Type,
     );
     pub fn DefineCustomBoolVariable(
         name: *const ::std::os::raw::c_char,
@@ -36842,7 +40947,7 @@ extern "C" {
         long_desc: *const ::std::os::raw::c_char,
         valueAddr: *mut bool,
         bootValue: bool,
-        context: GucContext,
+        context: GucContext::Type,
         flags: ::std::os::raw::c_int,
         check_hook: GucBoolCheckHook,
         assign_hook: GucBoolAssignHook,
@@ -36856,7 +40961,7 @@ extern "C" {
         bootValue: ::std::os::raw::c_int,
         minValue: ::std::os::raw::c_int,
         maxValue: ::std::os::raw::c_int,
-        context: GucContext,
+        context: GucContext::Type,
         flags: ::std::os::raw::c_int,
         check_hook: GucIntCheckHook,
         assign_hook: GucIntAssignHook,
@@ -36870,7 +40975,7 @@ extern "C" {
         bootValue: f64,
         minValue: f64,
         maxValue: f64,
-        context: GucContext,
+        context: GucContext::Type,
         flags: ::std::os::raw::c_int,
         check_hook: GucRealCheckHook,
         assign_hook: GucRealAssignHook,
@@ -36882,7 +40987,7 @@ extern "C" {
         long_desc: *const ::std::os::raw::c_char,
         valueAddr: *mut *mut ::std::os::raw::c_char,
         bootValue: *const ::std::os::raw::c_char,
-        context: GucContext,
+        context: GucContext::Type,
         flags: ::std::os::raw::c_int,
         check_hook: GucStringCheckHook,
         assign_hook: GucStringAssignHook,
@@ -36895,7 +41000,7 @@ extern "C" {
         valueAddr: *mut ::std::os::raw::c_int,
         bootValue: ::std::os::raw::c_int,
         options: *const config_enum_entry,
-        context: GucContext,
+        context: GucContext::Type,
         flags: ::std::os::raw::c_int,
         check_hook: GucEnumCheckHook,
         assign_hook: GucEnumAssignHook,
@@ -36914,7 +41019,7 @@ extern "C" {
         name: *const ::std::os::raw::c_char,
         missing_ok: bool,
     ) -> ::std::os::raw::c_int;
-    pub fn ProcessConfigFile(context: GucContext);
+    pub fn ProcessConfigFile(context: GucContext::Type);
     pub fn convert_GUC_name_for_parameter_acl(
         name: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
@@ -36951,9 +41056,9 @@ extern "C" {
     pub fn set_config_option(
         name: *const ::std::os::raw::c_char,
         value: *const ::std::os::raw::c_char,
-        context: GucContext,
-        source: GucSource,
-        action: GucAction,
+        context: GucContext::Type,
+        source: GucSource::Type,
+        action: GucAction::Type,
         changeVal: bool,
         elevel: ::std::os::raw::c_int,
         is_reload: bool,
@@ -36961,10 +41066,10 @@ extern "C" {
     pub fn set_config_option_ext(
         name: *const ::std::os::raw::c_char,
         value: *const ::std::os::raw::c_char,
-        context: GucContext,
-        source: GucSource,
+        context: GucContext::Type,
+        source: GucSource::Type,
         srole: Oid,
-        action: GucAction,
+        action: GucAction::Type,
         changeVal: bool,
         elevel: ::std::os::raw::c_int,
         is_reload: bool,
@@ -36977,9 +41082,9 @@ extern "C" {
     ) -> *mut ::std::os::raw::c_char;
     pub fn ProcessGUCArray(
         array: *mut ArrayType,
-        context: GucContext,
-        source: GucSource,
-        action: GucAction,
+        context: GucContext::Type,
+        source: GucSource::Type,
+        action: GucAction::Type,
     );
     pub fn GUCArrayAdd(
         array: *mut ArrayType,
@@ -37026,7 +41131,7 @@ extern "C" {
     pub fn check_createrole_self_grant(
         newval: *mut *mut ::std::os::raw::c_char,
         extra: *mut *mut ::std::os::raw::c_void,
-        source: GucSource,
+        source: GucSource::Type,
     ) -> bool;
     pub fn assign_createrole_self_grant(
         newval: *const ::std::os::raw::c_char,
@@ -37040,12 +41145,14 @@ extern "C" {
     pub fn GetBackgroundWorkerPid(
         handle: *mut BackgroundWorkerHandle,
         pidp: *mut pid_t,
-    ) -> BgwHandleStatus;
+    ) -> BgwHandleStatus::Type;
     pub fn WaitForBackgroundWorkerStartup(
         handle: *mut BackgroundWorkerHandle,
         pidp: *mut pid_t,
-    ) -> BgwHandleStatus;
-    pub fn WaitForBackgroundWorkerShutdown(arg1: *mut BackgroundWorkerHandle) -> BgwHandleStatus;
+    ) -> BgwHandleStatus::Type;
+    pub fn WaitForBackgroundWorkerShutdown(
+        arg1: *mut BackgroundWorkerHandle,
+    ) -> BgwHandleStatus::Type;
     pub fn GetBackgroundWorkerTypeByPid(pid: pid_t) -> *const ::std::os::raw::c_char;
     pub fn TerminateBackgroundWorker(handle: *mut BackgroundWorkerHandle);
     pub fn BackgroundWorkerInitializeConnection(
@@ -37147,8 +41254,11 @@ extern "C" {
     pub fn GetStartupBufferPinWaitBufId() -> ::std::os::raw::c_int;
     pub fn HaveNFreeProcs(n: ::std::os::raw::c_int, nfree: *mut ::std::os::raw::c_int) -> bool;
     pub fn ProcReleaseLocks(isCommit: bool);
-    pub fn ProcSleep(locallock: *mut LOCALLOCK, lockMethodTable: LockMethod) -> ProcWaitStatus;
-    pub fn ProcWakeup(proc_: *mut PGPROC, waitStatus: ProcWaitStatus);
+    pub fn ProcSleep(
+        locallock: *mut LOCALLOCK,
+        lockMethodTable: LockMethod,
+    ) -> ProcWaitStatus::Type;
+    pub fn ProcWakeup(proc_: *mut PGPROC, waitStatus: ProcWaitStatus::Type);
     pub fn ProcLockWakeup(lockMethodTable: LockMethod, lock: *mut LOCK);
     pub fn CheckDeadLockAlert();
     pub fn IsWaitingForLock() -> bool;
@@ -37177,21 +41287,21 @@ extern "C" {
         data: *const ::std::os::raw::c_void,
         nowait: bool,
         force_flush: bool,
-    ) -> shm_mq_result;
+    ) -> shm_mq_result::Type;
     pub fn shm_mq_sendv(
         mqh: *mut shm_mq_handle,
         iov: *mut shm_mq_iovec,
         iovcnt: ::std::os::raw::c_int,
         nowait: bool,
         force_flush: bool,
-    ) -> shm_mq_result;
+    ) -> shm_mq_result::Type;
     pub fn shm_mq_receive(
         mqh: *mut shm_mq_handle,
         nbytesp: *mut Size,
         datap: *mut *mut ::std::os::raw::c_void,
         nowait: bool,
-    ) -> shm_mq_result;
-    pub fn shm_mq_wait_for_attach(mqh: *mut shm_mq_handle) -> shm_mq_result;
+    ) -> shm_mq_result::Type;
+    pub fn shm_mq_wait_for_attach(mqh: *mut shm_mq_handle) -> shm_mq_result::Type;
     pub fn CreateParallelContext(
         library_name: *const ::std::os::raw::c_char,
         function_name: *const ::std::os::raw::c_char,
@@ -37356,7 +41466,7 @@ extern "C" {
     pub fn ExecAggRetrieveInstrumentation(node: *mut AggState);
     pub fn ExprEvalPushStep(es: *mut ExprState, s: *const ExprEvalStep);
     pub fn ExecReadyInterpretedExpr(state: *mut ExprState);
-    pub fn ExecEvalStepOp(state: *mut ExprState, op: *mut ExprEvalStep) -> ExprEvalOp;
+    pub fn ExecEvalStepOp(state: *mut ExprState, op: *mut ExprEvalStep) -> ExprEvalOp::Type;
     pub fn ExecInterpExprStillValid(
         state: *mut ExprState,
         econtext: *mut ExprContext,
@@ -37488,44 +41598,20 @@ extern "C" {
         op: *mut ExprEvalStep,
         econtext: *mut ExprContext,
     );
-    pub fn raw_parser(str_: *const ::std::os::raw::c_char, mode: RawParseMode) -> *mut List;
+    pub fn raw_parser(str_: *const ::std::os::raw::c_char, mode: RawParseMode::Type) -> *mut List;
     pub fn SystemFuncName(name: *mut ::std::os::raw::c_char) -> *mut List;
     pub fn SystemTypeName(name: *mut ::std::os::raw::c_char) -> *mut TypeName;
-    pub fn ResourceOwnerCreate(
-        parent: ResourceOwner,
-        name: *const ::std::os::raw::c_char,
-    ) -> ResourceOwner;
-    pub fn ResourceOwnerRelease(
-        owner: ResourceOwner,
-        phase: ResourceReleasePhase,
-        isCommit: bool,
-        isTopLevel: bool,
-    );
-    pub fn ResourceOwnerReleaseAllPlanCacheRefs(owner: ResourceOwner);
-    pub fn ResourceOwnerDelete(owner: ResourceOwner);
-    pub fn ResourceOwnerGetParent(owner: ResourceOwner) -> ResourceOwner;
-    pub fn ResourceOwnerNewParent(owner: ResourceOwner, newparent: ResourceOwner);
-    pub fn RegisterResourceReleaseCallback(
-        callback: ResourceReleaseCallback,
-        arg: *mut ::std::os::raw::c_void,
-    );
-    pub fn UnregisterResourceReleaseCallback(
-        callback: ResourceReleaseCallback,
-        arg: *mut ::std::os::raw::c_void,
-    );
-    pub fn CreateAuxProcessResourceOwner();
-    pub fn ReleaseAuxProcessResources(isCommit: bool);
     pub fn InitPlanCache();
     pub fn ResetPlanCache();
     pub fn CreateCachedPlan(
         raw_parse_tree: *mut RawStmt,
         query_string: *const ::std::os::raw::c_char,
-        commandTag: CommandTag,
+        commandTag: CommandTag::Type,
     ) -> *mut CachedPlanSource;
     pub fn CreateOneShotCachedPlan(
         raw_parse_tree: *mut RawStmt,
         query_string: *const ::std::os::raw::c_char,
-        commandTag: CommandTag,
+        commandTag: CommandTag::Type,
     ) -> *mut CachedPlanSource;
     pub fn CompleteCachedPlan(
         plansource: *mut CachedPlanSource,
@@ -37601,7 +41687,7 @@ extern "C" {
         portal: Portal,
         prepStmtName: *const ::std::os::raw::c_char,
         sourceText: *const ::std::os::raw::c_char,
-        commandTag: CommandTag,
+        commandTag: CommandTag::Type,
         stmts: *mut List,
         cplan: *mut CachedPlan,
     );
@@ -37778,12 +41864,12 @@ extern "C" {
     pub fn SPI_cursor_move(portal: Portal, forward: bool, count: ::std::os::raw::c_long);
     pub fn SPI_scroll_cursor_fetch(
         arg1: Portal,
-        direction: FetchDirection,
+        direction: FetchDirection::Type,
         count: ::std::os::raw::c_long,
     );
     pub fn SPI_scroll_cursor_move(
         arg1: Portal,
-        direction: FetchDirection,
+        direction: FetchDirection::Type,
         count: ::std::os::raw::c_long,
     );
     pub fn SPI_cursor_close(portal: Portal);
@@ -38174,14 +42260,14 @@ extern "C" {
         missing_ok: bool,
     ) -> *const CustomScanMethods;
     pub fn makeA_Expr(
-        kind: A_Expr_Kind,
+        kind: A_Expr_Kind::Type,
         name: *mut List,
         lexpr: *mut Node,
         rexpr: *mut Node,
         location: ::std::os::raw::c_int,
     ) -> *mut A_Expr;
     pub fn makeSimpleA_Expr(
-        kind: A_Expr_Kind,
+        kind: A_Expr_Kind::Type,
         name: *mut ::std::os::raw::c_char,
         lexpr: *mut Node,
         rexpr: *mut Node,
@@ -38222,7 +42308,7 @@ extern "C" {
     pub fn makeNullConst(consttype: Oid, consttypmod: int32, constcollid: Oid) -> *mut Const;
     pub fn makeBoolConst(value: bool, isnull: bool) -> *mut Node;
     pub fn makeBoolExpr(
-        boolop: BoolExprType,
+        boolop: BoolExprType::Type,
         args: *mut List,
         location: ::std::os::raw::c_int,
     ) -> *mut Expr;
@@ -38232,7 +42318,7 @@ extern "C" {
         rtype: Oid,
         rtypmod: int32,
         rcollid: Oid,
-        rformat: CoercionForm,
+        rformat: CoercionForm::Type,
     ) -> *mut RelabelType;
     pub fn makeRangeVar(
         schemaname: *mut ::std::os::raw::c_char,
@@ -38254,12 +42340,12 @@ extern "C" {
         args: *mut List,
         funccollid: Oid,
         inputcollid: Oid,
-        fformat: CoercionForm,
+        fformat: CoercionForm::Type,
     ) -> *mut FuncExpr;
     pub fn makeFuncCall(
         name: *mut List,
         args: *mut List,
-        funcformat: CoercionForm,
+        funcformat: CoercionForm::Type,
         location: ::std::os::raw::c_int,
     ) -> *mut FuncCall;
     pub fn make_opclause(
@@ -38298,11 +42384,11 @@ extern "C" {
         nameSpace: *mut ::std::os::raw::c_char,
         name: *mut ::std::os::raw::c_char,
         arg: *mut Node,
-        defaction: DefElemAction,
+        defaction: DefElemAction::Type,
         location: ::std::os::raw::c_int,
     ) -> *mut DefElem;
     pub fn makeGroupingSet(
-        kind: GroupingSetKind,
+        kind: GroupingSetKind::Type,
         content: *mut List,
         location: ::std::os::raw::c_int,
     ) -> *mut GroupingSet;
@@ -38312,8 +42398,8 @@ extern "C" {
         va_cols: *mut List,
     ) -> *mut VacuumRelation;
     pub fn makeJsonFormat(
-        type_: JsonFormatType,
-        encoding: JsonEncoding,
+        type_: JsonFormatType::Type,
+        encoding: JsonEncoding::Type,
         location: ::std::os::raw::c_int,
     ) -> *mut JsonFormat;
     pub fn makeJsonValueExpr(
@@ -38325,11 +42411,11 @@ extern "C" {
     pub fn makeJsonIsPredicate(
         expr: *mut Node,
         format: *mut JsonFormat,
-        item_type: JsonValueType,
+        item_type: JsonValueType::Type,
         unique_keys: bool,
         location: ::std::os::raw::c_int,
     ) -> *mut Node;
-    pub fn makeJsonEncoding(name: *mut ::std::os::raw::c_char) -> JsonEncoding;
+    pub fn makeJsonEncoding(name: *mut ::std::os::raw::c_char) -> JsonEncoding::Type;
     pub fn exprType(expr: *const Node) -> Oid;
     pub fn exprTypmod(expr: *const Node) -> int32;
     pub fn exprIsLengthCoercion(expr: *const Node, coercedTypmod: *mut int32) -> bool;
@@ -38338,7 +42424,7 @@ extern "C" {
         rtype: Oid,
         rtypmod: int32,
         rcollid: Oid,
-        rformat: CoercionForm,
+        rformat: CoercionForm::Type,
         rlocation: ::std::os::raw::c_int,
         overwrite_ok: bool,
     ) -> *mut Node;
@@ -38657,7 +42743,7 @@ extern "C" {
     pub fn cost_agg(
         path: *mut Path,
         root: *mut PlannerInfo,
-        aggstrategy: AggStrategy,
+        aggstrategy: AggStrategy::Type,
         aggcosts: *const AggClauseCosts,
         numGroupCols: ::std::os::raw::c_int,
         numGroups: f64,
@@ -38690,7 +42776,7 @@ extern "C" {
     pub fn initial_cost_nestloop(
         root: *mut PlannerInfo,
         workspace: *mut JoinCostWorkspace,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         outer_path: *mut Path,
         inner_path: *mut Path,
         extra: *mut JoinPathExtraData,
@@ -38704,7 +42790,7 @@ extern "C" {
     pub fn initial_cost_mergejoin(
         root: *mut PlannerInfo,
         workspace: *mut JoinCostWorkspace,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         mergeclauses: *mut List,
         outer_path: *mut Path,
         inner_path: *mut Path,
@@ -38721,7 +42807,7 @@ extern "C" {
     pub fn initial_cost_hashjoin(
         root: *mut PlannerInfo,
         workspace: *mut JoinCostWorkspace,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         hashclauses: *mut List,
         outer_path: *mut Path,
         inner_path: *mut Path,
@@ -38758,7 +42844,7 @@ extern "C" {
         joinrel: *mut RelOptInfo,
         outerrel: *mut RelOptInfo,
         innerrel: *mut RelOptInfo,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         sjinfo: *mut SpecialJoinInfo,
         restrictlist: *mut List,
         semifactors: *mut SemiAntiJoinFactors,
@@ -38809,14 +42895,14 @@ extern "C" {
         root: *mut PlannerInfo,
         clause: *mut Node,
         varRelid: ::std::os::raw::c_int,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         sjinfo: *mut SpecialJoinInfo,
     ) -> Selectivity;
     pub fn clause_selectivity_ext(
         root: *mut PlannerInfo,
         clause: *mut Node,
         varRelid: ::std::os::raw::c_int,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         sjinfo: *mut SpecialJoinInfo,
         use_extended_stats: bool,
     ) -> Selectivity;
@@ -38824,14 +42910,14 @@ extern "C" {
         root: *mut PlannerInfo,
         clauses: *mut List,
         varRelid: ::std::os::raw::c_int,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         sjinfo: *mut SpecialJoinInfo,
     ) -> Selectivity;
     pub fn clauselist_selectivity_ext(
         root: *mut PlannerInfo,
         clauses: *mut List,
         varRelid: ::std::os::raw::c_int,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         sjinfo: *mut SpecialJoinInfo,
         use_extended_stats: bool,
     ) -> Selectivity;
@@ -38931,7 +43017,7 @@ extern "C" {
     pub fn compare_path_costs(
         path1: *mut Path,
         path2: *mut Path,
-        criterion: CostSelector,
+        criterion: CostSelector::Type,
     ) -> ::std::os::raw::c_int;
     pub fn compare_fractional_path_costs(
         path1: *mut Path,
@@ -38971,7 +43057,7 @@ extern "C" {
         indexorderbys: *mut List,
         indexorderbycols: *mut List,
         pathkeys: *mut List,
-        indexscandir: ScanDirection,
+        indexscandir: ScanDirection::Type,
         indexonly: bool,
         required_outer: Relids,
         loop_count: f64,
@@ -39155,7 +43241,7 @@ extern "C" {
     pub fn create_nestloop_path(
         root: *mut PlannerInfo,
         joinrel: *mut RelOptInfo,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         workspace: *mut JoinCostWorkspace,
         extra: *mut JoinPathExtraData,
         outer_path: *mut Path,
@@ -39167,7 +43253,7 @@ extern "C" {
     pub fn create_mergejoin_path(
         root: *mut PlannerInfo,
         joinrel: *mut RelOptInfo,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         workspace: *mut JoinCostWorkspace,
         extra: *mut JoinPathExtraData,
         outer_path: *mut Path,
@@ -39182,7 +43268,7 @@ extern "C" {
     pub fn create_hashjoin_path(
         root: *mut PlannerInfo,
         joinrel: *mut RelOptInfo,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         workspace: *mut JoinCostWorkspace,
         extra: *mut JoinPathExtraData,
         outer_path: *mut Path,
@@ -39245,8 +43331,8 @@ extern "C" {
         rel: *mut RelOptInfo,
         subpath: *mut Path,
         target: *mut PathTarget,
-        aggstrategy: AggStrategy,
-        aggsplit: AggSplit,
+        aggstrategy: AggStrategy::Type,
+        aggsplit: AggSplit::Type,
         groupClause: *mut List,
         qual: *mut List,
         aggcosts: *const AggClauseCosts,
@@ -39257,7 +43343,7 @@ extern "C" {
         rel: *mut RelOptInfo,
         subpath: *mut Path,
         having_qual: *mut List,
-        aggstrategy: AggStrategy,
+        aggstrategy: AggStrategy::Type,
         rollups: *mut List,
         agg_costs: *const AggClauseCosts,
     ) -> *mut GroupingSetsPath;
@@ -39282,8 +43368,8 @@ extern "C" {
         root: *mut PlannerInfo,
         rel: *mut RelOptInfo,
         subpath: *mut Path,
-        cmd: SetOpCmd,
-        strategy: SetOpStrategy,
+        cmd: SetOpCmd::Type,
+        strategy: SetOpStrategy::Type,
         distinctList: *mut List,
         flagColIdx: AttrNumber,
         firstFlag: ::std::os::raw::c_int,
@@ -39311,7 +43397,7 @@ extern "C" {
         root: *mut PlannerInfo,
         rel: *mut RelOptInfo,
         subpath: *mut Path,
-        operation: CmdType,
+        operation: CmdType::Type,
         canSetTag: bool,
         nominalRelation: Index,
         rootRelation: Index,
@@ -39331,7 +43417,7 @@ extern "C" {
         subpath: *mut Path,
         limitOffset: *mut Node,
         limitCount: *mut Node,
-        limitOption: LimitOption,
+        limitOption: LimitOption::Type,
         offset_est: int64,
         count_est: int64,
     ) -> *mut LimitPath;
@@ -39383,7 +43469,7 @@ extern "C" {
     ) -> Relids;
     pub fn fetch_upper_rel(
         root: *mut PlannerInfo,
-        kind: UpperRelationKind,
+        kind: UpperRelationKind::Type,
         relids: Relids,
     ) -> *mut RelOptInfo;
     pub fn find_childrel_parents(root: *mut PlannerInfo, rel: *mut RelOptInfo) -> Relids;
@@ -39465,7 +43551,7 @@ extern "C" {
         joinrel: *mut RelOptInfo,
         outerrel: *mut RelOptInfo,
         innerrel: *mut RelOptInfo,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         sjinfo: *mut SpecialJoinInfo,
         restrictlist: *mut List,
     );
@@ -39592,7 +43678,7 @@ extern "C" {
         rinfo: *mut RestrictInfo,
         indexclauses: *mut List,
     ) -> bool;
-    pub fn compare_pathkeys(keys1: *mut List, keys2: *mut List) -> PathKeysComparison;
+    pub fn compare_pathkeys(keys1: *mut List, keys2: *mut List) -> PathKeysComparison::Type;
     pub fn pathkeys_contained_in(keys1: *mut List, keys2: *mut List) -> bool;
     pub fn pathkeys_count_contained_in(
         keys1: *mut List,
@@ -39603,7 +43689,7 @@ extern "C" {
         paths: *mut List,
         pathkeys: *mut List,
         required_outer: Relids,
-        cost_criterion: CostSelector,
+        cost_criterion: CostSelector::Type,
         require_parallel_safe: bool,
     ) -> *mut Path;
     pub fn get_cheapest_fractional_path_for_pathkeys(
@@ -39616,12 +43702,12 @@ extern "C" {
     pub fn build_index_pathkeys(
         root: *mut PlannerInfo,
         index: *mut IndexOptInfo,
-        scandir: ScanDirection,
+        scandir: ScanDirection::Type,
     ) -> *mut List;
     pub fn build_partition_pathkeys(
         root: *mut PlannerInfo,
         partrel: *mut RelOptInfo,
-        scandir: ScanDirection,
+        scandir: ScanDirection::Type,
         partialkeys: *mut bool,
     ) -> *mut List;
     pub fn build_expression_pathkey(
@@ -39640,7 +43726,7 @@ extern "C" {
     pub fn build_join_pathkeys(
         root: *mut PlannerInfo,
         joinrel: *mut RelOptInfo,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         outer_pathkeys: *mut List,
     ) -> *mut List;
     pub fn make_pathkeys_for_sortclauses(
@@ -39731,7 +43817,7 @@ extern "C" {
         operatorid: Oid,
         args: *mut List,
         inputcollid: Oid,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         sjinfo: *mut SpecialJoinInfo,
     ) -> Selectivity;
     pub fn function_selectivity(
@@ -39741,7 +43827,7 @@ extern "C" {
         inputcollid: Oid,
         is_join: bool,
         varRelid: ::std::os::raw::c_int,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         sjinfo: *mut SpecialJoinInfo,
     ) -> Selectivity;
     pub fn add_function_cost(
@@ -39751,7 +43837,7 @@ extern "C" {
         cost: *mut QualCost,
     );
     pub fn get_function_rows(root: *mut PlannerInfo, funcid: Oid, node: *mut Node) -> f64;
-    pub fn has_row_triggers(root: *mut PlannerInfo, rti: Index, event: CmdType) -> bool;
+    pub fn has_row_triggers(root: *mut PlannerInfo, rti: Index, event: CmdType::Type) -> bool;
     pub fn has_stored_generated_columns(root: *mut PlannerInfo, rti: Index) -> bool;
     pub fn get_dependent_generated_columns(
         root: *mut PlannerInfo,
@@ -39787,8 +43873,8 @@ extern "C" {
     pub fn make_agg(
         tlist: *mut List,
         qual: *mut List,
-        aggstrategy: AggStrategy,
-        aggsplit: AggSplit,
+        aggstrategy: AggStrategy::Type,
+        aggsplit: AggSplit::Type,
         numGroupCols: ::std::os::raw::c_int,
         grpColIdx: *mut AttrNumber,
         grpOperators: *mut Oid,
@@ -39803,7 +43889,7 @@ extern "C" {
         lefttree: *mut Plan,
         limitOffset: *mut Node,
         limitCount: *mut Node,
-        limitOption: LimitOption,
+        limitOption: LimitOption::Type,
         uniqNumCols: ::std::os::raw::c_int,
         uniqColIdx: *mut AttrNumber,
         uniqOperators: *mut Oid,
@@ -39846,7 +43932,7 @@ extern "C" {
         joinrelids: Relids,
         outerrelids: Relids,
         innerrel: *mut RelOptInfo,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         restrictlist: *mut List,
         force_cache: bool,
     ) -> bool;
@@ -39870,10 +43956,10 @@ extern "C" {
     ) -> *mut PlannerInfo;
     pub fn select_rowmark_type(
         rte: *mut RangeTblEntry,
-        strength: LockClauseStrength,
-    ) -> RowMarkType;
+        strength: LockClauseStrength::Type,
+    ) -> RowMarkType::Type;
     pub fn limit_needed(parse: *mut Query) -> bool;
-    pub fn mark_partial_aggref(agg: *mut Aggref, aggsplit: AggSplit);
+    pub fn mark_partial_aggref(agg: *mut Aggref, aggsplit: AggSplit::Type);
     pub fn get_cheapest_fractional_path(rel: *mut RelOptInfo, tuple_fraction: f64) -> *mut Path;
     pub fn preprocess_phv_expression(root: *mut PlannerInfo, expr: *mut Expr) -> *mut Expr;
     pub fn make_restrictinfo(
@@ -39985,13 +44071,13 @@ extern "C" {
     pub fn transformStmt(pstate: *mut ParseState, parseTree: *mut Node) -> *mut Query;
     pub fn stmt_requires_parse_analysis(parseTree: *mut RawStmt) -> bool;
     pub fn analyze_requires_snapshot(parseTree: *mut RawStmt) -> bool;
-    pub fn LCS_asString(strength: LockClauseStrength) -> *const ::std::os::raw::c_char;
-    pub fn CheckSelectLocking(qry: *mut Query, strength: LockClauseStrength);
+    pub fn LCS_asString(strength: LockClauseStrength::Type) -> *const ::std::os::raw::c_char;
+    pub fn CheckSelectLocking(qry: *mut Query, strength: LockClauseStrength::Type);
     pub fn applyLockingClause(
         qry: *mut Query,
         rtindex: Index,
-        strength: LockClauseStrength,
-        waitPolicy: LockWaitPolicy,
+        strength: LockClauseStrength::Type,
+        waitPolicy: LockWaitPolicy::Type,
         pushedDown: bool,
     );
     pub fn BuildOnConflictExcludedTargetlist(targetrel: Relation, exclRelIndex: Index)
@@ -40001,9 +44087,9 @@ extern "C" {
     pub fn transformExpr(
         pstate: *mut ParseState,
         expr: *mut Node,
-        exprKind: ParseExprKind,
+        exprKind: ParseExprKind::Type,
     ) -> *mut Node;
-    pub fn ParseExprKindName(exprKind: ParseExprKind) -> *const ::std::os::raw::c_char;
+    pub fn ParseExprKindName(exprKind: ParseExprKind::Type) -> *const ::std::os::raw::c_char;
     pub fn ParseFuncOrColumn(
         pstate: *mut ParseState,
         funcname: *mut List,
@@ -40029,7 +44115,7 @@ extern "C" {
         vatype: *mut Oid,
         true_typeids: *mut *mut Oid,
         argdefaults: *mut *mut List,
-    ) -> FuncDetailCode;
+    ) -> FuncDetailCode::Type;
     pub fn func_match_argtypes(
         nargs: ::std::os::raw::c_int,
         input_typeids: *mut Oid,
@@ -40066,7 +44152,7 @@ extern "C" {
         missing_ok: bool,
     ) -> Oid;
     pub fn LookupFuncWithArgs(
-        objtype: ObjectType,
+        objtype: ObjectType::Type,
         func: *mut ObjectWithArgs,
         missing_ok: bool,
     ) -> Oid;
@@ -40212,15 +44298,15 @@ extern "C" {
         exprtype: Oid,
         targettype: Oid,
         targettypmod: int32,
-        ccontext: CoercionContext,
-        cformat: CoercionForm,
+        ccontext: CoercionContext::Type,
+        cformat: CoercionForm::Type,
         location: ::std::os::raw::c_int,
     ) -> *mut Node;
     pub fn can_coerce_type(
         nargs: ::std::os::raw::c_int,
         input_typeids: *const Oid,
         target_typeids: *const Oid,
-        ccontext: CoercionContext,
+        ccontext: CoercionContext::Type,
     ) -> bool;
     pub fn coerce_type(
         pstate: *mut ParseState,
@@ -40228,8 +44314,8 @@ extern "C" {
         inputTypeId: Oid,
         targetTypeId: Oid,
         targetTypeMod: int32,
-        ccontext: CoercionContext,
-        cformat: CoercionForm,
+        ccontext: CoercionContext::Type,
+        cformat: CoercionForm::Type,
         location: ::std::os::raw::c_int,
     ) -> *mut Node;
     pub fn coerce_to_domain(
@@ -40237,8 +44323,8 @@ extern "C" {
         baseTypeId: Oid,
         baseTypeMod: int32,
         typeId: Oid,
-        ccontext: CoercionContext,
-        cformat: CoercionForm,
+        ccontext: CoercionContext::Type,
+        cformat: CoercionForm::Type,
         location: ::std::os::raw::c_int,
         hideInputCoercion: bool,
     ) -> *mut Node;
@@ -40308,10 +44394,10 @@ extern "C" {
     pub fn find_coercion_pathway(
         targetTypeId: Oid,
         sourceTypeId: Oid,
-        ccontext: CoercionContext,
+        ccontext: CoercionContext::Type,
         funcid: *mut Oid,
-    ) -> CoercionPathType;
-    pub fn find_typmod_coercion_function(typeId: Oid, funcid: *mut Oid) -> CoercionPathType;
+    ) -> CoercionPathType::Type;
+    pub fn find_typmod_coercion_function(typeId: Oid, funcid: *mut Oid) -> CoercionPathType::Type;
     pub fn get_rte_attribute_name(
         rte: *mut RangeTblEntry,
         attnum: AttrNumber,
@@ -40491,9 +44577,9 @@ extern "C" {
         trigdata: *mut TriggerData,
     ) -> HeapTuple;
     pub fn plpgsql_exec_event_trigger(func: *mut PLpgSQL_function, trigdata: *mut EventTriggerData);
-    pub fn plpgsql_xact_cb(event: XactEvent, arg: *mut ::std::os::raw::c_void);
+    pub fn plpgsql_xact_cb(event: XactEvent::Type, arg: *mut ::std::os::raw::c_void);
     pub fn plpgsql_subxact_cb(
-        event: SubXactEvent,
+        event: SubXactEvent::Type,
         mySubid: SubTransactionId,
         parentSubid: SubTransactionId,
         arg: *mut ::std::os::raw::c_void,
@@ -40510,11 +44596,14 @@ extern "C" {
         collation: *mut Oid,
     );
     pub fn plpgsql_ns_init();
-    pub fn plpgsql_ns_push(label: *const ::std::os::raw::c_char, label_type: PLpgSQL_label_type);
+    pub fn plpgsql_ns_push(
+        label: *const ::std::os::raw::c_char,
+        label_type: PLpgSQL_label_type::Type,
+    );
     pub fn plpgsql_ns_pop();
     pub fn plpgsql_ns_top() -> *mut PLpgSQL_nsitem;
     pub fn plpgsql_ns_additem(
-        itemtype: PLpgSQL_nsitem_type,
+        itemtype: PLpgSQL_nsitem_type::Type,
         itemno: ::std::os::raw::c_int,
         name: *const ::std::os::raw::c_char,
     );
@@ -40532,7 +44621,9 @@ extern "C" {
     ) -> *mut PLpgSQL_nsitem;
     pub fn plpgsql_ns_find_nearest_loop(ns_cur: *mut PLpgSQL_nsitem) -> *mut PLpgSQL_nsitem;
     pub fn plpgsql_stmt_typename(stmt: *mut PLpgSQL_stmt) -> *const ::std::os::raw::c_char;
-    pub fn plpgsql_getdiag_kindname(kind: PLpgSQL_getdiag_kind) -> *const ::std::os::raw::c_char;
+    pub fn plpgsql_getdiag_kindname(
+        kind: PLpgSQL_getdiag_kind::Type,
+    ) -> *const ::std::os::raw::c_char;
     pub fn plpgsql_free_function_memory(func: *mut PLpgSQL_function);
     pub fn plpgsql_dumptree(func: *mut PLpgSQL_function);
     pub fn plpgsql_base_yylex() -> ::std::os::raw::c_int;
@@ -40866,7 +44957,9 @@ extern "C" {
         abort_data: *mut LogicalRepStreamAbortData,
         read_abort_info: bool,
     );
-    pub fn logicalrep_message_type(action: LogicalRepMsgType) -> *const ::std::os::raw::c_char;
+    pub fn logicalrep_message_type(
+        action: LogicalRepMsgType::Type,
+    ) -> *const ::std::os::raw::c_char;
     pub fn InitWalSender();
     pub fn exec_replication_command(cmd_string: *const ::std::os::raw::c_char) -> bool;
     pub fn WalSndErrorCleanup();
@@ -40906,7 +44999,7 @@ extern "C" {
     pub fn ReplicationSlotCreate(
         name: *const ::std::os::raw::c_char,
         db_specific: bool,
-        persistency: ReplicationSlotPersistency,
+        persistency: ReplicationSlotPersistency::Type,
         two_phase: bool,
     );
     pub fn ReplicationSlotPersist();
@@ -40932,7 +45025,7 @@ extern "C" {
     ) -> bool;
     pub fn ReplicationSlotsDropDBSlots(dboid: Oid);
     pub fn InvalidateObsoleteReplicationSlots(
-        cause: ReplicationSlotInvalidationCause,
+        cause: ReplicationSlotInvalidationCause::Type,
         oldestSegno: XLogSegNo,
         dboid: Oid,
         snapshotConflictHorizon: TransactionId,
@@ -41018,193 +45111,6 @@ extern "C" {
         hasRowSecurity: *mut bool,
         hasSubLinks: *mut bool,
     );
-    pub fn SnapMgrShmemSize() -> Size;
-    pub fn SnapMgrInit();
-    pub fn GetSnapshotCurrentTimestamp() -> TimestampTz;
-    pub fn GetOldSnapshotThresholdTimestamp() -> TimestampTz;
-    pub fn SnapshotTooOldMagicForTest();
-    pub fn GetTransactionSnapshot() -> Snapshot;
-    pub fn GetLatestSnapshot() -> Snapshot;
-    pub fn SnapshotSetCommandId(curcid: CommandId);
-    pub fn GetOldestSnapshot() -> Snapshot;
-    pub fn GetCatalogSnapshot(relid: Oid) -> Snapshot;
-    pub fn GetNonHistoricCatalogSnapshot(relid: Oid) -> Snapshot;
-    pub fn InvalidateCatalogSnapshot();
-    pub fn InvalidateCatalogSnapshotConditionally();
-    pub fn PushActiveSnapshot(snapshot: Snapshot);
-    pub fn PushActiveSnapshotWithLevel(snapshot: Snapshot, snap_level: ::std::os::raw::c_int);
-    pub fn PushCopiedSnapshot(snapshot: Snapshot);
-    pub fn UpdateActiveSnapshotCommandId();
-    pub fn PopActiveSnapshot();
-    pub fn GetActiveSnapshot() -> Snapshot;
-    pub fn ActiveSnapshotSet() -> bool;
-    pub fn RegisterSnapshot(snapshot: Snapshot) -> Snapshot;
-    pub fn UnregisterSnapshot(snapshot: Snapshot);
-    pub fn RegisterSnapshotOnOwner(snapshot: Snapshot, owner: ResourceOwner) -> Snapshot;
-    pub fn UnregisterSnapshotFromOwner(snapshot: Snapshot, owner: ResourceOwner);
-    pub fn AtSubCommit_Snapshot(level: ::std::os::raw::c_int);
-    pub fn AtSubAbort_Snapshot(level: ::std::os::raw::c_int);
-    pub fn AtEOXact_Snapshot(isCommit: bool, resetXmin: bool);
-    pub fn ImportSnapshot(idstr: *const ::std::os::raw::c_char);
-    pub fn XactHasExportedSnapshots() -> bool;
-    pub fn DeleteAllExportedSnapshotFiles();
-    pub fn WaitForOlderSnapshots(limitXmin: TransactionId, progress: bool);
-    pub fn ThereAreNoPriorRegisteredSnapshots() -> bool;
-    pub fn HaveRegisteredOrActiveSnapshot() -> bool;
-    pub fn TransactionIdLimitedForOldSnapshots(
-        recentXmin: TransactionId,
-        relation: Relation,
-        limit_xid: *mut TransactionId,
-        limit_ts: *mut TimestampTz,
-    ) -> bool;
-    pub fn SetOldSnapshotThresholdTimestamp(ts: TimestampTz, xlimit: TransactionId);
-    pub fn MaintainOldSnapshotTimeMapping(whenTaken: TimestampTz, xmin: TransactionId);
-    pub fn ExportSnapshot(snapshot: Snapshot) -> *mut ::std::os::raw::c_char;
-    pub fn GlobalVisTestFor(rel: Relation) -> *mut GlobalVisState;
-    pub fn GlobalVisTestIsRemovableXid(state: *mut GlobalVisState, xid: TransactionId) -> bool;
-    pub fn GlobalVisTestIsRemovableFullXid(
-        state: *mut GlobalVisState,
-        fxid: FullTransactionId,
-    ) -> bool;
-    pub fn GlobalVisTestNonRemovableFullHorizon(state: *mut GlobalVisState) -> FullTransactionId;
-    pub fn GlobalVisTestNonRemovableHorizon(state: *mut GlobalVisState) -> TransactionId;
-    pub fn GlobalVisCheckRemovableXid(rel: Relation, xid: TransactionId) -> bool;
-    pub fn GlobalVisCheckRemovableFullXid(rel: Relation, fxid: FullTransactionId) -> bool;
-    pub fn XidInMVCCSnapshot(xid: TransactionId, snapshot: Snapshot) -> bool;
-    pub fn HistoricSnapshotGetTupleCids() -> *mut HTAB;
-    pub fn SetupHistoricSnapshot(historic_snapshot: Snapshot, tuplecids: *mut HTAB);
-    pub fn TeardownHistoricSnapshot(is_error: bool);
-    pub fn HistoricSnapshotActive() -> bool;
-    pub fn EstimateSnapshotSpace(snapshot: Snapshot) -> Size;
-    pub fn SerializeSnapshot(snapshot: Snapshot, start_address: *mut ::std::os::raw::c_char);
-    pub fn RestoreSnapshot(start_address: *mut ::std::os::raw::c_char) -> Snapshot;
-    pub fn RestoreTransactionSnapshot(
-        snapshot: Snapshot,
-        source_pgproc: *mut ::std::os::raw::c_void,
-    );
-    pub fn PrefetchSharedBuffer(
-        smgr_reln: *mut SMgrRelationData,
-        forkNum: ForkNumber,
-        blockNum: BlockNumber,
-    ) -> PrefetchBufferResult;
-    pub fn PrefetchBuffer(
-        reln: Relation,
-        forkNum: ForkNumber,
-        blockNum: BlockNumber,
-    ) -> PrefetchBufferResult;
-    pub fn ReadRecentBuffer(
-        rlocator: RelFileLocator,
-        forkNum: ForkNumber,
-        blockNum: BlockNumber,
-        recent_buffer: Buffer,
-    ) -> bool;
-    pub fn ReadBuffer(reln: Relation, blockNum: BlockNumber) -> Buffer;
-    pub fn ReadBufferExtended(
-        reln: Relation,
-        forkNum: ForkNumber,
-        blockNum: BlockNumber,
-        mode: ReadBufferMode,
-        strategy: BufferAccessStrategy,
-    ) -> Buffer;
-    pub fn ReadBufferWithoutRelcache(
-        rlocator: RelFileLocator,
-        forkNum: ForkNumber,
-        blockNum: BlockNumber,
-        mode: ReadBufferMode,
-        strategy: BufferAccessStrategy,
-        permanent: bool,
-    ) -> Buffer;
-    pub fn ReleaseBuffer(buffer: Buffer);
-    pub fn UnlockReleaseBuffer(buffer: Buffer);
-    pub fn MarkBufferDirty(buffer: Buffer);
-    pub fn IncrBufferRefCount(buffer: Buffer);
-    pub fn CheckBufferIsPinnedOnce(buffer: Buffer);
-    pub fn ReleaseAndReadBuffer(
-        buffer: Buffer,
-        relation: Relation,
-        blockNum: BlockNumber,
-    ) -> Buffer;
-    pub fn ExtendBufferedRel(
-        bmr: BufferManagerRelation,
-        forkNum: ForkNumber,
-        strategy: BufferAccessStrategy,
-        flags: uint32,
-    ) -> Buffer;
-    pub fn ExtendBufferedRelBy(
-        bmr: BufferManagerRelation,
-        fork: ForkNumber,
-        strategy: BufferAccessStrategy,
-        flags: uint32,
-        extend_by: uint32,
-        buffers: *mut Buffer,
-        extended_by: *mut uint32,
-    ) -> BlockNumber;
-    pub fn ExtendBufferedRelTo(
-        bmr: BufferManagerRelation,
-        fork: ForkNumber,
-        strategy: BufferAccessStrategy,
-        flags: uint32,
-        extend_to: BlockNumber,
-        mode: ReadBufferMode,
-    ) -> Buffer;
-    pub fn InitBufferPoolAccess();
-    pub fn AtEOXact_Buffers(isCommit: bool);
-    pub fn PrintBufferLeakWarning(buffer: Buffer);
-    pub fn CheckPointBuffers(flags: ::std::os::raw::c_int);
-    pub fn BufferGetBlockNumber(buffer: Buffer) -> BlockNumber;
-    pub fn RelationGetNumberOfBlocksInFork(relation: Relation, forkNum: ForkNumber) -> BlockNumber;
-    pub fn FlushOneBuffer(buffer: Buffer);
-    pub fn FlushRelationBuffers(rel: Relation);
-    pub fn FlushRelationsAllBuffers(
-        smgrs: *mut *mut SMgrRelationData,
-        nrels: ::std::os::raw::c_int,
-    );
-    pub fn CreateAndCopyRelationData(
-        src_rlocator: RelFileLocator,
-        dst_rlocator: RelFileLocator,
-        permanent: bool,
-    );
-    pub fn FlushDatabaseBuffers(dbid: Oid);
-    pub fn DropRelationBuffers(
-        smgr_reln: *mut SMgrRelationData,
-        forkNum: *mut ForkNumber,
-        nforks: ::std::os::raw::c_int,
-        firstDelBlock: *mut BlockNumber,
-    );
-    pub fn DropRelationsAllBuffers(
-        smgr_reln: *mut *mut SMgrRelationData,
-        nlocators: ::std::os::raw::c_int,
-    );
-    pub fn DropDatabaseBuffers(dbid: Oid);
-    pub fn BufferIsPermanent(buffer: Buffer) -> bool;
-    pub fn BufferGetLSNAtomic(buffer: Buffer) -> XLogRecPtr;
-    pub fn BufferGetTag(
-        buffer: Buffer,
-        rlocator: *mut RelFileLocator,
-        forknum: *mut ForkNumber,
-        blknum: *mut BlockNumber,
-    );
-    pub fn MarkBufferDirtyHint(buffer: Buffer, buffer_std: bool);
-    pub fn UnlockBuffers();
-    pub fn LockBuffer(buffer: Buffer, mode: ::std::os::raw::c_int);
-    pub fn ConditionalLockBuffer(buffer: Buffer) -> bool;
-    pub fn LockBufferForCleanup(buffer: Buffer);
-    pub fn ConditionalLockBufferForCleanup(buffer: Buffer) -> bool;
-    pub fn IsBufferCleanupOK(buffer: Buffer) -> bool;
-    pub fn HoldingBufferPinThatDelaysRecovery() -> bool;
-    pub fn AbortBufferIO(buffer: Buffer);
-    pub fn BgBufferSync(wb_context: *mut WritebackContext) -> bool;
-    pub fn TestForOldSnapshot_impl(snapshot: Snapshot, relation: Relation);
-    pub fn InitBufferPool();
-    pub fn BufferShmemSize() -> Size;
-    pub fn AtProcExit_LocalBuffers();
-    pub fn GetAccessStrategy(btype: BufferAccessStrategyType) -> BufferAccessStrategy;
-    pub fn GetAccessStrategyWithSize(
-        btype: BufferAccessStrategyType,
-        ring_size_kb: ::std::os::raw::c_int,
-    ) -> BufferAccessStrategy;
-    pub fn GetAccessStrategyBufferCount(strategy: BufferAccessStrategy) -> ::std::os::raw::c_int;
-    pub fn FreeAccessStrategy(strategy: BufferAccessStrategy);
     pub fn BufFileCreateTemp(interXact: bool) -> *mut BufFile;
     pub fn BufFileClose(file: *mut BufFile);
     pub fn BufFileRead(file: *mut BufFile, ptr: *mut ::std::os::raw::c_void, size: usize) -> usize;
@@ -41287,7 +45193,12 @@ extern "C" {
     pub fn UnlockTuple(relation: Relation, tid: ItemPointer, lockmode: LOCKMODE);
     pub fn XactLockTableInsert(xid: TransactionId);
     pub fn XactLockTableDelete(xid: TransactionId);
-    pub fn XactLockTableWait(xid: TransactionId, rel: Relation, ctid: ItemPointer, oper: XLTW_Oper);
+    pub fn XactLockTableWait(
+        xid: TransactionId,
+        rel: Relation,
+        ctid: ItemPointer,
+        oper: XLTW_Oper::Type,
+    );
     pub fn ConditionalXactLockTableWait(xid: TransactionId) -> bool;
     pub fn WaitForLockers(heaplocktag: LOCKTAG, lockmode: LOCKMODE, progress: bool);
     pub fn WaitForLockersMultiple(locktags: *mut List, lockmode: LOCKMODE, progress: bool);
@@ -41329,10 +45240,10 @@ extern "C" {
     pub fn ProcSignalInit(pss_idx: ::std::os::raw::c_int);
     pub fn SendProcSignal(
         pid: pid_t,
-        reason: ProcSignalReason,
+        reason: ProcSignalReason::Type,
         backendId: BackendId,
     ) -> ::std::os::raw::c_int;
-    pub fn EmitProcSignalBarrier(type_: ProcSignalBarrierType) -> uint64;
+    pub fn EmitProcSignalBarrier(type_: ProcSignalBarrierType::Type) -> uint64;
     pub fn WaitForProcSignalBarrier(generation: uint64);
     pub fn ProcessProcSignalBarrier();
     pub fn procsignal_sigusr1_handler(postgres_signal_arg: ::std::os::raw::c_int);
@@ -41368,7 +45279,7 @@ extern "C" {
     pub fn StandbyTimeoutHandler();
     pub fn StandbyLockTimeoutHandler();
     pub fn LogRecoveryConflict(
-        reason: ProcSignalReason,
+        reason: ProcSignalReason::Type,
         wait_start: TimestampTz,
         now: TimestampTz,
         wait_list: *mut VirtualTransactionId,
@@ -41453,17 +45364,23 @@ extern "C" {
         limitXmin: TransactionId,
         dbOid: Oid,
     ) -> *mut VirtualTransactionId;
-    pub fn CancelVirtualTransaction(vxid: VirtualTransactionId, sigmode: ProcSignalReason)
-        -> pid_t;
+    pub fn CancelVirtualTransaction(
+        vxid: VirtualTransactionId,
+        sigmode: ProcSignalReason::Type,
+    ) -> pid_t;
     pub fn SignalVirtualTransaction(
         vxid: VirtualTransactionId,
-        sigmode: ProcSignalReason,
+        sigmode: ProcSignalReason::Type,
         conflictPending: bool,
     ) -> pid_t;
     pub fn MinimumActiveBackends(min: ::std::os::raw::c_int) -> bool;
     pub fn CountDBBackends(databaseid: Oid) -> ::std::os::raw::c_int;
     pub fn CountDBConnections(databaseid: Oid) -> ::std::os::raw::c_int;
-    pub fn CancelDBBackends(databaseid: Oid, sigmode: ProcSignalReason, conflictPending: bool);
+    pub fn CancelDBBackends(
+        databaseid: Oid,
+        sigmode: ProcSignalReason::Type,
+        conflictPending: bool,
+    );
     pub fn CountUserBackends(roleid: Oid) -> ::std::os::raw::c_int;
     pub fn CountOtherDBBackends(
         databaseId: Oid,
@@ -41525,13 +45442,13 @@ extern "C" {
     pub fn quickdie(postgres_signal_arg: ::std::os::raw::c_int) -> !;
     pub fn StatementCancelHandler(postgres_signal_arg: ::std::os::raw::c_int);
     pub fn FloatExceptionHandler(postgres_signal_arg: ::std::os::raw::c_int) -> !;
-    pub fn RecoveryConflictInterrupt(reason: ProcSignalReason);
+    pub fn RecoveryConflictInterrupt(reason: ProcSignalReason::Type);
     pub fn ProcessClientReadInterrupt(blocked: bool);
     pub fn ProcessClientWriteInterrupt(blocked: bool);
     pub fn process_postgres_switches(
         argc: ::std::os::raw::c_int,
         argv: *mut *mut ::std::os::raw::c_char,
-        ctx: GucContext,
+        ctx: GucContext::Type,
         dbname: *mut *const ::std::os::raw::c_char,
     );
     pub fn PostgresSingleUserMain(
@@ -41552,13 +45469,13 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
     pub fn set_debug_options(
         debug_flag: ::std::os::raw::c_int,
-        context: GucContext,
-        source: GucSource,
+        context: GucContext::Type,
+        source: GucSource::Type,
     );
     pub fn set_plan_disabling_options(
         arg: *const ::std::os::raw::c_char,
-        context: GucContext,
-        source: GucSource,
+        context: GucContext::Type,
+        source: GucSource::Type,
     ) -> bool;
     pub fn get_stats_option_name(
         arg: *const ::std::os::raw::c_char,
@@ -41567,7 +45484,7 @@ extern "C" {
         pstmt: *mut PlannedStmt,
         queryString: *const ::std::os::raw::c_char,
         readOnlyTree: bool,
-        context: ProcessUtilityContext,
+        context: ProcessUtilityContext::Type,
         params: ParamListInfo,
         queryEnv: *mut QueryEnvironment,
         dest: *mut DestReceiver,
@@ -41577,7 +45494,7 @@ extern "C" {
         pstmt: *mut PlannedStmt,
         queryString: *const ::std::os::raw::c_char,
         readOnlyTree: bool,
-        context: ProcessUtilityContext,
+        context: ProcessUtilityContext::Type,
         params: ParamListInfo,
         queryEnv: *mut QueryEnvironment,
         dest: *mut DestReceiver,
@@ -41587,8 +45504,8 @@ extern "C" {
     pub fn UtilityReturnsTuples(parsetree: *mut Node) -> bool;
     pub fn UtilityTupleDescriptor(parsetree: *mut Node) -> TupleDesc;
     pub fn UtilityContainsQuery(parsetree: *mut Node) -> *mut Query;
-    pub fn CreateCommandTag(parsetree: *mut Node) -> CommandTag;
-    pub fn GetCommandLogLevel(parsetree: *mut Node) -> LogStmtLevel;
+    pub fn CreateCommandTag(parsetree: *mut Node) -> CommandTag::Type;
+    pub fn GetCommandLogLevel(parsetree: *mut Node) -> LogStmtLevel::Type;
     pub fn CommandIsReadOnly(pstmt: *mut PlannedStmt) -> bool;
     pub fn compareWordEntryPos(
         a: *const ::std::os::raw::c_void,
@@ -41664,7 +45581,7 @@ extern "C" {
         arg: *mut ::std::os::raw::c_void,
         flags: uint32,
         chkcond: TSExecuteCallback,
-    ) -> TSTernaryValue;
+    ) -> TSTernaryValue::Type;
     pub fn TS_execute_locations(
         curitem: *mut QueryItem,
         arg: *mut ::std::os::raw::c_void,
@@ -44968,7 +48885,7 @@ extern "C" {
     ) -> *mut JsonbValue;
     pub fn pushJsonbValue(
         pstate: *mut *mut JsonbParseState,
-        seq: JsonbIteratorToken,
+        seq: JsonbIteratorToken::Type,
         jbval: *mut JsonbValue,
     ) -> *mut JsonbValue;
     pub fn JsonbIteratorInit(container: *mut JsonbContainer) -> *mut JsonbIterator;
@@ -44976,7 +48893,7 @@ extern "C" {
         it: *mut *mut JsonbIterator,
         val: *mut JsonbValue,
         skipNested: bool,
-    ) -> JsonbIteratorToken;
+    ) -> JsonbIteratorToken::Type;
     pub fn JsonbToJsonbValue(jsonb: *mut Jsonb, val: *mut JsonbValue);
     pub fn JsonbValueToJsonb(val: *mut JsonbValue) -> *mut Jsonb;
     pub fn JsonbDeepContains(
@@ -45149,7 +49066,7 @@ extern "C" {
     pub fn getTypeIOParam(typeTuple: HeapTuple) -> Oid;
     pub fn get_type_io_data(
         typid: Oid,
-        which_func: IOFuncSelector,
+        which_func: IOFuncSelector::Type,
         typlen: *mut int16,
         typbyval: *mut bool,
         typalign: *mut ::std::os::raw::c_char,
@@ -45384,18 +49301,18 @@ extern "C" {
     ) -> Selectivity;
     pub fn booltestsel(
         root: *mut PlannerInfo,
-        booltesttype: BoolTestType,
+        booltesttype: BoolTestType::Type,
         arg: *mut Node,
         varRelid: ::std::os::raw::c_int,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         sjinfo: *mut SpecialJoinInfo,
     ) -> Selectivity;
     pub fn nulltestsel(
         root: *mut PlannerInfo,
-        nulltesttype: NullTestType,
+        nulltesttype: NullTestType::Type,
         arg: *mut Node,
         varRelid: ::std::os::raw::c_int,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         sjinfo: *mut SpecialJoinInfo,
     ) -> Selectivity;
     pub fn scalararraysel(
@@ -45403,7 +49320,7 @@ extern "C" {
         clause: *mut ScalarArrayOpExpr,
         is_join_clause: bool,
         varRelid: ::std::os::raw::c_int,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         sjinfo: *mut SpecialJoinInfo,
     ) -> Selectivity;
     pub fn estimate_array_length(arrayexpr: *mut Node) -> ::std::os::raw::c_int;
@@ -45411,7 +49328,7 @@ extern "C" {
         root: *mut PlannerInfo,
         clause: *mut RowCompareExpr,
         varRelid: ::std::os::raw::c_int,
-        jointype: JoinType,
+        jointype: JoinType::Type,
         sjinfo: *mut SpecialJoinInfo,
     ) -> Selectivity;
     pub fn mergejoinscansel(
@@ -45912,9 +49829,9 @@ extern "C" {
     pub static mut VacuumCostActive: bool;
     pub static mut trace_recovery_messages: ::std::os::raw::c_int;
     pub static mut DatabasePath: *mut ::std::os::raw::c_char;
-    pub static mut MyBackendType: BackendType;
-    pub static mut Mode: ProcessingMode;
-    pub static mut MyAuxProcType: AuxProcType;
+    pub static mut MyBackendType: BackendType::Type;
+    pub static mut Mode: ProcessingMode::Type;
+    pub static mut MyAuxProcType: AuxProcType::Type;
     pub static mut IgnoreSystemIndexes: bool;
     pub static mut process_shared_preload_libraries_in_progress: bool;
     pub static mut process_shared_preload_libraries_done: bool;
@@ -45939,7 +49856,7 @@ extern "C" {
     pub static mut pgStatBlockWriteTime: PgStat_Counter;
     pub static mut pgStatActiveTime: PgStat_Counter;
     pub static mut pgStatTransactionIdleTime: PgStat_Counter;
-    pub static mut pgStatSessionEndCause: SessionEndType;
+    pub static mut pgStatSessionEndCause: SessionEndType::Type;
     pub static mut PendingWalStats: PgStat_PendingWalStats;
     pub static mut sync_method: ::std::os::raw::c_int;
     pub static mut ProcLastRecPtr: XLogRecPtr;
@@ -46018,12 +49935,38 @@ extern "C" {
     pub static mut recoveryTargetTime: TimestampTz;
     pub static mut recoveryTargetName: *const ::std::os::raw::c_char;
     pub static mut recoveryTargetLSN: XLogRecPtr;
-    pub static mut recoveryTarget: RecoveryTargetType;
+    pub static mut recoveryTarget: RecoveryTargetType::Type;
     pub static mut wal_receiver_create_temp_slot: bool;
-    pub static mut recoveryTargetTimeLineGoal: RecoveryTargetTimeLineGoal;
+    pub static mut recoveryTargetTimeLineGoal: RecoveryTargetTimeLineGoal::Type;
     pub static mut recoveryTargetTLIRequested: TimeLineID;
     pub static mut recoveryTargetTLI: TimeLineID;
     pub static mut reachedConsistency: bool;
+    pub static mut CurrentResourceOwner: ResourceOwner;
+    pub static mut CurTransactionResourceOwner: ResourceOwner;
+    pub static mut TopTransactionResourceOwner: ResourceOwner;
+    pub static mut AuxProcessResourceOwner: ResourceOwner;
+    pub static mut old_snapshot_threshold: ::std::os::raw::c_int;
+    pub static mut FirstSnapshotSet: bool;
+    pub static mut TransactionXmin: TransactionId;
+    pub static mut RecentXmin: TransactionId;
+    pub static mut SnapshotSelfData: SnapshotData;
+    pub static mut SnapshotAnyData: SnapshotData;
+    pub static mut CatalogSnapshotData: SnapshotData;
+    pub static mut zero_damaged_pages: bool;
+    pub static mut bgwriter_lru_maxpages: ::std::os::raw::c_int;
+    pub static mut bgwriter_lru_multiplier: f64;
+    pub static mut track_io_timing: bool;
+    pub static mut effective_io_concurrency: ::std::os::raw::c_int;
+    pub static mut maintenance_io_concurrency: ::std::os::raw::c_int;
+    pub static mut checkpoint_flush_after: ::std::os::raw::c_int;
+    pub static mut backend_flush_after: ::std::os::raw::c_int;
+    pub static mut bgwriter_flush_after: ::std::os::raw::c_int;
+    pub static mut BufferBlocks: *mut ::std::os::raw::c_char;
+    pub static mut NLocBuffer: ::std::os::raw::c_int;
+    pub static mut LocalBufferBlockPointers: *mut Block;
+    pub static mut LocalRefCount: *mut int32;
+    pub static mut InRecovery: bool;
+    pub static mut standbyState: HotStandbyState::Type;
     pub static mut namespace_search_path: *mut ::std::os::raw::c_char;
     pub static mut object_access_hook: object_access_hook_type;
     pub static mut object_access_hook_str: object_access_hook_type_str;
@@ -46105,10 +50048,6 @@ extern "C" {
     pub static mut backslash_quote: ::std::os::raw::c_int;
     pub static mut escape_string_warning: bool;
     pub static mut standard_conforming_strings: bool;
-    pub static mut CurrentResourceOwner: ResourceOwner;
-    pub static mut CurTransactionResourceOwner: ResourceOwner;
-    pub static mut TopTransactionResourceOwner: ResourceOwner;
-    pub static mut AuxProcessResourceOwner: ResourceOwner;
     pub static mut plan_cache_mode: ::std::os::raw::c_int;
     pub static mut SPI_processed: uint64;
     pub static mut SPI_tuptable: *mut SPITupleTable;
@@ -46168,7 +50107,7 @@ extern "C" {
     pub static mut query_id_enabled: bool;
     pub static mut post_parse_analyze_hook: post_parse_analyze_hook_type;
     pub static mut Transform_null_equals: bool;
-    pub static mut plpgsql_IdentifierLookup: IdentifierLookup;
+    pub static mut plpgsql_IdentifierLookup: IdentifierLookup::Type;
     pub static mut plpgsql_variable_conflict: ::std::os::raw::c_int;
     pub static mut plpgsql_print_strict_params: bool;
     pub static mut plpgsql_check_asserts: bool;
@@ -46223,33 +50162,13 @@ extern "C" {
     pub static mut max_replication_slots: ::std::os::raw::c_int;
     pub static mut row_security_policy_hook_permissive: row_security_policy_hook_type;
     pub static mut row_security_policy_hook_restrictive: row_security_policy_hook_type;
-    pub static mut old_snapshot_threshold: ::std::os::raw::c_int;
-    pub static mut FirstSnapshotSet: bool;
-    pub static mut TransactionXmin: TransactionId;
-    pub static mut RecentXmin: TransactionId;
-    pub static mut SnapshotSelfData: SnapshotData;
-    pub static mut SnapshotAnyData: SnapshotData;
-    pub static mut CatalogSnapshotData: SnapshotData;
-    pub static mut zero_damaged_pages: bool;
-    pub static mut bgwriter_lru_maxpages: ::std::os::raw::c_int;
-    pub static mut bgwriter_lru_multiplier: f64;
-    pub static mut track_io_timing: bool;
-    pub static mut effective_io_concurrency: ::std::os::raw::c_int;
-    pub static mut maintenance_io_concurrency: ::std::os::raw::c_int;
-    pub static mut checkpoint_flush_after: ::std::os::raw::c_int;
-    pub static mut backend_flush_after: ::std::os::raw::c_int;
-    pub static mut bgwriter_flush_after: ::std::os::raw::c_int;
-    pub static mut BufferBlocks: *mut ::std::os::raw::c_char;
-    pub static mut NLocBuffer: ::std::os::raw::c_int;
-    pub static mut LocalBufferBlockPointers: *mut Block;
-    pub static mut LocalRefCount: *mut int32;
     pub static mut proc_exit_inprogress: bool;
     pub static mut shmem_exit_inprogress: bool;
     pub static mut shmem_startup_hook: shmem_startup_hook_type;
     pub static mut max_standby_archive_delay: ::std::os::raw::c_int;
     pub static mut max_standby_streaming_delay: ::std::os::raw::c_int;
     pub static mut log_recovery_conflict_waits: bool;
-    pub static mut whereToSendOutput: CommandDest;
+    pub static mut whereToSendOutput: CommandDest::Type;
     pub static mut debug_query_string: *const ::std::os::raw::c_char;
     pub static mut max_stack_depth: ::std::os::raw::c_int;
     pub static mut PostAuthDelay: ::std::os::raw::c_int;
@@ -46267,6 +50186,4955 @@ extern "C" {
     pub static mut get_relation_stats_hook: get_relation_stats_hook_type;
     pub static mut get_index_stats_hook: get_index_stats_hook_type;
 }
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_OP")]
+pub const A_Expr_Kind_AEXPR_OP: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_OP_ANY")]
+pub const A_Expr_Kind_AEXPR_OP_ANY: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_OP_ALL")]
+pub const A_Expr_Kind_AEXPR_OP_ALL: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_DISTINCT")]
+pub const A_Expr_Kind_AEXPR_DISTINCT: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_NOT_DISTINCT")]
+pub const A_Expr_Kind_AEXPR_NOT_DISTINCT: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_NULLIF")]
+pub const A_Expr_Kind_AEXPR_NULLIF: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_IN")]
+pub const A_Expr_Kind_AEXPR_IN: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_LIKE")]
+pub const A_Expr_Kind_AEXPR_LIKE: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_ILIKE")]
+pub const A_Expr_Kind_AEXPR_ILIKE: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_SIMILAR")]
+pub const A_Expr_Kind_AEXPR_SIMILAR: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_BETWEEN")]
+pub const A_Expr_Kind_AEXPR_BETWEEN: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_NOT_BETWEEN")]
+pub const A_Expr_Kind_AEXPR_NOT_BETWEEN: u32 = 11;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_BETWEEN_SYM")]
+pub const A_Expr_Kind_AEXPR_BETWEEN_SYM: u32 = 12;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_NOT_BETWEEN_SYM")]
+pub const A_Expr_Kind_AEXPR_NOT_BETWEEN_SYM: u32 = 13;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AclMaskHow::ACLMASK_ALL")]
+pub const AclMaskHow_ACLMASK_ALL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AclMaskHow::ACLMASK_ANY")]
+pub const AclMaskHow_ACLMASK_ANY: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AclResult::ACLCHECK_OK")]
+pub const AclResult_ACLCHECK_OK: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AclResult::ACLCHECK_NO_PRIV")]
+pub const AclResult_ACLCHECK_NO_PRIV: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AclResult::ACLCHECK_NOT_OWNER")]
+pub const AclResult_ACLCHECK_NOT_OWNER: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AggSplit::AGGSPLIT_SIMPLE")]
+pub const AggSplit_AGGSPLIT_SIMPLE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AggSplit::AGGSPLIT_INITIAL_SERIAL")]
+pub const AggSplit_AGGSPLIT_INITIAL_SERIAL: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AggSplit::AGGSPLIT_FINAL_DESERIAL")]
+pub const AggSplit_AGGSPLIT_FINAL_DESERIAL: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AggStrategy::AGG_PLAIN")]
+pub const AggStrategy_AGG_PLAIN: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AggStrategy::AGG_SORTED")]
+pub const AggStrategy_AGG_SORTED: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AggStrategy::AGG_HASHED")]
+pub const AggStrategy_AGG_HASHED: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AggStrategy::AGG_MIXED")]
+pub const AggStrategy_AGG_MIXED: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterPublicationAction::AP_AddObjects")]
+pub const AlterPublicationAction_AP_AddObjects: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterPublicationAction::AP_DropObjects")]
+pub const AlterPublicationAction_AP_DropObjects: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterPublicationAction::AP_SetObjects")]
+pub const AlterPublicationAction_AP_SetObjects: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::AlterSubscriptionType::ALTER_SUBSCRIPTION_OPTIONS"
+)]
+pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_OPTIONS: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::AlterSubscriptionType::ALTER_SUBSCRIPTION_CONNECTION"
+)]
+pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_CONNECTION: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::AlterSubscriptionType::ALTER_SUBSCRIPTION_SET_PUBLICATION"
+)]
+pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_SET_PUBLICATION: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::AlterSubscriptionType::ALTER_SUBSCRIPTION_ADD_PUBLICATION"
+)]
+pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_ADD_PUBLICATION: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::AlterSubscriptionType::ALTER_SUBSCRIPTION_DROP_PUBLICATION"
+)]
+pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_DROP_PUBLICATION: u32 = 4;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::AlterSubscriptionType::ALTER_SUBSCRIPTION_REFRESH"
+)]
+pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_REFRESH: u32 = 5;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::AlterSubscriptionType::ALTER_SUBSCRIPTION_ENABLED"
+)]
+pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_ENABLED: u32 = 6;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::AlterSubscriptionType::ALTER_SUBSCRIPTION_SKIP"
+)]
+pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_SKIP: u32 = 7;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::AlterTSConfigType::ALTER_TSCONFIG_ADD_MAPPING"
+)]
+pub const AlterTSConfigType_ALTER_TSCONFIG_ADD_MAPPING: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::AlterTSConfigType::ALTER_TSCONFIG_ALTER_MAPPING_FOR_TOKEN"
+)]
+pub const AlterTSConfigType_ALTER_TSCONFIG_ALTER_MAPPING_FOR_TOKEN: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::AlterTSConfigType::ALTER_TSCONFIG_REPLACE_DICT"
+)]
+pub const AlterTSConfigType_ALTER_TSCONFIG_REPLACE_DICT: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::AlterTSConfigType::ALTER_TSCONFIG_REPLACE_DICT_FOR_TOKEN"
+)]
+pub const AlterTSConfigType_ALTER_TSCONFIG_REPLACE_DICT_FOR_TOKEN: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::AlterTSConfigType::ALTER_TSCONFIG_DROP_MAPPING"
+)]
+pub const AlterTSConfigType_ALTER_TSCONFIG_DROP_MAPPING: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddColumn")]
+pub const AlterTableType_AT_AddColumn: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddColumnToView")]
+pub const AlterTableType_AT_AddColumnToView: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ColumnDefault")]
+pub const AlterTableType_AT_ColumnDefault: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_CookedColumnDefault")]
+pub const AlterTableType_AT_CookedColumnDefault: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropNotNull")]
+pub const AlterTableType_AT_DropNotNull: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetNotNull")]
+pub const AlterTableType_AT_SetNotNull: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropExpression")]
+pub const AlterTableType_AT_DropExpression: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_CheckNotNull")]
+pub const AlterTableType_AT_CheckNotNull: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetStatistics")]
+pub const AlterTableType_AT_SetStatistics: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetOptions")]
+pub const AlterTableType_AT_SetOptions: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ResetOptions")]
+pub const AlterTableType_AT_ResetOptions: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetStorage")]
+pub const AlterTableType_AT_SetStorage: u32 = 11;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetCompression")]
+pub const AlterTableType_AT_SetCompression: u32 = 12;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropColumn")]
+pub const AlterTableType_AT_DropColumn: u32 = 13;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddIndex")]
+pub const AlterTableType_AT_AddIndex: u32 = 14;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ReAddIndex")]
+pub const AlterTableType_AT_ReAddIndex: u32 = 15;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddConstraint")]
+pub const AlterTableType_AT_AddConstraint: u32 = 16;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ReAddConstraint")]
+pub const AlterTableType_AT_ReAddConstraint: u32 = 17;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ReAddDomainConstraint")]
+pub const AlterTableType_AT_ReAddDomainConstraint: u32 = 18;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AlterConstraint")]
+pub const AlterTableType_AT_AlterConstraint: u32 = 19;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ValidateConstraint")]
+pub const AlterTableType_AT_ValidateConstraint: u32 = 20;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddIndexConstraint")]
+pub const AlterTableType_AT_AddIndexConstraint: u32 = 21;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropConstraint")]
+pub const AlterTableType_AT_DropConstraint: u32 = 22;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ReAddComment")]
+pub const AlterTableType_AT_ReAddComment: u32 = 23;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AlterColumnType")]
+pub const AlterTableType_AT_AlterColumnType: u32 = 24;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::AlterTableType::AT_AlterColumnGenericOptions"
+)]
+pub const AlterTableType_AT_AlterColumnGenericOptions: u32 = 25;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ChangeOwner")]
+pub const AlterTableType_AT_ChangeOwner: u32 = 26;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ClusterOn")]
+pub const AlterTableType_AT_ClusterOn: u32 = 27;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropCluster")]
+pub const AlterTableType_AT_DropCluster: u32 = 28;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetLogged")]
+pub const AlterTableType_AT_SetLogged: u32 = 29;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetUnLogged")]
+pub const AlterTableType_AT_SetUnLogged: u32 = 30;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropOids")]
+pub const AlterTableType_AT_DropOids: u32 = 31;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetAccessMethod")]
+pub const AlterTableType_AT_SetAccessMethod: u32 = 32;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetTableSpace")]
+pub const AlterTableType_AT_SetTableSpace: u32 = 33;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetRelOptions")]
+pub const AlterTableType_AT_SetRelOptions: u32 = 34;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ResetRelOptions")]
+pub const AlterTableType_AT_ResetRelOptions: u32 = 35;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ReplaceRelOptions")]
+pub const AlterTableType_AT_ReplaceRelOptions: u32 = 36;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableTrig")]
+pub const AlterTableType_AT_EnableTrig: u32 = 37;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableAlwaysTrig")]
+pub const AlterTableType_AT_EnableAlwaysTrig: u32 = 38;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableReplicaTrig")]
+pub const AlterTableType_AT_EnableReplicaTrig: u32 = 39;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DisableTrig")]
+pub const AlterTableType_AT_DisableTrig: u32 = 40;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableTrigAll")]
+pub const AlterTableType_AT_EnableTrigAll: u32 = 41;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DisableTrigAll")]
+pub const AlterTableType_AT_DisableTrigAll: u32 = 42;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableTrigUser")]
+pub const AlterTableType_AT_EnableTrigUser: u32 = 43;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DisableTrigUser")]
+pub const AlterTableType_AT_DisableTrigUser: u32 = 44;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableRule")]
+pub const AlterTableType_AT_EnableRule: u32 = 45;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableAlwaysRule")]
+pub const AlterTableType_AT_EnableAlwaysRule: u32 = 46;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableReplicaRule")]
+pub const AlterTableType_AT_EnableReplicaRule: u32 = 47;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DisableRule")]
+pub const AlterTableType_AT_DisableRule: u32 = 48;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddInherit")]
+pub const AlterTableType_AT_AddInherit: u32 = 49;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropInherit")]
+pub const AlterTableType_AT_DropInherit: u32 = 50;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddOf")]
+pub const AlterTableType_AT_AddOf: u32 = 51;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropOf")]
+pub const AlterTableType_AT_DropOf: u32 = 52;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ReplicaIdentity")]
+pub const AlterTableType_AT_ReplicaIdentity: u32 = 53;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableRowSecurity")]
+pub const AlterTableType_AT_EnableRowSecurity: u32 = 54;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DisableRowSecurity")]
+pub const AlterTableType_AT_DisableRowSecurity: u32 = 55;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ForceRowSecurity")]
+pub const AlterTableType_AT_ForceRowSecurity: u32 = 56;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_NoForceRowSecurity")]
+pub const AlterTableType_AT_NoForceRowSecurity: u32 = 57;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_GenericOptions")]
+pub const AlterTableType_AT_GenericOptions: u32 = 58;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AttachPartition")]
+pub const AlterTableType_AT_AttachPartition: u32 = 59;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DetachPartition")]
+pub const AlterTableType_AT_DetachPartition: u32 = 60;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::AlterTableType::AT_DetachPartitionFinalize"
+)]
+pub const AlterTableType_AT_DetachPartitionFinalize: u32 = 61;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddIdentity")]
+pub const AlterTableType_AT_AddIdentity: u32 = 62;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetIdentity")]
+pub const AlterTableType_AT_SetIdentity: u32 = 63;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropIdentity")]
+pub const AlterTableType_AT_DropIdentity: u32 = 64;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ReAddStatistics")]
+pub const AlterTableType_AT_ReAddStatistics: u32 = 65;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ArchiveMode::ARCHIVE_MODE_OFF")]
+pub const ArchiveMode_ARCHIVE_MODE_OFF: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ArchiveMode::ARCHIVE_MODE_ON")]
+pub const ArchiveMode_ARCHIVE_MODE_ON: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ArchiveMode::ARCHIVE_MODE_ALWAYS")]
+pub const ArchiveMode_ARCHIVE_MODE_ALWAYS: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AuxProcType::NotAnAuxProcess")]
+pub const AuxProcType_NotAnAuxProcess: i32 = -1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AuxProcType::StartupProcess")]
+pub const AuxProcType_StartupProcess: i32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AuxProcType::BgWriterProcess")]
+pub const AuxProcType_BgWriterProcess: i32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AuxProcType::ArchiverProcess")]
+pub const AuxProcType_ArchiverProcess: i32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AuxProcType::CheckpointerProcess")]
+pub const AuxProcType_CheckpointerProcess: i32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AuxProcType::WalWriterProcess")]
+pub const AuxProcType_WalWriterProcess: i32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AuxProcType::WalReceiverProcess")]
+pub const AuxProcType_WalReceiverProcess: i32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AuxProcType::NUM_AUXPROCTYPES")]
+pub const AuxProcType_NUM_AUXPROCTYPES: i32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BMS_Comparison::BMS_EQUAL")]
+pub const BMS_Comparison_BMS_EQUAL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BMS_Comparison::BMS_SUBSET1")]
+pub const BMS_Comparison_BMS_SUBSET1: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BMS_Comparison::BMS_SUBSET2")]
+pub const BMS_Comparison_BMS_SUBSET2: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BMS_Comparison::BMS_DIFFERENT")]
+pub const BMS_Comparison_BMS_DIFFERENT: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BMS_Membership::BMS_EMPTY_SET")]
+pub const BMS_Membership_BMS_EMPTY_SET: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BMS_Membership::BMS_SINGLETON")]
+pub const BMS_Membership_BMS_SINGLETON: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BMS_Membership::BMS_MULTIPLE")]
+pub const BMS_Membership_BMS_MULTIPLE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendState::STATE_UNDEFINED")]
+pub const BackendState_STATE_UNDEFINED: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendState::STATE_IDLE")]
+pub const BackendState_STATE_IDLE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendState::STATE_RUNNING")]
+pub const BackendState_STATE_RUNNING: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendState::STATE_IDLEINTRANSACTION")]
+pub const BackendState_STATE_IDLEINTRANSACTION: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendState::STATE_FASTPATH")]
+pub const BackendState_STATE_FASTPATH: u32 = 4;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BackendState::STATE_IDLEINTRANSACTION_ABORTED"
+)]
+pub const BackendState_STATE_IDLEINTRANSACTION_ABORTED: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendState::STATE_DISABLED")]
+pub const BackendState_STATE_DISABLED: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_INVALID")]
+pub const BackendType_B_INVALID: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_ARCHIVER")]
+pub const BackendType_B_ARCHIVER: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_AUTOVAC_LAUNCHER")]
+pub const BackendType_B_AUTOVAC_LAUNCHER: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_AUTOVAC_WORKER")]
+pub const BackendType_B_AUTOVAC_WORKER: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_BACKEND")]
+pub const BackendType_B_BACKEND: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_BG_WORKER")]
+pub const BackendType_B_BG_WORKER: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_BG_WRITER")]
+pub const BackendType_B_BG_WRITER: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_CHECKPOINTER")]
+pub const BackendType_B_CHECKPOINTER: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_LOGGER")]
+pub const BackendType_B_LOGGER: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_STANDALONE_BACKEND")]
+pub const BackendType_B_STANDALONE_BACKEND: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_STARTUP")]
+pub const BackendType_B_STARTUP: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_WAL_RECEIVER")]
+pub const BackendType_B_WAL_RECEIVER: u32 = 11;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_WAL_SENDER")]
+pub const BackendType_B_WAL_SENDER: u32 = 12;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_WAL_WRITER")]
+pub const BackendType_B_WAL_WRITER: u32 = 13;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackslashQuoteType::BACKSLASH_QUOTE_OFF")]
+pub const BackslashQuoteType_BACKSLASH_QUOTE_OFF: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackslashQuoteType::BACKSLASH_QUOTE_ON")]
+pub const BackslashQuoteType_BACKSLASH_QUOTE_ON: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BackslashQuoteType::BACKSLASH_QUOTE_SAFE_ENCODING"
+)]
+pub const BackslashQuoteType_BACKSLASH_QUOTE_SAFE_ENCODING: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BgWorkerStartTime::BgWorkerStart_PostmasterStart"
+)]
+pub const BgWorkerStartTime_BgWorkerStart_PostmasterStart: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BgWorkerStartTime::BgWorkerStart_ConsistentState"
+)]
+pub const BgWorkerStartTime_BgWorkerStart_ConsistentState: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BgWorkerStartTime::BgWorkerStart_RecoveryFinished"
+)]
+pub const BgWorkerStartTime_BgWorkerStart_RecoveryFinished: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BgwHandleStatus::BGWH_STARTED")]
+pub const BgwHandleStatus_BGWH_STARTED: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BgwHandleStatus::BGWH_NOT_YET_STARTED")]
+pub const BgwHandleStatus_BGWH_NOT_YET_STARTED: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BgwHandleStatus::BGWH_STOPPED")]
+pub const BgwHandleStatus_BGWH_STOPPED: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BgwHandleStatus::BGWH_POSTMASTER_DIED")]
+pub const BgwHandleStatus_BGWH_POSTMASTER_DIED: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BoolExprType::AND_EXPR")]
+pub const BoolExprType_AND_EXPR: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BoolExprType::OR_EXPR")]
+pub const BoolExprType_OR_EXPR: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BoolExprType::NOT_EXPR")]
+pub const BoolExprType_NOT_EXPR: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BoolTestType::IS_TRUE")]
+pub const BoolTestType_IS_TRUE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BoolTestType::IS_NOT_TRUE")]
+pub const BoolTestType_IS_NOT_TRUE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BoolTestType::IS_FALSE")]
+pub const BoolTestType_IS_FALSE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BoolTestType::IS_NOT_FALSE")]
+pub const BoolTestType_IS_NOT_FALSE: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BoolTestType::IS_UNKNOWN")]
+pub const BoolTestType_IS_UNKNOWN: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BoolTestType::IS_NOT_UNKNOWN")]
+pub const BoolTestType_IS_NOT_UNKNOWN: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BufferAccessStrategyType::BAS_NORMAL")]
+pub const BufferAccessStrategyType_BAS_NORMAL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BufferAccessStrategyType::BAS_BULKREAD")]
+pub const BufferAccessStrategyType_BAS_BULKREAD: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BufferAccessStrategyType::BAS_BULKWRITE")]
+pub const BufferAccessStrategyType_BAS_BULKWRITE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BufferAccessStrategyType::BAS_VACUUM")]
+pub const BufferAccessStrategyType_BAS_VACUUM: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_XACT_BUFFER")]
+pub const BuiltinTrancheIds_LWTRANCHE_XACT_BUFFER: u32 = 48;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_COMMITTS_BUFFER"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_COMMITTS_BUFFER: u32 = 49;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_SUBTRANS_BUFFER"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_SUBTRANS_BUFFER: u32 = 50;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_MULTIXACTOFFSET_BUFFER"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_MULTIXACTOFFSET_BUFFER: u32 = 51;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_MULTIXACTMEMBER_BUFFER"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_MULTIXACTMEMBER_BUFFER: u32 = 52;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_NOTIFY_BUFFER"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_NOTIFY_BUFFER: u32 = 53;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_SERIAL_BUFFER"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_SERIAL_BUFFER: u32 = 54;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_WAL_INSERT")]
+pub const BuiltinTrancheIds_LWTRANCHE_WAL_INSERT: u32 = 55;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_BUFFER_CONTENT"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_BUFFER_CONTENT: u32 = 56;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_REPLICATION_ORIGIN_STATE"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_REPLICATION_ORIGIN_STATE: u32 = 57;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_REPLICATION_SLOT_IO"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_REPLICATION_SLOT_IO: u32 = 58;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_LOCK_FASTPATH"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_LOCK_FASTPATH: u32 = 59;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_BUFFER_MAPPING"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_BUFFER_MAPPING: u32 = 60;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_LOCK_MANAGER")]
+pub const BuiltinTrancheIds_LWTRANCHE_LOCK_MANAGER: u32 = 61;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PREDICATE_LOCK_MANAGER"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_PREDICATE_LOCK_MANAGER: u32 = 62;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PARALLEL_HASH_JOIN"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_PARALLEL_HASH_JOIN: u32 = 63;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PARALLEL_QUERY_DSA"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_PARALLEL_QUERY_DSA: u32 = 64;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PER_SESSION_DSA"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_PER_SESSION_DSA: u32 = 65;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PER_SESSION_RECORD_TYPE"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_PER_SESSION_RECORD_TYPE: u32 = 66;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PER_SESSION_RECORD_TYPMOD"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_PER_SESSION_RECORD_TYPMOD: u32 = 67;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_SHARED_TUPLESTORE"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_SHARED_TUPLESTORE: u32 = 68;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_SHARED_TIDBITMAP"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_SHARED_TIDBITMAP: u32 = 69;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PARALLEL_APPEND"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_PARALLEL_APPEND: u32 = 70;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PER_XACT_PREDICATE_LIST"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_PER_XACT_PREDICATE_LIST: u32 = 71;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PGSTATS_DSA")]
+pub const BuiltinTrancheIds_LWTRANCHE_PGSTATS_DSA: u32 = 72;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PGSTATS_HASH")]
+pub const BuiltinTrancheIds_LWTRANCHE_PGSTATS_HASH: u32 = 73;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PGSTATS_DATA")]
+pub const BuiltinTrancheIds_LWTRANCHE_PGSTATS_DATA: u32 = 74;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_LAUNCHER_DSA")]
+pub const BuiltinTrancheIds_LWTRANCHE_LAUNCHER_DSA: u32 = 75;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_LAUNCHER_HASH"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_LAUNCHER_HASH: u32 = 76;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_FIRST_USER_DEFINED"
+)]
+pub const BuiltinTrancheIds_LWTRANCHE_FIRST_USER_DEFINED: u32 = 77;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CRSSnapshotAction::CRS_EXPORT_SNAPSHOT")]
+pub const CRSSnapshotAction_CRS_EXPORT_SNAPSHOT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CRSSnapshotAction::CRS_NOEXPORT_SNAPSHOT")]
+pub const CRSSnapshotAction_CRS_NOEXPORT_SNAPSHOT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CRSSnapshotAction::CRS_USE_SNAPSHOT")]
+pub const CRSSnapshotAction_CRS_USE_SNAPSHOT: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CTEMaterialize::CTEMaterializeDefault")]
+pub const CTEMaterialize_CTEMaterializeDefault: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CTEMaterialize::CTEMaterializeAlways")]
+pub const CTEMaterialize_CTEMaterializeAlways: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CTEMaterialize::CTEMaterializeNever")]
+pub const CTEMaterialize_CTEMaterializeNever: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CmdType::CMD_UNKNOWN")]
+pub const CmdType_CMD_UNKNOWN: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CmdType::CMD_SELECT")]
+pub const CmdType_CMD_SELECT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CmdType::CMD_UPDATE")]
+pub const CmdType_CMD_UPDATE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CmdType::CMD_INSERT")]
+pub const CmdType_CMD_INSERT: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CmdType::CMD_DELETE")]
+pub const CmdType_CMD_DELETE: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CmdType::CMD_MERGE")]
+pub const CmdType_CMD_MERGE: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CmdType::CMD_UTILITY")]
+pub const CmdType_CMD_UTILITY: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CmdType::CMD_NOTHING")]
+pub const CmdType_CMD_NOTHING: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionContext::COERCION_IMPLICIT")]
+pub const CoercionContext_COERCION_IMPLICIT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionContext::COERCION_ASSIGNMENT")]
+pub const CoercionContext_COERCION_ASSIGNMENT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionContext::COERCION_PLPGSQL")]
+pub const CoercionContext_COERCION_PLPGSQL: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionContext::COERCION_EXPLICIT")]
+pub const CoercionContext_COERCION_EXPLICIT: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionForm::COERCE_EXPLICIT_CALL")]
+pub const CoercionForm_COERCE_EXPLICIT_CALL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionForm::COERCE_EXPLICIT_CAST")]
+pub const CoercionForm_COERCE_EXPLICIT_CAST: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionForm::COERCE_IMPLICIT_CAST")]
+pub const CoercionForm_COERCE_IMPLICIT_CAST: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionForm::COERCE_SQL_SYNTAX")]
+pub const CoercionForm_COERCE_SQL_SYNTAX: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionPathType::COERCION_PATH_NONE")]
+pub const CoercionPathType_COERCION_PATH_NONE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionPathType::COERCION_PATH_FUNC")]
+pub const CoercionPathType_COERCION_PATH_FUNC: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CoercionPathType::COERCION_PATH_RELABELTYPE"
+)]
+pub const CoercionPathType_COERCION_PATH_RELABELTYPE: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CoercionPathType::COERCION_PATH_ARRAYCOERCE"
+)]
+pub const CoercionPathType_COERCION_PATH_ARRAYCOERCE: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CoercionPathType::COERCION_PATH_COERCEVIAIO"
+)]
+pub const CoercionPathType_COERCION_PATH_COERCEVIAIO: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CollectedCommandType::SCT_Simple")]
+pub const CollectedCommandType_SCT_Simple: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CollectedCommandType::SCT_AlterTable")]
+pub const CollectedCommandType_SCT_AlterTable: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CollectedCommandType::SCT_Grant")]
+pub const CollectedCommandType_SCT_Grant: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CollectedCommandType::SCT_AlterOpFamily")]
+pub const CollectedCommandType_SCT_AlterOpFamily: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CollectedCommandType::SCT_AlterDefaultPrivileges"
+)]
+pub const CollectedCommandType_SCT_AlterDefaultPrivileges: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CollectedCommandType::SCT_CreateOpClass")]
+pub const CollectedCommandType_SCT_CreateOpClass: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CollectedCommandType::SCT_AlterTSConfig")]
+pub const CollectedCommandType_SCT_AlterTSConfig: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestNone")]
+pub const CommandDest_DestNone: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestDebug")]
+pub const CommandDest_DestDebug: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestRemote")]
+pub const CommandDest_DestRemote: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestRemoteExecute")]
+pub const CommandDest_DestRemoteExecute: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestRemoteSimple")]
+pub const CommandDest_DestRemoteSimple: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestSPI")]
+pub const CommandDest_DestSPI: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestTuplestore")]
+pub const CommandDest_DestTuplestore: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestIntoRel")]
+pub const CommandDest_DestIntoRel: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestCopyOut")]
+pub const CommandDest_DestCopyOut: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestSQLFunction")]
+pub const CommandDest_DestSQLFunction: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestTransientRel")]
+pub const CommandDest_DestTransientRel: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestTupleQueue")]
+pub const CommandDest_DestTupleQueue: u32 = 11;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_UNKNOWN")]
+pub const CommandTag_CMDTAG_UNKNOWN: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_ACCESS_METHOD")]
+pub const CommandTag_CMDTAG_ALTER_ACCESS_METHOD: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_AGGREGATE")]
+pub const CommandTag_CMDTAG_ALTER_AGGREGATE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_CAST")]
+pub const CommandTag_CMDTAG_ALTER_CAST: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_COLLATION")]
+pub const CommandTag_CMDTAG_ALTER_COLLATION: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_CONSTRAINT")]
+pub const CommandTag_CMDTAG_ALTER_CONSTRAINT: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_CONVERSION")]
+pub const CommandTag_CMDTAG_ALTER_CONVERSION: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_DATABASE")]
+pub const CommandTag_CMDTAG_ALTER_DATABASE: u32 = 7;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_DEFAULT_PRIVILEGES"
+)]
+pub const CommandTag_CMDTAG_ALTER_DEFAULT_PRIVILEGES: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_DOMAIN")]
+pub const CommandTag_CMDTAG_ALTER_DOMAIN: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_EVENT_TRIGGER")]
+pub const CommandTag_CMDTAG_ALTER_EVENT_TRIGGER: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_EXTENSION")]
+pub const CommandTag_CMDTAG_ALTER_EXTENSION: u32 = 11;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_FOREIGN_DATA_WRAPPER"
+)]
+pub const CommandTag_CMDTAG_ALTER_FOREIGN_DATA_WRAPPER: u32 = 12;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_FOREIGN_TABLE")]
+pub const CommandTag_CMDTAG_ALTER_FOREIGN_TABLE: u32 = 13;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_FUNCTION")]
+pub const CommandTag_CMDTAG_ALTER_FUNCTION: u32 = 14;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_INDEX")]
+pub const CommandTag_CMDTAG_ALTER_INDEX: u32 = 15;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_LANGUAGE")]
+pub const CommandTag_CMDTAG_ALTER_LANGUAGE: u32 = 16;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_LARGE_OBJECT")]
+pub const CommandTag_CMDTAG_ALTER_LARGE_OBJECT: u32 = 17;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_MATERIALIZED_VIEW"
+)]
+pub const CommandTag_CMDTAG_ALTER_MATERIALIZED_VIEW: u32 = 18;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_OPERATOR")]
+pub const CommandTag_CMDTAG_ALTER_OPERATOR: u32 = 19;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_OPERATOR_CLASS")]
+pub const CommandTag_CMDTAG_ALTER_OPERATOR_CLASS: u32 = 20;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_OPERATOR_FAMILY")]
+pub const CommandTag_CMDTAG_ALTER_OPERATOR_FAMILY: u32 = 21;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_POLICY")]
+pub const CommandTag_CMDTAG_ALTER_POLICY: u32 = 22;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_PROCEDURE")]
+pub const CommandTag_CMDTAG_ALTER_PROCEDURE: u32 = 23;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_PUBLICATION")]
+pub const CommandTag_CMDTAG_ALTER_PUBLICATION: u32 = 24;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_ROLE")]
+pub const CommandTag_CMDTAG_ALTER_ROLE: u32 = 25;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_ROUTINE")]
+pub const CommandTag_CMDTAG_ALTER_ROUTINE: u32 = 26;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_RULE")]
+pub const CommandTag_CMDTAG_ALTER_RULE: u32 = 27;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_SCHEMA")]
+pub const CommandTag_CMDTAG_ALTER_SCHEMA: u32 = 28;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_SEQUENCE")]
+pub const CommandTag_CMDTAG_ALTER_SEQUENCE: u32 = 29;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_SERVER")]
+pub const CommandTag_CMDTAG_ALTER_SERVER: u32 = 30;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_STATISTICS")]
+pub const CommandTag_CMDTAG_ALTER_STATISTICS: u32 = 31;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_SUBSCRIPTION")]
+pub const CommandTag_CMDTAG_ALTER_SUBSCRIPTION: u32 = 32;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_SYSTEM")]
+pub const CommandTag_CMDTAG_ALTER_SYSTEM: u32 = 33;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TABLE")]
+pub const CommandTag_CMDTAG_ALTER_TABLE: u32 = 34;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TABLESPACE")]
+pub const CommandTag_CMDTAG_ALTER_TABLESPACE: u32 = 35;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TEXT_SEARCH_CONFIGURATION"
+)]
+pub const CommandTag_CMDTAG_ALTER_TEXT_SEARCH_CONFIGURATION: u32 = 36;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TEXT_SEARCH_DICTIONARY"
+)]
+pub const CommandTag_CMDTAG_ALTER_TEXT_SEARCH_DICTIONARY: u32 = 37;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TEXT_SEARCH_PARSER"
+)]
+pub const CommandTag_CMDTAG_ALTER_TEXT_SEARCH_PARSER: u32 = 38;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TEXT_SEARCH_TEMPLATE"
+)]
+pub const CommandTag_CMDTAG_ALTER_TEXT_SEARCH_TEMPLATE: u32 = 39;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TRANSFORM")]
+pub const CommandTag_CMDTAG_ALTER_TRANSFORM: u32 = 40;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TRIGGER")]
+pub const CommandTag_CMDTAG_ALTER_TRIGGER: u32 = 41;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TYPE")]
+pub const CommandTag_CMDTAG_ALTER_TYPE: u32 = 42;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_USER_MAPPING")]
+pub const CommandTag_CMDTAG_ALTER_USER_MAPPING: u32 = 43;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_VIEW")]
+pub const CommandTag_CMDTAG_ALTER_VIEW: u32 = 44;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ANALYZE")]
+pub const CommandTag_CMDTAG_ANALYZE: u32 = 45;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_BEGIN")]
+pub const CommandTag_CMDTAG_BEGIN: u32 = 46;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CALL")]
+pub const CommandTag_CMDTAG_CALL: u32 = 47;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CHECKPOINT")]
+pub const CommandTag_CMDTAG_CHECKPOINT: u32 = 48;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CLOSE")]
+pub const CommandTag_CMDTAG_CLOSE: u32 = 49;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CLOSE_CURSOR")]
+pub const CommandTag_CMDTAG_CLOSE_CURSOR: u32 = 50;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CLOSE_CURSOR_ALL")]
+pub const CommandTag_CMDTAG_CLOSE_CURSOR_ALL: u32 = 51;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CLUSTER")]
+pub const CommandTag_CMDTAG_CLUSTER: u32 = 52;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_COMMENT")]
+pub const CommandTag_CMDTAG_COMMENT: u32 = 53;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_COMMIT")]
+pub const CommandTag_CMDTAG_COMMIT: u32 = 54;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_COMMIT_PREPARED")]
+pub const CommandTag_CMDTAG_COMMIT_PREPARED: u32 = 55;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_COPY")]
+pub const CommandTag_CMDTAG_COPY: u32 = 56;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_COPY_FROM")]
+pub const CommandTag_CMDTAG_COPY_FROM: u32 = 57;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_ACCESS_METHOD")]
+pub const CommandTag_CMDTAG_CREATE_ACCESS_METHOD: u32 = 58;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_AGGREGATE")]
+pub const CommandTag_CMDTAG_CREATE_AGGREGATE: u32 = 59;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_CAST")]
+pub const CommandTag_CMDTAG_CREATE_CAST: u32 = 60;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_COLLATION")]
+pub const CommandTag_CMDTAG_CREATE_COLLATION: u32 = 61;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_CONSTRAINT")]
+pub const CommandTag_CMDTAG_CREATE_CONSTRAINT: u32 = 62;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_CONVERSION")]
+pub const CommandTag_CMDTAG_CREATE_CONVERSION: u32 = 63;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_DATABASE")]
+pub const CommandTag_CMDTAG_CREATE_DATABASE: u32 = 64;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_DOMAIN")]
+pub const CommandTag_CMDTAG_CREATE_DOMAIN: u32 = 65;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_EVENT_TRIGGER")]
+pub const CommandTag_CMDTAG_CREATE_EVENT_TRIGGER: u32 = 66;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_EXTENSION")]
+pub const CommandTag_CMDTAG_CREATE_EXTENSION: u32 = 67;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_FOREIGN_DATA_WRAPPER"
+)]
+pub const CommandTag_CMDTAG_CREATE_FOREIGN_DATA_WRAPPER: u32 = 68;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_FOREIGN_TABLE")]
+pub const CommandTag_CMDTAG_CREATE_FOREIGN_TABLE: u32 = 69;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_FUNCTION")]
+pub const CommandTag_CMDTAG_CREATE_FUNCTION: u32 = 70;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_INDEX")]
+pub const CommandTag_CMDTAG_CREATE_INDEX: u32 = 71;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_LANGUAGE")]
+pub const CommandTag_CMDTAG_CREATE_LANGUAGE: u32 = 72;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_MATERIALIZED_VIEW"
+)]
+pub const CommandTag_CMDTAG_CREATE_MATERIALIZED_VIEW: u32 = 73;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_OPERATOR")]
+pub const CommandTag_CMDTAG_CREATE_OPERATOR: u32 = 74;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_OPERATOR_CLASS")]
+pub const CommandTag_CMDTAG_CREATE_OPERATOR_CLASS: u32 = 75;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_OPERATOR_FAMILY")]
+pub const CommandTag_CMDTAG_CREATE_OPERATOR_FAMILY: u32 = 76;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_POLICY")]
+pub const CommandTag_CMDTAG_CREATE_POLICY: u32 = 77;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_PROCEDURE")]
+pub const CommandTag_CMDTAG_CREATE_PROCEDURE: u32 = 78;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_PUBLICATION")]
+pub const CommandTag_CMDTAG_CREATE_PUBLICATION: u32 = 79;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_ROLE")]
+pub const CommandTag_CMDTAG_CREATE_ROLE: u32 = 80;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_ROUTINE")]
+pub const CommandTag_CMDTAG_CREATE_ROUTINE: u32 = 81;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_RULE")]
+pub const CommandTag_CMDTAG_CREATE_RULE: u32 = 82;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_SCHEMA")]
+pub const CommandTag_CMDTAG_CREATE_SCHEMA: u32 = 83;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_SEQUENCE")]
+pub const CommandTag_CMDTAG_CREATE_SEQUENCE: u32 = 84;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_SERVER")]
+pub const CommandTag_CMDTAG_CREATE_SERVER: u32 = 85;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_STATISTICS")]
+pub const CommandTag_CMDTAG_CREATE_STATISTICS: u32 = 86;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_SUBSCRIPTION")]
+pub const CommandTag_CMDTAG_CREATE_SUBSCRIPTION: u32 = 87;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TABLE")]
+pub const CommandTag_CMDTAG_CREATE_TABLE: u32 = 88;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TABLE_AS")]
+pub const CommandTag_CMDTAG_CREATE_TABLE_AS: u32 = 89;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TABLESPACE")]
+pub const CommandTag_CMDTAG_CREATE_TABLESPACE: u32 = 90;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TEXT_SEARCH_CONFIGURATION"
+)]
+pub const CommandTag_CMDTAG_CREATE_TEXT_SEARCH_CONFIGURATION: u32 = 91;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TEXT_SEARCH_DICTIONARY"
+)]
+pub const CommandTag_CMDTAG_CREATE_TEXT_SEARCH_DICTIONARY: u32 = 92;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TEXT_SEARCH_PARSER"
+)]
+pub const CommandTag_CMDTAG_CREATE_TEXT_SEARCH_PARSER: u32 = 93;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TEXT_SEARCH_TEMPLATE"
+)]
+pub const CommandTag_CMDTAG_CREATE_TEXT_SEARCH_TEMPLATE: u32 = 94;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TRANSFORM")]
+pub const CommandTag_CMDTAG_CREATE_TRANSFORM: u32 = 95;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TRIGGER")]
+pub const CommandTag_CMDTAG_CREATE_TRIGGER: u32 = 96;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TYPE")]
+pub const CommandTag_CMDTAG_CREATE_TYPE: u32 = 97;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_USER_MAPPING")]
+pub const CommandTag_CMDTAG_CREATE_USER_MAPPING: u32 = 98;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_VIEW")]
+pub const CommandTag_CMDTAG_CREATE_VIEW: u32 = 99;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DEALLOCATE")]
+pub const CommandTag_CMDTAG_DEALLOCATE: u32 = 100;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DEALLOCATE_ALL")]
+pub const CommandTag_CMDTAG_DEALLOCATE_ALL: u32 = 101;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DECLARE_CURSOR")]
+pub const CommandTag_CMDTAG_DECLARE_CURSOR: u32 = 102;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DELETE")]
+pub const CommandTag_CMDTAG_DELETE: u32 = 103;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DISCARD")]
+pub const CommandTag_CMDTAG_DISCARD: u32 = 104;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DISCARD_ALL")]
+pub const CommandTag_CMDTAG_DISCARD_ALL: u32 = 105;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DISCARD_PLANS")]
+pub const CommandTag_CMDTAG_DISCARD_PLANS: u32 = 106;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DISCARD_SEQUENCES")]
+pub const CommandTag_CMDTAG_DISCARD_SEQUENCES: u32 = 107;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DISCARD_TEMP")]
+pub const CommandTag_CMDTAG_DISCARD_TEMP: u32 = 108;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DO")]
+pub const CommandTag_CMDTAG_DO: u32 = 109;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_ACCESS_METHOD")]
+pub const CommandTag_CMDTAG_DROP_ACCESS_METHOD: u32 = 110;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_AGGREGATE")]
+pub const CommandTag_CMDTAG_DROP_AGGREGATE: u32 = 111;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_CAST")]
+pub const CommandTag_CMDTAG_DROP_CAST: u32 = 112;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_COLLATION")]
+pub const CommandTag_CMDTAG_DROP_COLLATION: u32 = 113;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_CONSTRAINT")]
+pub const CommandTag_CMDTAG_DROP_CONSTRAINT: u32 = 114;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_CONVERSION")]
+pub const CommandTag_CMDTAG_DROP_CONVERSION: u32 = 115;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_DATABASE")]
+pub const CommandTag_CMDTAG_DROP_DATABASE: u32 = 116;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_DOMAIN")]
+pub const CommandTag_CMDTAG_DROP_DOMAIN: u32 = 117;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_EVENT_TRIGGER")]
+pub const CommandTag_CMDTAG_DROP_EVENT_TRIGGER: u32 = 118;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_EXTENSION")]
+pub const CommandTag_CMDTAG_DROP_EXTENSION: u32 = 119;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_DROP_FOREIGN_DATA_WRAPPER"
+)]
+pub const CommandTag_CMDTAG_DROP_FOREIGN_DATA_WRAPPER: u32 = 120;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_FOREIGN_TABLE")]
+pub const CommandTag_CMDTAG_DROP_FOREIGN_TABLE: u32 = 121;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_FUNCTION")]
+pub const CommandTag_CMDTAG_DROP_FUNCTION: u32 = 122;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_INDEX")]
+pub const CommandTag_CMDTAG_DROP_INDEX: u32 = 123;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_LANGUAGE")]
+pub const CommandTag_CMDTAG_DROP_LANGUAGE: u32 = 124;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_MATERIALIZED_VIEW")]
+pub const CommandTag_CMDTAG_DROP_MATERIALIZED_VIEW: u32 = 125;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_OPERATOR")]
+pub const CommandTag_CMDTAG_DROP_OPERATOR: u32 = 126;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_OPERATOR_CLASS")]
+pub const CommandTag_CMDTAG_DROP_OPERATOR_CLASS: u32 = 127;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_OPERATOR_FAMILY")]
+pub const CommandTag_CMDTAG_DROP_OPERATOR_FAMILY: u32 = 128;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_OWNED")]
+pub const CommandTag_CMDTAG_DROP_OWNED: u32 = 129;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_POLICY")]
+pub const CommandTag_CMDTAG_DROP_POLICY: u32 = 130;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_PROCEDURE")]
+pub const CommandTag_CMDTAG_DROP_PROCEDURE: u32 = 131;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_PUBLICATION")]
+pub const CommandTag_CMDTAG_DROP_PUBLICATION: u32 = 132;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_ROLE")]
+pub const CommandTag_CMDTAG_DROP_ROLE: u32 = 133;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_ROUTINE")]
+pub const CommandTag_CMDTAG_DROP_ROUTINE: u32 = 134;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_RULE")]
+pub const CommandTag_CMDTAG_DROP_RULE: u32 = 135;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_SCHEMA")]
+pub const CommandTag_CMDTAG_DROP_SCHEMA: u32 = 136;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_SEQUENCE")]
+pub const CommandTag_CMDTAG_DROP_SEQUENCE: u32 = 137;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_SERVER")]
+pub const CommandTag_CMDTAG_DROP_SERVER: u32 = 138;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_STATISTICS")]
+pub const CommandTag_CMDTAG_DROP_STATISTICS: u32 = 139;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_SUBSCRIPTION")]
+pub const CommandTag_CMDTAG_DROP_SUBSCRIPTION: u32 = 140;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_TABLE")]
+pub const CommandTag_CMDTAG_DROP_TABLE: u32 = 141;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_TABLESPACE")]
+pub const CommandTag_CMDTAG_DROP_TABLESPACE: u32 = 142;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_DROP_TEXT_SEARCH_CONFIGURATION"
+)]
+pub const CommandTag_CMDTAG_DROP_TEXT_SEARCH_CONFIGURATION: u32 = 143;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_DROP_TEXT_SEARCH_DICTIONARY"
+)]
+pub const CommandTag_CMDTAG_DROP_TEXT_SEARCH_DICTIONARY: u32 = 144;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_DROP_TEXT_SEARCH_PARSER"
+)]
+pub const CommandTag_CMDTAG_DROP_TEXT_SEARCH_PARSER: u32 = 145;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_DROP_TEXT_SEARCH_TEMPLATE"
+)]
+pub const CommandTag_CMDTAG_DROP_TEXT_SEARCH_TEMPLATE: u32 = 146;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_TRANSFORM")]
+pub const CommandTag_CMDTAG_DROP_TRANSFORM: u32 = 147;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_TRIGGER")]
+pub const CommandTag_CMDTAG_DROP_TRIGGER: u32 = 148;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_TYPE")]
+pub const CommandTag_CMDTAG_DROP_TYPE: u32 = 149;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_USER_MAPPING")]
+pub const CommandTag_CMDTAG_DROP_USER_MAPPING: u32 = 150;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_VIEW")]
+pub const CommandTag_CMDTAG_DROP_VIEW: u32 = 151;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_EXECUTE")]
+pub const CommandTag_CMDTAG_EXECUTE: u32 = 152;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_EXPLAIN")]
+pub const CommandTag_CMDTAG_EXPLAIN: u32 = 153;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_FETCH")]
+pub const CommandTag_CMDTAG_FETCH: u32 = 154;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_GRANT")]
+pub const CommandTag_CMDTAG_GRANT: u32 = 155;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_GRANT_ROLE")]
+pub const CommandTag_CMDTAG_GRANT_ROLE: u32 = 156;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_IMPORT_FOREIGN_SCHEMA")]
+pub const CommandTag_CMDTAG_IMPORT_FOREIGN_SCHEMA: u32 = 157;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_INSERT")]
+pub const CommandTag_CMDTAG_INSERT: u32 = 158;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_LISTEN")]
+pub const CommandTag_CMDTAG_LISTEN: u32 = 159;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_LOAD")]
+pub const CommandTag_CMDTAG_LOAD: u32 = 160;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_LOCK_TABLE")]
+pub const CommandTag_CMDTAG_LOCK_TABLE: u32 = 161;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_MERGE")]
+pub const CommandTag_CMDTAG_MERGE: u32 = 162;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_MOVE")]
+pub const CommandTag_CMDTAG_MOVE: u32 = 163;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_NOTIFY")]
+pub const CommandTag_CMDTAG_NOTIFY: u32 = 164;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_PREPARE")]
+pub const CommandTag_CMDTAG_PREPARE: u32 = 165;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_PREPARE_TRANSACTION")]
+pub const CommandTag_CMDTAG_PREPARE_TRANSACTION: u32 = 166;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_REASSIGN_OWNED")]
+pub const CommandTag_CMDTAG_REASSIGN_OWNED: u32 = 167;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_REFRESH_MATERIALIZED_VIEW"
+)]
+pub const CommandTag_CMDTAG_REFRESH_MATERIALIZED_VIEW: u32 = 168;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_REINDEX")]
+pub const CommandTag_CMDTAG_REINDEX: u32 = 169;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_RELEASE")]
+pub const CommandTag_CMDTAG_RELEASE: u32 = 170;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_RESET")]
+pub const CommandTag_CMDTAG_RESET: u32 = 171;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_REVOKE")]
+pub const CommandTag_CMDTAG_REVOKE: u32 = 172;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_REVOKE_ROLE")]
+pub const CommandTag_CMDTAG_REVOKE_ROLE: u32 = 173;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ROLLBACK")]
+pub const CommandTag_CMDTAG_ROLLBACK: u32 = 174;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ROLLBACK_PREPARED")]
+pub const CommandTag_CMDTAG_ROLLBACK_PREPARED: u32 = 175;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SAVEPOINT")]
+pub const CommandTag_CMDTAG_SAVEPOINT: u32 = 176;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SECURITY_LABEL")]
+pub const CommandTag_CMDTAG_SECURITY_LABEL: u32 = 177;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SELECT")]
+pub const CommandTag_CMDTAG_SELECT: u32 = 178;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SELECT_FOR_KEY_SHARE")]
+pub const CommandTag_CMDTAG_SELECT_FOR_KEY_SHARE: u32 = 179;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::CommandTag::CMDTAG_SELECT_FOR_NO_KEY_UPDATE"
+)]
+pub const CommandTag_CMDTAG_SELECT_FOR_NO_KEY_UPDATE: u32 = 180;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SELECT_FOR_SHARE")]
+pub const CommandTag_CMDTAG_SELECT_FOR_SHARE: u32 = 181;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SELECT_FOR_UPDATE")]
+pub const CommandTag_CMDTAG_SELECT_FOR_UPDATE: u32 = 182;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SELECT_INTO")]
+pub const CommandTag_CMDTAG_SELECT_INTO: u32 = 183;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SET")]
+pub const CommandTag_CMDTAG_SET: u32 = 184;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SET_CONSTRAINTS")]
+pub const CommandTag_CMDTAG_SET_CONSTRAINTS: u32 = 185;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SHOW")]
+pub const CommandTag_CMDTAG_SHOW: u32 = 186;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_START_TRANSACTION")]
+pub const CommandTag_CMDTAG_START_TRANSACTION: u32 = 187;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_TRUNCATE_TABLE")]
+pub const CommandTag_CMDTAG_TRUNCATE_TABLE: u32 = 188;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_UNLISTEN")]
+pub const CommandTag_CMDTAG_UNLISTEN: u32 = 189;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_UPDATE")]
+pub const CommandTag_CMDTAG_UPDATE: u32 = 190;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_VACUUM")]
+pub const CommandTag_CMDTAG_VACUUM: u32 = 191;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::COMMAND_TAG_NEXTTAG")]
+pub const CommandTag_COMMAND_TAG_NEXTTAG: u32 = 192;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ComputeQueryIdType::COMPUTE_QUERY_ID_OFF")]
+pub const ComputeQueryIdType_COMPUTE_QUERY_ID_OFF: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ComputeQueryIdType::COMPUTE_QUERY_ID_ON")]
+pub const ComputeQueryIdType_COMPUTE_QUERY_ID_ON: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ComputeQueryIdType::COMPUTE_QUERY_ID_AUTO")]
+pub const ComputeQueryIdType_COMPUTE_QUERY_ID_AUTO: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ComputeQueryIdType::COMPUTE_QUERY_ID_REGRESS"
+)]
+pub const ComputeQueryIdType_COMPUTE_QUERY_ID_REGRESS: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_NULL")]
+pub const ConstrType_CONSTR_NULL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_NOTNULL")]
+pub const ConstrType_CONSTR_NOTNULL: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_DEFAULT")]
+pub const ConstrType_CONSTR_DEFAULT: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_IDENTITY")]
+pub const ConstrType_CONSTR_IDENTITY: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_GENERATED")]
+pub const ConstrType_CONSTR_GENERATED: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_CHECK")]
+pub const ConstrType_CONSTR_CHECK: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_PRIMARY")]
+pub const ConstrType_CONSTR_PRIMARY: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_UNIQUE")]
+pub const ConstrType_CONSTR_UNIQUE: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_EXCLUSION")]
+pub const ConstrType_CONSTR_EXCLUSION: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_FOREIGN")]
+pub const ConstrType_CONSTR_FOREIGN: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_ATTR_DEFERRABLE")]
+pub const ConstrType_CONSTR_ATTR_DEFERRABLE: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_ATTR_NOT_DEFERRABLE")]
+pub const ConstrType_CONSTR_ATTR_NOT_DEFERRABLE: u32 = 11;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_ATTR_DEFERRED")]
+pub const ConstrType_CONSTR_ATTR_DEFERRED: u32 = 12;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_ATTR_IMMEDIATE")]
+pub const ConstrType_CONSTR_ATTR_IMMEDIATE: u32 = 13;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ConstraintExclusionType::CONSTRAINT_EXCLUSION_OFF"
+)]
+pub const ConstraintExclusionType_CONSTRAINT_EXCLUSION_OFF: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ConstraintExclusionType::CONSTRAINT_EXCLUSION_ON"
+)]
+pub const ConstraintExclusionType_CONSTRAINT_EXCLUSION_ON: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ConstraintExclusionType::CONSTRAINT_EXCLUSION_PARTITION"
+)]
+pub const ConstraintExclusionType_CONSTRAINT_EXCLUSION_PARTITION: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CostSelector::STARTUP_COST")]
+pub const CostSelector_STARTUP_COST: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CostSelector::TOTAL_COST")]
+pub const CostSelector_TOTAL_COST: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DBState::DB_STARTUP")]
+pub const DBState_DB_STARTUP: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DBState::DB_SHUTDOWNED")]
+pub const DBState_DB_SHUTDOWNED: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DBState::DB_SHUTDOWNED_IN_RECOVERY")]
+pub const DBState_DB_SHUTDOWNED_IN_RECOVERY: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DBState::DB_SHUTDOWNING")]
+pub const DBState_DB_SHUTDOWNING: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DBState::DB_IN_CRASH_RECOVERY")]
+pub const DBState_DB_IN_CRASH_RECOVERY: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DBState::DB_IN_ARCHIVE_RECOVERY")]
+pub const DBState_DB_IN_ARCHIVE_RECOVERY: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DBState::DB_IN_PRODUCTION")]
+pub const DBState_DB_IN_PRODUCTION: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DeadLockState::DS_NOT_YET_CHECKED")]
+pub const DeadLockState_DS_NOT_YET_CHECKED: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DeadLockState::DS_NO_DEADLOCK")]
+pub const DeadLockState_DS_NO_DEADLOCK: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DeadLockState::DS_SOFT_DEADLOCK")]
+pub const DeadLockState_DS_SOFT_DEADLOCK: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DeadLockState::DS_HARD_DEADLOCK")]
+pub const DeadLockState_DS_HARD_DEADLOCK: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DeadLockState::DS_BLOCKED_BY_AUTOVACUUM")]
+pub const DeadLockState_DS_BLOCKED_BY_AUTOVACUUM: u32 = 4;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::DebugLogicalRepStreamingMode::DEBUG_LOGICAL_REP_STREAMING_BUFFERED"
+)]
+pub const DebugLogicalRepStreamingMode_DEBUG_LOGICAL_REP_STREAMING_BUFFERED: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::DebugLogicalRepStreamingMode::DEBUG_LOGICAL_REP_STREAMING_IMMEDIATE"
+)]
+pub const DebugLogicalRepStreamingMode_DEBUG_LOGICAL_REP_STREAMING_IMMEDIATE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DebugParallelMode::DEBUG_PARALLEL_OFF")]
+pub const DebugParallelMode_DEBUG_PARALLEL_OFF: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DebugParallelMode::DEBUG_PARALLEL_ON")]
+pub const DebugParallelMode_DEBUG_PARALLEL_ON: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DebugParallelMode::DEBUG_PARALLEL_REGRESS")]
+pub const DebugParallelMode_DEBUG_PARALLEL_REGRESS: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DefElemAction::DEFELEM_UNSPEC")]
+pub const DefElemAction_DEFELEM_UNSPEC: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DefElemAction::DEFELEM_SET")]
+pub const DefElemAction_DEFELEM_SET: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DefElemAction::DEFELEM_ADD")]
+pub const DefElemAction_DEFELEM_ADD: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DefElemAction::DEFELEM_DROP")]
+pub const DefElemAction_DEFELEM_DROP: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DependencyType::DEPENDENCY_NORMAL")]
+pub const DependencyType_DEPENDENCY_NORMAL: u32 = 110;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DependencyType::DEPENDENCY_AUTO")]
+pub const DependencyType_DEPENDENCY_AUTO: u32 = 97;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DependencyType::DEPENDENCY_INTERNAL")]
+pub const DependencyType_DEPENDENCY_INTERNAL: u32 = 105;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DependencyType::DEPENDENCY_PARTITION_PRI")]
+pub const DependencyType_DEPENDENCY_PARTITION_PRI: u32 = 80;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DependencyType::DEPENDENCY_PARTITION_SEC")]
+pub const DependencyType_DEPENDENCY_PARTITION_SEC: u32 = 83;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DependencyType::DEPENDENCY_EXTENSION")]
+pub const DependencyType_DEPENDENCY_EXTENSION: u32 = 101;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DependencyType::DEPENDENCY_AUTO_EXTENSION")]
+pub const DependencyType_DEPENDENCY_AUTO_EXTENSION: u32 = 120;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DiscardMode::DISCARD_ALL")]
+pub const DiscardMode_DISCARD_ALL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DiscardMode::DISCARD_PLANS")]
+pub const DiscardMode_DISCARD_PLANS: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DiscardMode::DISCARD_SEQUENCES")]
+pub const DiscardMode_DISCARD_SEQUENCES: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DiscardMode::DISCARD_TEMP")]
+pub const DiscardMode_DISCARD_TEMP: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::DomainConstraintType::DOM_CONSTRAINT_NOTNULL"
+)]
+pub const DomainConstraintType_DOM_CONSTRAINT_NOTNULL: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::DomainConstraintType::DOM_CONSTRAINT_CHECK"
+)]
+pub const DomainConstraintType_DOM_CONSTRAINT_CHECK: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DropBehavior::DROP_RESTRICT")]
+pub const DropBehavior_DROP_RESTRICT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DropBehavior::DROP_CASCADE")]
+pub const DropBehavior_DROP_CASCADE: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::EphemeralNameRelationType::ENR_NAMED_TUPLESTORE"
+)]
+pub const EphemeralNameRelationType_ENR_NAMED_TUPLESTORE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExplainFormat::EXPLAIN_FORMAT_TEXT")]
+pub const ExplainFormat_EXPLAIN_FORMAT_TEXT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExplainFormat::EXPLAIN_FORMAT_XML")]
+pub const ExplainFormat_EXPLAIN_FORMAT_XML: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExplainFormat::EXPLAIN_FORMAT_JSON")]
+pub const ExplainFormat_EXPLAIN_FORMAT_JSON: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExplainFormat::EXPLAIN_FORMAT_YAML")]
+pub const ExplainFormat_EXPLAIN_FORMAT_YAML: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprDoneCond::ExprSingleResult")]
+pub const ExprDoneCond_ExprSingleResult: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprDoneCond::ExprMultipleResult")]
+pub const ExprDoneCond_ExprMultipleResult: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprDoneCond::ExprEndResult")]
+pub const ExprDoneCond_ExprEndResult: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_DONE")]
+pub const ExprEvalOp_EEOP_DONE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_INNER_FETCHSOME")]
+pub const ExprEvalOp_EEOP_INNER_FETCHSOME: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_OUTER_FETCHSOME")]
+pub const ExprEvalOp_EEOP_OUTER_FETCHSOME: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SCAN_FETCHSOME")]
+pub const ExprEvalOp_EEOP_SCAN_FETCHSOME: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_INNER_VAR")]
+pub const ExprEvalOp_EEOP_INNER_VAR: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_OUTER_VAR")]
+pub const ExprEvalOp_EEOP_OUTER_VAR: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SCAN_VAR")]
+pub const ExprEvalOp_EEOP_SCAN_VAR: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_INNER_SYSVAR")]
+pub const ExprEvalOp_EEOP_INNER_SYSVAR: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_OUTER_SYSVAR")]
+pub const ExprEvalOp_EEOP_OUTER_SYSVAR: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SCAN_SYSVAR")]
+pub const ExprEvalOp_EEOP_SCAN_SYSVAR: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_WHOLEROW")]
+pub const ExprEvalOp_EEOP_WHOLEROW: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_INNER_VAR")]
+pub const ExprEvalOp_EEOP_ASSIGN_INNER_VAR: u32 = 11;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_OUTER_VAR")]
+pub const ExprEvalOp_EEOP_ASSIGN_OUTER_VAR: u32 = 12;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_SCAN_VAR")]
+pub const ExprEvalOp_EEOP_ASSIGN_SCAN_VAR: u32 = 13;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_TMP")]
+pub const ExprEvalOp_EEOP_ASSIGN_TMP: u32 = 14;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_TMP_MAKE_RO")]
+pub const ExprEvalOp_EEOP_ASSIGN_TMP_MAKE_RO: u32 = 15;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_CONST")]
+pub const ExprEvalOp_EEOP_CONST: u32 = 16;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_FUNCEXPR")]
+pub const ExprEvalOp_EEOP_FUNCEXPR: u32 = 17;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_FUNCEXPR_STRICT")]
+pub const ExprEvalOp_EEOP_FUNCEXPR_STRICT: u32 = 18;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_FUNCEXPR_FUSAGE")]
+pub const ExprEvalOp_EEOP_FUNCEXPR_FUSAGE: u32 = 19;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_FUNCEXPR_STRICT_FUSAGE")]
+pub const ExprEvalOp_EEOP_FUNCEXPR_STRICT_FUSAGE: u32 = 20;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_AND_STEP_FIRST")]
+pub const ExprEvalOp_EEOP_BOOL_AND_STEP_FIRST: u32 = 21;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_AND_STEP")]
+pub const ExprEvalOp_EEOP_BOOL_AND_STEP: u32 = 22;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_AND_STEP_LAST")]
+pub const ExprEvalOp_EEOP_BOOL_AND_STEP_LAST: u32 = 23;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_OR_STEP_FIRST")]
+pub const ExprEvalOp_EEOP_BOOL_OR_STEP_FIRST: u32 = 24;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_OR_STEP")]
+pub const ExprEvalOp_EEOP_BOOL_OR_STEP: u32 = 25;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_OR_STEP_LAST")]
+pub const ExprEvalOp_EEOP_BOOL_OR_STEP_LAST: u32 = 26;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_NOT_STEP")]
+pub const ExprEvalOp_EEOP_BOOL_NOT_STEP: u32 = 27;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_QUAL")]
+pub const ExprEvalOp_EEOP_QUAL: u32 = 28;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_JUMP")]
+pub const ExprEvalOp_EEOP_JUMP: u32 = 29;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_JUMP_IF_NULL")]
+pub const ExprEvalOp_EEOP_JUMP_IF_NULL: u32 = 30;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_JUMP_IF_NOT_NULL")]
+pub const ExprEvalOp_EEOP_JUMP_IF_NOT_NULL: u32 = 31;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_JUMP_IF_NOT_TRUE")]
+pub const ExprEvalOp_EEOP_JUMP_IF_NOT_TRUE: u32 = 32;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NULLTEST_ISNULL")]
+pub const ExprEvalOp_EEOP_NULLTEST_ISNULL: u32 = 33;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NULLTEST_ISNOTNULL")]
+pub const ExprEvalOp_EEOP_NULLTEST_ISNOTNULL: u32 = 34;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NULLTEST_ROWISNULL")]
+pub const ExprEvalOp_EEOP_NULLTEST_ROWISNULL: u32 = 35;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NULLTEST_ROWISNOTNULL")]
+pub const ExprEvalOp_EEOP_NULLTEST_ROWISNOTNULL: u32 = 36;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOLTEST_IS_TRUE")]
+pub const ExprEvalOp_EEOP_BOOLTEST_IS_TRUE: u32 = 37;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOLTEST_IS_NOT_TRUE")]
+pub const ExprEvalOp_EEOP_BOOLTEST_IS_NOT_TRUE: u32 = 38;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOLTEST_IS_FALSE")]
+pub const ExprEvalOp_EEOP_BOOLTEST_IS_FALSE: u32 = 39;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOLTEST_IS_NOT_FALSE")]
+pub const ExprEvalOp_EEOP_BOOLTEST_IS_NOT_FALSE: u32 = 40;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_PARAM_EXEC")]
+pub const ExprEvalOp_EEOP_PARAM_EXEC: u32 = 41;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_PARAM_EXTERN")]
+pub const ExprEvalOp_EEOP_PARAM_EXTERN: u32 = 42;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_PARAM_CALLBACK")]
+pub const ExprEvalOp_EEOP_PARAM_CALLBACK: u32 = 43;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_CASE_TESTVAL")]
+pub const ExprEvalOp_EEOP_CASE_TESTVAL: u32 = 44;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_MAKE_READONLY")]
+pub const ExprEvalOp_EEOP_MAKE_READONLY: u32 = 45;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_IOCOERCE")]
+pub const ExprEvalOp_EEOP_IOCOERCE: u32 = 46;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_DISTINCT")]
+pub const ExprEvalOp_EEOP_DISTINCT: u32 = 47;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NOT_DISTINCT")]
+pub const ExprEvalOp_EEOP_NOT_DISTINCT: u32 = 48;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NULLIF")]
+pub const ExprEvalOp_EEOP_NULLIF: u32 = 49;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SQLVALUEFUNCTION")]
+pub const ExprEvalOp_EEOP_SQLVALUEFUNCTION: u32 = 50;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_CURRENTOFEXPR")]
+pub const ExprEvalOp_EEOP_CURRENTOFEXPR: u32 = 51;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NEXTVALUEEXPR")]
+pub const ExprEvalOp_EEOP_NEXTVALUEEXPR: u32 = 52;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ARRAYEXPR")]
+pub const ExprEvalOp_EEOP_ARRAYEXPR: u32 = 53;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ARRAYCOERCE")]
+pub const ExprEvalOp_EEOP_ARRAYCOERCE: u32 = 54;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ROW")]
+pub const ExprEvalOp_EEOP_ROW: u32 = 55;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ROWCOMPARE_STEP")]
+pub const ExprEvalOp_EEOP_ROWCOMPARE_STEP: u32 = 56;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ROWCOMPARE_FINAL")]
+pub const ExprEvalOp_EEOP_ROWCOMPARE_FINAL: u32 = 57;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_MINMAX")]
+pub const ExprEvalOp_EEOP_MINMAX: u32 = 58;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_FIELDSELECT")]
+pub const ExprEvalOp_EEOP_FIELDSELECT: u32 = 59;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_FIELDSTORE_DEFORM")]
+pub const ExprEvalOp_EEOP_FIELDSTORE_DEFORM: u32 = 60;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_FIELDSTORE_FORM")]
+pub const ExprEvalOp_EEOP_FIELDSTORE_FORM: u32 = 61;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SBSREF_SUBSCRIPTS")]
+pub const ExprEvalOp_EEOP_SBSREF_SUBSCRIPTS: u32 = 62;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SBSREF_OLD")]
+pub const ExprEvalOp_EEOP_SBSREF_OLD: u32 = 63;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SBSREF_ASSIGN")]
+pub const ExprEvalOp_EEOP_SBSREF_ASSIGN: u32 = 64;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SBSREF_FETCH")]
+pub const ExprEvalOp_EEOP_SBSREF_FETCH: u32 = 65;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_DOMAIN_TESTVAL")]
+pub const ExprEvalOp_EEOP_DOMAIN_TESTVAL: u32 = 66;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_DOMAIN_NOTNULL")]
+pub const ExprEvalOp_EEOP_DOMAIN_NOTNULL: u32 = 67;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_DOMAIN_CHECK")]
+pub const ExprEvalOp_EEOP_DOMAIN_CHECK: u32 = 68;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_CONVERT_ROWTYPE")]
+pub const ExprEvalOp_EEOP_CONVERT_ROWTYPE: u32 = 69;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SCALARARRAYOP")]
+pub const ExprEvalOp_EEOP_SCALARARRAYOP: u32 = 70;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_HASHED_SCALARARRAYOP")]
+pub const ExprEvalOp_EEOP_HASHED_SCALARARRAYOP: u32 = 71;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_XMLEXPR")]
+pub const ExprEvalOp_EEOP_XMLEXPR: u32 = 72;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_JSON_CONSTRUCTOR")]
+pub const ExprEvalOp_EEOP_JSON_CONSTRUCTOR: u32 = 73;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_IS_JSON")]
+pub const ExprEvalOp_EEOP_IS_JSON: u32 = 74;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_AGGREF")]
+pub const ExprEvalOp_EEOP_AGGREF: u32 = 75;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_GROUPING_FUNC")]
+pub const ExprEvalOp_EEOP_GROUPING_FUNC: u32 = 76;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_WINDOW_FUNC")]
+pub const ExprEvalOp_EEOP_WINDOW_FUNC: u32 = 77;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SUBPLAN")]
+pub const ExprEvalOp_EEOP_SUBPLAN: u32 = 78;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_AGG_STRICT_DESERIALIZE")]
+pub const ExprEvalOp_EEOP_AGG_STRICT_DESERIALIZE: u32 = 79;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_AGG_DESERIALIZE")]
+pub const ExprEvalOp_EEOP_AGG_DESERIALIZE: u32 = 80;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ExprEvalOp::EEOP_AGG_STRICT_INPUT_CHECK_ARGS"
+)]
+pub const ExprEvalOp_EEOP_AGG_STRICT_INPUT_CHECK_ARGS: u32 = 81;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ExprEvalOp::EEOP_AGG_STRICT_INPUT_CHECK_NULLS"
+)]
+pub const ExprEvalOp_EEOP_AGG_STRICT_INPUT_CHECK_NULLS: u32 = 82;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ExprEvalOp::EEOP_AGG_PLAIN_PERGROUP_NULLCHECK"
+)]
+pub const ExprEvalOp_EEOP_AGG_PLAIN_PERGROUP_NULLCHECK: u32 = 83;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ExprEvalOp::EEOP_AGG_PLAIN_TRANS_INIT_STRICT_BYVAL"
+)]
+pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_INIT_STRICT_BYVAL: u32 = 84;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ExprEvalOp::EEOP_AGG_PLAIN_TRANS_STRICT_BYVAL"
+)]
+pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_STRICT_BYVAL: u32 = 85;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_AGG_PLAIN_TRANS_BYVAL")]
+pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_BYVAL: u32 = 86;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ExprEvalOp::EEOP_AGG_PLAIN_TRANS_INIT_STRICT_BYREF"
+)]
+pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_INIT_STRICT_BYREF: u32 = 87;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ExprEvalOp::EEOP_AGG_PLAIN_TRANS_STRICT_BYREF"
+)]
+pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_STRICT_BYREF: u32 = 88;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_AGG_PLAIN_TRANS_BYREF")]
+pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_BYREF: u32 = 89;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ExprEvalOp::EEOP_AGG_PRESORTED_DISTINCT_SINGLE"
+)]
+pub const ExprEvalOp_EEOP_AGG_PRESORTED_DISTINCT_SINGLE: u32 = 90;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ExprEvalOp::EEOP_AGG_PRESORTED_DISTINCT_MULTI"
+)]
+pub const ExprEvalOp_EEOP_AGG_PRESORTED_DISTINCT_MULTI: u32 = 91;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_AGG_ORDERED_TRANS_DATUM")]
+pub const ExprEvalOp_EEOP_AGG_ORDERED_TRANS_DATUM: u32 = 92;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_AGG_ORDERED_TRANS_TUPLE")]
+pub const ExprEvalOp_EEOP_AGG_ORDERED_TRANS_TUPLE: u32 = 93;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_LAST")]
+pub const ExprEvalOp_EEOP_LAST: u32 = 94;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ExtendBufferedFlags::EB_SKIP_EXTENSION_LOCK"
+)]
+pub const ExtendBufferedFlags_EB_SKIP_EXTENSION_LOCK: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ExtendBufferedFlags::EB_PERFORMING_RECOVERY"
+)]
+pub const ExtendBufferedFlags_EB_PERFORMING_RECOVERY: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ExtendBufferedFlags::EB_CREATE_FORK_IF_NEEDED"
+)]
+pub const ExtendBufferedFlags_EB_CREATE_FORK_IF_NEEDED: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExtendBufferedFlags::EB_LOCK_FIRST")]
+pub const ExtendBufferedFlags_EB_LOCK_FIRST: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExtendBufferedFlags::EB_CLEAR_SIZE_CACHE")]
+pub const ExtendBufferedFlags_EB_CLEAR_SIZE_CACHE: u32 = 16;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExtendBufferedFlags::EB_LOCK_TARGET")]
+pub const ExtendBufferedFlags_EB_LOCK_TARGET: u32 = 32;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FetchDirection::FETCH_FORWARD")]
+pub const FetchDirection_FETCH_FORWARD: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FetchDirection::FETCH_BACKWARD")]
+pub const FetchDirection_FETCH_BACKWARD: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FetchDirection::FETCH_ABSOLUTE")]
+pub const FetchDirection_FETCH_ABSOLUTE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FetchDirection::FETCH_RELATIVE")]
+pub const FetchDirection_FETCH_RELATIVE: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FmgrHookEventType::FHET_START")]
+pub const FmgrHookEventType_FHET_START: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FmgrHookEventType::FHET_END")]
+pub const FmgrHookEventType_FHET_END: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FmgrHookEventType::FHET_ABORT")]
+pub const FmgrHookEventType_FHET_ABORT: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ForkNumber::InvalidForkNumber")]
+pub const ForkNumber_InvalidForkNumber: i32 = -1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ForkNumber::MAIN_FORKNUM")]
+pub const ForkNumber_MAIN_FORKNUM: i32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ForkNumber::FSM_FORKNUM")]
+pub const ForkNumber_FSM_FORKNUM: i32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ForkNumber::VISIBILITYMAP_FORKNUM")]
+pub const ForkNumber_VISIBILITYMAP_FORKNUM: i32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ForkNumber::INIT_FORKNUM")]
+pub const ForkNumber_INIT_FORKNUM: i32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_NOTFOUND")]
+pub const FuncDetailCode_FUNCDETAIL_NOTFOUND: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_MULTIPLE")]
+pub const FuncDetailCode_FUNCDETAIL_MULTIPLE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_NORMAL")]
+pub const FuncDetailCode_FUNCDETAIL_NORMAL: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_PROCEDURE")]
+pub const FuncDetailCode_FUNCDETAIL_PROCEDURE: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_AGGREGATE")]
+pub const FuncDetailCode_FUNCDETAIL_AGGREGATE: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_WINDOWFUNC")]
+pub const FuncDetailCode_FUNCDETAIL_WINDOWFUNC: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_COERCION")]
+pub const FuncDetailCode_FUNCDETAIL_COERCION: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_IN")]
+pub const FunctionParameterMode_FUNC_PARAM_IN: u32 = 105;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_OUT")]
+pub const FunctionParameterMode_FUNC_PARAM_OUT: u32 = 111;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_INOUT")]
+pub const FunctionParameterMode_FUNC_PARAM_INOUT: u32 = 98;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_VARIADIC"
+)]
+pub const FunctionParameterMode_FUNC_PARAM_VARIADIC: u32 = 118;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_TABLE")]
+pub const FunctionParameterMode_FUNC_PARAM_TABLE: u32 = 116;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_DEFAULT")]
+pub const FunctionParameterMode_FUNC_PARAM_DEFAULT: u32 = 100;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GrantTargetType::ACL_TARGET_OBJECT")]
+pub const GrantTargetType_ACL_TARGET_OBJECT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GrantTargetType::ACL_TARGET_ALL_IN_SCHEMA")]
+pub const GrantTargetType_ACL_TARGET_ALL_IN_SCHEMA: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GrantTargetType::ACL_TARGET_DEFAULTS")]
+pub const GrantTargetType_ACL_TARGET_DEFAULTS: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GroupingSetKind::GROUPING_SET_EMPTY")]
+pub const GroupingSetKind_GROUPING_SET_EMPTY: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GroupingSetKind::GROUPING_SET_SIMPLE")]
+pub const GroupingSetKind_GROUPING_SET_SIMPLE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GroupingSetKind::GROUPING_SET_ROLLUP")]
+pub const GroupingSetKind_GROUPING_SET_ROLLUP: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GroupingSetKind::GROUPING_SET_CUBE")]
+pub const GroupingSetKind_GROUPING_SET_CUBE: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GroupingSetKind::GROUPING_SET_SETS")]
+pub const GroupingSetKind_GROUPING_SET_SETS: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucAction::GUC_ACTION_SET")]
+pub const GucAction_GUC_ACTION_SET: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucAction::GUC_ACTION_LOCAL")]
+pub const GucAction_GUC_ACTION_LOCAL: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucAction::GUC_ACTION_SAVE")]
+pub const GucAction_GUC_ACTION_SAVE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucContext::PGC_INTERNAL")]
+pub const GucContext_PGC_INTERNAL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucContext::PGC_POSTMASTER")]
+pub const GucContext_PGC_POSTMASTER: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucContext::PGC_SIGHUP")]
+pub const GucContext_PGC_SIGHUP: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucContext::PGC_SU_BACKEND")]
+pub const GucContext_PGC_SU_BACKEND: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucContext::PGC_BACKEND")]
+pub const GucContext_PGC_BACKEND: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucContext::PGC_SUSET")]
+pub const GucContext_PGC_SUSET: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucContext::PGC_USERSET")]
+pub const GucContext_PGC_USERSET: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_DEFAULT")]
+pub const GucSource_PGC_S_DEFAULT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_DYNAMIC_DEFAULT")]
+pub const GucSource_PGC_S_DYNAMIC_DEFAULT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_ENV_VAR")]
+pub const GucSource_PGC_S_ENV_VAR: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_FILE")]
+pub const GucSource_PGC_S_FILE: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_ARGV")]
+pub const GucSource_PGC_S_ARGV: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_GLOBAL")]
+pub const GucSource_PGC_S_GLOBAL: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_DATABASE")]
+pub const GucSource_PGC_S_DATABASE: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_USER")]
+pub const GucSource_PGC_S_USER: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_DATABASE_USER")]
+pub const GucSource_PGC_S_DATABASE_USER: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_CLIENT")]
+pub const GucSource_PGC_S_CLIENT: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_OVERRIDE")]
+pub const GucSource_PGC_S_OVERRIDE: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_INTERACTIVE")]
+pub const GucSource_PGC_S_INTERACTIVE: u32 = 11;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_TEST")]
+pub const GucSource_PGC_S_TEST: u32 = 12;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_SESSION")]
+pub const GucSource_PGC_S_SESSION: u32 = 13;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HASHACTION::HASH_FIND")]
+pub const HASHACTION_HASH_FIND: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HASHACTION::HASH_ENTER")]
+pub const HASHACTION_HASH_ENTER: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HASHACTION::HASH_REMOVE")]
+pub const HASHACTION_HASH_REMOVE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HASHACTION::HASH_ENTER_NULL")]
+pub const HASHACTION_HASH_ENTER_NULL: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HTSV_Result::HEAPTUPLE_DEAD")]
+pub const HTSV_Result_HEAPTUPLE_DEAD: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HTSV_Result::HEAPTUPLE_LIVE")]
+pub const HTSV_Result_HEAPTUPLE_LIVE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HTSV_Result::HEAPTUPLE_RECENTLY_DEAD")]
+pub const HTSV_Result_HEAPTUPLE_RECENTLY_DEAD: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HTSV_Result::HEAPTUPLE_INSERT_IN_PROGRESS")]
+pub const HTSV_Result_HEAPTUPLE_INSERT_IN_PROGRESS: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HTSV_Result::HEAPTUPLE_DELETE_IN_PROGRESS")]
+pub const HTSV_Result_HEAPTUPLE_DELETE_IN_PROGRESS: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HotStandbyState::STANDBY_DISABLED")]
+pub const HotStandbyState_STANDBY_DISABLED: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HotStandbyState::STANDBY_INITIALIZED")]
+pub const HotStandbyState_STANDBY_INITIALIZED: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HotStandbyState::STANDBY_SNAPSHOT_PENDING")]
+pub const HotStandbyState_STANDBY_SNAPSHOT_PENDING: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HotStandbyState::STANDBY_SNAPSHOT_READY")]
+pub const HotStandbyState_STANDBY_SNAPSHOT_READY: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOContext::IOCONTEXT_BULKREAD")]
+pub const IOContext_IOCONTEXT_BULKREAD: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOContext::IOCONTEXT_BULKWRITE")]
+pub const IOContext_IOCONTEXT_BULKWRITE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOContext::IOCONTEXT_NORMAL")]
+pub const IOContext_IOCONTEXT_NORMAL: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOContext::IOCONTEXT_VACUUM")]
+pub const IOContext_IOCONTEXT_VACUUM: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOFuncSelector::IOFunc_input")]
+pub const IOFuncSelector_IOFunc_input: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOFuncSelector::IOFunc_output")]
+pub const IOFuncSelector_IOFunc_output: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOFuncSelector::IOFunc_receive")]
+pub const IOFuncSelector_IOFunc_receive: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOFuncSelector::IOFunc_send")]
+pub const IOFuncSelector_IOFunc_send: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOObject::IOOBJECT_RELATION")]
+pub const IOObject_IOOBJECT_RELATION: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOObject::IOOBJECT_TEMP_RELATION")]
+pub const IOObject_IOOBJECT_TEMP_RELATION: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOOp::IOOP_EVICT")]
+pub const IOOp_IOOP_EVICT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOOp::IOOP_EXTEND")]
+pub const IOOp_IOOP_EXTEND: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOOp::IOOP_FSYNC")]
+pub const IOOp_IOOP_FSYNC: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOOp::IOOP_HIT")]
+pub const IOOp_IOOP_HIT: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOOp::IOOP_READ")]
+pub const IOOp_IOOP_READ: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOOp::IOOP_REUSE")]
+pub const IOOp_IOOP_REUSE: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOOp::IOOP_WRITE")]
+pub const IOOp_IOOP_WRITE: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOOp::IOOP_WRITEBACK")]
+pub const IOOp_IOOP_WRITEBACK: u32 = 7;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::IdentifierLookup::IDENTIFIER_LOOKUP_NORMAL"
+)]
+pub const IdentifierLookup_IDENTIFIER_LOOKUP_NORMAL: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::IdentifierLookup::IDENTIFIER_LOOKUP_DECLARE"
+)]
+pub const IdentifierLookup_IDENTIFIER_LOOKUP_DECLARE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IdentifierLookup::IDENTIFIER_LOOKUP_EXPR")]
+pub const IdentifierLookup_IDENTIFIER_LOOKUP_EXPR: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ImportForeignSchemaType::FDW_IMPORT_SCHEMA_ALL"
+)]
+pub const ImportForeignSchemaType_FDW_IMPORT_SCHEMA_ALL: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ImportForeignSchemaType::FDW_IMPORT_SCHEMA_LIMIT_TO"
+)]
+pub const ImportForeignSchemaType_FDW_IMPORT_SCHEMA_LIMIT_TO: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ImportForeignSchemaType::FDW_IMPORT_SCHEMA_EXCEPT"
+)]
+pub const ImportForeignSchemaType_FDW_IMPORT_SCHEMA_EXCEPT: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::IncrementalSortExecutionStatus::INCSORT_LOADFULLSORT"
+)]
+pub const IncrementalSortExecutionStatus_INCSORT_LOADFULLSORT: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::IncrementalSortExecutionStatus::INCSORT_LOADPREFIXSORT"
+)]
+pub const IncrementalSortExecutionStatus_INCSORT_LOADPREFIXSORT: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::IncrementalSortExecutionStatus::INCSORT_READFULLSORT"
+)]
+pub const IncrementalSortExecutionStatus_INCSORT_READFULLSORT: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::IncrementalSortExecutionStatus::INCSORT_READPREFIXSORT"
+)]
+pub const IncrementalSortExecutionStatus_INCSORT_READPREFIXSORT: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_UNKNOWN")]
+pub const IndexAMProperty_AMPROP_UNKNOWN: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_ASC")]
+pub const IndexAMProperty_AMPROP_ASC: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_DESC")]
+pub const IndexAMProperty_AMPROP_DESC: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_NULLS_FIRST")]
+pub const IndexAMProperty_AMPROP_NULLS_FIRST: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_NULLS_LAST")]
+pub const IndexAMProperty_AMPROP_NULLS_LAST: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_ORDERABLE")]
+pub const IndexAMProperty_AMPROP_ORDERABLE: u32 = 5;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::IndexAMProperty::AMPROP_DISTANCE_ORDERABLE"
+)]
+pub const IndexAMProperty_AMPROP_DISTANCE_ORDERABLE: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_RETURNABLE")]
+pub const IndexAMProperty_AMPROP_RETURNABLE: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_SEARCH_ARRAY")]
+pub const IndexAMProperty_AMPROP_SEARCH_ARRAY: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_SEARCH_NULLS")]
+pub const IndexAMProperty_AMPROP_SEARCH_NULLS: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_CLUSTERABLE")]
+pub const IndexAMProperty_AMPROP_CLUSTERABLE: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_INDEX_SCAN")]
+pub const IndexAMProperty_AMPROP_INDEX_SCAN: u32 = 11;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_BITMAP_SCAN")]
+pub const IndexAMProperty_AMPROP_BITMAP_SCAN: u32 = 12;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_BACKWARD_SCAN")]
+pub const IndexAMProperty_AMPROP_BACKWARD_SCAN: u32 = 13;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_CAN_ORDER")]
+pub const IndexAMProperty_AMPROP_CAN_ORDER: u32 = 14;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_CAN_UNIQUE")]
+pub const IndexAMProperty_AMPROP_CAN_UNIQUE: u32 = 15;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_CAN_MULTI_COL")]
+pub const IndexAMProperty_AMPROP_CAN_MULTI_COL: u32 = 16;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_CAN_EXCLUDE")]
+pub const IndexAMProperty_AMPROP_CAN_EXCLUDE: u32 = 17;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_CAN_INCLUDE")]
+pub const IndexAMProperty_AMPROP_CAN_INCLUDE: u32 = 18;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::IndexAttrBitmapKind::INDEX_ATTR_BITMAP_KEY"
+)]
+pub const IndexAttrBitmapKind_INDEX_ATTR_BITMAP_KEY: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::IndexAttrBitmapKind::INDEX_ATTR_BITMAP_PRIMARY_KEY"
+)]
+pub const IndexAttrBitmapKind_INDEX_ATTR_BITMAP_PRIMARY_KEY: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::IndexAttrBitmapKind::INDEX_ATTR_BITMAP_IDENTITY_KEY"
+)]
+pub const IndexAttrBitmapKind_INDEX_ATTR_BITMAP_IDENTITY_KEY: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::IndexAttrBitmapKind::INDEX_ATTR_BITMAP_HOT_BLOCKING"
+)]
+pub const IndexAttrBitmapKind_INDEX_ATTR_BITMAP_HOT_BLOCKING: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::IndexAttrBitmapKind::INDEX_ATTR_BITMAP_SUMMARIZED"
+)]
+pub const IndexAttrBitmapKind_INDEX_ATTR_BITMAP_SUMMARIZED: u32 = 4;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::IndexStateFlagsAction::INDEX_CREATE_SET_READY"
+)]
+pub const IndexStateFlagsAction_INDEX_CREATE_SET_READY: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::IndexStateFlagsAction::INDEX_CREATE_SET_VALID"
+)]
+pub const IndexStateFlagsAction_INDEX_CREATE_SET_VALID: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::IndexStateFlagsAction::INDEX_DROP_CLEAR_VALID"
+)]
+pub const IndexStateFlagsAction_INDEX_DROP_CLEAR_VALID: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::IndexStateFlagsAction::INDEX_DROP_SET_DEAD"
+)]
+pub const IndexStateFlagsAction_INDEX_DROP_SET_DEAD: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexUniqueCheck::UNIQUE_CHECK_NO")]
+pub const IndexUniqueCheck_UNIQUE_CHECK_NO: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexUniqueCheck::UNIQUE_CHECK_YES")]
+pub const IndexUniqueCheck_UNIQUE_CHECK_YES: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexUniqueCheck::UNIQUE_CHECK_PARTIAL")]
+pub const IndexUniqueCheck_UNIQUE_CHECK_PARTIAL: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexUniqueCheck::UNIQUE_CHECK_EXISTING")]
+pub const IndexUniqueCheck_UNIQUE_CHECK_EXISTING: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::InstrumentOption::INSTRUMENT_TIMER")]
+pub const InstrumentOption_INSTRUMENT_TIMER: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::InstrumentOption::INSTRUMENT_BUFFERS")]
+pub const InstrumentOption_INSTRUMENT_BUFFERS: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::InstrumentOption::INSTRUMENT_ROWS")]
+pub const InstrumentOption_INSTRUMENT_ROWS: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::InstrumentOption::INSTRUMENT_WAL")]
+pub const InstrumentOption_INSTRUMENT_WAL: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::InstrumentOption::INSTRUMENT_ALL")]
+pub const InstrumentOption_INSTRUMENT_ALL: u32 = 2147483647;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JoinType::JOIN_INNER")]
+pub const JoinType_JOIN_INNER: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JoinType::JOIN_LEFT")]
+pub const JoinType_JOIN_LEFT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JoinType::JOIN_FULL")]
+pub const JoinType_JOIN_FULL: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JoinType::JOIN_RIGHT")]
+pub const JoinType_JOIN_RIGHT: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JoinType::JOIN_SEMI")]
+pub const JoinType_JOIN_SEMI: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JoinType::JOIN_ANTI")]
+pub const JoinType_JOIN_ANTI: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JoinType::JOIN_RIGHT_ANTI")]
+pub const JoinType_JOIN_RIGHT_ANTI: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JoinType::JOIN_UNIQUE_OUTER")]
+pub const JoinType_JOIN_UNIQUE_OUTER: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JoinType::JOIN_UNIQUE_INNER")]
+pub const JoinType_JOIN_UNIQUE_INNER: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonConstructorType::JSCTOR_JSON_OBJECT")]
+pub const JsonConstructorType_JSCTOR_JSON_OBJECT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonConstructorType::JSCTOR_JSON_ARRAY")]
+pub const JsonConstructorType_JSCTOR_JSON_ARRAY: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::JsonConstructorType::JSCTOR_JSON_OBJECTAGG"
+)]
+pub const JsonConstructorType_JSCTOR_JSON_OBJECTAGG: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonConstructorType::JSCTOR_JSON_ARRAYAGG")]
+pub const JsonConstructorType_JSCTOR_JSON_ARRAYAGG: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonEncoding::JS_ENC_DEFAULT")]
+pub const JsonEncoding_JS_ENC_DEFAULT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonEncoding::JS_ENC_UTF8")]
+pub const JsonEncoding_JS_ENC_UTF8: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonEncoding::JS_ENC_UTF16")]
+pub const JsonEncoding_JS_ENC_UTF16: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonEncoding::JS_ENC_UTF32")]
+pub const JsonEncoding_JS_ENC_UTF32: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonFormatType::JS_FORMAT_DEFAULT")]
+pub const JsonFormatType_JS_FORMAT_DEFAULT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonFormatType::JS_FORMAT_JSON")]
+pub const JsonFormatType_JS_FORMAT_JSON: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonFormatType::JS_FORMAT_JSONB")]
+pub const JsonFormatType_JS_FORMAT_JSONB: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonValueType::JS_TYPE_ANY")]
+pub const JsonValueType_JS_TYPE_ANY: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonValueType::JS_TYPE_OBJECT")]
+pub const JsonValueType_JS_TYPE_OBJECT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonValueType::JS_TYPE_ARRAY")]
+pub const JsonValueType_JS_TYPE_ARRAY: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonValueType::JS_TYPE_SCALAR")]
+pub const JsonValueType_JS_TYPE_SCALAR: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIterState::JBI_ARRAY_START")]
+pub const JsonbIterState_JBI_ARRAY_START: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIterState::JBI_ARRAY_ELEM")]
+pub const JsonbIterState_JBI_ARRAY_ELEM: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIterState::JBI_OBJECT_START")]
+pub const JsonbIterState_JBI_OBJECT_START: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIterState::JBI_OBJECT_KEY")]
+pub const JsonbIterState_JBI_OBJECT_KEY: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIterState::JBI_OBJECT_VALUE")]
+pub const JsonbIterState_JBI_OBJECT_VALUE: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIteratorToken::WJB_DONE")]
+pub const JsonbIteratorToken_WJB_DONE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIteratorToken::WJB_KEY")]
+pub const JsonbIteratorToken_WJB_KEY: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIteratorToken::WJB_VALUE")]
+pub const JsonbIteratorToken_WJB_VALUE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIteratorToken::WJB_ELEM")]
+pub const JsonbIteratorToken_WJB_ELEM: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIteratorToken::WJB_BEGIN_ARRAY")]
+pub const JsonbIteratorToken_WJB_BEGIN_ARRAY: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIteratorToken::WJB_END_ARRAY")]
+pub const JsonbIteratorToken_WJB_END_ARRAY: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIteratorToken::WJB_BEGIN_OBJECT")]
+pub const JsonbIteratorToken_WJB_BEGIN_OBJECT: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIteratorToken::WJB_END_OBJECT")]
+pub const JsonbIteratorToken_WJB_END_OBJECT: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LWLockMode::LW_EXCLUSIVE")]
+pub const LWLockMode_LW_EXCLUSIVE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LWLockMode::LW_SHARED")]
+pub const LWLockMode_LW_SHARED: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LWLockMode::LW_WAIT_UNTIL_FREE")]
+pub const LWLockMode_LW_WAIT_UNTIL_FREE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LWLockWaitState::LW_WS_NOT_WAITING")]
+pub const LWLockWaitState_LW_WS_NOT_WAITING: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LWLockWaitState::LW_WS_WAITING")]
+pub const LWLockWaitState_LW_WS_WAITING: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LWLockWaitState::LW_WS_PENDING_WAKEUP")]
+pub const LWLockWaitState_LW_WS_PENDING_WAKEUP: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitOption::LIMIT_OPTION_COUNT")]
+pub const LimitOption_LIMIT_OPTION_COUNT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitOption::LIMIT_OPTION_WITH_TIES")]
+pub const LimitOption_LIMIT_OPTION_WITH_TIES: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitOption::LIMIT_OPTION_DEFAULT")]
+pub const LimitOption_LIMIT_OPTION_DEFAULT: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_INITIAL")]
+pub const LimitStateCond_LIMIT_INITIAL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_RESCAN")]
+pub const LimitStateCond_LIMIT_RESCAN: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_EMPTY")]
+pub const LimitStateCond_LIMIT_EMPTY: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_INWINDOW")]
+pub const LimitStateCond_LIMIT_INWINDOW: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_WINDOWEND_TIES")]
+pub const LimitStateCond_LIMIT_WINDOWEND_TIES: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_SUBPLANEOF")]
+pub const LimitStateCond_LIMIT_SUBPLANEOF: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_WINDOWEND")]
+pub const LimitStateCond_LIMIT_WINDOWEND: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_WINDOWSTART")]
+pub const LimitStateCond_LIMIT_WINDOWSTART: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockAcquireResult::LOCKACQUIRE_NOT_AVAIL")]
+pub const LockAcquireResult_LOCKACQUIRE_NOT_AVAIL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockAcquireResult::LOCKACQUIRE_OK")]
+pub const LockAcquireResult_LOCKACQUIRE_OK: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::LockAcquireResult::LOCKACQUIRE_ALREADY_HELD"
+)]
+pub const LockAcquireResult_LOCKACQUIRE_ALREADY_HELD: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::LockAcquireResult::LOCKACQUIRE_ALREADY_CLEAR"
+)]
+pub const LockAcquireResult_LOCKACQUIRE_ALREADY_CLEAR: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockClauseStrength::LCS_NONE")]
+pub const LockClauseStrength_LCS_NONE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockClauseStrength::LCS_FORKEYSHARE")]
+pub const LockClauseStrength_LCS_FORKEYSHARE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockClauseStrength::LCS_FORSHARE")]
+pub const LockClauseStrength_LCS_FORSHARE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockClauseStrength::LCS_FORNOKEYUPDATE")]
+pub const LockClauseStrength_LCS_FORNOKEYUPDATE: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockClauseStrength::LCS_FORUPDATE")]
+pub const LockClauseStrength_LCS_FORUPDATE: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_RELATION")]
+pub const LockTagType_LOCKTAG_RELATION: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_RELATION_EXTEND")]
+pub const LockTagType_LOCKTAG_RELATION_EXTEND: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_DATABASE_FROZEN_IDS")]
+pub const LockTagType_LOCKTAG_DATABASE_FROZEN_IDS: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_PAGE")]
+pub const LockTagType_LOCKTAG_PAGE: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_TUPLE")]
+pub const LockTagType_LOCKTAG_TUPLE: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_TRANSACTION")]
+pub const LockTagType_LOCKTAG_TRANSACTION: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_VIRTUALTRANSACTION")]
+pub const LockTagType_LOCKTAG_VIRTUALTRANSACTION: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_SPECULATIVE_TOKEN")]
+pub const LockTagType_LOCKTAG_SPECULATIVE_TOKEN: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_OBJECT")]
+pub const LockTagType_LOCKTAG_OBJECT: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_USERLOCK")]
+pub const LockTagType_LOCKTAG_USERLOCK: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_ADVISORY")]
+pub const LockTagType_LOCKTAG_ADVISORY: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_APPLY_TRANSACTION")]
+pub const LockTagType_LOCKTAG_APPLY_TRANSACTION: u32 = 11;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTupleMode::LockTupleKeyShare")]
+pub const LockTupleMode_LockTupleKeyShare: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTupleMode::LockTupleShare")]
+pub const LockTupleMode_LockTupleShare: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTupleMode::LockTupleNoKeyExclusive")]
+pub const LockTupleMode_LockTupleNoKeyExclusive: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTupleMode::LockTupleExclusive")]
+pub const LockTupleMode_LockTupleExclusive: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockWaitPolicy::LockWaitBlock")]
+pub const LockWaitPolicy_LockWaitBlock: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockWaitPolicy::LockWaitSkip")]
+pub const LockWaitPolicy_LockWaitSkip: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockWaitPolicy::LockWaitError")]
+pub const LockWaitPolicy_LockWaitError: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogStmtLevel::LOGSTMT_NONE")]
+pub const LogStmtLevel_LOGSTMT_NONE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogStmtLevel::LOGSTMT_DDL")]
+pub const LogStmtLevel_LOGSTMT_DDL: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogStmtLevel::LOGSTMT_MOD")]
+pub const LogStmtLevel_LOGSTMT_MOD: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogStmtLevel::LOGSTMT_ALL")]
+pub const LogStmtLevel_LOGSTMT_ALL: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_BEGIN")]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_BEGIN: u32 = 66;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_COMMIT")]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_COMMIT: u32 = 67;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_ORIGIN")]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_ORIGIN: u32 = 79;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_INSERT")]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_INSERT: u32 = 73;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_UPDATE")]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_UPDATE: u32 = 85;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_DELETE")]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_DELETE: u32 = 68;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_TRUNCATE"
+)]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_TRUNCATE: u32 = 84;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_RELATION"
+)]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_RELATION: u32 = 82;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_TYPE")]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_TYPE: u32 = 89;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_MESSAGE"
+)]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_MESSAGE: u32 = 77;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_BEGIN_PREPARE"
+)]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_BEGIN_PREPARE: u32 = 98;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_PREPARE"
+)]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_PREPARE: u32 = 80;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_COMMIT_PREPARED"
+)]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_COMMIT_PREPARED: u32 = 75;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_ROLLBACK_PREPARED"
+)]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_ROLLBACK_PREPARED: u32 = 114;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_STREAM_START"
+)]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_STREAM_START: u32 = 83;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_STREAM_STOP"
+)]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_STREAM_STOP: u32 = 69;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_STREAM_COMMIT"
+)]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_STREAM_COMMIT: u32 = 99;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_STREAM_ABORT"
+)]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_STREAM_ABORT: u32 = 65;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_STREAM_PREPARE"
+)]
+pub const LogicalRepMsgType_LOGICAL_REP_MSG_STREAM_PREPARE: u32 = 112;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::MinMaxOp::IS_GREATEST")]
+pub const MinMaxOp_IS_GREATEST: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::MinMaxOp::IS_LEAST")]
+pub const MinMaxOp_IS_LEAST: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::MonotonicFunction::MONOTONICFUNC_NONE")]
+pub const MonotonicFunction_MONOTONICFUNC_NONE: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::MonotonicFunction::MONOTONICFUNC_INCREASING"
+)]
+pub const MonotonicFunction_MONOTONICFUNC_INCREASING: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::MonotonicFunction::MONOTONICFUNC_DECREASING"
+)]
+pub const MonotonicFunction_MONOTONICFUNC_DECREASING: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::MonotonicFunction::MONOTONICFUNC_BOTH")]
+pub const MonotonicFunction_MONOTONICFUNC_BOTH: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::MultiXactStatus::MultiXactStatusForKeyShare"
+)]
+pub const MultiXactStatus_MultiXactStatusForKeyShare: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::MultiXactStatus::MultiXactStatusForShare")]
+pub const MultiXactStatus_MultiXactStatusForShare: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::MultiXactStatus::MultiXactStatusForNoKeyUpdate"
+)]
+pub const MultiXactStatus_MultiXactStatusForNoKeyUpdate: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::MultiXactStatus::MultiXactStatusForUpdate")]
+pub const MultiXactStatus_MultiXactStatusForUpdate: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::MultiXactStatus::MultiXactStatusNoKeyUpdate"
+)]
+pub const MultiXactStatus_MultiXactStatusNoKeyUpdate: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::MultiXactStatus::MultiXactStatusUpdate")]
+pub const MultiXactStatus_MultiXactStatusUpdate: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::NullTestType::IS_NULL")]
+pub const NullTestType_IS_NULL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::NullTestType::IS_NOT_NULL")]
+pub const NullTestType_IS_NOT_NULL: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectAccessType::OAT_POST_CREATE")]
+pub const ObjectAccessType_OAT_POST_CREATE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectAccessType::OAT_DROP")]
+pub const ObjectAccessType_OAT_DROP: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectAccessType::OAT_POST_ALTER")]
+pub const ObjectAccessType_OAT_POST_ALTER: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectAccessType::OAT_NAMESPACE_SEARCH")]
+pub const ObjectAccessType_OAT_NAMESPACE_SEARCH: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectAccessType::OAT_FUNCTION_EXECUTE")]
+pub const ObjectAccessType_OAT_FUNCTION_EXECUTE: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectAccessType::OAT_TRUNCATE")]
+pub const ObjectAccessType_OAT_TRUNCATE: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_CLASS")]
+pub const ObjectClass_OCLASS_CLASS: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_PROC")]
+pub const ObjectClass_OCLASS_PROC: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_TYPE")]
+pub const ObjectClass_OCLASS_TYPE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_CAST")]
+pub const ObjectClass_OCLASS_CAST: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_COLLATION")]
+pub const ObjectClass_OCLASS_COLLATION: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_CONSTRAINT")]
+pub const ObjectClass_OCLASS_CONSTRAINT: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_CONVERSION")]
+pub const ObjectClass_OCLASS_CONVERSION: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_DEFAULT")]
+pub const ObjectClass_OCLASS_DEFAULT: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_LANGUAGE")]
+pub const ObjectClass_OCLASS_LANGUAGE: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_LARGEOBJECT")]
+pub const ObjectClass_OCLASS_LARGEOBJECT: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_OPERATOR")]
+pub const ObjectClass_OCLASS_OPERATOR: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_OPCLASS")]
+pub const ObjectClass_OCLASS_OPCLASS: u32 = 11;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_OPFAMILY")]
+pub const ObjectClass_OCLASS_OPFAMILY: u32 = 12;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_AM")]
+pub const ObjectClass_OCLASS_AM: u32 = 13;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_AMOP")]
+pub const ObjectClass_OCLASS_AMOP: u32 = 14;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_AMPROC")]
+pub const ObjectClass_OCLASS_AMPROC: u32 = 15;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_REWRITE")]
+pub const ObjectClass_OCLASS_REWRITE: u32 = 16;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_TRIGGER")]
+pub const ObjectClass_OCLASS_TRIGGER: u32 = 17;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_SCHEMA")]
+pub const ObjectClass_OCLASS_SCHEMA: u32 = 18;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_STATISTIC_EXT")]
+pub const ObjectClass_OCLASS_STATISTIC_EXT: u32 = 19;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_TSPARSER")]
+pub const ObjectClass_OCLASS_TSPARSER: u32 = 20;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_TSDICT")]
+pub const ObjectClass_OCLASS_TSDICT: u32 = 21;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_TSTEMPLATE")]
+pub const ObjectClass_OCLASS_TSTEMPLATE: u32 = 22;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_TSCONFIG")]
+pub const ObjectClass_OCLASS_TSCONFIG: u32 = 23;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_ROLE")]
+pub const ObjectClass_OCLASS_ROLE: u32 = 24;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_ROLE_MEMBERSHIP")]
+pub const ObjectClass_OCLASS_ROLE_MEMBERSHIP: u32 = 25;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_DATABASE")]
+pub const ObjectClass_OCLASS_DATABASE: u32 = 26;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_TBLSPACE")]
+pub const ObjectClass_OCLASS_TBLSPACE: u32 = 27;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_FDW")]
+pub const ObjectClass_OCLASS_FDW: u32 = 28;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_FOREIGN_SERVER")]
+pub const ObjectClass_OCLASS_FOREIGN_SERVER: u32 = 29;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_USER_MAPPING")]
+pub const ObjectClass_OCLASS_USER_MAPPING: u32 = 30;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_DEFACL")]
+pub const ObjectClass_OCLASS_DEFACL: u32 = 31;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_EXTENSION")]
+pub const ObjectClass_OCLASS_EXTENSION: u32 = 32;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_EVENT_TRIGGER")]
+pub const ObjectClass_OCLASS_EVENT_TRIGGER: u32 = 33;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_PARAMETER_ACL")]
+pub const ObjectClass_OCLASS_PARAMETER_ACL: u32 = 34;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_POLICY")]
+pub const ObjectClass_OCLASS_POLICY: u32 = 35;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_PUBLICATION")]
+pub const ObjectClass_OCLASS_PUBLICATION: u32 = 36;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_PUBLICATION_NAMESPACE")]
+pub const ObjectClass_OCLASS_PUBLICATION_NAMESPACE: u32 = 37;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_PUBLICATION_REL")]
+pub const ObjectClass_OCLASS_PUBLICATION_REL: u32 = 38;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_SUBSCRIPTION")]
+pub const ObjectClass_OCLASS_SUBSCRIPTION: u32 = 39;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectClass::OCLASS_TRANSFORM")]
+pub const ObjectClass_OCLASS_TRANSFORM: u32 = 40;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_ACCESS_METHOD")]
+pub const ObjectType_OBJECT_ACCESS_METHOD: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_AGGREGATE")]
+pub const ObjectType_OBJECT_AGGREGATE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_AMOP")]
+pub const ObjectType_OBJECT_AMOP: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_AMPROC")]
+pub const ObjectType_OBJECT_AMPROC: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_ATTRIBUTE")]
+pub const ObjectType_OBJECT_ATTRIBUTE: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_CAST")]
+pub const ObjectType_OBJECT_CAST: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_COLUMN")]
+pub const ObjectType_OBJECT_COLUMN: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_COLLATION")]
+pub const ObjectType_OBJECT_COLLATION: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_CONVERSION")]
+pub const ObjectType_OBJECT_CONVERSION: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_DATABASE")]
+pub const ObjectType_OBJECT_DATABASE: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_DEFAULT")]
+pub const ObjectType_OBJECT_DEFAULT: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_DEFACL")]
+pub const ObjectType_OBJECT_DEFACL: u32 = 11;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_DOMAIN")]
+pub const ObjectType_OBJECT_DOMAIN: u32 = 12;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_DOMCONSTRAINT")]
+pub const ObjectType_OBJECT_DOMCONSTRAINT: u32 = 13;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_EVENT_TRIGGER")]
+pub const ObjectType_OBJECT_EVENT_TRIGGER: u32 = 14;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_EXTENSION")]
+pub const ObjectType_OBJECT_EXTENSION: u32 = 15;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_FDW")]
+pub const ObjectType_OBJECT_FDW: u32 = 16;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_FOREIGN_SERVER")]
+pub const ObjectType_OBJECT_FOREIGN_SERVER: u32 = 17;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_FOREIGN_TABLE")]
+pub const ObjectType_OBJECT_FOREIGN_TABLE: u32 = 18;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_FUNCTION")]
+pub const ObjectType_OBJECT_FUNCTION: u32 = 19;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_INDEX")]
+pub const ObjectType_OBJECT_INDEX: u32 = 20;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_LANGUAGE")]
+pub const ObjectType_OBJECT_LANGUAGE: u32 = 21;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_LARGEOBJECT")]
+pub const ObjectType_OBJECT_LARGEOBJECT: u32 = 22;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_MATVIEW")]
+pub const ObjectType_OBJECT_MATVIEW: u32 = 23;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_OPCLASS")]
+pub const ObjectType_OBJECT_OPCLASS: u32 = 24;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_OPERATOR")]
+pub const ObjectType_OBJECT_OPERATOR: u32 = 25;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_OPFAMILY")]
+pub const ObjectType_OBJECT_OPFAMILY: u32 = 26;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_PARAMETER_ACL")]
+pub const ObjectType_OBJECT_PARAMETER_ACL: u32 = 27;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_POLICY")]
+pub const ObjectType_OBJECT_POLICY: u32 = 28;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_PROCEDURE")]
+pub const ObjectType_OBJECT_PROCEDURE: u32 = 29;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_PUBLICATION")]
+pub const ObjectType_OBJECT_PUBLICATION: u32 = 30;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_PUBLICATION_NAMESPACE")]
+pub const ObjectType_OBJECT_PUBLICATION_NAMESPACE: u32 = 31;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_PUBLICATION_REL")]
+pub const ObjectType_OBJECT_PUBLICATION_REL: u32 = 32;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_ROLE")]
+pub const ObjectType_OBJECT_ROLE: u32 = 33;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_ROUTINE")]
+pub const ObjectType_OBJECT_ROUTINE: u32 = 34;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_RULE")]
+pub const ObjectType_OBJECT_RULE: u32 = 35;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_SCHEMA")]
+pub const ObjectType_OBJECT_SCHEMA: u32 = 36;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_SEQUENCE")]
+pub const ObjectType_OBJECT_SEQUENCE: u32 = 37;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_SUBSCRIPTION")]
+pub const ObjectType_OBJECT_SUBSCRIPTION: u32 = 38;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_STATISTIC_EXT")]
+pub const ObjectType_OBJECT_STATISTIC_EXT: u32 = 39;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TABCONSTRAINT")]
+pub const ObjectType_OBJECT_TABCONSTRAINT: u32 = 40;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TABLE")]
+pub const ObjectType_OBJECT_TABLE: u32 = 41;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TABLESPACE")]
+pub const ObjectType_OBJECT_TABLESPACE: u32 = 42;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TRANSFORM")]
+pub const ObjectType_OBJECT_TRANSFORM: u32 = 43;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TRIGGER")]
+pub const ObjectType_OBJECT_TRIGGER: u32 = 44;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TSCONFIGURATION")]
+pub const ObjectType_OBJECT_TSCONFIGURATION: u32 = 45;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TSDICTIONARY")]
+pub const ObjectType_OBJECT_TSDICTIONARY: u32 = 46;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TSPARSER")]
+pub const ObjectType_OBJECT_TSPARSER: u32 = 47;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TSTEMPLATE")]
+pub const ObjectType_OBJECT_TSTEMPLATE: u32 = 48;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TYPE")]
+pub const ObjectType_OBJECT_TYPE: u32 = 49;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_USER_MAPPING")]
+pub const ObjectType_OBJECT_USER_MAPPING: u32 = 50;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_VIEW")]
+pub const ObjectType_OBJECT_VIEW: u32 = 51;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OnCommitAction::ONCOMMIT_NOOP")]
+pub const OnCommitAction_ONCOMMIT_NOOP: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OnCommitAction::ONCOMMIT_PRESERVE_ROWS")]
+pub const OnCommitAction_ONCOMMIT_PRESERVE_ROWS: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OnCommitAction::ONCOMMIT_DELETE_ROWS")]
+pub const OnCommitAction_ONCOMMIT_DELETE_ROWS: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OnCommitAction::ONCOMMIT_DROP")]
+pub const OnCommitAction_ONCOMMIT_DROP: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OnConflictAction::ONCONFLICT_NONE")]
+pub const OnConflictAction_ONCONFLICT_NONE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OnConflictAction::ONCONFLICT_NOTHING")]
+pub const OnConflictAction_ONCONFLICT_NOTHING: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OnConflictAction::ONCONFLICT_UPDATE")]
+pub const OnConflictAction_ONCONFLICT_UPDATE: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::OutputPluginOutputType::OUTPUT_PLUGIN_BINARY_OUTPUT"
+)]
+pub const OutputPluginOutputType_OUTPUT_PLUGIN_BINARY_OUTPUT: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::OutputPluginOutputType::OUTPUT_PLUGIN_TEXTUAL_OUTPUT"
+)]
+pub const OutputPluginOutputType_OUTPUT_PLUGIN_TEXTUAL_OUTPUT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OverridingKind::OVERRIDING_NOT_SET")]
+pub const OverridingKind_OVERRIDING_NOT_SET: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OverridingKind::OVERRIDING_USER_VALUE")]
+pub const OverridingKind_OVERRIDING_USER_VALUE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OverridingKind::OVERRIDING_SYSTEM_VALUE")]
+pub const OverridingKind_OVERRIDING_SYSTEM_VALUE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PGErrorVerbosity::PGERROR_TERSE")]
+pub const PGErrorVerbosity_PGERROR_TERSE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PGErrorVerbosity::PGERROR_DEFAULT")]
+pub const PGErrorVerbosity_PGERROR_DEFAULT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PGErrorVerbosity::PGERROR_VERBOSE")]
+pub const PGErrorVerbosity_PGERROR_VERBOSE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_datum_type::PLPGSQL_DTYPE_VAR")]
+pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_VAR: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_datum_type::PLPGSQL_DTYPE_ROW")]
+pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_ROW: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_datum_type::PLPGSQL_DTYPE_REC")]
+pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_REC: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_datum_type::PLPGSQL_DTYPE_RECFIELD"
+)]
+pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_RECFIELD: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_datum_type::PLPGSQL_DTYPE_PROMISE")]
+pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_PROMISE: u32 = 4;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_getdiag_kind::PLPGSQL_GETDIAG_ROW_COUNT"
+)]
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_ROW_COUNT: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_getdiag_kind::PLPGSQL_GETDIAG_CONTEXT"
+)]
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_CONTEXT: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_getdiag_kind::PLPGSQL_GETDIAG_ERROR_CONTEXT"
+)]
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_ERROR_CONTEXT: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_getdiag_kind::PLPGSQL_GETDIAG_ERROR_DETAIL"
+)]
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_ERROR_DETAIL: u32 = 4;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_getdiag_kind::PLPGSQL_GETDIAG_ERROR_HINT"
+)]
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_ERROR_HINT: u32 = 5;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_getdiag_kind::PLPGSQL_GETDIAG_RETURNED_SQLSTATE"
+)]
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_RETURNED_SQLSTATE: u32 = 6;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_getdiag_kind::PLPGSQL_GETDIAG_COLUMN_NAME"
+)]
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_COLUMN_NAME: u32 = 7;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_getdiag_kind::PLPGSQL_GETDIAG_CONSTRAINT_NAME"
+)]
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_CONSTRAINT_NAME: u32 = 8;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_getdiag_kind::PLPGSQL_GETDIAG_DATATYPE_NAME"
+)]
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_DATATYPE_NAME: u32 = 9;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_getdiag_kind::PLPGSQL_GETDIAG_MESSAGE_TEXT"
+)]
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_MESSAGE_TEXT: u32 = 10;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_getdiag_kind::PLPGSQL_GETDIAG_TABLE_NAME"
+)]
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_TABLE_NAME: u32 = 11;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_getdiag_kind::PLPGSQL_GETDIAG_SCHEMA_NAME"
+)]
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_SCHEMA_NAME: u32 = 12;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_label_type::PLPGSQL_LABEL_BLOCK")]
+pub const PLpgSQL_label_type_PLPGSQL_LABEL_BLOCK: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_label_type::PLPGSQL_LABEL_LOOP")]
+pub const PLpgSQL_label_type_PLPGSQL_LABEL_LOOP: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_label_type::PLPGSQL_LABEL_OTHER")]
+pub const PLpgSQL_label_type_PLPGSQL_LABEL_OTHER: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_nsitem_type::PLPGSQL_NSTYPE_LABEL")]
+pub const PLpgSQL_nsitem_type_PLPGSQL_NSTYPE_LABEL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_nsitem_type::PLPGSQL_NSTYPE_VAR")]
+pub const PLpgSQL_nsitem_type_PLPGSQL_NSTYPE_VAR: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_nsitem_type::PLPGSQL_NSTYPE_REC")]
+pub const PLpgSQL_nsitem_type_PLPGSQL_NSTYPE_REC: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_promise_type::PLPGSQL_PROMISE_NONE"
+)]
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_NONE: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_promise_type::PLPGSQL_PROMISE_TG_NAME"
+)]
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_NAME: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_promise_type::PLPGSQL_PROMISE_TG_WHEN"
+)]
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_WHEN: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_promise_type::PLPGSQL_PROMISE_TG_LEVEL"
+)]
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_LEVEL: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_promise_type::PLPGSQL_PROMISE_TG_OP"
+)]
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_OP: u32 = 4;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_promise_type::PLPGSQL_PROMISE_TG_RELID"
+)]
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_RELID: u32 = 5;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_promise_type::PLPGSQL_PROMISE_TG_TABLE_NAME"
+)]
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_TABLE_NAME: u32 = 6;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_promise_type::PLPGSQL_PROMISE_TG_TABLE_SCHEMA"
+)]
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_TABLE_SCHEMA: u32 = 7;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_promise_type::PLPGSQL_PROMISE_TG_NARGS"
+)]
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_NARGS: u32 = 8;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_promise_type::PLPGSQL_PROMISE_TG_ARGV"
+)]
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_ARGV: u32 = 9;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_promise_type::PLPGSQL_PROMISE_TG_EVENT"
+)]
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_EVENT: u32 = 10;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_promise_type::PLPGSQL_PROMISE_TG_TAG"
+)]
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_TAG: u32 = 11;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_raise_option_type::PLPGSQL_RAISEOPTION_ERRCODE"
+)]
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_ERRCODE: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_raise_option_type::PLPGSQL_RAISEOPTION_MESSAGE"
+)]
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_MESSAGE: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_raise_option_type::PLPGSQL_RAISEOPTION_DETAIL"
+)]
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_DETAIL: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_raise_option_type::PLPGSQL_RAISEOPTION_HINT"
+)]
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_HINT: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_raise_option_type::PLPGSQL_RAISEOPTION_COLUMN"
+)]
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_COLUMN: u32 = 4;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_raise_option_type::PLPGSQL_RAISEOPTION_CONSTRAINT"
+)]
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_CONSTRAINT: u32 = 5;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_raise_option_type::PLPGSQL_RAISEOPTION_DATATYPE"
+)]
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_DATATYPE: u32 = 6;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_raise_option_type::PLPGSQL_RAISEOPTION_TABLE"
+)]
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_TABLE: u32 = 7;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_raise_option_type::PLPGSQL_RAISEOPTION_SCHEMA"
+)]
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_SCHEMA: u32 = 8;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_resolve_option::PLPGSQL_RESOLVE_ERROR"
+)]
+pub const PLpgSQL_resolve_option_PLPGSQL_RESOLVE_ERROR: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_resolve_option::PLPGSQL_RESOLVE_VARIABLE"
+)]
+pub const PLpgSQL_resolve_option_PLPGSQL_RESOLVE_VARIABLE: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_resolve_option::PLPGSQL_RESOLVE_COLUMN"
+)]
+pub const PLpgSQL_resolve_option_PLPGSQL_RESOLVE_COLUMN: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_BLOCK")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_BLOCK: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_ASSIGN")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_ASSIGN: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_IF")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_IF: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_CASE")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_CASE: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_LOOP")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_LOOP: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_WHILE")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_WHILE: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_FORI")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FORI: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_FORS")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FORS: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_FORC")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FORC: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_FOREACH_A")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FOREACH_A: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_EXIT")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_EXIT: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_RETURN")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_RETURN: u32 = 11;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_RETURN_NEXT"
+)]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_RETURN_NEXT: u32 = 12;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_RETURN_QUERY"
+)]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_RETURN_QUERY: u32 = 13;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_RAISE")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_RAISE: u32 = 14;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_ASSERT")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_ASSERT: u32 = 15;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_EXECSQL")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_EXECSQL: u32 = 16;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_DYNEXECUTE"
+)]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_DYNEXECUTE: u32 = 17;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_DYNFORS")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_DYNFORS: u32 = 18;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_GETDIAG")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_GETDIAG: u32 = 19;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_OPEN")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_OPEN: u32 = 20;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_FETCH")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FETCH: u32 = 21;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_CLOSE")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_CLOSE: u32 = 22;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_PERFORM")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_PERFORM: u32 = 23;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_CALL")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_CALL: u32 = 24;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_COMMIT")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_COMMIT: u32 = 25;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_ROLLBACK")]
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_ROLLBACK: u32 = 26;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_trigtype::PLPGSQL_DML_TRIGGER")]
+pub const PLpgSQL_trigtype_PLPGSQL_DML_TRIGGER: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_trigtype::PLPGSQL_EVENT_TRIGGER")]
+pub const PLpgSQL_trigtype_PLPGSQL_EVENT_TRIGGER: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_trigtype::PLPGSQL_NOT_TRIGGER")]
+pub const PLpgSQL_trigtype_PLPGSQL_NOT_TRIGGER: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_type_type::PLPGSQL_TTYPE_SCALAR")]
+pub const PLpgSQL_type_type_PLPGSQL_TTYPE_SCALAR: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_type_type::PLPGSQL_TTYPE_REC")]
+pub const PLpgSQL_type_type_PLPGSQL_TTYPE_REC: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_type_type::PLPGSQL_TTYPE_PSEUDO")]
+pub const PLpgSQL_type_type_PLPGSQL_TTYPE_PSEUDO: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParamKind::PARAM_EXTERN")]
+pub const ParamKind_PARAM_EXTERN: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParamKind::PARAM_EXEC")]
+pub const ParamKind_PARAM_EXEC: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParamKind::PARAM_SUBLINK")]
+pub const ParamKind_PARAM_SUBLINK: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParamKind::PARAM_MULTIEXPR")]
+pub const ParamKind_PARAM_MULTIEXPR: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_NONE")]
+pub const ParseExprKind_EXPR_KIND_NONE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_OTHER")]
+pub const ParseExprKind_EXPR_KIND_OTHER: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_JOIN_ON")]
+pub const ParseExprKind_EXPR_KIND_JOIN_ON: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_JOIN_USING")]
+pub const ParseExprKind_EXPR_KIND_JOIN_USING: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_FROM_SUBSELECT")]
+pub const ParseExprKind_EXPR_KIND_FROM_SUBSELECT: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_FROM_FUNCTION")]
+pub const ParseExprKind_EXPR_KIND_FROM_FUNCTION: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_WHERE")]
+pub const ParseExprKind_EXPR_KIND_WHERE: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_HAVING")]
+pub const ParseExprKind_EXPR_KIND_HAVING: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_FILTER")]
+pub const ParseExprKind_EXPR_KIND_FILTER: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_WINDOW_PARTITION")]
+pub const ParseExprKind_EXPR_KIND_WINDOW_PARTITION: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_WINDOW_ORDER")]
+pub const ParseExprKind_EXPR_KIND_WINDOW_ORDER: u32 = 10;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ParseExprKind::EXPR_KIND_WINDOW_FRAME_RANGE"
+)]
+pub const ParseExprKind_EXPR_KIND_WINDOW_FRAME_RANGE: u32 = 11;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ParseExprKind::EXPR_KIND_WINDOW_FRAME_ROWS"
+)]
+pub const ParseExprKind_EXPR_KIND_WINDOW_FRAME_ROWS: u32 = 12;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ParseExprKind::EXPR_KIND_WINDOW_FRAME_GROUPS"
+)]
+pub const ParseExprKind_EXPR_KIND_WINDOW_FRAME_GROUPS: u32 = 13;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_SELECT_TARGET")]
+pub const ParseExprKind_EXPR_KIND_SELECT_TARGET: u32 = 14;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_INSERT_TARGET")]
+pub const ParseExprKind_EXPR_KIND_INSERT_TARGET: u32 = 15;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_UPDATE_SOURCE")]
+pub const ParseExprKind_EXPR_KIND_UPDATE_SOURCE: u32 = 16;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_UPDATE_TARGET")]
+pub const ParseExprKind_EXPR_KIND_UPDATE_TARGET: u32 = 17;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_MERGE_WHEN")]
+pub const ParseExprKind_EXPR_KIND_MERGE_WHEN: u32 = 18;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_GROUP_BY")]
+pub const ParseExprKind_EXPR_KIND_GROUP_BY: u32 = 19;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_ORDER_BY")]
+pub const ParseExprKind_EXPR_KIND_ORDER_BY: u32 = 20;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_DISTINCT_ON")]
+pub const ParseExprKind_EXPR_KIND_DISTINCT_ON: u32 = 21;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_LIMIT")]
+pub const ParseExprKind_EXPR_KIND_LIMIT: u32 = 22;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_OFFSET")]
+pub const ParseExprKind_EXPR_KIND_OFFSET: u32 = 23;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_RETURNING")]
+pub const ParseExprKind_EXPR_KIND_RETURNING: u32 = 24;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_VALUES")]
+pub const ParseExprKind_EXPR_KIND_VALUES: u32 = 25;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_VALUES_SINGLE")]
+pub const ParseExprKind_EXPR_KIND_VALUES_SINGLE: u32 = 26;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_CHECK_CONSTRAINT")]
+pub const ParseExprKind_EXPR_KIND_CHECK_CONSTRAINT: u32 = 27;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_DOMAIN_CHECK")]
+pub const ParseExprKind_EXPR_KIND_DOMAIN_CHECK: u32 = 28;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_COLUMN_DEFAULT")]
+pub const ParseExprKind_EXPR_KIND_COLUMN_DEFAULT: u32 = 29;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_FUNCTION_DEFAULT")]
+pub const ParseExprKind_EXPR_KIND_FUNCTION_DEFAULT: u32 = 30;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_INDEX_EXPRESSION")]
+pub const ParseExprKind_EXPR_KIND_INDEX_EXPRESSION: u32 = 31;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_INDEX_PREDICATE")]
+pub const ParseExprKind_EXPR_KIND_INDEX_PREDICATE: u32 = 32;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_STATS_EXPRESSION")]
+pub const ParseExprKind_EXPR_KIND_STATS_EXPRESSION: u32 = 33;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ParseExprKind::EXPR_KIND_ALTER_COL_TRANSFORM"
+)]
+pub const ParseExprKind_EXPR_KIND_ALTER_COL_TRANSFORM: u32 = 34;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ParseExprKind::EXPR_KIND_EXECUTE_PARAMETER"
+)]
+pub const ParseExprKind_EXPR_KIND_EXECUTE_PARAMETER: u32 = 35;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_TRIGGER_WHEN")]
+pub const ParseExprKind_EXPR_KIND_TRIGGER_WHEN: u32 = 36;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_POLICY")]
+pub const ParseExprKind_EXPR_KIND_POLICY: u32 = 37;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_PARTITION_BOUND")]
+pub const ParseExprKind_EXPR_KIND_PARTITION_BOUND: u32 = 38;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ParseExprKind::EXPR_KIND_PARTITION_EXPRESSION"
+)]
+pub const ParseExprKind_EXPR_KIND_PARTITION_EXPRESSION: u32 = 39;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_CALL_ARGUMENT")]
+pub const ParseExprKind_EXPR_KIND_CALL_ARGUMENT: u32 = 40;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_COPY_WHERE")]
+pub const ParseExprKind_EXPR_KIND_COPY_WHERE: u32 = 41;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_GENERATED_COLUMN")]
+pub const ParseExprKind_EXPR_KIND_GENERATED_COLUMN: u32 = 42;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_CYCLE_MARK")]
+pub const ParseExprKind_EXPR_KIND_CYCLE_MARK: u32 = 43;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PartitionPruneCombineOp::PARTPRUNE_COMBINE_UNION"
+)]
+pub const PartitionPruneCombineOp_PARTPRUNE_COMBINE_UNION: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PartitionPruneCombineOp::PARTPRUNE_COMBINE_INTERSECT"
+)]
+pub const PartitionPruneCombineOp_PARTPRUNE_COMBINE_INTERSECT: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PartitionRangeDatumKind::PARTITION_RANGE_DATUM_MINVALUE"
+)]
+pub const PartitionRangeDatumKind_PARTITION_RANGE_DATUM_MINVALUE: i32 = -1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PartitionRangeDatumKind::PARTITION_RANGE_DATUM_VALUE"
+)]
+pub const PartitionRangeDatumKind_PARTITION_RANGE_DATUM_VALUE: i32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PartitionRangeDatumKind::PARTITION_RANGE_DATUM_MAXVALUE"
+)]
+pub const PartitionRangeDatumKind_PARTITION_RANGE_DATUM_MAXVALUE: i32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PartitionStrategy::PARTITION_STRATEGY_LIST"
+)]
+pub const PartitionStrategy_PARTITION_STRATEGY_LIST: u32 = 108;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PartitionStrategy::PARTITION_STRATEGY_RANGE"
+)]
+pub const PartitionStrategy_PARTITION_STRATEGY_RANGE: u32 = 114;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PartitionStrategy::PARTITION_STRATEGY_HASH"
+)]
+pub const PartitionStrategy_PARTITION_STRATEGY_HASH: u32 = 104;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PartitionwiseAggregateType::PARTITIONWISE_AGGREGATE_NONE"
+)]
+pub const PartitionwiseAggregateType_PARTITIONWISE_AGGREGATE_NONE: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PartitionwiseAggregateType::PARTITIONWISE_AGGREGATE_FULL"
+)]
+pub const PartitionwiseAggregateType_PARTITIONWISE_AGGREGATE_FULL: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PartitionwiseAggregateType::PARTITIONWISE_AGGREGATE_PARTIAL"
+)]
+pub const PartitionwiseAggregateType_PARTITIONWISE_AGGREGATE_PARTIAL: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PasswordType::PASSWORD_TYPE_PLAINTEXT")]
+pub const PasswordType_PASSWORD_TYPE_PLAINTEXT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PasswordType::PASSWORD_TYPE_MD5")]
+pub const PasswordType_PASSWORD_TYPE_MD5: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PasswordType::PASSWORD_TYPE_SCRAM_SHA_256")]
+pub const PasswordType_PASSWORD_TYPE_SCRAM_SHA_256: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PathKeysComparison::PATHKEYS_EQUAL")]
+pub const PathKeysComparison_PATHKEYS_EQUAL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PathKeysComparison::PATHKEYS_BETTER1")]
+pub const PathKeysComparison_PATHKEYS_BETTER1: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PathKeysComparison::PATHKEYS_BETTER2")]
+pub const PathKeysComparison_PATHKEYS_BETTER2: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PathKeysComparison::PATHKEYS_DIFFERENT")]
+pub const PathKeysComparison_PATHKEYS_DIFFERENT: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PgStat_FetchConsistency::PGSTAT_FETCH_CONSISTENCY_NONE"
+)]
+pub const PgStat_FetchConsistency_PGSTAT_FETCH_CONSISTENCY_NONE: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PgStat_FetchConsistency::PGSTAT_FETCH_CONSISTENCY_CACHE"
+)]
+pub const PgStat_FetchConsistency_PGSTAT_FETCH_CONSISTENCY_CACHE: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PgStat_FetchConsistency::PGSTAT_FETCH_CONSISTENCY_SNAPSHOT"
+)]
+pub const PgStat_FetchConsistency_PGSTAT_FETCH_CONSISTENCY_SNAPSHOT: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgStat_Kind::PGSTAT_KIND_INVALID")]
+pub const PgStat_Kind_PGSTAT_KIND_INVALID: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgStat_Kind::PGSTAT_KIND_DATABASE")]
+pub const PgStat_Kind_PGSTAT_KIND_DATABASE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgStat_Kind::PGSTAT_KIND_RELATION")]
+pub const PgStat_Kind_PGSTAT_KIND_RELATION: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgStat_Kind::PGSTAT_KIND_FUNCTION")]
+pub const PgStat_Kind_PGSTAT_KIND_FUNCTION: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgStat_Kind::PGSTAT_KIND_REPLSLOT")]
+pub const PgStat_Kind_PGSTAT_KIND_REPLSLOT: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgStat_Kind::PGSTAT_KIND_SUBSCRIPTION")]
+pub const PgStat_Kind_PGSTAT_KIND_SUBSCRIPTION: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgStat_Kind::PGSTAT_KIND_ARCHIVER")]
+pub const PgStat_Kind_PGSTAT_KIND_ARCHIVER: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgStat_Kind::PGSTAT_KIND_BGWRITER")]
+pub const PgStat_Kind_PGSTAT_KIND_BGWRITER: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgStat_Kind::PGSTAT_KIND_CHECKPOINTER")]
+pub const PgStat_Kind_PGSTAT_KIND_CHECKPOINTER: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgStat_Kind::PGSTAT_KIND_IO")]
+pub const PgStat_Kind_PGSTAT_KIND_IO: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgStat_Kind::PGSTAT_KIND_SLRU")]
+pub const PgStat_Kind_PGSTAT_KIND_SLRU: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgStat_Kind::PGSTAT_KIND_WAL")]
+pub const PgStat_Kind_PGSTAT_KIND_WAL: u32 = 11;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PlanCacheMode::PLAN_CACHE_MODE_AUTO")]
+pub const PlanCacheMode_PLAN_CACHE_MODE_AUTO: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PlanCacheMode::PLAN_CACHE_MODE_FORCE_GENERIC_PLAN"
+)]
+pub const PlanCacheMode_PLAN_CACHE_MODE_FORCE_GENERIC_PLAN: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PlanCacheMode::PLAN_CACHE_MODE_FORCE_CUSTOM_PLAN"
+)]
+pub const PlanCacheMode_PLAN_CACHE_MODE_FORCE_CUSTOM_PLAN: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStatus::PORTAL_NEW")]
+pub const PortalStatus_PORTAL_NEW: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStatus::PORTAL_DEFINED")]
+pub const PortalStatus_PORTAL_DEFINED: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStatus::PORTAL_READY")]
+pub const PortalStatus_PORTAL_READY: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStatus::PORTAL_ACTIVE")]
+pub const PortalStatus_PORTAL_ACTIVE: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStatus::PORTAL_DONE")]
+pub const PortalStatus_PORTAL_DONE: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStatus::PORTAL_FAILED")]
+pub const PortalStatus_PORTAL_FAILED: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStrategy::PORTAL_ONE_SELECT")]
+pub const PortalStrategy_PORTAL_ONE_SELECT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStrategy::PORTAL_ONE_RETURNING")]
+pub const PortalStrategy_PORTAL_ONE_RETURNING: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStrategy::PORTAL_ONE_MOD_WITH")]
+pub const PortalStrategy_PORTAL_ONE_MOD_WITH: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStrategy::PORTAL_UTIL_SELECT")]
+pub const PortalStrategy_PORTAL_UTIL_SELECT: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStrategy::PORTAL_MULTI_QUERY")]
+pub const PortalStrategy_PORTAL_MULTI_QUERY: u32 = 4;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcSignalBarrierType::PROCSIGNAL_BARRIER_SMGRRELEASE"
+)]
+pub const ProcSignalBarrierType_PROCSIGNAL_BARRIER_SMGRRELEASE: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcSignalReason::PROCSIG_CATCHUP_INTERRUPT"
+)]
+pub const ProcSignalReason_PROCSIG_CATCHUP_INTERRUPT: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcSignalReason::PROCSIG_NOTIFY_INTERRUPT"
+)]
+pub const ProcSignalReason_PROCSIG_NOTIFY_INTERRUPT: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcSignalReason::PROCSIG_PARALLEL_MESSAGE"
+)]
+pub const ProcSignalReason_PROCSIG_PARALLEL_MESSAGE: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcSignalReason::PROCSIG_WALSND_INIT_STOPPING"
+)]
+pub const ProcSignalReason_PROCSIG_WALSND_INIT_STOPPING: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ProcSignalReason::PROCSIG_BARRIER")]
+pub const ProcSignalReason_PROCSIG_BARRIER: u32 = 4;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcSignalReason::PROCSIG_LOG_MEMORY_CONTEXT"
+)]
+pub const ProcSignalReason_PROCSIG_LOG_MEMORY_CONTEXT: u32 = 5;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcSignalReason::PROCSIG_PARALLEL_APPLY_MESSAGE"
+)]
+pub const ProcSignalReason_PROCSIG_PARALLEL_APPLY_MESSAGE: u32 = 6;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_DATABASE"
+)]
+pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_DATABASE: u32 = 7;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_TABLESPACE"
+)]
+pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_TABLESPACE: u32 = 8;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_LOCK"
+)]
+pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_LOCK: u32 = 9;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_SNAPSHOT"
+)]
+pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_SNAPSHOT: u32 = 10;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_LOGICALSLOT"
+)]
+pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_LOGICALSLOT: u32 = 11;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_BUFFERPIN"
+)]
+pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_BUFFERPIN: u32 = 12;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_STARTUP_DEADLOCK"
+)]
+pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_STARTUP_DEADLOCK: u32 = 13;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ProcSignalReason::NUM_PROCSIGNALS")]
+pub const ProcSignalReason_NUM_PROCSIGNALS: u32 = 14;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ProcWaitStatus::PROC_WAIT_STATUS_OK")]
+pub const ProcWaitStatus_PROC_WAIT_STATUS_OK: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ProcWaitStatus::PROC_WAIT_STATUS_WAITING")]
+pub const ProcWaitStatus_PROC_WAIT_STATUS_WAITING: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ProcWaitStatus::PROC_WAIT_STATUS_ERROR")]
+pub const ProcWaitStatus_PROC_WAIT_STATUS_ERROR: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcessUtilityContext::PROCESS_UTILITY_TOPLEVEL"
+)]
+pub const ProcessUtilityContext_PROCESS_UTILITY_TOPLEVEL: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcessUtilityContext::PROCESS_UTILITY_QUERY"
+)]
+pub const ProcessUtilityContext_PROCESS_UTILITY_QUERY: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcessUtilityContext::PROCESS_UTILITY_QUERY_NONATOMIC"
+)]
+pub const ProcessUtilityContext_PROCESS_UTILITY_QUERY_NONATOMIC: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProcessUtilityContext::PROCESS_UTILITY_SUBCOMMAND"
+)]
+pub const ProcessUtilityContext_PROCESS_UTILITY_SUBCOMMAND: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ProcessingMode::BootstrapProcessing")]
+pub const ProcessingMode_BootstrapProcessing: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ProcessingMode::InitProcessing")]
+pub const ProcessingMode_InitProcessing: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ProcessingMode::NormalProcessing")]
+pub const ProcessingMode_NormalProcessing: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProgressCommandType::PROGRESS_COMMAND_INVALID"
+)]
+pub const ProgressCommandType_PROGRESS_COMMAND_INVALID: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProgressCommandType::PROGRESS_COMMAND_VACUUM"
+)]
+pub const ProgressCommandType_PROGRESS_COMMAND_VACUUM: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProgressCommandType::PROGRESS_COMMAND_ANALYZE"
+)]
+pub const ProgressCommandType_PROGRESS_COMMAND_ANALYZE: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProgressCommandType::PROGRESS_COMMAND_CLUSTER"
+)]
+pub const ProgressCommandType_PROGRESS_COMMAND_CLUSTER: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProgressCommandType::PROGRESS_COMMAND_CREATE_INDEX"
+)]
+pub const ProgressCommandType_PROGRESS_COMMAND_CREATE_INDEX: u32 = 4;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProgressCommandType::PROGRESS_COMMAND_BASEBACKUP"
+)]
+pub const ProgressCommandType_PROGRESS_COMMAND_BASEBACKUP: u32 = 5;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ProgressCommandType::PROGRESS_COMMAND_COPY"
+)]
+pub const ProgressCommandType_PROGRESS_COMMAND_COPY: u32 = 6;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PublicationObjSpecType::PUBLICATIONOBJ_TABLE"
+)]
+pub const PublicationObjSpecType_PUBLICATIONOBJ_TABLE: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PublicationObjSpecType::PUBLICATIONOBJ_TABLES_IN_SCHEMA"
+)]
+pub const PublicationObjSpecType_PUBLICATIONOBJ_TABLES_IN_SCHEMA: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PublicationObjSpecType::PUBLICATIONOBJ_TABLES_IN_CUR_SCHEMA"
+)]
+pub const PublicationObjSpecType_PUBLICATIONOBJ_TABLES_IN_CUR_SCHEMA: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::PublicationObjSpecType::PUBLICATIONOBJ_CONTINUATION"
+)]
+pub const PublicationObjSpecType_PUBLICATIONOBJ_CONTINUATION: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PublicationPartOpt::PUBLICATION_PART_ROOT")]
+pub const PublicationPartOpt_PUBLICATION_PART_ROOT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PublicationPartOpt::PUBLICATION_PART_LEAF")]
+pub const PublicationPartOpt_PUBLICATION_PART_LEAF: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PublicationPartOpt::PUBLICATION_PART_ALL")]
+pub const PublicationPartOpt_PUBLICATION_PART_ALL: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::QuerySource::QSRC_ORIGINAL")]
+pub const QuerySource_QSRC_ORIGINAL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::QuerySource::QSRC_PARSER")]
+pub const QuerySource_QSRC_PARSER: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::QuerySource::QSRC_INSTEAD_RULE")]
+pub const QuerySource_QSRC_INSTEAD_RULE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::QuerySource::QSRC_QUAL_INSTEAD_RULE")]
+pub const QuerySource_QSRC_QUAL_INSTEAD_RULE: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::QuerySource::QSRC_NON_INSTEAD_RULE")]
+pub const QuerySource_QSRC_NON_INSTEAD_RULE: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RTEKind::RTE_RELATION")]
+pub const RTEKind_RTE_RELATION: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RTEKind::RTE_SUBQUERY")]
+pub const RTEKind_RTE_SUBQUERY: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RTEKind::RTE_JOIN")]
+pub const RTEKind_RTE_JOIN: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RTEKind::RTE_FUNCTION")]
+pub const RTEKind_RTE_FUNCTION: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RTEKind::RTE_TABLEFUNC")]
+pub const RTEKind_RTE_TABLEFUNC: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RTEKind::RTE_VALUES")]
+pub const RTEKind_RTE_VALUES: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RTEKind::RTE_CTE")]
+pub const RTEKind_RTE_CTE: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RTEKind::RTE_NAMEDTUPLESTORE")]
+pub const RTEKind_RTE_NAMEDTUPLESTORE: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RTEKind::RTE_RESULT")]
+pub const RTEKind_RTE_RESULT: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RVROption::RVR_MISSING_OK")]
+pub const RVROption_RVR_MISSING_OK: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RVROption::RVR_NOWAIT")]
+pub const RVROption_RVR_NOWAIT: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RVROption::RVR_SKIP_LOCKED")]
+pub const RVROption_RVR_SKIP_LOCKED: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RawParseMode::RAW_PARSE_DEFAULT")]
+pub const RawParseMode_RAW_PARSE_DEFAULT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RawParseMode::RAW_PARSE_TYPE_NAME")]
+pub const RawParseMode_RAW_PARSE_TYPE_NAME: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RawParseMode::RAW_PARSE_PLPGSQL_EXPR")]
+pub const RawParseMode_RAW_PARSE_PLPGSQL_EXPR: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RawParseMode::RAW_PARSE_PLPGSQL_ASSIGN1")]
+pub const RawParseMode_RAW_PARSE_PLPGSQL_ASSIGN1: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RawParseMode::RAW_PARSE_PLPGSQL_ASSIGN2")]
+pub const RawParseMode_RAW_PARSE_PLPGSQL_ASSIGN2: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RawParseMode::RAW_PARSE_PLPGSQL_ASSIGN3")]
+pub const RawParseMode_RAW_PARSE_PLPGSQL_ASSIGN3: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReadBufferMode::RBM_NORMAL")]
+pub const ReadBufferMode_RBM_NORMAL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReadBufferMode::RBM_ZERO_AND_LOCK")]
+pub const ReadBufferMode_RBM_ZERO_AND_LOCK: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReadBufferMode::RBM_ZERO_AND_CLEANUP_LOCK")]
+pub const ReadBufferMode_RBM_ZERO_AND_CLEANUP_LOCK: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReadBufferMode::RBM_ZERO_ON_ERROR")]
+pub const ReadBufferMode_RBM_ZERO_ON_ERROR: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReadBufferMode::RBM_NORMAL_NO_LOG")]
+pub const ReadBufferMode_RBM_NORMAL_NO_LOG: u32 = 4;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::RecoveryInitSyncMethod::RECOVERY_INIT_SYNC_METHOD_FSYNC"
+)]
+pub const RecoveryInitSyncMethod_RECOVERY_INIT_SYNC_METHOD_FSYNC: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::RecoveryInitSyncMethod::RECOVERY_INIT_SYNC_METHOD_SYNCFS"
+)]
+pub const RecoveryInitSyncMethod_RECOVERY_INIT_SYNC_METHOD_SYNCFS: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryPauseState::RECOVERY_NOT_PAUSED")]
+pub const RecoveryPauseState_RECOVERY_NOT_PAUSED: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::RecoveryPauseState::RECOVERY_PAUSE_REQUESTED"
+)]
+pub const RecoveryPauseState_RECOVERY_PAUSE_REQUESTED: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryPauseState::RECOVERY_PAUSED")]
+pub const RecoveryPauseState_RECOVERY_PAUSED: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryState::RECOVERY_STATE_CRASH")]
+pub const RecoveryState_RECOVERY_STATE_CRASH: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryState::RECOVERY_STATE_ARCHIVE")]
+pub const RecoveryState_RECOVERY_STATE_ARCHIVE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryState::RECOVERY_STATE_DONE")]
+pub const RecoveryState_RECOVERY_STATE_DONE: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::RecoveryTargetAction::RECOVERY_TARGET_ACTION_PAUSE"
+)]
+pub const RecoveryTargetAction_RECOVERY_TARGET_ACTION_PAUSE: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::RecoveryTargetAction::RECOVERY_TARGET_ACTION_PROMOTE"
+)]
+pub const RecoveryTargetAction_RECOVERY_TARGET_ACTION_PROMOTE: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::RecoveryTargetAction::RECOVERY_TARGET_ACTION_SHUTDOWN"
+)]
+pub const RecoveryTargetAction_RECOVERY_TARGET_ACTION_SHUTDOWN: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::RecoveryTargetTimeLineGoal::RECOVERY_TARGET_TIMELINE_CONTROLFILE"
+)]
+pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_CONTROLFILE: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::RecoveryTargetTimeLineGoal::RECOVERY_TARGET_TIMELINE_LATEST"
+)]
+pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_LATEST: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::RecoveryTargetTimeLineGoal::RECOVERY_TARGET_TIMELINE_NUMERIC"
+)]
+pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_NUMERIC: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_UNSET")]
+pub const RecoveryTargetType_RECOVERY_TARGET_UNSET: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_XID")]
+pub const RecoveryTargetType_RECOVERY_TARGET_XID: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_TIME")]
+pub const RecoveryTargetType_RECOVERY_TARGET_TIME: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_NAME")]
+pub const RecoveryTargetType_RECOVERY_TARGET_NAME: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_LSN")]
+pub const RecoveryTargetType_RECOVERY_TARGET_LSN: u32 = 4;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_IMMEDIATE"
+)]
+pub const RecoveryTargetType_RECOVERY_TARGET_IMMEDIATE: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReindexObjectType::REINDEX_OBJECT_INDEX")]
+pub const ReindexObjectType_REINDEX_OBJECT_INDEX: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReindexObjectType::REINDEX_OBJECT_TABLE")]
+pub const ReindexObjectType_REINDEX_OBJECT_TABLE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReindexObjectType::REINDEX_OBJECT_SCHEMA")]
+pub const ReindexObjectType_REINDEX_OBJECT_SCHEMA: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReindexObjectType::REINDEX_OBJECT_SYSTEM")]
+pub const ReindexObjectType_REINDEX_OBJECT_SYSTEM: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReindexObjectType::REINDEX_OBJECT_DATABASE"
+)]
+pub const ReindexObjectType_REINDEX_OBJECT_DATABASE: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RelOptKind::RELOPT_BASEREL")]
+pub const RelOptKind_RELOPT_BASEREL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RelOptKind::RELOPT_JOINREL")]
+pub const RelOptKind_RELOPT_JOINREL: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RelOptKind::RELOPT_OTHER_MEMBER_REL")]
+pub const RelOptKind_RELOPT_OTHER_MEMBER_REL: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RelOptKind::RELOPT_OTHER_JOINREL")]
+pub const RelOptKind_RELOPT_OTHER_JOINREL: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RelOptKind::RELOPT_UPPER_REL")]
+pub const RelOptKind_RELOPT_UPPER_REL: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RelOptKind::RELOPT_OTHER_UPPER_REL")]
+pub const RelOptKind_RELOPT_OTHER_UPPER_REL: u32 = 5;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReorderBufferChangeType::REORDER_BUFFER_CHANGE_INSERT"
+)]
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INSERT: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReorderBufferChangeType::REORDER_BUFFER_CHANGE_UPDATE"
+)]
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_UPDATE: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReorderBufferChangeType::REORDER_BUFFER_CHANGE_DELETE"
+)]
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_DELETE: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReorderBufferChangeType::REORDER_BUFFER_CHANGE_MESSAGE"
+)]
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_MESSAGE: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReorderBufferChangeType::REORDER_BUFFER_CHANGE_INVALIDATION"
+)]
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INVALIDATION: u32 = 4;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReorderBufferChangeType::REORDER_BUFFER_CHANGE_INTERNAL_SNAPSHOT"
+)]
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_SNAPSHOT: u32 = 5;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReorderBufferChangeType::REORDER_BUFFER_CHANGE_INTERNAL_COMMAND_ID"
+)]
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_COMMAND_ID: u32 = 6;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReorderBufferChangeType::REORDER_BUFFER_CHANGE_INTERNAL_TUPLECID"
+)]
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_TUPLECID: u32 = 7;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReorderBufferChangeType::REORDER_BUFFER_CHANGE_INTERNAL_SPEC_INSERT"
+)]
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_SPEC_INSERT: u32 = 8;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReorderBufferChangeType::REORDER_BUFFER_CHANGE_INTERNAL_SPEC_CONFIRM"
+)]
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_SPEC_CONFIRM: u32 = 9;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReorderBufferChangeType::REORDER_BUFFER_CHANGE_INTERNAL_SPEC_ABORT"
+)]
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_SPEC_ABORT: u32 = 10;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReorderBufferChangeType::REORDER_BUFFER_CHANGE_TRUNCATE"
+)]
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_TRUNCATE: u32 = 11;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReplicationKind::REPLICATION_KIND_PHYSICAL"
+)]
+pub const ReplicationKind_REPLICATION_KIND_PHYSICAL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReplicationKind::REPLICATION_KIND_LOGICAL")]
+pub const ReplicationKind_REPLICATION_KIND_LOGICAL: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReplicationSlotInvalidationCause::RS_INVAL_NONE"
+)]
+pub const ReplicationSlotInvalidationCause_RS_INVAL_NONE: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReplicationSlotInvalidationCause::RS_INVAL_WAL_REMOVED"
+)]
+pub const ReplicationSlotInvalidationCause_RS_INVAL_WAL_REMOVED: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReplicationSlotInvalidationCause::RS_INVAL_HORIZON"
+)]
+pub const ReplicationSlotInvalidationCause_RS_INVAL_HORIZON: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ReplicationSlotInvalidationCause::RS_INVAL_WAL_LEVEL"
+)]
+pub const ReplicationSlotInvalidationCause_RS_INVAL_WAL_LEVEL: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReplicationSlotPersistency::RS_PERSISTENT")]
+pub const ReplicationSlotPersistency_RS_PERSISTENT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReplicationSlotPersistency::RS_EPHEMERAL")]
+pub const ReplicationSlotPersistency_RS_EPHEMERAL: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReplicationSlotPersistency::RS_TEMPORARY")]
+pub const ReplicationSlotPersistency_RS_TEMPORARY: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ResourceReleasePhase::RESOURCE_RELEASE_BEFORE_LOCKS"
+)]
+pub const ResourceReleasePhase_RESOURCE_RELEASE_BEFORE_LOCKS: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ResourceReleasePhase::RESOURCE_RELEASE_LOCKS"
+)]
+pub const ResourceReleasePhase_RESOURCE_RELEASE_LOCKS: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ResourceReleasePhase::RESOURCE_RELEASE_AFTER_LOCKS"
+)]
+pub const ResourceReleasePhase_RESOURCE_RELEASE_AFTER_LOCKS: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_XLOG_ID")]
+pub const RmgrIds_RM_XLOG_ID: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_XACT_ID")]
+pub const RmgrIds_RM_XACT_ID: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_SMGR_ID")]
+pub const RmgrIds_RM_SMGR_ID: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_CLOG_ID")]
+pub const RmgrIds_RM_CLOG_ID: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_DBASE_ID")]
+pub const RmgrIds_RM_DBASE_ID: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_TBLSPC_ID")]
+pub const RmgrIds_RM_TBLSPC_ID: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_MULTIXACT_ID")]
+pub const RmgrIds_RM_MULTIXACT_ID: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_RELMAP_ID")]
+pub const RmgrIds_RM_RELMAP_ID: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_STANDBY_ID")]
+pub const RmgrIds_RM_STANDBY_ID: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_HEAP2_ID")]
+pub const RmgrIds_RM_HEAP2_ID: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_HEAP_ID")]
+pub const RmgrIds_RM_HEAP_ID: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_BTREE_ID")]
+pub const RmgrIds_RM_BTREE_ID: u32 = 11;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_HASH_ID")]
+pub const RmgrIds_RM_HASH_ID: u32 = 12;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_GIN_ID")]
+pub const RmgrIds_RM_GIN_ID: u32 = 13;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_GIST_ID")]
+pub const RmgrIds_RM_GIST_ID: u32 = 14;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_SEQ_ID")]
+pub const RmgrIds_RM_SEQ_ID: u32 = 15;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_SPGIST_ID")]
+pub const RmgrIds_RM_SPGIST_ID: u32 = 16;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_BRIN_ID")]
+pub const RmgrIds_RM_BRIN_ID: u32 = 17;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_COMMIT_TS_ID")]
+pub const RmgrIds_RM_COMMIT_TS_ID: u32 = 18;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_REPLORIGIN_ID")]
+pub const RmgrIds_RM_REPLORIGIN_ID: u32 = 19;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_GENERIC_ID")]
+pub const RmgrIds_RM_GENERIC_ID: u32 = 20;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_LOGICALMSG_ID")]
+pub const RmgrIds_RM_LOGICALMSG_ID: u32 = 21;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_NEXT_ID")]
+pub const RmgrIds_RM_NEXT_ID: u32 = 22;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RoleSpecType::ROLESPEC_CSTRING")]
+pub const RoleSpecType_ROLESPEC_CSTRING: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RoleSpecType::ROLESPEC_CURRENT_ROLE")]
+pub const RoleSpecType_ROLESPEC_CURRENT_ROLE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RoleSpecType::ROLESPEC_CURRENT_USER")]
+pub const RoleSpecType_ROLESPEC_CURRENT_USER: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RoleSpecType::ROLESPEC_SESSION_USER")]
+pub const RoleSpecType_ROLESPEC_SESSION_USER: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RoleSpecType::ROLESPEC_PUBLIC")]
+pub const RoleSpecType_ROLESPEC_PUBLIC: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RoleStmtType::ROLESTMT_ROLE")]
+pub const RoleStmtType_ROLESTMT_ROLE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RoleStmtType::ROLESTMT_USER")]
+pub const RoleStmtType_ROLESTMT_USER: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RoleStmtType::ROLESTMT_GROUP")]
+pub const RoleStmtType_ROLESTMT_GROUP: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowCompareType::ROWCOMPARE_LT")]
+pub const RowCompareType_ROWCOMPARE_LT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowCompareType::ROWCOMPARE_LE")]
+pub const RowCompareType_ROWCOMPARE_LE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowCompareType::ROWCOMPARE_EQ")]
+pub const RowCompareType_ROWCOMPARE_EQ: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowCompareType::ROWCOMPARE_GE")]
+pub const RowCompareType_ROWCOMPARE_GE: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowCompareType::ROWCOMPARE_GT")]
+pub const RowCompareType_ROWCOMPARE_GT: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowCompareType::ROWCOMPARE_NE")]
+pub const RowCompareType_ROWCOMPARE_NE: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowMarkType::ROW_MARK_EXCLUSIVE")]
+pub const RowMarkType_ROW_MARK_EXCLUSIVE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowMarkType::ROW_MARK_NOKEYEXCLUSIVE")]
+pub const RowMarkType_ROW_MARK_NOKEYEXCLUSIVE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowMarkType::ROW_MARK_SHARE")]
+pub const RowMarkType_ROW_MARK_SHARE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowMarkType::ROW_MARK_KEYSHARE")]
+pub const RowMarkType_ROW_MARK_KEYSHARE: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowMarkType::ROW_MARK_REFERENCE")]
+pub const RowMarkType_ROW_MARK_REFERENCE: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowMarkType::ROW_MARK_COPY")]
+pub const RowMarkType_ROW_MARK_COPY: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_DATE")]
+pub const SQLValueFunctionOp_SVFOP_CURRENT_DATE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_TIME")]
+pub const SQLValueFunctionOp_SVFOP_CURRENT_TIME: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_TIME_N")]
+pub const SQLValueFunctionOp_SVFOP_CURRENT_TIME_N: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_TIMESTAMP"
+)]
+pub const SQLValueFunctionOp_SVFOP_CURRENT_TIMESTAMP: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_TIMESTAMP_N"
+)]
+pub const SQLValueFunctionOp_SVFOP_CURRENT_TIMESTAMP_N: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_LOCALTIME")]
+pub const SQLValueFunctionOp_SVFOP_LOCALTIME: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_LOCALTIME_N")]
+pub const SQLValueFunctionOp_SVFOP_LOCALTIME_N: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_LOCALTIMESTAMP")]
+pub const SQLValueFunctionOp_SVFOP_LOCALTIMESTAMP: u32 = 7;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SQLValueFunctionOp::SVFOP_LOCALTIMESTAMP_N"
+)]
+pub const SQLValueFunctionOp_SVFOP_LOCALTIMESTAMP_N: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_ROLE")]
+pub const SQLValueFunctionOp_SVFOP_CURRENT_ROLE: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_USER")]
+pub const SQLValueFunctionOp_SVFOP_CURRENT_USER: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_USER")]
+pub const SQLValueFunctionOp_SVFOP_USER: u32 = 11;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_SESSION_USER")]
+pub const SQLValueFunctionOp_SVFOP_SESSION_USER: u32 = 12;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_CATALOG")]
+pub const SQLValueFunctionOp_SVFOP_CURRENT_CATALOG: u32 = 13;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_SCHEMA")]
+pub const SQLValueFunctionOp_SVFOP_CURRENT_SCHEMA: u32 = 14;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanDirection::BackwardScanDirection")]
+pub const ScanDirection_BackwardScanDirection: i32 = -1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanDirection::NoMovementScanDirection")]
+pub const ScanDirection_NoMovementScanDirection: i32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanDirection::ForwardScanDirection")]
+pub const ScanDirection_ForwardScanDirection: i32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_TYPE_SEQSCAN")]
+pub const ScanOptions_SO_TYPE_SEQSCAN: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_TYPE_BITMAPSCAN")]
+pub const ScanOptions_SO_TYPE_BITMAPSCAN: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_TYPE_SAMPLESCAN")]
+pub const ScanOptions_SO_TYPE_SAMPLESCAN: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_TYPE_TIDSCAN")]
+pub const ScanOptions_SO_TYPE_TIDSCAN: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_TYPE_TIDRANGESCAN")]
+pub const ScanOptions_SO_TYPE_TIDRANGESCAN: u32 = 16;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_TYPE_ANALYZE")]
+pub const ScanOptions_SO_TYPE_ANALYZE: u32 = 32;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_ALLOW_STRAT")]
+pub const ScanOptions_SO_ALLOW_STRAT: u32 = 64;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_ALLOW_SYNC")]
+pub const ScanOptions_SO_ALLOW_SYNC: u32 = 128;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_ALLOW_PAGEMODE")]
+pub const ScanOptions_SO_ALLOW_PAGEMODE: u32 = 256;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_TEMP_SNAPSHOT")]
+pub const ScanOptions_SO_TEMP_SNAPSHOT: u32 = 512;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SessionBackupState::SESSION_BACKUP_NONE")]
+pub const SessionBackupState_SESSION_BACKUP_NONE: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SessionBackupState::SESSION_BACKUP_RUNNING"
+)]
+pub const SessionBackupState_SESSION_BACKUP_RUNNING: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SessionEndType::DISCONNECT_NOT_YET")]
+pub const SessionEndType_DISCONNECT_NOT_YET: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SessionEndType::DISCONNECT_NORMAL")]
+pub const SessionEndType_DISCONNECT_NORMAL: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SessionEndType::DISCONNECT_CLIENT_EOF")]
+pub const SessionEndType_DISCONNECT_CLIENT_EOF: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SessionEndType::DISCONNECT_FATAL")]
+pub const SessionEndType_DISCONNECT_FATAL: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SessionEndType::DISCONNECT_KILLED")]
+pub const SessionEndType_DISCONNECT_KILLED: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetFunctionReturnMode::SFRM_ValuePerCall")]
+pub const SetFunctionReturnMode_SFRM_ValuePerCall: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetFunctionReturnMode::SFRM_Materialize")]
+pub const SetFunctionReturnMode_SFRM_Materialize: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SetFunctionReturnMode::SFRM_Materialize_Random"
+)]
+pub const SetFunctionReturnMode_SFRM_Materialize_Random: u32 = 4;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SetFunctionReturnMode::SFRM_Materialize_Preferred"
+)]
+pub const SetFunctionReturnMode_SFRM_Materialize_Preferred: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetOpCmd::SETOPCMD_INTERSECT")]
+pub const SetOpCmd_SETOPCMD_INTERSECT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetOpCmd::SETOPCMD_INTERSECT_ALL")]
+pub const SetOpCmd_SETOPCMD_INTERSECT_ALL: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetOpCmd::SETOPCMD_EXCEPT")]
+pub const SetOpCmd_SETOPCMD_EXCEPT: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetOpCmd::SETOPCMD_EXCEPT_ALL")]
+pub const SetOpCmd_SETOPCMD_EXCEPT_ALL: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetOpStrategy::SETOP_SORTED")]
+pub const SetOpStrategy_SETOP_SORTED: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetOpStrategy::SETOP_HASHED")]
+pub const SetOpStrategy_SETOP_HASHED: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetOperation::SETOP_NONE")]
+pub const SetOperation_SETOP_NONE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetOperation::SETOP_UNION")]
+pub const SetOperation_SETOP_UNION: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetOperation::SETOP_INTERSECT")]
+pub const SetOperation_SETOP_INTERSECT: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetOperation::SETOP_EXCEPT")]
+pub const SetOperation_SETOP_EXCEPT: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetQuantifier::SET_QUANTIFIER_DEFAULT")]
+pub const SetQuantifier_SET_QUANTIFIER_DEFAULT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetQuantifier::SET_QUANTIFIER_ALL")]
+pub const SetQuantifier_SET_QUANTIFIER_ALL: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetQuantifier::SET_QUANTIFIER_DISTINCT")]
+pub const SetQuantifier_SET_QUANTIFIER_DISTINCT: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SharedBitmapState::BM_INITIAL")]
+pub const SharedBitmapState_BM_INITIAL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SharedBitmapState::BM_INPROGRESS")]
+pub const SharedBitmapState_BM_INPROGRESS: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SharedBitmapState::BM_FINISHED")]
+pub const SharedBitmapState_BM_FINISHED: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SharedDependencyType::SHARED_DEPENDENCY_OWNER"
+)]
+pub const SharedDependencyType_SHARED_DEPENDENCY_OWNER: u32 = 111;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SharedDependencyType::SHARED_DEPENDENCY_ACL"
+)]
+pub const SharedDependencyType_SHARED_DEPENDENCY_ACL: u32 = 97;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SharedDependencyType::SHARED_DEPENDENCY_POLICY"
+)]
+pub const SharedDependencyType_SHARED_DEPENDENCY_POLICY: u32 = 114;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SharedDependencyType::SHARED_DEPENDENCY_TABLESPACE"
+)]
+pub const SharedDependencyType_SHARED_DEPENDENCY_TABLESPACE: u32 = 116;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SharedDependencyType::SHARED_DEPENDENCY_INVALID"
+)]
+pub const SharedDependencyType_SHARED_DEPENDENCY_INVALID: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SnapshotType::SNAPSHOT_MVCC")]
+pub const SnapshotType_SNAPSHOT_MVCC: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SnapshotType::SNAPSHOT_SELF")]
+pub const SnapshotType_SNAPSHOT_SELF: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SnapshotType::SNAPSHOT_ANY")]
+pub const SnapshotType_SNAPSHOT_ANY: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SnapshotType::SNAPSHOT_TOAST")]
+pub const SnapshotType_SNAPSHOT_TOAST: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SnapshotType::SNAPSHOT_DIRTY")]
+pub const SnapshotType_SNAPSHOT_DIRTY: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SnapshotType::SNAPSHOT_HISTORIC_MVCC")]
+pub const SnapshotType_SNAPSHOT_HISTORIC_MVCC: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SnapshotType::SNAPSHOT_NON_VACUUMABLE")]
+pub const SnapshotType_SNAPSHOT_NON_VACUUMABLE: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SortByDir::SORTBY_DEFAULT")]
+pub const SortByDir_SORTBY_DEFAULT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SortByDir::SORTBY_ASC")]
+pub const SortByDir_SORTBY_ASC: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SortByDir::SORTBY_DESC")]
+pub const SortByDir_SORTBY_DESC: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SortByDir::SORTBY_USING")]
+pub const SortByDir_SORTBY_USING: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SortByNulls::SORTBY_NULLS_DEFAULT")]
+pub const SortByNulls_SORTBY_NULLS_DEFAULT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SortByNulls::SORTBY_NULLS_FIRST")]
+pub const SortByNulls_SORTBY_NULLS_FIRST: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SortByNulls::SORTBY_NULLS_LAST")]
+pub const SortByNulls_SORTBY_NULLS_LAST: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::StdRdOptIndexCleanup::STDRD_OPTION_VACUUM_INDEX_CLEANUP_AUTO"
+)]
+pub const StdRdOptIndexCleanup_STDRD_OPTION_VACUUM_INDEX_CLEANUP_AUTO: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::StdRdOptIndexCleanup::STDRD_OPTION_VACUUM_INDEX_CLEANUP_OFF"
+)]
+pub const StdRdOptIndexCleanup_STDRD_OPTION_VACUUM_INDEX_CLEANUP_OFF: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::StdRdOptIndexCleanup::STDRD_OPTION_VACUUM_INDEX_CLEANUP_ON"
+)]
+pub const StdRdOptIndexCleanup_STDRD_OPTION_VACUUM_INDEX_CLEANUP_ON: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubLinkType::EXISTS_SUBLINK")]
+pub const SubLinkType_EXISTS_SUBLINK: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubLinkType::ALL_SUBLINK")]
+pub const SubLinkType_ALL_SUBLINK: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubLinkType::ANY_SUBLINK")]
+pub const SubLinkType_ANY_SUBLINK: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubLinkType::ROWCOMPARE_SUBLINK")]
+pub const SubLinkType_ROWCOMPARE_SUBLINK: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubLinkType::EXPR_SUBLINK")]
+pub const SubLinkType_EXPR_SUBLINK: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubLinkType::MULTIEXPR_SUBLINK")]
+pub const SubLinkType_MULTIEXPR_SUBLINK: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubLinkType::ARRAY_SUBLINK")]
+pub const SubLinkType_ARRAY_SUBLINK: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubLinkType::CTE_SUBLINK")]
+pub const SubLinkType_CTE_SUBLINK: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubXactEvent::SUBXACT_EVENT_START_SUB")]
+pub const SubXactEvent_SUBXACT_EVENT_START_SUB: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubXactEvent::SUBXACT_EVENT_COMMIT_SUB")]
+pub const SubXactEvent_SUBXACT_EVENT_COMMIT_SUB: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubXactEvent::SUBXACT_EVENT_ABORT_SUB")]
+pub const SubXactEvent_SUBXACT_EVENT_ABORT_SUB: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SubXactEvent::SUBXACT_EVENT_PRE_COMMIT_SUB"
+)]
+pub const SubXactEvent_SUBXACT_EVENT_PRE_COMMIT_SUB: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubqueryScanStatus::SUBQUERY_SCAN_UNKNOWN")]
+pub const SubqueryScanStatus_SUBQUERY_SCAN_UNKNOWN: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubqueryScanStatus::SUBQUERY_SCAN_TRIVIAL")]
+pub const SubqueryScanStatus_SUBQUERY_SCAN_TRIVIAL: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SubqueryScanStatus::SUBQUERY_SCAN_NONTRIVIAL"
+)]
+pub const SubqueryScanStatus_SUBQUERY_SCAN_NONTRIVIAL: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SyncCommitLevel::SYNCHRONOUS_COMMIT_OFF")]
+pub const SyncCommitLevel_SYNCHRONOUS_COMMIT_OFF: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SyncCommitLevel::SYNCHRONOUS_COMMIT_LOCAL_FLUSH"
+)]
+pub const SyncCommitLevel_SYNCHRONOUS_COMMIT_LOCAL_FLUSH: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SyncCommitLevel::SYNCHRONOUS_COMMIT_REMOTE_WRITE"
+)]
+pub const SyncCommitLevel_SYNCHRONOUS_COMMIT_REMOTE_WRITE: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SyncCommitLevel::SYNCHRONOUS_COMMIT_REMOTE_FLUSH"
+)]
+pub const SyncCommitLevel_SYNCHRONOUS_COMMIT_REMOTE_FLUSH: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SyncCommitLevel::SYNCHRONOUS_COMMIT_REMOTE_APPLY"
+)]
+pub const SyncCommitLevel_SYNCHRONOUS_COMMIT_REMOTE_APPLY: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SyncRequestHandler::SYNC_HANDLER_MD")]
+pub const SyncRequestHandler_SYNC_HANDLER_MD: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SyncRequestHandler::SYNC_HANDLER_CLOG")]
+pub const SyncRequestHandler_SYNC_HANDLER_CLOG: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SyncRequestHandler::SYNC_HANDLER_COMMIT_TS"
+)]
+pub const SyncRequestHandler_SYNC_HANDLER_COMMIT_TS: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SyncRequestHandler::SYNC_HANDLER_MULTIXACT_OFFSET"
+)]
+pub const SyncRequestHandler_SYNC_HANDLER_MULTIXACT_OFFSET: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SyncRequestHandler::SYNC_HANDLER_MULTIXACT_MEMBER"
+)]
+pub const SyncRequestHandler_SYNC_HANDLER_MULTIXACT_MEMBER: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SyncRequestHandler::SYNC_HANDLER_NONE")]
+pub const SyncRequestHandler_SYNC_HANDLER_NONE: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SyncRequestType::SYNC_REQUEST")]
+pub const SyncRequestType_SYNC_REQUEST: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SyncRequestType::SYNC_UNLINK_REQUEST")]
+pub const SyncRequestType_SYNC_UNLINK_REQUEST: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SyncRequestType::SYNC_FORGET_REQUEST")]
+pub const SyncRequestType_SYNC_FORGET_REQUEST: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SyncRequestType::SYNC_FILTER_REQUEST")]
+pub const SyncRequestType_SYNC_FILTER_REQUEST: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::AMNAME")]
+pub const SysCacheIdentifier_AMNAME: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::AMOPOPID")]
+pub const SysCacheIdentifier_AMOPOPID: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::AMOPSTRATEGY")]
+pub const SysCacheIdentifier_AMOPSTRATEGY: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::AMPROCNUM")]
+pub const SysCacheIdentifier_AMPROCNUM: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::ATTNAME")]
+pub const SysCacheIdentifier_ATTNAME: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::ATTNUM")]
+pub const SysCacheIdentifier_ATTNUM: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::AUTHMEMMEMROLE")]
+pub const SysCacheIdentifier_AUTHMEMMEMROLE: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::AUTHMEMROLEMEM")]
+pub const SysCacheIdentifier_AUTHMEMROLEMEM: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::AUTHNAME")]
+pub const SysCacheIdentifier_AUTHNAME: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::CASTSOURCETARGET")]
+pub const SysCacheIdentifier_CASTSOURCETARGET: u32 = 12;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::CLAAMNAMENSP")]
+pub const SysCacheIdentifier_CLAAMNAMENSP: u32 = 13;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::COLLNAMEENCNSP")]
+pub const SysCacheIdentifier_COLLNAMEENCNSP: u32 = 15;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::CONDEFAULT")]
+pub const SysCacheIdentifier_CONDEFAULT: u32 = 17;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::CONNAMENSP")]
+pub const SysCacheIdentifier_CONNAMENSP: u32 = 18;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::DEFACLROLENSPOBJ")]
+pub const SysCacheIdentifier_DEFACLROLENSPOBJ: u32 = 22;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::EVENTTRIGGERNAME")]
+pub const SysCacheIdentifier_EVENTTRIGGERNAME: u32 = 25;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SysCacheIdentifier::FOREIGNDATAWRAPPERNAME"
+)]
+pub const SysCacheIdentifier_FOREIGNDATAWRAPPERNAME: u32 = 27;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::FOREIGNSERVERNAME")]
+pub const SysCacheIdentifier_FOREIGNSERVERNAME: u32 = 29;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::FOREIGNTABLEREL")]
+pub const SysCacheIdentifier_FOREIGNTABLEREL: u32 = 31;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::INDEXRELID")]
+pub const SysCacheIdentifier_INDEXRELID: u32 = 32;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::LANGNAME")]
+pub const SysCacheIdentifier_LANGNAME: u32 = 33;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::NAMESPACENAME")]
+pub const SysCacheIdentifier_NAMESPACENAME: u32 = 35;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::OPERNAMENSP")]
+pub const SysCacheIdentifier_OPERNAMENSP: u32 = 37;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::OPFAMILYAMNAMENSP")]
+pub const SysCacheIdentifier_OPFAMILYAMNAMENSP: u32 = 39;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::PARAMETERACLNAME")]
+pub const SysCacheIdentifier_PARAMETERACLNAME: u32 = 41;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::PARTRELID")]
+pub const SysCacheIdentifier_PARTRELID: u32 = 43;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::PROCNAMEARGSNSP")]
+pub const SysCacheIdentifier_PROCNAMEARGSNSP: u32 = 44;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::PUBLICATIONNAME")]
+pub const SysCacheIdentifier_PUBLICATIONNAME: u32 = 46;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::PUBLICATIONNAMESPACE")]
+pub const SysCacheIdentifier_PUBLICATIONNAMESPACE: u32 = 47;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::SysCacheIdentifier::PUBLICATIONNAMESPACEMAP"
+)]
+pub const SysCacheIdentifier_PUBLICATIONNAMESPACEMAP: u32 = 48;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::PUBLICATIONREL")]
+pub const SysCacheIdentifier_PUBLICATIONREL: u32 = 50;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::PUBLICATIONRELMAP")]
+pub const SysCacheIdentifier_PUBLICATIONRELMAP: u32 = 51;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::RANGEMULTIRANGE")]
+pub const SysCacheIdentifier_RANGEMULTIRANGE: u32 = 52;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::RANGETYPE")]
+pub const SysCacheIdentifier_RANGETYPE: u32 = 53;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::RELNAMENSP")]
+pub const SysCacheIdentifier_RELNAMENSP: u32 = 54;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::REPLORIGIDENT")]
+pub const SysCacheIdentifier_REPLORIGIDENT: u32 = 56;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::REPLORIGNAME")]
+pub const SysCacheIdentifier_REPLORIGNAME: u32 = 57;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::RULERELNAME")]
+pub const SysCacheIdentifier_RULERELNAME: u32 = 58;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::SEQRELID")]
+pub const SysCacheIdentifier_SEQRELID: u32 = 59;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::STATEXTNAMENSP")]
+pub const SysCacheIdentifier_STATEXTNAMENSP: u32 = 61;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::STATRELATTINH")]
+pub const SysCacheIdentifier_STATRELATTINH: u32 = 63;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::SUBSCRIPTIONNAME")]
+pub const SysCacheIdentifier_SUBSCRIPTIONNAME: u32 = 64;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::SUBSCRIPTIONRELMAP")]
+pub const SysCacheIdentifier_SUBSCRIPTIONRELMAP: u32 = 66;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::TRFTYPELANG")]
+pub const SysCacheIdentifier_TRFTYPELANG: u32 = 69;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::TSCONFIGMAP")]
+pub const SysCacheIdentifier_TSCONFIGMAP: u32 = 70;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::TSCONFIGNAMENSP")]
+pub const SysCacheIdentifier_TSCONFIGNAMENSP: u32 = 71;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::TSDICTNAMENSP")]
+pub const SysCacheIdentifier_TSDICTNAMENSP: u32 = 73;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::TSPARSERNAMENSP")]
+pub const SysCacheIdentifier_TSPARSERNAMENSP: u32 = 75;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::TSTEMPLATENAMENSP")]
+pub const SysCacheIdentifier_TSTEMPLATENAMENSP: u32 = 77;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::TYPENAMENSP")]
+pub const SysCacheIdentifier_TYPENAMENSP: u32 = 79;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::USERMAPPINGUSERSERVER")]
+pub const SysCacheIdentifier_USERMAPPINGUSERSERVER: u32 = 82;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TM_Result::TM_Ok")]
+pub const TM_Result_TM_Ok: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TM_Result::TM_Invisible")]
+pub const TM_Result_TM_Invisible: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TM_Result::TM_SelfModified")]
+pub const TM_Result_TM_SelfModified: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TM_Result::TM_Updated")]
+pub const TM_Result_TM_Updated: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TM_Result::TM_Deleted")]
+pub const TM_Result_TM_Deleted: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TM_Result::TM_BeingModified")]
+pub const TM_Result_TM_BeingModified: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TM_Result::TM_WouldBlock")]
+pub const TM_Result_TM_WouldBlock: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TSTernaryValue::TS_NO")]
+pub const TSTernaryValue_TS_NO: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TSTernaryValue::TS_YES")]
+pub const TSTernaryValue_TS_YES: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TSTernaryValue::TS_MAYBE")]
+pub const TSTernaryValue_TS_MAYBE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TU_UpdateIndexes::TU_None")]
+pub const TU_UpdateIndexes_TU_None: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TU_UpdateIndexes::TU_All")]
+pub const TU_UpdateIndexes_TU_All: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TU_UpdateIndexes::TU_Summarizing")]
+pub const TU_UpdateIndexes_TU_Summarizing: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::TableLikeOption::CREATE_TABLE_LIKE_COMMENTS"
+)]
+pub const TableLikeOption_CREATE_TABLE_LIKE_COMMENTS: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::TableLikeOption::CREATE_TABLE_LIKE_COMPRESSION"
+)]
+pub const TableLikeOption_CREATE_TABLE_LIKE_COMPRESSION: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::TableLikeOption::CREATE_TABLE_LIKE_CONSTRAINTS"
+)]
+pub const TableLikeOption_CREATE_TABLE_LIKE_CONSTRAINTS: u32 = 4;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::TableLikeOption::CREATE_TABLE_LIKE_DEFAULTS"
+)]
+pub const TableLikeOption_CREATE_TABLE_LIKE_DEFAULTS: u32 = 8;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::TableLikeOption::CREATE_TABLE_LIKE_GENERATED"
+)]
+pub const TableLikeOption_CREATE_TABLE_LIKE_GENERATED: u32 = 16;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::TableLikeOption::CREATE_TABLE_LIKE_IDENTITY"
+)]
+pub const TableLikeOption_CREATE_TABLE_LIKE_IDENTITY: u32 = 32;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::TableLikeOption::CREATE_TABLE_LIKE_INDEXES"
+)]
+pub const TableLikeOption_CREATE_TABLE_LIKE_INDEXES: u32 = 64;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::TableLikeOption::CREATE_TABLE_LIKE_STATISTICS"
+)]
+pub const TableLikeOption_CREATE_TABLE_LIKE_STATISTICS: u32 = 128;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::TableLikeOption::CREATE_TABLE_LIKE_STORAGE"
+)]
+pub const TableLikeOption_CREATE_TABLE_LIKE_STORAGE: u32 = 256;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TableLikeOption::CREATE_TABLE_LIKE_ALL")]
+pub const TableLikeOption_CREATE_TABLE_LIKE_ALL: u32 = 2147483647;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::TempNamespaceStatus::TEMP_NAMESPACE_NOT_TEMP"
+)]
+pub const TempNamespaceStatus_TEMP_NAMESPACE_NOT_TEMP: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TempNamespaceStatus::TEMP_NAMESPACE_IDLE")]
+pub const TempNamespaceStatus_TEMP_NAMESPACE_IDLE: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::TempNamespaceStatus::TEMP_NAMESPACE_IN_USE"
+)]
+pub const TempNamespaceStatus_TEMP_NAMESPACE_IN_USE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TrackFunctionsLevel::TRACK_FUNC_OFF")]
+pub const TrackFunctionsLevel_TRACK_FUNC_OFF: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TrackFunctionsLevel::TRACK_FUNC_PL")]
+pub const TrackFunctionsLevel_TRACK_FUNC_PL: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TrackFunctionsLevel::TRACK_FUNC_ALL")]
+pub const TrackFunctionsLevel_TRACK_FUNC_ALL: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_BEGIN")]
+pub const TransactionStmtKind_TRANS_STMT_BEGIN: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_START")]
+pub const TransactionStmtKind_TRANS_STMT_START: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_COMMIT")]
+pub const TransactionStmtKind_TRANS_STMT_COMMIT: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_ROLLBACK")]
+pub const TransactionStmtKind_TRANS_STMT_ROLLBACK: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_SAVEPOINT")]
+pub const TransactionStmtKind_TRANS_STMT_SAVEPOINT: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_RELEASE")]
+pub const TransactionStmtKind_TRANS_STMT_RELEASE: u32 = 5;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_ROLLBACK_TO"
+)]
+pub const TransactionStmtKind_TRANS_STMT_ROLLBACK_TO: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_PREPARE")]
+pub const TransactionStmtKind_TRANS_STMT_PREPARE: u32 = 7;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_COMMIT_PREPARED"
+)]
+pub const TransactionStmtKind_TRANS_STMT_COMMIT_PREPARED: u32 = 8;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_ROLLBACK_PREPARED"
+)]
+pub const TransactionStmtKind_TRANS_STMT_ROLLBACK_PREPARED: u32 = 9;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::TuplesortMethod::SORT_TYPE_STILL_IN_PROGRESS"
+)]
+pub const TuplesortMethod_SORT_TYPE_STILL_IN_PROGRESS: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TuplesortMethod::SORT_TYPE_TOP_N_HEAPSORT")]
+pub const TuplesortMethod_SORT_TYPE_TOP_N_HEAPSORT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TuplesortMethod::SORT_TYPE_QUICKSORT")]
+pub const TuplesortMethod_SORT_TYPE_QUICKSORT: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TuplesortMethod::SORT_TYPE_EXTERNAL_SORT")]
+pub const TuplesortMethod_SORT_TYPE_EXTERNAL_SORT: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TuplesortMethod::SORT_TYPE_EXTERNAL_MERGE")]
+pub const TuplesortMethod_SORT_TYPE_EXTERNAL_MERGE: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TuplesortSpaceType::SORT_SPACE_TYPE_DISK")]
+pub const TuplesortSpaceType_SORT_SPACE_TYPE_DISK: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::TuplesortSpaceType::SORT_SPACE_TYPE_MEMORY"
+)]
+pub const TuplesortSpaceType_SORT_SPACE_TYPE_MEMORY: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TypeFuncClass::TYPEFUNC_SCALAR")]
+pub const TypeFuncClass_TYPEFUNC_SCALAR: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TypeFuncClass::TYPEFUNC_COMPOSITE")]
+pub const TypeFuncClass_TYPEFUNC_COMPOSITE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TypeFuncClass::TYPEFUNC_COMPOSITE_DOMAIN")]
+pub const TypeFuncClass_TYPEFUNC_COMPOSITE_DOMAIN: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TypeFuncClass::TYPEFUNC_RECORD")]
+pub const TypeFuncClass_TYPEFUNC_RECORD: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TypeFuncClass::TYPEFUNC_OTHER")]
+pub const TypeFuncClass_TYPEFUNC_OTHER: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UniquePathMethod::UNIQUE_PATH_NOOP")]
+pub const UniquePathMethod_UNIQUE_PATH_NOOP: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UniquePathMethod::UNIQUE_PATH_HASH")]
+pub const UniquePathMethod_UNIQUE_PATH_HASH: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UniquePathMethod::UNIQUE_PATH_SORT")]
+pub const UniquePathMethod_UNIQUE_PATH_SORT: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UpperRelationKind::UPPERREL_SETOP")]
+pub const UpperRelationKind_UPPERREL_SETOP: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::UpperRelationKind::UPPERREL_PARTIAL_GROUP_AGG"
+)]
+pub const UpperRelationKind_UPPERREL_PARTIAL_GROUP_AGG: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UpperRelationKind::UPPERREL_GROUP_AGG")]
+pub const UpperRelationKind_UPPERREL_GROUP_AGG: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UpperRelationKind::UPPERREL_WINDOW")]
+pub const UpperRelationKind_UPPERREL_WINDOW: u32 = 3;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::UpperRelationKind::UPPERREL_PARTIAL_DISTINCT"
+)]
+pub const UpperRelationKind_UPPERREL_PARTIAL_DISTINCT: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UpperRelationKind::UPPERREL_DISTINCT")]
+pub const UpperRelationKind_UPPERREL_DISTINCT: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UpperRelationKind::UPPERREL_ORDERED")]
+pub const UpperRelationKind_UPPERREL_ORDERED: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UpperRelationKind::UPPERREL_FINAL")]
+pub const UpperRelationKind_UPPERREL_FINAL: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VacOptValue::VACOPTVALUE_UNSPECIFIED")]
+pub const VacOptValue_VACOPTVALUE_UNSPECIFIED: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VacOptValue::VACOPTVALUE_AUTO")]
+pub const VacOptValue_VACOPTVALUE_AUTO: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VacOptValue::VACOPTVALUE_DISABLED")]
+pub const VacOptValue_VACOPTVALUE_DISABLED: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VacOptValue::VACOPTVALUE_ENABLED")]
+pub const VacOptValue_VACOPTVALUE_ENABLED: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VariableSetKind::VAR_SET_VALUE")]
+pub const VariableSetKind_VAR_SET_VALUE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VariableSetKind::VAR_SET_DEFAULT")]
+pub const VariableSetKind_VAR_SET_DEFAULT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VariableSetKind::VAR_SET_CURRENT")]
+pub const VariableSetKind_VAR_SET_CURRENT: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VariableSetKind::VAR_SET_MULTI")]
+pub const VariableSetKind_VAR_SET_MULTI: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VariableSetKind::VAR_RESET")]
+pub const VariableSetKind_VAR_RESET: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VariableSetKind::VAR_RESET_ALL")]
+pub const VariableSetKind_VAR_RESET_ALL: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ViewCheckOption::NO_CHECK_OPTION")]
+pub const ViewCheckOption_NO_CHECK_OPTION: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ViewCheckOption::LOCAL_CHECK_OPTION")]
+pub const ViewCheckOption_LOCAL_CHECK_OPTION: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ViewCheckOption::CASCADED_CHECK_OPTION")]
+pub const ViewCheckOption_CASCADED_CHECK_OPTION: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ViewOptCheckOption::VIEW_OPTION_CHECK_OPTION_NOT_SET"
+)]
+pub const ViewOptCheckOption_VIEW_OPTION_CHECK_OPTION_NOT_SET: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ViewOptCheckOption::VIEW_OPTION_CHECK_OPTION_LOCAL"
+)]
+pub const ViewOptCheckOption_VIEW_OPTION_CHECK_OPTION_LOCAL: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::ViewOptCheckOption::VIEW_OPTION_CHECK_OPTION_CASCADED"
+)]
+pub const ViewOptCheckOption_VIEW_OPTION_CHECK_OPTION_CASCADED: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::VolatileFunctionStatus::VOLATILITY_UNKNOWN"
+)]
+pub const VolatileFunctionStatus_VOLATILITY_UNKNOWN: u32 = 0;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::VolatileFunctionStatus::VOLATILITY_VOLATILE"
+)]
+pub const VolatileFunctionStatus_VOLATILITY_VOLATILE: u32 = 1;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::VolatileFunctionStatus::VOLATILITY_NOVOLATILE"
+)]
+pub const VolatileFunctionStatus_VOLATILITY_NOVOLATILE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WALAvailability::WALAVAIL_INVALID_LSN")]
+pub const WALAvailability_WALAVAIL_INVALID_LSN: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WALAvailability::WALAVAIL_RESERVED")]
+pub const WALAvailability_WALAVAIL_RESERVED: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WALAvailability::WALAVAIL_EXTENDED")]
+pub const WALAvailability_WALAVAIL_EXTENDED: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WALAvailability::WALAVAIL_UNRESERVED")]
+pub const WALAvailability_WALAVAIL_UNRESERVED: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WALAvailability::WALAVAIL_REMOVED")]
+pub const WALAvailability_WALAVAIL_REMOVED: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WCOKind::WCO_VIEW_CHECK")]
+pub const WCOKind_WCO_VIEW_CHECK: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WCOKind::WCO_RLS_INSERT_CHECK")]
+pub const WCOKind_WCO_RLS_INSERT_CHECK: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WCOKind::WCO_RLS_UPDATE_CHECK")]
+pub const WCOKind_WCO_RLS_UPDATE_CHECK: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WCOKind::WCO_RLS_CONFLICT_CHECK")]
+pub const WCOKind_WCO_RLS_CONFLICT_CHECK: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WCOKind::WCO_RLS_MERGE_UPDATE_CHECK")]
+pub const WCOKind_WCO_RLS_MERGE_UPDATE_CHECK: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WCOKind::WCO_RLS_MERGE_DELETE_CHECK")]
+pub const WCOKind_WCO_RLS_MERGE_DELETE_CHECK: u32 = 5;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventActivity::WAIT_EVENT_ARCHIVER_MAIN"
+)]
+pub const WaitEventActivity_WAIT_EVENT_ARCHIVER_MAIN: u32 = 83886080;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventActivity::WAIT_EVENT_AUTOVACUUM_MAIN"
+)]
+pub const WaitEventActivity_WAIT_EVENT_AUTOVACUUM_MAIN: u32 = 83886081;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventActivity::WAIT_EVENT_BGWRITER_HIBERNATE"
+)]
+pub const WaitEventActivity_WAIT_EVENT_BGWRITER_HIBERNATE: u32 = 83886082;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventActivity::WAIT_EVENT_BGWRITER_MAIN"
+)]
+pub const WaitEventActivity_WAIT_EVENT_BGWRITER_MAIN: u32 = 83886083;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventActivity::WAIT_EVENT_CHECKPOINTER_MAIN"
+)]
+pub const WaitEventActivity_WAIT_EVENT_CHECKPOINTER_MAIN: u32 = 83886084;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventActivity::WAIT_EVENT_LOGICAL_APPLY_MAIN"
+)]
+pub const WaitEventActivity_WAIT_EVENT_LOGICAL_APPLY_MAIN: u32 = 83886085;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventActivity::WAIT_EVENT_LOGICAL_LAUNCHER_MAIN"
+)]
+pub const WaitEventActivity_WAIT_EVENT_LOGICAL_LAUNCHER_MAIN: u32 = 83886086;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventActivity::WAIT_EVENT_LOGICAL_PARALLEL_APPLY_MAIN"
+)]
+pub const WaitEventActivity_WAIT_EVENT_LOGICAL_PARALLEL_APPLY_MAIN: u32 = 83886087;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventActivity::WAIT_EVENT_RECOVERY_WAL_STREAM"
+)]
+pub const WaitEventActivity_WAIT_EVENT_RECOVERY_WAL_STREAM: u32 = 83886088;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventActivity::WAIT_EVENT_SYSLOGGER_MAIN"
+)]
+pub const WaitEventActivity_WAIT_EVENT_SYSLOGGER_MAIN: u32 = 83886089;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventActivity::WAIT_EVENT_WAL_RECEIVER_MAIN"
+)]
+pub const WaitEventActivity_WAIT_EVENT_WAL_RECEIVER_MAIN: u32 = 83886090;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventActivity::WAIT_EVENT_WAL_SENDER_MAIN"
+)]
+pub const WaitEventActivity_WAIT_EVENT_WAL_SENDER_MAIN: u32 = 83886091;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventActivity::WAIT_EVENT_WAL_WRITER_MAIN"
+)]
+pub const WaitEventActivity_WAIT_EVENT_WAL_WRITER_MAIN: u32 = 83886092;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventClient::WAIT_EVENT_CLIENT_READ")]
+pub const WaitEventClient_WAIT_EVENT_CLIENT_READ: u32 = 100663296;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventClient::WAIT_EVENT_CLIENT_WRITE")]
+pub const WaitEventClient_WAIT_EVENT_CLIENT_WRITE: u32 = 100663297;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventClient::WAIT_EVENT_GSS_OPEN_SERVER"
+)]
+pub const WaitEventClient_WAIT_EVENT_GSS_OPEN_SERVER: u32 = 100663298;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventClient::WAIT_EVENT_LIBPQWALRECEIVER_CONNECT"
+)]
+pub const WaitEventClient_WAIT_EVENT_LIBPQWALRECEIVER_CONNECT: u32 = 100663299;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventClient::WAIT_EVENT_LIBPQWALRECEIVER_RECEIVE"
+)]
+pub const WaitEventClient_WAIT_EVENT_LIBPQWALRECEIVER_RECEIVE: u32 = 100663300;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventClient::WAIT_EVENT_SSL_OPEN_SERVER"
+)]
+pub const WaitEventClient_WAIT_EVENT_SSL_OPEN_SERVER: u32 = 100663301;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventClient::WAIT_EVENT_WAL_SENDER_WAIT_WAL"
+)]
+pub const WaitEventClient_WAIT_EVENT_WAL_SENDER_WAIT_WAL: u32 = 100663302;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventClient::WAIT_EVENT_WAL_SENDER_WRITE_DATA"
+)]
+pub const WaitEventClient_WAIT_EVENT_WAL_SENDER_WRITE_DATA: u32 = 100663303;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BASEBACKUP_READ")]
+pub const WaitEventIO_WAIT_EVENT_BASEBACKUP_READ: u32 = 167772160;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BASEBACKUP_SYNC")]
+pub const WaitEventIO_WAIT_EVENT_BASEBACKUP_SYNC: u32 = 167772161;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BASEBACKUP_WRITE")]
+pub const WaitEventIO_WAIT_EVENT_BASEBACKUP_WRITE: u32 = 167772162;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BUFFILE_READ")]
+pub const WaitEventIO_WAIT_EVENT_BUFFILE_READ: u32 = 167772163;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BUFFILE_WRITE")]
+pub const WaitEventIO_WAIT_EVENT_BUFFILE_WRITE: u32 = 167772164;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BUFFILE_TRUNCATE")]
+pub const WaitEventIO_WAIT_EVENT_BUFFILE_TRUNCATE: u32 = 167772165;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_CONTROL_FILE_READ")]
+pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_READ: u32 = 167772166;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_CONTROL_FILE_SYNC")]
+pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_SYNC: u32 = 167772167;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_CONTROL_FILE_SYNC_UPDATE"
+)]
+pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_SYNC_UPDATE: u32 = 167772168;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_CONTROL_FILE_WRITE"
+)]
+pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_WRITE: u32 = 167772169;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_CONTROL_FILE_WRITE_UPDATE"
+)]
+pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_WRITE_UPDATE: u32 = 167772170;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_COPY_FILE_READ")]
+pub const WaitEventIO_WAIT_EVENT_COPY_FILE_READ: u32 = 167772171;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_COPY_FILE_WRITE")]
+pub const WaitEventIO_WAIT_EVENT_COPY_FILE_WRITE: u32 = 167772172;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_EXTEND")]
+pub const WaitEventIO_WAIT_EVENT_DATA_FILE_EXTEND: u32 = 167772173;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_FLUSH")]
+pub const WaitEventIO_WAIT_EVENT_DATA_FILE_FLUSH: u32 = 167772174;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_IMMEDIATE_SYNC"
+)]
+pub const WaitEventIO_WAIT_EVENT_DATA_FILE_IMMEDIATE_SYNC: u32 = 167772175;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_PREFETCH"
+)]
+pub const WaitEventIO_WAIT_EVENT_DATA_FILE_PREFETCH: u32 = 167772176;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_READ")]
+pub const WaitEventIO_WAIT_EVENT_DATA_FILE_READ: u32 = 167772177;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_SYNC")]
+pub const WaitEventIO_WAIT_EVENT_DATA_FILE_SYNC: u32 = 167772178;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_TRUNCATE"
+)]
+pub const WaitEventIO_WAIT_EVENT_DATA_FILE_TRUNCATE: u32 = 167772179;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_WRITE")]
+pub const WaitEventIO_WAIT_EVENT_DATA_FILE_WRITE: u32 = 167772180;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DSM_ALLOCATE")]
+pub const WaitEventIO_WAIT_EVENT_DSM_ALLOCATE: u32 = 167772181;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DSM_FILL_ZERO_WRITE"
+)]
+pub const WaitEventIO_WAIT_EVENT_DSM_FILL_ZERO_WRITE: u32 = 167772182;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_LOCK_FILE_ADDTODATADIR_READ"
+)]
+pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_ADDTODATADIR_READ: u32 = 167772183;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_LOCK_FILE_ADDTODATADIR_SYNC"
+)]
+pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_ADDTODATADIR_SYNC: u32 = 167772184;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_LOCK_FILE_ADDTODATADIR_WRITE"
+)]
+pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_ADDTODATADIR_WRITE: u32 = 167772185;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_LOCK_FILE_CREATE_READ"
+)]
+pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_CREATE_READ: u32 = 167772186;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_LOCK_FILE_CREATE_SYNC"
+)]
+pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_CREATE_SYNC: u32 = 167772187;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_LOCK_FILE_CREATE_WRITE"
+)]
+pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_CREATE_WRITE: u32 = 167772188;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_LOCK_FILE_RECHECKDATADIR_READ"
+)]
+pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_RECHECKDATADIR_READ: u32 = 167772189;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_LOGICAL_REWRITE_CHECKPOINT_SYNC"
+)]
+pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_CHECKPOINT_SYNC: u32 = 167772190;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_LOGICAL_REWRITE_MAPPING_SYNC"
+)]
+pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_MAPPING_SYNC: u32 = 167772191;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_LOGICAL_REWRITE_MAPPING_WRITE"
+)]
+pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_MAPPING_WRITE: u32 = 167772192;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_LOGICAL_REWRITE_SYNC"
+)]
+pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_SYNC: u32 = 167772193;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_LOGICAL_REWRITE_TRUNCATE"
+)]
+pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_TRUNCATE: u32 = 167772194;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_LOGICAL_REWRITE_WRITE"
+)]
+pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_WRITE: u32 = 167772195;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_RELATION_MAP_READ")]
+pub const WaitEventIO_WAIT_EVENT_RELATION_MAP_READ: u32 = 167772196;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_RELATION_MAP_REPLACE"
+)]
+pub const WaitEventIO_WAIT_EVENT_RELATION_MAP_REPLACE: u32 = 167772197;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_RELATION_MAP_WRITE"
+)]
+pub const WaitEventIO_WAIT_EVENT_RELATION_MAP_WRITE: u32 = 167772198;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_REORDER_BUFFER_READ"
+)]
+pub const WaitEventIO_WAIT_EVENT_REORDER_BUFFER_READ: u32 = 167772199;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_REORDER_BUFFER_WRITE"
+)]
+pub const WaitEventIO_WAIT_EVENT_REORDER_BUFFER_WRITE: u32 = 167772200;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_REORDER_LOGICAL_MAPPING_READ"
+)]
+pub const WaitEventIO_WAIT_EVENT_REORDER_LOGICAL_MAPPING_READ: u32 = 167772201;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_REPLICATION_SLOT_READ"
+)]
+pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_READ: u32 = 167772202;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_REPLICATION_SLOT_RESTORE_SYNC"
+)]
+pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_RESTORE_SYNC: u32 = 167772203;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_REPLICATION_SLOT_SYNC"
+)]
+pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_SYNC: u32 = 167772204;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_REPLICATION_SLOT_WRITE"
+)]
+pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_WRITE: u32 = 167772205;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SLRU_FLUSH_SYNC")]
+pub const WaitEventIO_WAIT_EVENT_SLRU_FLUSH_SYNC: u32 = 167772206;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SLRU_READ")]
+pub const WaitEventIO_WAIT_EVENT_SLRU_READ: u32 = 167772207;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SLRU_SYNC")]
+pub const WaitEventIO_WAIT_EVENT_SLRU_SYNC: u32 = 167772208;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SLRU_WRITE")]
+pub const WaitEventIO_WAIT_EVENT_SLRU_WRITE: u32 = 167772209;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SNAPBUILD_READ")]
+pub const WaitEventIO_WAIT_EVENT_SNAPBUILD_READ: u32 = 167772210;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SNAPBUILD_SYNC")]
+pub const WaitEventIO_WAIT_EVENT_SNAPBUILD_SYNC: u32 = 167772211;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SNAPBUILD_WRITE")]
+pub const WaitEventIO_WAIT_EVENT_SNAPBUILD_WRITE: u32 = 167772212;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_TIMELINE_HISTORY_FILE_SYNC"
+)]
+pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_FILE_SYNC: u32 = 167772213;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_TIMELINE_HISTORY_FILE_WRITE"
+)]
+pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_FILE_WRITE: u32 = 167772214;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_TIMELINE_HISTORY_READ"
+)]
+pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_READ: u32 = 167772215;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_TIMELINE_HISTORY_SYNC"
+)]
+pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_SYNC: u32 = 167772216;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_TIMELINE_HISTORY_WRITE"
+)]
+pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_WRITE: u32 = 167772217;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_TWOPHASE_FILE_READ"
+)]
+pub const WaitEventIO_WAIT_EVENT_TWOPHASE_FILE_READ: u32 = 167772218;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_TWOPHASE_FILE_SYNC"
+)]
+pub const WaitEventIO_WAIT_EVENT_TWOPHASE_FILE_SYNC: u32 = 167772219;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_TWOPHASE_FILE_WRITE"
+)]
+pub const WaitEventIO_WAIT_EVENT_TWOPHASE_FILE_WRITE: u32 = 167772220;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_VERSION_FILE_WRITE"
+)]
+pub const WaitEventIO_WAIT_EVENT_VERSION_FILE_WRITE: u32 = 167772221;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WALSENDER_TIMELINE_HISTORY_READ"
+)]
+pub const WaitEventIO_WAIT_EVENT_WALSENDER_TIMELINE_HISTORY_READ: u32 = 167772222;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_BOOTSTRAP_SYNC"
+)]
+pub const WaitEventIO_WAIT_EVENT_WAL_BOOTSTRAP_SYNC: u32 = 167772223;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_BOOTSTRAP_WRITE"
+)]
+pub const WaitEventIO_WAIT_EVENT_WAL_BOOTSTRAP_WRITE: u32 = 167772224;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_COPY_READ")]
+pub const WaitEventIO_WAIT_EVENT_WAL_COPY_READ: u32 = 167772225;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_COPY_SYNC")]
+pub const WaitEventIO_WAIT_EVENT_WAL_COPY_SYNC: u32 = 167772226;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_COPY_WRITE")]
+pub const WaitEventIO_WAIT_EVENT_WAL_COPY_WRITE: u32 = 167772227;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_INIT_SYNC")]
+pub const WaitEventIO_WAIT_EVENT_WAL_INIT_SYNC: u32 = 167772228;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_INIT_WRITE")]
+pub const WaitEventIO_WAIT_EVENT_WAL_INIT_WRITE: u32 = 167772229;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_READ")]
+pub const WaitEventIO_WAIT_EVENT_WAL_READ: u32 = 167772230;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_SYNC")]
+pub const WaitEventIO_WAIT_EVENT_WAL_SYNC: u32 = 167772231;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_SYNC_METHOD_ASSIGN"
+)]
+pub const WaitEventIO_WAIT_EVENT_WAL_SYNC_METHOD_ASSIGN: u32 = 167772232;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_WRITE")]
+pub const WaitEventIO_WAIT_EVENT_WAL_WRITE: u32 = 167772233;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_APPEND_READY")]
+pub const WaitEventIPC_WAIT_EVENT_APPEND_READY: u32 = 134217728;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_ARCHIVE_CLEANUP_COMMAND"
+)]
+pub const WaitEventIPC_WAIT_EVENT_ARCHIVE_CLEANUP_COMMAND: u32 = 134217729;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_ARCHIVE_COMMAND")]
+pub const WaitEventIPC_WAIT_EVENT_ARCHIVE_COMMAND: u32 = 134217730;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_BACKEND_TERMINATION"
+)]
+pub const WaitEventIPC_WAIT_EVENT_BACKEND_TERMINATION: u32 = 134217731;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_BACKUP_WAIT_WAL_ARCHIVE"
+)]
+pub const WaitEventIPC_WAIT_EVENT_BACKUP_WAIT_WAL_ARCHIVE: u32 = 134217732;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_BGWORKER_SHUTDOWN"
+)]
+pub const WaitEventIPC_WAIT_EVENT_BGWORKER_SHUTDOWN: u32 = 134217733;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_BGWORKER_STARTUP")]
+pub const WaitEventIPC_WAIT_EVENT_BGWORKER_STARTUP: u32 = 134217734;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_BTREE_PAGE")]
+pub const WaitEventIPC_WAIT_EVENT_BTREE_PAGE: u32 = 134217735;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_BUFFER_IO")]
+pub const WaitEventIPC_WAIT_EVENT_BUFFER_IO: u32 = 134217736;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_CHECKPOINT_DONE")]
+pub const WaitEventIPC_WAIT_EVENT_CHECKPOINT_DONE: u32 = 134217737;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_CHECKPOINT_START")]
+pub const WaitEventIPC_WAIT_EVENT_CHECKPOINT_START: u32 = 134217738;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_EXECUTE_GATHER")]
+pub const WaitEventIPC_WAIT_EVENT_EXECUTE_GATHER: u32 = 134217739;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_BATCH_ALLOCATE"
+)]
+pub const WaitEventIPC_WAIT_EVENT_HASH_BATCH_ALLOCATE: u32 = 134217740;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_BATCH_ELECT")]
+pub const WaitEventIPC_WAIT_EVENT_HASH_BATCH_ELECT: u32 = 134217741;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_BATCH_LOAD")]
+pub const WaitEventIPC_WAIT_EVENT_HASH_BATCH_LOAD: u32 = 134217742;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_BUILD_ALLOCATE"
+)]
+pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_ALLOCATE: u32 = 134217743;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_BUILD_ELECT")]
+pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_ELECT: u32 = 134217744;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_BUILD_HASH_INNER"
+)]
+pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_HASH_INNER: u32 = 134217745;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_BUILD_HASH_OUTER"
+)]
+pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_HASH_OUTER: u32 = 134217746;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_GROW_BATCHES_DECIDE"
+)]
+pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_DECIDE: u32 = 134217747;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_GROW_BATCHES_ELECT"
+)]
+pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_ELECT: u32 = 134217748;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_GROW_BATCHES_FINISH"
+)]
+pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_FINISH: u32 = 134217749;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_GROW_BATCHES_REALLOCATE"
+)]
+pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_REALLOCATE: u32 = 134217750;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_GROW_BATCHES_REPARTITION"
+)]
+pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_REPARTITION: u32 = 134217751;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_GROW_BUCKETS_ELECT"
+)]
+pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BUCKETS_ELECT: u32 = 134217752;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_GROW_BUCKETS_REALLOCATE"
+)]
+pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BUCKETS_REALLOCATE: u32 = 134217753;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_GROW_BUCKETS_REINSERT"
+)]
+pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BUCKETS_REINSERT: u32 = 134217754;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_LOGICAL_APPLY_SEND_DATA"
+)]
+pub const WaitEventIPC_WAIT_EVENT_LOGICAL_APPLY_SEND_DATA: u32 = 134217755;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_LOGICAL_PARALLEL_APPLY_STATE_CHANGE"
+)]
+pub const WaitEventIPC_WAIT_EVENT_LOGICAL_PARALLEL_APPLY_STATE_CHANGE: u32 = 134217756;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_LOGICAL_SYNC_DATA"
+)]
+pub const WaitEventIPC_WAIT_EVENT_LOGICAL_SYNC_DATA: u32 = 134217757;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE"
+)]
+pub const WaitEventIPC_WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE: u32 = 134217758;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_MQ_INTERNAL")]
+pub const WaitEventIPC_WAIT_EVENT_MQ_INTERNAL: u32 = 134217759;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_MQ_PUT_MESSAGE")]
+pub const WaitEventIPC_WAIT_EVENT_MQ_PUT_MESSAGE: u32 = 134217760;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_MQ_RECEIVE")]
+pub const WaitEventIPC_WAIT_EVENT_MQ_RECEIVE: u32 = 134217761;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_MQ_SEND")]
+pub const WaitEventIPC_WAIT_EVENT_MQ_SEND: u32 = 134217762;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PARALLEL_BITMAP_SCAN"
+)]
+pub const WaitEventIPC_WAIT_EVENT_PARALLEL_BITMAP_SCAN: u32 = 134217763;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN"
+)]
+pub const WaitEventIPC_WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN: u32 = 134217764;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PARALLEL_FINISH")]
+pub const WaitEventIPC_WAIT_EVENT_PARALLEL_FINISH: u32 = 134217765;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PROCARRAY_GROUP_UPDATE"
+)]
+pub const WaitEventIPC_WAIT_EVENT_PROCARRAY_GROUP_UPDATE: u32 = 134217766;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PROC_SIGNAL_BARRIER"
+)]
+pub const WaitEventIPC_WAIT_EVENT_PROC_SIGNAL_BARRIER: u32 = 134217767;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PROMOTE")]
+pub const WaitEventIPC_WAIT_EVENT_PROMOTE: u32 = 134217768;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_RECOVERY_CONFLICT_SNAPSHOT"
+)]
+pub const WaitEventIPC_WAIT_EVENT_RECOVERY_CONFLICT_SNAPSHOT: u32 = 134217769;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE"
+)]
+pub const WaitEventIPC_WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE: u32 = 134217770;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_RECOVERY_END_COMMAND"
+)]
+pub const WaitEventIPC_WAIT_EVENT_RECOVERY_END_COMMAND: u32 = 134217771;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_RECOVERY_PAUSE")]
+pub const WaitEventIPC_WAIT_EVENT_RECOVERY_PAUSE: u32 = 134217772;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_REPLICATION_ORIGIN_DROP"
+)]
+pub const WaitEventIPC_WAIT_EVENT_REPLICATION_ORIGIN_DROP: u32 = 134217773;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_REPLICATION_SLOT_DROP"
+)]
+pub const WaitEventIPC_WAIT_EVENT_REPLICATION_SLOT_DROP: u32 = 134217774;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_RESTORE_COMMAND")]
+pub const WaitEventIPC_WAIT_EVENT_RESTORE_COMMAND: u32 = 134217775;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_SAFE_SNAPSHOT")]
+pub const WaitEventIPC_WAIT_EVENT_SAFE_SNAPSHOT: u32 = 134217776;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_SYNC_REP")]
+pub const WaitEventIPC_WAIT_EVENT_SYNC_REP: u32 = 134217777;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_WAL_RECEIVER_EXIT"
+)]
+pub const WaitEventIPC_WAIT_EVENT_WAL_RECEIVER_EXIT: u32 = 134217778;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_WAL_RECEIVER_WAIT_START"
+)]
+pub const WaitEventIPC_WAIT_EVENT_WAL_RECEIVER_WAIT_START: u32 = 134217779;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_XACT_GROUP_UPDATE"
+)]
+pub const WaitEventIPC_WAIT_EVENT_XACT_GROUP_UPDATE: u32 = 134217780;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_BASE_BACKUP_THROTTLE"
+)]
+pub const WaitEventTimeout_WAIT_EVENT_BASE_BACKUP_THROTTLE: u32 = 150994944;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_CHECKPOINT_WRITE_DELAY"
+)]
+pub const WaitEventTimeout_WAIT_EVENT_CHECKPOINT_WRITE_DELAY: u32 = 150994945;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_PG_SLEEP")]
+pub const WaitEventTimeout_WAIT_EVENT_PG_SLEEP: u32 = 150994946;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_RECOVERY_APPLY_DELAY"
+)]
+pub const WaitEventTimeout_WAIT_EVENT_RECOVERY_APPLY_DELAY: u32 = 150994947;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_RECOVERY_RETRIEVE_RETRY_INTERVAL"
+)]
+pub const WaitEventTimeout_WAIT_EVENT_RECOVERY_RETRIEVE_RETRY_INTERVAL: u32 = 150994948;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_REGISTER_SYNC_REQUEST"
+)]
+pub const WaitEventTimeout_WAIT_EVENT_REGISTER_SYNC_REQUEST: u32 = 150994949;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_SPIN_DELAY")]
+pub const WaitEventTimeout_WAIT_EVENT_SPIN_DELAY: u32 = 150994950;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_VACUUM_DELAY")]
+pub const WaitEventTimeout_WAIT_EVENT_VACUUM_DELAY: u32 = 150994951;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_VACUUM_TRUNCATE"
+)]
+pub const WaitEventTimeout_WAIT_EVENT_VACUUM_TRUNCATE: u32 = 150994952;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalCompression::WAL_COMPRESSION_NONE")]
+pub const WalCompression_WAL_COMPRESSION_NONE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalCompression::WAL_COMPRESSION_PGLZ")]
+pub const WalCompression_WAL_COMPRESSION_PGLZ: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalCompression::WAL_COMPRESSION_LZ4")]
+pub const WalCompression_WAL_COMPRESSION_LZ4: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalCompression::WAL_COMPRESSION_ZSTD")]
+pub const WalCompression_WAL_COMPRESSION_ZSTD: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalLevel::WAL_LEVEL_MINIMAL")]
+pub const WalLevel_WAL_LEVEL_MINIMAL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalLevel::WAL_LEVEL_REPLICA")]
+pub const WalLevel_WAL_LEVEL_REPLICA: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalLevel::WAL_LEVEL_LOGICAL")]
+pub const WalLevel_WAL_LEVEL_LOGICAL: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvExecStatus::WALRCV_ERROR")]
+pub const WalRcvExecStatus_WALRCV_ERROR: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvExecStatus::WALRCV_OK_COMMAND")]
+pub const WalRcvExecStatus_WALRCV_OK_COMMAND: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvExecStatus::WALRCV_OK_TUPLES")]
+pub const WalRcvExecStatus_WALRCV_OK_TUPLES: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvExecStatus::WALRCV_OK_COPY_IN")]
+pub const WalRcvExecStatus_WALRCV_OK_COPY_IN: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvExecStatus::WALRCV_OK_COPY_OUT")]
+pub const WalRcvExecStatus_WALRCV_OK_COPY_OUT: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvExecStatus::WALRCV_OK_COPY_BOTH")]
+pub const WalRcvExecStatus_WALRCV_OK_COPY_BOTH: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvState::WALRCV_STOPPED")]
+pub const WalRcvState_WALRCV_STOPPED: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvState::WALRCV_STARTING")]
+pub const WalRcvState_WALRCV_STARTING: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvState::WALRCV_STREAMING")]
+pub const WalRcvState_WALRCV_STREAMING: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvState::WALRCV_WAITING")]
+pub const WalRcvState_WALRCV_WAITING: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvState::WALRCV_RESTARTING")]
+pub const WalRcvState_WALRCV_RESTARTING: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvState::WALRCV_STOPPING")]
+pub const WalRcvState_WALRCV_STOPPING: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WindowAggStatus::WINDOWAGG_DONE")]
+pub const WindowAggStatus_WINDOWAGG_DONE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WindowAggStatus::WINDOWAGG_RUN")]
+pub const WindowAggStatus_WINDOWAGG_RUN: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WindowAggStatus::WINDOWAGG_PASSTHROUGH")]
+pub const WindowAggStatus_WINDOWAGG_PASSTHROUGH: u32 = 2;
+#[deprecated(
+    since = "0.12.0",
+    note = "you want pg_sys::WindowAggStatus::WINDOWAGG_PASSTHROUGH_STRICT"
+)]
+pub const WindowAggStatus_WINDOWAGG_PASSTHROUGH_STRICT: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLTW_Oper::XLTW_None")]
+pub const XLTW_Oper_XLTW_None: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLTW_Oper::XLTW_Update")]
+pub const XLTW_Oper_XLTW_Update: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLTW_Oper::XLTW_Delete")]
+pub const XLTW_Oper_XLTW_Delete: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLTW_Oper::XLTW_Lock")]
+pub const XLTW_Oper_XLTW_Lock: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLTW_Oper::XLTW_LockUpdated")]
+pub const XLTW_Oper_XLTW_LockUpdated: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLTW_Oper::XLTW_InsertIndex")]
+pub const XLTW_Oper_XLTW_InsertIndex: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLTW_Oper::XLTW_InsertIndexUnique")]
+pub const XLTW_Oper_XLTW_InsertIndexUnique: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLTW_Oper::XLTW_FetchUpdated")]
+pub const XLTW_Oper_XLTW_FetchUpdated: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLTW_Oper::XLTW_RecheckExclusionConstr")]
+pub const XLTW_Oper_XLTW_RecheckExclusionConstr: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLogPageReadResult::XLREAD_SUCCESS")]
+pub const XLogPageReadResult_XLREAD_SUCCESS: i32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLogPageReadResult::XLREAD_FAIL")]
+pub const XLogPageReadResult_XLREAD_FAIL: i32 = -1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLogPageReadResult::XLREAD_WOULDBLOCK")]
+pub const XLogPageReadResult_XLREAD_WOULDBLOCK: i32 = -2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLogRedoAction::BLK_NEEDS_REDO")]
+pub const XLogRedoAction_BLK_NEEDS_REDO: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLogRedoAction::BLK_DONE")]
+pub const XLogRedoAction_BLK_DONE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLogRedoAction::BLK_RESTORED")]
+pub const XLogRedoAction_BLK_RESTORED: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLogRedoAction::BLK_NOTFOUND")]
+pub const XLogRedoAction_BLK_NOTFOUND: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XactEvent::XACT_EVENT_COMMIT")]
+pub const XactEvent_XACT_EVENT_COMMIT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XactEvent::XACT_EVENT_PARALLEL_COMMIT")]
+pub const XactEvent_XACT_EVENT_PARALLEL_COMMIT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XactEvent::XACT_EVENT_ABORT")]
+pub const XactEvent_XACT_EVENT_ABORT: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XactEvent::XACT_EVENT_PARALLEL_ABORT")]
+pub const XactEvent_XACT_EVENT_PARALLEL_ABORT: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XactEvent::XACT_EVENT_PREPARE")]
+pub const XactEvent_XACT_EVENT_PREPARE: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XactEvent::XACT_EVENT_PRE_COMMIT")]
+pub const XactEvent_XACT_EVENT_PRE_COMMIT: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XactEvent::XACT_EVENT_PARALLEL_PRE_COMMIT")]
+pub const XactEvent_XACT_EVENT_PARALLEL_PRE_COMMIT: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XactEvent::XACT_EVENT_PRE_PREPARE")]
+pub const XactEvent_XACT_EVENT_PRE_PREPARE: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XmlExprOp::IS_XMLCONCAT")]
+pub const XmlExprOp_IS_XMLCONCAT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XmlExprOp::IS_XMLELEMENT")]
+pub const XmlExprOp_IS_XMLELEMENT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XmlExprOp::IS_XMLFOREST")]
+pub const XmlExprOp_IS_XMLFOREST: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XmlExprOp::IS_XMLPARSE")]
+pub const XmlExprOp_IS_XMLPARSE: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XmlExprOp::IS_XMLPI")]
+pub const XmlExprOp_IS_XMLPI: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XmlExprOp::IS_XMLROOT")]
+pub const XmlExprOp_IS_XMLROOT: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XmlExprOp::IS_XMLSERIALIZE")]
+pub const XmlExprOp_IS_XMLSERIALIZE: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XmlExprOp::IS_DOCUMENT")]
+pub const XmlExprOp_IS_DOCUMENT: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XmlOptionType::XMLOPTION_DOCUMENT")]
+pub const XmlOptionType_XMLOPTION_DOCUMENT: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XmlOptionType::XMLOPTION_CONTENT")]
+pub const XmlOptionType_XMLOPTION_CONTENT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::__socket_type::SOCK_STREAM")]
+pub const __socket_type_SOCK_STREAM: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::__socket_type::SOCK_DGRAM")]
+pub const __socket_type_SOCK_DGRAM: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::__socket_type::SOCK_RAW")]
+pub const __socket_type_SOCK_RAW: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::__socket_type::SOCK_RDM")]
+pub const __socket_type_SOCK_RDM: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::__socket_type::SOCK_SEQPACKET")]
+pub const __socket_type_SOCK_SEQPACKET: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::__socket_type::SOCK_DCCP")]
+pub const __socket_type_SOCK_DCCP: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::__socket_type::SOCK_PACKET")]
+pub const __socket_type_SOCK_PACKET: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::__socket_type::SOCK_CLOEXEC")]
+pub const __socket_type_SOCK_CLOEXEC: u32 = 524288;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::__socket_type::SOCK_NONBLOCK")]
+pub const __socket_type_SOCK_NONBLOCK: u32 = 2048;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::dsm_op::DSM_OP_CREATE")]
+pub const dsm_op_DSM_OP_CREATE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::dsm_op::DSM_OP_ATTACH")]
+pub const dsm_op_DSM_OP_ATTACH: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::dsm_op::DSM_OP_DETACH")]
+pub const dsm_op_DSM_OP_DETACH: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::dsm_op::DSM_OP_DESTROY")]
+pub const dsm_op_DSM_OP_DESTROY: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::jbvType::jbvNull")]
+pub const jbvType_jbvNull: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::jbvType::jbvString")]
+pub const jbvType_jbvString: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::jbvType::jbvNumeric")]
+pub const jbvType_jbvNumeric: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::jbvType::jbvBool")]
+pub const jbvType_jbvBool: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::jbvType::jbvArray")]
+pub const jbvType_jbvArray: u32 = 16;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::jbvType::jbvObject")]
+pub const jbvType_jbvObject: u32 = 17;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::jbvType::jbvBinary")]
+pub const jbvType_jbvBinary: u32 = 18;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::jbvType::jbvDatetime")]
+pub const jbvType_jbvDatetime: u32 = 32;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_SQL_ASCII")]
+pub const pg_enc_PG_SQL_ASCII: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_EUC_JP")]
+pub const pg_enc_PG_EUC_JP: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_EUC_CN")]
+pub const pg_enc_PG_EUC_CN: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_EUC_KR")]
+pub const pg_enc_PG_EUC_KR: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_EUC_TW")]
+pub const pg_enc_PG_EUC_TW: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_EUC_JIS_2004")]
+pub const pg_enc_PG_EUC_JIS_2004: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_UTF8")]
+pub const pg_enc_PG_UTF8: u32 = 6;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_MULE_INTERNAL")]
+pub const pg_enc_PG_MULE_INTERNAL: u32 = 7;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_LATIN1")]
+pub const pg_enc_PG_LATIN1: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_LATIN2")]
+pub const pg_enc_PG_LATIN2: u32 = 9;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_LATIN3")]
+pub const pg_enc_PG_LATIN3: u32 = 10;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_LATIN4")]
+pub const pg_enc_PG_LATIN4: u32 = 11;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_LATIN5")]
+pub const pg_enc_PG_LATIN5: u32 = 12;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_LATIN6")]
+pub const pg_enc_PG_LATIN6: u32 = 13;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_LATIN7")]
+pub const pg_enc_PG_LATIN7: u32 = 14;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_LATIN8")]
+pub const pg_enc_PG_LATIN8: u32 = 15;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_LATIN9")]
+pub const pg_enc_PG_LATIN9: u32 = 16;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_LATIN10")]
+pub const pg_enc_PG_LATIN10: u32 = 17;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_WIN1256")]
+pub const pg_enc_PG_WIN1256: u32 = 18;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_WIN1258")]
+pub const pg_enc_PG_WIN1258: u32 = 19;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_WIN866")]
+pub const pg_enc_PG_WIN866: u32 = 20;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_WIN874")]
+pub const pg_enc_PG_WIN874: u32 = 21;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_KOI8R")]
+pub const pg_enc_PG_KOI8R: u32 = 22;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_WIN1251")]
+pub const pg_enc_PG_WIN1251: u32 = 23;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_WIN1252")]
+pub const pg_enc_PG_WIN1252: u32 = 24;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_ISO_8859_5")]
+pub const pg_enc_PG_ISO_8859_5: u32 = 25;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_ISO_8859_6")]
+pub const pg_enc_PG_ISO_8859_6: u32 = 26;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_ISO_8859_7")]
+pub const pg_enc_PG_ISO_8859_7: u32 = 27;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_ISO_8859_8")]
+pub const pg_enc_PG_ISO_8859_8: u32 = 28;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_WIN1250")]
+pub const pg_enc_PG_WIN1250: u32 = 29;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_WIN1253")]
+pub const pg_enc_PG_WIN1253: u32 = 30;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_WIN1254")]
+pub const pg_enc_PG_WIN1254: u32 = 31;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_WIN1255")]
+pub const pg_enc_PG_WIN1255: u32 = 32;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_WIN1257")]
+pub const pg_enc_PG_WIN1257: u32 = 33;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_KOI8U")]
+pub const pg_enc_PG_KOI8U: u32 = 34;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_SJIS")]
+pub const pg_enc_PG_SJIS: u32 = 35;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_BIG5")]
+pub const pg_enc_PG_BIG5: u32 = 36;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_GBK")]
+pub const pg_enc_PG_GBK: u32 = 37;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_UHC")]
+pub const pg_enc_PG_UHC: u32 = 38;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_GB18030")]
+pub const pg_enc_PG_GB18030: u32 = 39;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_JOHAB")]
+pub const pg_enc_PG_JOHAB: u32 = 40;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::PG_SHIFT_JIS_2004")]
+pub const pg_enc_PG_SHIFT_JIS_2004: u32 = 41;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::_PG_LAST_ENCODING_")]
+pub const pg_enc__PG_LAST_ENCODING_: u32 = 42;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_LOCAL")]
+pub const relopt_kind_RELOPT_KIND_LOCAL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_HEAP")]
+pub const relopt_kind_RELOPT_KIND_HEAP: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_TOAST")]
+pub const relopt_kind_RELOPT_KIND_TOAST: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_BTREE")]
+pub const relopt_kind_RELOPT_KIND_BTREE: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_HASH")]
+pub const relopt_kind_RELOPT_KIND_HASH: u32 = 8;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_GIN")]
+pub const relopt_kind_RELOPT_KIND_GIN: u32 = 16;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_GIST")]
+pub const relopt_kind_RELOPT_KIND_GIST: u32 = 32;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_ATTRIBUTE")]
+pub const relopt_kind_RELOPT_KIND_ATTRIBUTE: u32 = 64;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_TABLESPACE")]
+pub const relopt_kind_RELOPT_KIND_TABLESPACE: u32 = 128;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_SPGIST")]
+pub const relopt_kind_RELOPT_KIND_SPGIST: u32 = 256;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_VIEW")]
+pub const relopt_kind_RELOPT_KIND_VIEW: u32 = 512;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_BRIN")]
+pub const relopt_kind_RELOPT_KIND_BRIN: u32 = 1024;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_PARTITIONED")]
+pub const relopt_kind_RELOPT_KIND_PARTITIONED: u32 = 2048;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_LAST_DEFAULT")]
+pub const relopt_kind_RELOPT_KIND_LAST_DEFAULT: u32 = 2048;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_MAX")]
+pub const relopt_kind_RELOPT_KIND_MAX: u32 = 1073741824;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_type::RELOPT_TYPE_BOOL")]
+pub const relopt_type_RELOPT_TYPE_BOOL: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_type::RELOPT_TYPE_INT")]
+pub const relopt_type_RELOPT_TYPE_INT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_type::RELOPT_TYPE_REAL")]
+pub const relopt_type_RELOPT_TYPE_REAL: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_type::RELOPT_TYPE_ENUM")]
+pub const relopt_type_RELOPT_TYPE_ENUM: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_type::RELOPT_TYPE_STRING")]
+pub const relopt_type_RELOPT_TYPE_STRING: u32 = 4;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::shm_mq_result::SHM_MQ_SUCCESS")]
+pub const shm_mq_result_SHM_MQ_SUCCESS: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::shm_mq_result::SHM_MQ_WOULD_BLOCK")]
+pub const shm_mq_result_SHM_MQ_WOULD_BLOCK: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::shm_mq_result::SHM_MQ_DETACHED")]
+pub const shm_mq_result_SHM_MQ_DETACHED: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::tuplehash_status::tuplehash_SH_EMPTY")]
+pub const tuplehash_status_tuplehash_SH_EMPTY: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::tuplehash_status::tuplehash_SH_IN_USE")]
+pub const tuplehash_status_tuplehash_SH_IN_USE: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::vartag_external::VARTAG_INDIRECT")]
+pub const vartag_external_VARTAG_INDIRECT: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::vartag_external::VARTAG_EXPANDED_RO")]
+pub const vartag_external_VARTAG_EXPANDED_RO: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::vartag_external::VARTAG_EXPANDED_RW")]
+pub const vartag_external_VARTAG_EXPANDED_RW: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::vartag_external::VARTAG_ONDISK")]
+pub const vartag_external_VARTAG_ONDISK: u32 = 18;
 impl pg_sys::seal::Sealed for A_ArrayExpr {}
 impl pg_sys::PgNode for A_ArrayExpr {}
 impl ::core::fmt::Display for A_ArrayExpr {
