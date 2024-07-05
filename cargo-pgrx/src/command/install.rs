@@ -415,6 +415,23 @@ fn copy_sql_files(
     Ok(())
 }
 
+/// Check whether a given Cargo artifact target (i.e. [`cargo_metadata::Maessage::CompilerArtfiact`])
+/// matches the name of a well known target
+///
+/// This function is necessary because in versions of Rust 1.79 and later, cargo consistently
+/// snake_cases all artifact names in output.
+///
+/// Artifact names that may have have looked `like-this` now consistently look `like_this`.
+fn cargo_artifact_target_matches(artifact_target: &str, target: &str) -> bool {
+    if artifact_target == target {
+        return true;
+    }
+    if artifact_target == target.replace("-", "_") {
+        return true;
+    }
+    false
+}
+
 #[tracing::instrument(level = "error", skip_all)]
 pub(crate) fn find_library_file(
     manifest: &Manifest,
@@ -426,9 +443,10 @@ pub(crate) fn find_library_file(
     for message in build_command_messages {
         match message {
             cargo_metadata::Message::CompilerArtifact(artifact) => {
-                if artifact.target.name != *target_name {
+                if !cargo_artifact_target_matches(&artifact.target.name, &*target_name) {
                     continue;
                 }
+
                 for filename in &artifact.filenames {
                     let so_extension = if cfg!(target_os = "macos") { "dylib" } else { "so" };
                     if filename.extension() == Some(so_extension) {
