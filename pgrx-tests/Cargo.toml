@@ -65,7 +65,7 @@ thiserror.workspace = true
 paste = "1"
 postgres = "0.19.7"
 proptest = { version = "1", optional = true }
-sysinfo = "0.29.10"
+sysinfo = "0.30.10"
 rand = "0.8.5"
 
 [dependencies.pgrx] # Not unified in workspace due to default-features key
