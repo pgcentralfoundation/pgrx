@@ -24,7 +24,7 @@ use std::io::{BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
-use sysinfo::{Pid, ProcessExt, System, SystemExt};
+use sysinfo::{Pid, System};
 
 mod shutdown;
 pub use shutdown::add_shutdown_hook;
@@ -868,7 +868,7 @@ fn get_cargo_args() -> Vec<String> {
     while let Some(process) = system.process(pid) {
         // only if it's "cargo"... (This works for now, but just because `cargo`
         // is at the end of the path. How *should* this handle `CARGO`?)
-        if process.exe().ends_with("cargo") {
+        if process.exe().is_some_and(|p| p.ends_with("cargo")) {
             // ... and only if it's "cargo test"...
             if process.cmd().iter().any(|arg| arg == "test")
                 && !process.cmd().iter().any(|arg| arg == "pgrx")
