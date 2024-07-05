@@ -723,7 +723,7 @@ impl<'fcx> FcInfo<'fcx> {
     pub unsafe fn srf_return_next(&mut self) {
         unsafe {
             self.deref_fcx().call_cntr += 1;
-            self.get_result_info().set_is_done(pg_sys::ExprDoneCond_ExprMultipleResult);
+            self.get_result_info().set_is_done(pg_sys::ExprDoneCond::ExprMultipleResult);
         }
     }
 
@@ -733,7 +733,7 @@ impl<'fcx> FcInfo<'fcx> {
     pub unsafe fn srf_return_done(&mut self) {
         unsafe {
             pg_sys::end_MultiFuncCall(self.0, self.deref_fcx());
-            self.get_result_info().set_is_done(pg_sys::ExprDoneCond_ExprEndResult);
+            self.get_result_info().set_is_done(pg_sys::ExprDoneCond::ExprEndResult);
         }
     }
 
@@ -872,23 +872,23 @@ impl<'fcx> ReturnSetInfoWrapper<'fcx> {
     */
     // These four fields are, in-practice, owned by the callee.
     /// Status for ValuePerCall mode.
-    pub fn set_is_done(&mut self, value: pg_sys::ExprDoneCond) {
+    pub fn set_is_done(&mut self, value: pg_sys::ExprDoneCond::Type) {
         unsafe {
             (*self.0).isDone = value;
         }
     }
     /// Status for ValuePerCall mode.
-    pub fn get_is_done(&self) -> pg_sys::ExprDoneCond {
+    pub fn get_is_done(&self) -> pg_sys::ExprDoneCond::Type {
         unsafe { (*self.0).isDone }
     }
     /// Actual return mode.
-    pub fn set_return_mode(&mut self, return_mode: pgrx_pg_sys::SetFunctionReturnMode) {
+    pub fn set_return_mode(&mut self, return_mode: pgrx_pg_sys::SetFunctionReturnMode::Type) {
         unsafe {
             (*self.0).returnMode = return_mode;
         }
     }
     /// Actual return mode.
-    pub fn get_return_mode(&self) -> pgrx_pg_sys::SetFunctionReturnMode {
+    pub fn get_return_mode(&self) -> pgrx_pg_sys::SetFunctionReturnMode::Type {
         unsafe { (*self.0).returnMode }
     }
     /// Holds the complete returned tuple set.

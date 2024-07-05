@@ -110,8 +110,11 @@ fn random_abort() {
 #[pg_guard]
 pub unsafe extern "C" fn _PG_init() {
     #[pg_guard]
-    extern "C" fn random_abort_callback(event: pg_sys::XactEvent, _arg: *mut std::os::raw::c_void) {
-        if event == pg_sys::XactEvent_XACT_EVENT_PRE_COMMIT && rand::random::<bool>() {
+    extern "C" fn random_abort_callback(
+        event: pg_sys::XactEvent::Type,
+        _arg: *mut std::os::raw::c_void,
+    ) {
+        if event == pg_sys::XactEvent::XACT_EVENT_PRE_COMMIT && rand::random::<bool>() {
             // panic!("aborting transaction");
         }
     }

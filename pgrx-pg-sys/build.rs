@@ -7,18 +7,20 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use bindgen::callbacks::{DeriveTrait, ImplementsTrait, MacroParsingBehavior};
+use bindgen::callbacks::{DeriveTrait, EnumVariantValue, ImplementsTrait, MacroParsingBehavior};
 use bindgen::NonCopyUnionStyle;
 use eyre::{eyre, WrapErr};
 use pgrx_pg_config::{
     is_supported_major_version, prefix_path, PgConfig, PgConfigSelector, Pgrx, SUPPORTED_VERSIONS,
 };
 use quote::{quote, ToTokens};
+use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::fs;
 use std::path::{self, Path, PathBuf}; // disambiguate path::Path and syn::Type::Path
 use std::process::{Command, Output};
+use std::rc::Rc;
 use std::sync::OnceLock;
 use syn::{ForeignItem, Item, ItemConst};
 
@@ -30,44 +32,49 @@ mod build {
 }
 
 #[derive(Debug)]
-struct PgrxOverrides(HashSet<String>);
+struct BindingOverride {
+    ignore_macros: HashSet<&'static str>,
+    enum_names: InnerMut<EnumMap>,
+}
 
-impl PgrxOverrides {
-    fn default() -> Self {
+type InnerMut<T> = Rc<RefCell<T>>;
+type EnumMap = BTreeMap<String, Vec<(String, EnumVariantValue)>>;
+
+impl BindingOverride {
+    fn new_from(enum_names: InnerMut<EnumMap>) -> Self {
         // these cause duplicate definition problems on linux
         // see: https://github.com/rust-lang/rust-bindgen/issues/687
-        PgrxOverrides(
-            vec![
-                "FP_INFINITE".into(),
-                "FP_NAN".into(),
-                "FP_NORMAL".into(),
-                "FP_SUBNORMAL".into(),
-                "FP_ZERO".into(),
-                "IPPORT_RESERVED".into(),
+        BindingOverride {
+            ignore_macros: HashSet::from_iter([
+                "FP_INFINITE",
+                "FP_NAN",
+                "FP_NORMAL",
+                "FP_SUBNORMAL",
+                "FP_ZERO",
+                "IPPORT_RESERVED",
                 // These are just annoying due to clippy
-                "M_E".into(),
-                "M_LOG2E".into(),
-                "M_LOG10E".into(),
-                "M_LN2".into(),
-                "M_LN10".into(),
-                "M_PI".into(),
-                "M_PI_2".into(),
-                "M_PI_4".into(),
-                "M_1_PI".into(),
-                "M_2_PI".into(),
-                "M_SQRT2".into(),
-                "M_SQRT1_2".into(),
-                "M_2_SQRTPI".into(),
-            ]
-            .into_iter()
-            .collect(),
-        )
+                "M_E",
+                "M_LOG2E",
+                "M_LOG10E",
+                "M_LN2",
+                "M_LN10",
+                "M_PI",
+                "M_PI_2",
+                "M_PI_4",
+                "M_1_PI",
+                "M_2_PI",
+                "M_SQRT2",
+                "M_SQRT1_2",
+                "M_2_SQRTPI",
+            ]),
+            enum_names,
+        }
     }
 }
 
-impl bindgen::callbacks::ParseCallbacks for PgrxOverrides {
+impl bindgen::callbacks::ParseCallbacks for BindingOverride {
     fn will_parse_macro(&self, name: &str) -> MacroParsingBehavior {
-        if self.0.contains(name) {
+        if self.ignore_macros.contains(name) {
             bindgen::callbacks::MacroParsingBehavior::Ignore
         } else {
             bindgen::callbacks::MacroParsingBehavior::Default
@@ -89,6 +96,45 @@ impl bindgen::callbacks::ParseCallbacks for PgrxOverrides {
             _ => ImplementsTrait::No,
         };
         Some(implements_trait)
+    }
+
+    // FIXME: alter types on some int macros to the actually-used types so we can stop as-casting them
+    fn int_macro(&self, _name: &str, _value: i64) -> Option<bindgen::callbacks::IntKind> {
+        None
+    }
+
+    // FIXME: implement a... C compiler?
+    fn func_macro(&self, _name: &str, _value: &[&[u8]]) {}
+
+    /// Intentionally doesn't do anything, just updates internal state.
+    fn enum_variant_behavior(
+        &self,
+        enum_name: Option<&str>,
+        variant_name: &str,
+        variant_value: bindgen::callbacks::EnumVariantValue,
+    ) -> Option<bindgen::callbacks::EnumVariantCustomBehavior> {
+        enum_name.inspect(|name| match name.strip_prefix("enum").unwrap_or(name).trim() {
+            // specifically overridden enum
+            "NodeTag" => return,
+            name if name.contains("unnamed at") => return,
+            // to prevent problems with BuiltinOid
+            _ if variant_name.contains("OID") => return,
+            name => self
+                .enum_names
+                .borrow_mut()
+                .entry(name.to_string())
+                .or_insert(Vec::new())
+                .push((variant_name.to_string(), variant_value)),
+        });
+        None
+    }
+
+    // FIXME: hide nodetag fields and default them to appropriate values
+    fn field_visibility(
+        &self,
+        _info: bindgen::callbacks::FieldInfo<'_>,
+    ) -> Option<bindgen::FieldVisibilityKind> {
+        None
     }
 }
 
@@ -718,12 +764,15 @@ fn run_bindgen(
         let builtin_includes = includes.iter().filter_map(|p| Some(format!("-I{}", p.to_str()?)));
         binder = binder.clang_args(builtin_includes);
     };
+    let enum_names = Rc::new(RefCell::new(BTreeMap::new()));
+    let overrides = BindingOverride::new_from(Rc::clone(&enum_names));
     let bindings = binder
         .header(include_h.display().to_string())
         .clang_args(extra_bindgen_clang_args(pg_config)?)
         .clang_args(pg_target_include_flags(major_version, pg_config)?)
         .detect_include_paths(autodetect)
-        .parse_callbacks(Box::new(PgrxOverrides::default()))
+        .parse_callbacks(Box::new(overrides))
+        .default_enum_style(bindgen::EnumVariation::ModuleConsts)
         // The NodeTag enum is closed: additions break existing values in the set, so it is not extensible
         .rustified_non_exhaustive_enum("NodeTag")
         .size_t_is_usize(true)
@@ -733,8 +782,33 @@ fn run_bindgen(
         .default_non_copy_union_style(NonCopyUnionStyle::ManuallyDrop)
         .generate()
         .wrap_err_with(|| format!("Unable to generate bindings for pg{major_version}"))?;
+    let mut binding_str = bindings.to_string();
+    drop(bindings); // So the Rc::into_inner can unwrap
 
-    Ok(bindings.to_string())
+    // FIXME: do this for the Node graph instead of reparsing?
+    let enum_names: EnumMap = Rc::into_inner(enum_names).unwrap().into_inner();
+    binding_str.extend(enum_names.into_iter().flat_map(|(name, variants)| {
+        const MIN_I32: i64 = i32::MIN as _;
+        const MAX_I32: i64 = i32::MAX as _;
+        const MAX_U32: u64 = u32::MAX as _;
+        variants.into_iter().map(move |(variant, value)| {
+            let (ty, value) = match value {
+                EnumVariantValue::Boolean(b) => ("bool", b.to_string()),
+                EnumVariantValue::Signed(v @ MIN_I32..=MAX_I32) => ("i32", v.to_string()),
+                EnumVariantValue::Signed(v) => ("i64", v.to_string()),
+                EnumVariantValue::Unsigned(v @ 0..=MAX_U32) => ("u32", v.to_string()),
+                EnumVariantValue::Unsigned(v) => ("u64", v.to_string()),
+            };
+            format!(
+                r#"
+#[deprecated(since = "0.12.0", note = "you want pg_sys::{module}::{variant}")]
+pub const {module}_{variant}: {ty} = {value};"#,
+                module = &*name, // imprecise closure capture
+            )
+        })
+    }));
+
+    Ok(binding_str)
 }
 
 fn add_blocklists(bind: bindgen::Builder) -> bindgen::Builder {

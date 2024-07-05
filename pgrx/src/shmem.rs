@@ -183,7 +183,7 @@ impl PgSharedMem {
             let shm_name = alloc::ffi::CString::new(lock.get_name()).expect("CString::new failed");
             let addin_shmem_init_lock: *mut pg_sys::LWLock =
                 &mut (*pg_sys::MainLWLockArray.add(21)).lock;
-            pg_sys::LWLockAcquire(addin_shmem_init_lock, pg_sys::LWLockMode_LW_EXCLUSIVE);
+            pg_sys::LWLockAcquire(addin_shmem_init_lock, pg_sys::LWLockMode::LW_EXCLUSIVE);
 
             let fv_shmem =
                 pg_sys::ShmemInitStruct(shm_name.into_raw(), std::mem::size_of::<T>(), &mut found)
@@ -207,7 +207,7 @@ impl PgSharedMem {
                 &mut (*pg_sys::MainLWLockArray.add(21)).lock;
 
             let mut found = false;
-            pg_sys::LWLockAcquire(addin_shmem_init_lock, pg_sys::LWLockMode_LW_EXCLUSIVE);
+            pg_sys::LWLockAcquire(addin_shmem_init_lock, pg_sys::LWLockMode::LW_EXCLUSIVE);
             let fv_shmem =
                 pg_sys::ShmemInitStruct(shm_name.into_raw(), std::mem::size_of::<T>(), &mut found)
                     as *mut T;

@@ -66,12 +66,12 @@ pub trait PgHooks {
     fn executor_run(
         &mut self,
         query_desc: PgBox<pg_sys::QueryDesc>,
-        direction: pg_sys::ScanDirection,
+        direction: pg_sys::ScanDirection::Type,
         count: u64,
         execute_once: bool,
         prev_hook: fn(
             query_desc: PgBox<pg_sys::QueryDesc>,
-            direction: pg_sys::ScanDirection,
+            direction: pg_sys::ScanDirection::Type,
             count: u64,
             execute_once: bool,
         ) -> HookResult<()>,
@@ -118,7 +118,7 @@ pub trait PgHooks {
         pstmt: PgBox<pg_sys::PlannedStmt>,
         query_string: &core::ffi::CStr,
         read_only_tree: Option<bool>,
-        context: pg_sys::ProcessUtilityContext,
+        context: pg_sys::ProcessUtilityContext::Type,
         params: PgBox<pg_sys::ParamListInfoData>,
         query_env: PgBox<pg_sys::QueryEnvironment>,
         dest: PgBox<pg_sys::DestReceiver>,
@@ -127,7 +127,7 @@ pub trait PgHooks {
             pstmt: PgBox<pg_sys::PlannedStmt>,
             query_string: &core::ffi::CStr,
             read_only_tree: Option<bool>,
-            context: pg_sys::ProcessUtilityContext,
+            context: pg_sys::ProcessUtilityContext::Type,
             params: PgBox<pg_sys::ParamListInfoData>,
             query_env: PgBox<pg_sys::QueryEnvironment>,
             dest: PgBox<pg_sys::DestReceiver>,
@@ -241,10 +241,10 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
     });
 
     #[pg_guard]
-    unsafe extern "C" fn xact_callback(event: pg_sys::XactEvent, _data: void_mut_ptr) {
+    unsafe extern "C" fn xact_callback(event: pg_sys::XactEvent::Type, _data: void_mut_ptr) {
         match event {
-            pg_sys::XactEvent_XACT_EVENT_ABORT => HOOKS.as_mut().unwrap().current_hook.abort(),
-            pg_sys::XactEvent_XACT_EVENT_PRE_COMMIT => {
+            pg_sys::XactEvent::XACT_EVENT_ABORT => HOOKS.as_mut().unwrap().current_hook.abort(),
+            pg_sys::XactEvent::XACT_EVENT_PRE_COMMIT => {
                 HOOKS.as_mut().unwrap().current_hook.commit()
             }
             _ => { /* noop */ }
@@ -272,13 +272,13 @@ unsafe extern "C" fn pgrx_executor_start(query_desc: *mut pg_sys::QueryDesc, efl
 #[pg_guard]
 unsafe extern "C" fn pgrx_executor_run(
     query_desc: *mut pg_sys::QueryDesc,
-    direction: pg_sys::ScanDirection,
+    direction: pg_sys::ScanDirection::Type,
     count: u64,
     execute_once: bool,
 ) {
     fn prev(
         query_desc: PgBox<pg_sys::QueryDesc>,
-        direction: pg_sys::ScanDirection,
+        direction: pg_sys::ScanDirection::Type,
         count: u64,
         execute_once: bool,
     ) -> HookResult<()> {
@@ -379,7 +379,7 @@ unsafe extern "C" fn pgrx_executor_check_perms(
 unsafe extern "C" fn pgrx_process_utility(
     pstmt: *mut pg_sys::PlannedStmt,
     query_string: *const ::std::os::raw::c_char,
-    context: pg_sys::ProcessUtilityContext,
+    context: pg_sys::ProcessUtilityContext::Type,
     params: pg_sys::ParamListInfo,
     query_env: *mut pg_sys::QueryEnvironment,
     dest: *mut pg_sys::DestReceiver,
@@ -389,7 +389,7 @@ unsafe extern "C" fn pgrx_process_utility(
         pstmt: PgBox<pg_sys::PlannedStmt>,
         query_string: &core::ffi::CStr,
         _read_only_tree: Option<bool>,
-        context: pg_sys::ProcessUtilityContext,
+        context: pg_sys::ProcessUtilityContext::Type,
         params: PgBox<pg_sys::ParamListInfoData>,
         query_env: PgBox<pg_sys::QueryEnvironment>,
         dest: PgBox<pg_sys::DestReceiver>,
@@ -428,7 +428,7 @@ unsafe extern "C" fn pgrx_process_utility(
     pstmt: *mut pg_sys::PlannedStmt,
     query_string: *const ::std::os::raw::c_char,
     read_only_tree: bool,
-    context: pg_sys::ProcessUtilityContext,
+    context: pg_sys::ProcessUtilityContext::Type,
     params: pg_sys::ParamListInfo,
     query_env: *mut pg_sys::QueryEnvironment,
     dest: *mut pg_sys::DestReceiver,
@@ -438,7 +438,7 @@ unsafe extern "C" fn pgrx_process_utility(
         pstmt: PgBox<pg_sys::PlannedStmt>,
         query_string: &core::ffi::CStr,
         read_only_tree: Option<bool>,
-        context: pg_sys::ProcessUtilityContext,
+        context: pg_sys::ProcessUtilityContext::Type,
         params: PgBox<pg_sys::ParamListInfoData>,
         query_env: PgBox<pg_sys::QueryEnvironment>,
         dest: PgBox<pg_sys::DestReceiver>,
@@ -620,7 +620,7 @@ unsafe extern "C" fn pgrx_standard_executor_start_wrapper(
 #[pg_guard]
 unsafe extern "C" fn pgrx_standard_executor_run_wrapper(
     query_desc: *mut pg_sys::QueryDesc,
-    direction: pg_sys::ScanDirection,
+    direction: pg_sys::ScanDirection::Type,
     count: u64,
     execute_once: bool,
 ) {
@@ -661,7 +661,7 @@ unsafe extern "C" fn pgrx_standard_executor_check_perms_wrapper(
 unsafe extern "C" fn pgrx_standard_process_utility_wrapper(
     pstmt: *mut pg_sys::PlannedStmt,
     query_string: *const ::std::os::raw::c_char,
-    context: pg_sys::ProcessUtilityContext,
+    context: pg_sys::ProcessUtilityContext::Type,
     params: pg_sys::ParamListInfo,
     query_env: *mut pg_sys::QueryEnvironment,
     dest: *mut pg_sys::DestReceiver,
@@ -684,7 +684,7 @@ unsafe extern "C" fn pgrx_standard_process_utility_wrapper(
     pstmt: *mut pg_sys::PlannedStmt,
     query_string: *const ::std::os::raw::c_char,
     read_only_tree: bool,
-    context: pg_sys::ProcessUtilityContext,
+    context: pg_sys::ProcessUtilityContext::Type,
     params: pg_sys::ParamListInfo,
     query_env: *mut pg_sys::QueryEnvironment,
     dest: *mut pg_sys::DestReceiver,

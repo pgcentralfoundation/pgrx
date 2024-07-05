@@ -261,17 +261,18 @@ macro_rules! pg_magic_func {
 }
 
 pub(crate) static UTF8DATABASE: Lazy<Utf8Compat> = Lazy::new(|| {
-    let encoding_int = unsafe { pgrx_pg_sys::GetDatabaseEncoding() };
+    use pg_sys::pg_enc::*;
+    let encoding_int = unsafe { pg_sys::GetDatabaseEncoding() };
     match encoding_int as core::ffi::c_uint {
-        pg_sys::pg_enc_PG_UTF8 => Utf8Compat::Yes,
+        PG_UTF8 => Utf8Compat::Yes,
         // The 0 encoding. It... may be UTF-8
-        pg_sys::pg_enc_PG_SQL_ASCII => Utf8Compat::Maybe,
+        PG_SQL_ASCII => Utf8Compat::Maybe,
         // Modifies ASCII, and should never be seen as PG doesn't support it as server encoding
-        pg_sys::pg_enc_PG_SJIS | pg_sys::pg_enc_PG_SHIFT_JIS_2004
+        PG_SJIS | PG_SHIFT_JIS_2004
         // Not specified as an ASCII extension, also not a server encoding
-        | pg_sys::pg_enc_PG_BIG5
+        | PG_BIG5
         // Wild vendor differences including non-ASCII are possible, also not a server encoding
-        | pg_sys::pg_enc_PG_JOHAB => unreachable!("impossible? unsupported non-ASCII-compatible database encoding is not a server encoding"),
+        | PG_JOHAB => unreachable!("impossible? unsupported non-ASCII-compatible database encoding is not a server encoding"),
         // Other Postgres encodings either extend US-ASCII or CP437 (which includes US-ASCII)
         // There may be a subtlety that requires us to revisit this later
         1..=41=> Utf8Compat::Ascii,

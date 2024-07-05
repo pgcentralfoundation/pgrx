@@ -61,9 +61,9 @@ bitflags! {
 /// The various points in which a BackgroundWorker can be started by Postgres
 #[derive(Copy, Clone)]
 pub enum BgWorkerStartTime {
-    PostmasterStart = pg_sys::BgWorkerStartTime_BgWorkerStart_PostmasterStart as isize,
-    ConsistentState = pg_sys::BgWorkerStartTime_BgWorkerStart_ConsistentState as isize,
-    RecoveryFinished = pg_sys::BgWorkerStartTime_BgWorkerStart_RecoveryFinished as isize,
+    PostmasterStart = pg_sys::BgWorkerStartTime::BgWorkerStart_PostmasterStart as isize,
+    ConsistentState = pg_sys::BgWorkerStartTime::BgWorkerStart_ConsistentState as isize,
+    RecoveryFinished = pg_sys::BgWorkerStartTime::BgWorkerStart_RecoveryFinished as isize,
 }
 
 /// Static interface into a running Background Worker
@@ -254,7 +254,7 @@ impl BackgroundWorker {
 
 unsafe extern "C" fn worker_spi_sighup(_signal_args: i32) {
     GOT_SIGHUP.store(true, Ordering::SeqCst);
-    pg_sys::ProcessConfigFile(pg_sys::GucContext_PGC_SIGHUP);
+    pg_sys::ProcessConfigFile(pg_sys::GucContext::PGC_SIGHUP);
     pg_sys::SetLatch(pg_sys::MyLatch);
 }
 
@@ -298,13 +298,14 @@ pub enum BackgroundWorkerStatus {
     },
 }
 
-impl From<pg_sys::BgwHandleStatus> for BackgroundWorkerStatus {
-    fn from(s: pg_sys::BgwHandleStatus) -> Self {
+impl From<pg_sys::BgwHandleStatus::Type> for BackgroundWorkerStatus {
+    fn from(s: pg_sys::BgwHandleStatus::Type) -> Self {
+        use pg_sys::BgwHandleStatus::*;
         match s {
-            pg_sys::BgwHandleStatus_BGWH_STARTED => BackgroundWorkerStatus::Started,
-            pg_sys::BgwHandleStatus_BGWH_NOT_YET_STARTED => BackgroundWorkerStatus::NotYetStarted,
-            pg_sys::BgwHandleStatus_BGWH_STOPPED => BackgroundWorkerStatus::Stopped,
-            pg_sys::BgwHandleStatus_BGWH_POSTMASTER_DIED => BackgroundWorkerStatus::PostmasterDied,
+            BGWH_STARTED => BackgroundWorkerStatus::Started,
+            BGWH_NOT_YET_STARTED => BackgroundWorkerStatus::NotYetStarted,
+            BGWH_STOPPED => BackgroundWorkerStatus::Stopped,
+            BGWH_POSTMASTER_DIED => BackgroundWorkerStatus::PostmasterDied,
             _ => unreachable!(),
         }
     }

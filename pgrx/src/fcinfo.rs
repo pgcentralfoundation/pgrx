@@ -408,7 +408,7 @@ pub unsafe fn srf_return_next(
 ) {
     (*funcctx).call_cntr += 1;
     (*((*fcinfo).resultinfo as *mut pg_sys::ReturnSetInfo)).isDone =
-        pg_sys::ExprDoneCond_ExprMultipleResult;
+        pg_sys::ExprDoneCond::ExprMultipleResult;
 }
 
 #[inline]
@@ -418,5 +418,5 @@ pub unsafe fn srf_return_done(
 ) {
     pg_sys::end_MultiFuncCall(fcinfo, funcctx);
     (*((*fcinfo).resultinfo as *mut pg_sys::ReturnSetInfo)).isDone =
-        pg_sys::ExprDoneCond_ExprEndResult;
+        pg_sys::ExprDoneCond::ExprEndResult;
 }
