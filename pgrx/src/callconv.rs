@@ -16,7 +16,7 @@ use crate::heap_tuple::PgHeapTuple;
 use crate::nullable::Nullable;
 use crate::{
     pg_return_null, pg_sys, AnyArray, AnyElement, AnyNumeric, Date, FromDatum, Inet, Internal,
-    Interval, IntoDatum, Json, PgBox, PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone,
+    Interval, IntoDatum, Json, JsonB, PgBox, PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone,
     Timestamp, TimestampWithTimeZone, UnboxDatum, Uuid,
 };
 use core::marker::PhantomData;
@@ -258,7 +258,7 @@ macro_rules! argue_from_datum {
 argue_from_datum! { 'fcx; i8, i16, i32, i64, f32, f64, bool, char, String, Vec<u8> }
 argue_from_datum! { 'fcx; Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone }
 argue_from_datum! { 'fcx; AnyArray, AnyElement, AnyNumeric }
-argue_from_datum! { 'fcx; Inet, Internal, Json, Uuid }
+argue_from_datum! { 'fcx; Inet, Internal, Json, JsonB, Uuid }
 argue_from_datum! { 'fcx; pg_sys::Oid, pg_sys::Point, pg_sys::BOX  }
 argue_from_datum! { 'fcx; &'fcx str, &'fcx CStr, &'fcx [u8] }
 
@@ -505,7 +505,7 @@ macro_rules! impl_repackage_into_datum {
 
 impl_repackage_into_datum! {
     String, CString, Vec<u8>, char,
-    Json, Inet, Uuid, AnyNumeric, Internal,
+    Json, JsonB, Inet, Uuid, AnyNumeric, AnyArray, AnyElement, Internal,
     Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
     pg_sys::Oid, pg_sys::BOX, pg_sys::Point
 }
