@@ -9,6 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 mod aggregate_tests;
 mod anyarray_tests;
+mod anyelement_tests;
 mod array_tests;
 mod attributes_tests;
 mod bgworker_tests;
