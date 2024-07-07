@@ -10,6 +10,7 @@
 mod aggregate_tests;
 mod anyarray_tests;
 mod anyelement_tests;
+mod anynumeric_tests;
 mod array_tests;
 mod attributes_tests;
 mod bgworker_tests;
