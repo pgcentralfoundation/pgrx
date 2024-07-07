@@ -143,6 +143,74 @@ impl Aggregate for DemoCustomState {
     }
 }
 
+struct FirstJson;
+
+#[pg_aggregate]
+impl Aggregate for FirstJson {
+    type State = pgrx::Json;
+    type Args = pgrx::name!(value, pgrx::Json);
+
+    #[pgrx(parallel_safe, immutable, strict)]
+    fn state(
+        current: Self::State,
+        _arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::State {
+        current
+    }
+}
+
+struct FirstJsonB;
+
+#[pg_aggregate]
+impl Aggregate for FirstJsonB {
+    type State = pgrx::JsonB;
+    type Args = pgrx::name!(value, pgrx::JsonB);
+
+    #[pgrx(parallel_safe, immutable, strict)]
+    fn state(
+        current: Self::State,
+        _arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::State {
+        current
+    }
+}
+
+struct FirstAnyArray;
+
+#[pg_aggregate]
+impl Aggregate for FirstAnyArray {
+    type State = pgrx::AnyArray;
+    type Args = pgrx::name!(value, pgrx::AnyArray);
+
+    #[pgrx(parallel_safe, immutable, strict)]
+    fn state(
+        current: Self::State,
+        _arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::State {
+        current
+    }
+}
+
+struct FirstAnyElement;
+
+#[pg_aggregate]
+impl Aggregate for FirstAnyElement {
+    type State = pgrx::AnyElement;
+    type Args = pgrx::name!(value, pgrx::AnyElement);
+
+    #[pgrx(parallel_safe, immutable, strict)]
+    fn state(
+        current: Self::State,
+        _arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::State {
+        current
+    }
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
@@ -189,5 +257,61 @@ mod tests {
             "SELECT demo_sum_state(value) FROM UNNEST(ARRAY [1, 1, 2]) as value;",
         );
         assert_eq!(retval, Ok(Some(4)));
+    }
+
+    #[pg_test]
+    fn aggregate_first_json() -> Result<(), pgrx::spi::Error> {
+        let retval = Spi::get_one_with_args::<pgrx::Json>(
+            "SELECT FirstJson(value) FROM UNNEST(ARRAY [$1, $2]) as value;",
+            vec![
+                (
+                    PgBuiltInOids::JSONOID.oid(),
+                    pgrx::Json(serde_json::json!({ "foo": "one" })).into_datum(),
+                ),
+                (
+                    PgBuiltInOids::JSONOID.oid(),
+                    pgrx::Json(serde_json::json!({ "foo": "two" })).into_datum(),
+                ),
+            ],
+        )?
+        .map(|json| json.0);
+
+        assert_eq!(retval, Some(serde_json::json!({ "foo": "one" })));
+
+        Ok(())
+    }
+
+    #[pg_test]
+    fn aggregate_first_jsonb() -> Result<(), pgrx::spi::Error> {
+        let retval = Spi::get_one_with_args::<pgrx::JsonB>(
+            "SELECT FirstJsonB(value) FROM UNNEST(ARRAY [$1, $2]) as value;",
+            vec![
+                (
+                    PgBuiltInOids::JSONBOID.oid(),
+                    pgrx::JsonB(serde_json::json!({ "foo": "one" })).into_datum(),
+                ),
+                (
+                    PgBuiltInOids::JSONBOID.oid(),
+                    pgrx::JsonB(serde_json::json!({ "foo": "two" })).into_datum(),
+                ),
+            ],
+        )?
+        .map(|json| json.0);
+
+        assert_eq!(retval, Some(serde_json::json!({ "foo": "one" })));
+
+        Ok(())
+    }
+
+    #[pg_test]
+    fn aggregate_first_anyelement() -> Result<(), pgrx::spi::Error> {
+        let retval = Spi::get_one::<pgrx::AnyElement>(
+            "SELECT FirstAnyElement(value) FROM UNNEST(ARRAY [1, 2]) as value;",
+        )?
+        .map(|element| element.into_datum());
+
+        assert_eq!(retval, Some(1.into_datum()));
+
+        Ok(())
     }
 }
