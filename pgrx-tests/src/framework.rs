@@ -770,6 +770,7 @@ fn get_pgdata_path() -> eyre::Result<PathBuf> {
         .unwrap_or_else(|_| {
             let mut target_dir = get_target_dir()
                 .unwrap_or_else(|e| panic!("Failed to determine the crate target directory: {e}"));
+            // ./test-data or ./pgdata both seem too cryptic
             target_dir.push("test-pgdata");
             target_dir
         });
