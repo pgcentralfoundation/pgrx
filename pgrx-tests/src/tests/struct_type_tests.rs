@@ -101,7 +101,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
-    use crate::tests::struct_type_tests::Complex;
+    use super::Complex;
     use pgrx::prelude::*;
 
     #[pg_test]

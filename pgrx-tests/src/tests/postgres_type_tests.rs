@@ -159,7 +159,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
-    use crate::tests::postgres_type_tests::{
+    use super::{
         CustomTextFormatSerializedEnumType, CustomTextFormatSerializedType, JsonEnumType, JsonType,
         VarlenaEnumType, VarlenaType,
     };

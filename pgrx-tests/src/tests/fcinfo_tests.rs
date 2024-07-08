@@ -175,8 +175,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
-    use super::{NullError, NullStrict};
-    use crate::tests::fcinfo_tests::same_name;
+    use super::{same_name, NullError, NullStrict};
     use pgrx::prelude::*;
     use pgrx::{direct_pg_extern_function_call, IntoDatum};
 

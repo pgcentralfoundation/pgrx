@@ -48,7 +48,7 @@ mod tests {
 
     #[allow(unused_imports)]
     use crate as pgrx_tests;
-    use crate::tests::struct_type_tests::Complex;
+    use crate::tests::struct_type::Complex;
 
     use super::RandomData;
 
