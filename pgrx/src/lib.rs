@@ -67,6 +67,8 @@ pub mod pg_catalog;
 pub mod pgbox;
 pub mod rel;
 pub mod shmem;
+#[cfg(feature = "cshim")]
+pub mod shmem_hash;
 pub mod spi;
 #[cfg(feature = "cshim")]
 pub mod spinlock;
@@ -105,6 +107,8 @@ pub use nodes::*;
 pub use pgbox::*;
 pub use rel::*;
 pub use shmem::*;
+#[cfg(feature = "cshim")]
+pub use shmem_hash::*;
 pub use spi::Spi; // only Spi.  We don't want the top-level namespace polluted with spi::Result and spi::Error
 pub use stringinfo::*;
 pub use trigger_support::*;

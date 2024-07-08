@@ -9,6 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::pg_sys;
 use core::mem::MaybeUninit;
+use std::fmt;
 use std::{cell::UnsafeCell, marker::PhantomData};
 
 /// A Rust locking mechanism which uses a PostgreSQL `slock_t` to lock the data.
@@ -37,6 +38,12 @@ pub struct PgSpinLock<T> {
 // `Send` and `Sync`.
 unsafe impl<T: Send> Send for PgSpinLock<T> {}
 unsafe impl<T: Send> Sync for PgSpinLock<T> {}
+
+impl<T> fmt::Debug for PgSpinLock<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("PgSpinLock").finish()
+    }
+}
 
 impl<T> PgSpinLock<T> {
     /// Create a new [`PgSpinLock`]. See the type documentation for more info.

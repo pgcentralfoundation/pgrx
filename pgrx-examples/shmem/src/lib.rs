@@ -11,6 +11,7 @@ use pgrx::atomics::*;
 use pgrx::lwlock::PgLwLock;
 use pgrx::prelude::*;
 use pgrx::shmem::*;
+use pgrx::shmem_hash::*;
 use pgrx::{pg_shmem_init, warning};
 use serde::*;
 use std::sync::atomic::Ordering;
@@ -35,6 +36,7 @@ static HASH: PgLwLock<heapless::FnvIndexMap<i32, i32, 4>> = PgLwLock::new();
 static STRUCT: PgLwLock<Pgtest> = PgLwLock::new();
 static PRIMITIVE: PgLwLock<i32> = PgLwLock::new();
 static ATOMIC: PgAtomic<std::sync::atomic::AtomicBool> = PgAtomic::new();
+static HASH_TABLE: ShmemHashMap<i64, i64> = ShmemHashMap::new(250);
 
 #[pg_guard]
 pub extern "C" fn _PG_init() {
@@ -44,6 +46,7 @@ pub extern "C" fn _PG_init() {
     pg_shmem_init!(STRUCT);
     pg_shmem_init!(PRIMITIVE);
     pg_shmem_init!(ATOMIC);
+    pg_shmem_init!(HASH_TABLE);
 }
 
 #[pg_extern]
@@ -54,6 +57,26 @@ fn vec_select() -> SetOfIterator<'static, Pgtest> {
 #[pg_extern]
 fn vec_count() -> i32 {
     VEC.share().len() as i32
+}
+
+#[pg_extern]
+fn hash_table_insert(key: i64, value: i64) -> Option<i64> {
+    HASH_TABLE.insert(key, value).unwrap()
+}
+
+#[pg_extern]
+fn hash_table_get(key: i64) -> Option<i64> {
+    HASH_TABLE.get(key)
+}
+
+#[pg_extern]
+fn hash_table_remove(key: i64) -> Option<i64> {
+    HASH_TABLE.remove(key)
+}
+
+#[pg_extern]
+fn hash_table_len() -> i64 {
+    HASH_TABLE.len() as i64
 }
 
 #[pg_extern]
