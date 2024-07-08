@@ -763,12 +763,15 @@ fn get_extension_name() -> eyre::Result<String> {
 }
 
 fn get_pgdata_path() -> eyre::Result<PathBuf> {
+    // Note that this path is turned into an entry in the unix_socket_directories config.
+    // Each path has a low limit in maximum bytes, so we should avoid adding needless characters.
     let mut pgdata_base = std::env::var("CARGO_PGRX_TEST_PGDATA")
         .map(|path| PathBuf::from(path))
         .unwrap_or_else(|_| {
             let mut target_dir = get_target_dir()
                 .unwrap_or_else(|e| panic!("Failed to determine the crate target directory: {e}"));
-            target_dir.push("pgrx-test-pgdata");
+            // ./test-data or ./pgdata both seem too cryptic
+            target_dir.push("test-pgdata");
             target_dir
         });
 
