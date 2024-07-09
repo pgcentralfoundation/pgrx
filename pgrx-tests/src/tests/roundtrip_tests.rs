@@ -1,7 +1,7 @@
+use super::Complex;
+use pgrx::Date;
 use rand::distributions::{Alphanumeric, Standard};
 use rand::Rng;
-
-use pgrx::Date;
 
 #[derive(pgrx::PostgresType, Clone, PartialEq, Eq, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RandomData {
@@ -46,9 +46,9 @@ mod tests {
     use pgrx::prelude::*;
     use pgrx::Uuid;
 
+    use super::Complex;
     #[allow(unused_imports)]
     use crate as pgrx_tests;
-    use crate::tests::struct_type_tests::Complex;
 
     use super::RandomData;
 

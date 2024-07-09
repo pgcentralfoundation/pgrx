@@ -30,7 +30,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
-    use crate::tests::enum_type_tests::Foo;
+    use super::Foo;
     use pgrx::prelude::*;
 
     #[test]

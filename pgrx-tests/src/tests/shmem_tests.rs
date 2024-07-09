@@ -26,7 +26,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
-    use crate::tests::shmem_tests::LWLOCK;
+    use super::LWLOCK;
     use pgrx::prelude::*;
 
     #[pg_test]
