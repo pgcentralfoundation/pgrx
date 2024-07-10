@@ -2,6 +2,7 @@ use super::uuid::Uuid;
 use super::Datum;
 use crate::prelude::*;
 use crate::varlena::{text_to_rust_str_unchecked, varlena_to_byte_slice};
+use crate::{Json, JsonB};
 use alloc::ffi::CString;
 use core::ffi::CStr;
 
@@ -341,5 +342,27 @@ unsafe impl<T> UnboxDatum for PgBox<T, AllocatedByPostgres> {
         Self: 'src,
     {
         PgBox::from_datum(d.0, false).unwrap()
+    }
+}
+
+unsafe impl UnboxDatum for Json {
+    type As<'src> = Json where Self: 'src;
+    #[inline]
+    unsafe fn unbox<'src>(d: Datum<'src>) -> Self::As<'src>
+    where
+        Self: 'src,
+    {
+        Json::from_datum(d.0, false).unwrap()
+    }
+}
+
+unsafe impl UnboxDatum for JsonB {
+    type As<'src> = JsonB where Self: 'src;
+    #[inline]
+    unsafe fn unbox<'src>(d: Datum<'src>) -> Self::As<'src>
+    where
+        Self: 'src,
+    {
+        JsonB::from_datum(d.0, false).unwrap()
     }
 }
