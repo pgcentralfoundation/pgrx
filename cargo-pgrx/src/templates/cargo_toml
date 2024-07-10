@@ -20,10 +20,10 @@ pg16 = ["pgrx/pg16", "pgrx-tests/pg16" ]
 pg_test = []
 
 [dependencies]
-pgrx = "=0.12.0-beta.1"
+pgrx = "=0.12.0-beta.2"
 
 [dev-dependencies]
-pgrx-tests = "=0.12.0-beta.1"
+pgrx-tests = "=0.12.0-beta.2"
 
 [profile.dev]
 panic = "unwind"
