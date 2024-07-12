@@ -7,7 +7,6 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-#![doc(hidden)]
 #![deny(unsafe_op_in_unsafe_fn)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
 
@@ -273,6 +272,7 @@ argue_from_datum! { 'fcx; &'fcx str, &'fcx CStr, &'fcx [u8] }
 /// This trait is exposed to external code so macro-generated wrapper fn may expand to calls to it.
 /// The number of invariants implementers must uphold is unlikely to be adequately documented.
 /// Prefer to use RetAbi as a trait bound instead of implementing it, or even calling it, yourself.
+#[doc(hidden)]
 pub unsafe trait RetAbi: Sized {
     /// Type returned to Postgres
     type Item: Sized;
@@ -334,7 +334,12 @@ pub unsafe trait RetAbi: Sized {
     unsafe fn finish_call_fcinfo(_fcinfo: pg_sys::FunctionCallInfo) {}
 }
 
-/// A simplified blanket RetAbi
+/// Simplified variant of *RetAbi*.
+///
+/// In order to handle all of the nuances of the calling convention for returning result sets from
+/// Postgres functions, pgrx uses a very complicated trait, RetAbi. In practice, however, most
+/// types do not need to think about its many sharp-edged cases. Instead, they should implement
+/// this simplified trait, BoxRet. A blanket impl of RetAbi for BoxRet takes care of the rest.
 pub unsafe trait BoxRet: Sized {
     unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum;
 }
@@ -367,6 +372,7 @@ where
 }
 
 /// Control flow for RetAbi
+#[doc(hidden)]
 pub enum CallCx {
     RestoreCx,
     WrappedFn(pg_sys::MemoryContext),
@@ -845,6 +851,7 @@ impl<'a, 'fcx> Args<'a, 'fcx> {
 }
 
 #[derive(Clone)]
+#[doc(hidden)]
 pub struct ReturnSetInfoWrapper<'fcx>(
     *mut pg_sys::ReturnSetInfo,
     PhantomData<&'fcx mut pg_sys::ReturnSetInfo>,
