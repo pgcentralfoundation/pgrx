@@ -24,6 +24,7 @@
         pkgs,
         inputs',
         system,
+        self',
         ...
       }: let
         rustToolchain = inputs'.fenix.packages.stable.toolchain;
@@ -44,8 +45,26 @@
             cargoTestExtraArgs = "-- --skip=command::schema::tests::test_parse_managed_postmasters";
           };
         };
+        devShells.default = with pkgs; mkShell {
+          inputsFrom = [
+            self'.packages.cargo-pgrx
+          ];
+          nativeBuildInputs = with pkgs; [
+            rustToolchain
+            pkg-config
+          ];
+          buildInputs = with pkgs; [
+            openssl
+          ] ++ lib.optionals stdenv.isDarwin [
+            darwin.apple_sdk.frameworks.Security
+            libiconv
+          ];
+          
+          shellHook = ''
+            export PGRX_HOME=$(mktemp -d)
+          '';
+        };
       };
-
       flake.lib.buildPgrxExtension = {
         rustToolchain,
         system,
