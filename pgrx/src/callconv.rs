@@ -342,6 +342,10 @@ pub unsafe trait RetAbi: Sized {
 /// this simplified trait, BoxRet. A blanket impl of RetAbi for BoxRet takes care of the rest.
 pub unsafe trait BoxRet: Sized {
     unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum;
+
+    fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        unsafe { mem::transmute(Self::box_in_fcinfo(self, fcinfo.as_mut_ptr())) }
+    }
 }
 
 unsafe impl<T> RetAbi for T
