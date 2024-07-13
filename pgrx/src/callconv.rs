@@ -296,7 +296,7 @@ pub unsafe trait RetAbi: Sized {
     fn to_ret(self) -> Self::Ret;
 
     // move into the function context and obtain a Datum
-    fn box_ret_in<'fcx>(fcinfo: &mut FcInfo<'fcx>, ret: Self::Ret) -> Datum<'fcx> {
+    unsafe fn box_ret_in<'fcx>(fcinfo: &mut FcInfo<'fcx>, ret: Self::Ret) -> Datum<'fcx> {
         let fcinfo = fcinfo.0;
         unsafe { mem::transmute(Self::box_ret_in_fcinfo(fcinfo, ret)) }
     }
@@ -366,6 +366,10 @@ where
 
     unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
         unsafe { ret.box_in_fcinfo(fcinfo) }
+    }
+
+    unsafe fn box_ret_in<'fcx>(fcinfo: &mut FcInfo<'fcx>, ret: Self::Ret) -> Datum<'fcx> {
+        unsafe { ret.box_into(fcinfo) }
     }
 
     unsafe fn check_fcinfo_and_prepare(_fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
