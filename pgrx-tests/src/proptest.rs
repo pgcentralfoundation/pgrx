@@ -22,6 +22,8 @@ For exposed functions, `PgTestRunner` transparently replaces `TestRunner`:
 This does not provide compatibility with the entire proptest API surface:
 - `proptest!` can't use `PgTestRunner` as it builds its own runners
 - Using this with proptest's forking support is likely profoundly broken
+
+[`prop_assert!`]: proptest::prop_assert
 */
 #[derive(Default)]
 pub struct PgTestRunner(TestRunner);
