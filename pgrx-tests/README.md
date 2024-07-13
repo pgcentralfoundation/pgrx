@@ -19,3 +19,25 @@ A slightly more complicated example which runs al tests with start with `test_pg
 ```console
 cargo test --features "pg16,proptest,chrono" test_pgrx_chrono_roundtrip
 ```
+
+## FAQ / Common Issues
+
+### Different `cargo pgrx` version
+
+In local testing, if the version of `cargo-pgrx` differs from the ones the tests attempt to use, an error results.
+
+If you run into this issue, make sure to install the *local* version of `cargo-pgrx` rather than the officially released version, temporarily while you run your tests.
+
+From the `pgrx-tests` folder, you would run:
+
+```console
+cargo install --path ../cargo-pgrx
+```
+
+### `The specified pg_config binary, ... does not exist`
+
+If you get this error, and were trying to test against PG16 (as in the example from the [running tests section](#running-tests) above) you should re-initialize pgrx:
+
+```console
+cargo pgrx init --pg16 download
+```
