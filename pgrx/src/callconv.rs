@@ -14,9 +14,9 @@ use crate::datum::Datum;
 use crate::heap_tuple::PgHeapTuple;
 use crate::nullable::Nullable;
 use crate::{
-    pg_return_null, pg_sys, AnyArray, AnyElement, AnyNumeric, Date, FromDatum, Inet, Internal,
-    Interval, IntoDatum, Json, JsonB, PgBox, PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone,
-    Timestamp, TimestampWithTimeZone, UnboxDatum, Uuid,
+    pg_sys, AnyArray, AnyElement, AnyNumeric, Date, FromDatum, Inet, Internal, Interval, IntoDatum,
+    Json, JsonB, PgBox, PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone, Timestamp,
+    TimestampWithTimeZone, UnboxDatum, Uuid,
 };
 use core::marker::PhantomData;
 use core::{iter, mem, ptr, slice};
@@ -395,12 +395,10 @@ unsafe impl<T> BoxRet for Option<T>
 where
     T: BoxRet,
 {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        unsafe {
-            match self {
-                None => pg_return_null(fcinfo),
-                Some(value) => value.box_in_fcinfo(fcinfo),
-            }
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self {
+            Some(datum) => unsafe { datum.box_into(fcinfo) },
+            None => fcinfo.return_null(),
         }
     }
 }
@@ -409,12 +407,10 @@ unsafe impl<T> BoxRet for Nullable<T>
 where
     T: BoxRet,
 {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        unsafe {
-            match self {
-                Nullable::Null => pg_return_null(fcinfo),
-                Nullable::Valid(value) => value.box_in_fcinfo(fcinfo),
-            }
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self {
+            Nullable::Valid(datum) => unsafe { datum.box_into(fcinfo) },
+            Nullable::Null => fcinfo.return_null(),
         }
     }
 }
@@ -466,58 +462,71 @@ where
 
 macro_rules! return_packaging_for_primitives {
     ($($scalar:ty),*) => {
-        $(unsafe impl BoxRet for $scalar {
-              unsafe fn box_in_fcinfo(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-                  $crate::pg_sys::Datum::from(self)
-              }
-        })*
+        $(  unsafe impl BoxRet for $scalar {
+                unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+                    unsafe { fcinfo.return_raw_datum($crate::pg_sys::Datum::from(self)) }
+                }
+            }
+        )*
     }
 }
 
 return_packaging_for_primitives!(i8, i16, i32, i64, bool);
 
 unsafe impl BoxRet for () {
-    unsafe fn box_in_fcinfo(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        pg_sys::Datum::from(0)
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        unsafe { fcinfo.return_raw_datum(pg_sys::Datum::null()) }
     }
 }
 
 unsafe impl BoxRet for f32 {
-    unsafe fn box_in_fcinfo(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        pg_sys::Datum::from(self.to_bits())
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        unsafe { fcinfo.return_raw_datum(self.to_bits().into()) }
     }
 }
 
 unsafe impl BoxRet for f64 {
-    unsafe fn box_in_fcinfo(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        pg_sys::Datum::from(self.to_bits())
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        unsafe { fcinfo.return_raw_datum(self.to_bits().into()) }
     }
 }
 
 unsafe impl<'a> BoxRet for &'a [u8] {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
 unsafe impl<'a> BoxRet for &'a str {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
 unsafe impl<'a> BoxRet for &'a CStr {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
 macro_rules! impl_repackage_into_datum {
     ($($boxable:ty),*) => {
-        $(unsafe impl BoxRet for $boxable {
-              unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-                  self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
-              }
+        $(  unsafe impl BoxRet for $boxable {
+                unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+                    match self.into_datum() {
+                        Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+                        None => fcinfo.return_null(),
+                    }
+                }
           })*
     };
 }
@@ -530,8 +539,11 @@ impl_repackage_into_datum! {
 }
 
 unsafe impl<const P: u32, const S: u32> BoxRet for crate::Numeric<P, S> {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
@@ -539,8 +551,11 @@ unsafe impl<T> BoxRet for crate::Range<T>
 where
     T: IntoDatum + crate::RangeSubType,
 {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
@@ -548,14 +563,20 @@ unsafe impl<T> BoxRet for Vec<T>
 where
     T: IntoDatum,
 {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
 unsafe impl<T: Copy> BoxRet for PgVarlena<T> {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
@@ -563,8 +584,11 @@ unsafe impl<'mcx, A> BoxRet for PgHeapTuple<'mcx, A>
 where
     A: crate::WhoAllocated,
 {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
@@ -572,8 +596,11 @@ unsafe impl<T, A> BoxRet for PgBox<T, A>
 where
     A: crate::WhoAllocated,
 {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
