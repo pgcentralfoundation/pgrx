@@ -681,6 +681,7 @@ impl<'fcx> FcInfo<'fcx> {
     /// ```
     #[inline]
     pub fn return_null(&mut self) -> Datum<'fcx> {
+        // SAFETY: returning null is always safe
         unsafe { *self.set_return_is_null() = true };
         Datum::null()
     }
@@ -694,7 +695,10 @@ impl<'fcx> FcInfo<'fcx> {
     ///   to an object that will not last for the caller's lifetime, this is *undefined behavior*.
     /// - If the function call expects a by-value return, and the `pg_sys::Datum` is not a valid
     ///   instance of that type when interpreted as such, this is **undefined behavior**.
-    /// - If the return must be null, then calling this function is **undefined behavior**.
+    /// - If the return must be the SQL null, then calling this function is **undefined behavior**.
+    ///
+    /// Functionally, this can be thought of as a convenience for a [`mem::transmute`]
+    /// from `pg_sys::Datum` to `pgrx::datum::Datum<'fcx>`. This gives it similar constraints.
     #[inline]
     pub unsafe fn return_raw_datum(&mut self, datum: pg_sys::Datum) -> Datum<'fcx> {
         // SAFETY: Caller asserts
