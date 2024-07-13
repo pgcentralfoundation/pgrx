@@ -656,7 +656,7 @@ impl<'fcx> FcInfo<'fcx> {
     /// # Safety
     /// If this flag is set to "false", then the resulting return must be a valid [`Datum`] for
     /// the function call's result type.
-    pub unsafe fn return_is_null(&mut self) -> &mut bool {
+    pub unsafe fn set_return_is_null(&mut self) -> &mut bool {
         unsafe { &mut (*self.0).isnull }
     }
 
@@ -681,7 +681,7 @@ impl<'fcx> FcInfo<'fcx> {
     /// ```
     #[inline]
     pub fn return_null(&mut self) -> Datum<'fcx> {
-        unsafe { *self.return_is_null() = true };
+        unsafe { *self.set_return_is_null() = true };
         Datum::null()
     }
 
@@ -699,7 +699,7 @@ impl<'fcx> FcInfo<'fcx> {
     pub unsafe fn return_raw_datum(&mut self, datum: pg_sys::Datum) -> Datum<'fcx> {
         // SAFETY: Caller asserts
         unsafe {
-            *self.return_is_null() = false;
+            *self.set_return_is_null() = false;
             mem::transmute(datum)
         }
     }
