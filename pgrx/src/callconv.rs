@@ -341,10 +341,15 @@ pub unsafe trait RetAbi: Sized {
 /// types do not need to think about its many sharp-edged cases. Instead, they should implement
 /// this simplified trait, BoxRet. A blanket impl of RetAbi for BoxRet takes care of the rest.
 pub unsafe trait BoxRet: Sized {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum;
+    #[doc(hidden)]
+    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        unsafe { Self::box_into(self, &mut FcInfo::from_ptr(fcinfo)).sans_lifetime() }
+    }
 
-    fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
-        unsafe { mem::transmute(Self::box_in_fcinfo(self, fcinfo.as_mut_ptr())) }
+    /// # Safety
+    /// You have to actually return the resulting Datum to the function.
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        unsafe { fcinfo.return_raw_datum(self.box_in_fcinfo(fcinfo.0)) }
     }
 }
 
@@ -615,14 +620,23 @@ impl<'fcx> FcInfo<'fcx> {
         self.0
     }
 
-    /// Modifies the contained `fcinfo` struct to flag its return value as null.
+    /// Accessor for the "is null" flag
     ///
-    /// Returns a null-pointer Datum for use with the calling function's return value.
+    /// # Safety
+    /// If this flag is set to "false", then the resulting return must be a valid [`Datum`] for
+    /// the function call's result type.
+    pub unsafe fn return_is_null(&mut self) -> &mut bool {
+        unsafe { &mut (*self.0).isnull }
+    }
+
+    /// Modifies the function call's return to be null
     ///
-    /// Safety: If this flag is set, regardless of what your function actually returns,
-    /// Postgress will presume it is null and discard it. This means that, if you call this
+    /// Returns a null-pointer Datum for use as the calling function's return value.
+    ///
+    /// If this flag is set, regardless of what your function actually returns,
+    /// Postgres will presume it is null and discard it. This means that, if you call this
     /// method and then return a value anyway, *your extension will leak memory.* Please
-    /// ensure this method is only called for functions which, very definitely, returns null.
+    /// ensure this method is only called for functions which, very definitely, return null.
     ///
     /// # Examples
     ///
@@ -630,15 +644,33 @@ impl<'fcx> FcInfo<'fcx> {
     /// use pgrx::callconv::FcInfo;
     /// use pgrx::datum::Datum;
     /// use pgrx::prelude::*;
-    /// fn foo<'a>(mut fcinfo: FcInfo<'a>) -> Datum {
-    ///     return unsafe { fcinfo.set_return_null() };
+    /// fn foo<'a>(mut fcinfo: FcInfo<'a>) -> Datum<'a> {
+    ///     unsafe { fcinfo.return_null() }
     /// }
     /// ```
     #[inline]
-    pub unsafe fn set_return_null(&mut self) -> crate::datum::Datum<'fcx> {
-        let fcinfo = unsafe { self.0.as_mut() }.unwrap();
-        fcinfo.isnull = true;
-        crate::datum::Datum::null()
+    pub fn return_null(&mut self) -> Datum<'fcx> {
+        unsafe { *self.return_is_null() = true };
+        Datum::null()
+    }
+
+    /// Set the return to be non-null and assign a raw Datum the correct lifetime.
+    ///
+    /// # Safety
+    /// - If the function call expects a by-reference return, and the `pg_sys::Datum`
+    ///   does not point to a valid object of the correct type, this is *undefined behavior*.
+    /// - If the function call expects a by-reference return, and the `pg_sys::Datum` points
+    ///   to an object that will not last for the caller's lifetime, this is *undefined behavior*.
+    /// - If the function call expects a by-value return, and the `pg_sys::Datum` is not a valid
+    ///   instance of that type when interpreted as such, this is **undefined behavior**.
+    /// - If the return must be null, then calling this function is **undefined behavior**.
+    #[inline]
+    pub unsafe fn return_raw_datum(&mut self, datum: pg_sys::Datum) -> Datum<'fcx> {
+        // SAFETY: Caller asserts
+        unsafe {
+            *self.return_is_null() = false;
+            mem::transmute(datum)
+        }
     }
 
     /// Get the collation the function call should use.
