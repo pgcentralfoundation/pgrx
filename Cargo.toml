@@ -62,7 +62,7 @@ cargo_toml = "0.19" # used for building projects
 clap-cargo = { version = "0.14.0", features = [ "cargo_metadata" ] }
 eyre = "~0.6.12" # simplifies error-handling
 libc = "0.2" # FFI compat
-owo-colors =  { version = "3.5", features = [ "supports-colors" ] } # for output highlighting
+owo-colors =  { version = "4.0", features = [ "supports-colors" ] } # for output highlighting
 proc-macro2 = { version = "1.0.78", features = [ "span-locations" ] }
 quote = "1.0.33"
 regex = "1.1" # used for build/test
