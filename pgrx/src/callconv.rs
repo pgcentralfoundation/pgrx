@@ -7,7 +7,6 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-#![doc(hidden)]
 #![deny(unsafe_op_in_unsafe_fn)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
 
@@ -15,9 +14,9 @@ use crate::datum::Datum;
 use crate::heap_tuple::PgHeapTuple;
 use crate::nullable::Nullable;
 use crate::{
-    pg_return_null, pg_sys, AnyArray, AnyElement, AnyNumeric, Date, FromDatum, Inet, Internal,
-    Interval, IntoDatum, Json, JsonB, PgBox, PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone,
-    Timestamp, TimestampWithTimeZone, UnboxDatum, Uuid,
+    pg_sys, AnyArray, AnyElement, AnyNumeric, Date, FromDatum, Inet, Internal, Interval, IntoDatum,
+    Json, JsonB, PgBox, PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone, Timestamp,
+    TimestampWithTimeZone, UnboxDatum, Uuid,
 };
 use core::marker::PhantomData;
 use core::{iter, mem, ptr, slice};
@@ -273,6 +272,7 @@ argue_from_datum! { 'fcx; &'fcx str, &'fcx CStr, &'fcx [u8] }
 /// This trait is exposed to external code so macro-generated wrapper fn may expand to calls to it.
 /// The number of invariants implementers must uphold is unlikely to be adequately documented.
 /// Prefer to use RetAbi as a trait bound instead of implementing it, or even calling it, yourself.
+#[doc(hidden)]
 pub unsafe trait RetAbi: Sized {
     /// Type returned to Postgres
     type Item: Sized;
@@ -296,7 +296,7 @@ pub unsafe trait RetAbi: Sized {
     fn to_ret(self) -> Self::Ret;
 
     // move into the function context and obtain a Datum
-    fn box_ret_in<'fcx>(fcinfo: &mut FcInfo<'fcx>, ret: Self::Ret) -> Datum<'fcx> {
+    unsafe fn box_ret_in<'fcx>(fcinfo: &mut FcInfo<'fcx>, ret: Self::Ret) -> Datum<'fcx> {
         let fcinfo = fcinfo.0;
         unsafe { mem::transmute(Self::box_ret_in_fcinfo(fcinfo, ret)) }
     }
@@ -334,9 +334,16 @@ pub unsafe trait RetAbi: Sized {
     unsafe fn finish_call_fcinfo(_fcinfo: pg_sys::FunctionCallInfo) {}
 }
 
-/// A simplified blanket RetAbi
+/// Simplified variant of *RetAbi*.
+///
+/// In order to handle all of the nuances of the calling convention for returning result sets from
+/// Postgres functions, pgrx uses a very complicated trait, RetAbi. In practice, however, most
+/// types do not need to think about its many sharp-edged cases. Instead, they should implement
+/// this simplified trait, BoxRet. A blanket impl of RetAbi for BoxRet takes care of the rest.
 pub unsafe trait BoxRet: Sized {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum;
+    /// # Safety
+    /// You have to actually return the resulting Datum to the function.
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx>;
 }
 
 unsafe impl<T> RetAbi for T
@@ -351,7 +358,11 @@ where
     }
 
     unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
-        unsafe { ret.box_in_fcinfo(fcinfo) }
+        unsafe { ret.box_into(&mut FcInfo::from_ptr(fcinfo)) }.sans_lifetime()
+    }
+
+    unsafe fn box_ret_in<'fcx>(fcinfo: &mut FcInfo<'fcx>, ret: Self::Ret) -> Datum<'fcx> {
+        unsafe { ret.box_into(fcinfo) }
     }
 
     unsafe fn check_fcinfo_and_prepare(_fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
@@ -367,6 +378,7 @@ where
 }
 
 /// Control flow for RetAbi
+#[doc(hidden)]
 pub enum CallCx {
     RestoreCx,
     WrappedFn(pg_sys::MemoryContext),
@@ -376,12 +388,10 @@ unsafe impl<T> BoxRet for Option<T>
 where
     T: BoxRet,
 {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        unsafe {
-            match self {
-                None => pg_return_null(fcinfo),
-                Some(value) => value.box_in_fcinfo(fcinfo),
-            }
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self {
+            Some(datum) => unsafe { datum.box_into(fcinfo) },
+            None => fcinfo.return_null(),
         }
     }
 }
@@ -390,12 +400,10 @@ unsafe impl<T> BoxRet for Nullable<T>
 where
     T: BoxRet,
 {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        unsafe {
-            match self {
-                Nullable::Null => pg_return_null(fcinfo),
-                Nullable::Valid(value) => value.box_in_fcinfo(fcinfo),
-            }
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self {
+            Nullable::Valid(datum) => unsafe { datum.box_into(fcinfo) },
+            Nullable::Null => fcinfo.return_null(),
         }
     }
 }
@@ -447,58 +455,71 @@ where
 
 macro_rules! return_packaging_for_primitives {
     ($($scalar:ty),*) => {
-        $(unsafe impl BoxRet for $scalar {
-              unsafe fn box_in_fcinfo(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-                  $crate::pg_sys::Datum::from(self)
-              }
-        })*
+        $(  unsafe impl BoxRet for $scalar {
+                unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+                    unsafe { fcinfo.return_raw_datum($crate::pg_sys::Datum::from(self)) }
+                }
+            }
+        )*
     }
 }
 
 return_packaging_for_primitives!(i8, i16, i32, i64, bool);
 
 unsafe impl BoxRet for () {
-    unsafe fn box_in_fcinfo(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        pg_sys::Datum::from(0)
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        unsafe { fcinfo.return_raw_datum(pg_sys::Datum::null()) }
     }
 }
 
 unsafe impl BoxRet for f32 {
-    unsafe fn box_in_fcinfo(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        pg_sys::Datum::from(self.to_bits())
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        unsafe { fcinfo.return_raw_datum(self.to_bits().into()) }
     }
 }
 
 unsafe impl BoxRet for f64 {
-    unsafe fn box_in_fcinfo(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        pg_sys::Datum::from(self.to_bits())
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        unsafe { fcinfo.return_raw_datum(self.to_bits().into()) }
     }
 }
 
 unsafe impl<'a> BoxRet for &'a [u8] {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
 unsafe impl<'a> BoxRet for &'a str {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
 unsafe impl<'a> BoxRet for &'a CStr {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
 macro_rules! impl_repackage_into_datum {
     ($($boxable:ty),*) => {
-        $(unsafe impl BoxRet for $boxable {
-              unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-                  self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
-              }
+        $(  unsafe impl BoxRet for $boxable {
+                unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+                    match self.into_datum() {
+                        Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+                        None => fcinfo.return_null(),
+                    }
+                }
           })*
     };
 }
@@ -511,8 +532,11 @@ impl_repackage_into_datum! {
 }
 
 unsafe impl<const P: u32, const S: u32> BoxRet for crate::Numeric<P, S> {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
@@ -520,8 +544,11 @@ unsafe impl<T> BoxRet for crate::Range<T>
 where
     T: IntoDatum + crate::RangeSubType,
 {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
@@ -529,14 +556,20 @@ unsafe impl<T> BoxRet for Vec<T>
 where
     T: IntoDatum,
 {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
 unsafe impl<T: Copy> BoxRet for PgVarlena<T> {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
@@ -544,8 +577,11 @@ unsafe impl<'mcx, A> BoxRet for PgHeapTuple<'mcx, A>
 where
     A: crate::WhoAllocated,
 {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
@@ -553,8 +589,11 @@ unsafe impl<T, A> BoxRet for PgBox<T, A>
 where
     A: crate::WhoAllocated,
 {
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
     }
 }
 
@@ -605,14 +644,23 @@ impl<'fcx> FcInfo<'fcx> {
         self.0
     }
 
-    /// Modifies the contained `fcinfo` struct to flag its return value as null.
+    /// Accessor for the "is null" flag
     ///
-    /// Returns a null-pointer Datum for use with the calling function's return value.
+    /// # Safety
+    /// If this flag is set to "false", then the resulting return must be a valid [`Datum`] for
+    /// the function call's result type.
+    pub unsafe fn set_return_is_null(&mut self) -> &mut bool {
+        unsafe { &mut (*self.0).isnull }
+    }
+
+    /// Modifies the function call's return to be null
     ///
-    /// Safety: If this flag is set, regardless of what your function actually returns,
-    /// Postgress will presume it is null and discard it. This means that, if you call this
+    /// Returns a null-pointer Datum for use as the calling function's return value.
+    ///
+    /// If this flag is set, regardless of what your function actually returns,
+    /// Postgres will presume it is null and discard it. This means that, if you call this
     /// method and then return a value anyway, *your extension will leak memory.* Please
-    /// ensure this method is only called for functions which, very definitely, returns null.
+    /// ensure this method is only called for functions which, very definitely, return null.
     ///
     /// # Examples
     ///
@@ -620,15 +668,37 @@ impl<'fcx> FcInfo<'fcx> {
     /// use pgrx::callconv::FcInfo;
     /// use pgrx::datum::Datum;
     /// use pgrx::prelude::*;
-    /// fn foo<'a>(mut fcinfo: FcInfo<'a>) -> Datum {
-    ///     return unsafe { fcinfo.set_return_null() };
+    /// fn foo<'a>(mut fcinfo: FcInfo<'a>) -> Datum<'a> {
+    ///     unsafe { fcinfo.return_null() }
     /// }
     /// ```
     #[inline]
-    pub unsafe fn set_return_null(&mut self) -> crate::datum::Datum<'fcx> {
-        let fcinfo = unsafe { self.0.as_mut() }.unwrap();
-        fcinfo.isnull = true;
-        crate::datum::Datum::null()
+    pub fn return_null(&mut self) -> Datum<'fcx> {
+        // SAFETY: returning null is always safe
+        unsafe { *self.set_return_is_null() = true };
+        Datum::null()
+    }
+
+    /// Set the return to be non-null and assign a raw Datum the correct lifetime.
+    ///
+    /// # Safety
+    /// - If the function call expects a by-reference return, and the `pg_sys::Datum`
+    ///   does not point to a valid object of the correct type, this is *undefined behavior*.
+    /// - If the function call expects a by-reference return, and the `pg_sys::Datum` points
+    ///   to an object that will not last for the caller's lifetime, this is *undefined behavior*.
+    /// - If the function call expects a by-value return, and the `pg_sys::Datum` is not a valid
+    ///   instance of that type when interpreted as such, this is **undefined behavior**.
+    /// - If the return must be the SQL null, then calling this function is **undefined behavior**.
+    ///
+    /// Functionally, this can be thought of as a convenience for a [`mem::transmute`]
+    /// from `pg_sys::Datum` to `pgrx::datum::Datum<'fcx>`. This gives it similar constraints.
+    #[inline]
+    pub unsafe fn return_raw_datum(&mut self, datum: pg_sys::Datum) -> Datum<'fcx> {
+        // SAFETY: Caller asserts
+        unsafe {
+            *self.set_return_is_null() = false;
+            mem::transmute(datum)
+        }
     }
 
     /// Get the collation the function call should use.
@@ -845,6 +915,7 @@ impl<'a, 'fcx> Args<'a, 'fcx> {
 }
 
 #[derive(Clone)]
+#[doc(hidden)]
 pub struct ReturnSetInfoWrapper<'fcx>(
     *mut pg_sys::ReturnSetInfo,
     PhantomData<&'fcx mut pg_sys::ReturnSetInfo>,
