@@ -365,7 +365,7 @@ where
     }
 
     unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
-        unsafe { ret.box_in_fcinfo(fcinfo) }
+        unsafe { ret.box_into(&mut FcInfo::from_ptr(fcinfo)) }.sans_lifetime()
     }
 
     unsafe fn box_ret_in<'fcx>(fcinfo: &mut FcInfo<'fcx>, ret: Self::Ret) -> Datum<'fcx> {
