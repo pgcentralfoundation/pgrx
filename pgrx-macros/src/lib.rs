@@ -735,6 +735,13 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             unsafe fn box_in_fcinfo(self, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
                 ::pgrx::datum::IntoDatum::into_datum(self).unwrap()
             }
+
+            unsafe fn box_into<'fcx>(self, fcinfo: &mut ::pgrx::callconv::FcInfo<'fcx>) -> ::pgrx::datum::Datum<'fcx> {
+                match ::pgrx::datum::IntoDatum::into_datum(self) {
+                    None => fcinfo.return_null(),
+                    Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+                }
+            }
         }
     });
 
@@ -863,6 +870,13 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                         match ::pgrx::datum::IntoDatum::into_datum(self) {
                             None => ::pgrx::fcinfo::pg_return_null(fcinfo),
                             Some(datum) => datum,
+                        }
+                    }
+
+                    unsafe fn box_into<'fcx>(self, fcinfo: &mut ::pgrx::callconv::FcInfo<'fcx>) -> ::pgrx::datum::Datum<'fcx> {
+                        match ::pgrx::datum::IntoDatum::into_datum(self) {
+                            None => fcinfo.return_null(),
+                            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
                         }
                     }
                 }

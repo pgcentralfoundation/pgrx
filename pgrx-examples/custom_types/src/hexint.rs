@@ -107,6 +107,10 @@ unsafe impl BoxRet for HexInt {
     unsafe fn box_in_fcinfo(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         Datum::from(self.value)
     }
+
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut pgrx::callconv::FcInfo<'fcx>) -> pgrx::Datum<'fcx> {
+        unsafe { fcinfo.return_raw_datum(Datum::from(self.value)) }
+    }
 }
 
 /// Input function for `HexInt`.  Parses any valid "radix(16)" text string, with or without a leading

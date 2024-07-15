@@ -348,9 +348,7 @@ pub unsafe trait BoxRet: Sized {
 
     /// # Safety
     /// You have to actually return the resulting Datum to the function.
-    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
-        unsafe { fcinfo.return_raw_datum(self.box_in_fcinfo(fcinfo.0)) }
-    }
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx>;
 }
 
 unsafe impl<T> RetAbi for T
