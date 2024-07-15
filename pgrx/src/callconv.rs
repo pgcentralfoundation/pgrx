@@ -341,11 +341,6 @@ pub unsafe trait RetAbi: Sized {
 /// types do not need to think about its many sharp-edged cases. Instead, they should implement
 /// this simplified trait, BoxRet. A blanket impl of RetAbi for BoxRet takes care of the rest.
 pub unsafe trait BoxRet: Sized {
-    #[doc(hidden)]
-    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        unsafe { Self::box_into(self, &mut FcInfo::from_ptr(fcinfo)).sans_lifetime() }
-    }
-
     /// # Safety
     /// You have to actually return the resulting Datum to the function.
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx>;
