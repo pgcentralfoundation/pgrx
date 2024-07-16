@@ -27,7 +27,7 @@ mod rss {
     use std::collections::BTreeMap;
     use url::Url;
 
-    use crate::command::build_agent_for_url;
+    use crate::command::{build_agent_for_url, generate_ftp_download_url};
 
     pub(super) struct PostgreSQLVersionRss;
 
@@ -65,9 +65,8 @@ mod rss {
                     if matches!(known_pgver.minor, PgMinorVersion::Latest) {
                         // fill in the latest minor version number and its url
                         known_pgver.minor = PgMinorVersion::Release(minor);
-                        known_pgver.url = Some(Url::parse(
-                                &format!("https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2")
-                            )?);
+                        known_pgver.url =
+                            Some(Url::parse(&generate_ftp_download_url(major, minor))?);
                     }
                 }
             }

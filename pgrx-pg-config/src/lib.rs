@@ -86,6 +86,31 @@ impl PgMinorVersion {
     }
 }
 
+impl TryFrom<&str> for PgMinorVersion {
+    type Error = eyre::Error;
+    fn try_from(other: &str) -> eyre::Result<Self> {
+        Ok(match other.trim_start_matches("pg") {
+            "latest" => Self::Latest,
+            s if s.chars().all(|c| c.is_ascii_digit()) => {
+                Self::Release(u16::from_str_radix(s, 10)?)
+            }
+            s if s.contains("beta") => {
+                let (_major, minor) = s
+                    .split_once("beta")
+                    .ok_or_else(|| eyre!("unexpectedly missing 'beta' from version"))?;
+                Self::Beta(u16::from_str_radix(minor, 10)?)
+            }
+            s if s.contains("rc") => {
+                let (_major, minor) = s
+                    .split_once("rc")
+                    .ok_or_else(|| eyre!("unexpectedly missing 'rc' from version"))?;
+                Self::Rc(u16::from_str_radix(minor, 10)?)
+            }
+            s => eyre::bail!("unexpected input string for minor version [{s}]"),
+        })
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct PgVersion {
     pub major: u16,
@@ -106,6 +131,39 @@ impl PgVersion {
 impl Display for PgVersion {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}{}", self.major, self.minor)
+    }
+}
+
+impl TryFrom<(&str, Option<Url>)> for PgVersion {
+    type Error = eyre::Error;
+
+    fn try_from((s, url): (&str, Option<Url>)) -> eyre::Result<Self> {
+        let v = match s.trim_start_matches("pg") {
+            s if s.contains(".beta") => {
+                let (major, minor) =
+                    s.split_once(".").ok_or_else(|| eyre!("unexpectedly missing '.beta'"))?;
+                let major = u16::from_str_radix(major, 10)?;
+                Self::new(major, PgMinorVersion::try_from(minor)?, url)
+            }
+            s if s.contains(".rc") => {
+                let (major, minor) =
+                    s.split_once(".").ok_or_else(|| eyre!("unexpectedly missing '.rc'"))?;
+                let major = u16::from_str_radix(major, 10)?;
+                Self::new(major, PgMinorVersion::try_from(minor)?, url)
+            }
+            s if s.contains('.') => {
+                let (major, minor) =
+                    s.split_once('.').ok_or_else(|| eyre!("unexpectedly missing '.'"))?;
+                let major = u16::from_str_radix(major, 10)?;
+                Self::new(major, PgMinorVersion::try_from(minor)?, url)
+            }
+            s if s.chars().all(|c| c.is_ascii_digit()) => {
+                let major = u16::from_str_radix(s, 10)?;
+                Self::new(major, PgMinorVersion::Latest, url)
+            }
+            s => eyre::bail!("unexpected input string for pg version [{s}]"),
+        };
+        Ok(v)
     }
 }
 
