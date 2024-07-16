@@ -27,7 +27,7 @@ use std::ptr::NonNull;
 /// Depending on its usage, it'll interoperate correctly with Rust's Drop semantics, such that the
 /// backing Postgres-allocated memory is `pfree()'d` when the `PgBox<T>` is dropped, but it is
 /// possible to effectively return management of the memory back to Postgres (to free on Transaction
-/// end, for example) by calling `::into_pg()` or ``::into_pg_boxed()`.  This is especially useful
+/// end, for example) by calling `::into_pg()` or `::into_pg_boxed()`.  This is especially useful
 /// for returning values back to Postgres.
 ///
 /// ## Examples
