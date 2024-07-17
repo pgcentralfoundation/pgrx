@@ -34,7 +34,7 @@ impl From<TimestampWithTimeZone> for pg_sys::TimestampTz {
     }
 }
 
-/// Fallibly create a [`TimestampWithTimeZone]` from a Postgres [`pg_sys::TimestampTz`] value.
+/// Fallibly create a [`TimestampWithTimeZone`] from a Postgres [`pg_sys::TimestampTz`] value.
 impl TryFrom<pg_sys::TimestampTz> for TimestampWithTimeZone {
     type Error = FromTimeError;
 
