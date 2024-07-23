@@ -4,7 +4,8 @@ echo "---- setup rustc ----"
 if [ $(type rustup) ]; then
   echo "rustup already installed"
 else
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > ./rustup-init.sh
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs --output rustup-init.sh
+  chmod +rwx rustup-init.sh
   ./rustup-init.sh -y
 fi
 rustup update "${RUST_TOOLCHAIN:-stable}"
