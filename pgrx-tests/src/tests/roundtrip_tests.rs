@@ -111,7 +111,6 @@ mod tests {
     roundtrip!(rt_refstr, test_rt_refstr, &'a str, "foo");
     roundtrip!(rt_bool, test_rt_bool, bool, true);
     roundtrip!(rt_f32, test_rt_f32, f32, f32::MAX);
-    roundtrip!(rt_numeric, test_rt_numeric, Numeric<100,0>, Numeric::from_str("31241234123412341234").unwrap());
     roundtrip!(
         rt_anynumeric,
         test_rt_anynumeric,
@@ -302,19 +301,6 @@ mod tests {
         test_rt_array_f32,
         Vec<Option<f32>>,
         vec![None, Some(f32::MIN), Some(f32::MAX), None, Some(42.42), None]
-    );
-    roundtrip!(
-        rt_array_numeric,
-        test_rt_array_numeric,
-        Vec<Option<Numeric<100, 0>>>,
-        vec![
-            None,
-            Some(Numeric::try_from(i128::MIN).unwrap()),
-            Some(Numeric::try_from(u128::MAX).unwrap()),
-            None,
-            Some(Numeric::from_str("31241234123412341234").unwrap()),
-            None
-        ]
     );
     roundtrip!(
         rt_array_anynumeric,

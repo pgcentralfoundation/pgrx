@@ -13,7 +13,7 @@ use pgrx::prelude::*;
 pg_module_magic!();
 
 #[pg_extern]
-fn add_numeric(a: Numeric<1000, 33>, b: Numeric<1000, 33>) -> Numeric<1000, 33> {
+fn add_numeric(a: AnyNumeric, b: AnyNumeric) -> Numeric<1000, 33> {
     (a + b).rescale().unwrap()
 }
 
