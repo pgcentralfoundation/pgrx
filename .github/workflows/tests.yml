@@ -163,40 +163,36 @@ jobs:
           env
           echo ""
 
-      - name: Install release version of PostgreSQL
-        if: matrix.version != '17'
+      - name: Setup release Postgres apt repo
+        if: matrix.postgres != '17'
         run: |
-          echo "----- Set up PostgreSQL Apt repository -----"
           sudo apt-get install -y wget gnupg
           sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
           wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
           sudo apt-get update -y -qq --fix-missing
-          echo ""
-          
-          sudo apt-get install -y \
-            postgresql-$PG_VER \
-            postgresql-server-dev-$PG_VER
-          
-          echo ""
-          echo "----- pg_config -----"
-          pg_config
-          echo ""
-      - name: Install Postgres Beta
-        if: matrix.version == '17'
+
+      - name: Setup beta Postgres apt repo
+        if: matrix.postgres == '17'
         run: |
-          echo "----- Set up PostgreSQL Apt repository -----"
           sudo apt-get install -y wget gnupg
           sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7FCC7D46ACCC4CF8
           sudo add-apt-repository "deb https://apt.postgresql.org/pub/repos/apt/ $(lsb_release -s -c)-pgdg-snapshot main $PG_VER"
           sudo add-apt-repository "deb https://apt.postgresql.org/pub/repos/apt/ $(lsb_release -s -c)-pgdg main $PG_VER"
           wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
           sudo apt-get update -y -qq --fix-missing
-          echo ""
-          
-          sudo apt-get install -y \
-          postgresql-$PG_VER \
-          postgresql-server-dev-$PG_VER
 
+      - name: Install Postgres
+        run: |
+          sudo apt-get install -y 
+            postgresql-$PG_VER \
+            postgresql-server-dev-$PG_VER
+
+      - name: pg_config details
+        run: |
+          echo ""
+          echo "----- pg_config -----"
+          pg_config
+          echo ""
 
       - name: Set up PostgreSQL permissions
         run: sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
