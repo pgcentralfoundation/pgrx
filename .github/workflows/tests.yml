@@ -183,7 +183,7 @@ jobs:
 
       - name: Install Postgres
         run: |
-          sudo apt-get install -y 
+          sudo apt-get install -y \
             postgresql-$PG_VER \
             postgresql-server-dev-$PG_VER
 
