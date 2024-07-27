@@ -601,7 +601,7 @@ pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, DateTimeConv
             {
                 pg_sys::DecodeTimezoneAbbrev(0, lowzone, &mut val, &mut tzp) as u32
             }
-            #[cfg(feature = "pg16", feature = "pg17")]
+            #[cfg(any(feature = "pg16", feature = "pg17"))]
             {
                 let mut ftype = 0;
                 pg_sys::DecodeTimezoneAbbrev(
