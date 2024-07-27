@@ -722,6 +722,7 @@ impl<'a> From<&'a str> for RpgffiChar128 {
     }
 }
 
+#[allow(dead_code)]
 struct RpgffiChar1024([c_char; 1024]);
 
 impl<'a> From<&'a str> for RpgffiChar1024 {
