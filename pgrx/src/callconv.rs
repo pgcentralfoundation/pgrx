@@ -223,12 +223,6 @@ unsafe impl<'fcx, T: Copy> ArgAbi<'fcx> for PgVarlena<T> {
     }
 }
 
-unsafe impl<'fcx, const P: u32, const S: u32> ArgAbi<'fcx> for crate::Numeric<P, S> {
-    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
-        unsafe { arg.unbox_arg_using_from_datum().unwrap() }
-    }
-}
-
 unsafe impl<'fcx> ArgAbi<'fcx> for pg_sys::FunctionCallInfo {
     unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         unsafe { arg.0.as_mut_ptr() }
