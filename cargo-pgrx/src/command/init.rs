@@ -117,6 +117,9 @@ impl CommandExecute for Init {
         if let Some(ref version) = self.pg16 {
             versions.insert("pg16", version.clone());
         }
+        if let Some(ref version) = self.pg17 {
+            versions.insert("pg17", version.clone());
+        }
 
         if versions.is_empty() {
             // no arguments specified, so we'll just install our defaults
