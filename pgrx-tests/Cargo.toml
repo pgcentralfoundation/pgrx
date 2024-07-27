@@ -7,7 +7,7 @@
 #LICENSE All rights reserved.
 #LICENSE
 #LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
- 
+
 [package]
 name = "pgrx-tests"
 version = "0.12.0-beta.3"
@@ -22,24 +22,25 @@ edition = "2021"
 include = ["src/**/*", "README.md", "!**/tests/**/*"]
 
 [lib]
-crate-type = [ "cdylib", "lib" ]
+crate-type = ["cdylib", "lib"]
 
 [[bin]]
 name = "pgrx_embed_pgrx-tests"
 path = "./src/bin/pgrx_embed.rs"
 
 [features]
-default = [ "proptest" ]
-pg12 = [ "pgrx/pg12" ]
-pg13 = [ "pgrx/pg13" ]
-pg14 = [ "pgrx/pg14" ]
-pg15 = [ "pgrx/pg15" ]
-pg16 = [ "pgrx/pg16" ]
-pg_test = [ ]
-proptest = [ "dep:proptest" ]
-cshim = [ "pgrx/cshim" ]
-no-schema-generation = [ "pgrx/no-schema-generation", "pgrx-macros/no-schema-generation" ]
-nightly = [ "pgrx/nightly" ]
+default = ["proptest"]
+pg12 = ["pgrx/pg12"]
+pg13 = ["pgrx/pg13"]
+pg14 = ["pgrx/pg14"]
+pg15 = ["pgrx/pg15"]
+pg16 = ["pgrx/pg16"]
+pg17 = ["pgrx/pg17"]
+pg_test = []
+proptest = ["dep:proptest"]
+cshim = ["pgrx/cshim"]
+no-schema-generation = ["pgrx/no-schema-generation", "pgrx-macros/no-schema-generation"]
+nightly = ["pgrx/nightly"]
 
 [package.metadata.docs.rs]
 features = ["pg14", "proptest"]

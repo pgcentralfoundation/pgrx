@@ -20,7 +20,13 @@ use core::marker::PhantomData;
 use core::mem;
 use core::ptr::{self, NonNull};
 
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
+#[cfg(any(
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17"
+))]
 mod flat_list;
 #[cfg(feature = "pg12")]
 mod linked_list;

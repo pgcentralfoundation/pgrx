@@ -12,6 +12,7 @@ use pgrx_sql_entity_graph::metadata::{
 };
 
 #[cfg(any(
+    feature = "pg17",
     feature = "pg16",
     feature = "pg15",
     feature = "pg14",

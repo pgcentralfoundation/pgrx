@@ -107,7 +107,7 @@ jobs:
 
     strategy:
       matrix:
-        postgres: [12, 13, 14, 15, 16]
+        postgres: [ 12, 13, 14, 15, 16, 17 ]
         include:
           - postgres: 16
             rust: "beta"
@@ -162,7 +162,7 @@ jobs:
           echo "----- Print env -----"
           env
           echo ""
-          
+
       - name: Install release version of PostgreSQL
         run: |
           echo "----- Set up PostgreSQL Apt repository -----"

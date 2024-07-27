@@ -140,7 +140,10 @@ mod seal {
 // that we're trying to be built against some other kind of "postgres" that has its own ABI name.
 //
 // Unless the compiling user explicitly told us that they're aware of this via `--features unsafe-postgres`.
-#[cfg(all(any(feature = "pg15", feature = "pg16"), not(feature = "unsafe-postgres")))]
+#[cfg(all(
+    any(feature = "pg15", feature = "pg16", feature = "pg17"),
+    not(feature = "unsafe-postgres")
+))]
 const _: () = {
     // to appease `const`
     const fn same_slice(a: &[u8], b: &[u8]) -> bool {
@@ -235,7 +238,7 @@ macro_rules! pg_magic_func {
                 #[cfg(feature = "pg12")]
                 float4byval: ::pgrx::pg_sys::USE_FLOAT4_BYVAL as i32,
                 float8byval: cfg!(target_pointer_width = "64") as i32,
-                #[cfg(any(feature = "pg15", feature = "pg16"))]
+                #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
                 abi_extra: {
                     // we'll use what the bindings tell us, but if it ain't "PostgreSQL" then we'll
                     // raise a compilation error unless the `unsafe-postgres` feature is set

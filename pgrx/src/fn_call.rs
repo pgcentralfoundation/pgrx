@@ -397,7 +397,7 @@ fn lookup_fn(fname: &str, args: &[&dyn FnCallArg]) -> Result<pg_sys::Oid> {
                     pg_sys::pfree((*s).val.str_.cast());
                 }
 
-                #[cfg(any(feature = "pg15", feature = "pg16"))]
+                #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
                 {
                     let s = s.cast::<pg_sys::String>();
                     pg_sys::pfree((*s).sval.cast());

@@ -15,9 +15,9 @@ use pgrx_pg_sys::AsPgCStr;
 
 /// A helper struct for creating a Postgres `List` of `String`s to qualify an object name
 pub struct PgQualifiedNameBuilder {
-    #[cfg(any(feature = "pg15", feature = "pg16"))]
+    #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
     list: PgList<pg_sys::String>,
-    #[cfg(not(any(feature = "pg15", feature = "pg16")))]
+    #[cfg(not(any(feature = "pg15", feature = "pg16", feature = "pg17")))]
     list: PgList<pg_sys::Value>,
 }
 
@@ -30,9 +30,9 @@ impl Default for PgQualifiedNameBuilder {
 impl PgQualifiedNameBuilder {
     pub fn new() -> PgQualifiedNameBuilder {
         PgQualifiedNameBuilder {
-            #[cfg(any(feature = "pg15", feature = "pg16"))]
+            #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
             list: PgList::<pg_sys::String>::new(),
-            #[cfg(not(any(feature = "pg15", feature = "pg16")))]
+            #[cfg(not(any(feature = "pg15", feature = "pg16", feature = "pg17")))]
             list: PgList::<pg_sys::Value>::new(),
         }
     }

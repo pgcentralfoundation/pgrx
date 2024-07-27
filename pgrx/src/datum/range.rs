@@ -389,7 +389,7 @@ where
             let range_type =
                 pg_sys::make_range(typecache, &mut lower_bound, &mut upper_bound, is_empty);
 
-            #[cfg(feature = "pg16")]
+            #[cfg(any(feature = "pg16", feature = "pg17"))]
             let range_type = pg_sys::make_range(
                 typecache,
                 &mut lower_bound,

@@ -60,6 +60,9 @@ pub(crate) struct Init {
     /// If installed locally, the path to PG16's `pgconfig` tool, or `download` to have pgrx download/compile/install it
     #[clap(env = "PG16_PG_CONFIG", long)]
     pg16: Option<String>,
+    /// If installed locally, the path to PG17's `pgconfig` tool, or `download` to have pgrx download/compile/install it
+    #[clap(env = "PG17_PG_CONFIG", long)]
+    pg17: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
     verbose: u8,
     #[clap(long, help = "Base port number")]
