@@ -336,7 +336,7 @@ Compile/install extension to a pgrx-managed Postgres instance and start psql
 Usage: cargo pgrx run [OPTIONS] [PG_VERSION] [DBNAME]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg12, pg13, pg14, pg15, or pg16? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg12, pg13, pg14, pg15, pg16, or pg17? [env: PG_VERSION=]
   [DBNAME]      The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
 
 Options:
@@ -386,7 +386,7 @@ Connect, via psql, to a Postgres instance
 Usage: cargo pgrx connect [OPTIONS] [PG_VERSION] [DBNAME]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg12, pg13, pg14, pg15, or pg16? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg12, pg13, pg14, pg15, pg16, or pg17 [env: PG_VERSION=]
   [DBNAME]      The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name [env: DBNAME=]
 
 Options:
@@ -504,7 +504,7 @@ Run the test suite for this crate
 Usage: cargo pgrx test [OPTIONS] [PG_VERSION] [TESTNAME]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg12, pg13, pg14, pg15, pg16, or all? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg12, pg13, pg14, pg15, pg16, pg17 or all? [env: PG_VERSION=]
   [TESTNAME]    If specified, only run tests containing this string in their names
 
 Options:
@@ -591,7 +591,7 @@ Generate extension schema files
 Usage: cargo pgrx schema [OPTIONS] [PG_VERSION]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg12, pg13, pg14, pg15, or pg16?
+  [PG_VERSION]  Do you want to run against pg12, pg13, pg14, pg15, pg16, or pg17?
 
 Options:
   -p, --package <PACKAGE>              Package to build (see `cargo help pkgid`)
