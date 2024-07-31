@@ -26,10 +26,8 @@ use syn::{ForeignItem, Item, ItemConst};
 
 const BLOCKLISTED_TYPES: [&str; 3] = ["Datum", "NullableDatum", "Oid"];
 
-mod build {
-    pub(super) mod clang;
-    pub(super) mod sym_blocklist;
-}
+pub(super) mod clang;
+pub(super) mod sym_blocklist;
 
 #[derive(Debug)]
 struct BindingOverride {
@@ -138,7 +136,7 @@ impl bindgen::callbacks::ParseCallbacks for BindingOverride {
     }
 }
 
-fn main() -> eyre::Result<()> {
+pub fn main() -> eyre::Result<()> {
     if env_tracked("DOCS_RS").as_deref() == Some("1") {
         return Ok(());
     }
@@ -756,7 +754,7 @@ fn run_bindgen(
     let configure = pg_config.configure()?;
     let preferred_clang: Option<&std::path::Path> = configure.get("CLANG").map(|s| s.as_ref());
     eprintln!("pg_config --configure CLANG = {preferred_clang:?}");
-    let (autodetect, includes) = build::clang::detect_include_paths_for(preferred_clang);
+    let (autodetect, includes) = clang::detect_include_paths_for(preferred_clang);
     let mut binder = bindgen::Builder::default();
     binder = add_blocklists(binder);
     binder = add_derives(binder);
@@ -1110,7 +1108,7 @@ fn is_blocklisted_item(item: &ForeignItem) -> bool {
         _ => return false,
     };
     BLOCKLISTED
-        .get_or_init(|| build::sym_blocklist::SYMBOLS.iter().copied().collect::<BTreeSet<&str>>())
+        .get_or_init(|| sym_blocklist::SYMBOLS.iter().copied().collect::<BTreeSet<&str>>())
         .contains(sym_name.to_string().as_str())
 }
 

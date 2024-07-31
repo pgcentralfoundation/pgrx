@@ -1,4 +1,4 @@
-use crate::target_env_tracked;
+use super::target_env_tracked;
 use bindgen::ClangVersion;
 use clang_sys::support::Clang as ClangSys;
 use std::{ffi::OsStr, path::PathBuf};
