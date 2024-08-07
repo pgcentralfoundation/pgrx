@@ -209,6 +209,9 @@ jobs:
       - name: Install cargo-pgrx
         run: cargo install --path cargo-pgrx/ --debug --force
 
+      - name: Check publishability
+        run: cargo +nightly package --workspace -Zpackage-workspace
+
       - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
         run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
 
