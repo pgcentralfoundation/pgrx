@@ -33,10 +33,7 @@ feature-depth = 1
 [advisories]
 db-path = "~/.cargo/advisory-db"
 db-urls = ["https://github.com/rustsec/advisory-db"]
-vulnerability = "deny"
-unmaintained = "warn"
 yanked = "warn"
-notice = "warn"
 # Note that ignored advisories can still output a note when they are encountered.
 ignore = [
     #"RUSTSEC-0000-0000",
@@ -52,8 +49,6 @@ ignore = [
 
 # https://embarkstudios.github.io/cargo-deny/checks/licenses/cfg.html
 [licenses]
-# The lint level for crates which do not have a detectable license
-unlicensed = "deny"
 # See https://spdx.org/licenses/ for list of possible licenses
 # This allowlist is a superset of pgrx's allowlist, including the build tools like cargo-pgrx, etc.
 # We are not as concerned about licenses that affect linked code here: most tools aren't shipped.
@@ -70,9 +65,6 @@ allow = [
     "Unlicense",
     "Zlib",
 ]
-deny = []
-copyleft = "deny" # https://github.com/EmbarkStudios/cargo-deny/issues/354
-default = "deny"
 # The confidence threshold for detecting a license from license text.
 # The higher the value, the more closely the license text must be to the
 # canonical license text of a valid SPDX license file.
