@@ -281,6 +281,9 @@ fn update_files(args: &UpdateFilesArgs) {
         };
 
         let table_names = ["dependencies", "build-dependencies", "dev-dependencies"];
+        // jubilee: You CAN have workspace dependencies and normal dependencies in a Cargo.toml
+        // but I just got this code working and I don't want to write the flat_map right now.
+        // I'll take care of it when we actually do something like that.
         let ws_or_doc =
             if let Some(ws) = doc.get_mut("workspace") { ws } else { doc.as_item_mut() }
                 .as_table_mut()
