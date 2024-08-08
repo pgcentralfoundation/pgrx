@@ -30,17 +30,11 @@ feature-depth = 1
 [advisories]
 db-path = "~/.cargo/advisory-db"
 db-urls = ["https://github.com/rustsec/advisory-db"]
-vulnerability = "deny"
-unmaintained = "warn"
 yanked = "warn"
-notice = "warn"
 # Note that ignored advisories can still output a note when they are encountered.
 ignore = [
     #"RUSTSEC-0000-0000",
 ]
-# Threshold for security vulnerabilities based on CVSS
-# Note that CVSS values only measure severity, not risk.
-#severity-threshold =
 
 # If this is true, then cargo deny will use the git executable to fetch the advisory database.
 # If this is false, then it uses a built-in git library.
@@ -49,8 +43,6 @@ ignore = [
 
 # https://embarkstudios.github.io/cargo-deny/checks/licenses/cfg.html
 [licenses]
-# The lint level for crates which do not have a detectable license
-unlicensed = "deny"
 # See https://spdx.org/licenses/ for list of possible licenses
 # Be more cautious about adding licenses to the library itself, as they can affect all extensions.
 allow = [
@@ -63,9 +55,6 @@ allow = [
     "Unlicense",
     "Zlib",
 ]
-deny = []
-copyleft = "deny" # https://github.com/EmbarkStudios/cargo-deny/issues/354
-default = "deny"
 # The confidence threshold for detecting a license from license text.
 # The higher the value, the more closely the license text must be to the
 # canonical license text of a valid SPDX license file.
@@ -107,13 +96,13 @@ skip = [] #{ name = "ansi_term", version = "=0.11.0" },
 # skip but includes transitive dependencies from name to depth of N (default: infinite)
 skip-tree = [] #{ name = "ansi_term", version = "=0.11.0", depth = 20 }
 
+
 #[[bans.features]]
 #name = "reqwest"
 #deny = ["json"]
 #allow = []
 # If true, the allowed features must exactly match.
 #exact = true
-
 
 
 # https://embarkstudios.github.io/cargo-deny/checks/sources/cfg.html
