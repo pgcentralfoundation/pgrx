@@ -66,6 +66,6 @@ cargo run --bin pgrx-version-updater \
 
 
 echo "Generating bindings -- this may take a few moments"
-PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run $CARGO_QUIET_FLAG --workspace --no-default-features --features "pg${PG_VER:14}"
+PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run $CARGO_QUIET_FLAG --workspace --no-default-features --features "pg${PG_VER:-14}"
 
 echo "Done!"
