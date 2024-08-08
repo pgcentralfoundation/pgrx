@@ -280,34 +280,40 @@ fn update_files(args: &UpdateFilesArgs) {
             }
         };
 
+        let table_names = ["dependencies", "build-dependencies", "dev-dependencies"];
+        // jubilee: You CAN have workspace dependencies and normal dependencies in a Cargo.toml
+        // but I just got this code working and I don't want to write the flat_map right now.
+        // I'll take care of it when we actually do something like that.
+        let ws_or_doc =
+            if let Some(ws) = doc.get_mut("workspace") { ws } else { doc.as_item_mut() }
+                .as_table_mut()
+                .unwrap();
+        let table_iter = ws_or_doc.iter_mut().filter(|(k, _)| table_names.contains(&k.get()));
+
         // Process dependencies in each file. Generally dependencies can be found in
         // [dependencies], [dependencies.foo], [build-dependencies], [dev-dependencies]
-        for updatable_table_name in ["dependencies", "build-dependencies", "dev-dependencies"] {
-            if let Some(updatable_table) =
-                doc.get_mut(updatable_table_name).and_then(|i| i.as_table_mut())
-            {
-                for package in &updatable_package_names {
-                    // Tables can contain other tables, and if that's the case we're
-                    // probably at a case of a table like this:
-                    //   [dependencies.pgrx]
-                    //   version = "1.2.3"
-                    // or an inline table:
-                    //   [dependencies]
-                    //   pgrx = { version = "1.2.3", features = ["..."] }
-                    // so we attempt to drill into a dyn TableLike with that entry
-                    if let Some(Entry::Occupied(key_version)) = updatable_table
-                        .get_mut(package)
-                        .and_then(|t| Some(t.as_table_like_mut()?.entry("version")))
-                    {
-                        update_package_version(key_version.into_mut());
-                    }
-                    // Otherwise we are a string, such as:
-                    //   [dependencies]
-                    //   pgrx = "0.1.2"
-                    else if let Some(item) = updatable_table.get_mut(package) {
-                        update_package_version(item)
-                    };
+        for (_, table_v) in table_iter {
+            for package in &updatable_package_names {
+                // Tables can contain other tables, and if that's the case we're
+                // probably at a case of a table like this:
+                //   [dependencies.pgrx]
+                //   version = "1.2.3"
+                // or an inline table:
+                //   [dependencies]
+                //   pgrx = { version = "1.2.3", features = ["..."] }
+                // so we attempt to drill into a dyn TableLike with that entry
+                if let Some(Entry::Occupied(key_version)) = table_v
+                    .get_mut(package)
+                    .and_then(|t| Some(t.as_table_like_mut()?.entry("version")))
+                {
+                    update_package_version(key_version.into_mut());
                 }
+                // Otherwise we are a string, such as:
+                //   [dependencies]
+                //   pgrx = "0.1.2"
+                else if let Some(item) = table_v.get_mut(package) {
+                    update_package_version(item)
+                };
             }
         }
 
