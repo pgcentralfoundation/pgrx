@@ -12,7 +12,7 @@
 Type level metadata for Rust to SQL generation.
 
 > Like all of the [`sql_entity_graph`][crate] APIs, this is considered **internal**
-to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
+> to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
 use crate::composite_type::{handle_composite_type_macro, CompositeTypeMacro};
