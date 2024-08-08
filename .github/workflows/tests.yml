@@ -330,6 +330,9 @@ jobs:
       - name: Run `cargo pgrx schema` against the versioned_custom_libname_so example
         run: cargo pgrx schema pg$PG_VER --package versioned_custom_libname_so
 
+      - name: Test that version bumps work
+        run: ./update-versions.sh 0.0.999-rc.999
+
       # Attempt to make the cache payload slightly smaller.
       - name: Clean up built PGRX files
         run: |
