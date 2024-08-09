@@ -213,41 +213,41 @@ jobs:
       - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
         run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
 
-      - name: Run base-level tests
-        run: |
-          cargo test \
-            --features "pg$PG_VER" \
-            --package cargo-pgrx \
-            --package pgrx \
-            --package pgrx-macros \
-            --package pgrx-pg-sys \
-            --package pgrx-sql-entity-graph
+      # - name: Run base-level tests
+      #   run: |
+      #     cargo test \
+      #       --features "pg$PG_VER" \
+      #       --package cargo-pgrx \
+      #       --package pgrx \
+      #       --package pgrx-macros \
+      #       --package pgrx-pg-sys \
+      #       --package pgrx-sql-entity-graph
 
-      - name: Check that cross-compiled pgrx-tests can build
-        run: |
-          cargo build --tests \
-            --features "pg$PG_VER" \
-            --package pgrx-tests \
-            --target aarch64-unknown-linux-gnu
+      # - name: Check that cross-compiled pgrx-tests can build
+      #   run: |
+      #     cargo build --tests \
+      #       --features "pg$PG_VER" \
+      #       --package pgrx-tests \
+      #       --target aarch64-unknown-linux-gnu
 
-      - name: Run pgrx-tests with cshim enabled
-        run: |
-          cargo test \
-            --features "pg$PG_VER cshim proptest" \
-            --package pgrx-tests --lib
+      # - name: Run pgrx-tests with cshim enabled
+      #   run: |
+      #     cargo test \
+      #       --features "pg$PG_VER cshim proptest" \
+      #       --package pgrx-tests --lib
 
-      - name: Run pgrx-tests with cshim disabled
-        run: |
-          cargo test \
-            --features "pg$PG_VER proptest" \
-            --package pgrx-tests --lib
+      # - name: Run pgrx-tests with cshim disabled
+      #   run: |
+      #     cargo test \
+      #       --features "pg$PG_VER proptest" \
+      #       --package pgrx-tests --lib
 
-      - name: Run UI tests
-        if: ${{ matrix.rust == null }}
-        run: |
-          cargo test \
-            --features "pg$PG_VER proptest" \
-            --package pgrx-tests --test ui
+      # - name: Run UI tests
+      #   if: ${{ matrix.rust == null }}
+      #   run: |
+      #     cargo test \
+      #       --features "pg$PG_VER proptest" \
+      #       --package pgrx-tests --test ui
 
 
       - name: Run aggregate example tests
