@@ -19,6 +19,9 @@ members = [
     "pgrx-sql-entity-graph",
     "pgrx-tests",
 ]
+exclude = [
+    "pgrx-examples/*"
+]
 
 
 [workspace.metadata.local-install]
