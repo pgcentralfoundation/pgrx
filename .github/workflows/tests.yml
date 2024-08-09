@@ -209,9 +209,6 @@ jobs:
       - name: Install cargo-pgrx
         run: cargo install --path cargo-pgrx/ --debug --force
 
-      - name: Check publishability
-        run: cargo +nightly package --workspace -Zpackage-workspace
-
       - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
         run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
 
@@ -334,7 +331,7 @@ jobs:
         run: cargo pgrx schema pg$PG_VER --package versioned_custom_libname_so
 
       - name: Test that version bumps work
-        run: ./update-versions.sh 0.0.999-rc.999
+        run: ./update-versions.sh 0.0.999-rc.999 && cargo +nightly package --workspace -Zpackage-workspace
 
       # Attempt to make the cache payload slightly smaller.
       - name: Clean up built PGRX files
