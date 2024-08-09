@@ -275,7 +275,7 @@ jobs:
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_types/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run custom_types without schema generation example tests
-        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --features "pg14" pgrx-examples/custom_types/Cargo.toml  --features "pg$PG_VER no-schema-generation" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_types/Cargo.toml  --features "pg$PG_VER no-schema-generation" --no-default-features
 
       - name: Run custom_sql example tests
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_sql/Cargo.toml  --features "pg$PG_VER" --no-default-features
