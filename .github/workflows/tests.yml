@@ -251,85 +251,85 @@ jobs:
 
 
       - name: Run aggregate example tests
-        run: cargo test --package aggregate --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/aggregate && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run arrays example tests
-        run: cargo test --package arrays --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/arrays && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run bad_ideas example tests
-        run: cargo test --package bad_ideas --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/bad_ideas && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run bgworker example tests
-        run: cargo test --package bgworker --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/bgworker && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run bytea example tests
-        run: cargo test --package bytea --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/bytea && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run composite_type example tests
-        run: cargo test --package composite_type --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/composite_type && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run custom_libname example tests
-        run: cargo test --package custom_libname --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/custom_libname && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run custom_types example tests
-        run: cargo test --package custom_types --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/custom_types && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run custom_types without schema generation example tests
-        run: cargo test --package custom_types --features "pg$PG_VER no-schema-generation" --no-default-features
+        run: cd pgrx-examples/custom_types && cargo test --features "pg$PG_VER no-schema-generation" --no-default-features
 
       - name: Run custom_sql example tests
-        run: cargo test --package custom_sql --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/custom_sql && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run datetime example tests
-        run: cargo test --package datetime --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/datetime && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run errors example tests
-        run: cargo test --package errors --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/errors && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run nostd example tests
-        run: cargo test --package nostd --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/nostd && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run numeric example tests
-        run: cargo test --package numeric --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/numeric && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run pgtrybuilder example tests
-        run: cargo test --package pgtrybuilder --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/pgtrybuilder && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run operators example tests
-        run: cargo test --package operators --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/operators && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run range example tests
-        run: cargo test --package range --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/range && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run schemas example tests
-        run: cargo test --package schemas --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/schemas && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run shmem example tests
-        run: cargo test --package shmem --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/shmem && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run spi example tests
-        run: cargo test --package spi --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/spi && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run spi_srf example tests
-        run: cargo test --package spi_srf --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/spi_srf && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run srf example tests
-        run: cargo test --package srf --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/srf && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run strings example tests
-        run: cargo test --package strings --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/strings && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run triggers example tests
-        run: cargo test --package triggers --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/triggers && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run versioned_custom_libname_so example tests
-        run: cargo test --package versioned_custom_libname_so --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/versioned_custom_libname_so && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run versioned_so example tests
-        run: cargo test --package versioned_so --features "pg$PG_VER" --no-default-features
+        run: cd pgrx-examples/versioned_so && cargo test --features "pg$PG_VER" --no-default-features
 
       - name: Run `cargo pgrx schema` against the versioned_custom_libname_so example
-        run: cargo pgrx schema pg$PG_VER --package versioned_custom_libname_so
+        run: cd pgrx-examples/versioned_custom_libname_so && cargo pgrx schema pg$PG_VER versioned_custom_libname_so
 
       - name: Test that version bumps work
         run: ./update-versions.sh 0.0.999-rc.999 && cargo +nightly package --workspace -Zpackage-workspace
