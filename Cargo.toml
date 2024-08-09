@@ -20,7 +20,7 @@ members = [
     "pgrx-tests",
 ]
 exclude = [
-    "pgrx-examples/*"
+    "pgrx-examples/**/*"
 ]
 
 
