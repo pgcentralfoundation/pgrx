@@ -15,6 +15,7 @@ env:
   CARGO_INCREMENTAL: "false"
   SCCACHE_MAX_FRAME_LENGTH: 100000000
   # CARGO_LOG: cargo::core::compiler::fingerprint=info # Uncomment this to output compiler fingerprint info
+  TOOL_DIR: ./tools
 
 jobs:
   lintck:
@@ -43,7 +44,7 @@ jobs:
           mkdir -p /home/runner/.cache/sccache
           echo ""
 
-          ./ci/rustup.sh
+          "$TOOL_DIR"/rustup.sh
 
           # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
 
@@ -77,7 +78,7 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: Run license check
-        run: cargo install cargo-deny --locked && ./ci/license-check.sh
+        run: cargo install cargo-deny --locked && "$TOOL_DIR"/license-check.sh
 
       # We can't lint most crates because they require "cargo pgrx init" to build
       - name: Clippy -Dwarnings sql-entity-graph
@@ -149,7 +150,7 @@ jobs:
             zlib1g-dev
           echo ""
 
-          ./ci/rustup.sh
+          "$TOOL_DIR"/rustup.sh
 
           echo "----- Set up cross compilation -----"
           sudo apt-get install -y --fix-missing crossbuild-essential-arm64
@@ -401,7 +402,7 @@ jobs:
             zlib1g-dev
           echo ""
 
-          ./ci/rustup.sh
+          "$TOOL_DIR"/rustup.sh
 
           echo "----- Outputting env -----"
           env
@@ -528,7 +529,7 @@ jobs:
           # ls -lath `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
           echo ""
 
-          ./ci/rustup.sh
+          "$TOOL_DIR"/rustup.sh
 
           echo "----- Outputting env -----"
           env
