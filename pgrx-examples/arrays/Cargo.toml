@@ -38,6 +38,8 @@ rand = "*"
 [dev-dependencies]
 pgrx-tests = { path = "../../pgrx-tests" }
 
+[workspace]
+
 # uncomment these if compiling outside of 'pgrx'
 # [profile.dev]
 # panic = "unwind"
