@@ -47,7 +47,7 @@ INCLUDE_FOR_DEP_UPDATES=(
 # versions bumped at release time.
 EXCLUDE_FROM_VERSION_BUMP=(
   'cargo-pgrx/src/templates/cargo_toml'
-  'pgrx-version-updater/Cargo.toml'
+  'tools/version-updater/Cargo.toml'
 )
 
 # Exclude all pgrx-examples Cargo.toml files from version bumping
@@ -56,7 +56,7 @@ for file in pgrx-examples/**/Cargo.toml; do
 done
 
 # shellcheck disable=SC2086,SC2068
-cargo run --bin pgrx-version-updater \
+cargo run --manifest-path=./tools/version-updater/Cargo.toml \
   update-files \
   --update-version "$VERSION" \
   ${INCLUDE_FOR_DEP_UPDATES[@]/#/-i } \

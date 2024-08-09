@@ -15,6 +15,7 @@ env:
   CARGO_INCREMENTAL: "false"
   SCCACHE_MAX_FRAME_LENGTH: 100000000
   # CARGO_LOG: cargo::core::compiler::fingerprint=info # Uncomment this to output compiler fingerprint info
+  TOOL_DIR: ./tools
 
 jobs:
   lintck:
@@ -43,7 +44,7 @@ jobs:
           mkdir -p /home/runner/.cache/sccache
           echo ""
 
-          ./ci/rustup.sh
+          "$TOOL_DIR"/rustup.sh
 
           # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
 
@@ -77,7 +78,7 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: Run license check
-        run: cargo install cargo-deny --locked && ./ci/license-check.sh
+        run: cargo install cargo-deny --locked && "$TOOL_DIR"/license-check.sh
 
       # We can't lint most crates because they require "cargo pgrx init" to build
       - name: Clippy -Dwarnings sql-entity-graph
@@ -149,7 +150,7 @@ jobs:
             zlib1g-dev
           echo ""
 
-          ./ci/rustup.sh
+          "$TOOL_DIR"/rustup.sh
 
           echo "----- Set up cross compilation -----"
           sudo apt-get install -y --fix-missing crossbuild-essential-arm64
@@ -250,88 +251,88 @@ jobs:
 
 
       - name: Run aggregate example tests
-        run: cargo test --package aggregate --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/aggregate/Cargo.toml --features "pg$PG_VER" --no-default-features
 
       - name: Run arrays example tests
-        run: cargo test --package arrays --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/arrays/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run bad_ideas example tests
-        run: cargo test --package bad_ideas --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/bad_ideas/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run bgworker example tests
-        run: cargo test --package bgworker --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/bgworker/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run bytea example tests
-        run: cargo test --package bytea --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/bytea/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run composite_type example tests
-        run: cargo test --package composite_type --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/composite_type/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run custom_libname example tests
-        run: cargo test --package custom_libname --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_libname/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run custom_types example tests
-        run: cargo test --package custom_types --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_types/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run custom_types without schema generation example tests
-        run: cargo test --package custom_types --features "pg$PG_VER no-schema-generation" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_types/Cargo.toml  --features "pg$PG_VER no-schema-generation" --no-default-features
 
       - name: Run custom_sql example tests
-        run: cargo test --package custom_sql --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_sql/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run datetime example tests
-        run: cargo test --package datetime --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/datetime/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run errors example tests
-        run: cargo test --package errors --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/errors/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run nostd example tests
-        run: cargo test --package nostd --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/nostd/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run numeric example tests
-        run: cargo test --package numeric --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/numeric/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run pgtrybuilder example tests
-        run: cargo test --package pgtrybuilder --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/pgtrybuilder/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run operators example tests
-        run: cargo test --package operators --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/operators/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run range example tests
-        run: cargo test --package range --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/range/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run schemas example tests
-        run: cargo test --package schemas --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/schemas/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run shmem example tests
-        run: cargo test --package shmem --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/shmem/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run spi example tests
-        run: cargo test --package spi --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/spi/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run spi_srf example tests
-        run: cargo test --package spi_srf --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/spi_srf/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run srf example tests
-        run: cargo test --package srf --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/srf/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run strings example tests
-        run: cargo test --package strings --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/strings/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run triggers example tests
-        run: cargo test --package triggers --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/triggers/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run versioned_custom_libname_so example tests
-        run: cargo test --package versioned_custom_libname_so --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/versioned_custom_libname_so/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run versioned_so example tests
-        run: cargo test --package versioned_so --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/versioned_so/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run `cargo pgrx schema` against the versioned_custom_libname_so example
-        run: cargo pgrx schema pg$PG_VER --package versioned_custom_libname_so
+        run: cd pgrx-examples/versioned_custom_libname_so && cargo pgrx schema pg$PG_VER
 
       - name: Test that version bumps work
-        run: ./update-versions.sh 0.0.999-rc.999
+        run: ./update-versions.sh 0.0.999-rc.999 && cargo +nightly package --workspace -Zpackage-workspace --allow-dirty --features "pg$PG_VER"
 
       # Attempt to make the cache payload slightly smaller.
       - name: Clean up built PGRX files
@@ -401,7 +402,7 @@ jobs:
             zlib1g-dev
           echo ""
 
-          ./ci/rustup.sh
+          "$TOOL_DIR"/rustup.sh
 
           echo "----- Outputting env -----"
           env
@@ -528,7 +529,7 @@ jobs:
           # ls -lath `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
           echo ""
 
-          ./ci/rustup.sh
+          "$TOOL_DIR"/rustup.sh
 
           echo "----- Outputting env -----"
           env

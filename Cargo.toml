@@ -18,7 +18,9 @@ members = [
     "pgrx-pg-sys",
     "pgrx-sql-entity-graph",
     "pgrx-tests",
-    "pgrx-version-updater",
+]
+exclude = [
+    # "pgrx-examples/*",
     "pgrx-examples/aggregate",
     "pgrx-examples/arrays",
     "pgrx-examples/bad_ideas",
@@ -38,12 +40,12 @@ members = [
     "pgrx-examples/schemas",
     "pgrx-examples/shmem",
     "pgrx-examples/spi",
+    "pgrx-examples/spi_srf",
     "pgrx-examples/srf",
     "pgrx-examples/strings",
     "pgrx-examples/triggers",
     "pgrx-examples/versioned_custom_libname_so",
     "pgrx-examples/versioned_so",
-    "pgrx-examples/spi_srf",
 ]
 
 

@@ -8,6 +8,8 @@ else
   chmod +x rustup-init.sh
   ./rustup-init.sh -y
 fi
+# we want nightly to be always-available for some tests, even if we don't default to it
+rustup update nightly
 rustup update "${RUST_TOOLCHAIN:-stable}"
 rustup default "${RUST_TOOLCHAIN:-stable}"
 # only needed for cross-compile tests but we want consistent rust configuration
