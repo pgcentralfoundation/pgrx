@@ -251,85 +251,85 @@ jobs:
 
 
       - name: Run aggregate example tests
-        run: cd pgrx-examples/aggregate && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/aggregate/Cargo.toml --features "pg$PG_VER" --no-default-features
 
       - name: Run arrays example tests
-        run: cd pgrx-examples/arrays && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/arrays/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run bad_ideas example tests
-        run: cd pgrx-examples/bad_ideas && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/bad_ideas/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run bgworker example tests
-        run: cd pgrx-examples/bgworker && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/bgworker/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run bytea example tests
-        run: cd pgrx-examples/bytea && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/bytea/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run composite_type example tests
-        run: cd pgrx-examples/composite_type && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/composite_type/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run custom_libname example tests
-        run: cd pgrx-examples/custom_libname && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_libname/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run custom_types example tests
-        run: cd pgrx-examples/custom_types && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_types/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run custom_types without schema generation example tests
-        run: cd pgrx-examples/custom_types && cargo test --features "pg$PG_VER no-schema-generation" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --features "pg14" pgrx-examples/custom_types/Cargo.toml  --features "pg$PG_VER no-schema-generation" --no-default-features
 
       - name: Run custom_sql example tests
-        run: cd pgrx-examples/custom_sql && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_sql/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run datetime example tests
-        run: cd pgrx-examples/datetime && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/datetime/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run errors example tests
-        run: cd pgrx-examples/errors && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/errors/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run nostd example tests
-        run: cd pgrx-examples/nostd && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/nostd/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run numeric example tests
-        run: cd pgrx-examples/numeric && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/numeric/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run pgtrybuilder example tests
-        run: cd pgrx-examples/pgtrybuilder && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/pgtrybuilder/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run operators example tests
-        run: cd pgrx-examples/operators && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/operators/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run range example tests
-        run: cd pgrx-examples/range && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/range/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run schemas example tests
-        run: cd pgrx-examples/schemas && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/schemas/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run shmem example tests
-        run: cd pgrx-examples/shmem && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/shmem/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run spi example tests
-        run: cd pgrx-examples/spi && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/spi/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run spi_srf example tests
-        run: cd pgrx-examples/spi_srf && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/spi_srf/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run srf example tests
-        run: cd pgrx-examples/srf && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/srf/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run strings example tests
-        run: cd pgrx-examples/strings && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/strings/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run triggers example tests
-        run: cd pgrx-examples/triggers && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/triggers/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run versioned_custom_libname_so example tests
-        run: cd pgrx-examples/versioned_custom_libname_so && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/versioned_custom_libname_so/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run versioned_so example tests
-        run: cd pgrx-examples/versioned_so && cargo test --features "pg$PG_VER" --no-default-features
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/versioned_so/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run `cargo pgrx schema` against the versioned_custom_libname_so example
-        run: cd pgrx-examples/versioned_custom_libname_so && cargo pgrx schema pg$PG_VER versioned_custom_libname_so
+        run: cd pgrx-examples/versioned_custom_libname_so && cargo pgrx schema pg$PG_VER
 
       - name: Test that version bumps work
         run: ./update-versions.sh 0.0.999-rc.999 && cargo +nightly package --workspace -Zpackage-workspace
