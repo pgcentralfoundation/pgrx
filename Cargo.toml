@@ -20,6 +20,7 @@ members = [
     "pgrx-tests",
 ]
 exclude = [
+    "pgrx-examples/arrays"
     "pgrx-examples/**/*"
 ]
 
