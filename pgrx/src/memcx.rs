@@ -61,7 +61,7 @@ where
     f(&memcx)
 }
 
-#[cfg(all(feature = "nightly", feature = "pg16"))]
+#[cfg(all(feature = "nightly", feature = "pg16", feature = "pg17"))]
 mod nightly {
     use super::*;
     use std::slice;

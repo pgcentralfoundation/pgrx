@@ -21,7 +21,7 @@ use std::process::Stdio;
 #[derive(clap::Args, Debug, Clone)]
 #[clap(author)]
 pub(crate) struct Start {
-    /// The Postgres version to stop (pg12, pg13, pg14, pg15, pg16, or all)
+    /// The Postgres version to stop (pg12, pg13, pg14, pg15, pg16, pg17, or all)
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]

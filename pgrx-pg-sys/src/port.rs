@@ -296,7 +296,7 @@ extern "C" {
     ) -> bool;
 }
 
-#[cfg(feature = "pg16")]
+#[cfg(any(feature = "pg16", feature = "pg17"))]
 pub unsafe fn planstate_tree_walker(
     planstate: *mut super::PlanState,
     walker: ::core::option::Option<
@@ -307,7 +307,7 @@ pub unsafe fn planstate_tree_walker(
     crate::planstate_tree_walker_impl(planstate, walker, context)
 }
 
-#[cfg(feature = "pg16")]
+#[cfg(any(feature = "pg16", feature = "pg17"))]
 pub unsafe fn query_tree_walker(
     query: *mut super::Query,
     walker: ::core::option::Option<
@@ -319,7 +319,7 @@ pub unsafe fn query_tree_walker(
     crate::query_tree_walker_impl(query, walker, context, flags)
 }
 
-#[cfg(feature = "pg16")]
+#[cfg(any(feature = "pg16", feature = "pg17"))]
 pub unsafe fn query_or_expression_tree_walker(
     node: *mut super::Node,
     walker: ::core::option::Option<
@@ -331,7 +331,7 @@ pub unsafe fn query_or_expression_tree_walker(
     crate::query_or_expression_tree_walker_impl(node, walker, context, flags)
 }
 
-#[cfg(feature = "pg16")]
+#[cfg(any(feature = "pg16", feature = "pg17"))]
 pub unsafe fn expression_tree_walker(
     node: *mut crate::Node,
     walker: Option<unsafe extern "C" fn(*mut crate::Node, *mut ::core::ffi::c_void) -> bool>,
@@ -340,7 +340,7 @@ pub unsafe fn expression_tree_walker(
     crate::expression_tree_walker_impl(node, walker, context)
 }
 
-#[cfg(feature = "pg16")]
+#[cfg(any(feature = "pg16", feature = "pg17"))]
 pub unsafe fn range_table_entry_walker(
     rte: *mut super::RangeTblEntry,
     walker: ::core::option::Option<
@@ -352,7 +352,7 @@ pub unsafe fn range_table_entry_walker(
     crate::range_table_entry_walker_impl(rte, walker, context, flags)
 }
 
-#[cfg(feature = "pg16")]
+#[cfg(any(feature = "pg16", feature = "pg17"))]
 pub unsafe fn range_table_walker(
     rtable: *mut super::List,
     walker: ::core::option::Option<
@@ -364,7 +364,7 @@ pub unsafe fn range_table_walker(
     crate::range_table_walker_impl(rtable, walker, context, flags)
 }
 
-#[cfg(feature = "pg16")]
+#[cfg(any(feature = "pg16", feature = "pg17"))]
 pub unsafe fn raw_expression_tree_walker(
     node: *mut crate::Node,
     walker: Option<unsafe extern "C" fn(*mut crate::Node, *mut ::core::ffi::c_void) -> bool>,

@@ -206,7 +206,7 @@ macro_rules! anynumeric_assign_op_from_float {
                 }
 
                 // these versions won't, so we use .unwrap_unchecked()
-                #[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16"))]
+                #[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
                 {
                     unsafe {
                         *self = self.clone() $op AnyNumeric::try_from(rhs).unwrap_unchecked();

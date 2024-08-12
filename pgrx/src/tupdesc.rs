@@ -288,7 +288,8 @@ pub unsafe fn release_tupdesc(ptr: pg_sys::TupleDesc) {
     feature = "pg13",
     feature = "pg14",
     feature = "pg15",
-    feature = "pg16"
+    feature = "pg16",
+    feature = "pg17"
 ))]
 #[inline]
 fn tupdesc_get_attr(

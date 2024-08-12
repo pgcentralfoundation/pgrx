@@ -9,9 +9,9 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #[cfg(
     // no features at all will cause problems
-    not(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16")),
+    not(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17")),
 )]
-std::compile_error!("exactly one feature must be provided (pg12, pg13, pg14, pg15, pg16)");
+std::compile_error!("exactly one feature must be provided (pg12, pg13, pg14, pg15, pg16, pg17)");
 
 mod cshim;
 mod cstr;

@@ -117,7 +117,13 @@ impl<T> PgList<T> {
         cell.as_mut().expect("cell is null").data.ptr_value = with as void_mut_ptr;
     }
 
-    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
+    #[cfg(any(
+        feature = "pg13",
+        feature = "pg14",
+        feature = "pg15",
+        feature = "pg16",
+        feature = "pg17"
+    ))]
     #[inline]
     pub unsafe fn replace_ptr(&mut self, i: usize, with: *mut T) {
         let cell = pg_sys::pgrx_list_nth_cell(self.list, i as i32);
@@ -133,7 +139,13 @@ impl<T> PgList<T> {
         }
     }
 
-    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
+    #[cfg(any(
+        feature = "pg13",
+        feature = "pg14",
+        feature = "pg15",
+        feature = "pg16",
+        feature = "pg17"
+    ))]
     #[inline]
     pub fn replace_int(&mut self, i: usize, with: i32) {
         unsafe {
@@ -151,7 +163,13 @@ impl<T> PgList<T> {
         }
     }
 
-    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
+    #[cfg(any(
+        feature = "pg13",
+        feature = "pg14",
+        feature = "pg15",
+        feature = "pg16",
+        feature = "pg17"
+    ))]
     #[inline]
     pub fn replace_oid(&mut self, i: usize, with: pg_sys::Oid) {
         unsafe {

@@ -140,8 +140,8 @@ pub const HAVE_DECL_F_FULLFSYNC: u32 = 0;
 pub const HAVE_DECL_POSIX_FADVISE: u32 = 1;
 pub const HAVE_DECL_RTLD_GLOBAL: u32 = 1;
 pub const HAVE_DECL_RTLD_NOW: u32 = 1;
-pub const HAVE_DECL_STRLCAT: u32 = 1;
-pub const HAVE_DECL_STRLCPY: u32 = 1;
+pub const HAVE_DECL_STRLCAT: u32 = 0;
+pub const HAVE_DECL_STRLCPY: u32 = 0;
 pub const HAVE_DECL_STRNLEN: u32 = 1;
 pub const HAVE_DECL_STRTOLL: u32 = 1;
 pub const HAVE_DECL_STRTOULL: u32 = 1;
@@ -215,8 +215,6 @@ pub const HAVE_STRCHRNUL: u32 = 1;
 pub const HAVE_STRERROR_R: u32 = 1;
 pub const HAVE_STRINGS_H: u32 = 1;
 pub const HAVE_STRING_H: u32 = 1;
-pub const HAVE_STRLCAT: u32 = 1;
-pub const HAVE_STRLCPY: u32 = 1;
 pub const HAVE_STRNLEN: u32 = 1;
 pub const HAVE_STRSIGNAL: u32 = 1;
 pub const HAVE_STRTOF: u32 = 1;
@@ -276,16 +274,15 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &[u8; 32] = b"pgsql-bugs@lists.postgresql.org\0";
 pub const PACKAGE_NAME: &[u8; 11] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 17] = b"PostgreSQL 12.17\0";
+pub const PACKAGE_STRING: &[u8; 17] = b"PostgreSQL 12.19\0";
 pub const PACKAGE_TARNAME: &[u8; 11] = b"postgresql\0";
 pub const PACKAGE_URL: &[u8; 1] = b"\0";
-pub const PACKAGE_VERSION: &[u8; 6] = b"12.17\0";
+pub const PACKAGE_VERSION: &[u8; 6] = b"12.19\0";
 pub const PG_KRB_SRVNAM: &[u8; 9] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3] = b"12\0";
-pub const PG_VERSION: &[u8; 6] = b"12.17\0";
-pub const PG_VERSION_NUM: u32 = 120017;
-pub const PG_VERSION_STR: &[u8; 87] =
-    b"PostgreSQL 12.17 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 13.2.1 20230801, 64-bit\0";
+pub const PG_VERSION: &[u8; 6] = b"12.19\0";
+pub const PG_VERSION_NUM: u32 = 120019;
+pub const PG_VERSION_STR : & [u8 ; 103] = b"PostgreSQL 12.19 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -347,7 +344,6 @@ pub const __USE_ATFILE: u32 = 1;
 pub const __USE_FORTIFY_LEVEL: u32 = 0;
 pub const __GLIBC_USE_DEPRECATED_GETS: u32 = 0;
 pub const __GLIBC_USE_DEPRECATED_SCANF: u32 = 0;
-pub const __GLIBC_USE_C2X_STRTOL: u32 = 0;
 pub const _STDC_PREDEF_H: u32 = 1;
 pub const __STDC_IEC_559__: u32 = 1;
 pub const __STDC_IEC_60559_BFP__: u32 = 201404;
@@ -356,7 +352,7 @@ pub const __STDC_IEC_60559_COMPLEX__: u32 = 201404;
 pub const __STDC_ISO_10646__: u32 = 201706;
 pub const __GNU_LIBRARY__: u32 = 6;
 pub const __GLIBC__: u32 = 2;
-pub const __GLIBC_MINOR__: u32 = 39;
+pub const __GLIBC_MINOR__: u32 = 35;
 pub const _SYS_CDEFS_H: u32 = 1;
 pub const __glibc_c99_flexarr_available: u32 = 1;
 pub const __LDOUBLE_REDIRECTS_TO_FLOAT128_ABI: u32 = 0;
@@ -368,6 +364,7 @@ pub const __GLIBC_USE_IEC_60559_EXT: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_FUNCS_EXT: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_FUNCS_EXT_C2X: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_TYPES_EXT: u32 = 0;
+pub const __GNUC_VA_LIST: u32 = 1;
 pub const _BITS_TYPES_H: u32 = 1;
 pub const _BITS_TYPESIZES_H: u32 = 1;
 pub const __OFF_T_MATCHES_OFF64_T: u32 = 1;
@@ -386,7 +383,6 @@ pub const __struct_FILE_defined: u32 = 1;
 pub const _IO_EOF_SEEN: u32 = 16;
 pub const _IO_ERR_SEEN: u32 = 32;
 pub const _IO_USER_LOCK: u32 = 32768;
-pub const __cookie_io_functions_t_defined: u32 = 1;
 pub const _IOFBF: u32 = 0;
 pub const _IOLBF: u32 = 1;
 pub const _IONBF: u32 = 2;
@@ -396,9 +392,9 @@ pub const SEEK_SET: u32 = 0;
 pub const SEEK_CUR: u32 = 1;
 pub const SEEK_END: u32 = 2;
 pub const P_tmpdir: &[u8; 5] = b"/tmp\0";
+pub const _BITS_STDIO_LIM_H: u32 = 1;
 pub const L_tmpnam: u32 = 20;
 pub const TMP_MAX: u32 = 238328;
-pub const _BITS_STDIO_LIM_H: u32 = 1;
 pub const FILENAME_MAX: u32 = 4096;
 pub const L_ctermid: u32 = 9;
 pub const FOPEN_MAX: u32 = 16;
@@ -484,7 +480,6 @@ pub const _STRINGS_H: u32 = 1;
 pub const _STDINT_H: u32 = 1;
 pub const _BITS_WCHAR_H: u32 = 1;
 pub const _BITS_STDINT_UINTN_H: u32 = 1;
-pub const _BITS_STDINT_LEAST_H: u32 = 1;
 pub const INT8_MIN: i32 = -128;
 pub const INT16_MIN: i32 = -32768;
 pub const INT32_MIN: i32 = -2147483648;
@@ -858,9 +853,6 @@ pub const SOL_NFC: u32 = 280;
 pub const SOL_KCM: u32 = 281;
 pub const SOL_TLS: u32 = 282;
 pub const SOL_XDP: u32 = 283;
-pub const SOL_MPTCP: u32 = 284;
-pub const SOL_MCTP: u32 = 285;
-pub const SOL_SMC: u32 = 286;
 pub const SOMAXCONN: u32 = 4096;
 pub const _BITS_SOCKADDR_H: u32 = 1;
 pub const _SS_SIZE: u32 = 128;
@@ -949,11 +941,6 @@ pub const SO_PREFER_BUSY_POLL: u32 = 69;
 pub const SO_BUSY_POLL_BUDGET: u32 = 70;
 pub const SO_NETNS_COOKIE: u32 = 71;
 pub const SO_BUF_LOCK: u32 = 72;
-pub const SO_RESERVE_MEM: u32 = 73;
-pub const SO_TXREHASH: u32 = 74;
-pub const SO_RCVMARK: u32 = 75;
-pub const SO_PASSPIDFD: u32 = 76;
-pub const SO_PEERPIDFD: u32 = 77;
 pub const SO_TIMESTAMP: u32 = 29;
 pub const SO_TIMESTAMPNS: u32 = 35;
 pub const SO_TIMESTAMPING: u32 = 37;
@@ -1019,8 +1006,6 @@ pub const IP_PMTUDISC_DO: u32 = 2;
 pub const IP_PMTUDISC_PROBE: u32 = 3;
 pub const IP_PMTUDISC_INTERFACE: u32 = 4;
 pub const IP_PMTUDISC_OMIT: u32 = 5;
-pub const IP_LOCAL_PORT_RANGE: u32 = 51;
-pub const IP_PROTOCOL: u32 = 52;
 pub const SOL_IP: u32 = 0;
 pub const IP_DEFAULT_MULTICAST_TTL: u32 = 1;
 pub const IP_DEFAULT_MULTICAST_LOOP: u32 = 1;
@@ -1149,7 +1134,7 @@ pub const NI_DGRAM: u32 = 16;
 pub const _PWD_H: u32 = 1;
 pub const NSS_BUFLEN_PASSWD: u32 = 1024;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 29] = b"postgres (PostgreSQL) 12.17\n\0";
+pub const PG_BACKEND_VERSIONSTR: &[u8; 29] = b"postgres (PostgreSQL) 12.19\n\0";
 pub const EXE: &[u8; 1] = b"\0";
 pub const DEVNULL: &[u8; 10] = b"/dev/null\0";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -1326,6 +1311,11 @@ pub const POSIX_FADV_SEQUENTIAL: u32 = 2;
 pub const POSIX_FADV_WILLNEED: u32 = 3;
 pub const POSIX_FADV_DONTNEED: u32 = 4;
 pub const POSIX_FADV_NOREUSE: u32 = 5;
+pub const AT_FDCWD: i32 = -100;
+pub const AT_SYMLINK_NOFOLLOW: u32 = 256;
+pub const AT_REMOVEDIR: u32 = 512;
+pub const AT_SYMLINK_FOLLOW: u32 = 1024;
+pub const AT_EACCESS: u32 = 512;
 pub const _BITS_STAT_H: u32 = 1;
 pub const _BITS_STRUCT_STAT_H: u32 = 1;
 pub const __S_IFMT: u32 = 61440;
@@ -1371,11 +1361,6 @@ pub const R_OK: u32 = 4;
 pub const W_OK: u32 = 2;
 pub const X_OK: u32 = 1;
 pub const F_OK: u32 = 0;
-pub const AT_FDCWD: i32 = -100;
-pub const AT_SYMLINK_NOFOLLOW: u32 = 256;
-pub const AT_REMOVEDIR: u32 = 512;
-pub const AT_SYMLINK_FOLLOW: u32 = 1024;
-pub const AT_EACCESS: u32 = 512;
 pub const F_ULOCK: u32 = 0;
 pub const F_LOCK: u32 = 1;
 pub const F_TLOCK: u32 = 2;
@@ -2802,6 +2787,13 @@ pub const Natts_pg_namespace: u32 = 4;
 pub const PG_CATALOG_NAMESPACE: u32 = 11;
 pub const PG_TOAST_NAMESPACE: u32 = 99;
 pub const PG_PUBLIC_NAMESPACE: u32 = 2200;
+pub const SecLabelRelationId: Oid = Oid(3596);
+pub const Anum_pg_seclabel_objoid: u32 = 1;
+pub const Anum_pg_seclabel_classoid: u32 = 2;
+pub const Anum_pg_seclabel_objsubid: u32 = 3;
+pub const Anum_pg_seclabel_provider: u32 = 4;
+pub const Anum_pg_seclabel_label: u32 = 5;
+pub const Natts_pg_seclabel: u32 = 5;
 pub const TableSpaceRelationId: Oid = Oid(1213);
 pub const Anum_pg_tablespace_oid: u32 = 1;
 pub const Anum_pg_tablespace_spcname: u32 = 2;
@@ -3215,6 +3207,12 @@ pub const GROUPING_CAN_USE_HASH: u32 = 2;
 pub const GROUPING_CAN_PARTIAL_AGG: u32 = 4;
 pub const FSV_MISSING_OK: u32 = 1;
 pub const FDW_MISSING_OK: u32 = 1;
+pub const PGJIT_NONE: u32 = 0;
+pub const PGJIT_PERFORM: u32 = 1;
+pub const PGJIT_OPT3: u32 = 2;
+pub const PGJIT_INLINE: u32 = 4;
+pub const PGJIT_EXPR: u32 = 8;
+pub const PGJIT_DEFORM: u32 = 16;
 pub const MAX_MULTIBYTE_CHAR_LEN: u32 = 4;
 pub const SS2: u32 = 142;
 pub const SS3: u32 = 143;
@@ -3329,6 +3327,8 @@ pub const PLPGSQL_XCHECK_STRICTMULTIASSIGNMENT: u32 = 8;
 pub const POSTMASTER_FD_WATCH: u32 = 0;
 pub const POSTMASTER_FD_OWN: u32 = 1;
 pub const MAX_BACKENDS: u32 = 262143;
+pub const LOG_METAINFO_DATAFILE: &[u8; 17] = b"current_logfiles\0";
+pub const LOG_METAINFO_DATAFILE_TMP: &[u8; 21] = b"current_logfiles.tmp\0";
 pub const XLOG_STANDBY_LOCK: u32 = 0;
 pub const XLOG_RUNNING_XACTS: u32 = 16;
 pub const XLOG_INVALIDATIONS: u32 = 32;
@@ -5965,6 +5965,9 @@ pub const JB_FOBJECT: u32 = 536870912;
 pub const JB_FARRAY: u32 = 1073741824;
 pub const ATTSTATSSLOT_VALUES: u32 = 1;
 pub const ATTSTATSSLOT_NUMBERS: u32 = 2;
+pub const CATCACHE_MAXKEYS: u32 = 4;
+pub const CT_MAGIC: u32 = 1462113538;
+pub const CL_MAGIC: u32 = 1383485699;
 pub const DEFAULT_EQ_SEL: f64 = 0.005;
 pub const DEFAULT_INEQ_SEL: f64 = 0.3333333333333333;
 pub const DEFAULT_RANGE_INEQ_SEL: f64 = 0.005;
@@ -5972,9 +5975,6 @@ pub const DEFAULT_MATCH_SEL: f64 = 0.005;
 pub const DEFAULT_NUM_DISTINCT: u32 = 200;
 pub const DEFAULT_UNK_SEL: f64 = 0.005;
 pub const DEFAULT_NOT_UNK_SEL: f64 = 0.995;
-pub const CATCACHE_MAXKEYS: u32 = 4;
-pub const CT_MAGIC: u32 = 1462113538;
-pub const CL_MAGIC: u32 = 1383485699;
 pub const RANGE_EMPTY: u32 = 1;
 pub const RANGE_LB_INC: u32 = 2;
 pub const RANGE_UB_INC: u32 = 4;
@@ -5994,6 +5994,7 @@ pub const RANGESTRAT_CONTAINED_BY: u32 = 8;
 pub const RANGESTRAT_CONTAINS_ELEM: u32 = 16;
 pub const RANGESTRAT_EQ: u32 = 18;
 pub type pg_int64 = ::std::os::raw::c_long;
+pub type va_list = __builtin_va_list;
 pub type __gnuc_va_list = __builtin_va_list;
 pub type __u_char = ::std::os::raw::c_uchar;
 pub type __u_short = ::std::os::raw::c_ushort;
@@ -6184,40 +6185,6 @@ impl Default for _IO_FILE {
         }
     }
 }
-pub type cookie_read_function_t = ::std::option::Option<
-    unsafe extern "C" fn(
-        __cookie: *mut ::std::os::raw::c_void,
-        __buf: *mut ::std::os::raw::c_char,
-        __nbytes: usize,
-    ) -> __ssize_t,
->;
-pub type cookie_write_function_t = ::std::option::Option<
-    unsafe extern "C" fn(
-        __cookie: *mut ::std::os::raw::c_void,
-        __buf: *const ::std::os::raw::c_char,
-        __nbytes: usize,
-    ) -> __ssize_t,
->;
-pub type cookie_seek_function_t = ::std::option::Option<
-    unsafe extern "C" fn(
-        __cookie: *mut ::std::os::raw::c_void,
-        __pos: *mut __off64_t,
-        __w: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int,
->;
-pub type cookie_close_function_t = ::std::option::Option<
-    unsafe extern "C" fn(__cookie: *mut ::std::os::raw::c_void) -> ::std::os::raw::c_int,
->;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct _IO_cookie_io_functions_t {
-    pub read: cookie_read_function_t,
-    pub write: cookie_write_function_t,
-    pub seek: cookie_seek_function_t,
-    pub close: cookie_close_function_t,
-}
-pub type cookie_io_functions_t = _IO_cookie_io_functions_t;
-pub type va_list = __gnuc_va_list;
 pub type off_t = __off_t;
 pub type fpos_t = __fpos_t;
 pub type _Float32 = f32;
@@ -7016,6 +6983,13 @@ impl Default for ip_opts {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
+pub struct ip_mreqn {
+    pub imr_multiaddr: in_addr,
+    pub imr_address: in_addr,
+    pub imr_ifindex: ::std::os::raw::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
 pub struct in_pktinfo {
     pub ipi_ifindex: ::std::os::raw::c_int,
     pub ipi_spec_dst: in_addr,
@@ -7044,7 +7018,6 @@ pub mod _bindgen_ty_5 {
     pub const IPPROTO_ENCAP: Type = 98;
     pub const IPPROTO_PIM: Type = 103;
     pub const IPPROTO_COMP: Type = 108;
-    pub const IPPROTO_L2TP: Type = 115;
     pub const IPPROTO_SCTP: Type = 132;
     pub const IPPROTO_UDPLITE: Type = 136;
     pub const IPPROTO_MPLS: Type = 137;
@@ -7154,13 +7127,6 @@ impl Default for sockaddr_in6 {
 pub struct ip_mreq {
     pub imr_multiaddr: in_addr,
     pub imr_interface: in_addr,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct ip_mreqn {
-    pub imr_multiaddr: in_addr,
-    pub imr_address: in_addr,
-    pub imr_ifindex: ::std::os::raw::c_int,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -12591,6 +12557,8 @@ pub struct IndexOnlyScanState {
     pub ioss_TableSlot: *mut TupleTableSlot,
     pub ioss_VMBuffer: Buffer,
     pub ioss_PscanLen: Size,
+    pub ioss_NameCStringAttNums: *mut AttrNumber,
+    pub ioss_NameCStringCount: ::std::os::raw::c_int,
 }
 impl Default for IndexOnlyScanState {
     fn default() -> Self {
@@ -17362,7 +17330,6 @@ pub mod _bindgen_ty_13 {
     pub const SEGV_ADIPERR: Type = 7;
     pub const SEGV_MTEAERR: Type = 8;
     pub const SEGV_MTESERR: Type = 9;
-    pub const SEGV_CPERR: Type = 10;
 }
 pub mod _bindgen_ty_14 {
     pub type Type = ::std::os::raw::c_uint;
@@ -18216,6 +18183,12 @@ impl Default for xl_standby_lock {
         }
     }
 }
+pub mod LWLockWaitState {
+    pub type Type = ::std::os::raw::c_uint;
+    pub const LW_WS_NOT_WAITING: Type = 0;
+    pub const LW_WS_WAITING: Type = 1;
+    pub const LW_WS_PENDING_WAKEUP: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct LWLock {
@@ -18609,7 +18582,7 @@ pub struct PGPROC {
     pub tempNamespaceId: Oid,
     pub isBackgroundWorker: bool,
     pub recoveryConflictPending: bool,
-    pub lwWaiting: bool,
+    pub lwWaiting: uint8,
     pub lwWaitMode: uint8,
     pub lwWaitLink: proclist_node,
     pub cvWaitLink: proclist_node,
@@ -21327,8 +21300,8 @@ pub struct TableAmRoutine {
         ::std::option::Option<unsafe extern "C" fn(rel: Relation, newrnode: *const RelFileNode)>,
     pub relation_copy_for_cluster: ::std::option::Option<
         unsafe extern "C" fn(
-            NewTable: Relation,
             OldTable: Relation,
+            NewTable: Relation,
             OldIndex: Relation,
             use_sort: bool,
             OldestXmin: TransactionId,
@@ -22614,6 +22587,22 @@ impl Default for FormData_pg_namespace {
 pub type Form_pg_namespace = *mut FormData_pg_namespace;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct FormData_pg_seclabel {
+    pub objoid: Oid,
+    pub classoid: Oid,
+    pub objsubid: int32,
+}
+impl Default for FormData_pg_seclabel {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct FormData_pg_tablespace {
     pub oid: Oid,
     pub spcname: NameData,
@@ -22716,6 +22705,19 @@ impl Default for FormData_pg_user_mapping {
     }
 }
 pub type Form_pg_user_mapping = *mut FormData_pg_user_mapping;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CopyStateData {
+    _unused: [u8; 0],
+}
+pub type CopyState = *mut CopyStateData;
+pub type copy_data_source_cb = ::std::option::Option<
+    unsafe extern "C" fn(
+        outbuf: *mut ::std::os::raw::c_void,
+        minread: ::std::os::raw::c_int,
+        maxread: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int,
+>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct FormData_pg_event_trigger {
@@ -26322,6 +26324,51 @@ impl Default for ForeignTable {
         }
     }
 }
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct JitInstrumentation {
+    pub created_functions: usize,
+    pub generation_counter: instr_time,
+    pub inlining_counter: instr_time,
+    pub optimization_counter: instr_time,
+    pub emission_counter: instr_time,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct SharedJitInstrumentation {
+    pub num_workers: ::std::os::raw::c_int,
+    pub jit_instr: __IncompleteArrayField<JitInstrumentation>,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct JitContext {
+    pub flags: ::std::os::raw::c_int,
+    pub resowner: ResourceOwner,
+    pub instr: JitInstrumentation,
+}
+impl Default for JitContext {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type JitProviderInit =
+    ::std::option::Option<unsafe extern "C" fn(cb: *mut JitProviderCallbacks)>;
+pub type JitProviderResetAfterErrorCB = ::std::option::Option<unsafe extern "C" fn()>;
+pub type JitProviderReleaseContextCB =
+    ::std::option::Option<unsafe extern "C" fn(context: *mut JitContext)>;
+pub type JitProviderCompileExprCB =
+    ::std::option::Option<unsafe extern "C" fn(state: *mut ExprState) -> bool>;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct JitProviderCallbacks {
+    pub reset_after_error: JitProviderResetAfterErrorCB,
+    pub release_context: JitProviderReleaseContextCB,
+    pub compile_expr: JitProviderCompileExprCB,
+}
 pub type pg_wchar = ::std::os::raw::c_uint;
 pub mod pg_enc {
     pub type Type = ::std::os::raw::c_uint;
@@ -28348,6 +28395,29 @@ pub mod IdentifierLookup {
     pub const IDENTIFIER_LOOKUP_DECLARE: Type = 1;
     pub const IDENTIFIER_LOOKUP_EXPR: Type = 2;
 }
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct PipeProtoHeader {
+    pub nuls: [::std::os::raw::c_char; 2usize],
+    pub len: uint16,
+    pub pid: int32,
+    pub is_last: ::std::os::raw::c_char,
+    pub data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+pub union PipeProtoChunk {
+    pub proto: ::std::mem::ManuallyDrop<PipeProtoHeader>,
+    pub filler: ::std::mem::ManuallyDrop<[::std::os::raw::c_char; 4096usize]>,
+}
+impl Default for PipeProtoChunk {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 pub mod ReplicationSlotPersistency {
     pub type Type = ::std::os::raw::c_uint;
     pub const RS_PERSISTENT: Type = 0;
@@ -29902,74 +29972,6 @@ impl Default for AttStatsSlot {
 }
 pub type get_attavgwidth_hook_type =
     ::std::option::Option<unsafe extern "C" fn(relid: Oid, attnum: AttrNumber) -> int32>;
-pub type SamplerRandomState = [::std::os::raw::c_ushort; 3usize];
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct BlockSamplerData {
-    pub N: BlockNumber,
-    pub n: ::std::os::raw::c_int,
-    pub t: BlockNumber,
-    pub m: ::std::os::raw::c_int,
-    pub randstate: SamplerRandomState,
-}
-pub type BlockSampler = *mut BlockSamplerData;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct ReservoirStateData {
-    pub W: f64,
-    pub randstate: SamplerRandomState,
-}
-pub type ReservoirState = *mut ReservoirStateData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct VariableStatData {
-    pub var: *mut Node,
-    pub rel: *mut RelOptInfo,
-    pub statsTuple: HeapTuple,
-    pub freefunc: ::std::option::Option<unsafe extern "C" fn(tuple: HeapTuple)>,
-    pub vartype: Oid,
-    pub atttype: Oid,
-    pub atttypmod: int32,
-    pub isunique: bool,
-    pub acl_ok: bool,
-}
-impl Default for VariableStatData {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct GenericCosts {
-    pub indexStartupCost: Cost,
-    pub indexTotalCost: Cost,
-    pub indexSelectivity: Selectivity,
-    pub indexCorrelation: f64,
-    pub numIndexPages: f64,
-    pub numIndexTuples: f64,
-    pub spc_random_page_cost: f64,
-    pub num_sa_scans: f64,
-}
-pub type get_relation_stats_hook_type = ::std::option::Option<
-    unsafe extern "C" fn(
-        root: *mut PlannerInfo,
-        rte: *mut RangeTblEntry,
-        attnum: AttrNumber,
-        vardata: *mut VariableStatData,
-    ) -> bool,
->;
-pub type get_index_stats_hook_type = ::std::option::Option<
-    unsafe extern "C" fn(
-        root: *mut PlannerInfo,
-        indexOid: Oid,
-        indexattnum: AttrNumber,
-        vardata: *mut VariableStatData,
-    ) -> bool,
->;
 pub type CCHashFN = ::std::option::Option<unsafe extern "C" fn(datum: Datum) -> uint32>;
 pub type CCFastEqualFN = ::std::option::Option<unsafe extern "C" fn(a: Datum, b: Datum) -> bool>;
 #[repr(C)]
@@ -30067,6 +30069,74 @@ impl Default for catcacheheader {
     }
 }
 pub type CatCacheHeader = catcacheheader;
+pub type SamplerRandomState = [::std::os::raw::c_ushort; 3usize];
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct BlockSamplerData {
+    pub N: BlockNumber,
+    pub n: ::std::os::raw::c_int,
+    pub t: BlockNumber,
+    pub m: ::std::os::raw::c_int,
+    pub randstate: SamplerRandomState,
+}
+pub type BlockSampler = *mut BlockSamplerData;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ReservoirStateData {
+    pub W: f64,
+    pub randstate: SamplerRandomState,
+}
+pub type ReservoirState = *mut ReservoirStateData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct VariableStatData {
+    pub var: *mut Node,
+    pub rel: *mut RelOptInfo,
+    pub statsTuple: HeapTuple,
+    pub freefunc: ::std::option::Option<unsafe extern "C" fn(tuple: HeapTuple)>,
+    pub vartype: Oid,
+    pub atttype: Oid,
+    pub atttypmod: int32,
+    pub isunique: bool,
+    pub acl_ok: bool,
+}
+impl Default for VariableStatData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct GenericCosts {
+    pub indexStartupCost: Cost,
+    pub indexTotalCost: Cost,
+    pub indexSelectivity: Selectivity,
+    pub indexCorrelation: f64,
+    pub numIndexPages: f64,
+    pub numIndexTuples: f64,
+    pub spc_random_page_cost: f64,
+    pub num_sa_scans: f64,
+}
+pub type get_relation_stats_hook_type = ::std::option::Option<
+    unsafe extern "C" fn(
+        root: *mut PlannerInfo,
+        rte: *mut RangeTblEntry,
+        attnum: AttrNumber,
+        vardata: *mut VariableStatData,
+    ) -> bool,
+>;
+pub type get_index_stats_hook_type = ::std::option::Option<
+    unsafe extern "C" fn(
+        root: *mut PlannerInfo,
+        indexOid: Oid,
+        indexattnum: AttrNumber,
+        vardata: *mut VariableStatData,
+    ) -> bool,
+>;
 pub mod SysCacheIdentifier {
     pub type Type = ::std::os::raw::c_uint;
     pub const AGGFNOID: Type = 0;
@@ -30210,21 +30280,6 @@ pub struct AttrMissing {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct JitContext {
-    pub _address: u8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct JitInstrumentation {
-    pub _address: u8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct SharedJitInstrumentation {
-    pub _address: u8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
 pub struct PartitionTupleRouting {
     pub _address: u8,
 }
@@ -30306,9 +30361,6 @@ extern "C" {
         __format: *const ::std::os::raw::c_char,
         __arg: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
-    pub fn arc4random() -> __uint32_t;
-    pub fn arc4random_buf(__buf: *mut ::std::os::raw::c_void, __size: usize);
-    pub fn arc4random_uniform(__upper_bound: __uint32_t) -> __uint32_t;
     pub fn alloca(__size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void;
     pub fn atexit(__func: ::std::option::Option<unsafe extern "C" fn()>) -> ::std::os::raw::c_int;
     pub fn at_quick_exit(
@@ -30319,16 +30371,6 @@ extern "C" {
         __s2: *const ::std::os::raw::c_void,
         __n: usize,
     ) -> ::std::os::raw::c_int;
-    pub fn strlcpy(
-        __dest: *mut ::std::os::raw::c_char,
-        __src: *const ::std::os::raw::c_char,
-        __n: ::std::os::raw::c_ulong,
-    ) -> ::std::os::raw::c_ulong;
-    pub fn strlcat(
-        __dest: *mut ::std::os::raw::c_char,
-        __src: *const ::std::os::raw::c_char,
-        __n: ::std::os::raw::c_ulong,
-    ) -> ::std::os::raw::c_ulong;
     pub fn ExceptionalCondition(
         conditionName: *const ::std::os::raw::c_char,
         errorType: *const ::std::os::raw::c_char,
@@ -30695,6 +30737,16 @@ extern "C" {
     pub fn __fminl(__x: u128, __y: u128) -> u128;
     pub fn __fmal(__x: u128, __y: u128, __z: u128) -> u128;
     pub fn __scalbl(__x: u128, __n: u128) -> u128;
+    pub fn strlcat(
+        dst: *mut ::std::os::raw::c_char,
+        src: *const ::std::os::raw::c_char,
+        siz: usize,
+    ) -> usize;
+    pub fn strlcpy(
+        dst: *mut ::std::os::raw::c_char,
+        src: *const ::std::os::raw::c_char,
+        siz: usize,
+    ) -> usize;
     pub fn pg_qsort(
         base: *mut ::std::os::raw::c_void,
         nel: usize,
@@ -35956,6 +36008,43 @@ extern "C" {
     pub fn DeleteSharedComments(oid: Oid, classoid: Oid);
     pub fn CreateSharedComments(oid: Oid, classoid: Oid, comment: *const ::std::os::raw::c_char);
     pub fn GetComment(oid: Oid, classoid: Oid, subid: int32) -> *mut ::std::os::raw::c_char;
+    pub fn DoCopy(
+        state: *mut ParseState,
+        stmt: *const CopyStmt,
+        stmt_location: ::std::os::raw::c_int,
+        stmt_len: ::std::os::raw::c_int,
+        processed: *mut uint64,
+    );
+    pub fn ProcessCopyOptions(
+        pstate: *mut ParseState,
+        cstate: CopyState,
+        is_from: bool,
+        options: *mut List,
+    );
+    pub fn BeginCopyFrom(
+        pstate: *mut ParseState,
+        rel: Relation,
+        filename: *const ::std::os::raw::c_char,
+        is_program: bool,
+        data_source_cb: copy_data_source_cb,
+        attnamelist: *mut List,
+        options: *mut List,
+    ) -> CopyState;
+    pub fn EndCopyFrom(cstate: CopyState);
+    pub fn NextCopyFrom(
+        cstate: CopyState,
+        econtext: *mut ExprContext,
+        values: *mut Datum,
+        nulls: *mut bool,
+    ) -> bool;
+    pub fn NextCopyFromRawFields(
+        cstate: CopyState,
+        fields: *mut *mut *mut ::std::os::raw::c_char,
+        nfields: *mut ::std::os::raw::c_int,
+    ) -> bool;
+    pub fn CopyFromErrorCallback(arg: *mut ::std::os::raw::c_void);
+    pub fn CopyFrom(cstate: CopyState) -> uint64;
+    pub fn CreateCopyDestReceiver() -> *mut DestReceiver;
     pub fn createdb(pstate: *mut ParseState, stmt: *const CreatedbStmt) -> Oid;
     pub fn dropdb(dbname: *const ::std::os::raw::c_char, missing_ok: bool);
     pub fn RenameDatabase(
@@ -37236,6 +37325,11 @@ extern "C" {
         servername: *const ::std::os::raw::c_char,
         missing_ok: bool,
     ) -> Oid;
+    pub fn _PG_jit_provider_init(cb: *mut JitProviderCallbacks);
+    pub fn jit_reset_after_error();
+    pub fn jit_release_context(context: *mut JitContext);
+    pub fn jit_compile_expr(state: *mut ExprState) -> bool;
+    pub fn InstrJitAgg(dst: *mut JitInstrumentation, add: *mut JitInstrumentation);
     pub fn is_encoding_supported_by_icu(encoding: ::std::os::raw::c_int) -> bool;
     pub fn get_encoding_name_for_icu(
         encoding: ::std::os::raw::c_int,
@@ -38126,7 +38220,9 @@ extern "C" {
     pub fn negate_clause(node: *mut Node) -> *mut Node;
     pub fn canonicalize_qual(qual: *mut Expr, is_check: bool) -> *mut Expr;
     pub fn contain_mutable_functions(clause: *mut Node) -> bool;
+    pub fn contain_mutable_functions_after_planning(expr: *mut Expr) -> bool;
     pub fn contain_volatile_functions(clause: *mut Node) -> bool;
+    pub fn contain_volatile_functions_after_planning(expr: *mut Expr) -> bool;
     pub fn contain_volatile_functions_not_nextval(clause: *mut Node) -> bool;
     pub fn eval_const_expressions(root: *mut PlannerInfo, node: *mut Node) -> *mut Node;
     pub fn estimate_expression_value(root: *mut PlannerInfo, node: *mut Node) -> *mut Node;
@@ -39712,6 +39808,7 @@ extern "C" {
     pub fn plpgsql_dumptree(func: *mut PLpgSQL_function);
     pub fn plpgsql_base_yylex() -> ::std::os::raw::c_int;
     pub fn plpgsql_yylex() -> ::std::os::raw::c_int;
+    pub fn plpgsql_token_length() -> ::std::os::raw::c_int;
     pub fn plpgsql_push_back_token(token: ::std::os::raw::c_int);
     pub fn plpgsql_token_is_unreserved_keyword(token: ::std::os::raw::c_int) -> bool;
     pub fn plpgsql_append_source_text(
@@ -39740,6 +39837,14 @@ extern "C" {
     pub fn MaxLivePostmasterChildren() -> ::std::os::raw::c_int;
     pub fn GetNumShmemAttachedBgworkers() -> ::std::os::raw::c_int;
     pub fn PostmasterMarkPIDForWorkerNotify(arg1: ::std::os::raw::c_int) -> bool;
+    pub fn SysLogger_Start() -> ::std::os::raw::c_int;
+    pub fn write_syslogger_file(
+        buffer: *const ::std::os::raw::c_char,
+        count: ::std::os::raw::c_int,
+        dest: ::std::os::raw::c_int,
+    );
+    pub fn CheckLogrotateSignal() -> bool;
+    pub fn RemoveLogrotateSignalFiles();
     pub fn ReplicationSlotsShmemSize() -> Size;
     pub fn ReplicationSlotsShmemInit();
     pub fn ReplicationSlotCreate(
@@ -40018,6 +40123,12 @@ extern "C" {
     pub fn SpeculativeInsertionLockRelease(xid: TransactionId);
     pub fn SpeculativeInsertionWait(xid: TransactionId, token: uint32);
     pub fn LockDatabaseObject(classid: Oid, objid: Oid, objsubid: uint16, lockmode: LOCKMODE);
+    pub fn ConditionalLockDatabaseObject(
+        classid: Oid,
+        objid: Oid,
+        objsubid: uint16,
+        lockmode: LOCKMODE,
+    ) -> bool;
     pub fn UnlockDatabaseObject(classid: Oid, objid: Oid, objsubid: uint16, lockmode: LOCKMODE);
     pub fn LockSharedObject(classid: Oid, objid: Oid, objsubid: uint16, lockmode: LOCKMODE);
     pub fn UnlockSharedObject(classid: Oid, objid: Oid, objsubid: uint16, lockmode: LOCKMODE);
@@ -40197,6 +40308,37 @@ extern "C" {
         type_: SyncRequestType::Type,
         retryOnError: bool,
     ) -> bool;
+    pub fn ChoosePortalStrategy(stmts: *mut List) -> PortalStrategy::Type;
+    pub fn FetchPortalTargetList(portal: Portal) -> *mut List;
+    pub fn FetchStatementTargetList(stmt: *mut Node) -> *mut List;
+    pub fn PortalStart(
+        portal: Portal,
+        params: ParamListInfo,
+        eflags: ::std::os::raw::c_int,
+        snapshot: Snapshot,
+    );
+    pub fn PortalSetResultFormat(
+        portal: Portal,
+        nFormats: ::std::os::raw::c_int,
+        formats: *mut int16,
+    );
+    pub fn PortalRun(
+        portal: Portal,
+        count: ::std::os::raw::c_long,
+        isTopLevel: bool,
+        run_once: bool,
+        dest: *mut DestReceiver,
+        altdest: *mut DestReceiver,
+        completionTag: *mut ::std::os::raw::c_char,
+    ) -> bool;
+    pub fn PortalRunFetch(
+        portal: Portal,
+        fdirection: FetchDirection::Type,
+        count: ::std::os::raw::c_long,
+        dest: *mut DestReceiver,
+    ) -> uint64;
+    pub fn PlannedStmtRequiresSnapshot(pstmt: *mut PlannedStmt) -> bool;
+    pub fn EnsurePortalSnapshotExists();
     pub fn pg_parse_query(query_string: *const ::std::os::raw::c_char) -> *mut List;
     pub fn pg_analyze_and_rewrite(
         parsetree: *mut RawStmt,
@@ -43399,6 +43541,94 @@ extern "C" {
         objnames: *mut *mut List,
         objargs: *mut *mut List,
     );
+    pub fn CreateCacheMemoryContext();
+    pub fn InitCatCache(
+        id: ::std::os::raw::c_int,
+        reloid: Oid,
+        indexoid: Oid,
+        nkeys: ::std::os::raw::c_int,
+        key: *const ::std::os::raw::c_int,
+        nbuckets: ::std::os::raw::c_int,
+    ) -> *mut CatCache;
+    pub fn InitCatCachePhase2(cache: *mut CatCache, touch_index: bool);
+    pub fn SearchCatCache(
+        cache: *mut CatCache,
+        v1: Datum,
+        v2: Datum,
+        v3: Datum,
+        v4: Datum,
+    ) -> HeapTuple;
+    pub fn SearchCatCache1(cache: *mut CatCache, v1: Datum) -> HeapTuple;
+    pub fn SearchCatCache2(cache: *mut CatCache, v1: Datum, v2: Datum) -> HeapTuple;
+    pub fn SearchCatCache3(cache: *mut CatCache, v1: Datum, v2: Datum, v3: Datum) -> HeapTuple;
+    pub fn SearchCatCache4(
+        cache: *mut CatCache,
+        v1: Datum,
+        v2: Datum,
+        v3: Datum,
+        v4: Datum,
+    ) -> HeapTuple;
+    pub fn ReleaseCatCache(tuple: HeapTuple);
+    pub fn GetCatCacheHashValue(
+        cache: *mut CatCache,
+        v1: Datum,
+        v2: Datum,
+        v3: Datum,
+        v4: Datum,
+    ) -> uint32;
+    pub fn SearchCatCacheList(
+        cache: *mut CatCache,
+        nkeys: ::std::os::raw::c_int,
+        v1: Datum,
+        v2: Datum,
+        v3: Datum,
+    ) -> *mut CatCList;
+    pub fn ReleaseCatCacheList(list: *mut CatCList);
+    pub fn ResetCatalogCaches();
+    pub fn CatalogCacheFlushCatalog(catId: Oid);
+    pub fn CatCacheInvalidate(cache: *mut CatCache, hashValue: uint32);
+    pub fn PrepareToInvalidateCacheTuple(
+        relation: Relation,
+        tuple: HeapTuple,
+        newtuple: HeapTuple,
+        function: ::std::option::Option<
+            unsafe extern "C" fn(arg1: ::std::os::raw::c_int, arg2: uint32, arg3: Oid),
+        >,
+    );
+    pub fn PrintCatCacheLeakWarning(tuple: HeapTuple);
+    pub fn PrintCatCacheListLeakWarning(list: *mut CatCList);
+    pub fn ResourceOwnerEnlargeBuffers(owner: ResourceOwner);
+    pub fn ResourceOwnerRememberBuffer(owner: ResourceOwner, buffer: Buffer);
+    pub fn ResourceOwnerForgetBuffer(owner: ResourceOwner, buffer: Buffer);
+    pub fn ResourceOwnerRememberLock(owner: ResourceOwner, locallock: *mut LOCALLOCK);
+    pub fn ResourceOwnerForgetLock(owner: ResourceOwner, locallock: *mut LOCALLOCK);
+    pub fn ResourceOwnerEnlargeCatCacheRefs(owner: ResourceOwner);
+    pub fn ResourceOwnerRememberCatCacheRef(owner: ResourceOwner, tuple: HeapTuple);
+    pub fn ResourceOwnerForgetCatCacheRef(owner: ResourceOwner, tuple: HeapTuple);
+    pub fn ResourceOwnerEnlargeCatCacheListRefs(owner: ResourceOwner);
+    pub fn ResourceOwnerRememberCatCacheListRef(owner: ResourceOwner, list: *mut CatCList);
+    pub fn ResourceOwnerForgetCatCacheListRef(owner: ResourceOwner, list: *mut CatCList);
+    pub fn ResourceOwnerEnlargeRelationRefs(owner: ResourceOwner);
+    pub fn ResourceOwnerRememberRelationRef(owner: ResourceOwner, rel: Relation);
+    pub fn ResourceOwnerForgetRelationRef(owner: ResourceOwner, rel: Relation);
+    pub fn ResourceOwnerEnlargePlanCacheRefs(owner: ResourceOwner);
+    pub fn ResourceOwnerRememberPlanCacheRef(owner: ResourceOwner, plan: *mut CachedPlan);
+    pub fn ResourceOwnerForgetPlanCacheRef(owner: ResourceOwner, plan: *mut CachedPlan);
+    pub fn ResourceOwnerEnlargeTupleDescs(owner: ResourceOwner);
+    pub fn ResourceOwnerRememberTupleDesc(owner: ResourceOwner, tupdesc: TupleDesc);
+    pub fn ResourceOwnerForgetTupleDesc(owner: ResourceOwner, tupdesc: TupleDesc);
+    pub fn ResourceOwnerEnlargeSnapshots(owner: ResourceOwner);
+    pub fn ResourceOwnerRememberSnapshot(owner: ResourceOwner, snapshot: Snapshot);
+    pub fn ResourceOwnerForgetSnapshot(owner: ResourceOwner, snapshot: Snapshot);
+    pub fn ResourceOwnerEnlargeFiles(owner: ResourceOwner);
+    pub fn ResourceOwnerRememberFile(owner: ResourceOwner, file: File);
+    pub fn ResourceOwnerForgetFile(owner: ResourceOwner, file: File);
+    pub fn ResourceOwnerEnlargeDSMs(owner: ResourceOwner);
+    pub fn ResourceOwnerRememberDSM(owner: ResourceOwner, arg1: *mut dsm_segment);
+    pub fn ResourceOwnerForgetDSM(owner: ResourceOwner, arg1: *mut dsm_segment);
+    pub fn ResourceOwnerEnlargeJIT(owner: ResourceOwner);
+    pub fn ResourceOwnerRememberJIT(owner: ResourceOwner, handle: Datum);
+    pub fn ResourceOwnerForgetJIT(owner: ResourceOwner, handle: Datum);
     pub fn pg_get_indexdef_string(indexrelid: Oid) -> *mut ::std::os::raw::c_char;
     pub fn pg_get_indexdef_columns(indexrelid: Oid, pretty: bool) -> *mut ::std::os::raw::c_char;
     pub fn pg_get_partkeydef_columns(relid: Oid, pretty: bool) -> *mut ::std::os::raw::c_char;
@@ -43630,62 +43860,6 @@ extern "C" {
         useOr: bool,
         varRelid: ::std::os::raw::c_int,
     ) -> Selectivity;
-    pub fn CreateCacheMemoryContext();
-    pub fn InitCatCache(
-        id: ::std::os::raw::c_int,
-        reloid: Oid,
-        indexoid: Oid,
-        nkeys: ::std::os::raw::c_int,
-        key: *const ::std::os::raw::c_int,
-        nbuckets: ::std::os::raw::c_int,
-    ) -> *mut CatCache;
-    pub fn InitCatCachePhase2(cache: *mut CatCache, touch_index: bool);
-    pub fn SearchCatCache(
-        cache: *mut CatCache,
-        v1: Datum,
-        v2: Datum,
-        v3: Datum,
-        v4: Datum,
-    ) -> HeapTuple;
-    pub fn SearchCatCache1(cache: *mut CatCache, v1: Datum) -> HeapTuple;
-    pub fn SearchCatCache2(cache: *mut CatCache, v1: Datum, v2: Datum) -> HeapTuple;
-    pub fn SearchCatCache3(cache: *mut CatCache, v1: Datum, v2: Datum, v3: Datum) -> HeapTuple;
-    pub fn SearchCatCache4(
-        cache: *mut CatCache,
-        v1: Datum,
-        v2: Datum,
-        v3: Datum,
-        v4: Datum,
-    ) -> HeapTuple;
-    pub fn ReleaseCatCache(tuple: HeapTuple);
-    pub fn GetCatCacheHashValue(
-        cache: *mut CatCache,
-        v1: Datum,
-        v2: Datum,
-        v3: Datum,
-        v4: Datum,
-    ) -> uint32;
-    pub fn SearchCatCacheList(
-        cache: *mut CatCache,
-        nkeys: ::std::os::raw::c_int,
-        v1: Datum,
-        v2: Datum,
-        v3: Datum,
-    ) -> *mut CatCList;
-    pub fn ReleaseCatCacheList(list: *mut CatCList);
-    pub fn ResetCatalogCaches();
-    pub fn CatalogCacheFlushCatalog(catId: Oid);
-    pub fn CatCacheInvalidate(cache: *mut CatCache, hashValue: uint32);
-    pub fn PrepareToInvalidateCacheTuple(
-        relation: Relation,
-        tuple: HeapTuple,
-        newtuple: HeapTuple,
-        function: ::std::option::Option<
-            unsafe extern "C" fn(arg1: ::std::os::raw::c_int, arg2: uint32, arg3: Oid),
-        >,
-    );
-    pub fn PrintCatCacheLeakWarning(tuple: HeapTuple);
-    pub fn PrintCatCacheListLeakWarning(list: *mut CatCList);
     pub fn InitCatalogCache();
     pub fn InitCatalogCachePhase2();
     pub fn SearchSysCache(
@@ -44209,6 +44383,16 @@ extern "C" {
     pub static mut ParallelMessagePending: bool;
     pub static mut ParallelWorkerNumber: ::std::os::raw::c_int;
     pub static mut InitializingParallelWorker: bool;
+    pub static mut jit_enabled: bool;
+    pub static mut jit_provider: *mut ::std::os::raw::c_char;
+    pub static mut jit_debugging_support: bool;
+    pub static mut jit_dump_bitcode: bool;
+    pub static mut jit_expressions: bool;
+    pub static mut jit_profiling_support: bool;
+    pub static mut jit_tuple_deforming: bool;
+    pub static mut jit_above_cost: f64;
+    pub static mut jit_inline_above_cost: f64;
+    pub static mut jit_optimize_above_cost: f64;
     pub static pg_enc2name_tbl: [pg_enc2name; 0usize];
     pub static pg_enc2gettext_tbl: [pg_enc2gettext; 0usize];
     pub static pg_wchar_table: [pg_wchar_tbl; 0usize];
@@ -44293,6 +44477,15 @@ extern "C" {
     pub static mut restart_after_crash: bool;
     pub static mut postmaster_alive_fds: [::std::os::raw::c_int; 2usize];
     pub static mut progname: *const ::std::os::raw::c_char;
+    pub static mut Logging_collector: bool;
+    pub static mut Log_RotationAge: ::std::os::raw::c_int;
+    pub static mut Log_RotationSize: ::std::os::raw::c_int;
+    pub static mut Log_directory: *mut ::std::os::raw::c_char;
+    pub static mut Log_filename: *mut ::std::os::raw::c_char;
+    pub static mut Log_truncate_on_rotation: bool;
+    pub static mut Log_file_mode: ::std::os::raw::c_int;
+    pub static mut am_syslogger: bool;
+    pub static mut syslogPipe: [::std::os::raw::c_int; 2usize];
     pub static mut ReplicationSlotCtl: *mut ReplicationSlotCtlData;
     pub static mut MyReplicationSlot: *mut ReplicationSlot;
     pub static mut max_replication_slots: ::std::os::raw::c_int;
@@ -44304,6 +44497,7 @@ extern "C" {
     pub static mut vacuum_defer_cleanup_age: ::std::os::raw::c_int;
     pub static mut max_standby_archive_delay: ::std::os::raw::c_int;
     pub static mut max_standby_streaming_delay: ::std::os::raw::c_int;
+    pub static mut ActivePortal: Portal;
     pub static mut whereToSendOutput: CommandDest::Type;
     pub static mut debug_query_string: *const ::std::os::raw::c_char;
     pub static mut max_stack_depth: ::std::os::raw::c_int;
@@ -45594,6 +45788,12 @@ pub const LWLockMode_LW_EXCLUSIVE: u32 = 0;
 pub const LWLockMode_LW_SHARED: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::LWLockMode::LW_WAIT_UNTIL_FREE")]
 pub const LWLockMode_LW_WAIT_UNTIL_FREE: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LWLockWaitState::LW_WS_NOT_WAITING")]
+pub const LWLockWaitState_LW_WS_NOT_WAITING: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LWLockWaitState::LW_WS_WAITING")]
+pub const LWLockWaitState_LW_WS_WAITING: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LWLockWaitState::LW_WS_PENDING_WAKEUP")]
+pub const LWLockWaitState_LW_WS_PENDING_WAKEUP: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_INITIAL")]
 pub const LimitStateCond_LIMIT_INITIAL: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_RESCAN")]
