@@ -21,6 +21,7 @@ publish = false
 clap = { version = "4.4.2", features = [ "env", "derive" ] }
 owo-colors = "4"
 toml_edit = { version = "0.22" }
+cargo_toml = "*"
 walkdir = "2"
 
 [workspace]
