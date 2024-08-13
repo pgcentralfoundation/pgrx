@@ -4,6 +4,9 @@ description = "additional bindgen support for pgrx"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
+homepage = "https://github.com/pgcentralfoundation/pgrx"
+repository = "https://github.com/pgcentralfoundation/pgrx"
+docs = "https://docs.rs/pgrx-bindgen"
 
 [dependencies]
 pgrx-pg-config.workspace = true
