@@ -16,7 +16,7 @@
 use cargo_toml::Manifest;
 use clap::{Args, Parser, Subcommand};
 use owo_colors::OwoColorize;
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 use std::fs;
 use std::io::{BufRead, Write};
 use std::path::Path;
@@ -134,21 +134,24 @@ fn update_files(args: &UpdateFilesArgs) {
     // We operate on a workspace. Assume we are being run from the workspace root or its children,
     // and roll back to the nearest toml with a workspace.
     let current_dir = env::current_dir().expect("Could not get current directory!");
-    let workspace_toml = current_dir
+    let workspace_manifest_parent = current_dir
         .ancestors()
-        .find_map(|path| {
+        .find(|path| {
             Manifest::from_path(path.join("Cargo.toml"))
-                .ok()
                 .filter(|manifest| manifest.workspace.is_some())
+                .is_ok()
         })
         .unwrap();
+    let workspace_manifest = Manifest::from_path(workspace_manifest_path);
     let Some(workspace) = workspace_toml.workspace else { unreachable!() };
 
     // We specifically want to update the version to anything that has a version-dependency on a workspace member
 
     // Contains a set of package names (e.g. "pgrx", "pgrx-pg-sys") that will be used
     // to search for updatable dependencies later on
-    let mut updatable_package_names = HashSet::from_iter(workspace.members);
+    let mut updatable_package_names = HashSet::from_iter(
+        workspace.members.iter().map(|s| Manifest::from_path(workspace_manifest_path)),
+    );
 
     // This will eventually contain every file we want to process
     let mut files_to_process = HashSet::new();
@@ -185,23 +188,6 @@ fn update_files(args: &UpdateFilesArgs) {
                 filepath.display().cyan()
             );
 
-            // Extract the package name if possible
-            if !exclude_version_files.contains(&filepath) {
-                match extract_package_name(&filepath) {
-                    Some(package_name) => {
-                        updatable_package_names.insert(package_name);
-                    }
-                    None => {
-                        output.push_str(
-                            "\n           * Could not determine package name due to [package] not existing -- skipping version bump."
-                                .dimmed()
-                                .to_string()
-                                .as_str(),
-                        )
-                    }
-                }
-            }
-
             if args.verbose {
                 println!("{output}");
             }
@@ -220,23 +206,6 @@ fn update_files(args: &UpdateFilesArgs) {
             " Including".bold().green(),
             filepath.display().cyan()
         );
-
-        // Extract the package name if possible
-        if !exclude_version_files.contains(&filepath) {
-            match extract_package_name(&filepath) {
-                Some(package_name) => {
-                    updatable_package_names.insert(package_name);
-                }
-                None => {
-                    output.push_str(
-                        "\n           * Could not determine package name due to [package] not existing -- skipping version bump."
-                            .dimmed()
-                            .to_string()
-                            .as_str(),
-                    )
-                }
-            }
-        }
 
         if args.verbose {
             println!("{output}");

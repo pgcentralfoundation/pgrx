@@ -160,6 +160,7 @@ dependencies = [
  "cargo_toml",
  "clap",
  "owo-colors",
+ "rustc-hash",
  "toml_edit",
  "walkdir",
 ]
@@ -181,6 +182,12 @@ checksum = "0fa76aaf39101c457836aec0ce2316dbdc3ab723cdda1c6bd4e6ad4208acaca7"
 dependencies = [
  "proc-macro2",
 ]
+
+[[package]]
+name = "rustc-hash"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "583034fd73374156e66797ed8e5b0d5690409c9226b22d87cb7f19821c05d152"
 
 [[package]]
 name = "same-file"
