@@ -1,7 +1,9 @@
 [package]
 name = "pgrx-bindgen"
+description = "additional bindgen support for pgrx"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
 
 [dependencies]
 pgrx-pg-config.workspace = true
