@@ -16,7 +16,7 @@
 use cargo_toml::Manifest;
 use clap::{Args, Parser, Subcommand};
 use owo_colors::OwoColorize;
-use rustc_hash::FxHashSet;
+use rustc_hash::{FxHashSet, FxHashSet as HashSet};
 use std::fs;
 use std::io::{BufRead, Write};
 use std::path::Path;
@@ -138,23 +138,36 @@ fn update_files(args: &UpdateFilesArgs) {
         .ancestors()
         .find(|path| {
             Manifest::from_path(path.join("Cargo.toml"))
+                .ok()
                 .filter(|manifest| manifest.workspace.is_some())
-                .is_ok()
+                .is_some()
         })
         .unwrap();
-    let workspace_manifest = Manifest::from_path(workspace_manifest_path);
-    let Some(workspace) = workspace_toml.workspace else { unreachable!() };
+    let workspace_manifest =
+        Manifest::from_path(workspace_manifest_parent.join("Cargo.toml")).unwrap();
+    let Some(workspace) = workspace_manifest.workspace else { unreachable!() };
 
     // We specifically want to update the version to anything that has a version-dependency on a workspace member
 
     // Contains a set of package names (e.g. "pgrx", "pgrx-pg-sys") that will be used
     // to search for updatable dependencies later on
-    let mut updatable_package_names = HashSet::from_iter(
-        workspace.members.iter().map(|s| Manifest::from_path(workspace_manifest_path)),
-    );
+    let mut updatable_package_names = workspace
+        .members
+        .iter()
+        .map(|s| {
+            let package_path = workspace_manifest_parent.join(format!("{s}/Cargo.toml"));
+            Ok(Manifest::from_path(package_path)?
+                .package
+                .ok_or_else(|| {
+                    cargo_toml::Error::Other("expected package field in workspace member")
+                })?
+                .name)
+        })
+        .collect::<Result<FxHashSet<String>, cargo_toml::Error>>()
+        .unwrap();
 
     // This will eventually contain every file we want to process
-    let mut files_to_process = HashSet::new();
+    let mut files_to_process = HashSet::default();
 
     // Keep track of which files to exclude from a "package version" change.
     // For example, some Cargo.toml files do not need this updated:
@@ -164,7 +177,7 @@ fn update_files(args: &UpdateFilesArgs) {
     // Any such file is explicitly added via a command line argument.
     // Note that any files included here are still eligible to be processed for
     // *dependency* version updates.
-    let mut exclude_version_files = HashSet::new();
+    let mut exclude_version_files = HashSet::default();
     for file in &args.exclude_from_version_change {
         exclude_version_files.insert(
             fullpath(file).expect(format!("Could not get full path for file: {file}").as_str()),

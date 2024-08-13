@@ -161,6 +161,7 @@ dependencies = [
  "clap",
  "owo-colors",
  "rustc-hash",
+ "toml",
  "toml_edit",
  "walkdir",
 ]
