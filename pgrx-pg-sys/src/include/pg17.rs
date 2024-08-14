@@ -146,7 +146,7 @@ pub const PACKAGE_NAME: &::core::ffi::CStr =
     unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"PostgreSQL\0") };
 #[allow(unsafe_code)]
 pub const PACKAGE_STRING: &::core::ffi::CStr =
-    unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"PostgreSQL 17beta2\0") };
+    unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"PostgreSQL 17beta3\0") };
 #[allow(unsafe_code)]
 pub const PACKAGE_TARNAME: &::core::ffi::CStr =
     unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"postgresql\0") };
@@ -155,7 +155,7 @@ pub const PACKAGE_URL: &::core::ffi::CStr =
     unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"https://www.postgresql.org/\0") };
 #[allow(unsafe_code)]
 pub const PACKAGE_VERSION: &::core::ffi::CStr =
-    unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"17beta2\0") };
+    unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"17beta3\0") };
 #[allow(unsafe_code)]
 pub const PG_KRB_SRVNAM: &::core::ffi::CStr =
     unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"postgres\0") };
@@ -167,11 +167,11 @@ pub const PG_MINORVERSION_NUM: u32 = 0;
 pub const PG_USE_STDBOOL: u32 = 1;
 #[allow(unsafe_code)]
 pub const PG_VERSION: &::core::ffi::CStr =
-    unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"17beta2\0") };
+    unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"17beta3\0") };
 pub const PG_VERSION_NUM: u32 = 170000;
 #[allow(unsafe_code)]
 pub const PG_VERSION_STR: &::core::ffi::CStr = unsafe {
-    :: core :: ffi :: CStr :: from_bytes_with_nul_unchecked (b"PostgreSQL 17beta2 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 14.1.1 20240522, 64-bit\0")
+    :: core :: ffi :: CStr :: from_bytes_with_nul_unchecked (b"PostgreSQL 17beta3 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 14.1.1 20240522, 64-bit\0")
 };
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
@@ -580,7 +580,7 @@ pub const PG_BINARY_W: &::core::ffi::CStr =
 pub const PGINVALID_SOCKET: i32 = -1;
 #[allow(unsafe_code)]
 pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = unsafe {
-    ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"postgres (PostgreSQL) 17beta2\n\0")
+    ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"postgres (PostgreSQL) 17beta3\n\0")
 };
 #[allow(unsafe_code)]
 pub const EXE: &::core::ffi::CStr =
@@ -1195,7 +1195,7 @@ pub const RTPrefixStrategyNumber: u32 = 28;
 pub const RTOldBelowStrategyNumber: u32 = 29;
 pub const RTOldAboveStrategyNumber: u32 = 30;
 pub const RTMaxStrategyNumber: u32 = 30;
-pub const CATALOG_VERSION_NO: u32 = 202406171;
+pub const CATALOG_VERSION_NO: u32 = 202406281;
 pub const OIDCHARS: u32 = 10;
 pub const FORKNAMECHARS: u32 = 4;
 pub const INNER_VAR: i32 = -1;
@@ -2187,6 +2187,7 @@ pub const PqMsg_ParameterDescription: u8 = 116u8;
 pub const PqMsg_NegotiateProtocolVersion: u8 = 118u8;
 pub const PqMsg_CopyDone: u8 = 99u8;
 pub const PqMsg_CopyData: u8 = 100u8;
+pub const PqMsg_Progress: u8 = 80u8;
 pub const AUTH_REQ_OK: u32 = 0;
 pub const AUTH_REQ_KRB4: u32 = 1;
 pub const AUTH_REQ_KRB5: u32 = 2;
@@ -2213,6 +2214,7 @@ pub const PG_WAIT_EXTENSION: u32 = 117440512;
 pub const PG_WAIT_IPC: u32 = 134217728;
 pub const PG_WAIT_TIMEOUT: u32 = 150994944;
 pub const PG_WAIT_IO: u32 = 167772160;
+pub const PG_WAIT_INJECTIONPOINT: u32 = 184549376;
 #[allow(unsafe_code)]
 pub const PGSTAT_STAT_PERMANENT_DIRECTORY: &::core::ffi::CStr =
     unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"pg_stat\0") };
@@ -2530,7 +2532,7 @@ pub const InvalidLocalTransactionId: u32 = 0;
 pub const MAX_LOCKMODES: u32 = 10;
 pub const DEFAULT_LOCKMETHOD: u32 = 1;
 pub const USER_LOCKMETHOD: u32 = 2;
-pub const XLOG_PAGE_MAGIC: u32 = 53525;
+pub const XLOG_PAGE_MAGIC: u32 = 53526;
 pub const XLP_FIRST_IS_CONTRECORD: u32 = 1;
 pub const XLP_LONG_HEADER: u32 = 2;
 pub const XLP_BKP_REMOVABLE: u32 = 4;
@@ -2548,7 +2550,7 @@ pub const XLOG_CONTROL_FILE: &::core::ffi::CStr =
     unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"global/pg_control\0") };
 pub const MAXFNAMELEN: u32 = 64;
 pub const XLOG_FNAME_LEN: u32 = 24;
-pub const PG_CONTROL_VERSION: u32 = 1300;
+pub const PG_CONTROL_VERSION: u32 = 1700;
 pub const MOCK_AUTH_NONCE_LEN: u32 = 32;
 pub const XLOG_CHECKPOINT_SHUTDOWN: u32 = 0;
 pub const XLOG_CHECKPOINT_ONLINE: u32 = 16;
@@ -3462,6 +3464,8 @@ pub const XLOG_STANDBY_LOCK: u32 = 0;
 pub const XLOG_RUNNING_XACTS: u32 = 16;
 pub const XLOG_INVALIDATIONS: u32 = 32;
 pub const STACK_DEPTH_SLOP: u32 = 524288;
+pub const RESTRICT_RELKIND_VIEW: u32 = 1;
+pub const RESTRICT_RELKIND_FOREIGN_TABLE: u32 = 2;
 pub const COMMAND_OK_IN_READ_ONLY_TXN: u32 = 1;
 pub const COMMAND_OK_IN_PARALLEL_MODE: u32 = 2;
 pub const COMMAND_OK_IN_RECOVERY: u32 = 4;
@@ -11013,7 +11017,6 @@ pub struct JsonExpr {
     pub passing_values: *mut List,
     pub on_empty: *mut JsonBehavior,
     pub on_error: *mut JsonBehavior,
-    pub coercion_expr: *mut Node,
     pub use_io_coercion: bool,
     pub use_json_coercion: bool,
     pub wrapper: JsonWrapper::Type,
@@ -25204,6 +25207,7 @@ pub struct xl_end_of_recovery {
     pub end_time: TimestampTz,
     pub ThisTimeLineID: TimeLineID,
     pub PrevTimeLineID: TimeLineID,
+    pub wal_level: ::core::ffi::c_int,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -25266,6 +25270,7 @@ pub struct CheckPoint {
     pub ThisTimeLineID: TimeLineID,
     pub PrevTimeLineID: TimeLineID,
     pub fullPageWrites: bool,
+    pub wal_level: ::core::ffi::c_int,
     pub nextXid: FullTransactionId,
     pub nextOid: Oid,
     pub nextMulti: MultiXactId,
@@ -28564,7 +28569,11 @@ impl Default for ExprEvalStep__bindgen_ty_1__bindgen_ty_45 {
 pub struct ExprEvalStep__bindgen_ty_1__bindgen_ty_46 {
     pub targettype: Oid,
     pub targettypmod: int32,
-    pub json_populate_type_cache: *mut ::core::ffi::c_void,
+    pub omit_quotes: bool,
+    pub exists_coerce: bool,
+    pub exists_cast_to_int: bool,
+    pub exists_check_domain: bool,
+    pub json_coercion_cache: *mut ::core::ffi::c_void,
     pub escontext: *mut ErrorSaveContext,
 }
 impl Default for ExprEvalStep__bindgen_ty_1__bindgen_ty_46 {
@@ -30867,20 +30876,10 @@ pub struct SharedJitInstrumentation {
     pub jit_instr: __IncompleteArrayField<JitInstrumentation>,
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone)]
 pub struct JitContext {
     pub flags: ::core::ffi::c_int,
-    pub resowner: ResourceOwner,
     pub instr: JitInstrumentation,
-}
-impl Default for JitContext {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
 }
 pub type JitProviderInit =
     ::core::option::Option<unsafe extern "C" fn(cb: *mut JitProviderCallbacks)>;
@@ -34213,12 +34212,18 @@ impl Default for xl_invalidations {
         }
     }
 }
+pub mod subxids_array_status {
+    pub type Type = ::core::ffi::c_uint;
+    pub const SUBXIDS_IN_ARRAY: Type = 0;
+    pub const SUBXIDS_MISSING: Type = 1;
+    pub const SUBXIDS_IN_SUBTRANS: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct RunningTransactionsData {
     pub xcnt: ::core::ffi::c_int,
     pub subxcnt: ::core::ffi::c_int,
-    pub subxid_overflow: bool,
+    pub subxid_status: subxids_array_status::Type,
     pub nextXid: TransactionId,
     pub oldestRunningXid: TransactionId,
     pub oldestDatabaseRunningXid: TransactionId,
@@ -38885,10 +38890,12 @@ extern "C" {
     pub fn pgstat_get_wait_event_type(wait_event_info: uint32) -> *const ::core::ffi::c_char;
     pub fn pgstat_set_wait_event_storage(wait_event_info: *mut uint32);
     pub fn pgstat_reset_wait_event_storage();
-    pub fn WaitEventExtensionShmemInit();
-    pub fn WaitEventExtensionShmemSize() -> Size;
     pub fn WaitEventExtensionNew(wait_event_name: *const ::core::ffi::c_char) -> uint32;
-    pub fn GetWaitEventExtensionNames(
+    pub fn WaitEventInjectionPointNew(wait_event_name: *const ::core::ffi::c_char) -> uint32;
+    pub fn WaitEventCustomShmemInit();
+    pub fn WaitEventCustomShmemSize() -> Size;
+    pub fn GetWaitEventCustomNames(
+        classId: uint32,
         nwaitevents: *mut ::core::ffi::c_int,
     ) -> *mut *mut ::core::ffi::c_char;
     pub fn StatsShmemSize() -> Size;
@@ -39097,6 +39104,7 @@ extern "C" {
     pub fn GetInsertRecPtr() -> XLogRecPtr;
     pub fn GetFlushRecPtr(insertTLI: *mut TimeLineID) -> XLogRecPtr;
     pub fn GetWALInsertionTimeLine() -> TimeLineID;
+    pub fn GetWALInsertionTimeLineIfSet() -> TimeLineID;
     pub fn GetLastImportantRecPtr() -> XLogRecPtr;
     pub fn SetWalWriterSleeping(sleeping: bool);
     pub fn WALReadFromBuffers(
@@ -39251,9 +39259,11 @@ extern "C" {
     pub fn IsSystemRelation(relation: Relation) -> bool;
     pub fn IsToastRelation(relation: Relation) -> bool;
     pub fn IsCatalogRelation(relation: Relation) -> bool;
+    pub fn IsInplaceUpdateRelation(relation: Relation) -> bool;
     pub fn IsSystemClass(relid: Oid, reltuple: Form_pg_class) -> bool;
     pub fn IsToastClass(reltuple: Form_pg_class) -> bool;
     pub fn IsCatalogRelationOid(relid: Oid) -> bool;
+    pub fn IsInplaceUpdateOid(relid: Oid) -> bool;
     pub fn IsCatalogNamespace(namespaceId: Oid) -> bool;
     pub fn IsToastNamespace(namespaceId: Oid) -> bool;
     pub fn IsReservedName(name: *const ::core::ffi::c_char) -> bool;
@@ -40398,7 +40408,7 @@ extern "C" {
     pub fn LockReleaseSession(lockmethodid: LOCKMETHODID);
     pub fn LockReleaseCurrentOwner(locallocks: *mut *mut LOCALLOCK, nlocks: ::core::ffi::c_int);
     pub fn LockReassignCurrentOwner(locallocks: *mut *mut LOCALLOCK, nlocks: ::core::ffi::c_int);
-    pub fn LockHeldByMe(locktag: *const LOCKTAG, lockmode: LOCKMODE) -> bool;
+    pub fn LockHeldByMe(locktag: *const LOCKTAG, lockmode: LOCKMODE, orstronger: bool) -> bool;
     pub fn GetLockMethodLocalHash() -> *mut HTAB;
     pub fn LockHasWaiters(locktag: *const LOCKTAG, lockmode: LOCKMODE, sessionLock: bool) -> bool;
     pub fn GetLockConflicts(
@@ -46707,7 +46717,7 @@ extern "C" {
     pub fn GetSlotInvalidationCause(
         invalidation_reason: *const ::core::ffi::c_char,
     ) -> ReplicationSlotInvalidationCause::Type;
-    pub fn SlotExistsInStandbySlotNames(slot_name: *const ::core::ffi::c_char) -> bool;
+    pub fn SlotExistsInSyncStandbySlots(slot_name: *const ::core::ffi::c_char) -> bool;
     pub fn StandbySlotsHaveCaughtup(wait_for_lsn: XLogRecPtr, elevel: ::core::ffi::c_int) -> bool;
     pub fn WaitForStandbyConfirmation(wait_for_lsn: XLogRecPtr);
     pub fn CheckLogicalDecodingRequirements();
@@ -46849,6 +46859,7 @@ extern "C" {
         lockmode: LOCKMODE,
         orstronger: bool,
     ) -> bool;
+    pub fn CheckRelationOidLockedByMe(relid: Oid, lockmode: LOCKMODE, orstronger: bool) -> bool;
     pub fn LockHasWaitersRelation(relation: Relation, lockmode: LOCKMODE) -> bool;
     pub fn LockRelationIdForSession(relid: *mut LockRelId, lockmode: LOCKMODE);
     pub fn UnlockRelationIdForSession(relid: *mut LockRelId, lockmode: LOCKMODE);
@@ -51943,7 +51954,7 @@ extern "C" {
     pub static mut ReplicationSlotCtl: *mut ReplicationSlotCtlData;
     pub static mut MyReplicationSlot: *mut ReplicationSlot;
     pub static mut max_replication_slots: ::core::ffi::c_int;
-    pub static mut standby_slot_names: *mut ::core::ffi::c_char;
+    pub static mut synchronized_standby_slots: *mut ::core::ffi::c_char;
     pub static mut row_security_policy_hook_permissive: row_security_policy_hook_type;
     pub static mut row_security_policy_hook_restrictive: row_security_policy_hook_type;
     pub static mut proc_exit_inprogress: bool;
@@ -51959,6 +51970,7 @@ extern "C" {
     pub static mut PostAuthDelay: ::core::ffi::c_int;
     pub static mut client_connection_check_interval: ::core::ffi::c_int;
     pub static mut log_statement: ::core::ffi::c_int;
+    pub static mut restrict_nonsystem_relation_kind: ::core::ffi::c_int;
     pub static mut ProcessUtility_hook: ProcessUtility_hook_type;
     pub static tsearch_op_priority: [::core::ffi::c_int; 4usize];
     pub static mut quote_all_identifiers: bool;
@@ -57080,6 +57092,12 @@ pub const shm_mq_result_SHM_MQ_SUCCESS: u32 = 0;
 pub const shm_mq_result_SHM_MQ_WOULD_BLOCK: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::shm_mq_result::SHM_MQ_DETACHED")]
 pub const shm_mq_result_SHM_MQ_DETACHED: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::subxids_array_status::SUBXIDS_IN_ARRAY")]
+pub const subxids_array_status_SUBXIDS_IN_ARRAY: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::subxids_array_status::SUBXIDS_MISSING")]
+pub const subxids_array_status_SUBXIDS_MISSING: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::subxids_array_status::SUBXIDS_IN_SUBTRANS")]
+pub const subxids_array_status_SUBXIDS_IN_SUBTRANS: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::tuplehash_status::tuplehash_SH_EMPTY")]
 pub const tuplehash_status_tuplehash_SH_EMPTY: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::tuplehash_status::tuplehash_SH_IN_USE")]
