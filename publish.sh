@@ -23,8 +23,6 @@ set -x
 # │       └── pgrx
 # │           └── pgrx-tests
 # └── pgrx-tests
-# [build-dependencies]
-# └── pgrx-pg-sys
 
 cd $DIR/pgrx-pg-config && cargo publish
 cd $DIR/pgrx-bindgen && cargo publish
