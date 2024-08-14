@@ -777,6 +777,7 @@ fn run_bindgen(
         .merge_extern_blocks(true)
         .wrap_unsafe_ops(true)
         .use_core()
+        .generate_cstr(true)
         .disable_nested_struct_naming()
         .formatter(bindgen::Formatter::None)
         .layout_tests(false)
