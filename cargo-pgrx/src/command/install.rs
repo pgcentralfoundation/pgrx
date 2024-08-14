@@ -392,7 +392,7 @@ fn copy_sql_files(
 
             // match the required pattern `extension--old_version--target_version.sql`
             let re_update_script_name =
-                regex::Regex::new(&format!(r"^{extname}--.+--.+.sql$")).unwrap();
+                regex::Regex::new(&format!(r"^{extname}--.+--.+\.sql$")).unwrap();
 
             if re_update_script_name.is_match(filename.as_str()) {
                 let mut dest = base_directory.to_path_buf();
