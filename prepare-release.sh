@@ -25,7 +25,10 @@ elif [ "$NEW_VERSION" = "" ]; then
 else
     git pull origin develop --ff-only
     git switch -c "prepare-${NEW_VERSION}"
-   
+
+    cargo install --path cargo-pgrx --locked
+    cargo pgrx init
+
     # exit early if the script fails 
     ./update-versions.sh "${NEW_VERSION}" || exit $?
 
