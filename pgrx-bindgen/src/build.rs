@@ -775,6 +775,8 @@ fn run_bindgen(
         .rustified_non_exhaustive_enum("NodeTag")
         .size_t_is_usize(true)
         .merge_extern_blocks(true)
+        .wrap_unsafe_ops(true)
+        .use_core()
         .formatter(bindgen::Formatter::None)
         .layout_tests(false)
         .default_non_copy_union_style(NonCopyUnionStyle::ManuallyDrop)
