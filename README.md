@@ -91,22 +91,6 @@ but it may undermine otherwise-reasonable safety assumptions of PGRX extensions.
 We do not plan to add support without considerable ongoing technical and financial contributions.
 
 <details style="border: 1px solid; padding: 0.25em 0.5em 0;">
-   <summary><i>How to:</i> <b>GCC 7 on CentOS 7</b></summary>
-
-It is not recommended to use CentOS 7 for PGRX development, even if it works.
-
-Recommended Linux distributions include recent Debian, Fedora, and Ubuntu.
-
-In order to use GCC 7, install [`scl`](https://wiki.centos.org/AdditionalResources/Repositories/SCL) and enter the GCC 7 development environment:
-
-```bash
-yum install centos-release-scl
-yum install devtoolset-7
-scl enable devtoolset-7 bash
-```
-</details>
-
-<details style="border: 1px solid; padding: 0.25em 0.5em 0;">
    <summary><i>How to:</i> <b>Homebrew on macOS</b></summary>
 
 As macOS provides no package manager, it is recommended to use https://brew.sh for C dependencies.
