@@ -1505,6 +1505,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "pgrx-bindgen"
+version = "0.1.0"
+dependencies = [
+ "bindgen",
+ "clang-sys",
+ "eyre",
+ "pgrx-pg-config",
+ "proc-macro2",
+ "quote",
+ "shlex",
+ "syn",
+ "walkdir",
+]
+
+[[package]]
 name = "pgrx-macros"
 version = "0.12.0-beta.3"
 dependencies = [
@@ -1535,21 +1550,13 @@ dependencies = [
 name = "pgrx-pg-sys"
 version = "0.12.0-beta.3"
 dependencies = [
- "bindgen",
  "cee-scape",
- "clang-sys",
- "eyre",
  "libc",
+ "pgrx-bindgen",
  "pgrx-macros",
- "pgrx-pg-config",
  "pgrx-sql-entity-graph",
- "proc-macro2",
- "quote",
  "serde",
- "shlex",
  "sptr",
- "syn",
- "walkdir",
 ]
 
 [[package]]

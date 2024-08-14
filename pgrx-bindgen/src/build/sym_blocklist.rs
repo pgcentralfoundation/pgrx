@@ -37,7 +37,7 @@
 ///
 /// A future version of pgrx will achieve this effect in a more complete and less
 /// hacky manner. Effort should be spent there rather than updating this list.
-pub(crate) const SYMBOLS: &[&str] = &[
+pub const SYMBOLS: &[&str] = &[
     "a64l",
     "abort",
     "__abort_msg",

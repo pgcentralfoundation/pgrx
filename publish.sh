@@ -13,7 +13,31 @@
 DIR=`pwd`
 set -x
 
+# dependency graph, from roots to facades
+#
+# pgrx-pg-config
+# ├── cargo-pgrx
+# ├── pgrx-bindgen
+# │   [build-dependencies]
+# │   └── pgrx-pg-sys
+# │       └── pgrx
+# │           └── pgrx-tests
+# └── pgrx-tests
+#
+# pgrx-sql-entity-graph
+# ├── cargo-pgrx
+# ├── pgrx
+# │   └── pgrx-tests
+# ├── pgrx-macros
+# │   ├── pgrx
+# │   ├── pgrx-pg-sys
+# │   │   └── pgrx
+# │   └── pgrx-tests
+# └── pgrx-pg-sys
+
+
 cd $DIR/pgrx-pg-config && cargo publish
+cd $DIR/pgrx-bindgen && cargo publish
 cd $DIR/pgrx-sql-entity-graph && cargo publish
 cd $DIR/pgrx-macros && cargo publish
 cd $DIR/pgrx-pg-sys && cargo publish --no-verify

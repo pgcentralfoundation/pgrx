@@ -18,6 +18,7 @@ members = [
     "pgrx-pg-sys",
     "pgrx-sql-entity-graph",
     "pgrx-tests",
+    "pgrx-bindgen",
 ]
 exclude = [
     # "pgrx-examples/*",
@@ -57,6 +58,7 @@ pgrx-macros = { path = "./pgrx-macros", version = "=0.12.0-beta.3" }
 pgrx-pg-sys = { path = "./pgrx-pg-sys", version = "=0.12.0-beta.3" }
 pgrx-sql-entity-graph = { path = "./pgrx-sql-entity-graph", version = "=0.12.0-beta.3" }
 pgrx-pg-config = { path = "./pgrx-pg-config", version = "=0.12.0-beta.3" }
+pgrx-bindgen = { path = "./pgrx-bindgen", version = "0.1" }
 
 cargo_metadata = "0.18.0"
 cargo-edit = "0.12.2" # format-preserving edits to cargo.toml
