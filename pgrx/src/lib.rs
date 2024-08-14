@@ -145,14 +145,15 @@ mod seal {
     not(feature = "unsafe-postgres")
 ))]
 const _: () = {
+    use core::ffi::CStr;
     // to appease `const`
-    const fn same_slice(a: &[u8], b: &[u8]) -> bool {
-        if a.len() != b.len() {
+    const fn same_cstr(a: &CStr, b: &CStr) -> bool {
+        if a.to_bytes().len() != b.to_bytes().len() {
             return false;
         }
         let mut i = 0;
-        while i < a.len() {
-            if a[i] != b[i] {
+        while i < a.to_bytes().len() {
+            if a.to_bytes()[i] != b.to_bytes()[i] {
                 return false;
             }
             i += 1;
@@ -160,7 +161,7 @@ const _: () = {
         true
     }
     assert!(
-        same_slice(pg_sys::FMGR_ABI_EXTRA, b"PostgreSQL\0"),
+        same_cstr(pg_sys::FMGR_ABI_EXTRA, c"PostgreSQL"),
         "Unsupported Postgres ABI. Perhaps you need `--features unsafe-postgres`?",
     );
 };
