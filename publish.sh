@@ -23,6 +23,18 @@ set -x
 # │       └── pgrx
 # │           └── pgrx-tests
 # └── pgrx-tests
+#
+# pgrx-sql-entity-graph
+# ├── cargo-pgrx
+# ├── pgrx
+# │   └── pgrx-tests
+# ├── pgrx-macros
+# │   ├── pgrx
+# │   ├── pgrx-pg-sys
+# │   │   └── pgrx
+# │   └── pgrx-tests
+# └── pgrx-pg-sys
+
 
 cd $DIR/pgrx-pg-config && cargo publish
 cd $DIR/pgrx-bindgen && cargo publish
