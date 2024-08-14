@@ -6,7 +6,7 @@ edition = "2021"
 license = "MIT"
 homepage = "https://github.com/pgcentralfoundation/pgrx"
 repository = "https://github.com/pgcentralfoundation/pgrx"
-docs = "https://docs.rs/pgrx-bindgen"
+documentation = "https://docs.rs/pgrx-bindgen"
 
 [dependencies]
 pgrx-pg-config.workspace = true
