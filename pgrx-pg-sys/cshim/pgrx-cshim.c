@@ -23,11 +23,6 @@
 #include "storage/spin.h"
 #include "storage/bufpage.h"
 
-PGDLLEXPORT RangeTblEntry *pgrx_planner_rt_fetch(Index index, PlannerInfo *plannerInfo);
-RangeTblEntry *pgrx_planner_rt_fetch(Index index, PlannerInfo *root) {
-    return planner_rt_fetch(index, root);
-}
-
 PGDLLEXPORT void *pgrx_list_nth(List *list, int nth);
 void *pgrx_list_nth(List *list, int nth) {
     return list_nth(list, nth);
