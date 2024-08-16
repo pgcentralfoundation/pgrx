@@ -308,7 +308,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-pgrx"
-version = "0.12.0-beta.3"
+version = "0.12.0-beta.5"
 dependencies = [
  "bzip2",
  "cargo-edit",
@@ -1484,7 +1484,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx"
-version = "0.12.0-beta.3"
+version = "0.12.0-beta.5"
 dependencies = [
  "atomic-traits",
  "bitflags 2.4.2",
@@ -1505,8 +1505,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "pgrx-bindgen"
+version = "0.12.0-beta.5"
+dependencies = [
+ "bindgen",
+ "clang-sys",
+ "eyre",
+ "pgrx-pg-config",
+ "proc-macro2",
+ "quote",
+ "shlex",
+ "syn",
+ "walkdir",
+]
+
+[[package]]
 name = "pgrx-macros"
-version = "0.12.0-beta.3"
+version = "0.12.0-beta.5"
 dependencies = [
  "pgrx-sql-entity-graph",
  "proc-macro2",
@@ -1517,7 +1532,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-pg-config"
-version = "0.12.0-beta.3"
+version = "0.12.0-beta.5"
 dependencies = [
  "cargo_toml",
  "eyre",
@@ -1533,28 +1548,20 @@ dependencies = [
 
 [[package]]
 name = "pgrx-pg-sys"
-version = "0.12.0-beta.3"
+version = "0.12.0-beta.5"
 dependencies = [
- "bindgen",
  "cee-scape",
- "clang-sys",
- "eyre",
  "libc",
+ "pgrx-bindgen",
  "pgrx-macros",
- "pgrx-pg-config",
  "pgrx-sql-entity-graph",
- "proc-macro2",
- "quote",
  "serde",
- "shlex",
  "sptr",
- "syn",
- "walkdir",
 ]
 
 [[package]]
 name = "pgrx-sql-entity-graph"
-version = "0.12.0-beta.3"
+version = "0.12.0-beta.5"
 dependencies = [
  "convert_case",
  "eyre",
@@ -1570,7 +1577,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-tests"
-version = "0.12.0-beta.3"
+version = "0.12.0-beta.5"
 dependencies = [
  "clap-cargo 0.14.0",
  "eyre",

@@ -145,14 +145,15 @@ mod seal {
     not(feature = "unsafe-postgres")
 ))]
 const _: () = {
+    use core::ffi::CStr;
     // to appease `const`
-    const fn same_slice(a: &[u8], b: &[u8]) -> bool {
-        if a.len() != b.len() {
+    const fn same_cstr(a: &CStr, b: &CStr) -> bool {
+        if a.to_bytes().len() != b.to_bytes().len() {
             return false;
         }
         let mut i = 0;
-        while i < a.len() {
-            if a[i] != b[i] {
+        while i < a.to_bytes().len() {
+            if a.to_bytes()[i] != b.to_bytes()[i] {
                 return false;
             }
             i += 1;
@@ -160,7 +161,7 @@ const _: () = {
         true
     }
     assert!(
-        same_slice(pg_sys::FMGR_ABI_EXTRA, b"PostgreSQL\0"),
+        same_cstr(pg_sys::FMGR_ABI_EXTRA, c"PostgreSQL"),
         "Unsupported Postgres ABI. Perhaps you need `--features unsafe-postgres`?",
     );
 };
@@ -242,11 +243,11 @@ macro_rules! pg_magic_func {
                 abi_extra: {
                     // we'll use what the bindings tell us, but if it ain't "PostgreSQL" then we'll
                     // raise a compilation error unless the `unsafe-postgres` feature is set
-                    let magic = ::pgrx::pg_sys::FMGR_ABI_EXTRA;
+                    let magic = ::pgrx::pg_sys::FMGR_ABI_EXTRA.to_bytes_with_nul();
                     let mut abi = [0 as ::pgrx::ffi::c_char; 32];
                     let mut i = 0;
                     while i < magic.len() {
-                        abi[i] = magic[i] as _;
+                        abi[i] = magic[i] as ::pgrx::ffi::c_char;
                         i += 1;
                     }
                     abi

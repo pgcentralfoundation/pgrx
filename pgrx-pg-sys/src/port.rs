@@ -137,8 +137,7 @@ pub const VARHDRSZ_SHORT: usize = offset_of!(super::varattrib_1b, va_data);
 
 #[inline]
 pub fn get_pg_major_version_string() -> &'static str {
-    let mver = core::ffi::CStr::from_bytes_with_nul(super::PG_MAJORVERSION).unwrap();
-    mver.to_str().unwrap()
+    super::PG_MAJORVERSION.to_str().unwrap()
 }
 
 #[inline]
@@ -148,14 +147,12 @@ pub fn get_pg_major_version_num() -> u16 {
 
 #[inline]
 pub fn get_pg_version_string() -> &'static str {
-    let ver = core::ffi::CStr::from_bytes_with_nul(super::PG_VERSION_STR).unwrap();
-    ver.to_str().unwrap()
+    super::PG_VERSION_STR.to_str().unwrap()
 }
 
 #[inline]
 pub fn get_pg_major_minor_version_string() -> &'static str {
-    let mver = core::ffi::CStr::from_bytes_with_nul(super::PG_VERSION).unwrap();
-    mver.to_str().unwrap()
+    super::PG_VERSION.to_str().unwrap()
 }
 
 #[inline]

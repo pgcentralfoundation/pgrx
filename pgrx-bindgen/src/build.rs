@@ -26,10 +26,8 @@ use syn::{ForeignItem, Item, ItemConst};
 
 const BLOCKLISTED_TYPES: [&str; 3] = ["Datum", "NullableDatum", "Oid"];
 
-mod build {
-    pub(super) mod clang;
-    pub(super) mod sym_blocklist;
-}
+pub(super) mod clang;
+pub(super) mod sym_blocklist;
 
 #[derive(Debug)]
 struct BindingOverride {
@@ -138,7 +136,7 @@ impl bindgen::callbacks::ParseCallbacks for BindingOverride {
     }
 }
 
-fn main() -> eyre::Result<()> {
+pub fn main() -> eyre::Result<()> {
     if env_tracked("DOCS_RS").as_deref() == Some("1") {
         return Ok(());
     }
@@ -756,7 +754,7 @@ fn run_bindgen(
     let configure = pg_config.configure()?;
     let preferred_clang: Option<&std::path::Path> = configure.get("CLANG").map(|s| s.as_ref());
     eprintln!("pg_config --configure CLANG = {preferred_clang:?}");
-    let (autodetect, includes) = build::clang::detect_include_paths_for(preferred_clang);
+    let (autodetect, includes) = clang::detect_include_paths_for(preferred_clang);
     let mut binder = bindgen::Builder::default();
     binder = add_blocklists(binder);
     binder = add_derives(binder);
@@ -777,6 +775,10 @@ fn run_bindgen(
         .rustified_non_exhaustive_enum("NodeTag")
         .size_t_is_usize(true)
         .merge_extern_blocks(true)
+        .wrap_unsafe_ops(true)
+        .use_core()
+        .generate_cstr(true)
+        .disable_nested_struct_naming()
         .formatter(bindgen::Formatter::None)
         .layout_tests(false)
         .default_non_copy_union_style(NonCopyUnionStyle::ManuallyDrop)
@@ -821,9 +823,9 @@ fn add_blocklists(bind: bindgen::Builder) -> bindgen::Builder {
         .blocklist_function(".*(?:set|long)jmp")
         .blocklist_function("pg_re_throw")
         .blocklist_function("err(start|code|msg|detail|context_msg|hint|finish)")
-        .blocklist_item("CONFIGURE_ARGS") // configuration during build is hopefully irrelevant
-        .blocklist_item("_*(?:HAVE|have)_.*") // header tracking metadata
-        .blocklist_item("_[A-Z_]+_H") // more header metadata
+        .blocklist_var("CONFIGURE_ARGS") // configuration during build is hopefully irrelevant
+        .blocklist_var("_*(?:HAVE|have)_.*") // header tracking metadata
+        .blocklist_var("_[A-Z_]+_H") // more header metadata
         .blocklist_item("__[A-Z].*") // these are reserved and unused by Postgres
         .blocklist_item("__darwin.*") // this should always be Apple's names
         .blocklist_function("pq(?:Strerror|Get.*)") // wrappers around platform functions: user can call those themselves
@@ -1110,7 +1112,7 @@ fn is_blocklisted_item(item: &ForeignItem) -> bool {
         _ => return false,
     };
     BLOCKLISTED
-        .get_or_init(|| build::sym_blocklist::SYMBOLS.iter().copied().collect::<BTreeSet<&str>>())
+        .get_or_init(|| sym_blocklist::SYMBOLS.iter().copied().collect::<BTreeSet<&str>>())
         .contains(sym_name.to_string().as_str())
 }
 

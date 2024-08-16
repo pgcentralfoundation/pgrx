@@ -63,10 +63,9 @@ pub(super) fn is_os_main_thread() -> Option<bool> {
     };
     #[cfg(target_os = "linux")]
     return unsafe {
-        // Note: `gettid()` are only in glibc 2.30+ / musl 1.2.2+, which are
-        // somewhat recent (2019 for glibc, late 2020 for musl). I'm unsure what
-        // pgrx's support requirements are, but we have docs about usage on centos7,
-        // which predates glibc 2.30...
+        // Note: `gettid()` is in glibc 2.30+ (from 2019) and musl 1.2.2+ (from late 2020).
+        // It's not clear if we are able to raise pgrx's support requirements
+        // beyond "libc on a non-EOL OS that is also supported by Rust".
         //
         // So for now, we just use the raw syscall instead, which is available
         // in all versions of linux that Rust supports (exposing `gettid()` from

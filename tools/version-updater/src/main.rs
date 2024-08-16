@@ -13,9 +13,10 @@
 #![allow(clippy::redundant_closure)] // extra closures are easier to refactor
 #![allow(clippy::iter_nth_zero)] // can be easier to refactor
 #![allow(clippy::perf)] // not a priority here
+use cargo_toml::Manifest;
 use clap::{Args, Parser, Subcommand};
 use owo_colors::OwoColorize;
-use std::collections::HashSet;
+use rustc_hash::{FxHashSet, FxHashSet as HashSet};
 use std::fs;
 use std::io::{BufRead, Write};
 use std::path::Path;
@@ -130,14 +131,43 @@ fn query_toml(query_args: &QueryCargoVersionArgs) {
 }
 
 fn update_files(args: &UpdateFilesArgs) {
+    // We operate on a workspace. Assume we are being run from the workspace root or its children,
+    // and roll back to the nearest toml with a workspace.
     let current_dir = env::current_dir().expect("Could not get current directory!");
+    let workspace_manifest_parent = current_dir
+        .ancestors()
+        .find(|path| {
+            Manifest::from_path(path.join("Cargo.toml"))
+                .ok()
+                .filter(|manifest| manifest.workspace.is_some())
+                .is_some()
+        })
+        .unwrap();
+    let workspace_manifest =
+        Manifest::from_path(workspace_manifest_parent.join("Cargo.toml")).unwrap();
+    let Some(workspace) = workspace_manifest.workspace else { unreachable!() };
+
+    // We specifically want to update the version to anything that has a version-dependency on a workspace member
 
     // Contains a set of package names (e.g. "pgrx", "pgrx-pg-sys") that will be used
     // to search for updatable dependencies later on
-    let mut updatable_package_names = HashSet::new();
+    let mut updatable_package_names = workspace
+        .members
+        .iter()
+        .map(|s| {
+            let package_path = workspace_manifest_parent.join(format!("{s}/Cargo.toml"));
+            Ok(Manifest::from_path(package_path)?
+                .package
+                .ok_or_else(|| {
+                    cargo_toml::Error::Other("expected package field in workspace member")
+                })?
+                .name)
+        })
+        .collect::<Result<FxHashSet<String>, cargo_toml::Error>>()
+        .unwrap();
 
     // This will eventually contain every file we want to process
-    let mut files_to_process = HashSet::new();
+    let mut files_to_process = HashSet::default();
 
     // Keep track of which files to exclude from a "package version" change.
     // For example, some Cargo.toml files do not need this updated:
@@ -147,7 +177,7 @@ fn update_files(args: &UpdateFilesArgs) {
     // Any such file is explicitly added via a command line argument.
     // Note that any files included here are still eligible to be processed for
     // *dependency* version updates.
-    let mut exclude_version_files = HashSet::new();
+    let mut exclude_version_files = HashSet::default();
     for file in &args.exclude_from_version_change {
         exclude_version_files.insert(
             fullpath(file).expect(format!("Could not get full path for file: {file}").as_str()),
@@ -171,23 +201,6 @@ fn update_files(args: &UpdateFilesArgs) {
                 filepath.display().cyan()
             );
 
-            // Extract the package name if possible
-            if !exclude_version_files.contains(&filepath) {
-                match extract_package_name(&filepath) {
-                    Some(package_name) => {
-                        updatable_package_names.insert(package_name);
-                    }
-                    None => {
-                        output.push_str(
-                            "\n           * Could not determine package name due to [package] not existing -- skipping version bump."
-                                .dimmed()
-                                .to_string()
-                                .as_str(),
-                        )
-                    }
-                }
-            }
-
             if args.verbose {
                 println!("{output}");
             }
@@ -206,23 +219,6 @@ fn update_files(args: &UpdateFilesArgs) {
             " Including".bold().green(),
             filepath.display().cyan()
         );
-
-        // Extract the package name if possible
-        if !exclude_version_files.contains(&filepath) {
-            match extract_package_name(&filepath) {
-                Some(package_name) => {
-                    updatable_package_names.insert(package_name);
-                }
-                None => {
-                    output.push_str(
-                        "\n           * Could not determine package name due to [package] not existing -- skipping version bump."
-                            .dimmed()
-                            .to_string()
-                            .as_str(),
-                    )
-                }
-            }
-        }
 
         if args.verbose {
             println!("{output}");
@@ -434,7 +430,7 @@ fn parse_new_version(current_version_specifier: &str, new_version: &str) -> Stri
     match current_version_specifier.chars().nth(0) {
         // If first character is numeric, then we have just a version specified,
         // such as "0.5.2" or "4.15.0"
-        Some(c) if c.is_numeric() => result.push_str(current_version_specifier),
+        Some(c) if c.is_numeric() => result.push_str(new_version),
 
         // Otherwise, we have a specifier such as "=0.5.2" or "~0.4.6" or ">= 1.2.0"
         // Extract out the non-numeric prefix and join it with the new version to

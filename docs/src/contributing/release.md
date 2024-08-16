@@ -8,13 +8,10 @@
 - edit them as best as you can while channeling @workingjubilee's spirit
 - request a review
 - do a squash merge into develop
-
-```shell
-./finalize-release.sh
-```
-
 - create the actual release on GitHub, tagging the `develop` branch with "${NEW_VERSION}", using the release notes you made in your PR
 
 ```shell
+git switch develop
+git pull origin/develop
 ./publish.sh
 ```
