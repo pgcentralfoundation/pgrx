@@ -258,7 +258,7 @@ argue_from_datum! { 'fcx; i8, i16, i32, i64, f32, f64, bool, char, String, Vec<u
 argue_from_datum! { 'fcx; Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone }
 argue_from_datum! { 'fcx; AnyArray, AnyElement, AnyNumeric }
 argue_from_datum! { 'fcx; Inet, Internal, Json, JsonB, Uuid }
-argue_from_datum! { 'fcx; pg_sys::Oid, pg_sys::Point, pg_sys::BOX  }
+argue_from_datum! { 'fcx; pg_sys::BOX, pg_sys::ItemPointerData, pg_sys::Oid, pg_sys::Point }
 argue_from_datum! { 'fcx; &'fcx str, &'fcx CStr, &'fcx [u8] }
 
 /// How to return a value from Rust to Postgres
@@ -528,7 +528,7 @@ impl_repackage_into_datum! {
     String, CString, Vec<u8>, char,
     Json, JsonB, Inet, Uuid, AnyNumeric, AnyArray, AnyElement, Internal,
     Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
-    pg_sys::Oid, pg_sys::BOX, pg_sys::Point
+    pg_sys::BOX, pg_sys::ItemPointerData, pg_sys::Oid, pg_sys::Point
 }
 
 unsafe impl<const P: u32, const S: u32> BoxRet for crate::Numeric<P, S> {
