@@ -21,6 +21,10 @@ extern "C" {
     pub fn SpinLockFree(lock: *mut pg_sys::slock_t) -> bool;
     #[link_name = "pgrx_PageGetSpecialPointer"]
     pub fn PageGetSpecialPointer(page: pg_sys::Page) -> *mut i8;
+    #[link_name = "pgrx_PageGetItem"]
+    pub fn PageGetItem(page: pg_sys::Page, itemId: pg_sys::ItemId) -> pg_sys::Item;
+    #[link_name = "pgrx_PageGetItemId"]
+    pub fn PageGetItemId(page: pg_sys::Page, offsetNumber: pg_sys::OffsetNumber) -> pg_sys::ItemId;
     #[link_name = "pgrx_table_beginscan_strat"]
     pub fn table_beginscan_strat(
         relation: pg_sys::Relation,
