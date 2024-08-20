@@ -3,7 +3,9 @@ function exec_example() {
 }
 if [ $1 = "all" ]; then
   for example in pgrx-examples/*; do
-      exec_example "$example"
+      if [ -d $example ]; then
+        exec_example "$example"
+      fi
   done
 else
   exec_example "pgrx-examples/$1"
