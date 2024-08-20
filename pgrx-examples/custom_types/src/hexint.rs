@@ -105,11 +105,8 @@ where
 }
 
 unsafe impl BoxRet for HexInt {
-    unsafe fn box_into<'fcx>(
-        self,
-        fcinfo: &mut pgrx::callconv::FcInfo<'fcx>,
-    ) -> pgrx::datum::Datum<'fcx> {
-        unsafe { fcinfo.return_raw_datum(Datum::from(self.value)) }
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut pgrx::callconv::FcInfo<'fcx>) -> Datum<'fcx> {
+        unsafe { fcinfo.return_raw_datum(pg_sys::Datum::from(self.value)) }
     }
 }
 
