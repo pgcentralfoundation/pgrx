@@ -68,6 +68,16 @@ char * pgrx_PageGetSpecialPointer(Page page) {
     return PageGetSpecialPointer(page);
 }
 
+PGDLLEXPORT Item pgrx_PageGetItem(Page page, ItemId itemId);
+Item pgrx_PageGetItem(Page page, ItemId itemId) {
+    return PageGetItem(page, itemId);
+}
+
+PGDLLEXPORT ItemId pgrx_PageGetItemId(Page page, OffsetNumber offsetNumber);
+ItemId pgrx_PageGetItemId(Page page, OffsetNumber offsetNumber) {
+    return PageGetItemId(page, offsetNumber);
+}
+
 PGDLLEXPORT TableScanDesc pgrx_table_beginscan_strat(Relation relation, Snapshot snapshot, int nkeys, struct ScanKeyData * key, bool allow_strat, bool allow_sync);
 TableScanDesc pgrx_table_beginscan_strat(Relation relation, Snapshot snapshot, int nkeys, struct ScanKeyData * key, bool allow_strat, bool allow_sync) {
     return table_beginscan_strat(relation, snapshot, nkeys, key, allow_strat, allow_sync);
