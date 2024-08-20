@@ -80,7 +80,7 @@ pub enum SpiErrorCodes {
 
 impl std::fmt::Display for SpiErrorCodes {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        f.write_fmt(format_args!("{:?}", self))
+        write!(f, "{self:?}")
     }
 }
 
