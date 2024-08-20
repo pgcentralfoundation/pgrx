@@ -390,7 +390,11 @@ fn copy_sql_files(
         for sql in dir.flatten() {
             let filename = sql.file_name().into_string().unwrap();
 
-            if filename.starts_with(&format!("{extname}--")) && filename.ends_with(".sql") {
+            // match the required pattern `extension--old_version--target_version.sql`
+            let re_update_script_name =
+                regex::Regex::new(&format!(r"^{extname}--.+--.+\.sql$")).unwrap();
+
+            if re_update_script_name.is_match(filename.as_str()) {
                 let mut dest = base_directory.to_path_buf();
                 dest.push(extdir);
                 dest.push(filename);
