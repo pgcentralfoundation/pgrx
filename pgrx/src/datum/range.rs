@@ -147,7 +147,7 @@ where
 /// a Postgres range.  For example:
 ///
 /// ```rust,no_run
-/// use pgrx::Range;
+/// use pgrx::datum::Range;
 /// let r: Range<i32> = (1..10).into();
 /// ```
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
@@ -188,7 +188,7 @@ where
     /// # Examples
     ///
     /// ```rust,no_run
-    /// use pgrx::{Range, RangeBound};
+    /// use pgrx::datum::{Range, RangeBound};
     /// let _ = Range::<i32>::new(1, 10);  // `(1..=10)`
     /// let _ = Range::<i32>::new(None, 10); // `(..=10)`
     /// let _ = Range::<i32>::new(1, None); // `(1..)`
