@@ -92,8 +92,8 @@ mod tests {
     use crate as pgrx_tests;
 
     use pgrx::datum::datetime_support::IntervalConversionError;
+    use pgrx::datum::{get_timezone_offset, DateTimeConversionError};
     use pgrx::prelude::*;
-    use pgrx::{get_timezone_offset, DateTimeConversionError};
     use serde_json::*;
     use std::result::Result;
     use std::str::FromStr;

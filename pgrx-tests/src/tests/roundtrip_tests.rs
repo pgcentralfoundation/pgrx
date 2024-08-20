@@ -1,5 +1,5 @@
 use super::Complex;
-use pgrx::Date;
+use pgrx::datum::Date;
 use rand::distributions::{Alphanumeric, Standard};
 use rand::Rng;
 

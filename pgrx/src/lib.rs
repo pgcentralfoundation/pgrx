@@ -87,7 +87,8 @@ pub use aggregate::*;
 pub use atomics::*;
 pub use callbacks::*;
 pub use datum::{
-    AnyArray, AnyNumeric, Array, FromDatum, Inet, Internal, IntoDatum, Json, JsonB, Numeric, Range,
+    numeric, AnyArray, AnyElement, AnyNumeric, Array, FromDatum, Inet, Internal, IntoDatum, Json,
+    JsonB, Numeric, Range, Uuid, VariadicArray,
 };
 pub use enum_helper::*;
 pub use fcinfo::*;

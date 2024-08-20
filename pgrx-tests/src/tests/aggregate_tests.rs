@@ -7,8 +7,8 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use pgrx::datum::Internal;
 use pgrx::prelude::*;
-use pgrx::Internal;
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize)]

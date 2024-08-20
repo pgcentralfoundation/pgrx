@@ -15,7 +15,7 @@ mod tests {
 
     use pgrx::prelude::*;
 
-    use pgrx::numeric::Error;
+    use pgrx::datum::numeric::Error;
     use serde::Deserialize;
 
     #[pg_extern]
