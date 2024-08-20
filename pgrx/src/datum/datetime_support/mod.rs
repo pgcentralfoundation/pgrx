@@ -7,10 +7,10 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::{
-    direct_function_call, pg_sys, AnyNumeric, Date, Interval, IntoDatum, Time, TimeWithTimeZone,
-    Timestamp, TimestampWithTimeZone,
+use crate::datum::{
+    AnyNumeric, Date, Interval, IntoDatum, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
 };
+use crate::{direct_function_call, pg_sys};
 use core::fmt::{Display, Formatter};
 use core::str::FromStr;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;

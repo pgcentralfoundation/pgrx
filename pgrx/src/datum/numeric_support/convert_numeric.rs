@@ -13,9 +13,10 @@ use core::str::FromStr;
 
 use pgrx_pg_sys::AsPgCStr;
 
-use crate::numeric_support::convert::{from_primitive_helper, FromPrimitiveFunc};
-use crate::numeric_support::error::Error;
-use crate::{pg_sys, AnyNumeric, Numeric};
+use super::convert::{from_primitive_helper, FromPrimitiveFunc};
+use super::error::Error;
+use crate::datum::{AnyNumeric, Numeric};
+use crate::pg_sys;
 
 impl<const P: u32, const S: u32> TryFrom<AnyNumeric> for Numeric<P, S> {
     type Error = Error;

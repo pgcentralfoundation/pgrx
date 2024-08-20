@@ -163,8 +163,8 @@ mod tests {
         CustomTextFormatSerializedEnumType, CustomTextFormatSerializedType, JsonEnumType, JsonType,
         VarlenaEnumType, VarlenaType,
     };
+    use pgrx::datum::PgVarlena;
     use pgrx::prelude::*;
-    use pgrx::PgVarlena;
 
     #[pg_test]
     fn test_mytype() -> Result<(), pgrx::spi::Error> {

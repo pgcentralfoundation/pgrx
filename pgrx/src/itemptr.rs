@@ -9,6 +9,8 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Helper functions for working with Postgres `ItemPointerData` (`tid`) type
 
+use crate::datum::{FromDatum, IntoDatum};
+use crate::PgMemoryContexts;
 use crate::{pg_sys, AllocatedByRust, PgBox};
 
 /// ## Safety
@@ -126,4 +128,44 @@ pub fn new_item_pointer(
     tid.ip_blkid.bi_lo = (blockno & 0xffff) as u16;
     tid.ip_posid = offno;
     tid
+}
+
+impl FromDatum for pg_sys::ItemPointerData {
+    #[inline]
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: pg_sys::Oid,
+    ) -> Option<pg_sys::ItemPointerData> {
+        if is_null {
+            None
+        } else {
+            let tid = datum.cast_mut_ptr();
+            let (blockno, offno) = item_pointer_get_both(*tid);
+            let mut tid_copy = pg_sys::ItemPointerData::default();
+
+            item_pointer_set_all(&mut tid_copy, blockno, offno);
+            Some(tid_copy)
+        }
+    }
+}
+
+impl IntoDatum for pg_sys::ItemPointerData {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        let tid = self;
+        let tid_ptr = unsafe {
+            // SAFETY:  CurrentMemoryContext is always valid
+            PgMemoryContexts::CurrentMemoryContext.palloc_struct::<pg_sys::ItemPointerData>()
+        };
+        let (blockno, offno) = item_pointer_get_both(tid);
+
+        item_pointer_set_all(unsafe { &mut *tid_ptr }, blockno, offno);
+
+        Some(tid_ptr.into())
+    }
+
+    fn type_oid() -> pg_sys::Oid {
+        pg_sys::TIDOID
+    }
 }

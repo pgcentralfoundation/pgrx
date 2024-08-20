@@ -125,7 +125,7 @@ mod tests {
     }
 
     #[pg_extern]
-    fn anyele_type(x: pgrx::AnyElement) -> pg_sys::Oid {
+    fn anyele_type(x: pgrx::datum::AnyElement) -> pg_sys::Oid {
         x.oid()
     }
 

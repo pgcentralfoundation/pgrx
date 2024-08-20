@@ -13,8 +13,8 @@ use std::cmp::Ordering;
 use std::fmt;
 use std::iter::Sum;
 
-use crate::numeric_support::convert::{from_primitive_helper, FromPrimitiveFunc};
-pub use crate::numeric_support::error::Error;
+use crate::datum::numeric_support::convert::{from_primitive_helper, FromPrimitiveFunc};
+pub use crate::datum::numeric_support::error::Error;
 use crate::{direct_function_call, pg_sys};
 
 /// A wrapper around the Postgres SQL `NUMERIC(P, S)` type.  Its `Precision` and `Scale` values

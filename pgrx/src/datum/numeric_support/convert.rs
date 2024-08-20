@@ -11,12 +11,10 @@ use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::panic::CaughtError;
 use pgrx_pg_sys::PgTryBuilder;
 
-use crate::numeric::make_typmod;
-use crate::numeric_support::error::Error;
-use crate::{
-    direct_function_call, direct_function_call_as_datum, pg_sys, AnyNumeric, FromDatum, IntoDatum,
-    Numeric,
-};
+use super::error::Error;
+use crate::datum::numeric::make_typmod;
+use crate::datum::{AnyNumeric, FromDatum, IntoDatum, Numeric};
+use crate::{direct_function_call, direct_function_call_as_datum, pg_sys};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub(crate) enum FromPrimitiveFunc {

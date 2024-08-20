@@ -12,7 +12,7 @@
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
-    use pgrx::IntoDatum;
+    use pgrx::datum::IntoDatum;
     use std::error::Error;
 
     use pgrx::prelude::*;

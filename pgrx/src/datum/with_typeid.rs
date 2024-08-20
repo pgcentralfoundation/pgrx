@@ -1,8 +1,5 @@
-use crate::Array;
-use crate::FromDatum;
+use crate::datum::{Array, FromDatum, PgVarlena, VariadicArray};
 use crate::PgBox;
-use crate::PgVarlena;
-use crate::VariadicArray;
 use core::any::TypeId;
 use once_cell::sync::Lazy;
 use pgrx_sql_entity_graph::RustSqlMapping;

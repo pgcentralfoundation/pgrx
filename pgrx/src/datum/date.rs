@@ -14,11 +14,12 @@ use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 
-use crate::datetime_support::{DateTimeParts, HasExtractableParts};
-use crate::{
-    direct_function_call, pg_sys, DateTimeConversionError, FromDatum, IntoDatum, Timestamp,
+use super::datetime_support::{DateTimeParts, HasExtractableParts};
+use crate::datum::{
+    DateTimeConversionError, DateTimeTypeVisitor, FromDatum, IntoDatum, Timestamp,
     TimestampWithTimeZone, ToIsoString,
 };
+use crate::{direct_function_call, pg_sys};
 
 const JULIAN_DAY_ZERO: i32 = pg_sys::DATETIME_MIN_JULIAN as i32 - POSTGRES_EPOCH_JDATE;
 const LAST_JULIAN_DAY: i32 = pg_sys::DATE_END_JULIAN as i32 - POSTGRES_EPOCH_JDATE - 1;
@@ -280,7 +281,7 @@ impl<'de> serde::Deserialize<'de> for Date {
     where
         D: serde::de::Deserializer<'de>,
     {
-        deserializer.deserialize_str(crate::DateTimeTypeVisitor::<Self>::new())
+        deserializer.deserialize_str(DateTimeTypeVisitor::<Self>::new())
     }
 }
 

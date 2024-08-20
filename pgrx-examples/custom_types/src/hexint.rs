@@ -8,7 +8,8 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use pgrx::callconv::{ArgAbi, BoxRet};
-use pgrx::pg_sys::{Datum, Oid};
+use pgrx::datum::Datum;
+use pgrx::pg_sys::Oid;
 use pgrx::pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -72,7 +73,7 @@ unsafe impl SqlTranslatable for HexInt {
 }
 
 impl FromDatum for HexInt {
-    unsafe fn from_polymorphic_datum(datum: Datum, is_null: bool, _: Oid) -> Option<Self>
+    unsafe fn from_polymorphic_datum(datum: pg_sys::Datum, is_null: bool, _: Oid) -> Option<Self>
     where
         Self: Sized,
     {
@@ -85,8 +86,8 @@ impl FromDatum for HexInt {
 }
 
 impl IntoDatum for HexInt {
-    fn into_datum(self) -> Option<Datum> {
-        Some(Datum::from(self.value))
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        Some(pg_sys::Datum::from(self.value))
     }
 
     fn type_oid() -> Oid {
@@ -104,8 +105,8 @@ where
 }
 
 unsafe impl BoxRet for HexInt {
-    unsafe fn box_into<'fcx>(self, fcinfo: &mut pgrx::callconv::FcInfo<'fcx>) -> pgrx::Datum<'fcx> {
-        unsafe { fcinfo.return_raw_datum(Datum::from(self.value)) }
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut pgrx::callconv::FcInfo<'fcx>) -> Datum<'fcx> {
+        unsafe { fcinfo.return_raw_datum(pg_sys::Datum::from(self.value)) }
     }
 }
 

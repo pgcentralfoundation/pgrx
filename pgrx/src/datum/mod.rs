@@ -24,7 +24,6 @@ mod inet;
 mod internal;
 mod interval;
 mod into;
-mod item_pointer_data;
 mod json;
 pub mod numeric;
 pub mod numeric_support;

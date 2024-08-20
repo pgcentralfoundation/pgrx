@@ -7,10 +7,11 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::{
-    direct_function_call, pg_sys, Date, DateTimeConversionError, DateTimeParts, FromDatum,
+use super::{
+    Date, DateTimeConversionError, DateTimeParts, DateTimeTypeVisitor, FromDatum,
     HasExtractableParts, Interval, IntoDatum, Timestamp, ToIsoString,
 };
+use crate::{direct_function_call, pg_sys};
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
 use pgrx_sql_entity_graph::metadata::{
@@ -429,7 +430,7 @@ impl<'de> serde::Deserialize<'de> for TimestampWithTimeZone {
     where
         D: serde::de::Deserializer<'de>,
     {
-        deserializer.deserialize_str(crate::DateTimeTypeVisitor::<Self>::new())
+        deserializer.deserialize_str(DateTimeTypeVisitor::<Self>::new())
     }
 }
 

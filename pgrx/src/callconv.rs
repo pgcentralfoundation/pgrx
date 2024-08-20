@@ -11,13 +11,18 @@
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
 
 use crate::datum::Datum;
+use crate::datum::{
+    AnyArray, AnyElement, AnyNumeric, Date, FromDatum, Inet, Internal, Interval, IntoDatum, Json,
+    JsonB, Numeric, PgVarlena, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
+    UnboxDatum, Uuid,
+};
+use crate::datum::{Range, RangeSubType};
 use crate::heap_tuple::PgHeapTuple;
 use crate::nullable::Nullable;
-use crate::{
-    pg_sys, AnyArray, AnyElement, AnyNumeric, Date, FromDatum, Inet, Internal, Interval, IntoDatum,
-    Json, JsonB, PgBox, PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone, Timestamp,
-    TimestampWithTimeZone, UnboxDatum, Uuid,
-};
+use crate::pg_sys;
+use crate::pgbox::*;
+use crate::{PgBox, PgMemoryContexts};
+
 use core::marker::PhantomData;
 use core::{iter, mem, ptr, slice};
 use std::ffi::{CStr, CString};
@@ -132,7 +137,7 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::PgBox<T> {
     }
 }
 
-unsafe impl<'fcx> ArgAbi<'fcx> for PgHeapTuple<'fcx, crate::AllocatedByRust> {
+unsafe impl<'fcx> ArgAbi<'fcx> for PgHeapTuple<'fcx, AllocatedByRust> {
     unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         let index = arg.index();
         unsafe {
@@ -174,9 +179,9 @@ where
     }
 }
 
-unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::Range<T>
+unsafe impl<'fcx, T> ArgAbi<'fcx> for Range<T>
 where
-    T: FromDatum + crate::RangeSubType,
+    T: FromDatum + RangeSubType,
 {
     unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         let index = arg.index();
@@ -223,7 +228,7 @@ unsafe impl<'fcx, T: Copy> ArgAbi<'fcx> for PgVarlena<T> {
     }
 }
 
-unsafe impl<'fcx, const P: u32, const S: u32> ArgAbi<'fcx> for crate::Numeric<P, S> {
+unsafe impl<'fcx, const P: u32, const S: u32> ArgAbi<'fcx> for Numeric<P, S> {
     unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         unsafe { arg.unbox_arg_using_from_datum().unwrap() }
     }
@@ -258,7 +263,7 @@ argue_from_datum! { 'fcx; i8, i16, i32, i64, f32, f64, bool, char, String, Vec<u
 argue_from_datum! { 'fcx; Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone }
 argue_from_datum! { 'fcx; AnyArray, AnyElement, AnyNumeric }
 argue_from_datum! { 'fcx; Inet, Internal, Json, JsonB, Uuid }
-argue_from_datum! { 'fcx; pg_sys::Oid, pg_sys::Point, pg_sys::BOX  }
+argue_from_datum! { 'fcx; pg_sys::BOX, pg_sys::ItemPointerData, pg_sys::Oid, pg_sys::Point }
 argue_from_datum! { 'fcx; &'fcx str, &'fcx CStr, &'fcx [u8] }
 
 /// How to return a value from Rust to Postgres
@@ -528,10 +533,10 @@ impl_repackage_into_datum! {
     String, CString, Vec<u8>, char,
     Json, JsonB, Inet, Uuid, AnyNumeric, AnyArray, AnyElement, Internal,
     Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
-    pg_sys::Oid, pg_sys::BOX, pg_sys::Point
+    pg_sys::BOX, pg_sys::ItemPointerData, pg_sys::Oid, pg_sys::Point
 }
 
-unsafe impl<const P: u32, const S: u32> BoxRet for crate::Numeric<P, S> {
+unsafe impl<const P: u32, const S: u32> BoxRet for Numeric<P, S> {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
         match self.into_datum() {
             Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
@@ -540,9 +545,9 @@ unsafe impl<const P: u32, const S: u32> BoxRet for crate::Numeric<P, S> {
     }
 }
 
-unsafe impl<T> BoxRet for crate::Range<T>
+unsafe impl<T> BoxRet for Range<T>
 where
-    T: IntoDatum + crate::RangeSubType,
+    T: IntoDatum + RangeSubType,
 {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
         match self.into_datum() {
@@ -575,7 +580,7 @@ unsafe impl<T: Copy> BoxRet for PgVarlena<T> {
 
 unsafe impl<'mcx, A> BoxRet for PgHeapTuple<'mcx, A>
 where
-    A: crate::WhoAllocated,
+    A: WhoAllocated,
 {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
         match self.into_datum() {
@@ -587,7 +592,7 @@ where
 
 unsafe impl<T, A> BoxRet for PgBox<T, A>
 where
-    A: crate::WhoAllocated,
+    A: WhoAllocated,
 {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
         match self.into_datum() {

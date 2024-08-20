@@ -8,9 +8,10 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Utility functions for working with `pg_sys::RangeType` structs
-use crate::{
-    pg_sys, AnyNumeric, Date, FromDatum, IntoDatum, Numeric, Timestamp, TimestampWithTimeZone,
+use crate::datum::{
+    AnyNumeric, Date, FromDatum, IntoDatum, Numeric, Timestamp, TimestampWithTimeZone,
 };
+use crate::pg_sys;
 use core::fmt::{Display, Formatter};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
@@ -146,7 +147,7 @@ where
 /// a Postgres range.  For example:
 ///
 /// ```rust,no_run
-/// use pgrx::Range;
+/// use pgrx::datum::Range;
 /// let r: Range<i32> = (1..10).into();
 /// ```
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
@@ -187,7 +188,7 @@ where
     /// # Examples
     ///
     /// ```rust,no_run
-    /// use pgrx::{Range, RangeBound};
+    /// use pgrx::datum::{Range, RangeBound};
     /// let _ = Range::<i32>::new(1, 10);  // `(1..=10)`
     /// let _ = Range::<i32>::new(None, 10); // `(..=10)`
     /// let _ = Range::<i32>::new(1, None); // `(1..)`

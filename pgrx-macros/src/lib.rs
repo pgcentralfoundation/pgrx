@@ -853,7 +853,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                 impl #generics ::pgrx::datum::IntoDatum for #name #generics {
                     fn into_datum(self) -> Option<::pgrx::pg_sys::Datum> {
                         #[allow(deprecated)]
-                        Some(unsafe { ::pgrx::cbor_encode(&self) }.into())
+                        Some(unsafe { ::pgrx::datum::cbor_encode(&self) }.into())
                     }
 
                     fn type_oid() -> ::pgrx::pg_sys::Oid {
@@ -880,7 +880,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                             None
                         } else {
                             #[allow(deprecated)]
-                            ::pgrx::cbor_decode(datum.cast_mut_ptr())
+                            ::pgrx::datum::cbor_decode(datum.cast_mut_ptr())
                         }
                     }
 
