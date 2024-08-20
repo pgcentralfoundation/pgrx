@@ -8,7 +8,8 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::datum::datetime_support::IntervalConversionError;
-use crate::{direct_function_call, pg_sys, DateTimeParts, FromDatum, IntoDatum, Time, ToIsoString};
+use crate::datum::{DateTimeParts, DateTimeTypeVisitor, FromDatum, IntoDatum, Time, ToIsoString};
+use crate::{direct_function_call, pg_sys};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -307,7 +308,7 @@ impl<'de> serde::Deserialize<'de> for Interval {
     where
         D: serde::de::Deserializer<'de>,
     {
-        deserializer.deserialize_str(crate::DateTimeTypeVisitor::<Self>::new())
+        deserializer.deserialize_str(DateTimeTypeVisitor::<Self>::new())
     }
 }
 unsafe impl SqlTranslatable for Interval {

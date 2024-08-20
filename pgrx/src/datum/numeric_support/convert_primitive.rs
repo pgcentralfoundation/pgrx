@@ -9,8 +9,9 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Conversion implementations for converting [`AnyNumeric`] or [`Numeric<P, S>`] into primitives
 
-use crate::numeric::Error;
-use crate::{direct_function_call, pg_sys, AnyNumeric, FromDatum, Numeric};
+use super::error::Error;
+use crate::datum::{AnyNumeric, FromDatum, Numeric};
+use crate::{direct_function_call, pg_sys};
 use core::str::FromStr;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::panic::CaughtError;

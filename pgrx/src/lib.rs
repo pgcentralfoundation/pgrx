@@ -86,7 +86,9 @@ mod toast;
 pub use aggregate::*;
 pub use atomics::*;
 pub use callbacks::*;
-pub use datum::*;
+pub use datum::{
+    AnyArray, AnyNumeric, Array, FromDatum, Inet, Internal, IntoDatum, Json, JsonB, Numeric, Range,
+};
 pub use enum_helper::*;
 pub use fcinfo::*;
 pub use guc::*;
@@ -94,7 +96,6 @@ pub use guc::*;
 pub use hooks::*;
 pub use htup::*;
 pub use inoutfuncs::*;
-pub use itemptr::*;
 #[cfg(feature = "cshim")]
 pub use list::old_list::*;
 pub use lwlock::*;

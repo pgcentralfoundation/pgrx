@@ -8,9 +8,10 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Utility functions for working with `pg_sys::RangeType` structs
-use crate::{
-    pg_sys, AnyNumeric, Date, FromDatum, IntoDatum, Numeric, Timestamp, TimestampWithTimeZone,
+use crate::datum::{
+    AnyNumeric, Date, FromDatum, IntoDatum, Numeric, Timestamp, TimestampWithTimeZone,
 };
+use crate::pg_sys;
 use core::fmt::{Display, Formatter};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,

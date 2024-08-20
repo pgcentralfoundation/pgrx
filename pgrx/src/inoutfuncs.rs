@@ -13,6 +13,7 @@
 //! The default implementations use `serde_json` to serialize a custom type to human-readable strings,
 //! and `serde_cbor` to serialize internally as a `varlena *` for storage on disk.
 
+use crate::datum::PgVarlena;
 use crate::*;
 #[doc(hidden)]
 pub use serde_json::{from_slice as json_from_slice, to_vec as json_to_vec};

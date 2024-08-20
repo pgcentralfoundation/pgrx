@@ -7,12 +7,12 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::datetime_support::{DateTimeParts, HasExtractableParts};
-use crate::datum::time::Time;
-use crate::{
-    direct_function_call, direct_function_call_as_datum, pg_sys, DateTimeConversionError,
-    FromDatum, Interval, IntoDatum, PgMemoryContexts, TimestampWithTimeZone, ToIsoString,
+use super::{
+    DateTimeConversionError, FromDatum, Interval, IntoDatum, Time, TimestampWithTimeZone,
+    ToIsoString,
 };
+use crate::datum::datetime_support::{DateTimeParts, HasExtractableParts};
+use crate::{direct_function_call, direct_function_call_as_datum, pg_sys, PgMemoryContexts};
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
 use pgrx_sql_entity_graph::metadata::{
@@ -165,7 +165,7 @@ impl TimeWithTimeZone {
     ) -> Result<Self, DateTimeConversionError> {
         PgTryBuilder::new(|| {
             let mut time = Self::new(hour, minute, second)?;
-            let tzoff = crate::get_timezone_offset(timezone.as_ref())?;
+            let tzoff = super::get_timezone_offset(timezone.as_ref())?;
 
             time.0.zone = -tzoff;
             Ok(time)
@@ -323,7 +323,7 @@ impl<'de> serde::Deserialize<'de> for TimeWithTimeZone {
     where
         D: serde::de::Deserializer<'de>,
     {
-        deserializer.deserialize_str(crate::DateTimeTypeVisitor::<Self>::new())
+        deserializer.deserialize_str(super::DateTimeTypeVisitor::<Self>::new())
     }
 }
 
