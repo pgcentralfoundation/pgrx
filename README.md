@@ -72,9 +72,9 @@ those remain untested. So far, some of PGRX's build tooling works on Windows, bu
 
 - A Rust toolchain: `rustc`, `cargo`, and `rustfmt`. The recommended way to get these is from https://rustup.rs †
 - `git`
-- `libclang` 5.0 or greater (required by bindgen)
-   - Ubuntu: `apt install libclang-dev` or `apt install clang`
-   - RHEL: `yum install clang`
+- `libclang` 11 or greater (for bindgen)
+   - Debian-likes: `apt install libclang-dev` or `apt install clang`
+   - RHEL-likes: `yum install clang`
 - GCC 7 or newer
 - [PostgreSQL's build dependencies](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code) ‡
    - Debian-likes: `sudo apt-get install build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config`
