@@ -51,6 +51,7 @@ mod postgres_type_tests;
 #[cfg(feature = "proptest")]
 mod proptests;
 mod range_tests;
+mod rel_tests;
 mod result_tests;
 mod roundtrip_tests;
 mod schema_tests;
