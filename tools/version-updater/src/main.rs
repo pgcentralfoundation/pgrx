@@ -151,7 +151,7 @@ fn update_files(args: &UpdateFilesArgs) {
 
     // Contains a set of package names (e.g. "pgrx", "pgrx-pg-sys") that will be used
     // to search for updatable dependencies later on
-    let mut updatable_package_names = workspace
+    let updatable_package_names = workspace
         .members
         .iter()
         .map(|s| {
@@ -195,7 +195,7 @@ fn update_files(args: &UpdateFilesArgs) {
                 format!("Could not get full path for file {}", entry.path().display()).as_str(),
             );
 
-            let mut output = format!(
+            let output = format!(
                 "{} Cargo.toml file at {}",
                 "Discovered".bold().green(),
                 filepath.display().cyan()
@@ -214,7 +214,7 @@ fn update_files(args: &UpdateFilesArgs) {
         let filepath =
             fullpath(file).expect(format!("Could not get full path for file {file}").as_str());
 
-        let mut output = format!(
+        let output = format!(
             "{} Cargo.toml file at {} for processing",
             " Including".bold().green(),
             filepath.display().cyan()
@@ -451,19 +451,4 @@ fn parse_new_version(current_version_specifier: &str, new_version: &str) -> Stri
     }
 
     result
-}
-
-// Given a filepath pointing to a Cargo.toml file, extract out the [package] name
-// if it has one
-fn extract_package_name<P: AsRef<Path>>(filepath: P) -> Option<String> {
-    let filepath = filepath.as_ref();
-
-    let data = fs::read_to_string(filepath)
-        .expect(format!("Unable to open file at {}", filepath.display()).as_str());
-
-    let doc = data.parse::<DocumentMut>().expect(
-        format!("File at location {} is an invalid Cargo.toml file", filepath.display()).as_str(),
-    );
-
-    doc.get("package")?.as_table()?.get("name")?.as_str().map(|s| s.to_string())
 }
