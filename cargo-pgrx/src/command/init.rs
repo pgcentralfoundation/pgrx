@@ -408,8 +408,7 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &Path, init: &Init) -> eyre::
     let mut command = std::process::Command::new(configure_path);
     // Some of these are redundant with `--enable-debug`.
     let mut existing_cppflags = std::env::var("CPPFLAGS").unwrap_or_default();
-    existing_cppflags += " -DMEMORY_CONTEXT_CHECKING=1 \
-        -DCLOBBER_FREED_MEMORY=1 -DRANDOMIZE_ALLOCATED_MEMORY=1 ";
+    existing_cppflags += " -DUSE_ASSERT_CHECKING=1 -DRANDOMIZE_ALLOCATED_MEMORY=1 ";
     if init.valgrind {
         // `USE_VALGRIND` allows valgrind to understand PG's memory context
         // shenanigans. It requires Valgrind be installed (since it causes
