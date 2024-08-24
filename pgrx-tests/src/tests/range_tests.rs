@@ -146,8 +146,8 @@ mod tests {
         let matched =
             Spi::get_one::<bool>("SELECT accept_range_date(daterange'[2000-01-01,2022-01-01)') = daterange'[2000-01-01,2022-01-01)'");
         assert_eq!(matched, Ok(Some(true)));
-    } 
-    
+    }
+
     #[pg_test]
     fn test_accept_range_date_array() {
         let matched =
