@@ -323,6 +323,16 @@ unsafe impl<T: FromDatum + UnboxDatum> UnboxDatum for VariadicArray<'_, T> {
     }
 }
 
+unsafe impl<T: FromDatum + UnboxDatum + RangeSubType> UnboxDatum for Range<T> {
+    type As<'src> = Range<T> where Self: 'src;
+    unsafe fn unbox<'src>(d: Datum<'src>) -> Self::As<'src>
+    where
+        Self: 'src,
+    {
+        Range::<T>::from_datum(d.0, false).unwrap()
+    }
+}
+
 unsafe impl<const P: u32, const S: u32> UnboxDatum for Numeric<P, S> {
     type As<'src> = Numeric<P, S>;
     #[inline]

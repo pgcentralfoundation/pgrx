@@ -30,6 +30,11 @@ fn accept_range_date(range: Range<Date>) -> Range<Date> {
 }
 
 #[pg_extern]
+fn accept_range_date_array(arr: Array<Range<Date>>) -> Vec<Range<Date>> {
+    arr.iter_deny_null().collect()
+}
+
+#[pg_extern]
 fn accept_range_ts(range: Range<Timestamp>) -> Range<Timestamp> {
     range
 }
@@ -140,6 +145,13 @@ mod tests {
     fn test_accept_range_date() {
         let matched =
             Spi::get_one::<bool>("SELECT accept_range_date(daterange'[2000-01-01,2022-01-01)') = daterange'[2000-01-01,2022-01-01)'");
+        assert_eq!(matched, Ok(Some(true)));
+    }
+
+    #[pg_test]
+    fn test_accept_range_date_array() {
+        let matched =
+            Spi::get_one::<bool>("SELECT accept_range_date_array(ARRAY[daterange'[2000-01-01,2022-01-01)']::daterange[]) = ARRAY[daterange'[2000-01-01,2022-01-01)']::daterange[]");
         assert_eq!(matched, Ok(Some(true)));
     }
 
