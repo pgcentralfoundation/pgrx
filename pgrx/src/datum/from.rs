@@ -39,7 +39,7 @@ pub enum TryFromDatumError {
 ///
 /// If implementing this, also implement `IntoDatum` for the reverse
 /// conversion.
-pub trait FromDatum {
+pub trait FromDatum: Sized {
     /// Should a type OID be fetched when calling `from_datum`?
     const GET_TYPOID: bool = false;
 
@@ -54,10 +54,7 @@ pub trait FromDatum {
     ///
     /// If, however, you're providing an arbitrary datum value, it needs to be considered unsafe
     /// and that unsafeness should be propagated through your API.
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
-    where
-        Self: Sized,
-    {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self> {
         FromDatum::from_polymorphic_datum(datum, is_null, pg_sys::InvalidOid)
     }
 
@@ -71,9 +68,7 @@ pub trait FromDatum {
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,
-    ) -> Option<Self>
-    where
-        Self: Sized;
+    ) -> Option<Self>;
 
     /// Default implementation switched to the specified memory context and then simply calls
     /// `FromDatum::from_datum(...)` from within that context.
@@ -93,10 +88,7 @@ pub trait FromDatum {
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,
-    ) -> Option<Self>
-    where
-        Self: Sized,
-    {
+    ) -> Option<Self> {
         memory_context.switch_to(|_| FromDatum::from_polymorphic_datum(datum, is_null, typoid))
     }
 
@@ -114,7 +106,7 @@ pub trait FromDatum {
         type_oid: pg_sys::Oid,
     ) -> Result<Option<Self>, TryFromDatumError>
     where
-        Self: Sized + IntoDatum,
+        Self: IntoDatum,
     {
         if !is_binary_coercible::<Self>(type_oid) {
             Err(TryFromDatumError::IncompatibleTypes {
@@ -137,7 +129,7 @@ pub trait FromDatum {
         type_oid: pg_sys::Oid,
     ) -> Result<Option<Self>, TryFromDatumError>
     where
-        Self: Sized + IntoDatum,
+        Self: IntoDatum,
     {
         if !is_binary_coercible::<Self>(type_oid) {
             Err(TryFromDatumError::IncompatibleTypes {
