@@ -4,7 +4,7 @@ use std::ptr::NonNull;
 
 use crate::pg_sys;
 
-use super::{SpiClient, SpiError, SpiOkCodes, SpiTupleTable};
+use super::{SpiClient, SpiOkCodes, SpiResult, SpiTupleTable};
 
 type CursorName = String;
 
@@ -72,7 +72,7 @@ impl SpiCursor<'_> {
     /// Fetch up to `count` rows from the cursor, moving forward
     ///
     /// If `fetch` runs off the end of the available rows, an empty [`SpiTupleTable`] is returned.
-    pub fn fetch(&mut self, count: libc::c_long) -> std::result::Result<SpiTupleTable, SpiError> {
+    pub fn fetch(&mut self, count: libc::c_long) -> SpiResult<SpiTupleTable> {
         // SAFETY: no concurrent access
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
