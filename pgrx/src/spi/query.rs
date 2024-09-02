@@ -221,6 +221,22 @@ impl<'conn> PreparedStatement<'conn> {
             mutating: self.mutating,
         })
     }
+
+    fn args_to_datums(
+        &self,
+        args: <Self as Query<'conn>>::Arguments,
+    ) -> SpiResult<(Vec<pg_sys::Datum>, Vec<std::os::raw::c_char>)> {
+        let args = args.unwrap_or_default();
+
+        let actual = args.len();
+        let expected = unsafe { pg_sys::SPI_getargcount(self.plan.as_ptr()) } as usize;
+
+        if expected == actual {
+            Ok(args.into_iter().map(prepare_datum).unzip())
+        } else {
+            Err(SpiError::PreparedStatementArgumentMismatch { expected, got: actual })
+        }
+    }
 }
 
 impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
@@ -236,16 +252,8 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
         }
-        let args = arguments.unwrap_or_default();
-        let nargs = args.len();
 
-        let expected = unsafe { pg_sys::SPI_getargcount(self.plan.as_ptr()) } as usize;
-
-        if nargs != expected {
-            return Err(SpiError::PreparedStatementArgumentMismatch { expected, got: nargs });
-        }
-
-        let (mut datums, mut nulls): (Vec<_>, Vec<_>) = args.into_iter().map(prepare_datum).unzip();
+        let (mut datums, mut nulls) = self.args_to_datums(arguments)?;
 
         // SAFETY: all arguments are prepared above
         let status_code = unsafe {
@@ -262,9 +270,7 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
     }
 
     fn open_cursor(self, _client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
-        let args = args.unwrap_or_default();
-
-        let (mut datums, nulls): (Vec<_>, Vec<_>) = args.into_iter().map(prepare_datum).unzip();
+        let (mut datums, nulls) = self.args_to_datums(args).unwrap();
 
         // SAFETY: arguments are prepared above and SPI_cursor_open will never return the null
         // pointer.  It'll raise an ERROR if something is invalid for it to create the cursor
