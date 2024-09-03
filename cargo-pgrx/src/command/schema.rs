@@ -147,6 +147,7 @@ pub(crate) fn generate_schema(
     let lib_filename = manifest.lib_filename()?;
 
     if !skip_build {
+        // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
         first_build(
             user_manifest_path.as_ref(),
             profile,
@@ -202,7 +203,6 @@ pub(crate) fn generate_schema(
 
     second_build(
         user_manifest_path.as_ref(),
-        profile,
         features,
         log_level.clone(),
         &features_arg,
@@ -211,7 +211,7 @@ pub(crate) fn generate_schema(
         &package_name,
     )?;
 
-    compute_sql(profile, &package_name, &manifest)?;
+    compute_sql(&package_name, &manifest)?;
 
     Ok(())
 }
@@ -469,7 +469,6 @@ fn compute_codegen(
 
 fn second_build(
     user_manifest_path: Option<&impl AsRef<Path>>,
-    profile: &CargoProfile,
     features: &clap_cargo::Features,
     log_level: Option<String>,
     features_arg: &str,
@@ -495,8 +494,6 @@ fn second_build(
         command.arg("--manifest-path");
         command.arg(user_manifest_path.as_ref());
     }
-
-    command.args(profile.cargo_args());
 
     if let Some(log_level) = &log_level {
         command.env("RUST_LOG", log_level);
@@ -527,9 +524,10 @@ fn second_build(
 
     let command_str = format!("{:?}", command);
     eprintln!(
-        "{} for SQL generation with features `{}`",
+        "{} {}, in debug mode, for SQL generation with features {}",
         "  Rebuilding".bold().green(),
-        features_arg,
+        "pgrx_embed".cyan(),
+        features_arg.cyan(),
     );
 
     tracing::debug!(command = %command_str, "Running");
@@ -545,13 +543,9 @@ fn second_build(
     Ok(())
 }
 
-fn compute_sql(
-    profile: &CargoProfile,
-    package_name: &str,
-    manifest: &Manifest,
-) -> eyre::Result<()> {
+fn compute_sql(package_name: &str, manifest: &Manifest) -> eyre::Result<()> {
     let mut bin = get_target_dir()?;
-    bin.push(profile.target_subdir());
+    bin.push("debug"); // pgrx_embed_ is always compiled in debug mode
     bin.push(format!("pgrx_embed_{package_name}"));
 
     let mut command = std::process::Command::new(bin);
