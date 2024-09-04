@@ -118,7 +118,7 @@ impl<'conn> SpiClient<'conn> {
     ///
     /// See [`SpiCursor`] docs for usage details.
     ///
-    /// See [try_open_cursor] which will return an [Error] rather than panicking.
+    /// See [`try_open_cursor`][Self::try_open_cursor] which will return an [`SpiError`] rather than panicking.
     ///
     /// # Panics
     ///
@@ -147,7 +147,7 @@ impl<'conn> SpiClient<'conn> {
     ///
     /// See [`SpiCursor`] docs for usage details.
     ///
-    /// See [try_open_cursor_mut] which will return an [Error] rather than panicking.
+    /// See [`try_open_cursor_mut`][Self::try_open_cursor_mut] which will return an [`SpiError`] rather than panicking.
     ///
     /// # Panics
     ///
