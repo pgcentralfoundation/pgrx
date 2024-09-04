@@ -7,7 +7,7 @@
 #LICENSE All rights reserved.
 #LICENSE
 #LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
- 
+
 [workspace]
 resolver = "2"
 members = [
@@ -32,6 +32,7 @@ exclude = [
     "pgrx-examples/custom_types",
     "pgrx-examples/custom_sql",
     "pgrx-examples/datetime",
+    "pgrx-examples/wal_decoder",
     "pgrx-examples/errors",
     "pgrx-examples/nostd",
     "pgrx-examples/numeric",
