@@ -29,6 +29,7 @@ pub trait Query<'conn>: Sized {
     /// # Panics
     ///
     /// Panics if a cursor wasn't opened.
+    #[deprecated(since = "0.12.2", note = "undefined behavior")]
     fn open_cursor(self, client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
         self.try_open_cursor(client, args).unwrap()
     }
