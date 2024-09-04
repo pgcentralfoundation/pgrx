@@ -117,8 +117,28 @@ impl<'conn> SpiClient<'conn> {
     /// Rows may be then fetched using [`SpiCursor::fetch`].
     ///
     /// See [`SpiCursor`] docs for usage details.
+    ///
+    /// See [try_open_cursor] which will return an [Error] rather than panicking.
+    ///
+    /// # Panics
+    ///
+    /// Panics if a cursor wasn't opened.
+    #[deprecated(since = "0.12.2", note = "undefined behavior")]
     pub fn open_cursor<Q: Query<'conn>>(&self, query: Q, args: Q::Arguments) -> SpiCursor<'conn> {
-        query.open_cursor(self, args)
+        self.try_open_cursor(query, args).unwrap()
+    }
+
+    /// Set up a cursor that will execute the specified query
+    ///
+    /// Rows may be then fetched using [`SpiCursor::fetch`].
+    ///
+    /// See [`SpiCursor`] docs for usage details.
+    pub fn try_open_cursor<Q: Query<'conn>>(
+        &self,
+        query: Q,
+        args: Q::Arguments,
+    ) -> SpiResult<SpiCursor<'conn>> {
+        query.try_open_cursor(self, args)
     }
 
     /// Set up a cursor that will execute the specified update (mutating) query
@@ -126,13 +146,34 @@ impl<'conn> SpiClient<'conn> {
     /// Rows may be then fetched using [`SpiCursor::fetch`].
     ///
     /// See [`SpiCursor`] docs for usage details.
+    ///
+    /// See [try_open_cursor_mut] which will return an [Error] rather than panicking.
+    ///
+    /// # Panics
+    ///
+    /// Panics if a cursor wasn't opened.
+    #[deprecated(since = "0.12.2", note = "undefined behavior")]
     pub fn open_cursor_mut<Q: Query<'conn>>(
         &mut self,
         query: Q,
         args: Q::Arguments,
     ) -> SpiCursor<'conn> {
         Spi::mark_mutable();
-        query.open_cursor(self, args)
+        self.try_open_cursor_mut(query, args).unwrap()
+    }
+
+    /// Set up a cursor that will execute the specified update (mutating) query
+    ///
+    /// Rows may be then fetched using [`SpiCursor::fetch`].
+    ///
+    /// See [`SpiCursor`] docs for usage details.
+    pub fn try_open_cursor_mut<Q: Query<'conn>>(
+        &mut self,
+        query: Q,
+        args: Q::Arguments,
+    ) -> SpiResult<SpiCursor<'conn>> {
+        Spi::mark_mutable();
+        query.try_open_cursor(self, args)
     }
 
     /// Find a cursor in transaction by name

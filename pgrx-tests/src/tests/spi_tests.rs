@@ -203,6 +203,7 @@ mod tests {
     }
 
     #[pg_test]
+    #[allow(deprecated)]
     fn test_cursor() -> Result<(), spi::Error> {
         Spi::connect(|mut client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None)?;
@@ -223,6 +224,7 @@ mod tests {
     }
 
     #[pg_test]
+    #[allow(deprecated)]
     fn test_cursor_prepared_statement() -> Result<(), pgrx::spi::Error> {
         Spi::connect(|mut client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None)?;
@@ -261,6 +263,7 @@ mod tests {
         test_cursor_prepared_statement_panics_impl(Some([None, None].to_vec()))
     }
 
+    #[allow(deprecated)]
     fn test_cursor_prepared_statement_panics_impl(
         args: Option<Vec<Option<pg_sys::Datum>>>,
     ) -> Result<(), pgrx::spi::Error> {
@@ -282,6 +285,7 @@ mod tests {
     }
 
     #[pg_test]
+    #[allow(deprecated)]
     fn test_cursor_by_name() -> Result<(), pgrx::spi::Error> {
         let cursor_name = Spi::connect(|mut client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None)?;
@@ -313,6 +317,7 @@ mod tests {
     }
 
     #[pg_test(error = "syntax error at or near \"THIS\"")]
+    #[allow(deprecated)]
     fn test_cursor_failure() {
         Spi::connect(|client| {
             client.open_cursor("THIS IS NOT SQL", None);
@@ -320,6 +325,7 @@ mod tests {
     }
 
     #[pg_test(error = "cursor: CursorNotFound(\"NOT A CURSOR\")")]
+    #[allow(deprecated)]
     fn test_cursor_not_found() {
         Spi::connect(|client| client.find_cursor("NOT A CURSOR").map(|_| ())).expect("cursor");
     }
@@ -352,6 +358,7 @@ mod tests {
     }
 
     #[pg_test]
+    #[allow(deprecated)]
     fn test_spi_non_mut() -> Result<(), pgrx::spi::Error> {
         // Ensures update and cursor APIs do not need mutable reference to SpiClient
         Spi::connect(|mut client| {
@@ -570,6 +577,7 @@ mod tests {
     }
 
     #[pg_test]
+    #[allow(deprecated)]
     fn can_return_borrowed_str() -> Result<(), Box<dyn Error>> {
         let res = Spi::connect(|c| {
             let mut cursor = c.open_cursor("SELECT 'hello' FROM generate_series(1, 10000)", None);
