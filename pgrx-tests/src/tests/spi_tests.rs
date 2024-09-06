@@ -570,7 +570,6 @@ mod tests {
     }
 
     #[pg_test]
-    #[allow(deprecated)]
     fn can_return_borrowed_str() -> Result<(), Box<dyn Error>> {
         let res = Spi::connect(|c| {
             let mut cursor = c.open_cursor("SELECT 'hello' FROM generate_series(1, 10000)", None);
