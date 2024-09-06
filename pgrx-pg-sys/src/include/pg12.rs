@@ -166,9 +166,7 @@ pub const PG_VERSION: &::core::ffi::CStr =
 pub const PG_VERSION_NUM: u32 = 120020;
 #[allow(unsafe_code)]
 pub const PG_VERSION_STR: &::core::ffi::CStr = unsafe {
-    ::core::ffi::CStr::from_bytes_with_nul_unchecked(
-        b"PostgreSQL 12.20 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 14.1.1 20240522, 64-bit\0",
-    )
+    :: core :: ffi :: CStr :: from_bytes_with_nul_unchecked (b"PostgreSQL 12.20 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit\0")
 };
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
@@ -232,7 +230,6 @@ pub const __USE_ATFILE: u32 = 1;
 pub const __USE_FORTIFY_LEVEL: u32 = 0;
 pub const __GLIBC_USE_DEPRECATED_GETS: u32 = 0;
 pub const __GLIBC_USE_DEPRECATED_SCANF: u32 = 0;
-pub const __GLIBC_USE_C2X_STRTOL: u32 = 0;
 pub const __STDC_IEC_559__: u32 = 1;
 pub const __STDC_IEC_60559_BFP__: u32 = 201404;
 pub const __STDC_IEC_559_COMPLEX__: u32 = 1;
@@ -240,7 +237,7 @@ pub const __STDC_IEC_60559_COMPLEX__: u32 = 201404;
 pub const __STDC_ISO_10646__: u32 = 201706;
 pub const __GNU_LIBRARY__: u32 = 6;
 pub const __GLIBC__: u32 = 2;
-pub const __GLIBC_MINOR__: u32 = 39;
+pub const __GLIBC_MINOR__: u32 = 35;
 pub const __glibc_c99_flexarr_available: u32 = 1;
 pub const __LDOUBLE_REDIRECTS_TO_FLOAT128_ABI: u32 = 0;
 pub const __GLIBC_USE_LIB_EXT2: u32 = 0;
@@ -250,6 +247,7 @@ pub const __GLIBC_USE_IEC_60559_EXT: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_FUNCS_EXT: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_FUNCS_EXT_C2X: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_TYPES_EXT: u32 = 0;
+pub const __GNUC_VA_LIST: u32 = 1;
 pub const __OFF_T_MATCHES_OFF64_T: u32 = 1;
 pub const __INO_T_MATCHES_INO64_T: u32 = 1;
 pub const __RLIM_T_MATCHES_RLIM64_T: u32 = 1;
@@ -266,7 +264,6 @@ pub const __struct_FILE_defined: u32 = 1;
 pub const _IO_EOF_SEEN: u32 = 16;
 pub const _IO_ERR_SEEN: u32 = 32;
 pub const _IO_USER_LOCK: u32 = 32768;
-pub const __cookie_io_functions_t_defined: u32 = 1;
 pub const _IOFBF: u32 = 0;
 pub const _IOLBF: u32 = 1;
 pub const _IONBF: u32 = 2;
@@ -699,9 +696,6 @@ pub const SOL_NFC: u32 = 280;
 pub const SOL_KCM: u32 = 281;
 pub const SOL_TLS: u32 = 282;
 pub const SOL_XDP: u32 = 283;
-pub const SOL_MPTCP: u32 = 284;
-pub const SOL_MCTP: u32 = 285;
-pub const SOL_SMC: u32 = 286;
 pub const SOMAXCONN: u32 = 4096;
 pub const _SS_SIZE: u32 = 128;
 pub const __BITS_PER_LONG: u32 = 64;
@@ -789,11 +783,6 @@ pub const SO_PREFER_BUSY_POLL: u32 = 69;
 pub const SO_BUSY_POLL_BUDGET: u32 = 70;
 pub const SO_NETNS_COOKIE: u32 = 71;
 pub const SO_BUF_LOCK: u32 = 72;
-pub const SO_RESERVE_MEM: u32 = 73;
-pub const SO_TXREHASH: u32 = 74;
-pub const SO_RCVMARK: u32 = 75;
-pub const SO_PASSPIDFD: u32 = 76;
-pub const SO_PEERPIDFD: u32 = 77;
 pub const SO_TIMESTAMP: u32 = 29;
 pub const SO_TIMESTAMPNS: u32 = 35;
 pub const SO_TIMESTAMPING: u32 = 37;
@@ -859,8 +848,6 @@ pub const IP_PMTUDISC_DO: u32 = 2;
 pub const IP_PMTUDISC_PROBE: u32 = 3;
 pub const IP_PMTUDISC_INTERFACE: u32 = 4;
 pub const IP_PMTUDISC_OMIT: u32 = 5;
-pub const IP_LOCAL_PORT_RANGE: u32 = 51;
-pub const IP_PROTOCOL: u32 = 52;
 pub const SOL_IP: u32 = 0;
 pub const IP_DEFAULT_MULTICAST_TTL: u32 = 1;
 pub const IP_DEFAULT_MULTICAST_LOOP: u32 = 1;
@@ -1179,6 +1166,11 @@ pub const POSIX_FADV_SEQUENTIAL: u32 = 2;
 pub const POSIX_FADV_WILLNEED: u32 = 3;
 pub const POSIX_FADV_DONTNEED: u32 = 4;
 pub const POSIX_FADV_NOREUSE: u32 = 5;
+pub const AT_FDCWD: i32 = -100;
+pub const AT_SYMLINK_NOFOLLOW: u32 = 256;
+pub const AT_REMOVEDIR: u32 = 512;
+pub const AT_SYMLINK_FOLLOW: u32 = 1024;
+pub const AT_EACCESS: u32 = 512;
 pub const __S_IFMT: u32 = 61440;
 pub const __S_IFDIR: u32 = 16384;
 pub const __S_IFCHR: u32 = 8192;
@@ -1222,11 +1214,6 @@ pub const R_OK: u32 = 4;
 pub const W_OK: u32 = 2;
 pub const X_OK: u32 = 1;
 pub const F_OK: u32 = 0;
-pub const AT_FDCWD: i32 = -100;
-pub const AT_SYMLINK_NOFOLLOW: u32 = 256;
-pub const AT_REMOVEDIR: u32 = 512;
-pub const AT_SYMLINK_FOLLOW: u32 = 1024;
-pub const AT_EACCESS: u32 = 512;
 pub const F_ULOCK: u32 = 0;
 pub const F_LOCK: u32 = 1;
 pub const F_TLOCK: u32 = 2;
@@ -2095,6 +2082,10 @@ pub const XLOG_MULTIXACT_ZERO_OFF_PAGE: u32 = 0;
 pub const XLOG_MULTIXACT_ZERO_MEM_PAGE: u32 = 16;
 pub const XLOG_MULTIXACT_CREATE_ID: u32 = 32;
 pub const XLOG_MULTIXACT_TRUNCATE_ID: u32 = 48;
+pub const BITS_PER_HEAPBLOCK: u32 = 2;
+pub const VISIBILITYMAP_ALL_VISIBLE: u32 = 1;
+pub const VISIBILITYMAP_ALL_FROZEN: u32 = 2;
+pub const VISIBILITYMAP_VALID_BITS: u32 = 3;
 pub const SHAREDINVALCATALOG_ID: i32 = -1;
 pub const SHAREDINVALRELCACHE_ID: i32 = -2;
 pub const SHAREDINVALSMGR_ID: i32 = -3;
@@ -5953,6 +5944,7 @@ pub const RANGESTRAT_CONTAINED_BY: u32 = 8;
 pub const RANGESTRAT_CONTAINS_ELEM: u32 = 16;
 pub const RANGESTRAT_EQ: u32 = 18;
 pub type pg_int64 = ::core::ffi::c_long;
+pub type va_list = __builtin_va_list;
 pub type __gnuc_va_list = __builtin_va_list;
 pub type __u_char = ::core::ffi::c_uchar;
 pub type __u_short = ::core::ffi::c_ushort;
@@ -6143,40 +6135,6 @@ impl Default for _IO_FILE {
         }
     }
 }
-pub type cookie_read_function_t = ::core::option::Option<
-    unsafe extern "C" fn(
-        __cookie: *mut ::core::ffi::c_void,
-        __buf: *mut ::core::ffi::c_char,
-        __nbytes: usize,
-    ) -> __ssize_t,
->;
-pub type cookie_write_function_t = ::core::option::Option<
-    unsafe extern "C" fn(
-        __cookie: *mut ::core::ffi::c_void,
-        __buf: *const ::core::ffi::c_char,
-        __nbytes: usize,
-    ) -> __ssize_t,
->;
-pub type cookie_seek_function_t = ::core::option::Option<
-    unsafe extern "C" fn(
-        __cookie: *mut ::core::ffi::c_void,
-        __pos: *mut __off64_t,
-        __w: ::core::ffi::c_int,
-    ) -> ::core::ffi::c_int,
->;
-pub type cookie_close_function_t = ::core::option::Option<
-    unsafe extern "C" fn(__cookie: *mut ::core::ffi::c_void) -> ::core::ffi::c_int,
->;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct _IO_cookie_io_functions_t {
-    pub read: cookie_read_function_t,
-    pub write: cookie_write_function_t,
-    pub seek: cookie_seek_function_t,
-    pub close: cookie_close_function_t,
-}
-pub type cookie_io_functions_t = _IO_cookie_io_functions_t;
-pub type va_list = __gnuc_va_list;
 pub type off_t = __off_t;
 pub type fpos_t = __fpos_t;
 pub type _Float32 = f32;
@@ -6975,6 +6933,13 @@ impl Default for ip_opts {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
+pub struct ip_mreqn {
+    pub imr_multiaddr: in_addr,
+    pub imr_address: in_addr,
+    pub imr_ifindex: ::core::ffi::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
 pub struct in_pktinfo {
     pub ipi_ifindex: ::core::ffi::c_int,
     pub ipi_spec_dst: in_addr,
@@ -7003,7 +6968,6 @@ pub mod _bindgen_ty_5 {
     pub const IPPROTO_ENCAP: Type = 98;
     pub const IPPROTO_PIM: Type = 103;
     pub const IPPROTO_COMP: Type = 108;
-    pub const IPPROTO_L2TP: Type = 115;
     pub const IPPROTO_SCTP: Type = 132;
     pub const IPPROTO_UDPLITE: Type = 136;
     pub const IPPROTO_MPLS: Type = 137;
@@ -7113,13 +7077,6 @@ impl Default for sockaddr_in6 {
 pub struct ip_mreq {
     pub imr_multiaddr: in_addr,
     pub imr_interface: in_addr,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct ip_mreqn {
-    pub imr_multiaddr: in_addr,
-    pub imr_address: in_addr,
-    pub imr_ifindex: ::core::ffi::c_int,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -17323,7 +17280,6 @@ pub mod _bindgen_ty_13 {
     pub const SEGV_ADIPERR: Type = 7;
     pub const SEGV_MTEAERR: Type = 8;
     pub const SEGV_MTESERR: Type = 9;
-    pub const SEGV_CPERR: Type = 10;
 }
 pub mod _bindgen_ty_14 {
     pub type Type = ::core::ffi::c_uint;
@@ -30368,9 +30324,6 @@ extern "C" {
         __format: *const ::core::ffi::c_char,
         __arg: *mut __va_list_tag,
     ) -> ::core::ffi::c_int;
-    pub fn arc4random() -> __uint32_t;
-    pub fn arc4random_buf(__buf: *mut ::core::ffi::c_void, __size: usize);
-    pub fn arc4random_uniform(__upper_bound: __uint32_t) -> __uint32_t;
     pub fn alloca(__size: ::core::ffi::c_ulong) -> *mut ::core::ffi::c_void;
     pub fn atexit(__func: ::core::option::Option<unsafe extern "C" fn()>) -> ::core::ffi::c_int;
     pub fn at_quick_exit(
@@ -30381,16 +30334,6 @@ extern "C" {
         __s2: *const ::core::ffi::c_void,
         __n: usize,
     ) -> ::core::ffi::c_int;
-    pub fn strlcpy(
-        __dest: *mut ::core::ffi::c_char,
-        __src: *const ::core::ffi::c_char,
-        __n: ::core::ffi::c_ulong,
-    ) -> ::core::ffi::c_ulong;
-    pub fn strlcat(
-        __dest: *mut ::core::ffi::c_char,
-        __src: *const ::core::ffi::c_char,
-        __n: ::core::ffi::c_ulong,
-    ) -> ::core::ffi::c_ulong;
     pub fn ExceptionalCondition(
         conditionName: *const ::core::ffi::c_char,
         errorType: *const ::core::ffi::c_char,
@@ -30753,6 +30696,16 @@ extern "C" {
     pub fn __fminl(__x: u128, __y: u128) -> u128;
     pub fn __fmal(__x: u128, __y: u128, __z: u128) -> u128;
     pub fn __scalbl(__x: u128, __n: u128) -> u128;
+    pub fn strlcat(
+        dst: *mut ::core::ffi::c_char,
+        src: *const ::core::ffi::c_char,
+        siz: usize,
+    ) -> usize;
+    pub fn strlcpy(
+        dst: *mut ::core::ffi::c_char,
+        src: *const ::core::ffi::c_char,
+        siz: usize,
+    ) -> usize;
     pub fn pg_qsort(
         base: *mut ::core::ffi::c_void,
         nel: usize,
@@ -34861,6 +34814,34 @@ extern "C" {
     pub fn attribute_reloptions(reloptions: Datum, validate: bool) -> *mut bytea;
     pub fn tablespace_reloptions(reloptions: Datum, validate: bool) -> *mut bytea;
     pub fn AlterTableGetRelOptionsLockLevel(defList: *mut List) -> LOCKMODE;
+    pub fn visibilitymap_clear(
+        rel: Relation,
+        heapBlk: BlockNumber,
+        vmbuf: Buffer,
+        flags: uint8,
+    ) -> bool;
+    pub fn visibilitymap_pin(rel: Relation, heapBlk: BlockNumber, vmbuf: *mut Buffer);
+    pub fn visibilitymap_pin_ok(heapBlk: BlockNumber, vmbuf: Buffer) -> bool;
+    pub fn visibilitymap_set(
+        rel: Relation,
+        heapBlk: BlockNumber,
+        heapBuf: Buffer,
+        recptr: XLogRecPtr,
+        vmBuf: Buffer,
+        cutoff_xid: TransactionId,
+        flags: uint8,
+    );
+    pub fn visibilitymap_get_status(
+        rel: Relation,
+        heapBlk: BlockNumber,
+        vmbuf: *mut Buffer,
+    ) -> uint8;
+    pub fn visibilitymap_count(
+        rel: Relation,
+        all_visible: *mut BlockNumber,
+        all_frozen: *mut BlockNumber,
+    );
+    pub fn visibilitymap_truncate(rel: Relation, nheapblocks: BlockNumber);
     pub fn SendSharedInvalidMessages(msgs: *const SharedInvalidationMessage, n: ::core::ffi::c_int);
     pub fn ReceiveSharedInvalidMessages(
         invalFunction: ::core::option::Option<
