@@ -244,19 +244,19 @@ mod tests {
     }
 
     #[pg_test]
-    #[should_panic]
+    #[should_panic(expected = "PreparedStatementArgumentMismatch { expected: 1, got: 0 }")]
     fn test_cursor_prepared_statement_panics_none_args() -> Result<(), pgrx::spi::Error> {
         test_cursor_prepared_statement_panics_impl(None)
     }
 
     #[pg_test]
-    #[should_panic]
+    #[should_panic(expected = "PreparedStatementArgumentMismatch { expected: 1, got: 0 }")]
     fn test_cursor_prepared_statement_panics_less_args() -> Result<(), pgrx::spi::Error> {
         test_cursor_prepared_statement_panics_impl(Some([].to_vec()))
     }
 
     #[pg_test]
-    #[should_panic]
+    #[should_panic(expected = "PreparedStatementArgumentMismatch { expected: 1, got: 2 }")]
     fn test_cursor_prepared_statement_panics_more_args() -> Result<(), pgrx::spi::Error> {
         test_cursor_prepared_statement_panics_impl(Some([None, None].to_vec()))
     }
