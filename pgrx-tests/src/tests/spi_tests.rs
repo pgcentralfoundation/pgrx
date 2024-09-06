@@ -244,6 +244,44 @@ mod tests {
     }
 
     #[pg_test]
+    #[should_panic]
+    fn test_cursor_prepared_statement_panics_none_args() -> Result<(), pgrx::spi::Error> {
+        test_cursor_prepared_statement_panics_impl(None)
+    }
+
+    #[pg_test]
+    #[should_panic]
+    fn test_cursor_prepared_statement_panics_less_args() -> Result<(), pgrx::spi::Error> {
+        test_cursor_prepared_statement_panics_impl(Some([].to_vec()))
+    }
+
+    #[pg_test]
+    #[should_panic]
+    fn test_cursor_prepared_statement_panics_more_args() -> Result<(), pgrx::spi::Error> {
+        test_cursor_prepared_statement_panics_impl(Some([None, None].to_vec()))
+    }
+
+    fn test_cursor_prepared_statement_panics_impl(
+        args: Option<Vec<Option<pg_sys::Datum>>>,
+    ) -> Result<(), pgrx::spi::Error> {
+        Spi::connect(|mut client| {
+            client.update("CREATE TABLE tests.cursor_table (id int)", None, None)?;
+            client.update(
+                "INSERT INTO tests.cursor_table (id) \
+            SELECT i FROM generate_series(1, 10) AS t(i)",
+                None,
+                None,
+            )?;
+            let prepared = client.prepare(
+                "SELECT * FROM tests.cursor_table WHERE id = $1",
+                Some([PgBuiltInOids::INT4OID.oid()].to_vec()),
+            )?;
+            client.open_cursor(&prepared, args);
+            unreachable!();
+        })
+    }
+
+    #[pg_test]
     fn test_cursor_by_name() -> Result<(), pgrx::spi::Error> {
         let cursor_name = Spi::connect(|mut client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None)?;
@@ -532,6 +570,7 @@ mod tests {
     }
 
     #[pg_test]
+    #[allow(deprecated)]
     fn can_return_borrowed_str() -> Result<(), Box<dyn Error>> {
         let res = Spi::connect(|c| {
             let mut cursor = c.open_cursor("SELECT 'hello' FROM generate_series(1, 10000)", None);

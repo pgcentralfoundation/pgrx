@@ -2,6 +2,7 @@ use pgrx::prelude::*;
 use std::error::Error;
 
 #[pg_test]
+#[allow(deprecated)]
 fn issue1209() -> Result<Option<String>, Box<dyn Error>> {
     // create the cursor we actually care about
     let mut res = Spi::connect(|c| {
