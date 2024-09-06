@@ -123,7 +123,6 @@ impl<'conn> SpiClient<'conn> {
     /// # Panics
     ///
     /// Panics if a cursor wasn't opened.
-    #[deprecated(since = "0.12.2", note = "undefined behavior")]
     pub fn open_cursor<Q: Query<'conn>>(&self, query: Q, args: Q::Arguments) -> SpiCursor<'conn> {
         self.try_open_cursor(query, args).unwrap()
     }
@@ -152,7 +151,6 @@ impl<'conn> SpiClient<'conn> {
     /// # Panics
     ///
     /// Panics if a cursor wasn't opened.
-    #[deprecated(since = "0.12.2", note = "undefined behavior")]
     pub fn open_cursor_mut<Q: Query<'conn>>(
         &mut self,
         query: Q,
