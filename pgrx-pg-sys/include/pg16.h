@@ -179,6 +179,7 @@
 #include "utils/sortsupport.h"
 #include "utils/catcache.h"
 #include "utils/syscache.h"
+#include "utils/tuplestore.h"
 #include "utils/typcache.h"
 #include "utils/rangetypes.h"
 #include "utils/rel.h"
