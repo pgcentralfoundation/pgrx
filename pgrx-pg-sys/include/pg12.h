@@ -31,6 +31,7 @@
 #include "access/skey.h"
 #include "access/sysattr.h"
 #include "access/tableam.h"
+#include "access/visibilitymap.h"
 #include "access/xact.h"
 #include "access/xlog_internal.h"
 #include "access/xlogreader.h"
