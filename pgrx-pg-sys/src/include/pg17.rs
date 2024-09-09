@@ -146,7 +146,7 @@ pub const PACKAGE_NAME: &::core::ffi::CStr =
     unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"PostgreSQL\0") };
 #[allow(unsafe_code)]
 pub const PACKAGE_STRING: &::core::ffi::CStr =
-    unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"PostgreSQL 17beta3\0") };
+    unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"PostgreSQL 17rc1\0") };
 #[allow(unsafe_code)]
 pub const PACKAGE_TARNAME: &::core::ffi::CStr =
     unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"postgresql\0") };
@@ -155,7 +155,7 @@ pub const PACKAGE_URL: &::core::ffi::CStr =
     unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"https://www.postgresql.org/\0") };
 #[allow(unsafe_code)]
 pub const PACKAGE_VERSION: &::core::ffi::CStr =
-    unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"17beta3\0") };
+    unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"17rc1\0") };
 #[allow(unsafe_code)]
 pub const PG_KRB_SRVNAM: &::core::ffi::CStr =
     unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"postgres\0") };
@@ -167,11 +167,11 @@ pub const PG_MINORVERSION_NUM: u32 = 0;
 pub const PG_USE_STDBOOL: u32 = 1;
 #[allow(unsafe_code)]
 pub const PG_VERSION: &::core::ffi::CStr =
-    unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"17beta3\0") };
+    unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"17rc1\0") };
 pub const PG_VERSION_NUM: u32 = 170000;
 #[allow(unsafe_code)]
 pub const PG_VERSION_STR: &::core::ffi::CStr = unsafe {
-    :: core :: ffi :: CStr :: from_bytes_with_nul_unchecked (b"PostgreSQL 17beta3 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit\0")
+    :: core :: ffi :: CStr :: from_bytes_with_nul_unchecked (b"PostgreSQL 17rc1 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit\0")
 };
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
@@ -578,9 +578,8 @@ pub const PG_BINARY_W: &::core::ffi::CStr =
     unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"w\0") };
 pub const PGINVALID_SOCKET: i32 = -1;
 #[allow(unsafe_code)]
-pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = unsafe {
-    ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"postgres (PostgreSQL) 17beta3\n\0")
-};
+pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr =
+    unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"postgres (PostgreSQL) 17rc1\n\0") };
 #[allow(unsafe_code)]
 pub const EXE: &::core::ffi::CStr =
     unsafe { ::core::ffi::CStr::from_bytes_with_nul_unchecked(b"\0") };
@@ -3162,6 +3161,7 @@ pub const GUC_IS_NAME: u32 = 2048;
 pub const GUC_NOT_WHILE_SEC_REST: u32 = 4096;
 pub const GUC_DISALLOW_IN_AUTO_FILE: u32 = 8192;
 pub const GUC_RUNTIME_COMPUTED: u32 = 16384;
+pub const GUC_ALLOW_IN_PARALLEL: u32 = 32768;
 pub const GUC_UNIT_KB: u32 = 16777216;
 pub const GUC_UNIT_BLOCKS: u32 = 33554432;
 pub const GUC_UNIT_XBLOCKS: u32 = 50331648;
@@ -17061,8 +17061,6 @@ impl Default for PartitionRangeDatum {
 #[derive(Debug, Copy, Clone)]
 pub struct SinglePartitionSpec {
     pub type_: NodeTag,
-    pub name: *mut RangeVar,
-    pub bound: *mut PartitionBoundSpec,
 }
 impl Default for SinglePartitionSpec {
     fn default() -> Self {
@@ -17079,7 +17077,6 @@ pub struct PartitionCmd {
     pub type_: NodeTag,
     pub name: *mut RangeVar,
     pub bound: *mut PartitionBoundSpec,
-    pub partlist: *mut List,
     pub concurrent: bool,
 }
 impl Default for PartitionCmd {
@@ -18164,12 +18161,10 @@ pub mod AlterTableType {
     pub const AT_AttachPartition: Type = 60;
     pub const AT_DetachPartition: Type = 61;
     pub const AT_DetachPartitionFinalize: Type = 62;
-    pub const AT_SplitPartition: Type = 63;
-    pub const AT_MergePartitions: Type = 64;
-    pub const AT_AddIdentity: Type = 65;
-    pub const AT_SetIdentity: Type = 66;
-    pub const AT_DropIdentity: Type = 67;
-    pub const AT_ReAddStatistics: Type = 68;
+    pub const AT_AddIdentity: Type = 63;
+    pub const AT_SetIdentity: Type = 64;
+    pub const AT_DropIdentity: Type = 65;
+    pub const AT_ReAddStatistics: Type = 66;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -36088,6 +36083,7 @@ extern "C" {
         str_: *const ::core::ffi::c_char,
     ) -> ::core::ffi::c_int;
     pub fn geterrcode() -> ::core::ffi::c_int;
+    pub fn geterrlevel() -> ::core::ffi::c_int;
     pub fn geterrposition() -> ::core::ffi::c_int;
     pub fn getinternalerrposition() -> ::core::ffi::c_int;
     pub fn errsave_start(context: *mut Node, domain: *const ::core::ffi::c_char) -> bool;
@@ -50951,7 +50947,6 @@ extern "C" {
     pub fn generate_opclass_name(opclass: Oid) -> *mut ::core::ffi::c_char;
     pub fn get_range_partbound_string(bound_datums: *mut List) -> *mut ::core::ffi::c_char;
     pub fn pg_get_statisticsobjdef_string(statextid: Oid) -> *mut ::core::ffi::c_char;
-    pub fn get_list_partvalue_string(val: *mut Const) -> *mut ::core::ffi::c_char;
     pub fn sampler_random_init_state(seed: uint32, randstate: *mut pg_prng_state);
     pub fn sampler_random_fract(randstate: *mut pg_prng_state) -> f64;
     pub fn BlockSampler_Init(
@@ -52223,18 +52218,14 @@ pub const AlterTableType_AT_DetachPartition: u32 = 61;
     note = "you want pg_sys::AlterTableType::AT_DetachPartitionFinalize"
 )]
 pub const AlterTableType_AT_DetachPartitionFinalize: u32 = 62;
-#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SplitPartition")]
-pub const AlterTableType_AT_SplitPartition: u32 = 63;
-#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_MergePartitions")]
-pub const AlterTableType_AT_MergePartitions: u32 = 64;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddIdentity")]
-pub const AlterTableType_AT_AddIdentity: u32 = 65;
+pub const AlterTableType_AT_AddIdentity: u32 = 63;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetIdentity")]
-pub const AlterTableType_AT_SetIdentity: u32 = 66;
+pub const AlterTableType_AT_SetIdentity: u32 = 64;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropIdentity")]
-pub const AlterTableType_AT_DropIdentity: u32 = 67;
+pub const AlterTableType_AT_DropIdentity: u32 = 65;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ReAddStatistics")]
-pub const AlterTableType_AT_ReAddStatistics: u32 = 68;
+pub const AlterTableType_AT_ReAddStatistics: u32 = 66;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ArchiveMode::ARCHIVE_MODE_OFF")]
 pub const ArchiveMode_ARCHIVE_MODE_OFF: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ArchiveMode::ARCHIVE_MODE_ON")]
