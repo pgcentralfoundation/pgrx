@@ -21,7 +21,7 @@ pub trait Query<'conn>: Sized {
         self,
         client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
-        arguments: Option<&[Self::Argument]>,
+        arguments: &[Self::Argument],
     ) -> SpiResult<SpiTupleTable<'conn>>;
 
     /// Open a cursor for the query.
@@ -30,11 +30,7 @@ pub trait Query<'conn>: Sized {
     ///
     /// Panics if a cursor wasn't opened.
     #[deprecated(since = "0.12.2", note = "undefined behavior")]
-    fn open_cursor(
-        self,
-        client: &SpiClient<'conn>,
-        args: Option<&[Self::Argument]>,
-    ) -> SpiCursor<'conn> {
+    fn open_cursor(self, client: &SpiClient<'conn>, args: &[Self::Argument]) -> SpiCursor<'conn> {
         self.try_open_cursor(client, args).unwrap()
     }
 
@@ -42,7 +38,7 @@ pub trait Query<'conn>: Sized {
     fn try_open_cursor(
         self,
         client: &SpiClient<'conn>,
-        args: Option<&[Self::Argument]>,
+        args: &[Self::Argument],
     ) -> SpiResult<SpiCursor<'conn>>;
 }
 
@@ -53,7 +49,7 @@ impl<'conn> Query<'conn> for &String {
         self,
         client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
-        arguments: Option<&[Self::Argument]>,
+        arguments: &[Self::Argument],
     ) -> SpiResult<SpiTupleTable<'conn>> {
         self.as_str().execute(client, limit, arguments)
     }
@@ -61,7 +57,7 @@ impl<'conn> Query<'conn> for &String {
     fn try_open_cursor(
         self,
         client: &SpiClient<'conn>,
-        args: Option<&[Self::Argument]>,
+        args: &[Self::Argument],
     ) -> SpiResult<SpiCursor<'conn>> {
         self.as_str().try_open_cursor(client, args)
     }
@@ -102,7 +98,7 @@ impl<'conn> Query<'conn> for &str {
         self,
         _client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
-        arguments: Option<&[Self::Argument]>,
+        arguments: &[Self::Argument],
     ) -> SpiResult<SpiTupleTable<'conn>> {
         // SAFETY: no concurrent access
         unsafe {
@@ -110,10 +106,17 @@ impl<'conn> Query<'conn> for &str {
         }
 
         let src = CString::new(self).expect("query contained a null byte");
-        let status_code = match arguments {
-            Some(args) => {
-                let nargs = args.len();
-                let (mut argtypes, mut datums, nulls) = args_to_datums(args);
+        let status_code = match arguments.len() {
+            // SAFETY: arguments are prepared above
+            0 => unsafe {
+                pg_sys::SPI_execute(
+                    src.as_ptr(),
+                    Spi::is_xact_still_immutable(),
+                    limit.unwrap_or(0),
+                )
+            },
+            nargs => {
+                let (mut argtypes, mut datums, nulls) = args_to_datums(arguments);
 
                 // SAFETY: arguments are prepared above
                 unsafe {
@@ -128,14 +131,6 @@ impl<'conn> Query<'conn> for &str {
                     )
                 }
             }
-            // SAFETY: arguments are prepared above
-            None => unsafe {
-                pg_sys::SPI_execute(
-                    src.as_ptr(),
-                    Spi::is_xact_still_immutable(),
-                    limit.unwrap_or(0),
-                )
-            },
         };
 
         SpiClient::prepare_tuple_table(status_code)
@@ -144,10 +139,9 @@ impl<'conn> Query<'conn> for &str {
     fn try_open_cursor(
         self,
         _client: &SpiClient<'conn>,
-        args: Option<&[Self::Argument]>,
+        args: &[Self::Argument],
     ) -> SpiResult<SpiCursor<'conn>> {
         let src = CString::new(self).expect("query contained a null byte");
-        let args = args.unwrap_or_default();
 
         let nargs = args.len();
         let (mut argtypes, mut datums, nulls) = args_to_datums(args);
@@ -203,7 +197,7 @@ impl<'conn> Query<'conn> for &OwnedPreparedStatement {
         self,
         client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
-        arguments: Option<&[Self::Argument]>,
+        arguments: &[Self::Argument],
     ) -> SpiResult<SpiTupleTable<'conn>> {
         (&self.0).execute(client, limit, arguments)
     }
@@ -211,7 +205,7 @@ impl<'conn> Query<'conn> for &OwnedPreparedStatement {
     fn try_open_cursor(
         self,
         client: &SpiClient<'conn>,
-        args: Option<&[Self::Argument]>,
+        args: &[Self::Argument],
     ) -> SpiResult<SpiCursor<'conn>> {
         (&self.0).try_open_cursor(client, args)
     }
@@ -224,7 +218,7 @@ impl<'conn> Query<'conn> for OwnedPreparedStatement {
         self,
         client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
-        arguments: Option<&[Self::Argument]>,
+        arguments: &[Self::Argument],
     ) -> SpiResult<SpiTupleTable<'conn>> {
         (&self.0).execute(client, limit, arguments)
     }
@@ -232,7 +226,7 @@ impl<'conn> Query<'conn> for OwnedPreparedStatement {
     fn try_open_cursor(
         self,
         client: &SpiClient<'conn>,
-        args: Option<&[Self::Argument]>,
+        args: &[Self::Argument],
     ) -> SpiResult<SpiCursor<'conn>> {
         (&self.0).try_open_cursor(client, args)
     }
@@ -258,10 +252,8 @@ impl<'conn> PreparedStatement<'conn> {
 
     fn args_to_datums(
         &self,
-        args: Option<&[<Self as Query<'conn>>::Argument]>,
+        args: &[<Self as Query<'conn>>::Argument],
     ) -> SpiResult<(Vec<pg_sys::Datum>, Vec<std::os::raw::c_char>)> {
-        let args = args.unwrap_or_default();
-
         let actual = args.len();
         let expected = unsafe { pg_sys::SPI_getargcount(self.plan.as_ptr()) } as usize;
 
@@ -280,7 +272,7 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
         self,
         _client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
-        arguments: Option<&[Self::Argument]>,
+        arguments: &[Self::Argument],
     ) -> SpiResult<SpiTupleTable<'conn>> {
         // SAFETY: no concurrent access
         unsafe {
@@ -306,7 +298,7 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
     fn try_open_cursor(
         self,
         _client: &SpiClient<'conn>,
-        args: Option<&[Self::Argument]>,
+        args: &[Self::Argument],
     ) -> SpiResult<SpiCursor<'conn>> {
         let (mut datums, nulls) = self.args_to_datums(args)?;
 
@@ -332,7 +324,7 @@ impl<'conn> Query<'conn> for PreparedStatement<'conn> {
         self,
         client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
-        arguments: Option<&[Self::Argument]>,
+        arguments: &[Self::Argument],
     ) -> SpiResult<SpiTupleTable<'conn>> {
         (&self).execute(client, limit, arguments)
     }
@@ -340,7 +332,7 @@ impl<'conn> Query<'conn> for PreparedStatement<'conn> {
     fn try_open_cursor(
         self,
         client: &SpiClient<'conn>,
-        args: Option<&[Self::Argument]>,
+        args: &[Self::Argument],
     ) -> SpiResult<SpiCursor<'conn>> {
         (&self).try_open_cursor(client, args)
     }
