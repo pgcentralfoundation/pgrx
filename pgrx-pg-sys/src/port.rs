@@ -73,34 +73,45 @@ pub const unsafe fn MAXALIGN(len: usize) -> usize {
 ///
 /// [`palloc`]: crate::palloc
 #[allow(non_snake_case)]
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 pub unsafe fn GetMemoryChunkContext(pointer: *mut std::os::raw::c_void) -> pg_sys::MemoryContext {
-    // Postgres versions <16 don't export the "GetMemoryChunkContext" function.  It's a "static inline"
-    // function in `memutils.h`, so we port it to Rust right here
-    /*
-     * Try to detect bogus pointers handed to us, poorly though we can.
-     * Presumably, a pointer that isn't MAXALIGNED isn't pointing at an
-     * allocated chunk.
-     */
-    assert!(!pointer.is_null());
-    assert_eq!(pointer, MAXALIGN(pointer as usize) as *mut ::std::os::raw::c_void);
+    #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+    {
+        // Postgres versions <16 don't export the "GetMemoryChunkContext" function.  It's a "static inline"
+        // function in `memutils.h`, so we port it to Rust right here
+        /*
+         * Try to detect bogus pointers handed to us, poorly though we can.
+         * Presumably, a pointer that isn't MAXALIGNED isn't pointing at an
+         * allocated chunk.
+         */
+        assert!(!pointer.is_null());
+        assert_eq!(pointer, MAXALIGN(pointer as usize) as *mut ::std::os::raw::c_void);
 
-    /*
-     * OK, it's probably safe to look at the context.
-     */
-    // 	context = *(MemoryContext *) (((char *) pointer) - sizeof(void *));
-    let context = unsafe {
-        // SAFETY: the caller has assured us that `pointer` points to palloc'd memory, which
-        // means it'll have this header before it
-        *(pointer
-            .cast::<::std::os::raw::c_char>()
-            .sub(std::mem::size_of::<*mut ::std::os::raw::c_void>())
-            .cast())
-    };
+        /*
+         * OK, it's probably safe to look at the context.
+         */
+        // 	context = *(MemoryContext *) (((char *) pointer) - sizeof(void *));
+        let context = unsafe {
+            // SAFETY: the caller has assured us that `pointer` points to palloc'd memory, which
+            // means it'll have this header before it
+            *(pointer
+                .cast::<::std::os::raw::c_char>()
+                .sub(std::mem::size_of::<*mut ::std::os::raw::c_void>())
+                .cast())
+        };
 
-    assert!(MemoryContextIsValid(context));
+        assert!(MemoryContextIsValid(context));
 
-    context
+        context
+    }
+    #[cfg(any(feature = "pg16", feature = "pg17"))]
+    {
+        #[pgrx_macros::pg_guard]
+        extern "C" {
+            #[link_name = "GetMemoryChunkContext"]
+            pub fn extern_fn(pointer: *mut std::os::raw::c_void) -> pg_sys::MemoryContext;
+        }
+        extern_fn(pointer)
+    }
 }
 
 /// Returns true if memory context is tagged correctly according to Postgres.
