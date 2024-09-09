@@ -74,7 +74,7 @@ impl<'conn> SpiClient<'conn> {
         &self,
         query: Q,
         limit: Option<libc::c_long>,
-        args: Option<&[Q::Argument]>,
+        args: &[Q::Argument],
     ) -> SpiResult<SpiTupleTable<'conn>> {
         query.execute(self, limit, args)
     }
@@ -84,7 +84,7 @@ impl<'conn> SpiClient<'conn> {
         &mut self,
         query: Q,
         limit: Option<libc::c_long>,
-        args: Option<&[Q::Argument]>,
+        args: &[Q::Argument],
     ) -> SpiResult<SpiTupleTable<'conn>> {
         Spi::mark_mutable();
         query.execute(self, limit, args)
@@ -123,11 +123,7 @@ impl<'conn> SpiClient<'conn> {
     /// # Panics
     ///
     /// Panics if a cursor wasn't opened.
-    pub fn open_cursor<Q: Query<'conn>>(
-        &self,
-        query: Q,
-        args: Option<&[Q::Argument]>,
-    ) -> SpiCursor<'conn> {
+    pub fn open_cursor<Q: Query<'conn>>(&self, query: Q, args: &[Q::Argument]) -> SpiCursor<'conn> {
         self.try_open_cursor(query, args).unwrap()
     }
 
@@ -139,7 +135,7 @@ impl<'conn> SpiClient<'conn> {
     pub fn try_open_cursor<Q: Query<'conn>>(
         &self,
         query: Q,
-        args: Option<&[Q::Argument]>,
+        args: &[Q::Argument],
     ) -> SpiResult<SpiCursor<'conn>> {
         query.try_open_cursor(self, args)
     }
@@ -158,7 +154,7 @@ impl<'conn> SpiClient<'conn> {
     pub fn open_cursor_mut<Q: Query<'conn>>(
         &mut self,
         query: Q,
-        args: Option<&[Q::Argument]>,
+        args: &[Q::Argument],
     ) -> SpiCursor<'conn> {
         Spi::mark_mutable();
         self.try_open_cursor_mut(query, args).unwrap()
@@ -172,7 +168,7 @@ impl<'conn> SpiClient<'conn> {
     pub fn try_open_cursor_mut<Q: Query<'conn>>(
         &mut self,
         query: Q,
-        args: Option<&[Q::Argument]>,
+        args: &[Q::Argument],
     ) -> SpiResult<SpiCursor<'conn>> {
         Spi::mark_mutable();
         query.try_open_cursor(self, args)
