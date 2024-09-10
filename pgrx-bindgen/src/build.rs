@@ -230,7 +230,13 @@ pub fn main() -> eyre::Result<()> {
             .iter()
             .map(|(pg_major_ver, pg_config)| {
                 scope.spawn(|| {
-                    generate_bindings(*pg_major_ver, pg_config, &build_paths, is_for_release)
+                    generate_bindings(
+                        *pg_major_ver,
+                        pg_config,
+                        &build_paths,
+                        is_for_release,
+                        compile_cshim,
+                    )
                 })
             })
             .collect::<Vec<_>>();
@@ -290,12 +296,13 @@ fn generate_bindings(
     pg_config: &PgConfig,
     build_paths: &BuildPaths,
     is_for_release: bool,
+    enable_cshim: bool,
 ) -> eyre::Result<()> {
     let mut include_h = build_paths.manifest_dir.clone();
     include_h.push("include");
     include_h.push(format!("pg{major_version}.h"));
 
-    let bindgen_output = get_bindings(major_version, pg_config, &include_h)
+    let bindgen_output = get_bindings(major_version, pg_config, &include_h, enable_cshim)
         .wrap_err_with(|| format!("bindgen failed for pg{major_version}"))?;
 
     let oids = extract_oids(&bindgen_output);
@@ -726,6 +733,7 @@ fn get_bindings(
     major_version: u16,
     pg_config: &PgConfig,
     include_h: &path::Path,
+    enable_cshim: bool,
 ) -> eyre::Result<syn::File> {
     let bindings = if let Some(info_dir) =
         target_env_tracked(&format!("PGRX_TARGET_INFO_PATH_PG{major_version}"))
@@ -734,7 +742,7 @@ fn get_bindings(
         std::fs::read_to_string(&bindings_file)
             .wrap_err_with(|| format!("failed to read raw bindings from {bindings_file}"))?
     } else {
-        let bindings = run_bindgen(major_version, pg_config, include_h)?;
+        let bindings = run_bindgen(major_version, pg_config, include_h, enable_cshim)?;
         if let Some(path) = env_tracked("PGRX_PG_SYS_EXTRA_OUTPUT_PATH") {
             std::fs::write(path, &bindings)?;
         }
@@ -749,6 +757,7 @@ fn run_bindgen(
     major_version: u16,
     pg_config: &PgConfig,
     include_h: &path::Path,
+    enable_cshim: bool,
 ) -> eyre::Result<String> {
     eprintln!("Generating bindings for pg{major_version}");
     let configure = pg_config.configure()?;
@@ -764,6 +773,7 @@ fn run_bindgen(
     };
     let enum_names = Rc::new(RefCell::new(BTreeMap::new()));
     let overrides = BindingOverride::new_from(Rc::clone(&enum_names));
+    let out_path = PathBuf::from(std::env::var("OUT_DIR").unwrap());
     let bindings = binder
         .header(include_h.display().to_string())
         .clang_args(extra_bindgen_clang_args(pg_config)?)
@@ -782,6 +792,8 @@ fn run_bindgen(
         .formatter(bindgen::Formatter::None)
         .layout_tests(false)
         .default_non_copy_union_style(NonCopyUnionStyle::ManuallyDrop)
+        .wrap_static_fns(enable_cshim)
+        .wrap_static_fns_path(out_path.join("wrap_static_fns"))
         .generate()
         .wrap_err_with(|| format!("Unable to generate bindings for pg{major_version}"))?;
     let mut binding_str = bindings.to_string();
@@ -840,6 +852,31 @@ fn add_blocklists(bind: bindgen::Builder) -> bindgen::Builder {
         .blocklist_function("(?:sigstack|sigreturn|siggetmask|gets|vfork|te?mpnam(?:_r)?|mktemp)")
         // Missing on some systems, despite being in their headers.
         .blocklist_function("inet_net_pton.*")
+        // To make it work without `cshim`
+        .blocklist_function("heap_getattr")
+        .blocklist_function("BufferGetBlock")
+        .blocklist_function("BufferGetPage")
+        .blocklist_function("BufferIsLocal")
+        .blocklist_function("GetMemoryChunkContext")
+        .blocklist_function("GETSTRUCT")
+        .blocklist_function("MAXALIGN")
+        .blocklist_function("MemoryContextIsValid")
+        .blocklist_function("MemoryContextSwitchTo")
+        .blocklist_function("TYPEALIGN")
+        .blocklist_function("TransactionIdIsNormal")
+        .blocklist_function("expression_tree_walker")
+        .blocklist_function("get_pg_major_minor_version_string")
+        .blocklist_function("get_pg_major_version_num")
+        .blocklist_function("get_pg_major_version_string")
+        .blocklist_function("get_pg_version_string")
+        .blocklist_function("heap_tuple_get_struct")
+        .blocklist_function("planstate_tree_walker")
+        .blocklist_function("query_or_expression_tree_walker")
+        .blocklist_function("query_tree_walker")
+        .blocklist_function("range_table_entry_walker")
+        .blocklist_function("range_table_walker")
+        .blocklist_function("raw_expression_tree_walker")
+        .blocklist_function("type_is_array")
 }
 
 fn add_derives(bind: bindgen::Builder) -> bindgen::Builder {
