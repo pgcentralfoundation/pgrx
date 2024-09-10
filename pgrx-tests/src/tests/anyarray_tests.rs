@@ -16,6 +16,16 @@ fn anyarray_arg(array: AnyArray) -> Json {
         .expect("conversion to json returned null")
 }
 
+#[pg_extern]
+fn anyarray_iter_arg(array: AnyArray) -> Json {
+    let mut vec = Vec::<_>::new();
+    for el in &array {
+        vec.push(el.expect("element is null").datum().value() as i64)
+    }
+    unsafe { direct_function_call::<Json>(pg_sys::array_to_json, &[vec.into_datum()]) }
+        .expect("conversion to json returned null")
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
@@ -30,6 +40,15 @@ mod tests {
     fn test_anyarray_arg() -> std::result::Result<(), pgrx::spi::Error> {
         let json = Spi::get_one::<Json>("SELECT anyarray_arg(ARRAY[1::integer,2,3]::integer[]);")?
             .expect("datum was null");
+        assert_eq!(json.0, json! {[1,2,3]});
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_anyarray_iter_arg() -> std::result::Result<(), pgrx::spi::Error> {
+        let json =
+            Spi::get_one::<Json>("SELECT anyarray_iter_arg(ARRAY[1::integer,2,3]::integer[]);")?
+                .expect("datum was null");
         assert_eq!(json.0, json! {[1,2,3]});
         Ok(())
     }
