@@ -24,7 +24,10 @@ use std::panic::{RefUnwindSafe, UnwindSafe};
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
 pub struct TimeWithTimeZone(pg_sys::TimeTzADT);
-const MICROSECONDS_PER_DAY: pg_sys::TimeADT = 86_400_000;
+
+// 86_400_000_000
+const MICROSECONDS_PER_DAY: pg_sys::TimeADT = 24 * 60 * 60 * 1000 /* milli */ * 1000 /* micro */;
+
 impl From<TimeWithTimeZone> for pg_sys::TimeTzADT {
     #[inline]
     fn from(value: TimeWithTimeZone) -> Self {
