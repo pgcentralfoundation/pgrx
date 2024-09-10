@@ -91,7 +91,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
-    use pgrx::datum::datetime_support::IntervalConversionError;
+    use pgrx::datum::datetime_support::{IntervalConversionError, USECS_PER_DAY};
     use pgrx::datum::{get_timezone_offset, DateTimeConversionError};
     use pgrx::prelude::*;
     use serde_json::*;
@@ -131,6 +131,20 @@ mod tests {
 
         // however Postgres wants to format it is fine by us
         assert_eq!(json!({"time W/ Zone test":"12:23:34+02:00"}), json);
+    }
+
+    #[pg_test]
+    fn test_timetz_from_time_and_zone() {
+        let timeadt: pg_sys::TimeADT = USECS_PER_DAY / 2;
+        let zone = 0;
+        let timetz = TimeWithTimeZone::try_from((timeadt, zone)).unwrap();
+
+        let expected_timetz = TimeWithTimeZone::with_timezone(12, 0, 0.0, "UTC").unwrap();
+
+        assert_eq!(timetz.hour(), expected_timetz.hour());
+        assert_eq!(timetz.minute(), expected_timetz.minute());
+        assert_eq!(timetz.second(), expected_timetz.second());
+        assert_eq!(timetz.timezone_offset(), expected_timetz.timezone_offset());
     }
 
     #[pg_test]
