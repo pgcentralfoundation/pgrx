@@ -24,6 +24,9 @@ mod ops;
 
 pub use ctor::*;
 
+pub const USECS_PER_SEC: i64 = 1_000_000;
+pub const USECS_PER_DAY: i64 = pg_sys::SECS_PER_DAY as i64 * USECS_PER_SEC;
+
 /// Tags to identify which "part" of a date or time-type value to extract or truncate to
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum DateTimeParts {

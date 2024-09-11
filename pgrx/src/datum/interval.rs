@@ -7,15 +7,12 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::datum::datetime_support::IntervalConversionError;
+use crate::datum::datetime_support::{IntervalConversionError, USECS_PER_DAY, USECS_PER_SEC};
 use crate::datum::{DateTimeParts, DateTimeTypeVisitor, FromDatum, IntoDatum, Time, ToIsoString};
 use crate::{direct_function_call, pg_sys};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
-
-pub const USECS_PER_SEC: i64 = 1_000_000;
-pub const USECS_PER_DAY: i64 = pg_sys::SECS_PER_DAY as i64 * USECS_PER_SEC;
 
 /// From the PG docs <https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-INTERVAL-INPUT>
 /// Internally interval values are stored as months, days, and microseconds. This is done because the number of days in a month varies,

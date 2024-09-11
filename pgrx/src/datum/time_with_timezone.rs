@@ -11,7 +11,7 @@ use super::{
     DateTimeConversionError, FromDatum, Interval, IntoDatum, Time, TimestampWithTimeZone,
     ToIsoString,
 };
-use crate::datum::datetime_support::{DateTimeParts, HasExtractableParts};
+use crate::datum::datetime_support::{DateTimeParts, HasExtractableParts, USECS_PER_DAY};
 use crate::{direct_function_call, direct_function_call_as_datum, pg_sys, PgMemoryContexts};
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
@@ -24,7 +24,7 @@ use std::panic::{RefUnwindSafe, UnwindSafe};
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
 pub struct TimeWithTimeZone(pg_sys::TimeTzADT);
-const MICROSECONDS_PER_DAY: pg_sys::TimeADT = 86_400_000;
+
 impl From<TimeWithTimeZone> for pg_sys::TimeTzADT {
     #[inline]
     fn from(value: TimeWithTimeZone) -> Self {
@@ -146,7 +146,7 @@ impl TimeWithTimeZone {
     }
 
     pub fn modular_from_raw(tuple: (i64, i32)) -> Self {
-        let time = tuple.0.rem_euclid(MICROSECONDS_PER_DAY);
+        let time = tuple.0.rem_euclid(USECS_PER_DAY);
         let zone = tuple.1.rem_euclid(pg_sys::TZDISP_LIMIT as i32);
 
         Self(pg_sys::TimeTzADT { time, zone })
