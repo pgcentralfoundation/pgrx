@@ -10,14 +10,15 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
 
-use crate::datum::Datum;
 use crate::datum::{
     AnyArray, AnyElement, AnyNumeric, Date, FromDatum, Inet, Internal, Interval, IntoDatum, Json,
     JsonB, Numeric, PgVarlena, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
     UnboxDatum, Uuid,
 };
+use crate::datum::{BorrowDatum, Datum};
 use crate::datum::{Range, RangeSubType};
 use crate::heap_tuple::PgHeapTuple;
+use crate::layout::PassBy;
 use crate::nullable::Nullable;
 use crate::pg_sys;
 use crate::pgbox::*;
@@ -266,6 +267,20 @@ argue_from_datum! { 'fcx; AnyArray, AnyElement, AnyNumeric }
 argue_from_datum! { 'fcx; Inet, Internal, Json, JsonB, Uuid, PgRelation }
 argue_from_datum! { 'fcx; pg_sys::BOX, pg_sys::ItemPointerData, pg_sys::Oid, pg_sys::Point }
 argue_from_datum! { 'fcx; &'fcx str, &'fcx CStr, &'fcx [u8] }
+
+unsafe impl<'fcx, T> ArgAbi<'fcx> for &'fcx T
+where
+    T: BorrowDatum,
+{
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> &'fcx T {
+        let ptr: *mut u8 = match T::PASS {
+            Some(PassBy::Ref) => arg.2.value.cast_mut_ptr(),
+            Some(PassBy::Value) => ptr::addr_of!(arg.0.raw_args()[arg.1].value).cast_mut().cast(),
+            _ => todo!(),
+        };
+        unsafe { &*T::point_from(ptr) }
+    }
+}
 
 /// How to return a value from Rust to Postgres
 ///
