@@ -38075,7 +38075,6 @@ extern "C" {
     pub fn MemoryContextDeleteChildren(context: MemoryContext);
     pub fn MemoryContextSetIdentifier(context: MemoryContext, id: *const ::core::ffi::c_char);
     pub fn MemoryContextSetParent(context: MemoryContext, new_parent: MemoryContext);
-    pub fn GetMemoryChunkContext(pointer: *mut ::core::ffi::c_void) -> MemoryContext;
     pub fn GetMemoryChunkSpace(pointer: *mut ::core::ffi::c_void) -> Size;
     pub fn MemoryContextGetParent(context: MemoryContext) -> MemoryContext;
     pub fn MemoryContextIsEmpty(context: MemoryContext) -> bool;
