@@ -116,7 +116,8 @@ where
     }
 
     /**
-    Oxidized form of [ARR_NULLBITMAP(ArrayType*)][ARR_NULLBITMAP]
+    Oxidized form of [ARR_NULLBITMAP(ArrayType*)][arr_nullbitmap]
+
     If this returns None, the array *cannot* have nulls.
     Note that unlike the `is_null: bool` that appears elsewhere, 1 is "valid" and 0 is "null".
 
@@ -124,6 +125,7 @@ where
     Trailing bits must be set to 0, and all elements marked with 1 must be initialized.
     The null bitmap is linear but the layout of elements may be nonlinear, so for some arrays
     these cannot be calculated directly from each other.
+
     [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
     */
     pub unsafe fn nulls_mut(&mut self) -> Option<&mut [u8]> {
