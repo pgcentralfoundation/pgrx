@@ -19,7 +19,7 @@ repository = "https://github.com/pgcentralfoundation/pgrx/"
 documentation = "https://docs.rs/pgrx-pg-sys"
 readme = "README.md"
 edition = "2021"
-include = ["src/**/*", "README.md", "include/*", "cshim/*", "bindgen.rs"]
+include = ["src/**/*", "README.md", "include/*", "pgrx-cshim.c", "bindgen.rs"]
 build = "bindgen.rs"
 
 [features]

@@ -11,7 +11,7 @@ use bindgen::callbacks::{DeriveTrait, EnumVariantValue, ImplementsTrait, MacroPa
 use bindgen::NonCopyUnionStyle;
 use eyre::{eyre, WrapErr};
 use pgrx_pg_config::{
-    is_supported_major_version, prefix_path, PgConfig, PgConfigSelector, Pgrx, SUPPORTED_VERSIONS,
+    is_supported_major_version, PgConfig, PgConfigSelector, Pgrx, SUPPORTED_VERSIONS,
 };
 use quote::{quote, ToTokens};
 use std::cell::RefCell;
@@ -284,7 +284,7 @@ fn emit_rerun_if_changed() {
     println!("cargo:rerun-if-env-changed=PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE");
 
     println!("cargo:rerun-if-changed=include");
-    println!("cargo:rerun-if-changed=cshim");
+    println!("cargo:rerun-if-changed=pgrx-cshim.c");
 
     if let Ok(pgrx_config) = Pgrx::config_toml() {
         println!("cargo:rerun-if-changed={}", pgrx_config.display());
@@ -356,9 +356,9 @@ struct BuildPaths {
     out_dir: PathBuf,
     /// {manifest_dir}/src
     src_dir: PathBuf,
-    /// {manifest_dir}/cshim
+    /// {manifest_dir}/pgrx-cshim.c
     shim_src: PathBuf,
-    /// {out_dir}/cshim
+    /// {out_dir}/pgrx-cshim.c
     shim_dst: PathBuf,
 }
 
@@ -369,8 +369,8 @@ impl BuildPaths {
         let out_dir = env_tracked("OUT_DIR").map(PathBuf::from).unwrap();
         Self {
             src_dir: manifest_dir.join("src/include"),
-            shim_src: manifest_dir.join("cshim"),
-            shim_dst: out_dir.join("cshim"),
+            shim_src: manifest_dir.join("pgrx-cshim.c"),
+            shim_dst: out_dir.join("pgrx-cshim.c"),
             out_dir,
             manifest_dir,
         }
@@ -793,7 +793,7 @@ fn run_bindgen(
         .layout_tests(false)
         .default_non_copy_union_style(NonCopyUnionStyle::ManuallyDrop)
         .wrap_static_fns(enable_cshim)
-        .wrap_static_fns_path(out_path.join("wrap_static_fns"))
+        .wrap_static_fns_path(out_path.join("pgrx-cshim-static"))
         .generate()
         .wrap_err_with(|| format!("Unable to generate bindings for pg{major_version}"))?;
     let mut binding_str = bindings.to_string();
@@ -949,60 +949,17 @@ fn build_shim(
 ) -> eyre::Result<()> {
     let major_version = pg_config.major_version()?;
 
-    // then build the shim for the version feature currently being built
-    build_shim_for_version(shim_src, shim_dst, pg_config)?;
+    std::fs::copy(shim_src, shim_dst).unwrap();
 
-    // no matter what, tell rustc to link to the library that was built for the feature we're currently building
-    let envvar_name = format!("CARGO_FEATURE_PG{major_version}");
-    if env_tracked(&envvar_name).is_some() {
-        println!("cargo:rustc-link-search={}", shim_dst.display());
-        println!("cargo:rustc-link-lib=static=pgrx-cshim-{major_version}");
+    let mut build = cc::Build::new();
+    if let Some(flag) = pg_target_include_flags(major_version, pg_config)? {
+        build.flag(&flag);
     }
-
-    Ok(())
-}
-
-fn build_shim_for_version(
-    shim_src: &path::Path,
-    shim_dst: &path::Path,
-    pg_config: &PgConfig,
-) -> eyre::Result<()> {
-    let path_env = prefix_path(pg_config.parent_path());
-    let major_version = pg_config.major_version()?;
-
-    eprintln!("PATH for build_shim={path_env}");
-    eprintln!("shim_src={}", shim_src.display());
-    eprintln!("shim_dst={}", shim_dst.display());
-
-    fs::create_dir_all(shim_dst).unwrap();
-
-    let makefile_dst = path::Path::join(shim_dst, "./Makefile");
-    if !makefile_dst.try_exists()? {
-        fs::copy(path::Path::join(shim_src, "./Makefile"), makefile_dst).unwrap();
+    for flag in extra_bindgen_clang_args(pg_config)? {
+        build.flag(&flag);
     }
-
-    let cshim_dst = path::Path::join(shim_dst, "./pgrx-cshim.c");
-    if !cshim_dst.try_exists()? {
-        fs::copy(path::Path::join(shim_src, "./pgrx-cshim.c"), cshim_dst).unwrap();
-    }
-
-    let make = env_tracked("MAKE").unwrap_or_else(|| "make".to_string());
-    let rc = run_command(
-        Command::new(make)
-            .arg("clean")
-            .arg(&format!("libpgrx-cshim-{major_version}.a"))
-            .env("PG_TARGET_VERSION", format!("{major_version}"))
-            .env("PATH", path_env)
-            .env_remove("TARGET")
-            .env_remove("HOST")
-            .current_dir(shim_dst),
-        &format!("shim for PG v{major_version}"),
-    )?;
-
-    if rc.status.code().unwrap() != 0 {
-        return Err(eyre!("failed to make pgrx-cshim for v{major_version}"));
-    }
-
+    build.file(shim_dst);
+    build.compile("pgrx-cshim");
     Ok(())
 }
 

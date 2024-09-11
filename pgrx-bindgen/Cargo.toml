@@ -20,3 +20,4 @@ bindgen = { version = "0.70.1", default-features = false, features = ["experimen
 clang-sys = { version = "1", features = ["clang_6_0", "runtime"] }
 quote = "1.0.33"
 shlex = "1.3" # shell lexing, also used by many of our deps
+cc = "1.0"
