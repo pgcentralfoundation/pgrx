@@ -92,11 +92,11 @@ where
     Self: 'a,
 {
     type Item = Option<AnyElement>;
-    type IntoIter = AnyArrayIntoIterator<'a>;
+    type IntoIter = AnyArrayIterator<'a>;
 
     fn into_iter(self) -> Self::IntoIter {
         unsafe {
-            AnyArrayIntoIterator {
+            AnyArrayIterator {
                 inner: Array::<pg_sys::Datum>::from_polymorphic_datum(
                     self.datum(),
                     false,
@@ -109,12 +109,12 @@ where
     }
 }
 
-pub struct AnyArrayIntoIterator<'a> {
+pub struct AnyArrayIterator<'a> {
     inner: Option<ArrayIntoIterator<'a, pg_sys::Datum>>,
     typelem: pg_sys::Oid,
 }
 
-impl<'a> Iterator for AnyArrayIntoIterator<'a> {
+impl<'a> Iterator for AnyArrayIterator<'a> {
     type Item = Option<AnyElement>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -134,5 +134,5 @@ impl<'a> Iterator for AnyArrayIntoIterator<'a> {
     }
 }
 
-impl<'a> ExactSizeIterator for AnyArrayIntoIterator<'a> {}
-impl<'a> FusedIterator for AnyArrayIntoIterator<'a> {}
+impl<'a> ExactSizeIterator for AnyArrayIterator<'a> {}
+impl<'a> FusedIterator for AnyArrayIterator<'a> {}
