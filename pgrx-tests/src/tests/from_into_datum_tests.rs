@@ -43,4 +43,17 @@ mod tests {
         assert_eq!(cstr, expected);
         Ok(())
     }
+
+    #[pg_test]
+    fn null_string_is_none() {
+        let val: pg_sys::Datum = pg_sys::Datum::null();
+        let is_null: bool = true;
+
+        unsafe {
+            if let Some(_) = String::from_datum(val, is_null) {
+                // <- this seg fault
+                panic!("converted a null Datum into a valid string")
+            }
+        }
+    }
 }
