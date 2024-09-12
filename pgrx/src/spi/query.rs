@@ -15,11 +15,11 @@ use crate::{datum::DatumWithOid, pg_sys};
 /// be implemented for other types, provided they can be converted into a query.
 pub trait Query<'conn>: Sized {
     /// Execute a query given a client and other arguments.
-    fn execute(
+    fn execute<'mcx>(
         self,
         client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
-        args: &[DatumWithOid],
+        args: &[DatumWithOid<'mcx>],
     ) -> SpiResult<SpiTupleTable<'conn>>;
 
     /// Open a cursor for the query.
@@ -28,45 +28,51 @@ pub trait Query<'conn>: Sized {
     ///
     /// Panics if a cursor wasn't opened.
     #[deprecated(since = "0.12.2", note = "undefined behavior")]
-    fn open_cursor(self, client: &SpiClient<'conn>, args: &[DatumWithOid]) -> SpiCursor<'conn> {
+    fn open_cursor<'mcx>(
+        self,
+        client: &SpiClient<'conn>,
+        args: &[DatumWithOid<'mcx>],
+    ) -> SpiCursor<'conn> {
         self.try_open_cursor(client, args).unwrap()
     }
 
     /// Tries to open cursor for the query.
-    fn try_open_cursor(
+    fn try_open_cursor<'mcx>(
         self,
         client: &SpiClient<'conn>,
-        args: &[DatumWithOid],
+        args: &[DatumWithOid<'mcx>],
     ) -> SpiResult<SpiCursor<'conn>>;
 }
 
 impl<'conn> Query<'conn> for &String {
-    fn execute(
+    fn execute<'mcx>(
         self,
         client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
-        args: &[DatumWithOid],
+        args: &[DatumWithOid<'mcx>],
     ) -> SpiResult<SpiTupleTable<'conn>> {
         self.as_str().execute(client, limit, args)
     }
 
-    fn try_open_cursor(
+    fn try_open_cursor<'mcx>(
         self,
         client: &SpiClient<'conn>,
-        args: &[DatumWithOid],
+        args: &[DatumWithOid<'mcx>],
     ) -> SpiResult<SpiCursor<'conn>> {
         self.as_str().try_open_cursor(client, args)
     }
 }
 
-fn prepare_datum(datum: &DatumWithOid) -> (pg_sys::Datum, std::os::raw::c_char) {
+fn prepare_datum<'mcx>(datum: &DatumWithOid<'mcx>) -> (pg_sys::Datum, std::os::raw::c_char) {
     match datum.datum() {
         Some(datum) => (datum.sans_lifetime(), ' ' as std::os::raw::c_char),
         None => (pg_sys::Datum::from(0usize), 'n' as std::os::raw::c_char),
     }
 }
 
-fn args_to_datums(args: &[DatumWithOid]) -> (Vec<pg_sys::Oid>, Vec<pg_sys::Datum>, Vec<c_char>) {
+fn args_to_datums<'mcx>(
+    args: &[DatumWithOid<'mcx>],
+) -> (Vec<pg_sys::Oid>, Vec<pg_sys::Datum>, Vec<c_char>) {
     let mut argtypes = Vec::with_capacity(args.len());
     let mut datums = Vec::with_capacity(args.len());
     let mut nulls = Vec::with_capacity(args.len());
@@ -86,11 +92,11 @@ impl<'conn> Query<'conn> for &str {
     /// # Panics
     ///
     /// This function will panic if somehow the specified query contains a null byte.
-    fn execute(
+    fn execute<'mcx>(
         self,
         _client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
-        args: &[DatumWithOid],
+        args: &[DatumWithOid<'mcx>],
     ) -> SpiResult<SpiTupleTable<'conn>> {
         // SAFETY: no concurrent access
         unsafe {
@@ -128,10 +134,10 @@ impl<'conn> Query<'conn> for &str {
         SpiClient::prepare_tuple_table(status_code)
     }
 
-    fn try_open_cursor(
+    fn try_open_cursor<'mcx>(
         self,
         _client: &SpiClient<'conn>,
-        args: &[DatumWithOid],
+        args: &[DatumWithOid<'mcx>],
     ) -> SpiResult<SpiCursor<'conn>> {
         let src = CString::new(self).expect("query contained a null byte");
 
@@ -183,38 +189,38 @@ impl Drop for OwnedPreparedStatement {
 }
 
 impl<'conn> Query<'conn> for &OwnedPreparedStatement {
-    fn execute(
+    fn execute<'mcx>(
         self,
         client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
-        args: &[DatumWithOid],
+        args: &[DatumWithOid<'mcx>],
     ) -> SpiResult<SpiTupleTable<'conn>> {
         (&self.0).execute(client, limit, args)
     }
 
-    fn try_open_cursor(
+    fn try_open_cursor<'mcx>(
         self,
         client: &SpiClient<'conn>,
-        args: &[DatumWithOid],
+        args: &[DatumWithOid<'mcx>],
     ) -> SpiResult<SpiCursor<'conn>> {
         (&self.0).try_open_cursor(client, args)
     }
 }
 
 impl<'conn> Query<'conn> for OwnedPreparedStatement {
-    fn execute(
+    fn execute<'mcx>(
         self,
         client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
-        args: &[DatumWithOid],
+        args: &[DatumWithOid<'mcx>],
     ) -> SpiResult<SpiTupleTable<'conn>> {
         (&self.0).execute(client, limit, args)
     }
 
-    fn try_open_cursor(
+    fn try_open_cursor<'mcx>(
         self,
         client: &SpiClient<'conn>,
-        args: &[DatumWithOid],
+        args: &[DatumWithOid<'mcx>],
     ) -> SpiResult<SpiCursor<'conn>> {
         (&self.0).try_open_cursor(client, args)
     }
@@ -238,9 +244,9 @@ impl<'conn> PreparedStatement<'conn> {
         })
     }
 
-    fn args_to_datums(
+    fn args_to_datums<'mcx>(
         &self,
-        args: &[DatumWithOid],
+        args: &[DatumWithOid<'mcx>],
     ) -> SpiResult<(Vec<pg_sys::Datum>, Vec<std::os::raw::c_char>)> {
         let actual = args.len();
         let expected = unsafe { pg_sys::SPI_getargcount(self.plan.as_ptr()) } as usize;
@@ -254,11 +260,11 @@ impl<'conn> PreparedStatement<'conn> {
 }
 
 impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
-    fn execute(
+    fn execute<'mcx>(
         self,
         _client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
-        args: &[DatumWithOid],
+        args: &[DatumWithOid<'mcx>],
     ) -> SpiResult<SpiTupleTable<'conn>> {
         // SAFETY: no concurrent access
         unsafe {
@@ -281,10 +287,10 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
         SpiClient::prepare_tuple_table(status_code)
     }
 
-    fn try_open_cursor(
+    fn try_open_cursor<'mcx>(
         self,
         _client: &SpiClient<'conn>,
-        args: &[DatumWithOid],
+        args: &[DatumWithOid<'mcx>],
     ) -> SpiResult<SpiCursor<'conn>> {
         let (mut datums, nulls) = self.args_to_datums(args)?;
 
@@ -304,19 +310,19 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
 }
 
 impl<'conn> Query<'conn> for PreparedStatement<'conn> {
-    fn execute(
+    fn execute<'mcx>(
         self,
         client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
-        args: &[DatumWithOid],
+        args: &[DatumWithOid<'mcx>],
     ) -> SpiResult<SpiTupleTable<'conn>> {
         (&self).execute(client, limit, args)
     }
 
-    fn try_open_cursor(
+    fn try_open_cursor<'mcx>(
         self,
         client: &SpiClient<'conn>,
-        args: &[DatumWithOid],
+        args: &[DatumWithOid<'mcx>],
     ) -> SpiResult<SpiCursor<'conn>> {
         (&self).try_open_cursor(client, args)
     }
