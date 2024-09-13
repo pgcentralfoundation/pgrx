@@ -141,7 +141,7 @@ where
 }
 
 unsafe impl<T: ?Sized> BorrowDatum for FlatArray<'_, T> {
-    const PASS: Option<layout::PassBy> = Some(layout::PassBy::Ref);
+    const PASS: layout::PassBy = layout::PassBy::Ref;
     unsafe fn point_from(ptr: *mut u8) -> *mut Self {
         unsafe {
             let len = varlena::varsize_any(ptr.cast()) - mem::size_of::<pg_sys::ArrayType>();

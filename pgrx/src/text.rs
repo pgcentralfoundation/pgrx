@@ -36,7 +36,7 @@ impl DerefMut for Text {
 }
 
 unsafe impl BorrowDatum for Text {
-    const PASS: Option<PassBy> = Some(PassBy::Ref);
+    const PASS: PassBy = PassBy::Ref;
     unsafe fn point_from(ptr: *mut u8) -> *mut Self {
         unsafe {
             let len = varlena::varsize_any(ptr.cast());
