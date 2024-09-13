@@ -25,7 +25,7 @@ pub unsafe trait BorrowDatum {
     /// - `PassBy::Ref` means the pointee will occupy at least 1 byte for variable-sized types.
     ///
     /// Note that this means a zero-sized type is inappropriate for `BorrowDatum`.
-    const PASS: Option<PassBy>;
+    const PASS: PassBy;
 
     /// Cast a pointer to this blob of bytes to a pointer to this type.
     ///
@@ -62,10 +62,10 @@ macro_rules! borrow_by_value {
     ($($value_ty:ty),*) => {
         $(
             unsafe impl BorrowDatum for $value_ty {
-                const PASS: Option<PassBy> = if mem::size_of::<Self>() <= mem::size_of::<Datum>() {
-                    Some(PassBy::Value)
+                const PASS: PassBy = if mem::size_of::<Self>() <= mem::size_of::<Datum>() {
+                    PassBy::Value
                 } else {
-                    Some(PassBy::Ref)
+                    PassBy::Ref
                 };
 
                 unsafe fn point_from(ptr: *mut u8) -> *mut Self {
@@ -82,7 +82,7 @@ borrow_by_value! {
 
 /// It is rare to pass CStr via Datums, but not unheard of
 unsafe impl BorrowDatum for ffi::CStr {
-    const PASS: Option<PassBy> = Some(PassBy::Ref);
+    const PASS: PassBy = PassBy::Ref;
 
     unsafe fn point_from(ptr: *mut u8) -> *mut Self {
         let char_ptr: *mut ffi::c_char = ptr.cast();

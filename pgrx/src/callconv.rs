@@ -274,9 +274,8 @@ where
 {
     unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> &'fcx T {
         let ptr: *mut u8 = match T::PASS {
-            Some(PassBy::Ref) => arg.2.value.cast_mut_ptr(),
-            Some(PassBy::Value) => ptr::addr_of!(arg.0.raw_args()[arg.1].value).cast_mut().cast(),
-            _ => todo!(),
+            PassBy::Ref => arg.2.value.cast_mut_ptr(),
+            PassBy::Value => ptr::addr_of!(arg.0.raw_args()[arg.1].value).cast_mut().cast(),
         };
         unsafe { &*T::point_from(ptr) }
     }
