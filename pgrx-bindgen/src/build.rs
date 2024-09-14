@@ -676,7 +676,7 @@ impl<'a> From<&'a [syn::Item]> for StructGraph<'a> {
 
 impl<'a> StructDescriptor<'a> {
     /// children returns an iterator over the children of this node in the graph
-    fn children(&'a self, graph: &'a StructGraph) -> StructDescriptorChildren {
+    fn children(&'a self, graph: &'a StructGraph) -> StructDescriptorChildren<'a> {
         StructDescriptorChildren { offset: 0, descriptor: self, graph }
     }
 }

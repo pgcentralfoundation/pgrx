@@ -41,11 +41,11 @@ fn returns_option_ref_with_lifetime() -> Option<&'static str> {
 #[pg_extern]
 fn returns_tuple_with_lifetime<'a>(
     value: &'a str,
-) -> TableIterator<(name!(a, &'a str), name!(b, Option<&'a str>))> {
+) -> TableIterator<'a, (name!(a, &'a str), name!(b, Option<&'a str>))> {
     TableIterator::once((value, Some(value)))
 }
 
 #[pg_extern]
-fn returns_iterator_with_lifetime<'a>(value: &'a str) -> SetOfIterator<&'a str> {
+fn returns_iterator_with_lifetime<'a>(value: &'a str) -> SetOfIterator<'a, &'a str> {
     SetOfIterator::new(value.split_whitespace().into_iter())
 }

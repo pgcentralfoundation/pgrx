@@ -96,7 +96,7 @@ mod tests {
     #[pg_trigger]
     fn field_species_fox_to_bear<'a>(
         trigger: &'a pgrx::PgTrigger<'a>,
-    ) -> Result<Option<PgHeapTuple<'_, impl WhoAllocated>>, TriggerError> {
+    ) -> Result<Option<PgHeapTuple<'a, impl WhoAllocated>>, TriggerError> {
         let mut new = trigger.new().ok_or(TriggerError::NullTriggerTuple)?.into_owned();
 
         let field = "species";
