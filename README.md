@@ -84,7 +84,7 @@ those remain untested. So far, some of PGRX's build tooling works on Windows, bu
 
  ‡ A local PostgreSQL server installation is not required. `cargo pgrx` can download and compile PostgreSQL versions on its own.
 
- ⹋ PGRX has not been tested to work on 32-bit, but the library correcly handles conversion of `pg_sys::Datum`
+ ⹋ PGRX has not been tested to work on 32-bit, but the library attempts to handle conversion of `pg_sys::Datum`
 to and from `int8` and `double` types. Use it only for your own risk. We do not plan to add offical support
 without considerable ongoing technical and financial contributions.
 
