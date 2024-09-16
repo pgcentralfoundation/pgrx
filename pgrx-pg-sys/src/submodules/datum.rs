@@ -129,7 +129,7 @@ impl From<u32> for Datum {
 impl From<u64> for Datum {
     #[inline]
     fn from(val: u64) -> Datum {
-        if size_of::<u64>() <= size_of::<usize>() {
+        if size_of::<u64>() <= size_of::<Datum>() {
             Datum::from(val as usize)
         } else {
             Datum::from(Box::into_raw(Box::new(val)))
@@ -161,7 +161,7 @@ impl From<i32> for Datum {
 impl From<i64> for Datum {
     #[inline]
     fn from(val: i64) -> Datum {
-        if size_of::<i64>() <= size_of::<usize>() {
+        if size_of::<i64>() <= size_of::<Datum>() {
             Datum::from(val as usize)
         } else {
             Datum::from(Box::into_raw(Box::new(val)))

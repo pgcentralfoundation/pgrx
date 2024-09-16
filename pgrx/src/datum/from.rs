@@ -283,7 +283,7 @@ impl FromDatum for i64 {
         if is_null {
             None
         } else {
-            let value = if size_of::<i64>() <= size_of::<usize>() {
+            let value = if size_of::<i64>() <= size_of::<Datum>() {
                 datum.value() as _
             } else {
                 *(datum.cast_mut_ptr() as *const _)
@@ -320,7 +320,7 @@ impl FromDatum for f64 {
         if is_null {
             None
         } else {
-            let value = if size_of::<i64>() <= size_of::<usize>() {
+            let value = if size_of::<i64>() <= size_of::<Datum>() {
                 f64::from_bits(datum.value() as _)
             } else {
                 *(datum.cast_mut_ptr() as *const _)
