@@ -34,25 +34,3 @@ pub use pg_try::*;
 #[cfg(feature = "pg12")]
 pub use polyfill::*;
 pub use utils::*;
-
-#[cfg(target_os = "linux")]
-extern "C" {
-    #[link_name = "__sigsetjmp"]
-    pub(crate) fn sigsetjmp(
-        env: *mut crate::sigjmp_buf,
-        savemask: std::os::raw::c_int,
-    ) -> std::os::raw::c_int;
-}
-
-#[cfg(any(
-    target_os = "macos",
-    target_os = "freebsd",
-    target_os = "openbsd",
-    target_os = "illumos"
-))]
-extern "C" {
-    pub(crate) fn sigsetjmp(
-        env: *mut crate::sigjmp_buf,
-        savemask: std::os::raw::c_int,
-    ) -> std::os::raw::c_int;
-}
