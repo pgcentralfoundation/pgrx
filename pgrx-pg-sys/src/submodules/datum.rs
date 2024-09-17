@@ -129,7 +129,7 @@ impl From<u32> for Datum {
 impl From<u64> for Datum {
     #[inline]
     fn from(val: u64) -> Datum {
-        if size_of::<u64>() <= size_of::<Datum>() {
+        if cfg!(target_pointer_width = "64") {
             Datum::from(val as usize)
         } else {
             unsafe {
@@ -165,7 +165,7 @@ impl From<i32> for Datum {
 impl From<i64> for Datum {
     #[inline]
     fn from(val: i64) -> Datum {
-        if size_of::<i64>() <= size_of::<Datum>() {
+        if cfg!(target_pointer_width = "64") {
             Datum::from(val as usize)
         } else {
             unsafe {
