@@ -417,7 +417,11 @@ impl PgrxSql {
                 }
             }
 
-            full_sql.push_str(&inner_sql.join("\n\n"));
+            if !inner_sql.is_empty() {
+                full_sql.push_str("/* <begin connected objects> */\n");
+                full_sql.push_str(&inner_sql.join("\n\n"));
+                full_sql.push_str("/* </end connected objects> */\n\n");
+            }
         }
 
         Ok(full_sql)
