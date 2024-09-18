@@ -404,6 +404,22 @@ impl PgrxSql {
     pub fn to_sql(&self) -> eyre::Result<String> {
         let mut full_sql = String::new();
 
+        // NB:  A properly we'd *like* to maintain is that the schema generator outputs
+        // consistent results from run-to-run when there are no changes to the schema.
+        // This is to improve change detecting using simple tools like `diff`.
+        //
+        // Historically, we used [`petgraph::algo:toposort`] but its ordering is not at all
+        // consistent.
+        //
+        // [`petgraph::algo::tarjan_scc`] appears to be consistent, although it's not exactly
+        // clear if this is due to an implementation detail or specifics of the algorithm itself.
+        // (I, eeeebbbbrrrr, am not a graph theory expert)
+        //
+        // In any event, if in the future schema generation stops being consistent, this is the
+        // place to look.
+        //
+        // We have no tests around this as it's really just a property we'd like to have, and
+        // it does seem ensuring it is a bit of black magic.
         for nodes in petgraph::algo::tarjan_scc(&self.graph).iter().rev() {
             let mut inner_sql = Vec::with_capacity(nodes.len());
 
