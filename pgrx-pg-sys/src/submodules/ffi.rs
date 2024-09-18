@@ -53,7 +53,7 @@ pgrx::pg_sys::ffi::pg_guard_ffi_boundary(|| {
 ```
 
 Further, it is undefined behavior if the function passed into `pg_guard_ffi_boundary` panics. It
-is recommended that you keepthe body of the `pg_guard_ffi_boundary` closure very small -- ideally
+is recommended that you keep the body of the `pg_guard_ffi_boundary` closure very small -- ideally
 *only* containing a call to some C function, rather than containing any logic or variables of its
 own.
 
