@@ -403,19 +403,23 @@ impl PgrxSql {
 
     pub fn to_sql(&self) -> eyre::Result<String> {
         let mut full_sql = String::new();
-        for step_id in petgraph::algo::toposort(&self.graph, None).map_err(|e| {
-            eyre!("Failed to toposort SQL entities, node with cycle: {:?}", self.graph[e.node_id()])
-        })? {
-            let step = &self.graph[step_id];
 
-            let sql = step.to_sql(self)?;
-            full_sql.push_str(sql.trim_matches('\n'));
+        for nodes in petgraph::algo::tarjan_scc(&self.graph).iter().rev() {
+            let mut inner_sql = Vec::with_capacity(nodes.len());
 
-            if !full_sql.is_empty() && !full_sql.ends_with("\n\n") {
-                full_sql.push_str("\n\n");
+            for node in nodes {
+                let step = &self.graph[*node];
+                let sql = step.to_sql(self)?;
+
+                let trimmed = sql.trim();
+                if !trimmed.is_empty() {
+                    inner_sql.push(format!("{trimmed}\n"))
+                }
             }
+
+            full_sql.push_str(&inner_sql.join("\n\n"));
         }
-        let _ = full_sql.pop();
+
         Ok(full_sql)
     }
 
