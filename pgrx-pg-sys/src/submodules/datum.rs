@@ -129,7 +129,15 @@ impl From<u32> for Datum {
 impl From<u64> for Datum {
     #[inline]
     fn from(val: u64) -> Datum {
-        Datum::from(val as usize)
+        if cfg!(target_pointer_width = "64") {
+            Datum::from(val as usize)
+        } else {
+            unsafe {
+                let ptr = crate::palloc(size_of::<u64>()) as *mut u64;
+                *ptr = val;
+                Datum::from(ptr)
+            }
+        }
     }
 }
 
@@ -157,7 +165,15 @@ impl From<i32> for Datum {
 impl From<i64> for Datum {
     #[inline]
     fn from(val: i64) -> Datum {
-        Datum::from(val as usize)
+        if cfg!(target_pointer_width = "64") {
+            Datum::from(val as usize)
+        } else {
+            unsafe {
+                let ptr = crate::palloc(size_of::<i64>()) as *mut i64;
+                *ptr = val;
+                Datum::from(ptr)
+            }
+        }
     }
 }
 
@@ -223,41 +239,28 @@ mod test {
 
     #[test]
     fn roundtrip_integers() {
-        #[cfg(target_pointer_width = "64")]
-        mod types {
-            pub type UnsignedInt = u64;
-            pub type SignedInt = i64;
-        }
-        #[cfg(target_pointer_width = "32")]
-        mod types {
-            // 64-bit integers would be truncated on 32 bit platforms
-            pub type UnsignedInt = u32;
-            pub type SignedInt = i32;
-        }
-        use types::*;
-
-        let val: SignedInt = 123456;
+        let val = i64::MAX;
         let datum = Datum::from(val);
-        assert_eq!(datum.value() as SignedInt, val);
+        assert_eq!(datum.value() as i64, val);
 
-        let val: isize = 123456;
+        let val = isize::MAX;
         let datum = Datum::from(val);
         assert_eq!(datum.value() as isize, val);
 
-        let val: SignedInt = -123456;
+        let val = i64::MIN;
         let datum = Datum::from(val);
-        assert_eq!(datum.value() as SignedInt, val);
+        assert_eq!(datum.value() as i64, val);
 
-        let val: isize = -123456;
+        let val = isize::MIN;
         let datum = Datum::from(val);
         assert_eq!(datum.value() as isize, val);
 
-        let val: UnsignedInt = 123456;
+        let val = u64::MAX;
         let datum = Datum::from(val);
-        assert_eq!(datum.value() as UnsignedInt, val);
+        assert_eq!(datum.value() as u64, val);
 
-        let val: usize = 123456;
+        let val = usize::MAX;
         let datum = Datum::from(val);
-        assert_eq!({ datum.value() }, val);
+        assert_eq!(datum.value(), val);
     }
 }

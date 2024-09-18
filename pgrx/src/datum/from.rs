@@ -12,7 +12,7 @@
 use crate::{
     pg_sys, varlena, varlena_to_byte_slice, AllocatedByPostgres, IntoDatum, PgBox, PgMemoryContexts,
 };
-use core::ffi::CStr;
+use core::{ffi::CStr, mem::size_of};
 use std::num::NonZeroUsize;
 
 /// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
@@ -283,7 +283,12 @@ impl FromDatum for i64 {
         if is_null {
             None
         } else {
-            Some(datum.value() as _)
+            let value = if size_of::<i64>() <= size_of::<pg_sys::Datum>() {
+                datum.value() as _
+            } else {
+                *(datum.cast_mut_ptr() as *const _)
+            };
+            Some(value)
         }
     }
 }
@@ -315,7 +320,12 @@ impl FromDatum for f64 {
         if is_null {
             None
         } else {
-            Some(f64::from_bits(datum.value() as _))
+            let value = if size_of::<i64>() <= size_of::<pg_sys::Datum>() {
+                f64::from_bits(datum.value() as _)
+            } else {
+                *(datum.cast_mut_ptr() as *const _)
+            };
+            Some(value)
         }
     }
 }
