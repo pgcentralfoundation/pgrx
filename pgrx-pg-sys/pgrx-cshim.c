@@ -8,20 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-
-#include "postgres.h"
-
-#define IS_PG_12 (PG_VERSION_NUM >= 120000 && PG_VERSION_NUM < 130000)
-#define IS_PG_13 (PG_VERSION_NUM >= 130000 && PG_VERSION_NUM < 140000)
-
-#include "access/tableam.h"
-#include "executor/executor.h"
-#include "executor/tuptable.h"
-#include "nodes/pathnodes.h"
-#include "nodes/pg_list.h"
-#include "parser/parsetree.h"
-#include "storage/spin.h"
-#include "storage/bufpage.h"
+#include "pgrx-cshim-static.c"
 
 PGDLLEXPORT void *pgrx_list_nth(List *list, int nth);
 void *pgrx_list_nth(List *list, int nth) {
@@ -62,5 +49,3 @@ PGDLLEXPORT bool pgrx_SpinLockFree(slock_t *lock);
 bool pgrx_SpinLockFree(slock_t *lock) {
     return SpinLockFree(lock);
 }
-
-#include "../wrap_static_fns.c"
