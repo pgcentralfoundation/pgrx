@@ -406,7 +406,7 @@ impl PgrxSql {
 
         // NB:  A properly we'd *like* to maintain is that the schema generator outputs
         // consistent results from run-to-run when there are no changes to the schema.
-        // This is to improve change detecting using simple tools like `diff`.
+        // This is to improve change detection using simple tools like `diff`.
         //
         // Historically, we used [`petgraph::algo:toposort`] but its ordering is not at all
         // consistent.
