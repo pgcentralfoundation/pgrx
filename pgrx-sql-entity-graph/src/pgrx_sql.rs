@@ -403,19 +403,43 @@ impl PgrxSql {
 
     pub fn to_sql(&self) -> eyre::Result<String> {
         let mut full_sql = String::new();
-        for step_id in petgraph::algo::toposort(&self.graph, None).map_err(|e| {
-            eyre!("Failed to toposort SQL entities, node with cycle: {:?}", self.graph[e.node_id()])
-        })? {
-            let step = &self.graph[step_id];
 
-            let sql = step.to_sql(self)?;
-            full_sql.push_str(sql.trim_matches('\n'));
+        // NB:  A properly we'd *like* to maintain is that the schema generator outputs
+        // consistent results from run-to-run when there are no changes to the schema.
+        // This is to improve change detection using simple tools like `diff`.
+        //
+        // Historically, we used [`petgraph::algo:toposort`] but its ordering is not at all
+        // consistent.
+        //
+        // [`petgraph::algo::tarjan_scc`] appears to be consistent, although it's not exactly
+        // clear if this is due to an implementation detail or specifics of the algorithm itself.
+        // (I, eeeebbbbrrrr, am not a graph theory expert)
+        //
+        // In any event, if in the future schema generation stops being consistent, this is the
+        // place to look.
+        //
+        // We have no tests around this as it's really just a property we'd like to have, and
+        // it does seem ensuring it is a bit of black magic.
+        for nodes in petgraph::algo::tarjan_scc(&self.graph).iter().rev() {
+            let mut inner_sql = Vec::with_capacity(nodes.len());
 
-            if !full_sql.is_empty() && !full_sql.ends_with("\n\n") {
-                full_sql.push_str("\n\n");
+            for node in nodes {
+                let step = &self.graph[*node];
+                let sql = step.to_sql(self)?;
+
+                let trimmed = sql.trim();
+                if !trimmed.is_empty() {
+                    inner_sql.push(format!("{trimmed}\n"))
+                }
+            }
+
+            if !inner_sql.is_empty() {
+                full_sql.push_str("/* <begin connected objects> */\n");
+                full_sql.push_str(&inner_sql.join("\n\n"));
+                full_sql.push_str("/* </end connected objects> */\n\n");
             }
         }
-        let _ = full_sql.pop();
+
         Ok(full_sql)
     }
 
