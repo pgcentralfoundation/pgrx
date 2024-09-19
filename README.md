@@ -88,17 +88,36 @@ those remain untested. So far, some of PGRX's build tooling works on Windows, bu
 to and from `int8` and `double` types. Use it only for your own risk. We do not plan to add offical support
 without considerable ongoing technical and financial contributions.
 
-<details style="border: 1px solid; padding: 0.25em 0.5em 0;">
-   <summary><i>How to:</i> <b>Homebrew on macOS</b></summary>
+### macOS
 
-As macOS provides no package manager, it is recommended to use https://brew.sh for C dependencies.
+Running PGRX on a Mac requires some additional setup.
 
-In particular, you will probably need these if you don't have them already:
+The Mac C compiler (clang) and related tools are bundled with [XCode](https://developer.apple.com/xcode/). 
+XCode can be installed from the Mac App Store.
+
+For additional C libraries, it's easiest to use [Homebrew](https://brew.sh/). In particular, 
+you will probably need these if you don't have them already:
 
 ```zsh
 brew install git icu4c pkg-config
 ```
-</details>
+The config script that Postgres 17 uses in its build process does not automatically detect 
+the Homebrew install directory. (Earlier versions of Postgres do not have this problem.) 
+You may see this error:
+
+```configure: error: ICU library not found```
+
+To fix it, run
+```
+export PKG_CONFIG_PATH=/opt/homebrew/opt/icu4c/lib/pkgconfig
+```
+on the command line before you run ```cargo pgrx init```
+
+Every once in a while, XCode will update itself and move the directory that contains
+the C compiler. When the Postgres ./config process runs during the build, it grabs the current directory
+and stores it, which means that there will be build errors if you do a full rebuild of your
+project and the old directory has disappeared. The solution is re-run `cargo pgrx init` so the
+Postgres installs get rebuilt.
 
 ## Getting Started
 
