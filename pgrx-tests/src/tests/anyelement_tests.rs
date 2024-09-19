@@ -11,14 +11,13 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
-    use pgrx::{prelude::*, AnyElement};
+    use pgrx::{datum::DatumWithOid, prelude::*, AnyElement};
 
     #[pg_test]
     fn test_anyelement_arg() -> Result<(), pgrx::spi::Error> {
-        let element = Spi::get_one_with_args::<AnyElement>(
-            "SELECT anyelement_arg($1);",
-            vec![(PgBuiltInOids::ANYELEMENTOID.oid(), 123.into_datum())],
-        )?
+        let element = Spi::get_one_with_args::<AnyElement>("SELECT anyelement_arg($1);", unsafe {
+            &[DatumWithOid::new(123, AnyElement::type_oid())]
+        })?
         .map(|e| e.datum());
 
         assert_eq!(element, 123.into_datum());
