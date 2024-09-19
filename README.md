@@ -116,9 +116,8 @@ on the command line before you run ```cargo pgrx init```
 Every once in a while, XCode will update itself and move the directory that contains
 the C compiler. When the Postgres ./config process runs during the build, it grabs the current directory
 and stores it, which means that there will be build errors if you do a full rebuild of your
-project and the old directory has disappeared. The solution is to delete the ~\.pgrx directory and re-run `cargo pgrx init`.
-**Caution**: deleting .pgrx will also delete the databases you have stored there, so make
-sure they are preserved or can be recreated.
+project and the old directory has disappeared. The solution is re-run `cargo pgrx init` so the
+Postgres installs get rebuilt.
 
 ## Getting Started
 
