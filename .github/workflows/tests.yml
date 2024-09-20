@@ -236,6 +236,7 @@ jobs:
             --package pgrx-sql-entity-graph
 
       - name: Check that cross-compiled pgrx-tests can build
+        if: success() || failure()
         run: |
           cargo build --tests \
             --features "pg$PG_VER" \
@@ -243,104 +244,132 @@ jobs:
             --target aarch64-unknown-linux-gnu
 
       - name: Run pgrx-tests with cshim enabled
+        if: success() || failure()
         run: |
           cargo test \
             --features "pg$PG_VER cshim proptest" \
             --package pgrx-tests --lib
 
       - name: Run pgrx-tests with cshim disabled
+        if: success() || failure()
         run: |
           cargo test \
             --features "pg$PG_VER proptest" \
             --package pgrx-tests --lib
 
       - name: Run UI tests
-        if: ${{ matrix.rust == null }}
+        if: ${{ matrix.rust == null && (success() || failure()) }}
         run: |
           cargo test \
             --features "pg$PG_VER proptest" \
             --package pgrx-tests --test ui
 
-
       - name: Run aggregate example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/aggregate/Cargo.toml --features "pg$PG_VER" --no-default-features
 
       - name: Run arrays example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/arrays/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run bad_ideas example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/bad_ideas/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run bgworker example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/bgworker/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run bytea example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/bytea/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run composite_type example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/composite_type/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run custom_libname example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_libname/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run custom_types example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_types/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run custom_types without schema generation example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_types/Cargo.toml  --features "pg$PG_VER no-schema-generation" --no-default-features
 
       - name: Run custom_sql example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_sql/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run datetime example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/datetime/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run errors example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/errors/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run nostd example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/nostd/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run numeric example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/numeric/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run pgtrybuilder example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/pgtrybuilder/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run operators example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/operators/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run range example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/range/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run schemas example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/schemas/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run shmem example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/shmem/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run spi example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/spi/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run spi_srf example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/spi_srf/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run srf example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/srf/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run strings example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/strings/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run triggers example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/triggers/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run versioned_custom_libname_so example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/versioned_custom_libname_so/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run versioned_so example tests
+        if: success() || failure()
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/versioned_so/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
       - name: Run `cargo pgrx schema` against the versioned_custom_libname_so example
+        if: success() || failure()
         run: cd pgrx-examples/versioned_custom_libname_so && cargo pgrx schema pg$PG_VER
 
       # Attempt to make the cache payload slightly smaller.
