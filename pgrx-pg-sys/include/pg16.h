@@ -121,6 +121,7 @@
 #include "parser/parse_expr.h"
 #include "parser/parse_func.h"
 #include "parser/parse_oper.h"
+#include "parser/parse_relation.h"
 #include "parser/parse_type.h"
 #include "parser/parse_coerce.h"
 #include "parser/parser.h"
