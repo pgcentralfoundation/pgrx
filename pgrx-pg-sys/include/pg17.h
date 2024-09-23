@@ -73,6 +73,7 @@
 #include "commands/defrem.h"
 #include "commands/event_trigger.h"
 #include "commands/explain.h"
+#include "commands/prepare.h"
 #include "commands/proclang.h"
 #include "commands/seclabel.h"
 #include "commands/tablespace.h"
