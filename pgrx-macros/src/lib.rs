@@ -969,7 +969,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         stream.extend(quote! {
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: Option<&::core::ffi::CStr>, oid: Option<i32>, typmod: Option<i32>) -> Option<#name #generics> {
+            pub fn #funcname_in #generics(input: Option<&::core::ffi::CStr>, oid: pgrx::pg_sys::Oid, typmod: i32) -> Option<#name #generics> {
                 input.map_or_else(|| {
                     for m in <#name as ::pgrx::inoutfuncs::TypmodInOutFuncs>::NULL_ERROR_MESSAGE {
                         ::pgrx::pg_sys::error!("{m}");
