@@ -776,6 +776,7 @@ Optionally accepts the following attributes:
     PostgresType,
     attributes(
         inoutfuncs,
+        typmod_inoutfuncs,
         pgvarlena_inoutfuncs,
         bikeshed_postgres_type_manually_impl_from_into_datum,
         requires,
@@ -963,6 +964,29 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                 unsafe { buffer.leak_cstr().to_owned() }
             }
         });
+    } else if args.contains(&PostgresTypeAttribute::TypmodInOutFuncs) {
+        // otherwise if it's TypmodInOutFuncs our _in/_out functions use an owned type instance
+        stream.extend(quote! {
+            #[doc(hidden)]
+            #[::pgrx::pgrx_macros::pg_extern(immutable,parallel_safe)]
+            pub fn #funcname_in #generics(input: Option<&::core::ffi::CStr>, oid: Option<i32>, typmod: Option<i32>) -> Option<#name #generics> {
+                input.map_or_else(|| {
+                    for m in <#name as ::pgrx::inoutfuncs::TypmodInOutFuncs>::NULL_ERROR_MESSAGE {
+                        ::pgrx::pg_sys::error!("{m}");
+                    }
+                    None
+                }, |i| Some(<#name as ::pgrx::inoutfuncs::TypmodInOutFuncs>::input(i, oid, typmod)))
+            }
+
+            #[doc(hidden)]
+            #[::pgrx::pgrx_macros::pg_extern(immutable,parallel_safe)]
+            pub fn #funcname_out #generics(input: #name #generics) -> ::pgrx::ffi::CString {
+                let mut buffer = ::pgrx::stringinfo::StringInfo::new();
+                ::pgrx::inoutfuncs::TypmodInOutFuncs::output(&input, &mut buffer);
+                // SAFETY: We just constructed this StringInfo ourselves
+                unsafe { buffer.leak_cstr().to_owned() }
+            }
+        });
     } else if args.contains(&PostgresTypeAttribute::PgVarlenaInOutFuncs) {
         // otherwise if it's PgVarlenaInOutFuncs our _in/_out functions use a PgVarlena
         stream.extend(quote! {
@@ -1085,6 +1109,7 @@ fn impl_guc_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
 #[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
 enum PostgresTypeAttribute {
     InOutFuncs,
+    TypmodInOutFuncs,
     PgVarlenaInOutFuncs,
     Default,
     ManualFromIntoDatum,
@@ -1099,6 +1124,9 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
         match path.as_str() {
             "inoutfuncs" => {
                 categorized_attributes.insert(PostgresTypeAttribute::InOutFuncs);
+            }
+            "typmod_inoutfuncs" => {
+                categorized_attributes.insert(PostgresTypeAttribute::TypmodInOutFuncs);
             }
             "pgvarlena_inoutfuncs" => {
                 categorized_attributes.insert(PostgresTypeAttribute::PgVarlenaInOutFuncs);

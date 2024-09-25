@@ -17,6 +17,7 @@ use crate::datum::PgVarlena;
 use crate::*;
 #[doc(hidden)]
 pub use serde_json::{from_slice as json_from_slice, to_vec as json_to_vec};
+use crate::pg_sys::Oid;
 
 /// `#[derive(Copy, Clone, PostgresType)]` types need to implement this trait to provide the text
 /// input/output functions for that type
@@ -43,6 +44,25 @@ pub trait InOutFuncs {
     ///
     /// It is expected that malformed input will raise an `error!()` or `panic!()`
     fn input(input: &core::ffi::CStr) -> Self
+    where
+        Self: Sized;
+
+    /// Convert `Self` into text by writing to the supplied `StringInfo` buffer
+    fn output(&self, buffer: &mut StringInfo);
+
+    /// If PostgreSQL calls the conversion function with NULL as an argument, what
+    /// error message should be generated?
+    const NULL_ERROR_MESSAGE: Option<&'static str> = None;
+}
+
+/// `#[derive(Serialize, Deserialize, PostgresType)]` types may implement this trait if they prefer
+/// a textual representation that isn't JSON
+/// Input function taking three arguments of types `cstring`, `oid`, `integer`. 
+pub trait TypmodInOutFuncs {
+    /// Given a string representation of `Self`, parse it into `Self`.
+    ///
+    /// It is expected that malformed input will raise an `error!()` or `panic!()`
+    fn input(input: &core::ffi::CStr, oid: Option<i32>, typmod: Option<i32>) -> Self
     where
         Self: Sized;
 
