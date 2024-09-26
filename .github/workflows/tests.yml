@@ -164,7 +164,7 @@ jobs:
           echo ""
 
       - name: Setup release Postgres apt repo
-        if: matrix.postgres != '17'
+        if: matrix.postgres != '18'
         run: |
           sudo apt-get install -y wget gnupg
           sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
@@ -172,7 +172,7 @@ jobs:
           sudo apt-get update -y -qq --fix-missing
 
       - name: Setup beta Postgres apt repo
-        if: matrix.postgres == '17'
+        if: matrix.postgres == '18'
         run: |
           sudo apt-get install -y wget gnupg
           sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7FCC7D46ACCC4CF8
