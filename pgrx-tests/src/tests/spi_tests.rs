@@ -271,8 +271,10 @@ mod tests {
                 None,
                 None,
             )?;
-            let prepared = client
-                .prepare("SELECT * FROM tests.cursor_table WHERE id = $1", Some(oids_of![i32]))?;
+            let prepared = client.prepare(
+                "SELECT * FROM tests.cursor_table WHERE id = $1",
+                Some(oids_of![i32].to_vec()),
+            )?;
             client.open_cursor(&prepared, args);
             unreachable!();
         })
@@ -392,7 +394,7 @@ mod tests {
     #[pg_test]
     fn test_prepared_statement() -> Result<(), spi::Error> {
         let rc = Spi::connect(|client| {
-            let prepared = client.prepare("SELECT $1", Some(oids_of![i32]))?;
+            let prepared = client.prepare("SELECT $1", Some(oids_of![i32].to_vec()))?;
             client.select(&prepared, None, Some(vec![42.into_datum()]))?.first().get::<i32>(1)
         })?;
 
@@ -403,7 +405,7 @@ mod tests {
     #[pg_test]
     fn test_prepared_statement_argument_mismatch() {
         let err = Spi::connect(|client| {
-            let prepared = client.prepare("SELECT $1", Some(oids_of![i32]))?;
+            let prepared = client.prepare("SELECT $1", Some(oids_of![i32].to_vec()))?;
             client.select(&prepared, None, None).map(|_| ())
         })
         .unwrap_err();
@@ -417,7 +419,7 @@ mod tests {
     #[pg_test]
     fn test_owned_prepared_statement() -> Result<(), spi::Error> {
         let prepared = Spi::connect(|client| {
-            Ok::<_, spi::Error>(client.prepare("SELECT $1", Some(oids_of![i32]))?.keep())
+            Ok::<_, spi::Error>(client.prepare("SELECT $1", Some(oids_of![i32].to_vec()))?.keep())
         })?;
         let rc = Spi::connect(|client| {
             client.select(&prepared, None, Some(vec![42.into_datum()]))?.first().get::<i32>(1)

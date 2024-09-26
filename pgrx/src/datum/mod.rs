@@ -163,6 +163,6 @@ pub trait PostgresType {}
 #[macro_export]
 macro_rules! oids_of {
     ($($t:path),* $(,)?) => ({
-        vec![$(::pgrx::pg_sys::PgOid::from(<$t>::type_oid())),*]
+        [$(::pgrx::pg_sys::PgOid::from(<$t>::type_oid())),*]
     });
 }
