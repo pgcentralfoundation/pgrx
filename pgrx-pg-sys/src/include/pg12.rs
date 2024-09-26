@@ -3016,6 +3016,9 @@ pub const Natts_pg_event_trigger: u32 = 7;
 pub const AT_REWRITE_ALTER_PERSISTENCE: u32 = 1;
 pub const AT_REWRITE_DEFAULT_VAL: u32 = 2;
 pub const AT_REWRITE_COLUMN_REWRITE: u32 = 4;
+pub const CACHEDPLANSOURCE_MAGIC: u32 = 195726186;
+pub const CACHEDPLAN_MAGIC: u32 = 953717834;
+pub const CACHEDEXPR_MAGIC: u32 = 838275847;
 pub const XLOG_TBLSPC_CREATE: u32 = 0;
 pub const XLOG_TBLSPC_DROP: u32 = 16;
 pub const TRIGGER_EVENT_INSERT: u32 = 0;
@@ -3104,9 +3107,6 @@ pub const FIELDNO_AGGSTATEPERGROUPDATA_TRANSVALUEISNULL: u32 = 1;
 pub const FIELDNO_AGGSTATEPERGROUPDATA_NOTRANSVALUE: u32 = 2;
 pub const EEO_FLAG_INTERPRETER_INITIALIZED: u32 = 2;
 pub const EEO_FLAG_DIRECT_THREADED: u32 = 4;
-pub const CACHEDPLANSOURCE_MAGIC: u32 = 195726186;
-pub const CACHEDPLAN_MAGIC: u32 = 953717834;
-pub const CACHEDEXPR_MAGIC: u32 = 838275847;
 pub const SPI_ERROR_CONNECT: i32 = -1;
 pub const SPI_ERROR_COPY: i32 = -2;
 pub const SPI_ERROR_OPUNKNOWN: i32 = -3;
@@ -22946,6 +22946,116 @@ pub type ExplainOneQuery_hook_type = ::core::option::Option<
 >;
 pub type explain_get_index_name_hook_type =
     ::core::option::Option<unsafe extern "C" fn(indexId: Oid) -> *const ::core::ffi::c_char>;
+pub mod PlanCacheMode {
+    pub type Type = ::core::ffi::c_uint;
+    pub const PLAN_CACHE_MODE_AUTO: Type = 0;
+    pub const PLAN_CACHE_MODE_FORCE_GENERIC_PLAN: Type = 1;
+    pub const PLAN_CACHE_MODE_FORCE_CUSTOM_PLAN: Type = 2;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CachedPlanSource {
+    pub magic: ::core::ffi::c_int,
+    pub raw_parse_tree: *mut RawStmt,
+    pub query_string: *const ::core::ffi::c_char,
+    pub commandTag: *const ::core::ffi::c_char,
+    pub param_types: *mut Oid,
+    pub num_params: ::core::ffi::c_int,
+    pub parserSetup: ParserSetupHook,
+    pub parserSetupArg: *mut ::core::ffi::c_void,
+    pub cursor_options: ::core::ffi::c_int,
+    pub fixed_result: bool,
+    pub resultDesc: TupleDesc,
+    pub context: MemoryContext,
+    pub query_list: *mut List,
+    pub relationOids: *mut List,
+    pub invalItems: *mut List,
+    pub search_path: *mut OverrideSearchPath,
+    pub query_context: MemoryContext,
+    pub rewriteRoleId: Oid,
+    pub rewriteRowSecurity: bool,
+    pub dependsOnRLS: bool,
+    pub gplan: *mut CachedPlan,
+    pub is_oneshot: bool,
+    pub is_complete: bool,
+    pub is_saved: bool,
+    pub is_valid: bool,
+    pub generation: ::core::ffi::c_int,
+    pub node: dlist_node,
+    pub generic_cost: f64,
+    pub total_custom_cost: f64,
+    pub num_custom_plans: ::core::ffi::c_int,
+}
+impl Default for CachedPlanSource {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CachedPlan {
+    pub magic: ::core::ffi::c_int,
+    pub stmt_list: *mut List,
+    pub is_oneshot: bool,
+    pub is_saved: bool,
+    pub is_valid: bool,
+    pub planRoleId: Oid,
+    pub dependsOnRole: bool,
+    pub saved_xmin: TransactionId,
+    pub generation: ::core::ffi::c_int,
+    pub refcount: ::core::ffi::c_int,
+    pub context: MemoryContext,
+}
+impl Default for CachedPlan {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CachedExpression {
+    pub magic: ::core::ffi::c_int,
+    pub expr: *mut Node,
+    pub is_valid: bool,
+    pub relationOids: *mut List,
+    pub invalItems: *mut List,
+    pub context: MemoryContext,
+    pub node: dlist_node,
+}
+impl Default for CachedExpression {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PreparedStatement {
+    pub stmt_name: [::core::ffi::c_char; 64usize],
+    pub plansource: *mut CachedPlanSource,
+    pub from_sql: bool,
+    pub prepare_time: TimestampTz,
+}
+impl Default for PreparedStatement {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 pub type check_object_relabel_type = ::core::option::Option<
     unsafe extern "C" fn(object: *const ObjectAddress, seclabel: *const ::core::ffi::c_char),
 >;
@@ -24263,99 +24373,6 @@ pub struct SubscriptingRefState {
     pub prevnull: bool,
 }
 impl Default for SubscriptingRefState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub mod PlanCacheMode {
-    pub type Type = ::core::ffi::c_uint;
-    pub const PLAN_CACHE_MODE_AUTO: Type = 0;
-    pub const PLAN_CACHE_MODE_FORCE_GENERIC_PLAN: Type = 1;
-    pub const PLAN_CACHE_MODE_FORCE_CUSTOM_PLAN: Type = 2;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CachedPlanSource {
-    pub magic: ::core::ffi::c_int,
-    pub raw_parse_tree: *mut RawStmt,
-    pub query_string: *const ::core::ffi::c_char,
-    pub commandTag: *const ::core::ffi::c_char,
-    pub param_types: *mut Oid,
-    pub num_params: ::core::ffi::c_int,
-    pub parserSetup: ParserSetupHook,
-    pub parserSetupArg: *mut ::core::ffi::c_void,
-    pub cursor_options: ::core::ffi::c_int,
-    pub fixed_result: bool,
-    pub resultDesc: TupleDesc,
-    pub context: MemoryContext,
-    pub query_list: *mut List,
-    pub relationOids: *mut List,
-    pub invalItems: *mut List,
-    pub search_path: *mut OverrideSearchPath,
-    pub query_context: MemoryContext,
-    pub rewriteRoleId: Oid,
-    pub rewriteRowSecurity: bool,
-    pub dependsOnRLS: bool,
-    pub gplan: *mut CachedPlan,
-    pub is_oneshot: bool,
-    pub is_complete: bool,
-    pub is_saved: bool,
-    pub is_valid: bool,
-    pub generation: ::core::ffi::c_int,
-    pub node: dlist_node,
-    pub generic_cost: f64,
-    pub total_custom_cost: f64,
-    pub num_custom_plans: ::core::ffi::c_int,
-}
-impl Default for CachedPlanSource {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CachedPlan {
-    pub magic: ::core::ffi::c_int,
-    pub stmt_list: *mut List,
-    pub is_oneshot: bool,
-    pub is_saved: bool,
-    pub is_valid: bool,
-    pub planRoleId: Oid,
-    pub dependsOnRole: bool,
-    pub saved_xmin: TransactionId,
-    pub generation: ::core::ffi::c_int,
-    pub refcount: ::core::ffi::c_int,
-    pub context: MemoryContext,
-}
-impl Default for CachedPlan {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CachedExpression {
-    pub magic: ::core::ffi::c_int,
-    pub expr: *mut Node,
-    pub is_valid: bool,
-    pub relationOids: *mut List,
-    pub invalItems: *mut List,
-    pub context: MemoryContext,
-    pub node: dlist_node,
-}
-impl Default for CachedExpression {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -26971,6 +26988,24 @@ pub mod FuncDetailCode {
     pub const FUNCDETAIL_COERCION: Type = 6;
 }
 pub type Operator = HeapTuple;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct FuzzyAttrMatchState {
+    pub distance: ::core::ffi::c_int,
+    pub rfirst: *mut RangeTblEntry,
+    pub first: AttrNumber,
+    pub rsecond: *mut RangeTblEntry,
+    pub second: AttrNumber,
+}
+impl Default for FuzzyAttrMatchState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 pub type Type = HeapTuple;
 pub type TYPCATEGORY = ::core::ffi::c_char;
 pub mod CoercionPathType {
@@ -36281,6 +36316,113 @@ extern "C" {
         labeled: bool,
         es: *mut ExplainState,
     );
+    pub fn CreateExtension(
+        pstate: *mut ParseState,
+        stmt: *mut CreateExtensionStmt,
+    ) -> ObjectAddress;
+    pub fn RemoveExtensionById(extId: Oid);
+    pub fn InsertExtensionTuple(
+        extName: *const ::core::ffi::c_char,
+        extOwner: Oid,
+        schemaOid: Oid,
+        relocatable: bool,
+        extVersion: *const ::core::ffi::c_char,
+        extConfig: Datum,
+        extCondition: Datum,
+        requiredExtensions: *mut List,
+    ) -> ObjectAddress;
+    pub fn ExecAlterExtensionStmt(
+        pstate: *mut ParseState,
+        stmt: *mut AlterExtensionStmt,
+    ) -> ObjectAddress;
+    pub fn ExecAlterExtensionContentsStmt(
+        stmt: *mut AlterExtensionContentsStmt,
+        objAddress: *mut ObjectAddress,
+    ) -> ObjectAddress;
+    pub fn get_extension_oid(extname: *const ::core::ffi::c_char, missing_ok: bool) -> Oid;
+    pub fn get_extension_name(ext_oid: Oid) -> *mut ::core::ffi::c_char;
+    pub fn AlterExtensionNamespace(
+        extensionName: *const ::core::ffi::c_char,
+        newschema: *const ::core::ffi::c_char,
+        oldschema: *mut Oid,
+    ) -> ObjectAddress;
+    pub fn InitPlanCache();
+    pub fn ResetPlanCache();
+    pub fn CreateCachedPlan(
+        raw_parse_tree: *mut RawStmt,
+        query_string: *const ::core::ffi::c_char,
+        commandTag: *const ::core::ffi::c_char,
+    ) -> *mut CachedPlanSource;
+    pub fn CreateOneShotCachedPlan(
+        raw_parse_tree: *mut RawStmt,
+        query_string: *const ::core::ffi::c_char,
+        commandTag: *const ::core::ffi::c_char,
+    ) -> *mut CachedPlanSource;
+    pub fn CompleteCachedPlan(
+        plansource: *mut CachedPlanSource,
+        querytree_list: *mut List,
+        querytree_context: MemoryContext,
+        param_types: *mut Oid,
+        num_params: ::core::ffi::c_int,
+        parserSetup: ParserSetupHook,
+        parserSetupArg: *mut ::core::ffi::c_void,
+        cursor_options: ::core::ffi::c_int,
+        fixed_result: bool,
+    );
+    pub fn SaveCachedPlan(plansource: *mut CachedPlanSource);
+    pub fn DropCachedPlan(plansource: *mut CachedPlanSource);
+    pub fn CachedPlanSetParentContext(plansource: *mut CachedPlanSource, newcontext: MemoryContext);
+    pub fn CopyCachedPlan(plansource: *mut CachedPlanSource) -> *mut CachedPlanSource;
+    pub fn CachedPlanIsValid(plansource: *mut CachedPlanSource) -> bool;
+    pub fn CachedPlanGetTargetList(
+        plansource: *mut CachedPlanSource,
+        queryEnv: *mut QueryEnvironment,
+    ) -> *mut List;
+    pub fn GetCachedPlan(
+        plansource: *mut CachedPlanSource,
+        boundParams: ParamListInfo,
+        useResOwner: bool,
+        queryEnv: *mut QueryEnvironment,
+    ) -> *mut CachedPlan;
+    pub fn ReleaseCachedPlan(plan: *mut CachedPlan, useResOwner: bool);
+    pub fn GetCachedExpression(expr: *mut Node) -> *mut CachedExpression;
+    pub fn FreeCachedExpression(cexpr: *mut CachedExpression);
+    pub fn PrepareQuery(
+        stmt: *mut PrepareStmt,
+        queryString: *const ::core::ffi::c_char,
+        stmt_location: ::core::ffi::c_int,
+        stmt_len: ::core::ffi::c_int,
+    );
+    pub fn ExecuteQuery(
+        stmt: *mut ExecuteStmt,
+        intoClause: *mut IntoClause,
+        queryString: *const ::core::ffi::c_char,
+        params: ParamListInfo,
+        dest: *mut DestReceiver,
+        completionTag: *mut ::core::ffi::c_char,
+    );
+    pub fn DeallocateQuery(stmt: *mut DeallocateStmt);
+    pub fn ExplainExecuteQuery(
+        execstmt: *mut ExecuteStmt,
+        into: *mut IntoClause,
+        es: *mut ExplainState,
+        queryString: *const ::core::ffi::c_char,
+        params: ParamListInfo,
+        queryEnv: *mut QueryEnvironment,
+    );
+    pub fn StorePreparedStatement(
+        stmt_name: *const ::core::ffi::c_char,
+        plansource: *mut CachedPlanSource,
+        from_sql: bool,
+    );
+    pub fn FetchPreparedStatement(
+        stmt_name: *const ::core::ffi::c_char,
+        throwError: bool,
+    ) -> *mut PreparedStatement;
+    pub fn DropPreparedStatement(stmt_name: *const ::core::ffi::c_char, showError: bool);
+    pub fn FetchPreparedStatementResultDesc(stmt: *mut PreparedStatement) -> TupleDesc;
+    pub fn FetchPreparedStatementTargetList(stmt: *mut PreparedStatement) -> *mut List;
+    pub fn DropAllPreparedStatements();
     pub fn CreateProceduralLanguage(stmt: *mut CreatePLangStmt) -> ObjectAddress;
     pub fn DropProceduralLanguageById(langOid: Oid);
     pub fn PLTemplateExists(languageName: *const ::core::ffi::c_char) -> bool;
@@ -36816,47 +36958,6 @@ extern "C" {
         op: *mut ExprEvalStep,
         econtext: *mut ExprContext,
     );
-    pub fn InitPlanCache();
-    pub fn ResetPlanCache();
-    pub fn CreateCachedPlan(
-        raw_parse_tree: *mut RawStmt,
-        query_string: *const ::core::ffi::c_char,
-        commandTag: *const ::core::ffi::c_char,
-    ) -> *mut CachedPlanSource;
-    pub fn CreateOneShotCachedPlan(
-        raw_parse_tree: *mut RawStmt,
-        query_string: *const ::core::ffi::c_char,
-        commandTag: *const ::core::ffi::c_char,
-    ) -> *mut CachedPlanSource;
-    pub fn CompleteCachedPlan(
-        plansource: *mut CachedPlanSource,
-        querytree_list: *mut List,
-        querytree_context: MemoryContext,
-        param_types: *mut Oid,
-        num_params: ::core::ffi::c_int,
-        parserSetup: ParserSetupHook,
-        parserSetupArg: *mut ::core::ffi::c_void,
-        cursor_options: ::core::ffi::c_int,
-        fixed_result: bool,
-    );
-    pub fn SaveCachedPlan(plansource: *mut CachedPlanSource);
-    pub fn DropCachedPlan(plansource: *mut CachedPlanSource);
-    pub fn CachedPlanSetParentContext(plansource: *mut CachedPlanSource, newcontext: MemoryContext);
-    pub fn CopyCachedPlan(plansource: *mut CachedPlanSource) -> *mut CachedPlanSource;
-    pub fn CachedPlanIsValid(plansource: *mut CachedPlanSource) -> bool;
-    pub fn CachedPlanGetTargetList(
-        plansource: *mut CachedPlanSource,
-        queryEnv: *mut QueryEnvironment,
-    ) -> *mut List;
-    pub fn GetCachedPlan(
-        plansource: *mut CachedPlanSource,
-        boundParams: ParamListInfo,
-        useResOwner: bool,
-        queryEnv: *mut QueryEnvironment,
-    ) -> *mut CachedPlan;
-    pub fn ReleaseCachedPlan(plan: *mut CachedPlan, useResOwner: bool);
-    pub fn GetCachedExpression(expr: *mut Node) -> *mut CachedExpression;
-    pub fn FreeCachedExpression(cexpr: *mut CachedExpression);
     pub fn EnablePortalManager();
     pub fn PreCommit_Portals(isPrepare: bool) -> bool;
     pub fn AtAbort_Portals();
@@ -39106,6 +39207,11 @@ extern "C" {
     );
     pub fn BuildOnConflictExcludedTargetlist(targetrel: Relation, exclRelIndex: Index)
         -> *mut List;
+    pub fn assign_query_collations(pstate: *mut ParseState, query: *mut Query);
+    pub fn assign_list_collations(pstate: *mut ParseState, exprs: *mut List);
+    pub fn assign_expr_collations(pstate: *mut ParseState, expr: *mut Node);
+    pub fn select_common_collation(pstate: *mut ParseState, exprs: *mut List, none_ok: bool)
+        -> Oid;
     pub fn transformExpr(
         pstate: *mut ParseState,
         expr: *mut Node,
@@ -39250,6 +39356,170 @@ extern "C" {
         rtree: *mut Node,
         location: ::core::ffi::c_int,
     ) -> *mut Expr;
+    pub fn refnameRangeTblEntry(
+        pstate: *mut ParseState,
+        schemaname: *const ::core::ffi::c_char,
+        refname: *const ::core::ffi::c_char,
+        location: ::core::ffi::c_int,
+        sublevels_up: *mut ::core::ffi::c_int,
+    ) -> *mut RangeTblEntry;
+    pub fn scanNameSpaceForCTE(
+        pstate: *mut ParseState,
+        refname: *const ::core::ffi::c_char,
+        ctelevelsup: *mut Index,
+    ) -> *mut CommonTableExpr;
+    pub fn scanNameSpaceForENR(
+        pstate: *mut ParseState,
+        refname: *const ::core::ffi::c_char,
+    ) -> bool;
+    pub fn checkNameSpaceConflicts(
+        pstate: *mut ParseState,
+        namespace1: *mut List,
+        namespace2: *mut List,
+    );
+    pub fn RTERangeTablePosn(
+        pstate: *mut ParseState,
+        rte: *mut RangeTblEntry,
+        sublevels_up: *mut ::core::ffi::c_int,
+    ) -> ::core::ffi::c_int;
+    pub fn GetRTEByRangeTablePosn(
+        pstate: *mut ParseState,
+        varno: ::core::ffi::c_int,
+        sublevels_up: ::core::ffi::c_int,
+    ) -> *mut RangeTblEntry;
+    pub fn GetCTEForRTE(
+        pstate: *mut ParseState,
+        rte: *mut RangeTblEntry,
+        rtelevelsup: ::core::ffi::c_int,
+    ) -> *mut CommonTableExpr;
+    pub fn scanRTEForColumn(
+        pstate: *mut ParseState,
+        rte: *mut RangeTblEntry,
+        colname: *const ::core::ffi::c_char,
+        location: ::core::ffi::c_int,
+        fuzzy_rte_penalty: ::core::ffi::c_int,
+        fuzzystate: *mut FuzzyAttrMatchState,
+    ) -> *mut Node;
+    pub fn colNameToVar(
+        pstate: *mut ParseState,
+        colname: *const ::core::ffi::c_char,
+        localonly: bool,
+        location: ::core::ffi::c_int,
+    ) -> *mut Node;
+    pub fn markVarForSelectPriv(pstate: *mut ParseState, var: *mut Var, rte: *mut RangeTblEntry);
+    pub fn parserOpenTable(
+        pstate: *mut ParseState,
+        relation: *const RangeVar,
+        lockmode: ::core::ffi::c_int,
+    ) -> Relation;
+    pub fn addRangeTableEntry(
+        pstate: *mut ParseState,
+        relation: *mut RangeVar,
+        alias: *mut Alias,
+        inh: bool,
+        inFromCl: bool,
+    ) -> *mut RangeTblEntry;
+    pub fn addRangeTableEntryForRelation(
+        pstate: *mut ParseState,
+        rel: Relation,
+        lockmode: ::core::ffi::c_int,
+        alias: *mut Alias,
+        inh: bool,
+        inFromCl: bool,
+    ) -> *mut RangeTblEntry;
+    pub fn addRangeTableEntryForSubquery(
+        pstate: *mut ParseState,
+        subquery: *mut Query,
+        alias: *mut Alias,
+        lateral: bool,
+        inFromCl: bool,
+    ) -> *mut RangeTblEntry;
+    pub fn addRangeTableEntryForFunction(
+        pstate: *mut ParseState,
+        funcnames: *mut List,
+        funcexprs: *mut List,
+        coldeflists: *mut List,
+        rangefunc: *mut RangeFunction,
+        lateral: bool,
+        inFromCl: bool,
+    ) -> *mut RangeTblEntry;
+    pub fn addRangeTableEntryForValues(
+        pstate: *mut ParseState,
+        exprs: *mut List,
+        coltypes: *mut List,
+        coltypmods: *mut List,
+        colcollations: *mut List,
+        alias: *mut Alias,
+        lateral: bool,
+        inFromCl: bool,
+    ) -> *mut RangeTblEntry;
+    pub fn addRangeTableEntryForTableFunc(
+        pstate: *mut ParseState,
+        tf: *mut TableFunc,
+        alias: *mut Alias,
+        lateral: bool,
+        inFromCl: bool,
+    ) -> *mut RangeTblEntry;
+    pub fn addRangeTableEntryForJoin(
+        pstate: *mut ParseState,
+        colnames: *mut List,
+        jointype: JoinType::Type,
+        aliasvars: *mut List,
+        alias: *mut Alias,
+        inFromCl: bool,
+    ) -> *mut RangeTblEntry;
+    pub fn addRangeTableEntryForCTE(
+        pstate: *mut ParseState,
+        cte: *mut CommonTableExpr,
+        levelsup: Index,
+        rv: *mut RangeVar,
+        inFromCl: bool,
+    ) -> *mut RangeTblEntry;
+    pub fn addRangeTableEntryForENR(
+        pstate: *mut ParseState,
+        rv: *mut RangeVar,
+        inFromCl: bool,
+    ) -> *mut RangeTblEntry;
+    pub fn isLockedRefname(pstate: *mut ParseState, refname: *const ::core::ffi::c_char) -> bool;
+    pub fn addRTEtoQuery(
+        pstate: *mut ParseState,
+        rte: *mut RangeTblEntry,
+        addToJoinList: bool,
+        addToRelNameSpace: bool,
+        addToVarNameSpace: bool,
+    );
+    pub fn errorMissingRTE(pstate: *mut ParseState, relation: *mut RangeVar) -> !;
+    pub fn errorMissingColumn(
+        pstate: *mut ParseState,
+        relname: *const ::core::ffi::c_char,
+        colname: *const ::core::ffi::c_char,
+        location: ::core::ffi::c_int,
+    ) -> !;
+    pub fn expandRTE(
+        rte: *mut RangeTblEntry,
+        rtindex: ::core::ffi::c_int,
+        sublevels_up: ::core::ffi::c_int,
+        location: ::core::ffi::c_int,
+        include_dropped: bool,
+        colnames: *mut *mut List,
+        colvars: *mut *mut List,
+    );
+    pub fn expandRelAttrs(
+        pstate: *mut ParseState,
+        rte: *mut RangeTblEntry,
+        rtindex: ::core::ffi::c_int,
+        sublevels_up: ::core::ffi::c_int,
+        location: ::core::ffi::c_int,
+    ) -> *mut List;
+    pub fn attnameAttNum(
+        rd: Relation,
+        attname: *const ::core::ffi::c_char,
+        sysColOK: bool,
+    ) -> ::core::ffi::c_int;
+    pub fn attnumAttName(rd: Relation, attid: ::core::ffi::c_int) -> *const NameData;
+    pub fn attnumTypeId(rd: Relation, attid: ::core::ffi::c_int) -> Oid;
+    pub fn attnumCollationId(rd: Relation, attid: ::core::ffi::c_int) -> Oid;
+    pub fn isQueryUsingTempRelation(query: *mut Query) -> bool;
     pub fn LookupTypeName(
         pstate: *mut ParseState,
         typeName: *const TypeName,
@@ -44174,6 +44444,9 @@ extern "C" {
     pub static mut object_access_hook: object_access_hook_type;
     pub static mut ExplainOneQuery_hook: ExplainOneQuery_hook_type;
     pub static mut explain_get_index_name_hook: explain_get_index_name_hook_type;
+    pub static mut creating_extension: bool;
+    pub static mut CurrentExtensionObject: Oid;
+    pub static mut plan_cache_mode: ::core::ffi::c_int;
     pub static mut allow_in_place_tablespaces: bool;
     pub static mut SessionReplicationRole: ::core::ffi::c_int;
     pub static mut Password_encryption: ::core::ffi::c_int;
@@ -44183,7 +44456,6 @@ extern "C" {
     pub static mut vacuum_freeze_table_age: ::core::ffi::c_int;
     pub static mut vacuum_multixact_freeze_min_age: ::core::ffi::c_int;
     pub static mut vacuum_multixact_freeze_table_age: ::core::ffi::c_int;
-    pub static mut plan_cache_mode: ::core::ffi::c_int;
     pub static mut SPI_processed: uint64;
     pub static mut SPI_tuptable: *mut SPITupleTable;
     pub static mut SPI_result: ::core::ffi::c_int;
