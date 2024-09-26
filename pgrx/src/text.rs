@@ -7,9 +7,10 @@ use crate::{pg_sys, varlena};
 use core::ops::{Deref, DerefMut};
 use core::ptr;
 
-/// A more strongly-typed representation of a Postgres string, AKA `TEXT`.
-/// A pointer to this points to a byte array, which includes a variable-length header
-/// and an unsized data field which is... often but not always UTF-8.
+/// A Postgres string, AKA `TEXT`.
+///
+/// This is a varlena: a reference to a variable-length header followed by a slice of bytes.
+/// Usually this will be UTF-8, but this is not always strictly enforced by PostgreSQL.
 #[repr(transparent)]
 pub struct Text([u8]);
 
