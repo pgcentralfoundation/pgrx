@@ -195,6 +195,7 @@ where
 }
 
 fn is_null(p: Option<NonNull<u8>>) -> bool {
+    // TODO: this
     if let Some(p) = p {
         todo!()
     } else {
@@ -209,6 +210,7 @@ where
     type Item = Nullable<&'arr T>;
 
     fn next(&mut self) -> Option<Nullable<&'arr T>> {
+        // TODO: iteration
         if todo!() {
             Some(Nullable::Null)
         } else {
