@@ -58,8 +58,7 @@ where
     T: ?Sized + BorrowDatum,
 {
     /// Iterate the array
-    // this lifetime seems wrong
-    pub fn iter(&'mcx self) -> ArrayIter<'mcx, T> {
+    pub fn iter(&self) -> ArrayIter<'_, T> {
         let nelems = self.count();
         let raw = self.as_raw();
         let nulls =
