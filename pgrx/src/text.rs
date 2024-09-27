@@ -4,6 +4,8 @@ use crate::pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use crate::{pg_sys, varlena};
+use alloc::borrow::Cow;
+use alloc::string::String;
 use core::borrow::Borrow;
 use core::{ptr, slice, str};
 
@@ -96,6 +98,13 @@ impl Text {
     /// Obtain a reference to the varlena data if it is a UTF-8 str
     pub fn to_str(&self) -> Result<&str, Utf8Error> {
         str::from_utf8(self.as_bytes())
+    }
+
+    /// You have two cows. Both are UTF-8 data.
+    ///
+    /// One is completely UTF-8, but the other is allocated and non-UTF-8 is patched over with �.
+    pub fn to_str_lossy(&self) -> Cow<'_, str> {
+        String::from_utf8_lossy(self.as_bytes())
     }
 
     /// Iterate over the UTF-8 chunks of the Text's data
