@@ -69,6 +69,14 @@ mod tests {
 
             roundtrip_test!($fname, $tname, $rtype, $expected);
         };
+        ($fname:ident, $tname:ident, $itype:ty, $input:expr, $otype:ty, $output:expr) => {
+            #[pg_extern(requires = [ "create_complex_type" ])] // the "Complex" type comes from another crate, and we need its schema fully created before it can be used here
+            fn $fname(i: $itype) -> $otype {
+                i.into()
+            }
+
+            roundtrip_test!($fname, $tname, $itype, $input, $otype, $output);
+        };
     }
 
     macro_rules! roundtrip_test {
@@ -87,10 +95,32 @@ mod tests {
                 Ok(())
             }
         };
+        ($fname:ident, $tname:ident, $itype:ty, $input:expr, $otype:ty, $output:expr) => {
+            #[pg_test]
+            fn $tname() -> Result<(), Box<dyn Error>> {
+                let input: $itype = $input;
+                let output: $otype = $output;
+                let result: $otype = Spi::get_one_with_args(
+                    &format!("SELECT {}($1)", stringify!(tests.$fname)),
+                    vec![(PgOid::from(<$itype>::type_oid()), input.into_datum())],
+                )?
+                .unwrap();
+
+                assert_eq!(result, output);
+                Ok(())
+            }
+        };
     }
 
     roundtrip!(rt_bytea, test_rt_bytea, &'a [u8], [b'a', b'b', b'c'].as_slice());
-    roundtrip!(rt_char, test_rt_char, char, 'a');
+    roundtrip!(rt_char_0, test_rt_char_0, char, 'a');
+    roundtrip!(rt_char_1, test_rt_char_1, char, 'ß');
+    roundtrip!(rt_char_2, test_rt_char_2, char, 'ℝ');
+    roundtrip!(rt_char_3, test_rt_char_3, char, '💣');
+    roundtrip!(rt_char_4, test_rt_char_4, char, 'a', String, "a".to_owned());
+    roundtrip!(rt_char_5, test_rt_char_5, char, 'ß', String, "ß".to_owned());
+    roundtrip!(rt_char_6, test_rt_char_6, char, 'ℝ', String, "ℝ".to_owned());
+    roundtrip!(rt_char_7, test_rt_char_7, char, '💣', String, "💣".to_owned());
     roundtrip!(rt_i8, test_rt_i8, i8, i8::MAX);
     roundtrip!(rt_point, test_rt_point, pg_sys::Point, pg_sys::Point { x: 1.0, y: 2.0 });
     roundtrip!(rt_string, test_rt_string, String, String::from("string"));

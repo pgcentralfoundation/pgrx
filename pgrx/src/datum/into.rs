@@ -302,7 +302,8 @@ impl IntoDatum for char {
         unsafe {
             // SAFETY: The buffer contains only valid UTF8 data
             // coming from the encode_utf8 method used above.
-            str::from_utf8_unchecked(&buf).into_datum()
+            let len = self.len_utf8();
+            str::from_utf8_unchecked(&buf[..len]).into_datum()
         }
     }
 
