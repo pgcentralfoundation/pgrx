@@ -21,7 +21,11 @@ pub use core::str::{Utf8Chunks, Utf8Error};
 #[repr(transparent)]
 pub struct Text([u8]);
 
+// API decision: we could deref to TextData and move some fn to TextData so it can be returned from
+// `split_at`, `trim`, etc., and thus preserve conveniences that [u8] doesn't have?
+
 impl Text {
+    /// Obtain a reference to the Text's data as bytes
     pub fn as_bytes(&self) -> &[u8] {
         let self_ptr = self as *const Text as *const pg_sys::varlena;
         unsafe {
@@ -32,7 +36,7 @@ impl Text {
         }
     }
 
-    /// Manipulate Text as its byte repr
+    /// Obtain a mutable reference the Text's data as bytes
     ///
     /// # Safety
     /// Like [`str::as_bytes_mut`], this can cause problems if you change Text in a way that
@@ -51,23 +55,50 @@ impl Text {
     /// Reborrow `&Text as `&BStr`
     ///
     /// We do not implement Deref to BStr or [u8] because we'd like to expose a more selective API.
-    /// Several fn that [u8] implements are implemented very differently on str!
+    /// Several fn that [u8] implements are implemented very differently on str, and we would like
+    /// the API of Text to "feel like" that of str in most cases.
     fn as_bstr(&self) -> &BStr {
         self.as_bytes().borrow()
     }
 
+    /// Iterate over the UTF-8 characters of this Text
+    ///
+    /// If the data is not UTF-8, the replacement character � is returned.
     pub fn chars(&self) -> Chars<'_> {
         self.as_bstr().chars()
     }
 
+    /// Iterate over the Text's data as bytes
     pub fn bytes(&self) -> Bytes<'_> {
         self.as_bstr().bytes()
     }
 
+    /// Is the data ASCII?
+    pub fn is_ascii(&self) -> bool {
+        self.as_bytes().is_ascii()
+    }
+
+    /// Is the varlena larger than its header?
+    pub fn is_empty(&self) -> bool {
+        self.as_bytes().is_empty()
+    }
+
+    /// Length of the data in bytes
+    pub fn len_data(&self) -> usize {
+        self.as_bytes().len()
+    }
+
+    /// Length of the entire varlena in bytes
+    pub fn len_full(&self) -> usize {
+        self.0.len()
+    }
+
+    /// Obtain a reference to the varlena data if it is a UTF-8 str
     pub fn to_str(&self) -> Result<&str, Utf8Error> {
         str::from_utf8(self.as_bytes())
     }
 
+    /// Iterate over the UTF-8 chunks of the Text's data
     pub fn utf8_chunks(&self) -> Utf8Chunks {
         self.as_bytes().utf8_chunks()
     }
