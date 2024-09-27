@@ -72,6 +72,10 @@ where
         ArrayIter { data, nulls, nelems, arr, index, offset }
     }
 
+    pub fn iter_non_null(&self) -> impl Iterator<Item = &T> {
+        self.iter().filter_map(|elem| elem.into_option())
+    }
+
     /*
     /**
     Some problems with the design of an iter_mut for FlatArray:
