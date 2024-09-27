@@ -153,6 +153,33 @@ unsafe impl<T: ?Sized> BorrowDatum for FlatArray<'_, T> {
     }
 }
 
+unsafe impl<T> SqlTranslatable for &FlatArray<'_, T>
+where
+    T: SqlTranslatable,
+{
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        match T::argument_sql()? {
+            SqlMapping::As(sql) => Ok(SqlMapping::As(format!("{sql}[]"))),
+            SqlMapping::Skip => Err(ArgumentError::SkipInArray),
+            SqlMapping::Composite { .. } => Ok(SqlMapping::Composite { array_brackets: true }),
+        }
+    }
+
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        match T::return_sql()? {
+            Returns::One(SqlMapping::As(sql)) => {
+                Ok(Returns::One(SqlMapping::As(format!("{sql}[]"))))
+            }
+            Returns::One(SqlMapping::Composite { array_brackets: _ }) => {
+                Ok(Returns::One(SqlMapping::Composite { array_brackets: true }))
+            }
+            Returns::One(SqlMapping::Skip) => Err(ReturnsError::SkipInArray),
+            Returns::SetOf(_) => Err(ReturnsError::SetOfInArray),
+            Returns::Table(_) => Err(ReturnsError::TableInArray),
+        }
+    }
+}
+
 /// Iterator for arrays
 #[derive(Clone)]
 struct ArrayIter<'arr, T>
