@@ -36,6 +36,8 @@ pub struct PostgresTypeEntity {
     pub in_fn_module_path: String,
     pub out_fn: &'static str,
     pub out_fn_module_path: String,
+    pub typmod_in_fn: &'static str,
+    pub typmod_in_fn_module_path: String,
     pub to_sql_config: ToSqlConfigEntity,
 }
 
@@ -71,7 +73,9 @@ impl SqlGraphIdentifier for PostgresTypeEntity {
 impl ToSql for PostgresTypeEntity {
     fn to_sql(&self, context: &PgrxSql) -> eyre::Result<String> {
         let self_index = context.types[self];
+        //println!("=====> self_index <===== {:?}", self_index);
         let item_node = &context.graph[self_index];
+        //println!("=====> item_node <===== \n{:?}\n==========================", item_node);
         let SqlGraphEntity::Type(PostgresTypeEntity {
             name,
             file,
@@ -82,6 +86,8 @@ impl ToSql for PostgresTypeEntity {
             out_fn,
             out_fn_module_path,
             in_fn,
+            typmod_in_fn,
+            typmod_in_fn_module_path,
             ..
         }) = item_node
         else {
@@ -99,15 +105,18 @@ impl ToSql for PostgresTypeEntity {
         } else {
             module_path.to_string() // Presume a local
         };
+        println!("in_fn_module_path: {}",in_fn_module_path);
         let in_fn_path = format!(
             "{in_fn_module_path}{maybe_colons}{in_fn}",
             maybe_colons = if !in_fn_module_path.is_empty() { "::" } else { "" }
         );
-        let (_, _index) = context
+        println!("in_fn_path: {}", in_fn_path);
+        let (_, index) = context
             .externs
             .iter()
             .find(|(k, _v)| k.full_path == in_fn_path)
             .ok_or_else(|| eyre::eyre!("Did not find `in_fn: {}`.", in_fn_path))?;
+        println!("in_fn_path index: {:?}", index);
         let (in_fn_graph_index, in_fn_entity) = context
             .graph
             .neighbors_undirected(self_index)
@@ -118,6 +127,7 @@ impl ToSql for PostgresTypeEntity {
                 _ => None,
             })
             .ok_or_else(|| eyre!("Could not find in_fn graph entity."))?;
+        //println!("in_fn_graph_index: {:?}\n in_fn_entity: {:?}",in_fn_graph_index,in_fn_entity);
         let in_fn_sql = in_fn_entity.to_sql(context)?;
 
         let out_fn_module_path = if !out_fn_module_path.is_empty() {
@@ -146,6 +156,37 @@ impl ToSql for PostgresTypeEntity {
             .ok_or_else(|| eyre!("Could not find out_fn graph entity."))?;
         let out_fn_sql = out_fn_entity.to_sql(context)?;
 
+        let typmod_in_fn_module_path = if !typmod_in_fn_module_path.is_empty() {
+            typmod_in_fn_module_path.clone()
+        } else {
+            module_path.to_string() // Presume a local
+        };
+        println!("typmod_in_fn_module_path: {}",typmod_in_fn_module_path);
+        let typmod_in_fn_path = format!(
+            "{typmod_in_fn_module_path}{maybe_colons}{typmod_in_fn}",
+            maybe_colons = if !typmod_in_fn_module_path.is_empty() { "::" } else { "" }
+        );
+        println!("typmod_in_fn_path: {}", typmod_in_fn_path);
+        let (_, index) = context
+            .externs
+            .iter()
+            .find(|(k, _v)| k.full_path == typmod_in_fn_path)
+            .ok_or_else(|| eyre::eyre!("Did not find `typmod_in_fn: {}`.", typmod_in_fn_path))?;
+        println!("typmod_in_fn_path index: {:?}", index);
+        //println!("=====> context.graph <===== \n{:?}\n==========================", context.graph);
+        let (typmod_in_fn_graph_index, typmod_in_fn_entity) = context
+            .graph
+            .neighbors_undirected(self_index)
+            .find_map(|neighbor| match &context.graph[neighbor] {
+                SqlGraphEntity::Function(func) if func.full_path == typmod_in_fn_path => {
+                    Some((neighbor, func))
+                }
+                _ => None,
+            })
+            .ok_or_else(|| eyre!("Could not find typmod_in_fn graph entity."))?;
+        //println!("in_fn_graph_index: {:?}\n in_fn_entity: {:?}",in_fn_graph_index,in_fn_entity);
+        let typmod_in_fn_sql = typmod_in_fn_entity.to_sql(context)?;
+
         let shell_type = format!(
             "\n\
                 -- {file}:{line}\n\
@@ -163,14 +204,16 @@ impl ToSql for PostgresTypeEntity {
                     \tINTERNALLENGTH = variable,\n\
                     \tINPUT = {schema_prefix_in_fn}{in_fn}, /* {in_fn_path} */\n\
                     \tOUTPUT = {schema_prefix_out_fn}{out_fn}, /* {out_fn_path} */\n\
+                    \tTYPMOD_IN = {schema_prefix_typmod_in_fn}{typmod_in_fn}, /* {typmod_in_fn_path} */\n\
                     \tSTORAGE = extended\n\
                 );\
             ",
             schema = context.schema_prefix_for(&self_index),
             schema_prefix_in_fn = context.schema_prefix_for(&in_fn_graph_index),
             schema_prefix_out_fn = context.schema_prefix_for(&out_fn_graph_index),
+            schema_prefix_typmod_in_fn = context.schema_prefix_for(&typmod_in_fn_graph_index),
         };
 
-        Ok(shell_type + "\n" + &in_fn_sql + "\n" + &out_fn_sql + "\n" + &materialized_type)
+        Ok(shell_type + "\n" + &in_fn_sql + "\n" + &out_fn_sql + "\n" + &typmod_in_fn_sql + "\n" + &materialized_type)
     }
 }

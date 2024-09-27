@@ -18,6 +18,7 @@ use crate::*;
 #[doc(hidden)]
 pub use serde_json::{from_slice as json_from_slice, to_vec as json_to_vec};
 use crate::pg_sys::Oid;
+use core::ffi::CStr;
 
 /// `#[derive(Copy, Clone, PostgresType)]` types need to implement this trait to provide the text
 /// input/output functions for that type
@@ -68,6 +69,10 @@ pub trait TypmodInOutFuncs {
 
     /// Convert `Self` into text by writing to the supplied `StringInfo` buffer
     fn output(&self, buffer: &mut StringInfo);
+
+    /// The type_modifier_input_function is passed the declared modifier(s) in the form of a cstring array. It must check the values for validity (throwing an error if they are wrong), and if they are correct, return a single non-negative integer value that will be stored as the column “typmod”. 
+    fn typmod_in(input: Array<&CStr>) -> i32 ;
+
 
     /// If PostgreSQL calls the conversion function with NULL as an argument, what
     /// error message should be generated?

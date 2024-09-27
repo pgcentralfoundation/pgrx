@@ -769,6 +769,7 @@ enum Animal {
 Optionally accepts the following attributes:
 
 * `inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the type.
+* `typmod_inoutfuncs(some_in_fn, some_out_fn, some_typmod_in_fn)`: Define custom in/out functions for the type with typmod.
 * `pgvarlena_inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the `PgVarlena` of this type.
 * `sql`: Same arguments as [`#[pgrx(sql = ..)]`](macro@pgrx).
 */
@@ -794,6 +795,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     let generics = &ast.generics.clone();
     let has_lifetimes = generics.lifetimes().next();
     let funcname_in = Ident::new(&format!("{name}_in").to_lowercase(), name.span());
+    let funcname_typmod_in = Ident::new(&format!("{name}_typmod_in").to_lowercase(), name.span());
     let funcname_out = Ident::new(&format!("{name}_out").to_lowercase(), name.span());
     let mut args = parse_postgres_type_args(&ast.attrs);
     let mut stream = proc_macro2::TokenStream::new();
@@ -969,7 +971,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         stream.extend(quote! {
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: Option<&::core::ffi::CStr>, oid: pgrx::pg_sys::Oid, typmod: i32) -> Option<#name #generics> {
+            pub fn #funcname_in #generics(input: Option<&::core::ffi::CStr>, oid: ::pgrx::pg_sys::Oid, typmod: i32) -> Option<#name #generics> {
                 input.map_or_else(|| {
                     for m in <#name as ::pgrx::inoutfuncs::TypmodInOutFuncs>::NULL_ERROR_MESSAGE {
                         ::pgrx::pg_sys::error!("{m}");
@@ -986,6 +988,13 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                 // SAFETY: We just constructed this StringInfo ourselves
                 unsafe { buffer.leak_cstr().to_owned() }
             }
+
+            #[doc(hidden)]
+            #[::pgrx::pgrx_macros::pg_extern(immutable,parallel_safe)]
+            pub fn #funcname_typmod_in #generics(input: Array<&::core::ffi::CStr>) -> i32 {
+                <#name as ::pgrx::inoutfuncs::TypmodInOutFuncs>::typmod_in(input)
+            }
+
         });
     } else if args.contains(&PostgresTypeAttribute::PgVarlenaInOutFuncs) {
         // otherwise if it's PgVarlenaInOutFuncs our _in/_out functions use a PgVarlena
