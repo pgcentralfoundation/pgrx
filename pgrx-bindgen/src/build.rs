@@ -114,7 +114,7 @@ impl bindgen::callbacks::ParseCallbacks for BindingOverride {
         enum_name.inspect(|name| match name.strip_prefix("enum").unwrap_or(name).trim() {
             // specifically overridden enum
             "NodeTag" => return,
-            name if name.contains("unnamed at") => return,
+            name if name.contains("unnamed at") || name.contains("anonymous at") => return,
             // to prevent problems with BuiltinOid
             _ if variant_name.contains("OID") => return,
             name => self
