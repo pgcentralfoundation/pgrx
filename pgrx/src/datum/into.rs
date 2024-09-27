@@ -15,7 +15,7 @@
 use crate::{pg_sys, rust_regtypein, set_varsize_4b, PgBox, PgOid, WhoAllocated};
 use core::fmt::Display;
 use pgrx_pg_sys::panic::ErrorReportable;
-use std::{any::Any, ptr::addr_of_mut};
+use std::{any::Any, ptr::addr_of_mut, str};
 
 /// Convert a Rust type into a `pg_sys::Datum`.
 ///
@@ -297,7 +297,13 @@ impl IntoDatum for &String {
 impl IntoDatum for char {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        self.to_string().into_datum()
+        let mut buf = [0; 4];
+        self.encode_utf8(&mut buf);
+        unsafe {
+            // SAFETY: The buffer contains only valid UTF8 data
+            // coming from the encode_utf8 method used above.
+            str::from_utf8_unchecked(&buf).into_datum()
+        }
     }
 
     fn type_oid() -> pg_sys::Oid {
