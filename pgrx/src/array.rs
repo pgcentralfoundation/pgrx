@@ -194,15 +194,6 @@ where
     offset: usize,
 }
 
-fn is_null(p: Option<NonNull<u8>>) -> bool {
-    // TODO: this
-    if let Some(p) = p {
-        todo!()
-    } else {
-        false
-    }
-}
-
 impl<'arr, T> Iterator for ArrayIter<'arr, T>
 where
     T: ?Sized + BorrowDatum,
@@ -210,12 +201,23 @@ where
     type Item = Nullable<&'arr T>;
 
     fn next(&mut self) -> Option<Nullable<&'arr T>> {
-        // TODO: iteration
-        if todo!() {
+        if self.index >= self.nelems {
+            return None;
+        }
+        let is_null = match self.nulls {
+            Some(nulls) => !nulls.get(index).unwrap(),
+            None => false,
+        };
+        // note the index freezes when we reach the end of the null bitslice, fusing the iterator
+        self.index += 1;
+
+        if is_null {
             Some(Nullable::Null)
         } else {
             unsafe {
-                let ptr = <T as BorrowDatum>::point_from(self.data.cast_mut());
+                let ptr = <T as BorrowDatum>::point_from(self.data.add(self.offset).cast_mut());
+                // need some way of determining size using BorrowDatum...
+                self.offset += todo!();
                 Some(Nullable::Valid(&*ptr))
             }
         }
