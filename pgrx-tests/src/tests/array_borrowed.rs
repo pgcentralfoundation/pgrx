@@ -10,6 +10,7 @@
 #![allow(unused_imports)]
 use core::ffi::CStr;
 use pgrx::array::{FlatArray, RawArray};
+use pgrx::nullable::Nullable;
 use pgrx::prelude::*;
 use pgrx::Json;
 use pgrx::PostgresEnum;
@@ -87,16 +88,10 @@ fn borrow_get_arr_nelems(arr: &FlatArray<'_, i32>) -> libc::c_int {
     arr.count() as _
 }
 
-// #[pg_extern]
-// fn borrow_get_arr_data_ptr_nth_elem(arr: &FlatArray<'_, i32>, elem: i32) -> Option<i32> {
-//     // SAFETY: this is Known to be an FlatArray from FlatArrayType,
-//     // and it's valid-ish to see any bitpattern of an i32 inbounds of a slice.
-//     unsafe {
-//         let raw = RawArray::from_array(arr).unwrap().data::<i32>();
-//         let slice = &(*raw.as_ptr());
-//         slice.get(elem as usize).copied()
-//     }
-// }
+#[pg_extern]
+fn borrow_get_arr_data_ptr_nth_elem(arr: &FlatArray<'_, i32>, elem: i32) -> Option<i32> {
+    arr.nth(elem as usize).unwrap().into_option().copied()
+}
 
 #[pg_extern]
 fn borrow_display_get_arr_nullbitmap(arr: &FlatArray<'_, i32>) -> String {
@@ -299,12 +294,12 @@ mod tests {
         assert_eq!(len, Ok(Some(5)));
     }
 
-    // #[pg_test]
-    // fn borrow_test_get_arr_data_ptr_nth_elem() {
-    //     let nth =
-    //         Spi::get_one::<i32>("SELECT borrow_get_arr_data_ptr_nth_elem('{1,2,3,4,5}'::int[], 2)");
-    //     assert_eq!(nth, Ok(Some(3)));
-    // }
+    #[pg_test]
+    fn borrow_test_get_arr_data_ptr_nth_elem() {
+        let nth =
+            Spi::get_one::<i32>("SELECT borrow_get_arr_data_ptr_nth_elem('{1,2,3,4,5}'::int[], 2)");
+        assert_eq!(nth, Ok(Some(3)));
+    }
 
     #[pg_test]
     fn borrow_test_display_get_arr_nullbitmap() -> Result<(), pgrx::spi::Error> {
