@@ -26,9 +26,11 @@ use core::{ffi, mem, slice};
 
 mod port;
 
-/// &FlatArray is akin to &ArrayType
-///
-/// `pgrx::datum::Array` is essentially `&FlatArray`
+/** `pg_sys::ArrayType` and its unsized varlena
+
+# Safety
+`&FlatArray<'_, T>` assumes its tail is the remainder of a Postgres array of element `T`.
+*/
 #[repr(C)]
 #[derive(Debug)]
 pub struct FlatArray<'mcx, T: ?Sized> {
@@ -48,7 +50,7 @@ where
         }
     }
 
-    /// Number of elements in the Array
+    /// Number of elements in the Array, including nulls
     ///
     /// Note that for many Arrays, this doesn't have a linear relationship with array byte-len.
     pub fn count(&self) -> usize {
@@ -133,8 +135,7 @@ where
         }
     }
 
-    /**
-    Oxidized form of [ARR_NULLBITMAP(ArrayType*)][arr_nullbitmap]
+    /** Oxidized form of [ARR_NULLBITMAP(ArrayType*)][arr_nullbitmap]
 
     If this returns None, the array *cannot* have nulls.
     Note that unlike the `is_null: bool` that appears elsewhere, 1 is "valid" and 0 is "null".
@@ -397,8 +398,7 @@ impl RawArray {
         }
     }
 
-    /**
-    A slice of the dimensions.
+    /** A slice describing the array's dimensions.
 
     Oxidized form of [ARR_DIMS(ArrayType*)][ARR_DIMS].
     The length will be within 0..=[pg_sys::MAXDIM].
@@ -421,6 +421,7 @@ impl RawArray {
     }
 
     /// The flattened length of the array over every single element.
+    ///
     /// Includes all items, even the ones that might be null.
     ///
     /// # Panics
@@ -461,8 +462,7 @@ impl RawArray {
         // This field is an "int32" in Postgres
     }
 
-    /**
-    Equivalent to [ARR_HASNULL(ArrayType*)][ARR_HASNULL].
+    /** Equivalent to [ARR_HASNULL(ArrayType*)][ARR_HASNULL].
 
     Note this means that it only asserts that there MIGHT be a null
 
@@ -501,8 +501,7 @@ impl RawArray {
         }
     }
 
-    /**
-    Oxidized form of [ARR_NULLBITMAP(ArrayType*)][ARR_NULLBITMAP]
+    /** Oxidized form of [ARR_NULLBITMAP(ArrayType*)][ARR_NULLBITMAP]
 
     If this returns None, the array cannot have nulls.
     If this returns Some, it points to the bitslice that marks nulls in this array.
@@ -521,8 +520,8 @@ impl RawArray {
         NonNull::new(ptr::slice_from_raw_parts_mut(self.nulls_mut_ptr(), len))
     }
 
-    /**
-    The [bitvec] equivalent of [RawArray::nulls].
+    /** The [bitvec] equivalent of [RawArray::nulls].
+
     If this returns `None`, the array cannot have nulls.
     If this returns `Some`, it points to the bitslice that marks nulls in this array.
 
@@ -537,20 +536,18 @@ impl RawArray {
         NonNull::new(bitptr::bitslice_from_raw_parts_mut(self.nulls_mut_bitptr()?, self.len()))
     }
 
-    /**
-    Checks the array for any NULL values by assuming it is a proper varlena array,
+    /** Checks the array for any NULL values
 
     # Safety
-
     * This requires every index is valid to read or correctly marked as null.
+
     */
     pub unsafe fn any_nulls(&self) -> bool {
         // SAFETY: Caller asserted safety conditions.
         unsafe { pg_sys::array_contains_nulls(self.ptr.as_ptr()) }
     }
 
-    /**
-    Oxidized form of [ARR_DATA_PTR(ArrayType*)][ARR_DATA_PTR]
+    /** Oxidized form of [ARR_DATA_PTR(ArrayType*)][ARR_DATA_PTR]
 
     # Safety
 
