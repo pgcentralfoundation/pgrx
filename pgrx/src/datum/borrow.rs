@@ -41,7 +41,7 @@ pub unsafe trait BorrowDatum {
     ///
     /// Do not attempt to handle pass-by-value versus pass-by-ref in this fn's body!
     /// A caller may be in a context where all types are handled by-reference, for instance.
-    unsafe fn point_from(ptr: *mut u8) -> *mut Self;
+    unsafe fn point_from(ptr: ptr::NonNull<u8>) -> ptr::NonNull<Self>;
 
     /// Cast a pointer to aligned varlena headers to this type
     ///
@@ -52,14 +52,14 @@ pub unsafe trait BorrowDatum {
     /// # Safety
     /// - This must be correctly invoked for the pointee type, as it may deref.
     /// - This must be 4-byte aligned!
-    unsafe fn point_from_align4(ptr: *mut u32) -> *mut Self {
+    unsafe fn point_from_align4(ptr: ptr::NonNull<u32>) -> ptr::NonNull<Self> {
         debug_assert!(ptr.is_aligned());
         unsafe { <Self as BorrowDatum>::point_from(ptr.cast()) }
     }
 
     /// Optimization for borrowing the referent
-    unsafe fn borrow_unchecked<'dat>(ptr: *const u8) -> &'dat Self {
-        unsafe { &*Self::point_from(ptr.cast_mut()) }
+    unsafe fn borrow_unchecked<'dat>(ptr: ptr::NonNull<u8>) -> &'dat Self {
+        unsafe { Self::point_from(ptr).as_ref() }
     }
 }
 
@@ -73,7 +73,7 @@ macro_rules! borrow_by_value {
                     PassBy::Ref
                 };
 
-                unsafe fn point_from(ptr: *mut u8) -> *mut Self {
+                unsafe fn point_from(ptr: ptr::NonNull<u8>) -> ptr::NonNull<Self> {
                     ptr.cast()
                 }
             }
@@ -89,14 +89,16 @@ borrow_by_value! {
 unsafe impl BorrowDatum for ffi::CStr {
     const PASS: PassBy = PassBy::Ref;
 
-    unsafe fn point_from(ptr: *mut u8) -> *mut Self {
-        let char_ptr: *mut ffi::c_char = ptr.cast();
-        let len = unsafe { ffi::CStr::from_ptr(char_ptr).to_bytes_with_nul().len() };
-        ptr::slice_from_raw_parts_mut(char_ptr, len) as *mut Self
+    unsafe fn point_from(ptr: ptr::NonNull<u8>) -> ptr::NonNull<Self> {
+        let char_ptr: *mut ffi::c_char = ptr.as_ptr().cast();
+        unsafe {
+            let len = ffi::CStr::from_ptr(char_ptr).to_bytes_with_nul().len();
+            ptr::NonNull::new_unchecked(ptr::slice_from_raw_parts_mut(char_ptr, len) as *mut Self)
+        }
     }
 
-    unsafe fn borrow_unchecked<'dat>(ptr: *const u8) -> &'dat Self {
-        let char_ptr: *const ffi::c_char = ptr.cast();
+    unsafe fn borrow_unchecked<'dat>(ptr: ptr::NonNull<u8>) -> &'dat Self {
+        let char_ptr: *const ffi::c_char = ptr.as_ptr().cast();
         unsafe { ffi::CStr::from_ptr(char_ptr) }
     }
 }

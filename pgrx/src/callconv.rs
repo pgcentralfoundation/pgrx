@@ -277,18 +277,20 @@ where
             PassBy::Ref => arg.2.value.cast_mut_ptr(),
             PassBy::Value => ptr::addr_of!(arg.0.raw_args()[arg.1].value).cast_mut().cast(),
         };
-        unsafe { T::borrow_unchecked(ptr) }
+        unsafe {
+            let ptr = ptr::NonNull::new_unchecked(ptr);
+            T::borrow_unchecked(ptr)
+        }
     }
 
     unsafe fn unbox_nullable_arg(arg: Arg<'_, 'fcx>) -> Nullable<Self> {
-        let ptr: *mut u8 = match T::PASS {
+        let ptr: Option<ptr::NonNull<u8>> = NonNull::new(match T::PASS {
             PassBy::Ref => arg.2.value.cast_mut_ptr(),
             PassBy::Value => ptr::addr_of!(arg.0.raw_args()[arg.1].value).cast_mut().cast(),
-        };
-        if arg.is_null() || ptr.is_null() {
-            Nullable::Null
-        } else {
-            unsafe { Nullable::Valid(T::borrow_unchecked(ptr)) }
+        });
+        match (arg.is_null(), ptr) {
+            (true, _) | (false, None) => Nullable::Null,
+            (false, Some(ptr)) => unsafe { Nullable::Valid(T::borrow_unchecked(ptr)) },
         }
     }
 }
