@@ -77,7 +77,7 @@ where
         let nulls =
             raw.nulls_bitptr().map(|p| unsafe { bitslice::from_raw_parts(p, nelems).unwrap() });
 
-        let data = raw.data_ptr();
+        let data = unsafe { NonNull::new_unchecked(raw.data_ptr().cast_mut()) };
         let arr = self;
         let index = 0;
         let offset = 0;
@@ -159,10 +159,13 @@ where
 
 unsafe impl<T: ?Sized> BorrowDatum for FlatArray<'_, T> {
     const PASS: layout::PassBy = layout::PassBy::Ref;
-    unsafe fn point_from(ptr: *mut u8) -> *mut Self {
+    unsafe fn point_from(ptr: ptr::NonNull<u8>) -> ptr::NonNull<Self> {
         unsafe {
-            let len = varlena::varsize_any(ptr.cast()) - mem::size_of::<pg_sys::ArrayType>();
-            ptr::slice_from_raw_parts_mut(ptr, len) as *mut Self
+            let len =
+                varlena::varsize_any(ptr.as_ptr().cast()) - mem::size_of::<pg_sys::ArrayType>();
+            ptr::NonNull::new_unchecked(
+                ptr::slice_from_raw_parts_mut(ptr.as_ptr(), len) as *mut Self
+            )
         }
     }
 }
@@ -212,7 +215,7 @@ where
     T: ?Sized + BorrowDatum,
 {
     arr: &'arr FlatArray<'arr, T>,
-    data: *const u8,
+    data: ptr::NonNull<u8>,
     nulls: Option<&'arr BitSlice<u8>>,
     nelems: usize,
     index: usize,

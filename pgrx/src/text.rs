@@ -115,10 +115,12 @@ impl Text {
 
 unsafe impl BorrowDatum for Text {
     const PASS: PassBy = PassBy::Ref;
-    unsafe fn point_from(ptr: *mut u8) -> *mut Self {
+    unsafe fn point_from(ptr: ptr::NonNull<u8>) -> ptr::NonNull<Self> {
         unsafe {
-            let len = varlena::varsize_any(ptr.cast());
-            ptr::slice_from_raw_parts_mut(ptr, len) as *mut Text
+            let len = varlena::varsize_any(ptr.as_ptr().cast());
+            ptr::NonNull::new_unchecked(
+                ptr::slice_from_raw_parts_mut(ptr.as_ptr(), len) as *mut Text
+            )
         }
     }
 }
