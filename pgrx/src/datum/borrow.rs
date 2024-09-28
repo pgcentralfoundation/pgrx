@@ -94,4 +94,9 @@ unsafe impl BorrowDatum for ffi::CStr {
         let len = unsafe { ffi::CStr::from_ptr(char_ptr).to_bytes_with_nul().len() };
         ptr::slice_from_raw_parts_mut(char_ptr, len) as *mut Self
     }
+
+    unsafe fn borrow_unchecked<'dat>(ptr: *const u8) -> &'dat Self {
+        let char_ptr: *const ffi::c_char = ptr.cast();
+        unsafe { ffi::CStr::from_ptr(char_ptr) }
+    }
 }

@@ -277,7 +277,7 @@ where
             PassBy::Ref => arg.2.value.cast_mut_ptr(),
             PassBy::Value => ptr::addr_of!(arg.0.raw_args()[arg.1].value).cast_mut().cast(),
         };
-        unsafe { &*T::point_from(ptr) }
+        unsafe { T::borrow_unchecked(ptr) }
     }
 
     unsafe fn unbox_nullable_arg(arg: Arg<'_, 'fcx>) -> Nullable<Self> {
@@ -288,7 +288,7 @@ where
         if arg.is_null() || ptr.is_null() {
             Nullable::Null
         } else {
-            unsafe { Nullable::Valid(&*T::point_from(ptr)) }
+            unsafe { Nullable::Valid(T::borrow_unchecked(ptr)) }
         }
     }
 }
