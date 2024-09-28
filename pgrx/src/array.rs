@@ -9,6 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::precedence)]
 #![allow(unused)]
+#![deny(unsafe_op_in_unsafe_fn)]
 use crate::datum::{Array, BorrowDatum, Datum};
 use crate::layout::{Align, Layout};
 use crate::nullable::Nullable;

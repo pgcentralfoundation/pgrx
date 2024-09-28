@@ -1,3 +1,4 @@
+#![deny(unsafe_op_in_unsafe_fn)]
 use crate::datum::BorrowDatum;
 use crate::layout::PassBy;
 use crate::pgrx_sql_entity_graph::metadata::{
