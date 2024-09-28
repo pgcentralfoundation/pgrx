@@ -86,7 +86,7 @@ unsafe impl BorrowDatum for ffi::CStr {
 
     unsafe fn point_from(ptr: *mut u8) -> *mut Self {
         let char_ptr: *mut ffi::c_char = ptr.cast();
-        let len = unsafe { ffi::CStr::from_ptr(char_ptr).to_bytes().len() };
-        ptr::slice_from_raw_parts_mut(char_ptr, len + 1) as *mut Self
+        let len = unsafe { ffi::CStr::from_ptr(char_ptr).to_bytes_with_nul().len() };
+        ptr::slice_from_raw_parts_mut(char_ptr, len) as *mut Self
     }
 }
