@@ -102,7 +102,7 @@ impl TextData {
 
 impl Text {
     /// Length of the entire varlena in bytes
-    pub fn va_len(&self) -> usize {
+    pub fn vl_len(&self) -> usize {
         self.0.len()
     }
 }
