@@ -40,6 +40,8 @@ where
     }
 }
 
+impl<T> Copy for Nullable<T> where T: Copy {}
+
 impl<T> PartialEq for Nullable<T>
 where
     T: PartialEq,
