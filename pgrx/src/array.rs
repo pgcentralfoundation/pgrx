@@ -53,6 +53,8 @@ where
     /// Number of elements in the Array, including nulls
     ///
     /// Note that for many Arrays, this doesn't have a linear relationship with array byte-len.
+    #[doc(alias = "cardinality")]
+    #[doc(alias = "nelems")]
     pub fn count(&self) -> usize {
         self.as_raw().len()
     }
@@ -74,6 +76,7 @@ where
     T: ?Sized + BorrowDatum,
 {
     /// Iterate the array
+    #[doc(alias = "unnest")]
     pub fn iter(&self) -> ArrayIter<'_, T> {
         let nelems = self.count();
         let raw = self.as_raw();
