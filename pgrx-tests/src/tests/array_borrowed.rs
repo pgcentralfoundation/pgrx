@@ -22,7 +22,7 @@ fn borrow_sum_array_i32(values: &FlatArray<'_, i32>) -> i32 {
     // we implement it this way so we can trap an overflow (as we have a test for this) and
     // catch it correctly in both --debug and --release modes
     let mut sum = 0_i32;
-    for v in values.iter() {
+    for v in values {
         let v = v.into_option().copied().unwrap_or(0);
         let (val, overflow) = sum.overflowing_add(v);
         if overflow {

@@ -20,6 +20,7 @@ use crate::toast::{Toast, Toasty};
 use crate::{layout, pg_sys, varlena};
 use bitvec::ptr::{self as bitptr, BitPtr, BitPtrError, Const, Mut};
 use bitvec::slice::{self as bitslice, BitSlice};
+use core::iter::{ExactSizeIterator, FusedIterator};
 use core::marker::PhantomData;
 use core::ptr::{self, NonNull};
 use core::{ffi, mem, slice};
@@ -256,6 +257,20 @@ where
         }
     }
 }
+
+impl<'arr, 'mcx, T> IntoIterator for &'arr FlatArray<'mcx, T>
+where
+    T: ?Sized + BorrowDatum,
+{
+    type IntoIter = ArrayIter<'arr, T>;
+    type Item = Nullable<&'arr T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'arr, T> ExactSizeIterator for ArrayIter<'arr, T> where T: ?Sized + BorrowDatum {}
+impl<'arr, T> FusedIterator for ArrayIter<'arr, T> where T: ?Sized + BorrowDatum {}
 
 /**
 An aligned, dereferenceable `NonNull<ArrayType>` with low-level accessors.
