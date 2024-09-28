@@ -159,27 +159,26 @@ fn borrow_arr_sort_uniq(arr: &FlatArray<'_, i32>) -> Vec<i32> {
 //     a.iter().cloned().collect()
 // }
 
-// FIXME: something about entity?
-// #[pg_extern]
-// fn borrow_validate_cstring_array(
-//     a: &FlatArray<'_, CStr>,
-// ) -> std::result::Result<bool, Box<dyn std::error::Error>> {
-//     assert_eq!(
-//         a.iter().map(|v| v.into_option()).collect::<Vec<_>>(),
-//         vec![
-//             Some(CStr::from_bytes_with_nul(b"one\0")?),
-//             Some(CStr::from_bytes_with_nul(b"two\0")?),
-//             None,
-//             Some(CStr::from_bytes_with_nul(b"four\0")?),
-//             Some(CStr::from_bytes_with_nul(b"five\0")?),
-//             None,
-//             Some(CStr::from_bytes_with_nul(b"seven\0")?),
-//             None,
-//             None
-//         ]
-//     );
-//     Ok(true)
-// }
+#[pg_extern]
+fn borrow_validate_cstring_array(
+    a: &FlatArray<'_, CStr>,
+) -> std::result::Result<bool, Box<dyn std::error::Error>> {
+    assert_eq!(
+        a.iter().map(|v| v.into_option()).collect::<Vec<_>>(),
+        vec![
+            Some(CStr::from_bytes_with_nul(b"one\0")?),
+            Some(CStr::from_bytes_with_nul(b"two\0")?),
+            None,
+            Some(CStr::from_bytes_with_nul(b"four\0")?),
+            Some(CStr::from_bytes_with_nul(b"five\0")?),
+            None,
+            Some(CStr::from_bytes_with_nul(b"seven\0")?),
+            None,
+            None
+        ]
+    );
+    Ok(true)
+}
 
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
@@ -377,12 +376,12 @@ mod tests {
         assert_eq!(result, Ok(Some(vec![1, 2, 3])));
     }
 
-    // #[pg_test]
-    // fn borrow_test_cstring_array() -> Result<(), pgrx::spi::Error> {
-    //     let strings = Spi::get_one::<bool>("SELECT borrow_validate_cstring_array(ARRAY['one', 'two', NULL, 'four', 'five', NULL, 'seven', NULL, NULL]::cstring[])")?.expect("datum was NULL");
-    //     assert_eq!(strings, true);
-    //     Ok(())
-    // }
+    #[pg_test]
+    fn borrow_test_cstring_array() -> Result<(), pgrx::spi::Error> {
+        let strings = Spi::get_one::<bool>("SELECT borrow_validate_cstring_array(ARRAY['one', 'two', NULL, 'four', 'five', NULL, 'seven', NULL, NULL]::cstring[])")?.expect("datum was NULL");
+        assert_eq!(strings, true);
+        Ok(())
+    }
 
     // FIXME: lol SPI
     // #[pg_test]

@@ -158,7 +158,7 @@ unsafe impl<T: ?Sized> BorrowDatum for FlatArray<'_, T> {
 
 unsafe impl<T> SqlTranslatable for &FlatArray<'_, T>
 where
-    T: SqlTranslatable,
+    T: ?Sized + SqlTranslatable,
 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         match T::argument_sql()? {
