@@ -72,11 +72,6 @@ fn borrow_optional_array_with_default(
 //     Json(json! { { "values": values } })
 // }
 
-// #[pg_extern]
-// fn borrow_serde_serialize_array_i32_deny_null(values: &FlatArray<'_, i32>) -> Json {
-//     Json(json! { { "values": values.iter_non_null() } })
-// }
-
 #[pg_extern]
 fn borrow_return_text_array() -> Vec<&'static str> {
     vec!["a", "b", "c", "d"]
@@ -115,11 +110,11 @@ fn borrow_display_get_arr_nullbitmap(arr: &FlatArray<'_, i32>) -> String {
     }
 }
 
-// #[pg_extern]
-// fn borrow_get_arr_ndim(arr: &FlatArray<'_, i32>) -> libc::c_int {
-//     // SAFETY: This is a valid FlatArrayType and it's just a field access.
-//     unsafe { RawArray::from_array(arr) }.unwrap().dims().len() as _
-// }
+#[pg_extern]
+fn borrow_get_arr_ndim(arr: &FlatArray<'_, i32>) -> libc::c_int {
+    // SAFETY: This is a valid FlatArrayType and it's just a field access.
+    arr.dims().len() as libc::c_int
+}
 
 // This deliberately iterates the FlatArray.
 // Because FlatArray::iter currently iterates the FlatArray as Datums, this is guaranteed to be "bug-free" regarding size.
@@ -265,13 +260,6 @@ mod tests {
     //     Ok(())
     // }
 
-    // #[pg_test(expected = "array contains NULL")]
-    // fn borrow_test_serde_serialize_array_i32_deny_null() -> Result<Option<Json>, pgrx::spi::Error> {
-    //     Spi::get_one::<Json>(
-    //         "SELECT borrow_serde_serialize_array_i32_deny_null(ARRAY[1, 2, 3, null, 4, 5])",
-    //     )
-    // }
-
     #[pg_test]
     fn borrow_test_return_text_array() {
         let rc = Spi::get_one::<bool>("SELECT ARRAY['a', 'b', 'c', 'd'] = return_text_array();");
@@ -336,19 +324,19 @@ mod tests {
         Ok(())
     }
 
-    // #[pg_test]
-    // fn borrow_test_get_arr_ndim() -> Result<(), pgrx::spi::Error> {
-    //     let ndim = Spi::get_one::<i32>("SELECT borrow_get_arr_ndim(ARRAY[1,2,3,4,5]::int[])")?
-    //         .expect("datum was null");
+    #[pg_test]
+    fn borrow_test_get_arr_ndim() -> Result<(), pgrx::spi::Error> {
+        let ndim = Spi::get_one::<i32>("SELECT borrow_get_arr_ndim(ARRAY[1,2,3,4,5]::int[])")?
+            .expect("datum was null");
 
-    //     assert_eq!(ndim, 1);
+        assert_eq!(ndim, 1);
 
-    //     let ndim = Spi::get_one::<i32>("SELECT borrow_get_arr_ndim('{{1,2,3},{4,5,6}}'::int[])")?
-    //         .expect("datum was null");
+        let ndim = Spi::get_one::<i32>("SELECT borrow_get_arr_ndim('{{1,2,3},{4,5,6}}'::int[])")?
+            .expect("datum was null");
 
-    //     assert_eq!(ndim, 2);
-    //     Ok(())
-    // }
+        assert_eq!(ndim, 2);
+        Ok(())
+    }
 
     #[pg_test]
     fn borrow_test_arr_to_vec() {
@@ -461,7 +449,7 @@ mod tests {
     //     Ok(())
     // }
 
-    // FIXME: needs to be type-subbed to a stringly type
+    // FIXME: needs to be type-subbed to a stringly type and SPI needs to make sense
     // #[pg_test]
     // fn borrow_test_text_array_as_vec_string() -> Result<(), Box<dyn std::error::Error>> {
     //     let a = Spi::get_one::<&FlatArray<'_, String>>(

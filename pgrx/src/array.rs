@@ -21,7 +21,7 @@ use bitvec::ptr::{self as bitptr, BitPtr, BitPtrError, Const, Mut};
 use bitvec::slice::{self as bitslice, BitSlice};
 use core::marker::PhantomData;
 use core::ptr::{self, NonNull};
-use core::{mem, slice};
+use core::{ffi, mem, slice};
 
 mod port;
 
@@ -52,6 +52,17 @@ where
     /// Note that for many Arrays, this doesn't have a linear relationship with array byte-len.
     pub fn count(&self) -> usize {
         self.as_raw().len()
+    }
+
+    pub fn dims(&self) -> Dimensions {
+        // SAFETY: Validity of the ptr and ndim field was asserted upon obtaining the FlatArray ref,
+        // so can assume the dims ptr is also valid, allowing making the slice.
+        unsafe {
+            let ptr = self as *const Self as *const pg_sys::ArrayType;
+            let ndim = self.head.ndim as usize;
+            let dims = slice::from_raw_parts(port::ARR_DIMS(ptr.cast_mut()), ndim);
+            Dimensions { dims }
+        }
     }
 }
 
@@ -180,6 +191,17 @@ where
             Returns::SetOf(_) => Err(ReturnsError::SetOfInArray),
             Returns::Table(_) => Err(ReturnsError::TableInArray),
         }
+    }
+}
+
+#[derive(Clone)]
+pub struct Dimensions<'arr> {
+    dims: &'arr [ffi::c_int],
+}
+
+impl<'arr> Dimensions<'arr> {
+    pub fn len(&self) -> usize {
+        self.dims.len()
     }
 }
 
