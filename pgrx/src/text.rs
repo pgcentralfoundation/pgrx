@@ -8,7 +8,8 @@ use crate::{pg_sys, varlena};
 use alloc::borrow::Cow;
 use alloc::string::String;
 use core::borrow::Borrow;
-use core::{ptr, slice, str};
+use core::ops::{Deref, DerefMut};
+use core::{ptr, str};
 
 use bstr::{BStr, ByteSlice};
 
@@ -24,37 +25,11 @@ pub use core::str::{Utf8Chunks, Utf8Error};
 #[repr(transparent)]
 pub struct Text([u8]);
 
-// API decision: we could deref to TextData and move some fn to TextData so it can be returned from
-// `split_at`, `trim`, etc., and thus preserve conveniences that [u8] doesn't have?
+/// Data field of a TEXT varlena
+#[repr(transparent)]
+pub struct TextData([u8]);
 
-impl Text {
-    /// Obtain a reference to the Text's data as bytes
-    pub fn as_bytes(&self) -> &[u8] {
-        let self_ptr = self as *const Text as *const pg_sys::varlena;
-        unsafe {
-            let len = varlena::varsize_any_exhdr(self_ptr);
-            let data = varlena::vardata_any(self_ptr);
-
-            slice::from_raw_parts(data.cast::<u8>(), len)
-        }
-    }
-
-    /// Obtain a mutable reference the Text's data as bytes
-    ///
-    /// # Safety
-    /// Like [`str::as_bytes_mut`], this can cause problems if you change Text in a way that
-    /// your database is not specified to support, so the caller must assure that it remains in
-    /// a valid encoding for the database.
-    pub unsafe fn as_bytes_mut(&mut self) -> &mut [u8] {
-        let self_ptr = self as *mut Text as *mut pg_sys::varlena;
-        unsafe {
-            let len = varlena::varsize_any_exhdr(self_ptr);
-            let data = varlena::vardata_any(self_ptr);
-
-            slice::from_raw_parts_mut(data.cast::<u8>().cast_mut(), len)
-        }
-    }
-
+impl TextData {
     /// Reborrow `&Text as `&BStr`
     ///
     /// We do not implement Deref to BStr or [u8] because we'd like to expose a more selective API.
@@ -62,6 +37,21 @@ impl Text {
     /// the API of Text to "feel like" that of str in most cases.
     fn as_bstr(&self) -> &BStr {
         self.as_bytes().borrow()
+    }
+
+    /// Obtain a reference to the Text's data as bytes
+    pub fn as_bytes(&self) -> &[u8] {
+        &self.0
+    }
+
+    /// Obtain a mutable reference to the Text's data as bytes
+    ///
+    /// # Safety
+    /// Like [`str::as_bytes_mut`], this can cause problems if you change Text in a way that
+    /// your database is not specified to support, so the caller must assure that it remains in
+    /// a valid encoding for the database.
+    pub unsafe fn as_bytes_mut(&mut self) -> &mut [u8] {
+        &mut self.0
     }
 
     /// Iterate over the UTF-8 characters of this Text
@@ -81,22 +71,17 @@ impl Text {
         self.as_bytes().is_ascii()
     }
 
-    /// Is the varlena larger than its header?
+    /// Is this slice nonzero len?
     pub fn is_empty(&self) -> bool {
         self.as_bytes().is_empty()
     }
 
     /// Length of the data in bytes
-    pub fn len_data(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.as_bytes().len()
     }
 
-    /// Length of the entire varlena in bytes
-    pub fn len_full(&self) -> usize {
-        self.0.len()
-    }
-
-    /// Obtain a reference to the varlena data if it is a UTF-8 str
+    /// Obtain a reference to the data if it is a UTF-8 str
     pub fn to_str(&self) -> Result<&str, Utf8Error> {
         str::from_utf8(self.as_bytes())
     }
@@ -111,6 +96,37 @@ impl Text {
     /// Iterate over the UTF-8 chunks of the Text's data
     pub fn utf8_chunks(&self) -> Utf8Chunks {
         self.as_bytes().utf8_chunks()
+    }
+}
+
+impl Text {
+    /// Length of the entire varlena in bytes
+    pub fn va_len(&self) -> usize {
+        self.0.len()
+    }
+}
+
+impl Deref for Text {
+    type Target = TextData;
+    fn deref(&self) -> &Self::Target {
+        let self_ptr = self as *const Text as *const pg_sys::varlena;
+        unsafe { &*varlena_to_text_data(self_ptr.cast_mut()) }
+    }
+}
+
+impl DerefMut for Text {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        let self_ptr = self as *mut Text as *mut pg_sys::varlena;
+        unsafe { &mut *varlena_to_text_data(self_ptr) }
+    }
+}
+
+unsafe fn varlena_to_text_data(vptr: *mut pg_sys::varlena) -> *mut TextData {
+    unsafe {
+        let len = varlena::varsize_any_exhdr(vptr);
+        let data = varlena::vardata_any(vptr).cast_mut();
+
+        ptr::slice_from_raw_parts_mut(data.cast::<u8>(), len) as *mut TextData
     }
 }
 
