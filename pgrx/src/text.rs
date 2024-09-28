@@ -21,11 +21,12 @@ pub use core::str::{Utf8Chunks, Utf8Error};
 /// A Postgres string, AKA `TEXT`.
 ///
 /// This is a varlena: a reference to a variable-length header followed by a slice of bytes.
-/// Usually this will be UTF-8, but this is not always strictly enforced by PostgreSQL.
 #[repr(transparent)]
 pub struct Text([u8]);
 
 /// Data field of a TEXT varlena
+///
+/// Usually this will be UTF-8, but this is not always strictly enforced by PostgreSQL.
 #[repr(transparent)]
 pub struct TextData([u8]);
 
