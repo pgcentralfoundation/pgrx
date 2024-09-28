@@ -56,6 +56,11 @@ pub unsafe trait BorrowDatum {
         debug_assert!(ptr.is_aligned());
         unsafe { <Self as BorrowDatum>::point_from(ptr.cast()) }
     }
+
+    /// Optimization for borrowing the referent
+    unsafe fn borrow_unchecked<'dat>(ptr: *const u8) -> &'dat Self {
+        unsafe { &*Self::point_from(ptr.cast_mut()) }
+    }
 }
 
 macro_rules! borrow_by_value {
