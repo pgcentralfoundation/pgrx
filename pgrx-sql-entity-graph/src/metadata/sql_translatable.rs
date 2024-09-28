@@ -16,6 +16,7 @@ A trait denoting a type can possibly be mapped to an SQL type
 
 */
 use std::any::Any;
+use std::ffi::{CStr, CString};
 use std::fmt::Display;
 use thiserror::Error;
 
@@ -217,7 +218,7 @@ unsafe impl SqlTranslatable for String {
 
 unsafe impl<T> SqlTranslatable for &T
 where
-    T: SqlTranslatable,
+    T: ?Sized + SqlTranslatable,
 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()
@@ -227,7 +228,7 @@ where
     }
 }
 
-unsafe impl<'a> SqlTranslatable for &'a str {
+unsafe impl SqlTranslatable for str {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("TEXT"))
     }
@@ -236,7 +237,7 @@ unsafe impl<'a> SqlTranslatable for &'a str {
     }
 }
 
-unsafe impl<'a> SqlTranslatable for &'a [u8] {
+unsafe impl SqlTranslatable for [u8] {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("bytea"))
     }
@@ -308,8 +309,7 @@ unsafe impl SqlTranslatable for f64 {
     }
 }
 
-extern crate alloc;
-unsafe impl SqlTranslatable for alloc::ffi::CString {
+unsafe impl SqlTranslatable for CString {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("cstring"))
     }
@@ -318,16 +318,7 @@ unsafe impl SqlTranslatable for alloc::ffi::CString {
     }
 }
 
-unsafe impl SqlTranslatable for core::ffi::CStr {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("cstring"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("cstring")))
-    }
-}
-
-unsafe impl SqlTranslatable for &'_ core::ffi::CStr {
+unsafe impl SqlTranslatable for CStr {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("cstring"))
     }
