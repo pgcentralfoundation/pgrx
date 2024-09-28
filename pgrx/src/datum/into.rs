@@ -15,7 +15,12 @@
 use crate::{pg_sys, rust_regtypein, set_varsize_4b, PgBox, PgOid, WhoAllocated};
 use core::fmt::Display;
 use pgrx_pg_sys::panic::ErrorReportable;
-use std::{any::Any, ptr::addr_of_mut, str};
+use std::{
+    any::Any,
+    ffi::{CStr, CString},
+    ptr::addr_of_mut,
+    str,
+};
 
 /// Convert a Rust type into a `pg_sys::Datum`.
 ///
@@ -245,54 +250,31 @@ impl IntoDatum for PgOid {
     }
 }
 
-/// for text, varchar
-impl<'a> IntoDatum for &'a str {
-    #[inline]
-    fn into_datum(self) -> Option<pg_sys::Datum> {
-        self.as_bytes().into_datum()
-    }
+// for text, varchar
+macro_rules! impl_into_datum_str {
+    ($t:ty) => {
+        impl IntoDatum for $t {
+            #[inline]
+            fn into_datum(self) -> Option<$crate::pg_sys::Datum> {
+                self.as_bytes().into_datum()
+            }
 
-    fn type_oid() -> pg_sys::Oid {
-        pg_sys::TEXTOID
-    }
+            #[inline]
+            fn type_oid() -> pg_sys::Oid {
+                pg_sys::TEXTOID
+            }
 
-    #[inline]
-    fn is_compatible_with(other: pg_sys::Oid) -> bool {
-        Self::type_oid() == other || other == pg_sys::VARCHAROID
-    }
+            #[inline]
+            fn is_compatible_with(other: pg_sys::Oid) -> bool {
+                Self::type_oid() == other || other == pg_sys::VARCHAROID
+            }
+        }
+    };
 }
 
-impl IntoDatum for String {
-    #[inline]
-    fn into_datum(self) -> Option<pg_sys::Datum> {
-        self.as_str().into_datum()
-    }
-
-    fn type_oid() -> pg_sys::Oid {
-        pg_sys::TEXTOID
-    }
-
-    #[inline]
-    fn is_compatible_with(other: pg_sys::Oid) -> bool {
-        Self::type_oid() == other || other == pg_sys::VARCHAROID
-    }
-}
-
-impl IntoDatum for &String {
-    #[inline]
-    fn into_datum(self) -> Option<pg_sys::Datum> {
-        self.as_str().into_datum()
-    }
-
-    fn type_oid() -> pg_sys::Oid {
-        pg_sys::TEXTOID
-    }
-
-    #[inline]
-    fn is_compatible_with(other: pg_sys::Oid) -> bool {
-        Self::type_oid() == other || other == pg_sys::VARCHAROID
-    }
-}
+impl_into_datum_str!(String);
+impl_into_datum_str!(&String);
+impl_into_datum_str!(&str);
 
 impl IntoDatum for char {
     #[inline]
@@ -317,47 +299,39 @@ impl IntoDatum for char {
     }
 }
 
-/// for cstring
-impl<'a> IntoDatum for &'a core::ffi::CStr {
-    /// The [`core::ffi::CStr`] is copied to `palloc`'d memory.  That memory will either be freed by
-    /// Postgres when [`pg_sys::CurrentMemoryContext`] is reset, or when the function you passed the
-    /// returned Datum to decides to free it.
-    #[inline]
-    fn into_datum(self) -> Option<pg_sys::Datum> {
-        unsafe {
-            // SAFETY:  A `CStr` has already been validated to be a non-null pointer to a null-terminated
-            // "char *", and it won't ever overlap with a newly palloc'd block of memory.  Using
-            // `to_bytes_with_nul()` ensures that we'll never try to palloc zero bytes -- it'll at
-            // least always be 1 byte to hold the null terminator for the empty string.
-            //
-            // This is akin to Postgres' `pg_sys::pstrdup` or even `pg_sys::pnstrdup` functions, but
-            // doing the copy ourselves allows us to elide the "strlen" or "strnlen" operations those
-            // functions need to do; the byte slice returned from `to_bytes_with_nul` knows its length.
-            let bytes = self.to_bytes_with_nul();
-            let copy = pg_sys::palloc(bytes.len()).cast();
-            core::ptr::copy_nonoverlapping(bytes.as_ptr(), copy, bytes.len());
-            Some(copy.into())
+// for cstring
+macro_rules! impl_into_datum_c_str {
+    ($t:ty) => {
+        impl IntoDatum for $t {
+            #[inline]
+            fn into_datum(self) -> Option<$crate::pg_sys::Datum> {
+                unsafe {
+                    // SAFETY:  A `CStr` has already been validated to be a non-null pointer to a null-terminated
+                    // "char *", and it won't ever overlap with a newly palloc'd block of memory. Using
+                    // `to_bytes_with_nul()` ensures that we'll never try to palloc zero bytes -- it'll at
+                    // least always be 1 byte to hold the null terminator for the empty string.
+                    //
+                    // This is akin to Postgres' `pg_sys::pstrdup` or even `pg_sys::pnstrdup` functions, but
+                    // doing the copy ourselves allows us to elide the "strlen" or "strnlen" operations those
+                    // functions need to do; the byte slice returned from `to_bytes_with_nul` knows its length.
+                    let src = self.as_ref().to_bytes_with_nul();
+                    let dst = $crate::pg_sys::palloc(src.len());
+                    dst.copy_from(src.as_ptr().cast(), src.len());
+                    Some(dst.into())
+                }
+            }
+
+            #[inline]
+            fn type_oid() -> pg_sys::Oid {
+                pg_sys::CSTRINGOID
+            }
         }
-    }
-
-    fn type_oid() -> pg_sys::Oid {
-        pg_sys::CSTRINGOID
-    }
+    };
 }
 
-impl IntoDatum for alloc::ffi::CString {
-    /// The [`alloc::ffi::CString`] is copied to `palloc`'d memory.  That memory will either be freed by
-    /// Postgres when [`pg_sys::CurrentMemoryContext`] is reset, or when the function you passed the
-    /// returned Datum to decides to free it.
-    #[inline]
-    fn into_datum(self) -> Option<pg_sys::Datum> {
-        self.as_c_str().into_datum()
-    }
-
-    fn type_oid() -> pg_sys::Oid {
-        pg_sys::CSTRINGOID
-    }
-}
+impl_into_datum_c_str!(CString);
+impl_into_datum_c_str!(&CString);
+impl_into_datum_c_str!(&CStr);
 
 /// for bytea
 impl<'a> IntoDatum for &'a [u8] {
