@@ -17,10 +17,6 @@ use core::{ffi, mem, ptr};
 pub unsafe trait BorrowDatum {
     /// The "native" passing convention for this type.
     ///
-    /// Use `None` if you are uncertain, as in some cases the answer is ambiguous,
-    /// or dynamic, and callers must correctly handle this.
-    ///
-    /// If this is `Some`:
     /// - `PassBy::Value` implies [`mem::size_of<T>()`][size_of] <= [`mem::size_of::<Datum>()`][Datum].
     /// - `PassBy::Ref` means the pointee will occupy at least 1 byte for variable-sized types.
     ///
@@ -33,27 +29,31 @@ pub unsafe trait BorrowDatum {
     /// reading varlena headers. For all fixed-size types, `ptr.cast()` should be correct.
     ///
     /// # Safety
-    /// - This must be correctly invoked for the pointee type, as it may deref.
+    /// - This must be correctly invoked for the pointee type, as it may deref and read one or more
+    ///   bytes in its implementation in order to read the inline metadata and unsize the type.
     ///
-    /// ## For Implementors
-    /// While implementing this function, reading the *first* byte is permitted if `T::PASS
-    /// == Some(PassBy::Ref)`. As you are not writing this for CStr, you may then treat that
-    /// byte as a varlena header.
+    /// ## For Implementers
+    /// Reading the **first** byte pointed to is permitted if `T::PASS = PassBy::Ref`, assuming you
+    /// are implementing a varlena type. As the other dynamic length type, CStr also does this.
+    /// This function
+    /// - must NOT mutate the pointee
+    /// - must return a pointer with provenance to the entire allocation
     ///
-    /// Do not attempt to handle pass-by-value versus pass-by-ref in this fn's body.
+    /// Do not attempt to handle pass-by-value versus pass-by-ref in this fn's body!
     /// A caller may be in a context where all types are handled by-reference, for instance.
     unsafe fn point_from(ptr: *mut u8) -> *mut Self;
 
     /// Cast a pointer to aligned varlena headers to this type
     ///
-    /// This version allows you to assume alignment and a readable 4-byte header.
-    /// This optimization is not required. When in doubt, avoid implementing it:
-    /// your `point_from` should also correctly handle this case.
+    /// This version allows you to assume the pointer is aligned to, and readable for, 4 bytes.
+    /// This optimization is not required. When in doubt, avoid implementing it, and rely on your
+    /// `point_from` implementation alone.
     ///
     /// # Safety
     /// - This must be correctly invoked for the pointee type, as it may deref.
-    /// - This must also most definitely be aligned!
+    /// - This must be 4-byte aligned!
     unsafe fn point_from_align4(ptr: *mut u32) -> *mut Self {
+        debug_assert!(ptr.is_aligned());
         unsafe { <Self as BorrowDatum>::point_from(ptr.cast()) }
     }
 }
