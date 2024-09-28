@@ -279,6 +279,18 @@ where
         };
         unsafe { &*T::point_from(ptr) }
     }
+
+    unsafe fn unbox_nullable_arg(arg: Arg<'_, 'fcx>) -> Nullable<Self> {
+        let ptr: *mut u8 = match T::PASS {
+            PassBy::Ref => arg.2.value.cast_mut_ptr(),
+            PassBy::Value => ptr::addr_of!(arg.0.raw_args()[arg.1].value).cast_mut().cast(),
+        };
+        if arg.is_null() || ptr.is_null() {
+            Nullable::Null
+        } else {
+            unsafe { Nullable::Valid(&*T::point_from(ptr)) }
+        }
+    }
 }
 
 /// How to return a value from Rust to Postgres
