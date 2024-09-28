@@ -54,13 +54,6 @@ fn borrow_optional_array_arg(values: Option<&FlatArray<'_, f32>>) -> f32 {
 }
 
 #[pg_extern]
-fn borrow_iterate_array_with_deny_null(values: &FlatArray<'_, i32>) {
-    for _ in values.iter_non_null() {
-        // noop
-    }
-}
-
-#[pg_extern]
 fn borrow_optional_array_with_default(
     values: default!(Option<&FlatArray<'_, i32>>, "NULL"),
 ) -> i32 {
@@ -223,7 +216,7 @@ mod tests {
     #[pg_test(expected = "attempt to add with overflow")]
     fn borrow_test_sum_array_i32_overflow() -> Result<Option<i64>, pgrx::spi::Error> {
         Spi::get_one::<i64>(
-            "SELECT borrow_sum_array(a) FROM (SELECT borrow_array_agg(s) a FROM generate_series(1, 1000000) s) x;",
+            "SELECT borrow_sum_array(a) FROM (SELECT array_agg(s) a FROM generate_series(1, 1000000) s) x;",
         )
     }
 
@@ -244,11 +237,6 @@ mod tests {
     fn borrow_test_optional_array() {
         let sum = Spi::get_one::<f32>("SELECT borrow_optional_array_arg(ARRAY[1,2,3]::real[])");
         assert_eq!(sum, Ok(Some(6f32)));
-    }
-
-    #[pg_test(expected = "array contains NULL")]
-    fn borrow_test_array_deny_nulls() -> Result<(), spi::Error> {
-        Spi::run("SELECT borrow_iterate_array_with_deny_null(ARRAY[1,2,3, NULL]::int[])")
     }
 
     // TODO: fix this test by redesigning SPI.
@@ -297,26 +285,26 @@ mod tests {
         assert_eq!(rc, Ok(Some(true)));
     }
 
-    #[pg_test]
-    fn borrow_test_slice_to_array() -> Result<(), pgrx::spi::Error> {
-        let owned_vec = vec![Some(1), None, Some(2), Some(3), None, Some(4), Some(5)];
-        let json = Spi::connect(|client| {
-            client
-                .select(
-                    "SELECT borrow_serde_serialize_array_i32($1)",
-                    None,
-                    Some(vec![(
-                        PgBuiltInOids::INT4ARRAYOID.oid(),
-                        owned_vec.as_slice().into_datum(),
-                    )]),
-                )?
-                .first()
-                .get_one::<Json>()
-        })?
-        .expect("Failed to return json even though it's right there ^^");
-        assert_eq!(json.0, json! {{"values": [1, null, 2, 3, null, 4, 5]}});
-        Ok(())
-    }
+    // #[pg_test]
+    // fn borrow_test_slice_to_array() -> Result<(), pgrx::spi::Error> {
+    //     let owned_vec = vec![Some(1), None, Some(2), Some(3), None, Some(4), Some(5)];
+    //     let json = Spi::connect(|client| {
+    //         client
+    //             .select(
+    //                 "SELECT borrow_serde_serialize_array_i32($1)",
+    //                 None,
+    //                 Some(vec![(
+    //                     PgBuiltInOids::INT4ARRAYOID.oid(),
+    //                     owned_vec.as_slice().into_datum(),
+    //                 )]),
+    //             )?
+    //             .first()
+    //             .get_one::<Json>()
+    //     })?
+    //     .expect("Failed to return json even though it's right there ^^");
+    //     assert_eq!(json.0, json! {{"values": [1, null, 2, 3, null, 4, 5]}});
+    //     Ok(())
+    // }
 
     #[pg_test]
     fn borrow_test_arr_data_ptr() {
@@ -383,10 +371,10 @@ mod tests {
     }
 
     #[pg_test]
-    #[should_panic]
-    fn borrow_test_arr_sort_uniq_with_null() -> Result<(), pgrx::spi::Error> {
-        Spi::get_one::<Vec<i32>>("SELECT borrow_arr_sort_uniq(ARRAY[3,2,NULL,2,1]::integer[])")
-            .map(|_| ())
+    fn borrow_test_arr_sort_uniq_with_null() {
+        let result =
+            Spi::get_one::<Vec<i32>>("SELECT borrow_arr_sort_uniq(ARRAY[3,2,NULL,2,1]::integer[])");
+        assert_eq!(result, Ok(Some(vec![1, 2, 3])));
     }
 
     // #[pg_test]

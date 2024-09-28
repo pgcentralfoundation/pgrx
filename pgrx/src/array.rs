@@ -10,6 +10,7 @@
 #![allow(clippy::precedence)]
 #![allow(unused)]
 use crate::datum::{Array, BorrowDatum, Datum};
+use crate::layout::{Align, Layout};
 use crate::nullable::Nullable;
 use crate::pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
@@ -28,6 +29,7 @@ mod port;
 ///
 /// `pgrx::datum::Array` is essentially `&FlatArray`
 #[repr(C)]
+#[derive(Debug)]
 pub struct FlatArray<'mcx, T: ?Sized> {
     scalar: PhantomData<&'mcx T>,
     head: pg_sys::ArrayType,
@@ -68,8 +70,9 @@ where
         let arr = self;
         let index = 0;
         let offset = 0;
+        let align = Layout::lookup_oid(self.head.elemtype).align;
 
-        ArrayIter { data, nulls, nelems, arr, index, offset }
+        ArrayIter { data, nulls, nelems, arr, index, offset, align }
     }
 
     pub fn iter_non_null(&self) -> impl Iterator<Item = &T> {
@@ -192,6 +195,7 @@ where
     nelems: usize,
     index: usize,
     offset: usize,
+    align: Align,
 }
 
 impl<'arr, T> Iterator for ArrayIter<'arr, T>
@@ -205,21 +209,22 @@ where
             return None;
         }
         let is_null = match self.nulls {
-            Some(nulls) => !nulls.get(index).unwrap(),
+            Some(nulls) => !nulls.get(self.index).unwrap(),
             None => false,
         };
-        // note the index freezes when we reach the end of the null bitslice, fusing the iterator
+        // note the index freezes when we reach the end, fusing the iterator
         self.index += 1;
 
         if is_null {
+            // note that we do NOT offset when the value is a null!
             Some(Nullable::Null)
         } else {
-            unsafe {
-                let ptr = <T as BorrowDatum>::point_from(self.data.add(self.offset).cast_mut());
-                // need some way of determining size using BorrowDatum...
-                self.offset += todo!();
-                Some(Nullable::Valid(&*ptr))
-            }
+            let borrow = unsafe {
+                &*<T as BorrowDatum>::point_from(self.data.byte_add(self.offset).cast_mut())
+            };
+            // As we always have a borrow, we just ask Rust what the array element's size is
+            self.offset += self.align.pad(mem::size_of_val(borrow));
+            Some(Nullable::Valid(borrow))
         }
     }
 }
