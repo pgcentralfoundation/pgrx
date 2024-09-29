@@ -31,6 +31,7 @@ pub unsafe trait BorrowDatum {
     /// # Safety
     /// - This must be correctly invoked for the pointee type, as it may deref and read one or more
     ///   bytes in its implementation in order to read the inline metadata and unsize the type.
+    /// - This must be invoked with a pointee initialized for the dynamically specified length.
     ///
     /// ## For Implementers
     /// Reading the **first** byte pointed to is permitted if `T::PASS = PassBy::Ref`, assuming you
