@@ -65,6 +65,7 @@ pub use varlena::*;
 use crate::memcx::MemCx;
 use crate::pg_sys;
 use core::marker::PhantomData;
+use core::ptr;
 #[doc(hidden)]
 pub use with_typeid::nonstatic_typeid;
 pub use with_typeid::{WithArrayTypeIds, WithSizedTypeIds, WithTypeIds, WithVarlenaTypeIds};
@@ -145,6 +146,14 @@ impl<'src> Datum<'src> {
     /// Construct a Datum containing only a null pointer.
     pub fn null() -> Datum<'src> {
         Self(pg_sys::Datum::from(0), PhantomData)
+    }
+
+    /// Reborrow the Datum as `T`
+    ///
+    /// If the type is `PassBy::Ref`, this may be `None`.
+    pub unsafe fn borrow_as<T: BorrowDatum>(&self) -> Option<&T> {
+        let ptr = ptr::NonNull::new_unchecked(ptr::from_ref(self).cast_mut());
+        borrow::datum_ptr_to_bytes::<T>(ptr).map(|ptr| BorrowDatum::borrow_unchecked(ptr))
     }
 }
 

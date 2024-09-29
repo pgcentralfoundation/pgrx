@@ -63,6 +63,28 @@ pub unsafe trait BorrowDatum {
     }
 }
 
+/// From a pointer to a Datum, obtain a pointer to T's bytes
+///
+/// This may be None if T is PassBy::Ref
+///
+/// # Safety
+/// Assumes the Datum is init
+pub(crate) unsafe fn datum_ptr_to_bytes<T>(ptr: ptr::NonNull<Datum<'_>>) -> Option<ptr::NonNull<u8>>
+where
+    T: BorrowDatum,
+{
+    match T::PASS {
+        // Ptr<Datum> casts to Ptr<T>
+        PassBy::Value => Some(ptr.cast()),
+        // Ptr<Datum> derefs to Datum which to Ptr
+        PassBy::Ref => unsafe {
+            let datum = ptr.read();
+            let ptr = ptr::NonNull::new(datum.sans_lifetime().cast_mut_ptr());
+            ptr
+        },
+    }
+}
+
 macro_rules! impl_borrow_fixed_len {
     ($($value_ty:ty),*) => {
         $(
