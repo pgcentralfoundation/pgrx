@@ -139,7 +139,7 @@ pub struct Datum<'src>(
 );
 
 impl<'src> Datum<'src> {
-    /// The Datum without its lifetime.
+    /// Strip a Datum of its lifetime for FFI purposes.
     pub fn sans_lifetime(self) -> pg_sys::Datum {
         self.0
     }
