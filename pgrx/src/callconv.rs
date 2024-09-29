@@ -266,11 +266,11 @@ argue_from_datum! { 'fcx; Date, Interval, Time, TimeWithTimeZone, Timestamp, Tim
 argue_from_datum! { 'fcx; AnyArray, AnyElement, AnyNumeric }
 argue_from_datum! { 'fcx; Inet, Internal, Json, JsonB, Uuid, PgRelation }
 argue_from_datum! { 'fcx; pg_sys::BOX, pg_sys::ItemPointerData, pg_sys::Oid, pg_sys::Point }
-argue_from_datum! { 'fcx; &'fcx str, &'fcx CStr, &'fcx [u8] }
+argue_from_datum! { 'fcx; &'fcx str, &'fcx [u8] }
 
 unsafe impl<'fcx, T> ArgAbi<'fcx> for &'fcx T
 where
-    T: BorrowDatum,
+    T: ?Sized + BorrowDatum,
 {
     unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> &'fcx T {
         let ptr: *mut u8 = match T::PASS {
