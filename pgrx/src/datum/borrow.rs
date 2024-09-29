@@ -37,7 +37,7 @@ pub unsafe trait BorrowDatum {
     /// are implementing a varlena type. As the other dynamic length type, CStr also does this.
     /// This function
     /// - must NOT mutate the pointee
-    /// - must return a pointer with provenance to the entire allocation
+    /// - must point to the entire datum's length (`size_of_val` must not lose bytes)
     ///
     /// Do not attempt to handle pass-by-value versus pass-by-ref in this fn's body!
     /// A caller may be in a context where all types are handled by-reference, for instance.
@@ -63,7 +63,7 @@ pub unsafe trait BorrowDatum {
     }
 }
 
-macro_rules! borrow_by_value {
+macro_rules! impl_borrow_fixed_len {
     ($($value_ty:ty),*) => {
         $(
             unsafe impl BorrowDatum for $value_ty {
@@ -81,7 +81,7 @@ macro_rules! borrow_by_value {
     }
 }
 
-borrow_by_value! {
+impl_borrow_fixed_len! {
     i8, i16, i32, i64, bool, f32, f64, pg_sys::Oid, Date, Time, Timestamp, TimestampWithTimeZone
 }
 
