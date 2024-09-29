@@ -55,12 +55,12 @@ pub unsafe trait BorrowDatum {
     /// - This must be 4-byte aligned!
     unsafe fn point_from_align4(ptr: ptr::NonNull<u32>) -> ptr::NonNull<Self> {
         debug_assert!(ptr.is_aligned());
-        unsafe { <Self as BorrowDatum>::point_from(ptr.cast()) }
+        unsafe { BorrowDatum::point_from(ptr.cast()) }
     }
 
     /// Optimization for borrowing the referent
     unsafe fn borrow_unchecked<'dat>(ptr: ptr::NonNull<u8>) -> &'dat Self {
-        unsafe { Self::point_from(ptr).as_ref() }
+        unsafe { BorrowDatum::point_from(ptr).as_ref() }
     }
 }
 
