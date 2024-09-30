@@ -44,7 +44,7 @@ impl FromDatum for Json {
             let len = varsize_any_exhdr(varlena);
             let data = vardata_any(varlena);
             let slice = std::slice::from_raw_parts(data as *const u8, len);
-            let value = serde_json::from_slice(slice).expect("failed to parse Json value");
+            let value = serde_json::from_slice(slice).expect("failed to parse a json value");
             Some(Json(value))
         }
     }
@@ -67,12 +67,12 @@ impl FromDatum for JsonB {
                 pg_sys::jsonb_out,
                 &[Some(detoasted.into())],
             )
-            .expect("failed to convert jsonb to a cstring");
+            .expect("failed to convert a jsonb to a cstring");
 
             let value = serde_json::from_str(
-                cstr.to_str().expect("text version of jsonb is not valid UTF8"),
+                cstr.to_str().expect("a text version of the jsonb is not valid UTF8"),
             )
-            .expect("failed to parse JsonB value");
+            .expect("failed to parse a jsonb value");
 
             // free the cstring returned from direct_function_call -- we don't need it anymore
             pg_sys::pfree(cstr.as_ptr() as void_mut_ptr);
@@ -122,7 +122,7 @@ impl FromDatum for JsonString {
 /// for json
 impl IntoDatum for Json {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let string = serde_json::to_string(&self.0).expect("failed to serialize Json value");
+        let string = serde_json::to_string(&self.0).expect("failed to serialize a json value");
         string.into_datum()
     }
 
@@ -134,9 +134,9 @@ impl IntoDatum for Json {
 /// for jsonb
 impl IntoDatum for JsonB {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let string = serde_json::to_string(&self.0).expect("failed to serialize JsonB value");
-        let cstring =
-            alloc::ffi::CString::new(string).expect("string version of jsonb is not valid UTF8");
+        let string = serde_json::to_string(&self.0).expect("failed to serialize a jsonb value");
+        let cstring = alloc::ffi::CString::new(string)
+            .expect("string version of jsonb contains a non-terminating nul");
 
         unsafe { direct_function_call_as_datum(pg_sys::jsonb_in, &[Some(cstring.as_ptr().into())]) }
     }
