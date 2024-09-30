@@ -11,6 +11,7 @@ use crate::{
     direct_function_call, direct_function_call_as_datum, pg_sys, vardata_any, varsize_any_exhdr,
     void_mut_ptr, FromDatum, IntoDatum,
 };
+use alloc::ffi::CString;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -134,11 +135,12 @@ impl IntoDatum for Json {
 /// for jsonb
 impl IntoDatum for JsonB {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let string = serde_json::to_string(&self.0).expect("failed to serialize JsonB value");
-        let cstring =
-            alloc::ffi::CString::new(string).expect("string version of jsonb is not valid UTF8");
+        let mut buf = serde_json::to_vec(&self.0).expect("failed to serialize JsonB value");
+        buf.push(0);
+        let str = CString::from_vec_with_nul(buf)
+            .expect("string version of jsonb contains a non-terminating nul");
 
-        unsafe { direct_function_call_as_datum(pg_sys::jsonb_in, &[Some(cstring.as_ptr().into())]) }
+        unsafe { direct_function_call_as_datum(pg_sys::jsonb_in, &[Some(str.as_ptr().into())]) }
     }
 
     fn type_oid() -> pg_sys::Oid {
