@@ -337,7 +337,7 @@ impl_into_datum_c_str!(&CStr);
 impl<'a> IntoDatum for &'a [u8] {
     /// # Panics
     ///
-    /// This function will panic if the string being converted to a datum is longer than a `u32`.
+    /// This function will panic if the string being converted to a datum is longer than a half of [`i32::MAX`].
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let len = pg_sys::VARHDRSZ + self.len();
@@ -352,9 +352,9 @@ impl<'a> IntoDatum for &'a [u8] {
 
             // This is the same as Postgres' `#define SET_VARSIZE_4B` (which have over in
             // `pgrx/src/varlena.rs`), however we're asserting that the input string isn't too big
-            // for a Postgres varlena, since it's limited to 32bits -- in reality it's about half
+            // for a Postgres varlena, since it's limited to 32bits -- in reality it's a quarter
             // that length, but this is good enough
-            debug_assert!(len < (u32::MAX as usize >> 2));
+            assert!(len < (u32::MAX as usize >> 2));
             set_varsize_4b(varlena, len as i32);
 
             // SAFETY: src and dest pointers are valid, exactly `self.len()` bytes long,
