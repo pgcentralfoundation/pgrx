@@ -60,6 +60,7 @@ mod tests {
     use super::*;
     #[allow(unused)]
     use crate as pgrx_tests;
+    use std::ffi::{CStr, CString};
 
     // Exercising BorrowDatum impls
     clonetrip!(clone_bool, test_clone_bool, &'a bool, &false);
@@ -73,7 +74,7 @@ mod tests {
         &'a pg_sys::Point,
         &pg_sys::Point { x: -1.0, y: f64::INFINITY }
     );
-    clonetrip!(clone_str, test_clone_str, &'a str => String, "string", String::from("string"));
+    clonetrip!(clone_str, test_clone_str, &'a CStr => CString, c"cee string", CString::from(c"cee string"));
     clonetrip!(
         clone_oid,
         test_clone_oid,
