@@ -156,13 +156,13 @@ fn borrow_validate_cstring_array(
     assert_eq!(
         a.iter().map(|v| v.into_option()).collect::<Vec<_>>(),
         vec![
-            Some(CStr::from_bytes_with_nul(b"one\0")?),
-            Some(CStr::from_bytes_with_nul(b"two\0")?),
+            Some(c"one"),
+            Some(c"two"),
             None,
-            Some(CStr::from_bytes_with_nul(b"four\0")?),
-            Some(CStr::from_bytes_with_nul(b"five\0")?),
+            Some(c"four"),
+            Some(c"five"),
             None,
-            Some(CStr::from_bytes_with_nul(b"seven\0")?),
+            Some(c"seven"),
             None,
             None
         ]
