@@ -216,7 +216,7 @@ impl<'arr> Dimensions<'arr> {
 
 /// Iterator for arrays
 #[derive(Clone)]
-struct ArrayIter<'arr, T>
+pub struct ArrayIter<'arr, T>
 where
     T: ?Sized + BorrowDatum,
 {
