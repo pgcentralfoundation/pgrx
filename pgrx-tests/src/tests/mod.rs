@@ -16,6 +16,7 @@ mod attributes_tests;
 mod bgworker_tests;
 #[cfg(feature = "cshim")]
 mod bindings_of_inline_fn_tests;
+mod borrow_datum;
 mod bytea_tests;
 mod cfg_tests;
 mod complex;

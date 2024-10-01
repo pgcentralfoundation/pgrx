@@ -16,6 +16,7 @@
 mod anyarray;
 mod anyelement;
 mod array;
+mod borrow;
 mod date;
 pub mod datetime_support;
 mod from;
@@ -44,6 +45,7 @@ pub use self::uuid::*;
 pub use anyarray::*;
 pub use anyelement::*;
 pub use array::*;
+pub use borrow::*;
 pub use date::*;
 pub use datetime_support::*;
 pub use from::*;
@@ -63,6 +65,7 @@ pub use varlena::*;
 use crate::memcx::MemCx;
 use crate::pg_sys;
 use core::marker::PhantomData;
+use core::ptr;
 #[doc(hidden)]
 pub use with_typeid::nonstatic_typeid;
 pub use with_typeid::{WithArrayTypeIds, WithSizedTypeIds, WithTypeIds, WithVarlenaTypeIds};
@@ -136,13 +139,21 @@ pub struct Datum<'src>(
 );
 
 impl<'src> Datum<'src> {
-    /// The Datum without its lifetime.
+    /// Strip a Datum of its lifetime for FFI purposes.
     pub fn sans_lifetime(self) -> pg_sys::Datum {
         self.0
     }
     /// Construct a Datum containing only a null pointer.
     pub fn null() -> Datum<'src> {
         Self(pg_sys::Datum::from(0), PhantomData)
+    }
+
+    /// Reborrow the Datum as `T`
+    ///
+    /// If the type is `PassBy::Ref`, this may be `None`.
+    pub unsafe fn borrow_as<T: BorrowDatum>(&self) -> Option<&T> {
+        let ptr = ptr::NonNull::new_unchecked(ptr::from_ref(self).cast_mut());
+        borrow::datum_ptr_to_bytes::<T>(ptr).map(|ptr| BorrowDatum::borrow_unchecked(ptr))
     }
 }
 
