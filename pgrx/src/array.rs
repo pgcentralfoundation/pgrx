@@ -241,9 +241,7 @@ where
             // note that we do NOT offset when the value is a null!
             Some(Nullable::Null)
         } else {
-            let borrow = unsafe {
-                &*<T as BorrowDatum>::point_from(self.data.byte_add(self.offset).cast_mut())
-            };
+            let borrow = unsafe { T::borrow_unchecked(self.data.add(self.offset)) };
             // As we always have a borrow, we just ask Rust what the array element's size is
             self.offset += self.align.pad(mem::size_of_val(borrow));
             Some(Nullable::Valid(borrow))
