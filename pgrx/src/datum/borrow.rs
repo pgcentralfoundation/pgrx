@@ -9,8 +9,7 @@ use core::{ffi, mem, ptr};
 /// Despite its pleasant-sounding name, this implements a fairly low-level detail.
 /// It exists to allow other code to use that nice-sounding BorrowDatum bound.
 /// Outside of the pgrx library, it is probably incorrect to call and rely on this:
-/// instead use the convenience functions available in `pgrx::datum`.
-// TODO: implement those.
+/// instead use convenience functions `Datum::borrow_as`.
 ///
 /// Its behavior is trusted for ABI details, and it should not be implemented if any doubt
 /// exists of whether the type would be suitable for passing via Postgres.
@@ -104,6 +103,7 @@ macro_rules! impl_borrow_fixed_len {
     }
 }
 
+// FIXME: these value-based impls are not actually well-tested in argument position
 impl_borrow_fixed_len! {
     i8, i16, i32, i64, bool, f32, f64, pg_sys::Oid, Date, Time, Timestamp, TimestampWithTimeZone
 }
