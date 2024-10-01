@@ -449,7 +449,7 @@ impl FromDatum for char {
 }
 
 /// for cstring
-impl<'a> FromDatum for &'a core::ffi::CStr {
+impl<'a> FromDatum for &'a CStr {
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
@@ -459,7 +459,7 @@ impl<'a> FromDatum for &'a core::ffi::CStr {
         if is_null || datum.is_null() {
             None
         } else {
-            Some(core::ffi::CStr::from_ptr(datum.cast_mut_ptr()))
+            Some(CStr::from_ptr(datum.cast_mut_ptr()))
         }
     }
 
@@ -475,8 +475,8 @@ impl<'a> FromDatum for &'a core::ffi::CStr {
         if is_null || datum.is_null() {
             None
         } else {
-            let copy = memory_context
-                .switch_to(|_| core::ffi::CStr::from_ptr(pg_sys::pstrdup(datum.cast_mut_ptr())));
+            let copy =
+                memory_context.switch_to(|_| CStr::from_ptr(pg_sys::pstrdup(datum.cast_mut_ptr())));
 
             Some(copy)
         }
