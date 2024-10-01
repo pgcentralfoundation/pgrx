@@ -12,6 +12,7 @@
 use crate::{
     pg_sys, varlena, varlena_to_byte_slice, AllocatedByPostgres, IntoDatum, PgBox, PgMemoryContexts,
 };
+use alloc::ffi::CString;
 use core::{ffi::CStr, mem::size_of};
 use std::num::NonZeroUsize;
 
@@ -479,6 +480,34 @@ impl<'a> FromDatum for &'a core::ffi::CStr {
 
             Some(copy)
         }
+    }
+}
+
+impl FromDatum for CString {
+    #[inline]
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<CString> {
+        if is_null || datum.is_null() {
+            None
+        } else {
+            Some(CStr::from_ptr(datum.cast_mut_ptr()).to_owned())
+        }
+    }
+
+    /// Nonsensical because CString is always allocated within Rust memory.
+    unsafe fn from_datum_in_memory_context(
+        _memory_context: PgMemoryContexts,
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: pg_sys::Oid,
+    ) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        Self::from_polymorphic_datum(datum, is_null, _typoid)
     }
 }
 
