@@ -9,7 +9,7 @@ use core::{ffi, mem, ptr};
 /// Despite its pleasant-sounding name, this implements a fairly low-level detail.
 /// It exists to allow other code to use that nice-sounding BorrowDatum bound.
 /// Outside of the pgrx library, it is probably incorrect to call and rely on this:
-/// instead use convenience functions `Datum::borrow_as`.
+/// instead use convenience functions like `Datum::borrow_as`.
 ///
 /// Its behavior is trusted for ABI details, and it should not be implemented if any doubt
 /// exists of whether the type would be suitable for passing via Postgres.
