@@ -337,10 +337,12 @@ impl_into_datum_c_str!(&CStr);
 impl<'a> IntoDatum for &'a [u8] {
     /// # Panics
     ///
-    /// This function will panic if the string being converted to a datum is longer than a `u32`.
+    /// This function will panic if the string being converted to a datum
+    //  is longer than 1 GiB including 4 bytes used for a header.
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let len = pg_sys::VARHDRSZ + self.len();
+        let len = self.len().saturating_add(pg_sys::VARHDRSZ);
+        assert!(len < (u32::MAX as usize >> 2));
         unsafe {
             // SAFETY:  palloc gives us a valid pointer and if there's not enough memory it'll raise an error
             let varlena = pg_sys::palloc(len) as *mut pg_sys::varlena;
@@ -351,10 +353,9 @@ impl<'a> IntoDatum for &'a [u8] {
                 &mut varlena.cast::<pg_sys::varattrib_4b>().as_mut().unwrap_unchecked().va_4byte;
 
             // This is the same as Postgres' `#define SET_VARSIZE_4B` (which have over in
-            // `pgrx/src/varlena.rs`), however we're asserting that the input string isn't too big
-            // for a Postgres varlena, since it's limited to 32bits -- in reality it's about half
-            // that length, but this is good enough
-            debug_assert!(len < (u32::MAX as usize >> 2));
+            // `pgrx/src/varlena.rs`), however we're asserting above that the input string
+            // isn't too big for a Postgres varlena, since it's limited to 32 bits and,
+            // in reality, it's a quarter that length, but this is good enough
             set_varsize_4b(varlena, len as i32);
 
             // SAFETY: src and dest pointers are valid, exactly `self.len()` bytes long,

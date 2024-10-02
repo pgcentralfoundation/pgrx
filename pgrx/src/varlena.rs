@@ -15,7 +15,7 @@ use core::{ops::DerefMut, slice, str};
 /// # Safety
 ///
 /// The caller asserts the specified `ptr` really is a non-null, palloc'd [`pg_sys::varlena`] pointer
-/// that is aligned to 4 bytes.
+/// that is aligned to 4 bytes, and that the `len` is a half of [`i32::MAX`]
 #[inline(always)]
 pub unsafe fn set_varsize_4b(ptr: *mut pg_sys::varlena, len: i32) {
     // #define SET_VARSIZE_4B(PTR,len) \
