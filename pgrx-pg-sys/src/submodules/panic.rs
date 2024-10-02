@@ -496,8 +496,7 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
 /// error (and purposely exclude them from `build.rs`) to ensure users can't get into trouble
 /// trying to roll their own error handling.
 fn do_ereport(ereport: ErrorReportWithLevel) {
-    // SAFETY:  we are providing a null-terminated byte string
-    const PERCENT_S: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"%s\0") };
+    const PERCENT_S: &CStr = c"%s";
     const DOMAIN: *const ::std::os::raw::c_char = std::ptr::null_mut();
 
     // the following code is definitely thread-unsafe -- not-the-main-thread can't be creating Postgres

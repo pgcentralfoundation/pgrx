@@ -148,9 +148,7 @@ mod tests {
         AnyNumeric,
         AnyNumeric::from_str("31241234123412341234").unwrap()
     );
-    roundtrip!(rt_cstr, test_rt_cstr, &'a CStr, unsafe {
-        CStr::from_bytes_with_nul_unchecked(b"&cstr\0")
-    });
+    roundtrip!(rt_cstr, test_rt_cstr, &'a CStr, c"&cstr");
 
     roundtrip!(rt_date, test_rt_date, Date, Date::from_str("1977-03-20").unwrap());
     roundtrip!(rt_ts, test_rt_ts, Timestamp, Timestamp::from_str("1977-03-20 04:42:00").unwrap());

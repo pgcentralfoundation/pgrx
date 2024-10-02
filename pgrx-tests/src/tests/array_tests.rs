@@ -169,13 +169,13 @@ fn validate_cstring_array<'a>(
     assert_eq!(
         a.iter().collect::<Vec<_>>(),
         vec![
-            Some(core::ffi::CStr::from_bytes_with_nul(b"one\0")?),
-            Some(core::ffi::CStr::from_bytes_with_nul(b"two\0")?),
+            Some(c"one"),
+            Some(c"two"),
             None,
-            Some(core::ffi::CStr::from_bytes_with_nul(b"four\0")?),
-            Some(core::ffi::CStr::from_bytes_with_nul(b"five\0")?),
+            Some(c"four"),
+            Some(c"five"),
             None,
-            Some(core::ffi::CStr::from_bytes_with_nul(b"seven\0")?),
+            Some(c"seven"),
             None,
             None
         ]

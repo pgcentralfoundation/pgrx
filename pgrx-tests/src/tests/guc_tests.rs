@@ -106,9 +106,7 @@ mod tests {
     #[pg_test]
     fn test_string_guc() {
         static GUC: GucSetting<Option<&'static CStr>> =
-            GucSetting::<Option<&'static CStr>>::new(Some(unsafe {
-                CStr::from_bytes_with_nul_unchecked(b"this is a test\0")
-            }));
+            GucSetting::<Option<&'static CStr>>::new(Some(c"this is a test"));
         GucRegistry::define_string_guc(
             "test.string",
             "test string guc",

@@ -139,7 +139,7 @@ mod seal {
     pub trait Sealed {}
 }
 
-// Postgres v15+ has the concept of an ABI "name".  The default is `b"PostgreSQL\0"` and this is the
+// Postgres v15+ has the concept of an ABI "name".  The default is `c"PostgreSQL"` and this is the
 // ABI that pgrx extensions expect to be running under.  We will refuse to compile if it is detected
 // that we're trying to be built against some other kind of "postgres" that has its own ABI name.
 //
