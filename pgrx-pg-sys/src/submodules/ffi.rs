@@ -9,7 +9,64 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![deny(unsafe_op_in_unsafe_fn)]
 
-use cee_scape::SigJmpBufFields;
+#[cfg(not(all(
+    any(target_os = "linux", target_os = "macos"),
+    any(target_arch = "x86_64", target_arch = "aarch64")
+)))]
+mod cee_scape {
+    #[cfg(not(feature = "cshim"))]
+    compile_error!("target platform cannot work without feature cshim");
+
+    use libc::{c_int, c_void};
+    use std::marker::PhantomData;
+
+    #[repr(C)]
+    pub struct SigJmpBufFields {
+        _internal: [u8; 0],
+        _neither_send_nor_sync: PhantomData<*const u8>,
+    }
+
+    pub fn call_with_sigsetjmp<F>(savemask: bool, mut callback: F) -> c_int
+    where
+        F: for<'a> FnOnce(&'a SigJmpBufFields) -> c_int,
+    {
+        extern "C" {
+            fn call_closure_with_sigsetjmp(
+                savemask: c_int,
+                closure_env_ptr: *mut c_void,
+                closure_code: extern "C" fn(
+                    jbuf: *const SigJmpBufFields,
+                    env_ptr: *mut c_void,
+                ) -> c_int,
+            ) -> c_int;
+        }
+
+        extern "C" fn call_from_c_to_rust<F>(
+            jbuf: *const SigJmpBufFields,
+            closure_env_ptr: *mut c_void,
+        ) -> c_int
+        where
+            F: for<'a> FnOnce(&'a SigJmpBufFields) -> c_int,
+        {
+            let closure_env_ptr: *mut F = closure_env_ptr as *mut F;
+            unsafe { (closure_env_ptr.read())(&*jbuf) }
+        }
+
+        let savemask: libc::c_int = if savemask { 1 } else { 0 };
+
+        unsafe {
+            let closure_env_ptr = core::ptr::addr_of_mut!(callback);
+            core::mem::forget(callback);
+            call_closure_with_sigsetjmp(
+                savemask,
+                closure_env_ptr as *mut libc::c_void,
+                call_from_c_to_rust::<F>,
+            )
+        }
+    }
+}
+
+use cee_scape::{call_with_sigsetjmp, SigJmpBufFields};
 
 /**
 Given a closure that is assumed to be a wrapped Postgres `extern "C"` function, [pg_guard_ffi_boundary]
@@ -113,7 +170,7 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
         let prev_exception_stack = pg_sys::PG_exception_stack;
         let prev_error_context_stack = pg_sys::error_context_stack;
         let mut result: std::mem::MaybeUninit<T> = MaybeUninit::uninit();
-        let jump_value = cee_scape::call_with_sigsetjmp(false, |jump_buffer| {
+        let jump_value = call_with_sigsetjmp(false, |jump_buffer| {
             // Make Postgres' error-handling system aware of our new
             // setjmp/longjmp restore point.
             pg_sys::PG_exception_stack = std::mem::transmute(jump_buffer as *const SigJmpBufFields);

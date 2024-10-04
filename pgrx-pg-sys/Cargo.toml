@@ -50,6 +50,7 @@ serde.workspace = true # impls on pub types
 # polyfill until #![feature(strict_provenance)] stabilizes
 sptr = "0.3"
 
+[target.'cfg(all(any(target_os = "linux", target_os = "macos"), any(target_arch = "x86_64", target_arch = "aarch64")))'.dependencies]
 # Safer `sigsetjmp` and `siglongjmp`
 cee-scape = "0.2"
 

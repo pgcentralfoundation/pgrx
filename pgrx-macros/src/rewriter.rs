@@ -16,8 +16,8 @@ use std::str::FromStr;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{
-    FnArg, ForeignItem, ForeignItemFn, GenericParam, ItemFn, ItemForeignMod, Pat, Signature, Token,
-    Visibility,
+    Expr, ExprLit, FnArg, ForeignItem, ForeignItemFn, ForeignItemStatic, GenericParam, ItemFn,
+    ItemForeignMod, Lit, Pat, Signature, Token, Visibility,
 };
 
 macro_rules! format_ident {
@@ -126,6 +126,7 @@ fn foreign_item(item: ForeignItem, abi: &syn::Abi) -> syn::Result<proc_macro2::T
 
             foreign_item_fn(&func, abi)
         }
+        ForeignItem::Static(variable) => foreign_item_static(&variable, abi),
         _ => Ok(quote! { #abi { #item } }),
     }
 }
@@ -135,16 +136,41 @@ fn foreign_item_fn(func: &ForeignItemFn, abi: &syn::Abi) -> syn::Result<proc_mac
     let arg_list = rename_arg_list(&func.sig)?;
     let arg_list_with_types = rename_arg_list_with_types(&func.sig)?;
     let return_type = func.sig.output.clone();
+    let link_with_cshim = func.attrs.iter().any(|attr| match &attr.meta {
+        syn::Meta::NameValue(kv) if kv.path.get_ident().filter(|x| *x == "link_name").is_some() => {
+            if let Expr::Lit(ExprLit { lit: Lit::Str(value), .. }) = &kv.value {
+                value.value().ends_with("__pgrx_cshim")
+            } else {
+                false
+            }
+        }
+        _ => false,
+    });
+    let link = if link_with_cshim {
+        quote! {}
+    } else {
+        quote! { #[cfg_attr(target_os = "windows", link(name = "postgres"))] }
+    };
 
     Ok(quote! {
         #[inline]
         #[track_caller]
         pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
             crate::ffi::pg_guard_ffi_boundary(move || {
-                #abi { #func }
+                #link #abi { #func }
                 #func_name(#arg_list)
             })
         }
+    })
+}
+
+fn foreign_item_static(
+    variable: &ForeignItemStatic,
+    abi: &syn::Abi,
+) -> syn::Result<proc_macro2::TokenStream> {
+    let link = quote! { #[cfg_attr(target_os = "windows", link(name = "postgres"))] };
+    Ok(quote! {
+        #link #abi { #variable }
     })
 }
 

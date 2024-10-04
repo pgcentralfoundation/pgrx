@@ -634,7 +634,7 @@ impl<'a> From<&'a BackgroundWorkerBuilder> for pg_sys::BackgroundWorker {
             bgw_name: RpgffiChar::from(&builder.bgw_name[..]).0,
             bgw_type: RpgffiChar::from(&builder.bgw_type[..]).0,
             bgw_flags: builder.bgw_flags.bits(),
-            bgw_start_time: builder.bgw_start_time as u32,
+            bgw_start_time: builder.bgw_start_time as _,
             bgw_restart_time: match builder.bgw_restart_time {
                 None => -1,
                 Some(d) => d.as_secs() as i32,

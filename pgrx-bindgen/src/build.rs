@@ -794,6 +794,7 @@ fn run_bindgen(
         .default_non_copy_union_style(NonCopyUnionStyle::ManuallyDrop)
         .wrap_static_fns(enable_cshim)
         .wrap_static_fns_path(out_path.join("pgrx-cshim-static"))
+        .wrap_static_fns_suffix("__pgrx_cshim")
         .generate()
         .wrap_err_with(|| format!("Unable to generate bindings for pg{major_version}"))?;
     let mut binding_str = bindings.to_string();
@@ -877,6 +878,14 @@ fn add_blocklists(bind: bindgen::Builder) -> bindgen::Builder {
         .blocklist_function("range_table_walker")
         .blocklist_function("raw_expression_tree_walker")
         .blocklist_function("type_is_array")
+        // These structs contains array that is larger than 32
+        // so that `derive(Default)` would fail.
+        .blocklist_type("tagMONITORINFOEXA")
+        .blocklist_type("MONITORINFOEXA")
+        .blocklist_type("LPMONITORINFOEXA")
+        .blocklist_type("MONITORINFOEX")
+        .blocklist_type("LPMONITORINFOEX")
+        .blocklist_function("ua_.*") // this should be Windows's names
 }
 
 fn add_derives(bind: bindgen::Builder) -> bindgen::Builder {
@@ -1116,18 +1125,11 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
         match item {
             Item::ForeignMod(block) => {
                 let abi = &block.abi;
-                let (mut extern_funcs, mut others) = (Vec::new(), Vec::new());
-                block.items.iter().filter(|&item| !is_blocklisted_item(item)).cloned().for_each(
-                    |item| match item {
-                        ForeignItem::Fn(func) => extern_funcs.push(func),
-                        item => others.push(item),
-                    },
-                );
+                let items = block.items.iter().filter(|&item| !is_blocklisted_item(item));
                 out.extend(quote! {
                     #[pgrx_macros::pg_guard]
-                    #abi { #(#extern_funcs)* }
+                    #abi { #(#items)* }
                 });
-                out.extend(quote! { #abi { #(#others)* } });
             }
             _ => {
                 out.extend(item.into_token_stream());
