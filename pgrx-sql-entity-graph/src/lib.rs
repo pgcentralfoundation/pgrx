@@ -232,7 +232,7 @@ impl ToSql for SqlGraphEntity {
                     result
                 } else if context
                     .graph
-                    .neighbors_undirected(*context.externs.get(item).unwrap())
+                    .neighbors_undirected(context.graph_root/* *context.externs.get(item).unwrap()*/)
                     .any(|neighbor| {
                         let SqlGraphEntity::Type(PostgresTypeEntity {
                             in_fn,

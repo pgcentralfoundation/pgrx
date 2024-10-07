@@ -220,7 +220,7 @@ impl Parse for CodeEnrichment<PostgresTypeDerive> {
         let to_sql_config = ToSqlConfig::from_attributes(attrs.as_slice())?.unwrap_or_default();
         let in_fn = Ident::new(&format!("{}_in", ident).to_lowercase(), ident.span());
         let out_fn = Ident::new(&format!("{}_out", ident).to_lowercase(), ident.span());
-        let typmod_in_fn = Ident::new(&format!("{}_in", ident).to_lowercase(), ident.span());
+        let typmod_in_fn = Ident::new(&format!("{}_typmod_in", ident).to_lowercase(), ident.span());
         PostgresTypeDerive::new(ident, generics, in_fn, out_fn, typmod_in_fn, to_sql_config)
     }
 }
