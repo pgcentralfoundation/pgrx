@@ -68,7 +68,7 @@ impl FromDatum for JsonB {
                 pg_sys::jsonb_out,
                 &[Some(detoasted.into())],
             )
-            .expect("Ddtum must refer to a valid JSONB varlena");
+            .expect("datum must refer to a valid JSONB varlena");
 
             let value = serde_json::from_str(
                 cstr.to_str().expect("a text version of the JSONB must be a valid UTF8"),
