@@ -395,6 +395,7 @@ where
     match unsafe { run_guarded(AssertUnwindSafe(f)) } {
         GuardAction::Return(r) => r,
         GuardAction::ReThrow => {
+            #[cfg_attr(target_os = "windows", link(name = "postgres"))]
             extern "C" /* "C-unwind" */ {
                 fn pg_re_throw() -> !;
             }
@@ -509,6 +510,7 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
     // `build.rs` and we'd prefer pgrx users not have access to them at all
     //
 
+    #[cfg_attr(target_os = "windows", link(name = "postgres"))]
     extern "C" {
         fn errcode(sqlerrcode: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
         fn errmsg(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
@@ -524,6 +526,7 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
     #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
     fn do_ereport_impl(ereport: ErrorReportWithLevel) {
 
+        #[cfg_attr(target_os = "windows", link(name = "postgres"))]
         extern "C" {
             fn errstart(elevel: ::std::os::raw::c_int, domain: *const ::std::os::raw::c_char) -> bool;
             fn errfinish(filename: *const ::std::os::raw::c_char, lineno: ::std::os::raw::c_int, funcname: *const ::std::os::raw::c_char);
@@ -588,6 +591,7 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
     #[cfg(feature = "pg12")]
     fn do_ereport_impl(ereport: ErrorReportWithLevel) {
 
+        #[cfg_attr(target_os = "windows", link(name = "postgres"))]
         extern "C" {
             fn errstart(elevel: ::std::os::raw::c_int, filename: *const ::std::os::raw::c_char, lineno: ::std::os::raw::c_int, funcname: *const ::std::os::raw::c_char, domain: *const ::std::os::raw::c_char) -> bool;
             fn errfinish(dummy: ::std::os::raw::c_int, ...);

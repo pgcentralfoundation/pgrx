@@ -10,42 +10,28 @@
 
 #include "pgrx-cshim-static.c"
 
-PGDLLEXPORT void *pgrx_list_nth(List *list, int nth);
-void *pgrx_list_nth(List *list, int nth) {
-    return list_nth(list, nth);
-}
-
-PGDLLEXPORT int pgrx_list_nth_int(List *list, int nth);
-int pgrx_list_nth_int(List *list, int nth) {
-    return list_nth_int(list, nth);
-}
-
-PGDLLEXPORT Oid pgrx_list_nth_oid(List *list, int nth);
-Oid pgrx_list_nth_oid(List *list, int nth) {
-    return list_nth_oid(list, nth);
-}
-
-PGDLLEXPORT ListCell *pgrx_list_nth_cell(List *list, int nth);
-ListCell *pgrx_list_nth_cell(List *list, int nth) {
-    return list_nth_cell(list, nth);
-}
-
-PGDLLEXPORT void pgrx_SpinLockInit(volatile slock_t *lock);
-void pgrx_SpinLockInit(volatile slock_t *lock) {
+void SpinLockInit__pgrx_cshim(volatile slock_t *lock) {
     SpinLockInit(lock);
 }
 
-PGDLLEXPORT void pgrx_SpinLockAcquire(volatile slock_t *lock);
-void pgrx_SpinLockAcquire(volatile slock_t *lock) {
+void SpinLockAcquire__pgrx_cshim(volatile slock_t *lock) {
     SpinLockAcquire(lock);
 }
 
-PGDLLEXPORT void pgrx_SpinLockRelease(volatile slock_t *lock);
-void pgrx_SpinLockRelease(volatile slock_t *lock) {
+void SpinLockRelease__pgrx_cshim(volatile slock_t *lock) {
     SpinLockRelease(lock);
 }
 
-PGDLLEXPORT bool pgrx_SpinLockFree(slock_t *lock);
-bool pgrx_SpinLockFree(slock_t *lock) {
+bool SpinLockFree__pgrx_cshim(slock_t *lock) {
     return SpinLockFree(lock);
+}
+
+int call_closure_with_sigsetjmp(int savemask, void* closure_env_ptr, int (*closure_code)(sigjmp_buf jbuf, void *env_ptr)) {
+    sigjmp_buf jbuf;
+    int val;
+    if (0 == (val = sigsetjmp(jbuf, savemask))) {
+        return closure_code(jbuf, closure_env_ptr);
+    } else {
+        return val;
+    }
 }

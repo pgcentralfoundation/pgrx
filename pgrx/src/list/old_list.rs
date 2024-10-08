@@ -53,7 +53,7 @@ impl<T> PgList<T> {
         if self.list.is_null() {
             None
         } else {
-            Some(unsafe { pg_sys::pgrx_list_nth(self.list, 0) } as *mut T)
+            Some(unsafe { pg_sys::list_nth(self.list, 0) } as *mut T)
         }
     }
 
@@ -62,7 +62,7 @@ impl<T> PgList<T> {
         if self.list.is_null() {
             None
         } else {
-            Some(unsafe { pg_sys::pgrx_list_nth(self.list, (self.len() - 1) as i32) } as *mut T)
+            Some(unsafe { pg_sys::list_nth(self.list, (self.len() - 1) as i32) } as *mut T)
         }
     }
 
@@ -76,7 +76,7 @@ impl<T> PgList<T> {
         if self.list.is_null() || i >= self.len() {
             None
         } else {
-            Some(unsafe { pg_sys::pgrx_list_nth(self.list, i as i32) } as *mut T)
+            Some(unsafe { pg_sys::list_nth(self.list, i as i32) } as *mut T)
         }
     }
 
@@ -91,7 +91,7 @@ impl<T> PgList<T> {
         if self.list.is_null() || i >= self.len() {
             None
         } else {
-            Some(unsafe { pg_sys::pgrx_list_nth_int(self.list, i as i32) })
+            Some(unsafe { pg_sys::list_nth_int(self.list, i as i32) })
         }
     }
 
@@ -106,14 +106,14 @@ impl<T> PgList<T> {
         if self.list.is_null() || i >= self.len() {
             None
         } else {
-            Some(unsafe { pg_sys::pgrx_list_nth_oid(self.list, i as i32) })
+            Some(unsafe { pg_sys::list_nth_oid(self.list, i as i32) })
         }
     }
 
     #[cfg(feature = "pg12")]
     #[inline]
     pub unsafe fn replace_ptr(&mut self, i: usize, with: *mut T) {
-        let cell = pg_sys::pgrx_list_nth_cell(self.list, i as i32);
+        let cell = pg_sys::list_nth_cell(self.list, i as i32);
         cell.as_mut().expect("cell is null").data.ptr_value = with as void_mut_ptr;
     }
 
@@ -126,7 +126,7 @@ impl<T> PgList<T> {
     ))]
     #[inline]
     pub unsafe fn replace_ptr(&mut self, i: usize, with: *mut T) {
-        let cell = pg_sys::pgrx_list_nth_cell(self.list, i as i32);
+        let cell = pg_sys::list_nth_cell(self.list, i as i32);
         cell.as_mut().expect("cell is null").ptr_value = with as void_mut_ptr;
     }
 
@@ -134,7 +134,7 @@ impl<T> PgList<T> {
     #[inline]
     pub fn replace_int(&mut self, i: usize, with: i32) {
         unsafe {
-            let cell = pg_sys::pgrx_list_nth_cell(self.list, i as i32);
+            let cell = pg_sys::list_nth_cell(self.list, i as i32);
             cell.as_mut().expect("cell is null").data.int_value = with;
         }
     }
@@ -149,7 +149,7 @@ impl<T> PgList<T> {
     #[inline]
     pub fn replace_int(&mut self, i: usize, with: i32) {
         unsafe {
-            let cell = pg_sys::pgrx_list_nth_cell(self.list, i as i32);
+            let cell = pg_sys::list_nth_cell(self.list, i as i32);
             cell.as_mut().expect("cell is null").int_value = with;
         }
     }
@@ -158,7 +158,7 @@ impl<T> PgList<T> {
     #[inline]
     pub fn replace_oid(&mut self, i: usize, with: pg_sys::Oid) {
         unsafe {
-            let cell = pg_sys::pgrx_list_nth_cell(self.list, i as i32);
+            let cell = pg_sys::list_nth_cell(self.list, i as i32);
             cell.as_mut().expect("cell is null").data.oid_value = with;
         }
     }
@@ -173,7 +173,7 @@ impl<T> PgList<T> {
     #[inline]
     pub fn replace_oid(&mut self, i: usize, with: pg_sys::Oid) {
         unsafe {
-            let cell = pg_sys::pgrx_list_nth_cell(self.list, i as i32);
+            let cell = pg_sys::list_nth_cell(self.list, i as i32);
             cell.as_mut().expect("cell is null").oid_value = with;
         }
     }

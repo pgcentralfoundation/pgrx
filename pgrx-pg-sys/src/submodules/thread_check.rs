@@ -94,6 +94,7 @@ fn init_active_thread(tid: NonZeroUsize) {
         panic!("Attempt to initialize `pgrx` active thread from a thread other than the main");
     }
     match ACTIVE_THREAD.compare_exchange(0, tid.get(), Ordering::Relaxed, Ordering::Relaxed) {
+        #[cfg(not(target_os = "windows"))]
         Ok(_) => unsafe {
             // We won the race. Register an atfork handler to clear the atomic
             // in any child processes we spawn.
@@ -102,6 +103,8 @@ fn init_active_thread(tid: NonZeroUsize) {
             }
             libc::pthread_atfork(None, None, Some(clear_in_child));
         },
+        #[cfg(target_os = "windows")]
+        Ok(_) => (),
         Err(_) => {
             thread_id_check_failed();
         }

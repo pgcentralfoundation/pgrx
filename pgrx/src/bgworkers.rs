@@ -343,7 +343,7 @@ impl DynamicBackgroundWorker {
     /// return [`BackgroundWorkerStatus::Untracked`] error
     pub fn wait_for_startup(&self) -> Result<Pid, BackgroundWorkerStatus> {
         unsafe {
-            if self.notify_pid != pg_sys::MyProcPid {
+            if self.notify_pid != pg_sys::MyProcPid as pg_sys::pid_t {
                 return Err(BackgroundWorkerStatus::Untracked { notify_pid: self.notify_pid });
             }
         }
@@ -382,7 +382,7 @@ impl TerminatingDynamicBackgroundWorker {
     /// return [`BackgroundWorkerStatus::Untracked`] error
     pub fn wait_for_shutdown(self) -> Result<(), BackgroundWorkerStatus> {
         unsafe {
-            if self.notify_pid != pg_sys::MyProcPid {
+            if self.notify_pid != pg_sys::MyProcPid as pg_sys::pid_t {
                 return Err(BackgroundWorkerStatus::Untracked { notify_pid: self.notify_pid });
             }
         }
@@ -580,7 +580,7 @@ impl BackgroundWorkerBuilder {
     /// to wait for the worker to start up. Otherwise, it should be initialized to
     /// `pgrx::pg_sys::MyProcPid`
     pub fn set_notify_pid(mut self, input: i32) -> Self {
-        self.bgw_notify_pid = input;
+        self.bgw_notify_pid = input as pg_sys::pid_t;
         self
     }
 
@@ -634,7 +634,7 @@ impl<'a> From<&'a BackgroundWorkerBuilder> for pg_sys::BackgroundWorker {
             bgw_name: RpgffiChar::from(&builder.bgw_name[..]).0,
             bgw_type: RpgffiChar::from(&builder.bgw_type[..]).0,
             bgw_flags: builder.bgw_flags.bits(),
-            bgw_start_time: builder.bgw_start_time as u32,
+            bgw_start_time: builder.bgw_start_time as _,
             bgw_restart_time: match builder.bgw_restart_time {
                 None => -1,
                 Some(d) => d.as_secs() as i32,
