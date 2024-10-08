@@ -45,7 +45,7 @@ impl FromDatum for Json {
             let data = vardata_any(varlena);
             let slice = std::slice::from_raw_parts(data as *const u8, len);
             let value =
-                serde_json::from_slice(slice).expect("datum must refer to a valid JSON varlena");
+                serde_json::from_slice(slice).expect("datum must refer to a valid json varlena");
             Some(Json(value))
         }
     }
@@ -68,12 +68,12 @@ impl FromDatum for JsonB {
                 pg_sys::jsonb_out,
                 &[Some(detoasted.into())],
             )
-            .expect("datum must refer to a valid JSONB varlena");
+            .expect("datum must refer to a valid jsonb varlena");
 
             let value = serde_json::from_str(
-                cstr.to_str().expect("a text version of the JSONB must be a valid UTF8"),
+                cstr.to_str().expect("a text version of the jsonb must be a valid utf-8"),
             )
-            .expect("a text version of JSONB must be a vaild JSON");
+            .expect("a text version of jsonb must be a vaild json");
 
             // free the cstring returned from direct_function_call -- we don't need it anymore
             pg_sys::pfree(cstr.as_ptr() as void_mut_ptr);
