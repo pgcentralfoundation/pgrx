@@ -499,11 +499,6 @@ jobs:
     steps:
       - uses: Homebrew/actions/setup-homebrew@master
 
-      # Although we don't use Python per se, if Homebrew has an updated version of Python,
-      # the following steps could fail because GitHub Actions mixed up the linkage.
-      - name: Workaround GitHub Actions Python issues
-        run: brew unlink python && brew link --overwrite python
-
       # install postgres with homebrew, but do't let homebrew do an update too.  The update
       # process not only takes forever, but it tends to fail when the internet changes
       #       https://github.com/Homebrew/brew/issues/1670#issuecomment-267096602
