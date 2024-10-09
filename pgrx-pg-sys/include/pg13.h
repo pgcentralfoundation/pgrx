@@ -15,6 +15,7 @@
 #include "miscadmin.h"
 #include "pgstat.h"
 
+#include "libpq/auth.h"
 #include "access/amapi.h"
 #include "access/genam.h"
 #include "access/generic_xlog.h"
