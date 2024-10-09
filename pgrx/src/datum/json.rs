@@ -123,8 +123,7 @@ impl FromDatum for JsonString {
 /// for json
 impl IntoDatum for Json {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let string =
-            serde_json::to_string(&self.0).expect("a json value must be serializable to json");
+        let string = serde_json::to_string(&self.0).unwrap();
         string.into_datum()
     }
 
@@ -136,8 +135,7 @@ impl IntoDatum for Json {
 /// for jsonb
 impl IntoDatum for JsonB {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let string =
-            serde_json::to_string(&self.0).expect("a jsonb value must be serializable to json");
+        let string = serde_json::to_string(&self.0).unwrap();
         let cstring = alloc::ffi::CString::new(string)
             .expect("a text version of jsonb must contain no null terminator");
 
