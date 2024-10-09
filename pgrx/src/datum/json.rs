@@ -71,9 +71,9 @@ impl FromDatum for JsonB {
             .expect("datum must refer to a valid jsonb varlena");
 
             let value = serde_json::from_str(
-                cstr.to_str().expect("a text version of the jsonb must be a valid utf-8"),
+                cstr.to_str().expect("a text version of the jsonb must be valid utf-8"),
             )
-            .expect("a text version of jsonb must be a vaild json");
+            .expect("a text version of jsonb must be a valid json");
 
             // free the cstring returned from direct_function_call -- we don't need it anymore
             pg_sys::pfree(cstr.as_ptr() as void_mut_ptr);
