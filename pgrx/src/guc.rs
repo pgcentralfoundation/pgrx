@@ -32,16 +32,18 @@ pub enum GucContext {
     /// file asynchronously.)
     Sighup = pg_sys::GucContext::PGC_SIGHUP as isize,
 
-    /// can only be set at postmaster startup, from the configuration file, or by
-    /// client request in the connection startup packet (e.g., from libpq's PGOPTIONS
-    /// variable).  
+    /// can only be set at postmaster startup, from the configuration file, or by client request in
+    /// the connection startup packet (e.g., from libpq's PGOPTIONS variable), but only when the
+    /// user is a superuser. Furthermore, an already-started backend will ignore changes to such an
+    /// option in the configuration file.  The idea is that these options are fixed for a given
+    /// backend once it's started, but they can vary across backends.
     SuBackend = pg_sys::GucContext::PGC_SU_BACKEND as isize,
 
-    /// can be set from the startup packet only when the user is a
-    /// superuser.  Furthermore, an already-started backend will ignore changes
-    /// to such an option in the configuration file.  The idea is that these
-    /// options are fixed for a given backend once it's started, but they can
-    /// vary across backends.
+    /// can only be set at postmaster startup, from the configuration file, or by client request in
+    /// the connection startup packet (e.g., from libpq's PGOPTIONS variable), by any user.
+    /// Furthermore, an already-started backend will ignore changes to such an option in the
+    /// configuration file.  The idea is that these options are fixed for a given backend once it's
+    /// started, but they can vary across backends.
     Backend = pg_sys::GucContext::PGC_BACKEND as isize,
 
     /// can be set at postmaster startup, with the SIGHUP
