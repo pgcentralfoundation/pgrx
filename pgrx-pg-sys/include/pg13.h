@@ -16,6 +16,7 @@
 #include "pgstat.h"
 
 #include "access/amapi.h"
+#include "access/detoast.h"
 #include "access/genam.h"
 #include "access/generic_xlog.h"
 #include "access/gin.h"
@@ -172,6 +173,7 @@
 #include "utils/relcache.h"
 #include "utils/resowner.h"
 #include "utils/resowner_private.h"
+#include "utils/rls.h"
 #include "utils/ruleutils.h"
 #include "utils/sampling.h"
 #include "utils/selfuncs.h"
