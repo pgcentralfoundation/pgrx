@@ -27,7 +27,7 @@
    + `cargo pgrx package`: Create installation packages for your extension
    + More in the [`README.md`](cargo-pgrx/README.md)!
 - **Target Multiple Postgres Versions**
-   + Support from Postgres 12 to Postgres 16 from the same codebase
+   + Support from Postgres 12 to Postgres 17 from the same codebase
    + Use Rust feature gating to use version-specific APIs
    + Seamlessly test against all versions
 - **Automatic Schema Generation**
