@@ -76,10 +76,10 @@ mod tests {
         Vec<Option<&'static CStr>>,
         vec![
             None,
-            Some(unsafe { CStr::from_bytes_with_nul_unchecked(b"&one\0") }),
-            Some(unsafe { CStr::from_bytes_with_nul_unchecked(b"&two\0") }),
+            Some(unsafe { c"&one" }),
+            Some(unsafe { c"&two" }),
             None,
-            Some(unsafe { CStr::from_bytes_with_nul_unchecked(b"&three\0") }),
+            Some(unsafe { "&three" }),
             None,
         ]
     );
