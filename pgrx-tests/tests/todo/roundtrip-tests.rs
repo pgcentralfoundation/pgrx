@@ -76,10 +76,10 @@ mod tests {
         Vec<Option<&'static CStr>>,
         vec![
             None,
-            Some(unsafe { c"&one" }),
-            Some(unsafe { c"&two" }),
+            Some( c"&one" ),
+            Some( c"&two" ),
             None,
-            Some(unsafe { "&three" }),
+            Some( c"&three" ),
             None,
         ]
     );
