@@ -35160,6 +35160,12 @@ impl Default for AttStatsSlot {
 }
 pub type get_attavgwidth_hook_type =
     ::core::option::Option<unsafe extern "C" fn(relid: Oid, attnum: AttrNumber) -> int32>;
+pub mod CheckEnableRlsResult {
+    pub type Type = ::core::ffi::c_uint;
+    pub const RLS_NONE: Type = 0;
+    pub const RLS_NONE_ENV: Type = 1;
+    pub const RLS_ENABLED: Type = 2;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct BlockSamplerData {
@@ -36115,6 +36121,8 @@ extern "C" {
         domain: *const ::core::ffi::c_char,
     );
     pub fn format_elog_string(fmt: *const ::core::ffi::c_char, ...) -> *mut ::core::ffi::c_char;
+    pub static mut error_context_stack: *mut ErrorContextCallback;
+    pub static mut PG_exception_stack: *mut sigjmp_buf;
     pub fn EmitErrorReport();
     pub fn CopyErrorData() -> *mut ErrorData;
     pub fn FreeErrorData(edata: *mut ErrorData);
@@ -36122,6 +36130,13 @@ extern "C" {
     pub fn ReThrowError(edata: *mut ErrorData) -> !;
     pub fn ThrowErrorData(edata: *mut ErrorData);
     pub fn GetErrorContextStack() -> *mut ::core::ffi::c_char;
+    pub static mut emit_log_hook: emit_log_hook_type;
+    pub static mut Log_error_verbosity: ::core::ffi::c_int;
+    pub static mut Log_line_prefix: *mut ::core::ffi::c_char;
+    pub static mut Log_destination: ::core::ffi::c_int;
+    pub static mut Log_destination_string: *mut ::core::ffi::c_char;
+    pub static mut syslog_sequence_numbers: bool;
+    pub static mut syslog_split_messages: bool;
     pub fn log_status_format(
         buf: StringInfo,
         format: *const ::core::ffi::c_char,
@@ -36144,6 +36159,7 @@ extern "C" {
     pub fn write_csvlog(edata: *mut ErrorData);
     pub fn write_jsonlog(edata: *mut ErrorData);
     pub fn write_stderr(fmt: *const ::core::ffi::c_char, ...);
+    pub static mut CurrentMemoryContext: MemoryContext;
     pub fn MemoryContextAlloc(context: MemoryContext, size: Size) -> *mut ::core::ffi::c_void;
     pub fn MemoryContextAllocZero(context: MemoryContext, size: Size) -> *mut ::core::ffi::c_void;
     pub fn MemoryContextAllocExtended(
@@ -36192,6 +36208,7 @@ extern "C" {
     pub fn pnstrdup(in_: *const ::core::ffi::c_char, len: Size) -> *mut ::core::ffi::c_char;
     pub fn pchomp(in_: *const ::core::ffi::c_char) -> *mut ::core::ffi::c_char;
     pub fn psprintf(fmt: *const ::core::ffi::c_char, ...) -> *mut ::core::ffi::c_char;
+    pub static mut no_such_variable: ::core::ffi::c_int;
     pub fn outNode(str_: *mut StringInfoData, obj: *const ::core::ffi::c_void);
     pub fn outToken(str_: *mut StringInfoData, s: *const ::core::ffi::c_char);
     pub fn outBitmapset(str_: *mut StringInfoData, bms: *const Bitmapset);
@@ -36374,6 +36391,7 @@ extern "C" {
     );
     pub fn HeapTupleGetUpdateXid(tuple: HeapTupleHeader) -> TransactionId;
     pub fn TransactionStartedDuringRecovery() -> bool;
+    pub static mut TransamVariables: *mut TransamVariablesData;
     pub fn TransactionIdDidCommit(transactionId: TransactionId) -> bool;
     pub fn TransactionIdDidAbort(transactionId: TransactionId) -> bool;
     pub fn TransactionIdCommitTree(
@@ -36520,6 +36538,10 @@ extern "C" {
     pub fn minimal_tuple_from_heap_tuple(htup: HeapTuple) -> MinimalTuple;
     pub fn heap_expand_tuple(sourceTuple: HeapTuple, tupleDesc: TupleDesc) -> HeapTuple;
     pub fn minimal_expand_tuple(sourceTuple: HeapTuple, tupleDesc: TupleDesc) -> MinimalTuple;
+    pub static TTSOpsVirtual: TupleTableSlotOps;
+    pub static TTSOpsHeapTuple: TupleTableSlotOps;
+    pub static TTSOpsMinimalTuple: TupleTableSlotOps;
+    pub static TTSOpsBufferHeapTuple: TupleTableSlotOps;
     pub fn MakeTupleTableSlot(
         tupleDesc: TupleDesc,
         tts_ops: *const TupleTableSlotOps,
@@ -36641,6 +36663,8 @@ extern "C" {
     ) -> *mut TupleTableSlot;
     pub fn execute_attr_map_cols(attrMap: *mut AttrMap, in_cols: *mut Bitmapset) -> *mut Bitmapset;
     pub fn free_conversion_map(map: *mut TupleConversionMap);
+    pub static mut pgBufferUsage: BufferUsage;
+    pub static mut pgWalUsage: WalUsage;
     pub fn InstrAlloc(
         n: ::core::ffi::c_int,
         instrument_options: ::core::ffi::c_int,
@@ -36976,6 +37000,7 @@ extern "C" {
     pub fn has_fn_opclass_options(flinfo: *mut FmgrInfo) -> bool;
     pub fn set_fn_opclass_options(flinfo: *mut FmgrInfo, options: *mut bytea);
     pub fn CheckFunctionValidatorAccess(validatorOid: Oid, functionOid: Oid) -> bool;
+    pub static mut Dynamic_library_path: *mut ::core::ffi::c_char;
     pub fn load_external_function(
         filename: *const ::core::ffi::c_char,
         funcname: *const ::core::ffi::c_char,
@@ -37005,6 +37030,8 @@ extern "C" {
         func: fmExprContextCallbackFunction,
         arg: Datum,
     );
+    pub static mut needs_fmgr_hook: needs_fmgr_hook_type;
+    pub static mut fmgr_hook: fmgr_hook_type;
     pub fn slist_delete(head: *mut slist_head, node: *const slist_node);
     pub fn pairingheap_allocate(
         compare: pairingheap_comparator,
@@ -37026,6 +37053,7 @@ extern "C" {
         maxlen: ::core::ffi::c_int,
     ) -> *mut ::core::ffi::c_char;
     pub fn ParamsErrorCallback(arg: *mut ::core::ffi::c_void);
+    pub static forkNames: [*const ::core::ffi::c_char; 0usize];
     pub fn forkname_to_number(forkName: *const ::core::ffi::c_char) -> ForkNumber::Type;
     pub fn forkname_chars(
         str_: *const ::core::ffi::c_char,
@@ -37039,6 +37067,8 @@ extern "C" {
         procNumber: ::core::ffi::c_int,
         forkNumber: ForkNumber::Type,
     ) -> *mut ::core::ffi::c_char;
+    pub static mut dynamic_shared_memory_type: ::core::ffi::c_int;
+    pub static mut min_dynamic_shared_memory: ::core::ffi::c_int;
     pub fn dsm_impl_op(
         op: dsm_op::Type,
         handle: dsm_handle,
@@ -37138,6 +37168,8 @@ extern "C" {
     pub fn tbm_attach_shared_iterate(dsa: *mut dsa_area, dp: dsa_pointer)
         -> *mut TBMSharedIterator;
     pub fn tbm_calculate_entries(maxbytes: f64) -> ::core::ffi::c_long;
+    pub static mut MyProcNumber: ProcNumber;
+    pub static mut ParallelLeaderProcNumber: ProcNumber;
     pub fn s_lock(
         lock: *mut slock_t,
         file: *const ::core::ffi::c_char,
@@ -37215,6 +37247,11 @@ extern "C" {
         __key: *const ::core::ffi::c_char,
         __salt: *const ::core::ffi::c_char,
     ) -> *mut ::core::ffi::c_char;
+    pub static mut max_files_per_process: ::core::ffi::c_int;
+    pub static mut data_sync_retry: bool;
+    pub static mut recovery_init_sync_method: ::core::ffi::c_int;
+    pub static mut io_direct_flags: ::core::ffi::c_int;
+    pub static mut max_safe_fds: ::core::ffi::c_int;
     pub fn PathNameOpenFile(
         fileName: *const ::core::ffi::c_char,
         fileFlags: ::core::ffi::c_int,
@@ -37485,6 +37522,8 @@ extern "C" {
     pub fn RelationCacheInitFilePreInvalidate();
     pub fn RelationCacheInitFilePostInvalidate();
     pub fn RelationCacheInitFileRemove();
+    pub static mut criticalRelcachesBuilt: bool;
+    pub static mut criticalSharedRelcachesBuilt: bool;
     pub fn ssup_datum_unsigned_cmp(x: Datum, y: Datum, ssup: SortSupport) -> ::core::ffi::c_int;
     pub fn ssup_datum_signed_cmp(x: Datum, y: Datum, ssup: SortSupport) -> ::core::ffi::c_int;
     pub fn ssup_datum_int32_cmp(x: Datum, y: Datum, ssup: SortSupport) -> ::core::ffi::c_int;
@@ -37997,6 +38036,23 @@ extern "C" {
     pub fn tuplestore_rescan(state: *mut Tuplestorestate);
     pub fn tuplestore_clear(state: *mut Tuplestorestate);
     pub fn tuplestore_end(state: *mut Tuplestorestate);
+    pub static pg_leftmost_one_pos: [uint8; 256usize];
+    pub static pg_rightmost_one_pos: [uint8; 256usize];
+    pub static pg_number_of_ones: [uint8; 256usize];
+    pub static mut pg_popcount32:
+        ::core::option::Option<unsafe extern "C" fn(word: uint32) -> ::core::ffi::c_int>;
+    pub static mut pg_popcount64:
+        ::core::option::Option<unsafe extern "C" fn(word: uint64) -> ::core::ffi::c_int>;
+    pub static mut pg_popcount_optimized: ::core::option::Option<
+        unsafe extern "C" fn(buf: *const ::core::ffi::c_char, bytes: ::core::ffi::c_int) -> uint64,
+    >;
+    pub static mut pg_popcount_masked_optimized: ::core::option::Option<
+        unsafe extern "C" fn(
+            buf: *const ::core::ffi::c_char,
+            bytes: ::core::ffi::c_int,
+            mask: bits8,
+        ) -> uint64,
+    >;
     pub fn pg_popcount_avx512_available() -> bool;
     pub fn pg_popcount_avx512(buf: *const ::core::ffi::c_char, bytes: ::core::ffi::c_int)
         -> uint64;
@@ -38058,6 +38114,7 @@ extern "C" {
         qc: *const QueryCompletion,
         nameonly: bool,
     ) -> Size;
+    pub static mut None_Receiver: *mut DestReceiver;
     pub fn BeginCommand(commandTag: CommandTag::Type, dest: CommandDest::Type);
     pub fn CreateDestReceiver(dest: CommandDest::Type) -> *mut DestReceiver;
     pub fn EndCommand(
@@ -38084,6 +38141,14 @@ extern "C" {
     pub fn makeBoolean(val: bool) -> *mut Boolean;
     pub fn makeString(str_: *mut ::core::ffi::c_char) -> *mut String;
     pub fn makeBitString(str_: *mut ::core::ffi::c_char) -> *mut BitString;
+    pub static mut TopMemoryContext: MemoryContext;
+    pub static mut ErrorContext: MemoryContext;
+    pub static mut PostmasterContext: MemoryContext;
+    pub static mut CacheMemoryContext: MemoryContext;
+    pub static mut MessageContext: MemoryContext;
+    pub static mut TopTransactionContext: MemoryContext;
+    pub static mut CurTransactionContext: MemoryContext;
+    pub static mut PortalContext: MemoryContext;
     pub fn MemoryContextInit();
     pub fn MemoryContextReset(context: MemoryContext);
     pub fn MemoryContextDelete(context: MemoryContext);
@@ -38135,6 +38200,11 @@ extern "C" {
         initBlockSize: Size,
         maxBlockSize: Size,
     ) -> MemoryContext;
+    pub static mut ExecutorStart_hook: ExecutorStart_hook_type;
+    pub static mut ExecutorRun_hook: ExecutorRun_hook_type;
+    pub static mut ExecutorFinish_hook: ExecutorFinish_hook_type;
+    pub static mut ExecutorEnd_hook: ExecutorEnd_hook_type;
+    pub static mut ExecutorCheckPerms_hook: ExecutorCheckPerms_hook_type;
     pub fn ExecReScan(node: *mut PlanState);
     pub fn ExecMarkPos(node: *mut PlanState);
     pub fn ExecRestrPos(node: *mut PlanState);
@@ -38720,13 +38790,83 @@ extern "C" {
         format: *const ::core::ffi::c_char,
         t: *const pg_tm,
     ) -> usize;
+    pub static mut session_timezone: *mut pg_tz;
+    pub static mut log_timezone: *mut pg_tz;
     pub fn pg_timezone_initialize();
     pub fn pg_tzset(tzname: *const ::core::ffi::c_char) -> *mut pg_tz;
     pub fn pg_tzset_offset(gmtoffset: ::core::ffi::c_long) -> *mut pg_tz;
     pub fn pg_tzenumerate_start() -> *mut pg_tzenum;
     pub fn pg_tzenumerate_next(dir: *mut pg_tzenum) -> *mut pg_tz;
     pub fn pg_tzenumerate_end(dir: *mut pg_tzenum);
+    #[doc = "\t  System interrupt and critical section handling\n\n There are two types of interrupts that a running backend needs to accept\n without messing up its state: QueryCancel (SIGINT) and ProcDie (SIGTERM).\n In both cases, we need to be able to clean up the current transaction\n gracefully, so we can't respond to the interrupt instantaneously ---\n there's no guarantee that internal data structures would be self-consistent\n if the code is interrupted at an arbitrary instant.  Instead, the signal\n handlers set flags that are checked periodically during execution.\n\n The CHECK_FOR_INTERRUPTS() macro is called at strategically located spots\n where it is normally safe to accept a cancel or die interrupt.  In some\n cases, we invoke CHECK_FOR_INTERRUPTS() inside low-level subroutines that\n might sometimes be called in contexts that do *not* want to allow a cancel\n or die interrupt.  The HOLD_INTERRUPTS() and RESUME_INTERRUPTS() macros\n allow code to ensure that no cancel or die interrupt will be accepted,\n even if CHECK_FOR_INTERRUPTS() gets called in a subroutine.  The interrupt\n will be held off until CHECK_FOR_INTERRUPTS() is done outside any\n HOLD_INTERRUPTS() ... RESUME_INTERRUPTS() section.\n\n There is also a mechanism to prevent query cancel interrupts, while still\n allowing die interrupts: HOLD_CANCEL_INTERRUPTS() and\n RESUME_CANCEL_INTERRUPTS().\n\n Note that ProcessInterrupts() has also acquired a number of tasks that\n do not necessarily cause a query-cancel-or-die response.  Hence, it's\n possible that it will just clear InterruptPending and return.\n\n INTERRUPTS_PENDING_CONDITION() can be checked to see whether an\n interrupt needs to be serviced, without trying to do so immediately.\n Some callers are also interested in INTERRUPTS_CAN_BE_PROCESSED(),\n which tells whether ProcessInterrupts is sure to clear the interrupt.\n\n Special mechanisms are used to let an interrupt be accepted when we are\n waiting for a lock or when we are waiting for command input (but, of\n course, only if the interrupt holdoff counter is zero).  See the\n related code for details.\n\n A lost connection is handled similarly, although the loss of connection\n does not raise a signal, but is detected when we fail to write to the\n socket. If there was a signal for a broken connection, we could make use of\n it by setting ClientConnectionLost in the signal handler.\n\n A related, but conceptually distinct, mechanism is the \"critical section\"\n mechanism.  A critical section not only holds off cancel/die interrupts,\n but causes any ereport(ERROR) or ereport(FATAL) to become ereport(PANIC)\n --- that is, a system-wide reset is forced.  Needless to say, only really\n *critical* code should be marked as a critical section!\tCurrently, this\n mechanism is only used for XLOG-related code.\n"]
+    pub static mut InterruptPending: sig_atomic_t;
+    pub static mut QueryCancelPending: sig_atomic_t;
+    pub static mut ProcDiePending: sig_atomic_t;
+    pub static mut IdleInTransactionSessionTimeoutPending: sig_atomic_t;
+    pub static mut TransactionTimeoutPending: sig_atomic_t;
+    pub static mut IdleSessionTimeoutPending: sig_atomic_t;
+    pub static mut ProcSignalBarrierPending: sig_atomic_t;
+    pub static mut LogMemoryContextPending: sig_atomic_t;
+    pub static mut IdleStatsUpdateTimeoutPending: sig_atomic_t;
+    pub static mut CheckClientConnectionPending: sig_atomic_t;
+    pub static mut ClientConnectionLost: sig_atomic_t;
+    pub static mut InterruptHoldoffCount: uint32;
+    pub static mut QueryCancelHoldoffCount: uint32;
+    pub static mut CritSectionCount: uint32;
     pub fn ProcessInterrupts();
+    #[doc = "\t  globals.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *"]
+    pub static mut PostmasterPid: pid_t;
+    pub static mut IsPostmasterEnvironment: bool;
+    pub static mut IsUnderPostmaster: bool;
+    pub static mut IsBinaryUpgrade: bool;
+    pub static mut ExitOnAnyError: bool;
+    pub static mut DataDir: *mut ::core::ffi::c_char;
+    pub static mut data_directory_mode: ::core::ffi::c_int;
+    pub static mut NBuffers: ::core::ffi::c_int;
+    pub static mut MaxBackends: ::core::ffi::c_int;
+    pub static mut MaxConnections: ::core::ffi::c_int;
+    pub static mut max_worker_processes: ::core::ffi::c_int;
+    pub static mut max_parallel_workers: ::core::ffi::c_int;
+    pub static mut commit_timestamp_buffers: ::core::ffi::c_int;
+    pub static mut multixact_member_buffers: ::core::ffi::c_int;
+    pub static mut multixact_offset_buffers: ::core::ffi::c_int;
+    pub static mut notify_buffers: ::core::ffi::c_int;
+    pub static mut serializable_buffers: ::core::ffi::c_int;
+    pub static mut subtransaction_buffers: ::core::ffi::c_int;
+    pub static mut transaction_buffers: ::core::ffi::c_int;
+    pub static mut MyProcPid: ::core::ffi::c_int;
+    pub static mut MyStartTime: pg_time_t;
+    pub static mut MyStartTimestamp: TimestampTz;
+    pub static mut MyProcPort: *mut Port;
+    pub static mut MyLatch: *mut Latch;
+    pub static mut MyCancelKey: int32;
+    pub static mut MyPMChildSlot: ::core::ffi::c_int;
+    pub static mut OutputFileName: [::core::ffi::c_char; 0usize];
+    pub static mut my_exec_path: [::core::ffi::c_char; 0usize];
+    pub static mut pkglib_path: [::core::ffi::c_char; 0usize];
+    pub static mut MyDatabaseId: Oid;
+    pub static mut MyDatabaseTableSpace: Oid;
+    pub static mut MyDatabaseHasLoginEventTriggers: bool;
+    pub static mut DateStyle: ::core::ffi::c_int;
+    pub static mut DateOrder: ::core::ffi::c_int;
+    pub static mut IntervalStyle: ::core::ffi::c_int;
+    pub static mut enableFsync: bool;
+    pub static mut allowSystemTableMods: bool;
+    pub static mut work_mem: ::core::ffi::c_int;
+    pub static mut hash_mem_multiplier: f64;
+    pub static mut maintenance_work_mem: ::core::ffi::c_int;
+    pub static mut max_parallel_maintenance_workers: ::core::ffi::c_int;
+    pub static mut VacuumBufferUsageLimit: ::core::ffi::c_int;
+    pub static mut VacuumCostPageHit: ::core::ffi::c_int;
+    pub static mut VacuumCostPageMiss: ::core::ffi::c_int;
+    pub static mut VacuumCostPageDirty: ::core::ffi::c_int;
+    pub static mut VacuumCostLimit: ::core::ffi::c_int;
+    pub static mut VacuumCostDelay: f64;
+    pub static mut VacuumPageHit: int64;
+    pub static mut VacuumPageMiss: int64;
+    pub static mut VacuumPageDirty: int64;
+    pub static mut VacuumCostBalance: ::core::ffi::c_int;
+    pub static mut VacuumCostActive: bool;
     pub fn set_stack_base() -> pg_stack_base_t;
     pub fn restore_stack_base(base: pg_stack_base_t);
     pub fn check_stack_depth();
@@ -38734,11 +38874,13 @@ extern "C" {
     pub fn PreventCommandIfReadOnly(cmdname: *const ::core::ffi::c_char);
     pub fn PreventCommandIfParallelMode(cmdname: *const ::core::ffi::c_char);
     pub fn PreventCommandDuringRecovery(cmdname: *const ::core::ffi::c_char);
+    pub static mut DatabasePath: *mut ::core::ffi::c_char;
     pub fn InitPostmasterChild();
     pub fn InitStandaloneProcess(argv0: *const ::core::ffi::c_char);
     pub fn InitProcessLocalLatch();
     pub fn SwitchToSharedLatch();
     pub fn SwitchBackToLocalLatch();
+    pub static mut MyBackendType: BackendType::Type;
     pub fn GetBackendTypeDesc(backendType: BackendType::Type) -> *const ::core::ffi::c_char;
     pub fn SetDatabasePath(path: *const ::core::ffi::c_char);
     pub fn checkDataDir();
@@ -38772,6 +38914,7 @@ extern "C" {
     pub fn GetSystemUser() -> *const ::core::ffi::c_char;
     pub fn superuser() -> bool;
     pub fn superuser_arg(roleid: Oid) -> bool;
+    pub static mut Mode: ProcessingMode::Type;
     pub fn pg_split_opts(
         argv: *mut *mut ::core::ffi::c_char,
         argcp: *mut ::core::ffi::c_int,
@@ -38787,6 +38930,13 @@ extern "C" {
         out_dbname: *mut ::core::ffi::c_char,
     );
     pub fn BaseInit();
+    pub static mut IgnoreSystemIndexes: bool;
+    pub static mut process_shared_preload_libraries_in_progress: bool;
+    pub static mut process_shared_preload_libraries_done: bool;
+    pub static mut process_shmem_requests_in_progress: bool;
+    pub static mut session_preload_libraries_string: *mut ::core::ffi::c_char;
+    pub static mut shared_preload_libraries_string: *mut ::core::ffi::c_char;
+    pub static mut local_preload_libraries_string: *mut ::core::ffi::c_char;
     pub fn CreateDataDirLockFile(amPostmaster: bool);
     pub fn CreateSocketLockFile(
         socketfile: *const ::core::ffi::c_char,
@@ -38802,6 +38952,7 @@ extern "C" {
     pub fn process_shmem_requests();
     pub fn pg_bindtextdomain(domain: *const ::core::ffi::c_char);
     pub fn has_rolreplication(roleid: Oid) -> bool;
+    pub static mut shmem_request_hook: shmem_request_hook_type;
     pub fn EstimateClientConnectionInfoSpace() -> Size;
     pub fn SerializeClientConnectionInfo(maxsize: Size, start_address: *mut ::core::ffi::c_char);
     pub fn RestoreClientConnectionInfo(conninfo: *mut ::core::ffi::c_char);
@@ -38826,6 +38977,9 @@ extern "C" {
         __sockfd: ::core::ffi::c_int,
         __sock_in: *mut sockaddr_in6,
     ) -> ::core::ffi::c_int;
+    pub static mut pgstat_track_activities: bool;
+    pub static mut pgstat_track_activity_query_size: ::core::ffi::c_int;
+    pub static mut MyBEEntry: *mut PgBackendStatus;
     pub fn BackendStatusShmemSize() -> Size;
     pub fn CreateSharedBackendStatus();
     pub fn pgstat_beinit();
@@ -38859,6 +39013,7 @@ extern "C" {
     pub fn pgstat_get_wait_event_type(wait_event_info: uint32) -> *const ::core::ffi::c_char;
     pub fn pgstat_set_wait_event_storage(wait_event_info: *mut uint32);
     pub fn pgstat_reset_wait_event_storage();
+    pub static mut my_wait_event_info: *mut uint32;
     pub fn WaitEventExtensionNew(wait_event_name: *const ::core::ffi::c_char) -> uint32;
     pub fn WaitEventInjectionPointNew(wait_event_name: *const ::core::ffi::c_char) -> uint32;
     pub fn WaitEventCustomShmemInit();
@@ -39020,10 +39175,58 @@ extern "C" {
     );
     pub fn pgstat_report_wal(force: bool);
     pub fn pgstat_fetch_stat_wal() -> *mut PgStat_WalStats;
+    pub static mut pgstat_track_counts: bool;
+    pub static mut pgstat_track_functions: ::core::ffi::c_int;
+    pub static mut pgstat_fetch_consistency: ::core::ffi::c_int;
+    pub static mut PendingBgWriterStats: PgStat_BgWriterStats;
+    pub static mut PendingCheckpointerStats: PgStat_CheckpointerStats;
+    pub static mut pgStatBlockReadTime: PgStat_Counter;
+    pub static mut pgStatBlockWriteTime: PgStat_Counter;
+    pub static mut pgStatActiveTime: PgStat_Counter;
+    pub static mut pgStatTransactionIdleTime: PgStat_Counter;
+    pub static mut pgStatSessionEndCause: SessionEndType::Type;
+    pub static mut PendingWalStats: PgStat_PendingWalStats;
+    pub fn detoast_external_attr(attr: *mut varlena) -> *mut varlena;
+    pub fn detoast_attr(attr: *mut varlena) -> *mut varlena;
+    pub fn detoast_attr_slice(
+        attr: *mut varlena,
+        sliceoffset: int32,
+        slicelength: int32,
+    ) -> *mut varlena;
+    pub fn toast_raw_datum_size(value: Datum) -> Size;
+    pub fn toast_datum_size(value: Datum) -> Size;
     pub fn build_backup_content(
         state: *mut BackupState,
         ishistoryfile: bool,
     ) -> *mut ::core::ffi::c_char;
+    pub static mut wal_sync_method: ::core::ffi::c_int;
+    pub static mut ProcLastRecPtr: XLogRecPtr;
+    pub static mut XactLastRecEnd: XLogRecPtr;
+    pub static mut XactLastCommitEnd: XLogRecPtr;
+    pub static mut wal_segment_size: ::core::ffi::c_int;
+    pub static mut min_wal_size_mb: ::core::ffi::c_int;
+    pub static mut max_wal_size_mb: ::core::ffi::c_int;
+    pub static mut wal_keep_size_mb: ::core::ffi::c_int;
+    pub static mut max_slot_wal_keep_size_mb: ::core::ffi::c_int;
+    pub static mut XLOGbuffers: ::core::ffi::c_int;
+    pub static mut XLogArchiveTimeout: ::core::ffi::c_int;
+    pub static mut wal_retrieve_retry_interval: ::core::ffi::c_int;
+    pub static mut XLogArchiveCommand: *mut ::core::ffi::c_char;
+    pub static mut EnableHotStandby: bool;
+    pub static mut fullPageWrites: bool;
+    pub static mut wal_log_hints: bool;
+    pub static mut wal_compression: ::core::ffi::c_int;
+    pub static mut wal_init_zero: bool;
+    pub static mut wal_recycle: bool;
+    pub static mut wal_consistency_checking: *mut bool;
+    pub static mut wal_consistency_checking_string: *mut ::core::ffi::c_char;
+    pub static mut log_checkpoints: bool;
+    pub static mut track_wal_io_timing: bool;
+    pub static mut wal_decode_buffer_size: ::core::ffi::c_int;
+    pub static mut CheckPointSegments: ::core::ffi::c_int;
+    pub static mut XLogArchiveMode: ::core::ffi::c_int;
+    pub static mut wal_level: ::core::ffi::c_int;
+    pub static mut CheckpointStats: CheckpointStatsData;
     pub fn XLogInsertRecord(
         rdata: *mut XLogRecData,
         fpw_lsn: XLogRecPtr,
@@ -39105,6 +39308,13 @@ extern "C" {
         data: *const ::core::ffi::c_void,
         len: usize,
     ) -> pg_crc32c;
+    pub static mut pg_comp_crc32c: ::core::option::Option<
+        unsafe extern "C" fn(
+            crc: pg_crc32c,
+            data: *const ::core::ffi::c_void,
+            len: usize,
+        ) -> pg_crc32c,
+    >;
     pub fn pg_comp_crc32c_sse42(
         crc: pg_crc32c,
         data: *const ::core::ffi::c_void,
@@ -39244,6 +39454,7 @@ extern "C" {
         pg_class: Relation,
         relpersistence: ::core::ffi::c_char,
     ) -> RelFileNumber;
+    pub static InvalidObjectAddress: ObjectAddress;
     pub fn get_object_address(
         objtype: ObjectType::Type,
         object: *mut Node,
@@ -39428,6 +39639,8 @@ extern "C" {
     pub fn generic_identify(info: uint8) -> *const ::core::ffi::c_char;
     pub fn generic_desc(buf: StringInfo, record: *mut XLogReaderState);
     pub fn generic_mask(page: *mut ::core::ffi::c_char, blkno: BlockNumber);
+    pub static mut GinFuzzySearchLimit: ::core::ffi::c_int;
+    pub static mut gin_pending_list_limit: ::core::ffi::c_int;
     pub fn ginGetStats(index: Relation, stats: *mut GinStatsData);
     pub fn ginUpdateStats(index: Relation, stats: *const GinStatsData, is_build: bool);
     pub fn relation_open(relationId: Oid, lockmode: LOCKMODE) -> Relation;
@@ -39448,6 +39661,8 @@ extern "C" {
     ) -> Relation;
     pub fn try_table_open(relationId: Oid, lockmode: LOCKMODE) -> Relation;
     pub fn table_close(relation: Relation, lockmode: LOCKMODE);
+    pub static mut SharedInvalidMessageCounter: uint64;
+    pub static mut catchupInterruptPending: sig_atomic_t;
     pub fn SendSharedInvalidMessages(msgs: *const SharedInvalidationMessage, n: ::core::ffi::c_int);
     pub fn ReceiveSharedInvalidMessages(
         invalFunction: ::core::option::Option<
@@ -39469,6 +39684,17 @@ extern "C" {
         tsid: Oid,
     );
     pub fn LocalExecuteInvalidationMessage(msg: *mut SharedInvalidationMessage);
+    pub static mut DefaultXactIsoLevel: ::core::ffi::c_int;
+    pub static mut XactIsoLevel: ::core::ffi::c_int;
+    pub static mut DefaultXactReadOnly: bool;
+    pub static mut XactReadOnly: bool;
+    pub static mut xact_is_sampled: bool;
+    pub static mut DefaultXactDeferrable: bool;
+    pub static mut XactDeferrable: bool;
+    pub static mut synchronous_commit: ::core::ffi::c_int;
+    pub static mut CheckXidAlive: TransactionId;
+    pub static mut bsysscan: bool;
+    pub static mut MyXactFlags: ::core::ffi::c_int;
     pub fn IsTransactionState() -> bool;
     pub fn IsAbortedTransactionBlockState() -> bool;
     pub fn GetTopTransactionId() -> TransactionId;
@@ -39578,6 +39804,10 @@ extern "C" {
     pub fn EnterParallelMode();
     pub fn ExitParallelMode();
     pub fn IsInParallelMode() -> bool;
+    pub static mut CurrentResourceOwner: ResourceOwner;
+    pub static mut CurTransactionResourceOwner: ResourceOwner;
+    pub static mut TopTransactionResourceOwner: ResourceOwner;
+    pub static mut AuxProcessResourceOwner: ResourceOwner;
     pub fn ResourceOwnerCreate(
         parent: ResourceOwner,
         name: *const ::core::ffi::c_char,
@@ -39611,6 +39841,12 @@ extern "C" {
     pub fn ReleaseAuxProcessResources(isCommit: bool);
     pub fn ResourceOwnerRememberLock(owner: ResourceOwner, locallock: *mut LOCALLOCK);
     pub fn ResourceOwnerForgetLock(owner: ResourceOwner, locallock: *mut LOCALLOCK);
+    pub static mut FirstSnapshotSet: bool;
+    pub static mut TransactionXmin: TransactionId;
+    pub static mut RecentXmin: TransactionId;
+    pub static mut SnapshotSelfData: SnapshotData;
+    pub static mut SnapshotAnyData: SnapshotData;
+    pub static mut CatalogSnapshotData: SnapshotData;
     pub fn GetTransactionSnapshot() -> Snapshot;
     pub fn GetLatestSnapshot() -> Snapshot;
     pub fn SnapshotSetCommandId(curcid: CommandId);
@@ -39657,6 +39893,20 @@ extern "C" {
     pub fn SerializeSnapshot(snapshot: Snapshot, start_address: *mut ::core::ffi::c_char);
     pub fn RestoreSnapshot(start_address: *mut ::core::ffi::c_char) -> Snapshot;
     pub fn RestoreTransactionSnapshot(snapshot: Snapshot, source_pgproc: *mut ::core::ffi::c_void);
+    pub static mut zero_damaged_pages: bool;
+    pub static mut bgwriter_lru_maxpages: ::core::ffi::c_int;
+    pub static mut bgwriter_lru_multiplier: f64;
+    pub static mut track_io_timing: bool;
+    pub static mut effective_io_concurrency: ::core::ffi::c_int;
+    pub static mut maintenance_io_concurrency: ::core::ffi::c_int;
+    pub static mut io_combine_limit: ::core::ffi::c_int;
+    pub static mut checkpoint_flush_after: ::core::ffi::c_int;
+    pub static mut backend_flush_after: ::core::ffi::c_int;
+    pub static mut bgwriter_flush_after: ::core::ffi::c_int;
+    pub static mut BufferBlocks: *mut ::core::ffi::c_char;
+    pub static mut NLocBuffer: ::core::ffi::c_int;
+    pub static mut LocalBufferBlockPointers: *mut Block;
+    pub static mut LocalRefCount: *mut int32;
     pub fn PrefetchSharedBuffer(
         smgr_reln: *mut SMgrRelationData,
         forkNum: ForkNumber::Type,
@@ -39817,6 +40067,8 @@ extern "C" {
     ) -> BlockNumber;
     pub fn read_stream_reset(stream: *mut ReadStream);
     pub fn read_stream_end(stream: *mut ReadStream);
+    pub static mut default_table_access_method: *mut ::core::ffi::c_char;
+    pub static mut synchronize_seqscans: bool;
     pub fn table_slot_callbacks(relation: Relation) -> *const TupleTableSlotOps;
     pub fn table_slot_create(relation: Relation, reglist: *mut *mut List) -> *mut TupleTableSlot;
     pub fn table_beginscan_catalog(
@@ -40240,6 +40492,9 @@ extern "C" {
         nmembers: ::core::ffi::c_int,
         members: *mut MultiXactMember,
     ) -> *mut ::core::ffi::c_char;
+    pub static mut MainLWLockArray: *mut LWLockPadded;
+    pub static mut NamedLWLockTrancheArray: *mut NamedLWLockTranche;
+    pub static mut NamedLWLockTrancheRequests: ::core::ffi::c_int;
     pub fn LWLockAcquire(lock: *mut LWLock, mode: LWLockMode::Type) -> bool;
     pub fn LWLockConditionalAcquire(lock: *mut LWLock, mode: LWLockMode::Type) -> bool;
     pub fn LWLockAcquireOrWait(lock: *mut LWLock, mode: LWLockMode::Type) -> bool;
@@ -40271,6 +40526,8 @@ extern "C" {
         tranche_name: *const ::core::ffi::c_char,
     );
     pub fn LWLockInitialize(lock: *mut LWLock, tranche_id: ::core::ffi::c_int);
+    pub static mut PgStartTime: TimestampTz;
+    pub static mut PgReloadTime: TimestampTz;
     pub fn anytimestamp_typmod_check(istz: bool, typmod: int32) -> int32;
     pub fn GetCurrentTimestamp() -> TimestampTz;
     pub fn GetSQLCurrentTimestamp(typmod: int32) -> TimestampTz;
@@ -40355,6 +40612,8 @@ extern "C" {
         mday: ::core::ffi::c_int,
     ) -> ::core::ffi::c_int;
     pub fn TimestampTimestampTzRequiresRewrite() -> bool;
+    pub static mut max_locks_per_xact: ::core::ffi::c_int;
+    pub static LockTagTypeNames: [*const ::core::ffi::c_char; 0usize];
     pub fn InitLocks();
     pub fn GetLocksMethodTable(lock: *const LOCK) -> LockMethod;
     pub fn GetLockTagsMethodTable(locktag: *const LOCKTAG) -> LockMethod;
@@ -40609,6 +40868,7 @@ extern "C" {
         all_frozen: *mut BlockNumber,
     );
     pub fn visibilitymap_prepare_truncate(rel: Relation, nheapblocks: BlockNumber) -> BlockNumber;
+    pub static mut RmgrTable: [RmgrData; 0usize];
     pub fn RmgrStartup();
     pub fn RmgrCleanup();
     pub fn RmgrNotFound(rmid: RmgrId);
@@ -40623,6 +40883,28 @@ extern "C" {
         buf: StringInfo,
         fpi_len: *mut uint32,
     );
+    pub static mut ArchiveRecoveryRequested: bool;
+    pub static mut InArchiveRecovery: bool;
+    pub static mut StandbyMode: bool;
+    pub static mut recoveryRestoreCommand: *mut ::core::ffi::c_char;
+    pub static mut recoveryTargetInclusive: bool;
+    pub static mut recoveryTargetAction: ::core::ffi::c_int;
+    pub static mut recovery_min_apply_delay: ::core::ffi::c_int;
+    pub static mut PrimaryConnInfo: *mut ::core::ffi::c_char;
+    pub static mut PrimarySlotName: *mut ::core::ffi::c_char;
+    pub static mut recoveryEndCommand: *mut ::core::ffi::c_char;
+    pub static mut archiveCleanupCommand: *mut ::core::ffi::c_char;
+    pub static mut recoveryTargetXid: TransactionId;
+    pub static mut recovery_target_time_string: *mut ::core::ffi::c_char;
+    pub static mut recoveryTargetTime: TimestampTz;
+    pub static mut recoveryTargetName: *const ::core::ffi::c_char;
+    pub static mut recoveryTargetLSN: XLogRecPtr;
+    pub static mut recoveryTarget: RecoveryTargetType::Type;
+    pub static mut wal_receiver_create_temp_slot: bool;
+    pub static mut recoveryTargetTimeLineGoal: RecoveryTargetTimeLineGoal::Type;
+    pub static mut recoveryTargetTLIRequested: TimeLineID;
+    pub static mut recoveryTargetTLI: TimeLineID;
+    pub static mut reachedConsistency: bool;
     pub fn XLogRecoveryShmemSize() -> Size;
     pub fn XLogRecoveryShmemInit();
     pub fn InitWalRecovery(
@@ -40654,6 +40936,8 @@ extern "C" {
         minValue: ::core::ffi::c_int,
     );
     pub fn xlog_outdesc(buf: StringInfo, record: *mut XLogReaderState);
+    pub static mut InRecovery: bool;
+    pub static mut standbyState: HotStandbyState::Type;
     pub fn XLogHaveInvalidPages() -> bool;
     pub fn XLogCheckInvalidPages();
     pub fn XLogDropRelation(rlocator: RelFileLocator, forknum: ForkNumber::Type);
@@ -41071,11 +41355,14 @@ extern "C" {
         mySubid: SubTransactionId,
         parentSubid: SubTransactionId,
     );
+    pub static mut namespace_search_path: *mut ::core::ffi::c_char;
     pub fn fetch_search_path(includeImplicit: bool) -> *mut List;
     pub fn fetch_search_path_array(
         sarray: *mut Oid,
         sarray_len: ::core::ffi::c_int,
     ) -> ::core::ffi::c_int;
+    pub static mut object_access_hook: object_access_hook_type;
+    pub static mut object_access_hook_str: object_access_hook_type_str;
     pub fn RunObjectPostCreateHook(
         classId: Oid,
         objectId: Oid,
@@ -41464,6 +41751,7 @@ extern "C" {
         rangeTypeName: *const ::core::ffi::c_char,
         typeNamespace: Oid,
     ) -> *mut ::core::ffi::c_char;
+    pub static mut wal_skip_threshold: ::core::ffi::c_int;
     pub fn RelationCreateStorage(
         rlocator: RelFileLocator,
         relpersistence: ::core::ffi::c_char,
@@ -41595,6 +41883,7 @@ extern "C" {
     pub fn MakeExpandedObjectReadOnlyInternal(d: Datum) -> Datum;
     pub fn TransferExpandedObject(d: Datum, new_parent: MemoryContext) -> Datum;
     pub fn DeleteExpandedObject(d: Datum);
+    pub static mut Array_nulls: bool;
     pub fn CopyArrayEls(
         array: *mut ArrayType,
         values: *mut Datum,
@@ -42031,6 +42320,7 @@ extern "C" {
     pub fn defGetTypeLength(def: *mut DefElem) -> ::core::ffi::c_int;
     pub fn defGetStringList(def: *mut DefElem) -> *mut List;
     pub fn errorConflictingDefElem(defel: *mut DefElem, pstate: *mut ParseState) -> !;
+    pub static mut event_triggers: bool;
     pub fn CreateEventTrigger(stmt: *mut CreateEventTrigStmt) -> Oid;
     pub fn get_event_trigger_oid(trigname: *const ::core::ffi::c_char, missing_ok: bool) -> Oid;
     pub fn AlterEventTrigger(stmt: *mut AlterEventTrigStmt) -> Oid;
@@ -42085,6 +42375,8 @@ extern "C" {
         ndicts: ::core::ffi::c_int,
     );
     pub fn EventTriggerCollectAlterDefPrivs(stmt: *mut AlterDefaultPrivilegesStmt);
+    pub static mut ExplainOneQuery_hook: ExplainOneQuery_hook_type;
+    pub static mut explain_get_index_name_hook: explain_get_index_name_hook_type;
     pub fn ExplainQuery(
         pstate: *mut ParseState,
         stmt: *mut ExplainStmt,
@@ -42185,6 +42477,8 @@ extern "C" {
         es: *mut ExplainState,
     );
     pub fn CreateExplainSerializeDestReceiver(es: *mut ExplainState) -> *mut DestReceiver;
+    pub static mut creating_extension: bool;
+    pub static mut CurrentExtensionObject: Oid;
     pub fn CreateExtension(
         pstate: *mut ParseState,
         stmt: *mut CreateExtensionStmt,
@@ -42217,6 +42511,7 @@ extern "C" {
         newschema: *const ::core::ffi::c_char,
         oldschema: *mut Oid,
     ) -> ObjectAddress;
+    pub static mut plan_cache_mode: ::core::ffi::c_int;
     pub fn InitPlanCache();
     pub fn ResetPlanCache();
     pub fn ReleaseAllPlanCacheRefsInOwner(owner: ResourceOwner);
@@ -42323,6 +42618,7 @@ extern "C" {
         provider_name: *const ::core::ffi::c_char,
         hook: check_object_relabel_type,
     );
+    pub static mut allow_in_place_tablespaces: bool;
     pub fn CreateTableSpace(stmt: *mut CreateTableSpaceStmt) -> Oid;
     pub fn DropTableSpace(stmt: *mut DropTableSpaceStmt);
     pub fn RenameTableSpace(
@@ -42440,6 +42736,7 @@ extern "C" {
         scanrel: Relation,
         partConstraint: *mut List,
     ) -> bool;
+    pub static mut SessionReplicationRole: ::core::ffi::c_int;
     pub fn CreateTrigger(
         stmt: *mut CreateTrigStmt,
         queryString: *const ::core::ffi::c_char,
@@ -42665,6 +42962,43 @@ extern "C" {
     ) -> bool;
     pub fn FreeConfigVariables(list: *mut ConfigVariable);
     pub fn DeescapeQuotedString(s: *const ::core::ffi::c_char) -> *mut ::core::ffi::c_char;
+    pub static mut Debug_print_plan: bool;
+    pub static mut Debug_print_parse: bool;
+    pub static mut Debug_print_rewritten: bool;
+    pub static mut Debug_pretty_print: bool;
+    pub static mut log_parser_stats: bool;
+    pub static mut log_planner_stats: bool;
+    pub static mut log_executor_stats: bool;
+    pub static mut log_statement_stats: bool;
+    pub static mut log_btree_build_stats: bool;
+    pub static mut check_function_bodies: bool;
+    pub static mut current_role_is_superuser: bool;
+    pub static mut AllowAlterSystem: bool;
+    pub static mut log_duration: bool;
+    pub static mut log_parameter_max_length: ::core::ffi::c_int;
+    pub static mut log_parameter_max_length_on_error: ::core::ffi::c_int;
+    pub static mut log_min_error_statement: ::core::ffi::c_int;
+    pub static mut log_min_messages: ::core::ffi::c_int;
+    pub static mut client_min_messages: ::core::ffi::c_int;
+    pub static mut log_min_duration_sample: ::core::ffi::c_int;
+    pub static mut log_min_duration_statement: ::core::ffi::c_int;
+    pub static mut log_temp_files: ::core::ffi::c_int;
+    pub static mut log_statement_sample_rate: f64;
+    pub static mut log_xact_sample_rate: f64;
+    pub static mut backtrace_functions: *mut ::core::ffi::c_char;
+    pub static mut temp_file_limit: ::core::ffi::c_int;
+    pub static mut num_temp_buffers: ::core::ffi::c_int;
+    pub static mut cluster_name: *mut ::core::ffi::c_char;
+    pub static mut ConfigFileName: *mut ::core::ffi::c_char;
+    pub static mut HbaFileName: *mut ::core::ffi::c_char;
+    pub static mut IdentFileName: *mut ::core::ffi::c_char;
+    pub static mut external_pid_file: *mut ::core::ffi::c_char;
+    pub static mut application_name: *mut ::core::ffi::c_char;
+    pub static mut tcp_keepalives_idle: ::core::ffi::c_int;
+    pub static mut tcp_keepalives_interval: ::core::ffi::c_int;
+    pub static mut tcp_keepalives_count: ::core::ffi::c_int;
+    pub static mut tcp_user_timeout: ::core::ffi::c_int;
+    pub static mut trace_sort: bool;
     pub fn SetConfigOption(
         name: *const ::core::ffi::c_char,
         value: *const ::core::ffi::c_char,
@@ -42860,7 +43194,13 @@ extern "C" {
     pub fn SetPGVariable(name: *const ::core::ffi::c_char, args: *mut List, is_local: bool);
     pub fn GetPGVariable(name: *const ::core::ffi::c_char, dest: *mut DestReceiver);
     pub fn GetPGVariableResultDesc(name: *const ::core::ffi::c_char) -> TupleDesc;
+    pub static mut GUC_check_errmsg_string: *mut ::core::ffi::c_char;
+    pub static mut GUC_check_errdetail_string: *mut ::core::ffi::c_char;
+    pub static mut GUC_check_errhint_string: *mut ::core::ffi::c_char;
     pub fn GUC_check_errcode(sqlerrcode: ::core::ffi::c_int);
+    pub static mut Password_encryption: ::core::ffi::c_int;
+    pub static mut createrole_self_grant: *mut ::core::ffi::c_char;
+    pub static mut check_password_hook: check_password_hook_type;
     pub fn CreateRole(pstate: *mut ParseState, stmt: *mut CreateRoleStmt) -> Oid;
     pub fn AlterRole(pstate: *mut ParseState, stmt: *mut AlterRoleStmt) -> Oid;
     pub fn AlterRoleSet(stmt: *mut AlterRoleSetStmt) -> Oid;
@@ -42900,6 +43240,7 @@ extern "C" {
     ) -> BgwHandleStatus::Type;
     pub fn GetBackgroundWorkerTypeByPid(pid: pid_t) -> *const ::core::ffi::c_char;
     pub fn TerminateBackgroundWorker(handle: *mut BackgroundWorkerHandle);
+    pub static mut MyBgworkerEntry: *mut BackgroundWorker;
     pub fn BackgroundWorkerInitializeConnection(
         dbname: *const ::core::ffi::c_char,
         username: *const ::core::ffi::c_char,
@@ -42988,6 +43329,16 @@ extern "C" {
     pub fn PGSemaphoreLock(sema: PGSemaphore);
     pub fn PGSemaphoreUnlock(sema: PGSemaphore);
     pub fn PGSemaphoreTryLock(sema: PGSemaphore) -> bool;
+    pub static mut MyProc: *mut PGPROC;
+    pub static mut ProcGlobal: *mut PROC_HDR;
+    pub static mut PreparedXactProcs: *mut PGPROC;
+    pub static mut DeadlockTimeout: ::core::ffi::c_int;
+    pub static mut StatementTimeout: ::core::ffi::c_int;
+    pub static mut LockTimeout: ::core::ffi::c_int;
+    pub static mut IdleInTransactionSessionTimeout: ::core::ffi::c_int;
+    pub static mut TransactionTimeout: ::core::ffi::c_int;
+    pub static mut IdleSessionTimeout: ::core::ffi::c_int;
+    pub static mut log_lock_waits: bool;
     pub fn ProcGlobalSemas() -> ::core::ffi::c_int;
     pub fn ProcGlobalShmemSize() -> Size;
     pub fn InitProcGlobal();
@@ -43047,6 +43398,10 @@ extern "C" {
         nowait: bool,
     ) -> shm_mq_result::Type;
     pub fn shm_mq_wait_for_attach(mqh: *mut shm_mq_handle) -> shm_mq_result::Type;
+    pub static shm_mq_minimum_size: Size;
+    pub static mut ParallelMessagePending: sig_atomic_t;
+    pub static mut ParallelWorkerNumber: ::core::ffi::c_int;
+    pub static mut InitializingParallelWorker: bool;
     pub fn CreateParallelContext(
         library_name: *const ::core::ffi::c_char,
         function_name: *const ::core::ffi::c_char,
@@ -43090,6 +43445,19 @@ extern "C" {
     pub fn TidStoreMemoryUsage(ts: *mut TidStore) -> usize;
     pub fn TidStoreGetHandle(ts: *mut TidStore) -> dsa_pointer;
     pub fn TidStoreGetDSA(ts: *mut TidStore) -> *mut dsa_area;
+    pub static mut default_statistics_target: ::core::ffi::c_int;
+    pub static mut vacuum_freeze_min_age: ::core::ffi::c_int;
+    pub static mut vacuum_freeze_table_age: ::core::ffi::c_int;
+    pub static mut vacuum_multixact_freeze_min_age: ::core::ffi::c_int;
+    pub static mut vacuum_multixact_freeze_table_age: ::core::ffi::c_int;
+    pub static mut vacuum_failsafe_age: ::core::ffi::c_int;
+    pub static mut vacuum_multixact_failsafe_age: ::core::ffi::c_int;
+    pub static mut VacuumSharedCostBalance: *mut pg_atomic_uint32;
+    pub static mut VacuumActiveNWorkers: *mut pg_atomic_uint32;
+    pub static mut VacuumCostBalanceLocal: ::core::ffi::c_int;
+    pub static mut VacuumFailsafeActive: bool;
+    pub static mut vacuum_cost_delay: f64;
+    pub static mut vacuum_cost_limit: ::core::ffi::c_int;
     pub fn ExecVacuum(pstate: *mut ParseState, vacstmt: *mut VacuumStmt, isTopLevel: bool);
     pub fn vacuum(
         relations: *mut List,
@@ -43389,6 +43757,9 @@ extern "C" {
         op: *mut ExprEvalStep,
         econtext: *mut ExprContext,
     );
+    pub static mut backslash_quote: ::core::ffi::c_int;
+    pub static mut escape_string_warning: bool;
+    pub static mut standard_conforming_strings: bool;
     pub fn raw_parser(str_: *const ::core::ffi::c_char, mode: RawParseMode::Type) -> *mut List;
     pub fn SystemFuncName(name: *mut ::core::ffi::c_char) -> *mut List;
     pub fn SystemTypeName(name: *mut ::core::ffi::c_char) -> *mut TypeName;
@@ -43437,6 +43808,9 @@ extern "C" {
     pub fn ThereAreNoReadyPortals() -> bool;
     pub fn HoldPinnedPortals();
     pub fn ForgetPortalSnapshots();
+    pub static mut SPI_processed: uint64;
+    pub static mut SPI_tuptable: *mut SPITupleTable;
+    pub static mut SPI_result: ::core::ffi::c_int;
     pub fn SPI_connect() -> ::core::ffi::c_int;
     pub fn SPI_connect_ext(options: ::core::ffi::c_int) -> ::core::ffi::c_int;
     pub fn SPI_finish() -> ::core::ffi::c_int;
@@ -43646,10 +44020,23 @@ extern "C" {
     ) -> Oid;
     pub fn get_foreign_server_oid(servername: *const ::core::ffi::c_char, missing_ok: bool) -> Oid;
     pub fn _PG_jit_provider_init(cb: *mut JitProviderCallbacks);
+    pub static mut jit_enabled: bool;
+    pub static mut jit_provider: *mut ::core::ffi::c_char;
+    pub static mut jit_debugging_support: bool;
+    pub static mut jit_dump_bitcode: bool;
+    pub static mut jit_expressions: bool;
+    pub static mut jit_profiling_support: bool;
+    pub static mut jit_tuple_deforming: bool;
+    pub static mut jit_above_cost: f64;
+    pub static mut jit_inline_above_cost: f64;
+    pub static mut jit_optimize_above_cost: f64;
     pub fn jit_reset_after_error();
     pub fn jit_release_context(context: *mut JitContext);
     pub fn jit_compile_expr(state: *mut ExprState) -> bool;
     pub fn InstrJitAgg(dst: *mut JitInstrumentation, add: *mut JitInstrumentation);
+    pub static pg_enc2name_tbl: [pg_enc2name; 0usize];
+    pub static mut pg_enc2gettext_tbl: [*const ::core::ffi::c_char; 0usize];
+    pub static pg_wchar_table: [pg_wchar_tbl; 0usize];
     pub fn pg_char_to_encoding_private(name: *const ::core::ffi::c_char) -> ::core::ffi::c_int;
     pub fn pg_encoding_to_char_private(encoding: ::core::ffi::c_int) -> *const ::core::ffi::c_char;
     pub fn pg_valid_server_encoding_id_private(encoding: ::core::ffi::c_int) -> ::core::ffi::c_int;
@@ -44319,6 +44706,30 @@ extern "C" {
         rte: *mut RangeTblEntry,
     ) -> *mut Query;
     pub fn pull_paramids(expr: *mut Expr) -> *mut Bitmapset;
+    pub static mut disable_cost: Cost;
+    pub static mut max_parallel_workers_per_gather: ::core::ffi::c_int;
+    pub static mut enable_seqscan: bool;
+    pub static mut enable_indexscan: bool;
+    pub static mut enable_indexonlyscan: bool;
+    pub static mut enable_bitmapscan: bool;
+    pub static mut enable_tidscan: bool;
+    pub static mut enable_sort: bool;
+    pub static mut enable_incremental_sort: bool;
+    pub static mut enable_hashagg: bool;
+    pub static mut enable_nestloop: bool;
+    pub static mut enable_material: bool;
+    pub static mut enable_memoize: bool;
+    pub static mut enable_mergejoin: bool;
+    pub static mut enable_hashjoin: bool;
+    pub static mut enable_gathermerge: bool;
+    pub static mut enable_partitionwise_join: bool;
+    pub static mut enable_partitionwise_aggregate: bool;
+    pub static mut enable_parallel_append: bool;
+    pub static mut enable_parallel_hash: bool;
+    pub static mut enable_partition_pruning: bool;
+    pub static mut enable_presorted_aggregate: bool;
+    pub static mut enable_async_append: bool;
+    pub static mut constraint_exclusion: ::core::ffi::c_int;
     pub fn index_pages_fetched(
         tuples_fetched: f64,
         pages: BlockNumber,
@@ -44633,6 +45044,15 @@ extern "C" {
         sjinfo: *mut SpecialJoinInfo,
         use_extended_stats: bool,
     ) -> Selectivity;
+    pub static mut seq_page_cost: f64;
+    pub static mut random_page_cost: f64;
+    pub static mut cpu_tuple_cost: f64;
+    pub static mut cpu_index_tuple_cost: f64;
+    pub static mut cpu_operator_cost: f64;
+    pub static mut parallel_tuple_cost: f64;
+    pub static mut parallel_setup_cost: f64;
+    pub static mut recursive_worktable_factor: f64;
+    pub static mut effective_cache_size: ::core::ffi::c_int;
     pub fn clamp_row_est(nrows: f64) -> f64;
     pub fn clamp_width_est(tuple_width: int64) -> int32;
     pub fn clamp_cardinality_to_long(x: Cardinality) -> ::core::ffi::c_long;
@@ -44641,6 +45061,8 @@ extern "C" {
         expr: *mut Node,
         index: *mut IndexOptInfo,
     ) -> bool;
+    pub static mut debug_parallel_query: ::core::ffi::c_int;
+    pub static mut parallel_leader_participation: bool;
     pub fn planner(
         parse: *mut Query,
         query_string: *const ::core::ffi::c_char,
@@ -45226,6 +45648,14 @@ extern "C" {
         restrictlist: *mut List,
         sjinfo: *mut SpecialJoinInfo,
     ) -> *mut RelOptInfo;
+    pub static mut enable_geqo: bool;
+    pub static mut geqo_threshold: ::core::ffi::c_int;
+    pub static mut min_parallel_table_scan_size: ::core::ffi::c_int;
+    pub static mut min_parallel_index_scan_size: ::core::ffi::c_int;
+    pub static mut enable_group_by_reordering: bool;
+    pub static mut set_rel_pathlist_hook: set_rel_pathlist_hook_type;
+    pub static mut set_join_pathlist_hook: set_join_pathlist_hook_type;
+    pub static mut join_search_hook: join_search_hook_type;
     pub fn make_one_rel(root: *mut PlannerInfo, joinlist: *mut List) -> *mut RelOptInfo;
     pub fn standard_join_search(
         root: *mut PlannerInfo,
@@ -45519,6 +45949,7 @@ extern "C" {
         rel: *mut RelOptInfo,
         live_childrels: *mut List,
     );
+    pub static mut get_relation_info_hook: get_relation_info_hook_type;
     pub fn get_relation_info(
         root: *mut PlannerInfo,
         relationObjectId: Oid,
@@ -45581,6 +46012,7 @@ extern "C" {
         rti: Index,
         target_cols: *mut Bitmapset,
     ) -> *mut Bitmapset;
+    pub static mut cursor_tuple_fraction: f64;
     pub fn query_planner(
         root: *mut PlannerInfo,
         qp_callback: query_pathkeys_callback,
@@ -45632,6 +46064,8 @@ extern "C" {
         uniqOperators: *mut Oid,
         uniqCollations: *mut Oid,
     ) -> *mut Limit;
+    pub static mut from_collapse_limit: ::core::ffi::c_int;
+    pub static mut join_collapse_limit: ::core::ffi::c_int;
     pub fn add_base_rels_to_query(root: *mut PlannerInfo, jtnode: *mut Node);
     pub fn add_other_rels_to_query(root: *mut PlannerInfo);
     pub fn build_base_rel_tlists(root: *mut PlannerInfo, final_tlist: *mut List);
@@ -45690,6 +46124,8 @@ extern "C" {
     pub fn record_plan_function_dependency(root: *mut PlannerInfo, funcid: Oid);
     pub fn record_plan_type_dependency(root: *mut PlannerInfo, typid: Oid);
     pub fn extract_query_dependencies_walker(node: *mut Node, context: *mut PlannerInfo) -> bool;
+    pub static mut planner_hook: planner_hook_type;
+    pub static mut create_upper_paths_hook: create_upper_paths_hook_type;
     pub fn standard_planner(
         parse: *mut Query,
         query_string: *const ::core::ffi::c_char,
@@ -45771,6 +46207,7 @@ extern "C" {
         targets: *mut *mut List,
         targets_contain_srfs: *mut *mut List,
     );
+    pub static mut compute_query_id: ::core::ffi::c_int;
     pub fn CleanQuerytext(
         query: *const ::core::ffi::c_char,
         location: *mut ::core::ffi::c_int,
@@ -45778,6 +46215,8 @@ extern "C" {
     ) -> *const ::core::ffi::c_char;
     pub fn JumbleQuery(query: *mut Query) -> *mut JumbleState;
     pub fn EnableQueryId();
+    pub static mut query_id_enabled: bool;
+    pub static mut post_parse_analyze_hook: post_parse_analyze_hook_type;
     pub fn parse_analyze_fixedparams(
         parseTree: *mut RawStmt,
         sourceText: *const ::core::ffi::c_char,
@@ -45842,6 +46281,7 @@ extern "C" {
     pub fn assign_expr_collations(pstate: *mut ParseState, expr: *mut Node);
     pub fn select_common_collation(pstate: *mut ParseState, exprs: *mut List, none_ok: bool)
         -> Oid;
+    pub static mut Transform_null_equals: bool;
     pub fn transformExpr(
         pstate: *mut ParseState,
         expr: *mut Node,
@@ -46412,6 +46852,21 @@ extern "C" {
         isnulls: *const bool,
         expand_external: bool,
     );
+    pub static mut plpgsql_IdentifierLookup: IdentifierLookup::Type;
+    pub static mut plpgsql_variable_conflict: ::core::ffi::c_int;
+    pub static mut plpgsql_print_strict_params: bool;
+    pub static mut plpgsql_check_asserts: bool;
+    pub static mut plpgsql_extra_warnings: ::core::ffi::c_int;
+    pub static mut plpgsql_extra_errors: ::core::ffi::c_int;
+    pub static mut plpgsql_check_syntax: bool;
+    pub static mut plpgsql_DumpExecTree: bool;
+    pub static mut plpgsql_parse_result: *mut PLpgSQL_stmt_block;
+    pub static mut plpgsql_nDatums: ::core::ffi::c_int;
+    pub static mut plpgsql_Datums: *mut *mut PLpgSQL_datum;
+    pub static mut plpgsql_error_funcname: *mut ::core::ffi::c_char;
+    pub static mut plpgsql_curr_compile: *mut PLpgSQL_function;
+    pub static mut plpgsql_compile_tmp_cxt: MemoryContext;
+    pub static mut plpgsql_plugin_ptr: *mut *mut PLpgSQL_plugin;
     #[doc = " Function declarations"]
     pub fn plpgsql_compile(fcinfo: FunctionCallInfo, forValidator: bool) -> *mut PLpgSQL_function;
     pub fn plpgsql_compile_inline(proc_source: *mut ::core::ffi::c_char) -> *mut PLpgSQL_function;
@@ -46556,12 +47011,35 @@ extern "C" {
     pub fn plpgsql_scanner_init(str_: *const ::core::ffi::c_char);
     pub fn plpgsql_scanner_finish();
     pub fn plpgsql_yyparse() -> ::core::ffi::c_int;
+    pub static mut EnableSSL: bool;
+    pub static mut SuperuserReservedConnections: ::core::ffi::c_int;
+    pub static mut ReservedConnections: ::core::ffi::c_int;
+    pub static mut PostPortNumber: ::core::ffi::c_int;
+    pub static mut Unix_socket_permissions: ::core::ffi::c_int;
+    pub static mut Unix_socket_group: *mut ::core::ffi::c_char;
+    pub static mut Unix_socket_directories: *mut ::core::ffi::c_char;
+    pub static mut ListenAddresses: *mut ::core::ffi::c_char;
+    pub static mut ClientAuthInProgress: bool;
+    pub static mut PreAuthDelay: ::core::ffi::c_int;
+    pub static mut AuthenticationTimeout: ::core::ffi::c_int;
+    pub static mut Log_connections: bool;
+    pub static mut log_hostname: bool;
+    pub static mut enable_bonjour: bool;
+    pub static mut bonjour_name: *mut ::core::ffi::c_char;
+    pub static mut restart_after_crash: bool;
+    pub static mut remove_temp_files_after_crash: bool;
+    pub static mut send_abort_for_crash: bool;
+    pub static mut send_abort_for_kill: bool;
+    pub static mut postmaster_alive_fds: [::core::ffi::c_int; 2usize];
+    pub static mut progname: *const ::core::ffi::c_char;
+    pub static mut LoadedSSL: bool;
     pub fn PostmasterMain(argc: ::core::ffi::c_int, argv: *mut *mut ::core::ffi::c_char) -> !;
     pub fn ClosePostmasterPorts(am_syslogger: bool);
     pub fn InitProcessGlobals();
     pub fn MaxLivePostmasterChildren() -> ::core::ffi::c_int;
     pub fn PostmasterMarkPIDForWorkerNotify(arg1: ::core::ffi::c_int) -> bool;
     pub fn processCancelRequest(backendPID: ::core::ffi::c_int, cancelAuthCode: int32);
+    pub static mut MyClientSocket: *mut ClientSocket;
     pub fn postmaster_child_launch(
         child_type: BackendType::Type,
         startup_data: *mut ::core::ffi::c_char,
@@ -46569,6 +47047,14 @@ extern "C" {
         client_sock: *mut ClientSocket,
     ) -> pid_t;
     pub fn PostmasterChildName(child_type: BackendType::Type) -> *const ::core::ffi::c_char;
+    pub static mut Logging_collector: bool;
+    pub static mut Log_RotationAge: ::core::ffi::c_int;
+    pub static mut Log_RotationSize: ::core::ffi::c_int;
+    pub static mut Log_directory: *mut ::core::ffi::c_char;
+    pub static mut Log_filename: *mut ::core::ffi::c_char;
+    pub static mut Log_truncate_on_rotation: bool;
+    pub static mut Log_file_mode: ::core::ffi::c_int;
+    pub static mut syslogPipe: [::core::ffi::c_int; 2usize];
     pub fn SysLogger_Start() -> ::core::ffi::c_int;
     pub fn write_syslogger_file(
         buffer: *const ::core::ffi::c_char,
@@ -46578,6 +47064,8 @@ extern "C" {
     pub fn SysLoggerMain(startup_data: *mut ::core::ffi::c_char, startup_data_len: usize) -> !;
     pub fn CheckLogrotateSignal() -> bool;
     pub fn RemoveLogrotateSignalFiles();
+    pub static mut logical_decoding_work_mem: ::core::ffi::c_int;
+    pub static mut debug_logical_replication_streaming: ::core::ffi::c_int;
     pub fn ReorderBufferAllocate() -> *mut ReorderBuffer;
     pub fn ReorderBufferFree(rb: *mut ReorderBuffer);
     pub fn ReorderBufferGetTupleBuf(rb: *mut ReorderBuffer, tuple_len: Size) -> HeapTuple;
@@ -46875,6 +47363,13 @@ extern "C" {
         read_abort_info: bool,
     );
     pub fn logicalrep_message_type(action: LogicalRepMsgType::Type) -> *const ::core::ffi::c_char;
+    pub static mut am_walsender: bool;
+    pub static mut am_cascading_walsender: bool;
+    pub static mut am_db_walsender: bool;
+    pub static mut wake_wal_senders: bool;
+    pub static mut max_wal_senders: ::core::ffi::c_int;
+    pub static mut wal_sender_timeout: ::core::ffi::c_int;
+    pub static mut log_replication_commands: bool;
     pub fn InitWalSender();
     pub fn exec_replication_command(cmd_string: *const ::core::ffi::c_char) -> bool;
     pub fn WalSndErrorCleanup();
@@ -46889,6 +47384,11 @@ extern "C" {
     pub fn WalSndWaitStopping();
     pub fn HandleWalSndInitStopping();
     pub fn WalSndRqstFileReload();
+    pub static mut wal_receiver_status_interval: ::core::ffi::c_int;
+    pub static mut wal_receiver_timeout: ::core::ffi::c_int;
+    pub static mut hot_standby_feedback: bool;
+    pub static mut WalRcv: *mut WalRcvData;
+    pub static mut WalReceiverFunctions: *mut WalReceiverFunctionsType;
     pub fn WalReceiverMain(startup_data: *mut ::core::ffi::c_char, startup_data_len: usize) -> !;
     pub fn ProcessWalRcvInterrupts();
     pub fn WalRcvForceReply();
@@ -46911,6 +47411,11 @@ extern "C" {
     pub fn GetWalRcvWriteRecPtr() -> XLogRecPtr;
     pub fn GetReplicationApplyDelay() -> ::core::ffi::c_int;
     pub fn GetReplicationTransferLatency() -> ::core::ffi::c_int;
+    pub static SlotInvalidationCauses: [*const ::core::ffi::c_char; 0usize];
+    pub static mut ReplicationSlotCtl: *mut ReplicationSlotCtlData;
+    pub static mut MyReplicationSlot: *mut ReplicationSlot;
+    pub static mut max_replication_slots: ::core::ffi::c_int;
+    pub static mut synchronized_standby_slots: *mut ::core::ffi::c_char;
     pub fn ReplicationSlotsShmemSize() -> Size;
     pub fn ReplicationSlotsShmemInit();
     pub fn ReplicationSlotCreate(
@@ -47045,6 +47550,8 @@ extern "C" {
         mergeActionList: *mut List,
         detail: *const ::core::ffi::c_char,
     );
+    pub static mut row_security_policy_hook_permissive: row_security_policy_hook_type;
+    pub static mut row_security_policy_hook_restrictive: row_security_policy_hook_type;
     pub fn get_row_security_policies(
         root: *mut Query,
         rte: *mut RangeTblEntry,
@@ -47092,6 +47599,12 @@ extern "C" {
         missing_ok: bool,
     );
     pub fn BufFileTruncateFileSet(file: *mut BufFile, fileno: ::core::ffi::c_int, offset: off_t);
+    pub fn GetFreeIndexPage(rel: Relation) -> BlockNumber;
+    pub fn RecordFreeIndexPage(rel: Relation, freeBlock: BlockNumber);
+    pub fn RecordUsedIndexPage(rel: Relation, usedBlock: BlockNumber);
+    pub fn IndexFreeSpaceMapVacuum(rel: Relation);
+    pub static mut proc_exit_inprogress: bool;
+    pub static mut shmem_exit_inprogress: bool;
     pub fn proc_exit(code: ::core::ffi::c_int) -> !;
     pub fn shmem_exit(code: ::core::ffi::c_int);
     pub fn on_proc_exit(function: pg_on_exit_callback, arg: Datum);
@@ -47100,6 +47613,7 @@ extern "C" {
     pub fn cancel_before_shmem_exit(function: pg_on_exit_callback, arg: Datum);
     pub fn on_exit_reset();
     pub fn check_on_shmem_exit_lists_are_empty();
+    pub static mut shmem_startup_hook: shmem_startup_hook_type;
     pub fn CalculateShmemSize(num_semaphores: *mut ::core::ffi::c_int) -> Size;
     pub fn CreateSharedMemoryAndSemaphores();
     pub fn InitializeShmemGUCs();
@@ -47211,6 +47725,9 @@ extern "C" {
         tsId: Oid,
         relcacheInitFileInval: bool,
     );
+    pub static mut max_standby_archive_delay: ::core::ffi::c_int;
+    pub static mut max_standby_streaming_delay: ::core::ffi::c_int;
+    pub static mut log_recovery_conflict_waits: bool;
     pub fn InitRecoveryTransactionEnvironment();
     pub fn ShutdownRecoveryTransactionEnvironment();
     pub fn ResolveRecoveryConflictWithSnapshot(
@@ -47364,6 +47881,7 @@ extern "C" {
         xmin: *mut TransactionId,
         catalog_xmin: *mut TransactionId,
     );
+    pub static mut ActivePortal: Portal;
     pub fn ChoosePortalStrategy(stmts: *mut List) -> PortalStrategy::Type;
     pub fn FetchPortalTargetList(portal: Portal) -> *mut List;
     pub fn FetchStatementTargetList(stmt: *mut Node) -> *mut List;
@@ -47391,6 +47909,13 @@ extern "C" {
     ) -> uint64;
     pub fn PlannedStmtRequiresSnapshot(pstmt: *mut PlannedStmt) -> bool;
     pub fn EnsurePortalSnapshotExists();
+    pub static mut whereToSendOutput: CommandDest::Type;
+    pub static mut debug_query_string: *const ::core::ffi::c_char;
+    pub static mut max_stack_depth: ::core::ffi::c_int;
+    pub static mut PostAuthDelay: ::core::ffi::c_int;
+    pub static mut client_connection_check_interval: ::core::ffi::c_int;
+    pub static mut log_statement: ::core::ffi::c_int;
+    pub static mut restrict_nonsystem_relation_kind: ::core::ffi::c_int;
     pub fn pg_parse_query(query_string: *const ::core::ffi::c_char) -> *mut List;
     pub fn pg_rewrite_query(query: *mut Query) -> *mut List;
     pub fn pg_analyze_and_rewrite_fixedparams(
@@ -47466,6 +47991,7 @@ extern "C" {
         source: GucSource::Type,
     ) -> bool;
     pub fn get_stats_option_name(arg: *const ::core::ffi::c_char) -> *const ::core::ffi::c_char;
+    pub static mut ProcessUtility_hook: ProcessUtility_hook_type;
     pub fn ProcessUtility(
         pstmt: *mut PlannedStmt,
         queryString: *const ::core::ffi::c_char,
@@ -47497,6 +48023,7 @@ extern "C" {
         a: *const ::core::ffi::c_void,
         b: *const ::core::ffi::c_void,
     ) -> ::core::ffi::c_int;
+    pub static tsearch_op_priority: [::core::ffi::c_int; 4usize];
     pub fn get_tsearch_config_filename(
         basename: *const ::core::ffi::c_char,
         extension: *const ::core::ffi::c_char,
@@ -50565,6 +51092,7 @@ extern "C" {
         collation: Oid,
         exact: *mut bool,
     ) -> *mut ::core::ffi::c_char;
+    pub static mut quote_all_identifiers: bool;
     pub fn quote_identifier(ident: *const ::core::ffi::c_char) -> *const ::core::ffi::c_char;
     pub fn quote_qualified_identifier(
         qualifier: *const ::core::ffi::c_char,
@@ -50667,6 +51195,9 @@ extern "C" {
         sec: f64,
     ) -> bool;
     pub fn AdjustTimeForTypmod(time: *mut TimeADT, typmod: int32);
+    pub static months: [*const ::core::ffi::c_char; 0usize];
+    pub static days: [*const ::core::ffi::c_char; 0usize];
+    pub static mut day_tab: [[::core::ffi::c_int; 13usize]; 2usize];
     pub fn GetCurrentDateTime(tm: *mut pg_tm);
     pub fn GetCurrentTimeUsec(tm: *mut pg_tm, fsec: *mut fsec_t, tzp: *mut ::core::ffi::c_int);
     pub fn j2date(
@@ -50822,6 +51353,7 @@ extern "C" {
         typmod: int32,
         escontext: *mut Node,
     ) -> bool;
+    pub static mut extra_float_digits: ::core::ffi::c_int;
     pub fn float_overflow_error() -> !;
     pub fn float_underflow_error() -> !;
     pub fn float_zero_divide_error() -> !;
@@ -50868,6 +51400,7 @@ extern "C" {
         absent_on_null: bool,
     ) -> Datum;
     pub fn json_validate(json: *mut text, check_unique_keys: bool, throw_error: bool) -> bool;
+    pub static mut pg_global_prng_state: pg_prng_state;
     pub fn pg_prng_seed(state: *mut pg_prng_state, seed: uint64);
     pub fn pg_prng_fseed(state: *mut pg_prng_state, fseed: f64);
     pub fn pg_prng_seed_check(state: *mut pg_prng_state) -> bool;
@@ -50983,6 +51516,7 @@ extern "C" {
         types: *const Oid,
         absent_on_null: bool,
     ) -> Datum;
+    pub static mut get_attavgwidth_hook: get_attavgwidth_hook_type;
     pub fn op_in_opfamily(opno: Oid, opfamily: Oid) -> bool;
     pub fn get_op_opfamily_strategy(opno: Oid, opfamily: Oid) -> ::core::ffi::c_int;
     pub fn get_op_opfamily_sortfamily(opno: Oid, opfamily: Oid) -> Oid;
@@ -51187,6 +51721,8 @@ extern "C" {
         objargs: *mut *mut List,
         missing_ok: bool,
     );
+    pub static mut row_security: bool;
+    pub fn check_enable_rls(relid: Oid, checkAsUser: Oid, noError: bool) -> ::core::ffi::c_int;
     pub fn pg_get_indexdef_string(indexrelid: Oid) -> *mut ::core::ffi::c_char;
     pub fn pg_get_indexdef_columns(indexrelid: Oid, pretty: bool) -> *mut ::core::ffi::c_char;
     pub fn pg_get_indexdef_columns_extended(
@@ -51236,6 +51772,8 @@ extern "C" {
     pub fn BlockSampler_Next(bs: BlockSampler) -> BlockNumber;
     pub fn reservoir_init_selection_state(rs: ReservoirState, n: ::core::ffi::c_int);
     pub fn reservoir_get_next_S(rs: ReservoirState, t: f64, n: ::core::ffi::c_int) -> f64;
+    pub static mut get_relation_stats_hook: get_relation_stats_hook_type;
+    pub static mut get_index_stats_hook: get_index_stats_hook_type;
     pub fn examine_variable(
         root: *mut PlannerInfo,
         node: *mut Node,
@@ -51722,525 +52260,6 @@ extern "C" {
     );
     pub fn updateClosestMatch(state: *mut ClosestMatchState, candidate: *const ::core::ffi::c_char);
     pub fn getClosestMatch(state: *mut ClosestMatchState) -> *const ::core::ffi::c_char;
-}
-extern "C" {
-    pub static mut error_context_stack: *mut ErrorContextCallback;
-    pub static mut PG_exception_stack: *mut sigjmp_buf;
-    pub static mut emit_log_hook: emit_log_hook_type;
-    pub static mut Log_error_verbosity: ::core::ffi::c_int;
-    pub static mut Log_line_prefix: *mut ::core::ffi::c_char;
-    pub static mut Log_destination: ::core::ffi::c_int;
-    pub static mut Log_destination_string: *mut ::core::ffi::c_char;
-    pub static mut syslog_sequence_numbers: bool;
-    pub static mut syslog_split_messages: bool;
-    pub static mut CurrentMemoryContext: MemoryContext;
-    pub static mut no_such_variable: ::core::ffi::c_int;
-    pub static mut TransamVariables: *mut TransamVariablesData;
-    pub static TTSOpsVirtual: TupleTableSlotOps;
-    pub static TTSOpsHeapTuple: TupleTableSlotOps;
-    pub static TTSOpsMinimalTuple: TupleTableSlotOps;
-    pub static TTSOpsBufferHeapTuple: TupleTableSlotOps;
-    pub static mut pgBufferUsage: BufferUsage;
-    pub static mut pgWalUsage: WalUsage;
-    pub static mut Dynamic_library_path: *mut ::core::ffi::c_char;
-    pub static mut needs_fmgr_hook: needs_fmgr_hook_type;
-    pub static mut fmgr_hook: fmgr_hook_type;
-    pub static forkNames: [*const ::core::ffi::c_char; 0usize];
-    pub static mut dynamic_shared_memory_type: ::core::ffi::c_int;
-    pub static mut min_dynamic_shared_memory: ::core::ffi::c_int;
-    pub static mut MyProcNumber: ProcNumber;
-    pub static mut ParallelLeaderProcNumber: ProcNumber;
-    pub static mut max_files_per_process: ::core::ffi::c_int;
-    pub static mut data_sync_retry: bool;
-    pub static mut recovery_init_sync_method: ::core::ffi::c_int;
-    pub static mut io_direct_flags: ::core::ffi::c_int;
-    pub static mut max_safe_fds: ::core::ffi::c_int;
-    pub static mut criticalRelcachesBuilt: bool;
-    pub static mut criticalSharedRelcachesBuilt: bool;
-    pub static pg_leftmost_one_pos: [uint8; 256usize];
-    pub static pg_rightmost_one_pos: [uint8; 256usize];
-    pub static pg_number_of_ones: [uint8; 256usize];
-    pub static mut pg_popcount32:
-        ::core::option::Option<unsafe extern "C" fn(word: uint32) -> ::core::ffi::c_int>;
-    pub static mut pg_popcount64:
-        ::core::option::Option<unsafe extern "C" fn(word: uint64) -> ::core::ffi::c_int>;
-    pub static mut pg_popcount_optimized: ::core::option::Option<
-        unsafe extern "C" fn(buf: *const ::core::ffi::c_char, bytes: ::core::ffi::c_int) -> uint64,
-    >;
-    pub static mut pg_popcount_masked_optimized: ::core::option::Option<
-        unsafe extern "C" fn(
-            buf: *const ::core::ffi::c_char,
-            bytes: ::core::ffi::c_int,
-            mask: bits8,
-        ) -> uint64,
-    >;
-    pub static mut None_Receiver: *mut DestReceiver;
-    pub static mut TopMemoryContext: MemoryContext;
-    pub static mut ErrorContext: MemoryContext;
-    pub static mut PostmasterContext: MemoryContext;
-    pub static mut CacheMemoryContext: MemoryContext;
-    pub static mut MessageContext: MemoryContext;
-    pub static mut TopTransactionContext: MemoryContext;
-    pub static mut CurTransactionContext: MemoryContext;
-    pub static mut PortalContext: MemoryContext;
-    pub static mut ExecutorStart_hook: ExecutorStart_hook_type;
-    pub static mut ExecutorRun_hook: ExecutorRun_hook_type;
-    pub static mut ExecutorFinish_hook: ExecutorFinish_hook_type;
-    pub static mut ExecutorEnd_hook: ExecutorEnd_hook_type;
-    pub static mut ExecutorCheckPerms_hook: ExecutorCheckPerms_hook_type;
-    pub static mut session_timezone: *mut pg_tz;
-    pub static mut log_timezone: *mut pg_tz;
-    #[doc = "\t  System interrupt and critical section handling\n\n There are two types of interrupts that a running backend needs to accept\n without messing up its state: QueryCancel (SIGINT) and ProcDie (SIGTERM).\n In both cases, we need to be able to clean up the current transaction\n gracefully, so we can't respond to the interrupt instantaneously ---\n there's no guarantee that internal data structures would be self-consistent\n if the code is interrupted at an arbitrary instant.  Instead, the signal\n handlers set flags that are checked periodically during execution.\n\n The CHECK_FOR_INTERRUPTS() macro is called at strategically located spots\n where it is normally safe to accept a cancel or die interrupt.  In some\n cases, we invoke CHECK_FOR_INTERRUPTS() inside low-level subroutines that\n might sometimes be called in contexts that do *not* want to allow a cancel\n or die interrupt.  The HOLD_INTERRUPTS() and RESUME_INTERRUPTS() macros\n allow code to ensure that no cancel or die interrupt will be accepted,\n even if CHECK_FOR_INTERRUPTS() gets called in a subroutine.  The interrupt\n will be held off until CHECK_FOR_INTERRUPTS() is done outside any\n HOLD_INTERRUPTS() ... RESUME_INTERRUPTS() section.\n\n There is also a mechanism to prevent query cancel interrupts, while still\n allowing die interrupts: HOLD_CANCEL_INTERRUPTS() and\n RESUME_CANCEL_INTERRUPTS().\n\n Note that ProcessInterrupts() has also acquired a number of tasks that\n do not necessarily cause a query-cancel-or-die response.  Hence, it's\n possible that it will just clear InterruptPending and return.\n\n INTERRUPTS_PENDING_CONDITION() can be checked to see whether an\n interrupt needs to be serviced, without trying to do so immediately.\n Some callers are also interested in INTERRUPTS_CAN_BE_PROCESSED(),\n which tells whether ProcessInterrupts is sure to clear the interrupt.\n\n Special mechanisms are used to let an interrupt be accepted when we are\n waiting for a lock or when we are waiting for command input (but, of\n course, only if the interrupt holdoff counter is zero).  See the\n related code for details.\n\n A lost connection is handled similarly, although the loss of connection\n does not raise a signal, but is detected when we fail to write to the\n socket. If there was a signal for a broken connection, we could make use of\n it by setting ClientConnectionLost in the signal handler.\n\n A related, but conceptually distinct, mechanism is the \"critical section\"\n mechanism.  A critical section not only holds off cancel/die interrupts,\n but causes any ereport(ERROR) or ereport(FATAL) to become ereport(PANIC)\n --- that is, a system-wide reset is forced.  Needless to say, only really\n *critical* code should be marked as a critical section!\tCurrently, this\n mechanism is only used for XLOG-related code.\n"]
-    pub static mut InterruptPending: sig_atomic_t;
-    pub static mut QueryCancelPending: sig_atomic_t;
-    pub static mut ProcDiePending: sig_atomic_t;
-    pub static mut IdleInTransactionSessionTimeoutPending: sig_atomic_t;
-    pub static mut TransactionTimeoutPending: sig_atomic_t;
-    pub static mut IdleSessionTimeoutPending: sig_atomic_t;
-    pub static mut ProcSignalBarrierPending: sig_atomic_t;
-    pub static mut LogMemoryContextPending: sig_atomic_t;
-    pub static mut IdleStatsUpdateTimeoutPending: sig_atomic_t;
-    pub static mut CheckClientConnectionPending: sig_atomic_t;
-    pub static mut ClientConnectionLost: sig_atomic_t;
-    pub static mut InterruptHoldoffCount: uint32;
-    pub static mut QueryCancelHoldoffCount: uint32;
-    pub static mut CritSectionCount: uint32;
-    #[doc = "\t  globals.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *"]
-    pub static mut PostmasterPid: pid_t;
-    pub static mut IsPostmasterEnvironment: bool;
-    pub static mut IsUnderPostmaster: bool;
-    pub static mut IsBinaryUpgrade: bool;
-    pub static mut ExitOnAnyError: bool;
-    pub static mut DataDir: *mut ::core::ffi::c_char;
-    pub static mut data_directory_mode: ::core::ffi::c_int;
-    pub static mut NBuffers: ::core::ffi::c_int;
-    pub static mut MaxBackends: ::core::ffi::c_int;
-    pub static mut MaxConnections: ::core::ffi::c_int;
-    pub static mut max_worker_processes: ::core::ffi::c_int;
-    pub static mut max_parallel_workers: ::core::ffi::c_int;
-    pub static mut commit_timestamp_buffers: ::core::ffi::c_int;
-    pub static mut multixact_member_buffers: ::core::ffi::c_int;
-    pub static mut multixact_offset_buffers: ::core::ffi::c_int;
-    pub static mut notify_buffers: ::core::ffi::c_int;
-    pub static mut serializable_buffers: ::core::ffi::c_int;
-    pub static mut subtransaction_buffers: ::core::ffi::c_int;
-    pub static mut transaction_buffers: ::core::ffi::c_int;
-    pub static mut MyProcPid: ::core::ffi::c_int;
-    pub static mut MyStartTime: pg_time_t;
-    pub static mut MyStartTimestamp: TimestampTz;
-    pub static mut MyProcPort: *mut Port;
-    pub static mut MyLatch: *mut Latch;
-    pub static mut MyCancelKey: int32;
-    pub static mut MyPMChildSlot: ::core::ffi::c_int;
-    pub static mut OutputFileName: [::core::ffi::c_char; 0usize];
-    pub static mut my_exec_path: [::core::ffi::c_char; 0usize];
-    pub static mut pkglib_path: [::core::ffi::c_char; 0usize];
-    pub static mut MyDatabaseId: Oid;
-    pub static mut MyDatabaseTableSpace: Oid;
-    pub static mut MyDatabaseHasLoginEventTriggers: bool;
-    pub static mut DateStyle: ::core::ffi::c_int;
-    pub static mut DateOrder: ::core::ffi::c_int;
-    pub static mut IntervalStyle: ::core::ffi::c_int;
-    pub static mut enableFsync: bool;
-    pub static mut allowSystemTableMods: bool;
-    pub static mut work_mem: ::core::ffi::c_int;
-    pub static mut hash_mem_multiplier: f64;
-    pub static mut maintenance_work_mem: ::core::ffi::c_int;
-    pub static mut max_parallel_maintenance_workers: ::core::ffi::c_int;
-    pub static mut VacuumBufferUsageLimit: ::core::ffi::c_int;
-    pub static mut VacuumCostPageHit: ::core::ffi::c_int;
-    pub static mut VacuumCostPageMiss: ::core::ffi::c_int;
-    pub static mut VacuumCostPageDirty: ::core::ffi::c_int;
-    pub static mut VacuumCostLimit: ::core::ffi::c_int;
-    pub static mut VacuumCostDelay: f64;
-    pub static mut VacuumPageHit: int64;
-    pub static mut VacuumPageMiss: int64;
-    pub static mut VacuumPageDirty: int64;
-    pub static mut VacuumCostBalance: ::core::ffi::c_int;
-    pub static mut VacuumCostActive: bool;
-    pub static mut DatabasePath: *mut ::core::ffi::c_char;
-    pub static mut MyBackendType: BackendType::Type;
-    pub static mut Mode: ProcessingMode::Type;
-    pub static mut IgnoreSystemIndexes: bool;
-    pub static mut process_shared_preload_libraries_in_progress: bool;
-    pub static mut process_shared_preload_libraries_done: bool;
-    pub static mut process_shmem_requests_in_progress: bool;
-    pub static mut session_preload_libraries_string: *mut ::core::ffi::c_char;
-    pub static mut shared_preload_libraries_string: *mut ::core::ffi::c_char;
-    pub static mut local_preload_libraries_string: *mut ::core::ffi::c_char;
-    pub static mut shmem_request_hook: shmem_request_hook_type;
-    pub static mut pgstat_track_activities: bool;
-    pub static mut pgstat_track_activity_query_size: ::core::ffi::c_int;
-    pub static mut MyBEEntry: *mut PgBackendStatus;
-    pub static mut my_wait_event_info: *mut uint32;
-    pub static mut pgstat_track_counts: bool;
-    pub static mut pgstat_track_functions: ::core::ffi::c_int;
-    pub static mut pgstat_fetch_consistency: ::core::ffi::c_int;
-    pub static mut PendingBgWriterStats: PgStat_BgWriterStats;
-    pub static mut PendingCheckpointerStats: PgStat_CheckpointerStats;
-    pub static mut pgStatBlockReadTime: PgStat_Counter;
-    pub static mut pgStatBlockWriteTime: PgStat_Counter;
-    pub static mut pgStatActiveTime: PgStat_Counter;
-    pub static mut pgStatTransactionIdleTime: PgStat_Counter;
-    pub static mut pgStatSessionEndCause: SessionEndType::Type;
-    pub static mut PendingWalStats: PgStat_PendingWalStats;
-    pub static mut wal_sync_method: ::core::ffi::c_int;
-    pub static mut ProcLastRecPtr: XLogRecPtr;
-    pub static mut XactLastRecEnd: XLogRecPtr;
-    pub static mut XactLastCommitEnd: XLogRecPtr;
-    pub static mut wal_segment_size: ::core::ffi::c_int;
-    pub static mut min_wal_size_mb: ::core::ffi::c_int;
-    pub static mut max_wal_size_mb: ::core::ffi::c_int;
-    pub static mut wal_keep_size_mb: ::core::ffi::c_int;
-    pub static mut max_slot_wal_keep_size_mb: ::core::ffi::c_int;
-    pub static mut XLOGbuffers: ::core::ffi::c_int;
-    pub static mut XLogArchiveTimeout: ::core::ffi::c_int;
-    pub static mut wal_retrieve_retry_interval: ::core::ffi::c_int;
-    pub static mut XLogArchiveCommand: *mut ::core::ffi::c_char;
-    pub static mut EnableHotStandby: bool;
-    pub static mut fullPageWrites: bool;
-    pub static mut wal_log_hints: bool;
-    pub static mut wal_compression: ::core::ffi::c_int;
-    pub static mut wal_init_zero: bool;
-    pub static mut wal_recycle: bool;
-    pub static mut wal_consistency_checking: *mut bool;
-    pub static mut wal_consistency_checking_string: *mut ::core::ffi::c_char;
-    pub static mut log_checkpoints: bool;
-    pub static mut track_wal_io_timing: bool;
-    pub static mut wal_decode_buffer_size: ::core::ffi::c_int;
-    pub static mut CheckPointSegments: ::core::ffi::c_int;
-    pub static mut XLogArchiveMode: ::core::ffi::c_int;
-    pub static mut wal_level: ::core::ffi::c_int;
-    pub static mut CheckpointStats: CheckpointStatsData;
-    pub static mut pg_comp_crc32c: ::core::option::Option<
-        unsafe extern "C" fn(
-            crc: pg_crc32c,
-            data: *const ::core::ffi::c_void,
-            len: usize,
-        ) -> pg_crc32c,
-    >;
-    pub static InvalidObjectAddress: ObjectAddress;
-    pub static mut GinFuzzySearchLimit: ::core::ffi::c_int;
-    pub static mut gin_pending_list_limit: ::core::ffi::c_int;
-    pub static mut SharedInvalidMessageCounter: uint64;
-    pub static mut catchupInterruptPending: sig_atomic_t;
-    pub static mut DefaultXactIsoLevel: ::core::ffi::c_int;
-    pub static mut XactIsoLevel: ::core::ffi::c_int;
-    pub static mut DefaultXactReadOnly: bool;
-    pub static mut XactReadOnly: bool;
-    pub static mut xact_is_sampled: bool;
-    pub static mut DefaultXactDeferrable: bool;
-    pub static mut XactDeferrable: bool;
-    pub static mut synchronous_commit: ::core::ffi::c_int;
-    pub static mut CheckXidAlive: TransactionId;
-    pub static mut bsysscan: bool;
-    pub static mut MyXactFlags: ::core::ffi::c_int;
-    pub static mut CurrentResourceOwner: ResourceOwner;
-    pub static mut CurTransactionResourceOwner: ResourceOwner;
-    pub static mut TopTransactionResourceOwner: ResourceOwner;
-    pub static mut AuxProcessResourceOwner: ResourceOwner;
-    pub static mut FirstSnapshotSet: bool;
-    pub static mut TransactionXmin: TransactionId;
-    pub static mut RecentXmin: TransactionId;
-    pub static mut SnapshotSelfData: SnapshotData;
-    pub static mut SnapshotAnyData: SnapshotData;
-    pub static mut CatalogSnapshotData: SnapshotData;
-    pub static mut zero_damaged_pages: bool;
-    pub static mut bgwriter_lru_maxpages: ::core::ffi::c_int;
-    pub static mut bgwriter_lru_multiplier: f64;
-    pub static mut track_io_timing: bool;
-    pub static mut effective_io_concurrency: ::core::ffi::c_int;
-    pub static mut maintenance_io_concurrency: ::core::ffi::c_int;
-    pub static mut io_combine_limit: ::core::ffi::c_int;
-    pub static mut checkpoint_flush_after: ::core::ffi::c_int;
-    pub static mut backend_flush_after: ::core::ffi::c_int;
-    pub static mut bgwriter_flush_after: ::core::ffi::c_int;
-    pub static mut BufferBlocks: *mut ::core::ffi::c_char;
-    pub static mut NLocBuffer: ::core::ffi::c_int;
-    pub static mut LocalBufferBlockPointers: *mut Block;
-    pub static mut LocalRefCount: *mut int32;
-    pub static mut default_table_access_method: *mut ::core::ffi::c_char;
-    pub static mut synchronize_seqscans: bool;
-    pub static mut MainLWLockArray: *mut LWLockPadded;
-    pub static mut NamedLWLockTrancheArray: *mut NamedLWLockTranche;
-    pub static mut NamedLWLockTrancheRequests: ::core::ffi::c_int;
-    pub static mut PgStartTime: TimestampTz;
-    pub static mut PgReloadTime: TimestampTz;
-    pub static mut max_locks_per_xact: ::core::ffi::c_int;
-    pub static LockTagTypeNames: [*const ::core::ffi::c_char; 0usize];
-    pub static mut RmgrTable: [RmgrData; 0usize];
-    pub static mut ArchiveRecoveryRequested: bool;
-    pub static mut InArchiveRecovery: bool;
-    pub static mut StandbyMode: bool;
-    pub static mut recoveryRestoreCommand: *mut ::core::ffi::c_char;
-    pub static mut recoveryTargetInclusive: bool;
-    pub static mut recoveryTargetAction: ::core::ffi::c_int;
-    pub static mut recovery_min_apply_delay: ::core::ffi::c_int;
-    pub static mut PrimaryConnInfo: *mut ::core::ffi::c_char;
-    pub static mut PrimarySlotName: *mut ::core::ffi::c_char;
-    pub static mut recoveryEndCommand: *mut ::core::ffi::c_char;
-    pub static mut archiveCleanupCommand: *mut ::core::ffi::c_char;
-    pub static mut recoveryTargetXid: TransactionId;
-    pub static mut recovery_target_time_string: *mut ::core::ffi::c_char;
-    pub static mut recoveryTargetTime: TimestampTz;
-    pub static mut recoveryTargetName: *const ::core::ffi::c_char;
-    pub static mut recoveryTargetLSN: XLogRecPtr;
-    pub static mut recoveryTarget: RecoveryTargetType::Type;
-    pub static mut wal_receiver_create_temp_slot: bool;
-    pub static mut recoveryTargetTimeLineGoal: RecoveryTargetTimeLineGoal::Type;
-    pub static mut recoveryTargetTLIRequested: TimeLineID;
-    pub static mut recoveryTargetTLI: TimeLineID;
-    pub static mut reachedConsistency: bool;
-    pub static mut InRecovery: bool;
-    pub static mut standbyState: HotStandbyState::Type;
-    pub static mut namespace_search_path: *mut ::core::ffi::c_char;
-    pub static mut object_access_hook: object_access_hook_type;
-    pub static mut object_access_hook_str: object_access_hook_type_str;
-    pub static mut wal_skip_threshold: ::core::ffi::c_int;
-    pub static mut Array_nulls: bool;
-    pub static mut event_triggers: bool;
-    pub static mut ExplainOneQuery_hook: ExplainOneQuery_hook_type;
-    pub static mut explain_get_index_name_hook: explain_get_index_name_hook_type;
-    pub static mut creating_extension: bool;
-    pub static mut CurrentExtensionObject: Oid;
-    pub static mut plan_cache_mode: ::core::ffi::c_int;
-    pub static mut allow_in_place_tablespaces: bool;
-    pub static mut SessionReplicationRole: ::core::ffi::c_int;
-    pub static mut Debug_print_plan: bool;
-    pub static mut Debug_print_parse: bool;
-    pub static mut Debug_print_rewritten: bool;
-    pub static mut Debug_pretty_print: bool;
-    pub static mut log_parser_stats: bool;
-    pub static mut log_planner_stats: bool;
-    pub static mut log_executor_stats: bool;
-    pub static mut log_statement_stats: bool;
-    pub static mut log_btree_build_stats: bool;
-    pub static mut check_function_bodies: bool;
-    pub static mut current_role_is_superuser: bool;
-    pub static mut AllowAlterSystem: bool;
-    pub static mut log_duration: bool;
-    pub static mut log_parameter_max_length: ::core::ffi::c_int;
-    pub static mut log_parameter_max_length_on_error: ::core::ffi::c_int;
-    pub static mut log_min_error_statement: ::core::ffi::c_int;
-    pub static mut log_min_messages: ::core::ffi::c_int;
-    pub static mut client_min_messages: ::core::ffi::c_int;
-    pub static mut log_min_duration_sample: ::core::ffi::c_int;
-    pub static mut log_min_duration_statement: ::core::ffi::c_int;
-    pub static mut log_temp_files: ::core::ffi::c_int;
-    pub static mut log_statement_sample_rate: f64;
-    pub static mut log_xact_sample_rate: f64;
-    pub static mut backtrace_functions: *mut ::core::ffi::c_char;
-    pub static mut temp_file_limit: ::core::ffi::c_int;
-    pub static mut num_temp_buffers: ::core::ffi::c_int;
-    pub static mut cluster_name: *mut ::core::ffi::c_char;
-    pub static mut ConfigFileName: *mut ::core::ffi::c_char;
-    pub static mut HbaFileName: *mut ::core::ffi::c_char;
-    pub static mut IdentFileName: *mut ::core::ffi::c_char;
-    pub static mut external_pid_file: *mut ::core::ffi::c_char;
-    pub static mut application_name: *mut ::core::ffi::c_char;
-    pub static mut tcp_keepalives_idle: ::core::ffi::c_int;
-    pub static mut tcp_keepalives_interval: ::core::ffi::c_int;
-    pub static mut tcp_keepalives_count: ::core::ffi::c_int;
-    pub static mut tcp_user_timeout: ::core::ffi::c_int;
-    pub static mut trace_sort: bool;
-    pub static mut GUC_check_errmsg_string: *mut ::core::ffi::c_char;
-    pub static mut GUC_check_errdetail_string: *mut ::core::ffi::c_char;
-    pub static mut GUC_check_errhint_string: *mut ::core::ffi::c_char;
-    pub static mut Password_encryption: ::core::ffi::c_int;
-    pub static mut createrole_self_grant: *mut ::core::ffi::c_char;
-    pub static mut check_password_hook: check_password_hook_type;
-    pub static mut MyBgworkerEntry: *mut BackgroundWorker;
-    pub static mut MyProc: *mut PGPROC;
-    pub static mut ProcGlobal: *mut PROC_HDR;
-    pub static mut PreparedXactProcs: *mut PGPROC;
-    pub static mut DeadlockTimeout: ::core::ffi::c_int;
-    pub static mut StatementTimeout: ::core::ffi::c_int;
-    pub static mut LockTimeout: ::core::ffi::c_int;
-    pub static mut IdleInTransactionSessionTimeout: ::core::ffi::c_int;
-    pub static mut TransactionTimeout: ::core::ffi::c_int;
-    pub static mut IdleSessionTimeout: ::core::ffi::c_int;
-    pub static mut log_lock_waits: bool;
-    pub static shm_mq_minimum_size: Size;
-    pub static mut ParallelMessagePending: sig_atomic_t;
-    pub static mut ParallelWorkerNumber: ::core::ffi::c_int;
-    pub static mut InitializingParallelWorker: bool;
-    pub static mut default_statistics_target: ::core::ffi::c_int;
-    pub static mut vacuum_freeze_min_age: ::core::ffi::c_int;
-    pub static mut vacuum_freeze_table_age: ::core::ffi::c_int;
-    pub static mut vacuum_multixact_freeze_min_age: ::core::ffi::c_int;
-    pub static mut vacuum_multixact_freeze_table_age: ::core::ffi::c_int;
-    pub static mut vacuum_failsafe_age: ::core::ffi::c_int;
-    pub static mut vacuum_multixact_failsafe_age: ::core::ffi::c_int;
-    pub static mut VacuumSharedCostBalance: *mut pg_atomic_uint32;
-    pub static mut VacuumActiveNWorkers: *mut pg_atomic_uint32;
-    pub static mut VacuumCostBalanceLocal: ::core::ffi::c_int;
-    pub static mut VacuumFailsafeActive: bool;
-    pub static mut vacuum_cost_delay: f64;
-    pub static mut vacuum_cost_limit: ::core::ffi::c_int;
-    pub static mut backslash_quote: ::core::ffi::c_int;
-    pub static mut escape_string_warning: bool;
-    pub static mut standard_conforming_strings: bool;
-    pub static mut SPI_processed: uint64;
-    pub static mut SPI_tuptable: *mut SPITupleTable;
-    pub static mut SPI_result: ::core::ffi::c_int;
-    pub static mut jit_enabled: bool;
-    pub static mut jit_provider: *mut ::core::ffi::c_char;
-    pub static mut jit_debugging_support: bool;
-    pub static mut jit_dump_bitcode: bool;
-    pub static mut jit_expressions: bool;
-    pub static mut jit_profiling_support: bool;
-    pub static mut jit_tuple_deforming: bool;
-    pub static mut jit_above_cost: f64;
-    pub static mut jit_inline_above_cost: f64;
-    pub static mut jit_optimize_above_cost: f64;
-    pub static pg_enc2name_tbl: [pg_enc2name; 0usize];
-    pub static mut pg_enc2gettext_tbl: [*const ::core::ffi::c_char; 0usize];
-    pub static pg_wchar_table: [pg_wchar_tbl; 0usize];
-    pub static mut disable_cost: Cost;
-    pub static mut max_parallel_workers_per_gather: ::core::ffi::c_int;
-    pub static mut enable_seqscan: bool;
-    pub static mut enable_indexscan: bool;
-    pub static mut enable_indexonlyscan: bool;
-    pub static mut enable_bitmapscan: bool;
-    pub static mut enable_tidscan: bool;
-    pub static mut enable_sort: bool;
-    pub static mut enable_incremental_sort: bool;
-    pub static mut enable_hashagg: bool;
-    pub static mut enable_nestloop: bool;
-    pub static mut enable_material: bool;
-    pub static mut enable_memoize: bool;
-    pub static mut enable_mergejoin: bool;
-    pub static mut enable_hashjoin: bool;
-    pub static mut enable_gathermerge: bool;
-    pub static mut enable_partitionwise_join: bool;
-    pub static mut enable_partitionwise_aggregate: bool;
-    pub static mut enable_parallel_append: bool;
-    pub static mut enable_parallel_hash: bool;
-    pub static mut enable_partition_pruning: bool;
-    pub static mut enable_presorted_aggregate: bool;
-    pub static mut enable_async_append: bool;
-    pub static mut constraint_exclusion: ::core::ffi::c_int;
-    pub static mut seq_page_cost: f64;
-    pub static mut random_page_cost: f64;
-    pub static mut cpu_tuple_cost: f64;
-    pub static mut cpu_index_tuple_cost: f64;
-    pub static mut cpu_operator_cost: f64;
-    pub static mut parallel_tuple_cost: f64;
-    pub static mut parallel_setup_cost: f64;
-    pub static mut recursive_worktable_factor: f64;
-    pub static mut effective_cache_size: ::core::ffi::c_int;
-    pub static mut debug_parallel_query: ::core::ffi::c_int;
-    pub static mut parallel_leader_participation: bool;
-    pub static mut enable_geqo: bool;
-    pub static mut geqo_threshold: ::core::ffi::c_int;
-    pub static mut min_parallel_table_scan_size: ::core::ffi::c_int;
-    pub static mut min_parallel_index_scan_size: ::core::ffi::c_int;
-    pub static mut enable_group_by_reordering: bool;
-    pub static mut set_rel_pathlist_hook: set_rel_pathlist_hook_type;
-    pub static mut set_join_pathlist_hook: set_join_pathlist_hook_type;
-    pub static mut join_search_hook: join_search_hook_type;
-    pub static mut get_relation_info_hook: get_relation_info_hook_type;
-    pub static mut cursor_tuple_fraction: f64;
-    pub static mut from_collapse_limit: ::core::ffi::c_int;
-    pub static mut join_collapse_limit: ::core::ffi::c_int;
-    pub static mut planner_hook: planner_hook_type;
-    pub static mut create_upper_paths_hook: create_upper_paths_hook_type;
-    pub static mut compute_query_id: ::core::ffi::c_int;
-    pub static mut query_id_enabled: bool;
-    pub static mut post_parse_analyze_hook: post_parse_analyze_hook_type;
-    pub static mut Transform_null_equals: bool;
-    pub static mut plpgsql_IdentifierLookup: IdentifierLookup::Type;
-    pub static mut plpgsql_variable_conflict: ::core::ffi::c_int;
-    pub static mut plpgsql_print_strict_params: bool;
-    pub static mut plpgsql_check_asserts: bool;
-    pub static mut plpgsql_extra_warnings: ::core::ffi::c_int;
-    pub static mut plpgsql_extra_errors: ::core::ffi::c_int;
-    pub static mut plpgsql_check_syntax: bool;
-    pub static mut plpgsql_DumpExecTree: bool;
-    pub static mut plpgsql_parse_result: *mut PLpgSQL_stmt_block;
-    pub static mut plpgsql_nDatums: ::core::ffi::c_int;
-    pub static mut plpgsql_Datums: *mut *mut PLpgSQL_datum;
-    pub static mut plpgsql_error_funcname: *mut ::core::ffi::c_char;
-    pub static mut plpgsql_curr_compile: *mut PLpgSQL_function;
-    pub static mut plpgsql_compile_tmp_cxt: MemoryContext;
-    pub static mut plpgsql_plugin_ptr: *mut *mut PLpgSQL_plugin;
-    pub static mut EnableSSL: bool;
-    pub static mut SuperuserReservedConnections: ::core::ffi::c_int;
-    pub static mut ReservedConnections: ::core::ffi::c_int;
-    pub static mut PostPortNumber: ::core::ffi::c_int;
-    pub static mut Unix_socket_permissions: ::core::ffi::c_int;
-    pub static mut Unix_socket_group: *mut ::core::ffi::c_char;
-    pub static mut Unix_socket_directories: *mut ::core::ffi::c_char;
-    pub static mut ListenAddresses: *mut ::core::ffi::c_char;
-    pub static mut ClientAuthInProgress: bool;
-    pub static mut PreAuthDelay: ::core::ffi::c_int;
-    pub static mut AuthenticationTimeout: ::core::ffi::c_int;
-    pub static mut Log_connections: bool;
-    pub static mut log_hostname: bool;
-    pub static mut enable_bonjour: bool;
-    pub static mut bonjour_name: *mut ::core::ffi::c_char;
-    pub static mut restart_after_crash: bool;
-    pub static mut remove_temp_files_after_crash: bool;
-    pub static mut send_abort_for_crash: bool;
-    pub static mut send_abort_for_kill: bool;
-    pub static mut postmaster_alive_fds: [::core::ffi::c_int; 2usize];
-    pub static mut progname: *const ::core::ffi::c_char;
-    pub static mut LoadedSSL: bool;
-    pub static mut MyClientSocket: *mut ClientSocket;
-    pub static mut Logging_collector: bool;
-    pub static mut Log_RotationAge: ::core::ffi::c_int;
-    pub static mut Log_RotationSize: ::core::ffi::c_int;
-    pub static mut Log_directory: *mut ::core::ffi::c_char;
-    pub static mut Log_filename: *mut ::core::ffi::c_char;
-    pub static mut Log_truncate_on_rotation: bool;
-    pub static mut Log_file_mode: ::core::ffi::c_int;
-    pub static mut syslogPipe: [::core::ffi::c_int; 2usize];
-    pub static mut logical_decoding_work_mem: ::core::ffi::c_int;
-    pub static mut debug_logical_replication_streaming: ::core::ffi::c_int;
-    pub static mut am_walsender: bool;
-    pub static mut am_cascading_walsender: bool;
-    pub static mut am_db_walsender: bool;
-    pub static mut wake_wal_senders: bool;
-    pub static mut max_wal_senders: ::core::ffi::c_int;
-    pub static mut wal_sender_timeout: ::core::ffi::c_int;
-    pub static mut log_replication_commands: bool;
-    pub static mut wal_receiver_status_interval: ::core::ffi::c_int;
-    pub static mut wal_receiver_timeout: ::core::ffi::c_int;
-    pub static mut hot_standby_feedback: bool;
-    pub static mut WalRcv: *mut WalRcvData;
-    pub static mut WalReceiverFunctions: *mut WalReceiverFunctionsType;
-    pub static SlotInvalidationCauses: [*const ::core::ffi::c_char; 0usize];
-    pub static mut ReplicationSlotCtl: *mut ReplicationSlotCtlData;
-    pub static mut MyReplicationSlot: *mut ReplicationSlot;
-    pub static mut max_replication_slots: ::core::ffi::c_int;
-    pub static mut synchronized_standby_slots: *mut ::core::ffi::c_char;
-    pub static mut row_security_policy_hook_permissive: row_security_policy_hook_type;
-    pub static mut row_security_policy_hook_restrictive: row_security_policy_hook_type;
-    pub static mut proc_exit_inprogress: bool;
-    pub static mut shmem_exit_inprogress: bool;
-    pub static mut shmem_startup_hook: shmem_startup_hook_type;
-    pub static mut max_standby_archive_delay: ::core::ffi::c_int;
-    pub static mut max_standby_streaming_delay: ::core::ffi::c_int;
-    pub static mut log_recovery_conflict_waits: bool;
-    pub static mut ActivePortal: Portal;
-    pub static mut whereToSendOutput: CommandDest::Type;
-    pub static mut debug_query_string: *const ::core::ffi::c_char;
-    pub static mut max_stack_depth: ::core::ffi::c_int;
-    pub static mut PostAuthDelay: ::core::ffi::c_int;
-    pub static mut client_connection_check_interval: ::core::ffi::c_int;
-    pub static mut log_statement: ::core::ffi::c_int;
-    pub static mut restrict_nonsystem_relation_kind: ::core::ffi::c_int;
-    pub static mut ProcessUtility_hook: ProcessUtility_hook_type;
-    pub static tsearch_op_priority: [::core::ffi::c_int; 4usize];
-    pub static mut quote_all_identifiers: bool;
-    pub static months: [*const ::core::ffi::c_char; 0usize];
-    pub static days: [*const ::core::ffi::c_char; 0usize];
-    pub static mut day_tab: [[::core::ffi::c_int; 13usize]; 2usize];
-    pub static mut extra_float_digits: ::core::ffi::c_int;
-    pub static mut pg_global_prng_state: pg_prng_state;
-    pub static mut get_attavgwidth_hook: get_attavgwidth_hook_type;
-    pub static mut get_relation_stats_hook: get_relation_stats_hook_type;
-    pub static mut get_index_stats_hook: get_index_stats_hook_type;
 }
 #[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_OP")]
 pub const A_Expr_Kind_AEXPR_OP: u32 = 0;
@@ -52814,6 +52833,12 @@ pub const CTEMaterialize_CTEMaterializeDefault: u32 = 0;
 pub const CTEMaterialize_CTEMaterializeAlways: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CTEMaterialize::CTEMaterializeNever")]
 pub const CTEMaterialize_CTEMaterializeNever: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CheckEnableRlsResult::RLS_NONE")]
+pub const CheckEnableRlsResult_RLS_NONE: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CheckEnableRlsResult::RLS_NONE_ENV")]
+pub const CheckEnableRlsResult_RLS_NONE_ENV: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CheckEnableRlsResult::RLS_ENABLED")]
+pub const CheckEnableRlsResult_RLS_ENABLED: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CmdType::CMD_UNKNOWN")]
 pub const CmdType_CMD_UNKNOWN: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CmdType::CMD_SELECT")]
