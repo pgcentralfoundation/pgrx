@@ -348,10 +348,18 @@ where
                     &mut is_empty,
                 );
 
-                // SAFETY: The lower_bound/upper_bound RangeBound value's .val will be a valid Datum of the T type
-                // If the range is_empty or either bound is infinite then .val = (Datum) 0
-                let lower = RangeBound::from_pg(lower_bound);
-                let upper = RangeBound::from_pg(upper_bound);
+                let range = if is_empty {
+                    // empty ranges cannot go through `RangeBound::from_pg()` as the bound's `.val`
+                    // Datum will be zero, and for a pass-by-reference range type, that's an instant segfault
+                    Range::empty()
+                } else {
+                    // SAFETY: The lower_bound/upper_bound RangeBound value's .val will be a valid Datum of the T type
+                    // If the range is_empty or either bound is infinite then .val = (Datum) 0, which we handled above
+                    let lower = RangeBound::from_pg(lower_bound);
+                    let upper = RangeBound::from_pg(upper_bound);
+
+                    Range { inner: Some((lower, upper)) }
+                };
 
                 if !std::ptr::eq(ptr, range_type.cast()) {
                     // SAFETY: range_type was allocated by Postgres in the call to
@@ -359,7 +367,7 @@ where
                     pg_sys::pfree(range_type.cast());
                 }
 
-                Some(Range { inner: if is_empty { None } else { Some((lower, upper)) } })
+                Some(range)
             }
         }
     }

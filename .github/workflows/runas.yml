@@ -2,9 +2,9 @@ name: cargo pgrx test --runas
 
 on:
   push:
-    branches: [develop]
+    branches: [ develop ]
   pull_request:
-    branches: [develop]
+    branches: [ develop ]
 
 env:
   CARGO_TERM_COLOR: always
@@ -12,7 +12,7 @@ env:
 
 jobs:
   ubuntu:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v4

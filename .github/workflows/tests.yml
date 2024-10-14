@@ -20,7 +20,7 @@ env:
 jobs:
   lintck:
     name: rustfmt, clippy, et al.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
       RUSTC_WRAPPER: sccache
@@ -97,7 +97,7 @@ jobs:
   pgrx_tests:
     name: Linux tests & examples
     needs: lintck
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
       RUSTC_WRAPPER: sccache
@@ -363,7 +363,7 @@ jobs:
 
   cargo_pgrx_init:
     name: cargo pgrx init
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
       RUSTC_WRAPPER: sccache
