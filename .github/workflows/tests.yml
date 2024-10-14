@@ -20,7 +20,7 @@ env:
 jobs:
   lintck:
     name: rustfmt, clippy, et al.
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
       RUSTC_WRAPPER: sccache
@@ -97,7 +97,7 @@ jobs:
   pgrx_tests:
     name: Linux tests & examples
     needs: lintck
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
       RUSTC_WRAPPER: sccache
@@ -134,12 +134,13 @@ jobs:
           echo ""
           
           echo "----- Remove old postgres -----"
-          sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*'
+          sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
           echo ""
           
           echo "----- Install system dependencies -----"
           sudo apt-get install -y \
             build-essential \
+            llvm-14-dev libclang-14-dev clang-14 \
             gcc \
             libssl-dev \
             libz-dev \
@@ -362,7 +363,7 @@ jobs:
 
   cargo_pgrx_init:
     name: cargo pgrx init
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
       RUSTC_WRAPPER: sccache
@@ -394,12 +395,13 @@ jobs:
           echo ""
           
           echo "----- Remove old postgres -----"
-          sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*'
+          sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
           echo ""
           
           echo "----- Install system dependencies -----"
           sudo apt-get install -y \
             build-essential \
+            llvm-14-dev libclang-14-dev clang-14 \
             gcc \
             libssl-dev \
             libz-dev \
