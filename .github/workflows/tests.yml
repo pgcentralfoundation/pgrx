@@ -140,7 +140,6 @@ jobs:
           echo "----- Install system dependencies -----"
           sudo apt-get install -y \
             build-essential \
-            llvm-14-dev libclang-14-dev clang-14 \
             gcc \
             libssl-dev \
             libz-dev \
@@ -401,7 +400,6 @@ jobs:
           echo "----- Install system dependencies -----"
           sudo apt-get install -y \
             build-essential \
-            llvm-14-dev libclang-14-dev clang-14 \
             gcc \
             libssl-dev \
             libz-dev \
