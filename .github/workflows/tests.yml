@@ -134,7 +134,7 @@ jobs:
           echo ""
           
           echo "----- Remove old postgres -----"
-          sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
+          sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*'
           echo ""
           
           echo "----- Install system dependencies -----"
@@ -395,7 +395,7 @@ jobs:
           echo ""
           
           echo "----- Remove old postgres -----"
-          sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
+          sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*'
           echo ""
           
           echo "----- Install system dependencies -----"
