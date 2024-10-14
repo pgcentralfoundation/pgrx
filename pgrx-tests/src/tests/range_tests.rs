@@ -142,6 +142,14 @@ mod tests {
     }
 
     #[pg_test]
+    fn test_empty_anynumeric_range() {
+        let matched = Spi::get_one::<Range<AnyNumeric>>(
+            "SELECT accept_range_numeric('[10.5, 10.5)'::numrange)",
+        );
+        assert_eq!(matched, Ok(Some(Range::empty())));
+    }
+
+    #[pg_test]
     fn test_accept_range_date() {
         let matched =
             Spi::get_one::<bool>("SELECT accept_range_date(daterange'[2000-01-01,2022-01-01)') = daterange'[2000-01-01,2022-01-01)'");
