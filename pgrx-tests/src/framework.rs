@@ -877,7 +877,11 @@ fn get_cargo_args() -> Vec<String> {
                 && !process.cmd().iter().any(|arg| arg == "pgrx")
             {
                 // ... do we want its args
-                return process.cmd().to_vec();
+                return process
+                    .cmd()
+                    .iter()
+                    .map(|os_str| os_str.to_string_lossy().to_string())
+                    .collect();
             }
         }
 

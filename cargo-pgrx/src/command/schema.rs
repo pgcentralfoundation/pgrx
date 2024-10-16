@@ -594,8 +594,8 @@ fn parse_object(data: &[u8]) -> object::Result<object::File> {
 }
 
 fn slice_arch32<'a>(data: &'a [u8], arch: &str) -> Option<&'a [u8]> {
-    use object::macho::FatHeader;
     use object::read::macho::FatArch;
+    use object::read::macho::MachOFatFile32;
     use object::Architecture;
     let target = match arch {
         "x86" => Architecture::I386,
@@ -608,7 +608,7 @@ fn slice_arch32<'a>(data: &'a [u8], arch: &str) -> Option<&'a [u8]> {
         _ => Architecture::Unknown,
     };
 
-    let candidates = FatHeader::parse_arch32(data).ok()?;
+    let candidates = MachOFatFile32::parse(data).ok()?.arches();
     let architecture = candidates.iter().find(|a| a.architecture() == target)?;
 
     architecture.data(data).ok()
