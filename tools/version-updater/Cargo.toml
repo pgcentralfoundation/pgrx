@@ -7,7 +7,7 @@
 #LICENSE All rights reserved.
 #LICENSE
 #LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
- 
+
 [package]
 name = "pgrx-version-updater"
 version = "0.1.1"
@@ -19,11 +19,11 @@ publish = false
 
 [dependencies]
 cargo_toml = "0.20.4"
-clap = { version = "4.4.2", features = [ "env", "derive" ] }
+clap = { version = "4.4.2", features = ["env", "derive"] }
 owo-colors = "4"
 rustc-hash = "2"
 toml = "0.8.19"
-toml_edit.workspace = true
+toml_edit = { version = "0.22" }
 walkdir = "2"
 
 [workspace]
