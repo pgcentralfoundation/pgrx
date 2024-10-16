@@ -22,7 +22,7 @@ pg_test = []
 
 [dependencies]
 pgrx = { path = "../../pgrx", default-features = false }
-serde = "1.0.209"
+serde = "1.0.210"
 serde_json = "1.0.128"
 
 [dev-dependencies]
