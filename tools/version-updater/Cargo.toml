@@ -23,7 +23,7 @@ clap = { version = "4.4.2", features = [ "env", "derive" ] }
 owo-colors = "4"
 rustc-hash = "2"
 toml = "0.8.19"
-toml_edit = { version = "0.22" }
+toml_edit.workspace = true
 walkdir = "2"
 
 [workspace]

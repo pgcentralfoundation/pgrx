@@ -37,30 +37,30 @@ toml.workspace = true
 toml_edit.workspace = true
 
 clap = { version = "4.4.2", features = [ "env", "suggestions", "cargo", "derive", "wrap_help" ] }
-jobslot = "0.2.12" # as seen in gmake -j{N}
-semver = "1.0.20" # checking pgrx versions match
-tempfile = "3.8.0"
+jobslot = "0.2.19" # as seen in gmake -j{N}
+semver = "1.0.23" # checking pgrx versions match
+tempfile = "3.13.0"
 
 # SQL schema generation
-object = { version = "0.32.1", default-features = false, features = [ "std" ] }
+object = { version = "0.36.5", default-features = false, features = [ "std" ] }
 proc-macro2.workspace = true
 quote.workspace = true
 
 # emit better diagnostics
-color-eyre = "0.6.2"
+color-eyre = "0.6.3"
 eyre.workspace = true
 owo-colors.workspace = true
 tracing = "0.1"
 tracing-error = "0.2.0"
-tracing-subscriber = { version = "0.3.17", features = [ "env-filter" ] }
+tracing-subscriber = { version = "0.3.18", features = [ "env-filter" ] }
 
 # for downloading/unpacking things from the Postgres file servers
 bzip2 = "0.4.4"
 env_proxy = "0.4.1"
 serde.workspace = true
 serde-xml-rs = "0.6.0"
-tar = "0.4.40"
-ureq = { version = "2.8.0", default-features = false, features = [ "gzip" ] }
+tar = "0.4.42"
+ureq = { version = "2.10.1", default-features = false, features = [ "gzip" ] }
 url.workspace = true
 
 [features]
