@@ -388,3 +388,5 @@ pub unsafe fn MemoryContextSwitchTo(context: crate::MemoryContext) -> crate::Mem
     crate::CurrentMemoryContext = context;
     old
 }
+
+pub use crate::PGERROR as ERROR;
