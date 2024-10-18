@@ -189,3 +189,7 @@
 #include "utils/rangetypes.h"
 #include "utils/rel.h"
 #include "utils/varlena.h"
+
+#ifndef WIN32
+#define PGERROR ERROR
+#endif
