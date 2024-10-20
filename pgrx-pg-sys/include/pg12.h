@@ -139,6 +139,7 @@
 #include "storage/buffile.h"
 #include "storage/bufpage.h"
 #include "storage/indexfsm.h"
+#include "storage/freespace.h"
 #include "storage/ipc.h"
 #include "storage/itemptr.h"
 #include "storage/lmgr.h"
