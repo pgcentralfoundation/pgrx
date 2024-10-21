@@ -47,7 +47,7 @@ mod tests {
 
     #[pg_test]
     fn test_pg_cast_assignment_type_cast() {
-        let _ = Spi::connect(|mut client| {
+        let _ = Spi::connect_mut(|client| {
             client.update("CREATE TABLE test_table(value int4);", None, None)?;
             client.update("INSERT INTO test_table VALUES('{\"a\": 1}'::json->'a');", None, None)?;
 

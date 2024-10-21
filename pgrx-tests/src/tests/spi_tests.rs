@@ -181,7 +181,7 @@ mod tests {
 
     #[pg_test]
     fn test_inserting_null() -> Result<(), pgrx::spi::Error> {
-        Spi::connect(|mut client| {
+        Spi::connect_mut(|client| {
             client.update("CREATE TABLE tests.null_test (id uuid)", None, None).map(|_| ())
         })?;
         assert_eq!(
@@ -204,7 +204,7 @@ mod tests {
 
     #[pg_test]
     fn test_cursor() -> Result<(), spi::Error> {
-        Spi::connect(|mut client| {
+        Spi::connect_mut(|client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None)?;
             client.update(
                 "INSERT INTO tests.cursor_table (id) \
@@ -224,7 +224,7 @@ mod tests {
 
     #[pg_test]
     fn test_cursor_prepared_statement() -> Result<(), pgrx::spi::Error> {
-        Spi::connect(|mut client| {
+        Spi::connect_mut(|client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None)?;
             client.update(
                 "INSERT INTO tests.cursor_table (id) \
@@ -264,7 +264,7 @@ mod tests {
     fn test_cursor_prepared_statement_panics_impl(
         args: Option<Vec<Option<pg_sys::Datum>>>,
     ) -> Result<(), pgrx::spi::Error> {
-        Spi::connect(|mut client| {
+        Spi::connect_mut(|client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None)?;
             client.update(
                 "INSERT INTO tests.cursor_table (id) \
@@ -283,7 +283,7 @@ mod tests {
 
     #[pg_test]
     fn test_cursor_by_name() -> Result<(), pgrx::spi::Error> {
-        let cursor_name = Spi::connect(|mut client| {
+        let cursor_name = Spi::connect_mut(|client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None)?;
             client.update(
                 "INSERT INTO tests.cursor_table (id) \
@@ -337,7 +337,7 @@ mod tests {
             Ok::<_, spi::Error>(())
         })?;
 
-        Spi::connect(|mut client| {
+        Spi::connect_mut(|client| {
             let res = client.update("SET TIME ZONE 'PST8PDT'", None, None)?;
 
             assert_eq!(Err(spi::Error::NoTupleTable), res.columns());
@@ -353,9 +353,8 @@ mod tests {
 
     #[pg_test]
     fn test_spi_non_mut() -> Result<(), pgrx::spi::Error> {
-        // Ensures update and cursor APIs do not need mutable reference to SpiClient
-        Spi::connect(|mut client| {
-            client.update("SELECT 1", None, None).expect("SPI failed");
+        // Ensures cursor APIs do not need mutable reference to SpiClient
+        Spi::connect(|client| {
             let cursor = client.open_cursor("SELECT 1", None).detach_into_name();
             client.find_cursor(&cursor).map(|_| ())
         })
@@ -449,7 +448,7 @@ mod tests {
 
     #[pg_test]
     fn test_readwrite_in_select_readwrite() -> Result<(), spi::Error> {
-        Spi::connect(|mut client| {
+        Spi::connect_mut(|client| {
             // This is supposed to switch connection to read-write and run it there
             client.update("CREATE TABLE a (id INT)", None, None)?;
             // This is supposed to run in read-write
@@ -480,7 +479,7 @@ mod tests {
 
     #[pg_test]
     fn test_spi_select_sees_update() -> spi::Result<()> {
-        let with_select = Spi::connect(|mut client| {
+        let with_select = Spi::connect_mut(|client| {
             client.update("CREATE TABLE asd(id int)", None, None)?;
             client.update("INSERT INTO asd(id) VALUES (1)", None, None)?;
             client.select("SELECT COUNT(*) FROM asd", None, None)?.first().get_one::<i64>()
@@ -506,7 +505,7 @@ mod tests {
 
     #[pg_test]
     fn test_spi_select_sees_update_in_other_session() -> spi::Result<()> {
-        Spi::connect::<spi::Result<()>, _>(|mut client| {
+        Spi::connect_mut::<spi::Result<()>, _>(|client| {
             client.update("CREATE TABLE asd(id int)", None, None)?;
             client.update("INSERT INTO asd(id) VALUES (1)", None, None)?;
             Ok(())
