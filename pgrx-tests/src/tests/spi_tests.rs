@@ -16,8 +16,7 @@ mod tests {
     use std::error::Error;
 
     use pgrx::prelude::*;
-    use pgrx::spi;
-    use pgrx::spi::Query;
+    use pgrx::spi::{self, Query};
 
     #[pg_test(error = "syntax error at or near \"THIS\"")]
     fn test_spi_failure() -> Result<(), spi::Error> {
@@ -274,7 +273,7 @@ mod tests {
             )?;
             let prepared = client.prepare(
                 "SELECT * FROM tests.cursor_table WHERE id = $1",
-                Some([PgBuiltInOids::INT4OID.oid()].to_vec()),
+                Some(oids_of![i32].to_vec()),
             )?;
             client.open_cursor(&prepared, args);
             unreachable!();
@@ -395,8 +394,7 @@ mod tests {
     #[pg_test]
     fn test_prepared_statement() -> Result<(), spi::Error> {
         let rc = Spi::connect(|client| {
-            let prepared =
-                client.prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]))?;
+            let prepared = client.prepare("SELECT $1", Some(oids_of![i32].to_vec()))?;
             client.select(&prepared, None, Some(vec![42.into_datum()]))?.first().get::<i32>(1)
         })?;
 
@@ -407,8 +405,7 @@ mod tests {
     #[pg_test]
     fn test_prepared_statement_argument_mismatch() {
         let err = Spi::connect(|client| {
-            let prepared =
-                client.prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]))?;
+            let prepared = client.prepare("SELECT $1", Some(oids_of![i32].to_vec()))?;
             client.select(&prepared, None, None).map(|_| ())
         })
         .unwrap_err();
@@ -422,11 +419,7 @@ mod tests {
     #[pg_test]
     fn test_owned_prepared_statement() -> Result<(), spi::Error> {
         let prepared = Spi::connect(|client| {
-            Ok::<_, spi::Error>(
-                client
-                    .prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]))?
-                    .keep(),
-            )
+            Ok::<_, spi::Error>(client.prepare("SELECT $1", Some(oids_of![i32].to_vec()))?.keep())
         })?;
         let rc = Spi::connect(|client| {
             client.select(&prepared, None, Some(vec![42.into_datum()]))?.first().get::<i32>(1)
