@@ -74,6 +74,7 @@
 #include "commands/extension.h"
 #include "commands/prepare.h"
 #include "commands/proclang.h"
+#include "commands/progress.h"
 #include "commands/seclabel.h"
 #include "commands/tablespace.h"
 #include "commands/tablecmds.h"
