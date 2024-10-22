@@ -33,12 +33,12 @@ syn.workspace = true
 thiserror.workspace = true
 
 convert_case = "0.6.0"
-petgraph = "0.6.4"
+petgraph = "0.6.5"
 unescape = "0.1.0" # for escaped-character-handling
 
 # colorized sql output
 owo-colors = { optional = true, workspace = true }
-syntect = { version = "5.1.0", default-features = false, features = ["default-fancy"], optional = true }
+syntect = { version = "5.2.0", default-features = false, features = ["default-fancy"], optional = true }
 
 [lints.clippy]
 assigning-clones = "allow" # wrong diagnosis and wrong suggestions
