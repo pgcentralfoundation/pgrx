@@ -55,7 +55,7 @@ pub enum GucContext {
 }
 
 bitflags! {
-    #[derive(Default)]
+    #[derive(Default, Copy, Clone)]
     /// Flags to control special behaviour for the GUC that these are set on. See their
     /// descriptions below for their behaviour.
     pub struct GucFlags: i32 {

@@ -174,6 +174,9 @@ mod tests {
 
     #[pg_test]
     fn test_guc_flags() {
+        // variable ensures that GucFlags is Copy, so single name can be used when defining
+        // multiple gucs
+        let no_show_flag = GucFlags::NO_SHOW_ALL;
         static GUC_NO_SHOW: GucSetting<bool> = GucSetting::<bool>::new(true);
         static GUC_NO_RESET_ALL: GucSetting<bool> = GucSetting::<bool>::new(true);
         GucRegistry::define_bool_guc(
@@ -182,7 +185,7 @@ mod tests {
             "test no show gucs",
             &GUC_NO_SHOW,
             GucContext::Userset,
-            GucFlags::NO_SHOW_ALL,
+            no_show_flag,
         );
         GucRegistry::define_bool_guc(
             "test.no_reset_all",
