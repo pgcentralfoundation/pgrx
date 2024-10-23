@@ -41,11 +41,6 @@ jobslot = "0.2.12" # as seen in gmake -j{N}
 semver = "1.0.20" # checking pgrx versions match
 tempfile = "3.8.0"
 
-# SQL schema generation
-object = { version = "0.32.1", default-features = false, features = [ "std" ] }
-proc-macro2.workspace = true
-quote.workspace = true
-
 # emit better diagnostics
 color-eyre = "0.6.2"
 eyre.workspace = true
@@ -62,6 +57,18 @@ serde-xml-rs = "0.6.0"
 tar = "0.4.40"
 ureq = { version = "2.8.0", default-features = false, features = [ "gzip" ] }
 url.workspace = true
+
+# SQL schema generation
+proc-macro2.workspace = true
+quote.workspace = true
+[dependencies.object]
+version = "0.32.2"
+default-features = false
+features = [
+    "read_core", "std", # we use object read-only and like having actual errors
+    "coff", "elf", "macho", "pe", "xcoff", # support all object formats to allow cross-builds
+]
+
 
 [features]
 default = ["rustls"]
