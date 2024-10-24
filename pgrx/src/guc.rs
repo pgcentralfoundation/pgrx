@@ -55,12 +55,12 @@ pub enum GucContext {
 }
 
 bitflags! {
-    #[derive(Default)]
+    #[derive(Default, Copy, Clone)]
     /// Flags to control special behaviour for the GUC that these are set on. See their
     /// descriptions below for their behaviour.
     pub struct GucFlags: i32 {
         /// Exclude from SHOW ALL
-        const NO_SHOW_ALL = pg_sys::GUC_NO_SHOW_ALL as i32;
+        const NO_SHOW_ALL = pg_sys::GUC_NO_SHOW_ALL as i32 | pg_sys::GUC_NOT_IN_SAMPLE as i32;
         /// Exclude from RESET ALL
         const NO_RESET_ALL = pg_sys::GUC_NO_RESET_ALL as i32;
         /// Auto-report changes to client

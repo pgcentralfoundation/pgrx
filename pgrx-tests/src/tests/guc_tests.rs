@@ -171,4 +171,58 @@ mod tests {
         Spi::run("SET test.enum = 'three'").expect("SPI failed");
         assert_eq!(GUC.get(), TestEnum::Three);
     }
+
+    #[pg_test]
+    fn test_guc_flags() {
+        // variable ensures that GucFlags is Copy, so single name can be used when defining
+        // multiple gucs
+        let no_show_flag = GucFlags::NO_SHOW_ALL;
+        static GUC_NO_SHOW: GucSetting<bool> = GucSetting::<bool>::new(true);
+        static GUC_NO_RESET_ALL: GucSetting<bool> = GucSetting::<bool>::new(true);
+        GucRegistry::define_bool_guc(
+            "test.no_show",
+            "test no show gucs",
+            "test no show gucs",
+            &GUC_NO_SHOW,
+            GucContext::Userset,
+            no_show_flag,
+        );
+        GucRegistry::define_bool_guc(
+            "test.no_reset_all",
+            "test no reset gucs",
+            "test no reset gucs",
+            &GUC_NO_RESET_ALL,
+            GucContext::Userset,
+            GucFlags::NO_RESET_ALL,
+        );
+
+        // change both, then check that:
+        //  1. no_show does not appear in SHOW ALL while no_reset_all does
+        //  2. no_reset_all is not reset by RESET ALL, while no_show is
+        Spi::run("SET test.no_show TO false;").expect("SPI failed");
+        Spi::run("SET test.no_reset_all TO false;").expect("SPI failed");
+        assert_eq!(GUC_NO_RESET_ALL.get(), false);
+        Spi::connect(|mut client| {
+            let r = client.update("SHOW ALL", None, None).expect("SPI failed");
+
+            let mut no_reset_guc_in_show_all = false;
+            for row in r {
+                // cols of show all: name, setting, description
+                let name: &str = row.get(1).unwrap().unwrap();
+                assert!(!name.contains("test.no_show"));
+                if name.contains("test.no_reset_all") {
+                    no_reset_guc_in_show_all = true;
+                }
+            }
+            assert!(no_reset_guc_in_show_all);
+
+            Spi::run("RESET ALL").expect("SPI failed");
+            assert_eq!(
+                GUC_NO_RESET_ALL.get(),
+                false,
+                "'no_reset_all' should remain unchanged after 'RESET ALL'"
+            );
+            assert_eq!(GUC_NO_SHOW.get(), true, "'no_show' should reset after 'RESET ALL'");
+        });
+    }
 }
