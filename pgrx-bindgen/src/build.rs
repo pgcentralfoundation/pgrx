@@ -331,7 +331,7 @@ fn generate_bindings(
         .wrap_err_with(|| format!("bindgen failed for pg{major_version}"))?;
 
     let oids = extract_oids(&bindgen_output);
-    let rewritten_items = rewrite_items(&bindgen_output, &oids)
+    let rewritten_items = rewrite_items(bindgen_output, &oids)
         .wrap_err_with(|| format!("failed to rewrite items for pg{major_version}"))?;
     let oids = format_builtin_oid_impl(oids);
 
@@ -438,9 +438,10 @@ fn write_rs_file(
 /// Given a token stream representing a file, apply a series of transformations to munge
 /// the bindgen generated code with some postgres specific enhancements
 fn rewrite_items(
-    file: &syn::File,
+    mut file: syn::File,
     oids: &BTreeMap<syn::Ident, Box<syn::Expr>>,
 ) -> eyre::Result<proc_macro2::TokenStream> {
+    rewrite_c_abi_to_c_unwind(&mut file);
     let items_vec = rewrite_oid_consts(&file.items, oids);
     let mut items = apply_pg_guard(&items_vec)?;
     let pgnode_impls = impl_pg_node(&items_vec)?;
@@ -829,7 +830,6 @@ fn run_bindgen(
         .wrap_static_fns(enable_cshim)
         .wrap_static_fns_path(out_path.join("pgrx-cshim-static"))
         .wrap_static_fns_suffix("__pgrx_cshim")
-        .override_abi(bindgen::Abi::CUnwind, ".*")
         .generate()
         .wrap_err_with(|| format!("Unable to generate bindings for pg{major_version}"))?;
     let mut binding_str = bindings.to_string();
@@ -1174,6 +1174,23 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
     }
 
     Ok(out)
+}
+
+fn rewrite_c_abi_to_c_unwind(file: &mut syn::File) {
+    use proc_macro2::Span;
+    use syn::visit_mut::VisitMut;
+    use syn::LitStr;
+    pub struct Visitor {}
+    impl VisitMut for Visitor {
+        fn visit_abi_mut(&mut self, abi: &mut syn::Abi) {
+            if let Some(name) = &mut abi.name {
+                if name.value() == "C" {
+                    *name = LitStr::new("C-unwind", Span::call_site());
+                }
+            }
+        }
+    }
+    Visitor {}.visit_file_mut(file);
 }
 
 fn rust_fmt(path: &Path) -> eyre::Result<()> {
