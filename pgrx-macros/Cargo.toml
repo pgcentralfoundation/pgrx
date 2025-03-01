@@ -10,7 +10,7 @@
  
 [package]
 name = "pgrx-macros"
-version = "0.13.0"
+version = "0.13.1"
 authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
 license = "MIT"
 description = "Proc Macros for 'pgrx'"
