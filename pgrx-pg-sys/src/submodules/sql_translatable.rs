@@ -45,6 +45,16 @@ unsafe impl SqlTranslatable for crate::IndexAmRoutine {
         Ok(Returns::One(SqlMapping::literal("internal")))
     }
 }
+
+unsafe impl SqlTranslatable for crate::TableAmRoutine {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("internal"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("internal")))
+    }
+}
+
 unsafe impl SqlTranslatable for crate::FdwRoutine {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("fdw_handler"))
