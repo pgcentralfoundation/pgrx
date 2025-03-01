@@ -308,10 +308,11 @@ impl FromDatum for PgRelation {
         if is_null {
             None
         } else {
-            Some(PgRelation::with_lock(
-                pg_sys::Oid::from(u32::try_from(datum.value()).ok()?),
-                pg_sys::AccessShareLock as pg_sys::LOCKMODE,
-            ))
+            // the `PgRelation` SQL type is `REGCLASS`, which is just an `OID`, so that's how
+            // we'll get the value
+            let oid = pg_sys::Oid::from_datum(datum, false)
+                .expect("regclass oid value should not be null");
+            Some(PgRelation::with_lock(oid, pg_sys::AccessShareLock as pg_sys::LOCKMODE))
         }
     }
 }

@@ -188,7 +188,23 @@ impl FromDatum for pg_sys::Oid {
         if is_null {
             None
         } else {
-            datum.value().try_into().ok().map(|uint: u32| pg_sys::Oid::from(uint))
+            // NB:  Postgres' `DatumGetObjectId()` function is defined as a straight cast
+            // rather than assuming the Datum's pointer value is itself a valid unsigned int:
+            //
+            // ```c
+            // /*
+            //  * DatumGetObjectId
+            //  *		Returns object identifier value of a datum.
+            //  */
+            // static inline Oid
+            // DatumGetObjectId(Datum X)
+            // {
+            // 	return (Oid) X;
+            // }
+            // ```
+
+            let oid_as_u32 = datum.value() as u32;
+            Some(pg_sys::Oid::from(oid_as_u32))
         }
     }
 }
