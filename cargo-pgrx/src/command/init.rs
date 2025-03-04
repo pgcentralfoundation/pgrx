@@ -72,6 +72,9 @@ pub(crate) struct Init {
     base_testing_port: Option<u16>,
     #[clap(long, help = "Additional flags to pass to the configure script")]
     configure_flag: Vec<String>,
+    /// Do not attempt to run any compiled postgresql binaries. Useful for cross compiling.
+    #[clap(long)]
+    no_run: bool,
     /// Compile PostgreSQL with the necessary flags to detect a good amount of
     /// memory errors when run under Valgrind.
     ///
@@ -220,13 +223,15 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
     for pg_config in output_configs.iter() {
         validate_pg_config(pg_config)?;
 
-        if is_root_user() {
-            println!("{} initdb as current user is root user", "   Skipping".bold().green());
-        } else {
-            let datadir = pg_config.data_dir()?;
-            let bindir = pg_config.bin_dir()?;
-            if !datadir.try_exists()? {
-                initdb(&bindir, &datadir)?;
+        if !init.no_run {
+            if is_root_user() {
+                println!("{} initdb as current user is root user", "   Skipping".bold().green());
+            } else {
+                let datadir = pg_config.data_dir()?;
+                let bindir = pg_config.bin_dir()?;
+                if !datadir.try_exists()? {
+                    initdb(&bindir, &datadir)?;
+                }
             }
         }
     }
