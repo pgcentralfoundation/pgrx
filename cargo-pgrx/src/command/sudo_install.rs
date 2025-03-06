@@ -18,6 +18,7 @@ pub(crate) struct SudoInstall {
     pg_config: Option<PathBuf>,
     out_dir: Option<PathBuf>,
     features: clap_cargo::Features,
+    target: Option<String>,
     verbose: u8,
 }
 
@@ -32,6 +33,7 @@ impl From<Install> for SudoInstall {
             pg_config: value.pg_config.map(PathBuf::from),
             out_dir: None,
             features: value.features,
+            target: value.target,
             verbose: value.verbose,
         }
     }
@@ -49,6 +51,7 @@ impl From<SudoInstall> for Package {
             out_dir: value.out_dir,
             features: value.features,
             verbose: value.verbose,
+            target: value.target,
         }
     }
 }
