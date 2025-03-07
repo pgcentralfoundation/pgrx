@@ -236,7 +236,7 @@ $ cargo pgrx start all
     Starting Postgres v13 on port 28813
     Starting Postgres v14 on port 28814
     Starting Postgres v15 on port 28815
-    Starting Postgres v15 on port 28816
+    Starting Postgres v16 on port 28816
 
 $ cargo pgrx status all
 Postgres v12 is running
