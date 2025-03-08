@@ -156,6 +156,7 @@
 #include "tcop/pquery.h"
 #include "tcop/tcopprot.h"
 #include "tcop/utility.h"
+#include "tsearch/ts_cache.h"
 #include "tsearch/ts_public.h"
 #include "tsearch/ts_utils.h"
 #include "utils/acl.h"
