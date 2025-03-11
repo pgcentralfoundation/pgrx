@@ -358,9 +358,9 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
                         if att.atttypid != array_of_composite_type_oid {
                             return Err(TryFromDatumError::IncompatibleTypes {
                                 rust_type: std::any::type_name::<T>(),
-                                rust_oid: att.atttypid,
-                                datum_type: lookup_type_name(array_of_composite_type_oid),
-                                datum_oid: array_of_composite_type_oid,
+                                rust_oid: array_of_composite_type_oid,
+                                datum_type: lookup_type_name(att.atttypid),
+                                datum_oid: att.atttypid,
                             });
                         }
                     } else {
@@ -372,9 +372,9 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
                         if !is_compatible_composite_types && !T::is_compatible_with(att.atttypid) {
                             return Err(TryFromDatumError::IncompatibleTypes {
                                 rust_type: std::any::type_name::<T>(),
-                                rust_oid: att.atttypid,
-                                datum_type: lookup_type_name(type_oid),
-                                datum_oid: type_oid,
+                                rust_oid: type_oid,
+                                datum_type: lookup_type_name(att.atttypid),
+                                datum_oid: att.atttypid,
                             });
                         }
                     }
