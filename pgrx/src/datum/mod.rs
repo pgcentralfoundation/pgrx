@@ -171,7 +171,22 @@ impl<'src> DatumWithOid<'src> {
     ///
     /// [`Oid`]: pg_sys::Oid
     pub unsafe fn new<T: IntoDatum>(value: T, oid: pg_sys::Oid) -> Self {
-        Self { datum: value.into_datum().map(|d| Datum(d, PhantomData::default())), oid }
+        Self::new_from_datum(value.into_datum().map(|d| Datum(d, PhantomData::default())), oid)
+    }
+
+    /// Construct a `DatumWithOid` given an optional [`Datum`] and [`Oid`].
+    ///
+    /// SQL NULL is represented by passing `None` for `datum`.
+    ///
+    /// [`Datum`]: crate::datum::Datum
+    /// [`Oid`]: pg_sys::Oid
+    pub unsafe fn new_from_datum(datum: Option<Datum<'src>>, oid: pg_sys::Oid) -> Self {
+        Self { datum, oid }
+    }
+
+    /// Constructs a `DatumWithOid` representing SQL NULL
+    pub fn null_oid(oid: pg_sys::Oid) -> Self {
+        Self { datum: None, oid }
     }
 
     /// Construct a `DatumWithOid` containing a null value for type `T`.
