@@ -125,7 +125,7 @@ pub unsafe fn HeapTupleHeaderGetRawXmin(tup: *const HeapTupleHeaderData) -> Tran
     // )
     unsafe {
         // SAFETY:  caller has asserted `tup` is a valid HeapTupleHeader pointer
-        (*tup).t_choice.t_heap.t_xmin
+        (*tup).t_choice.t_heap.t_xmin as _
     }
 }
 

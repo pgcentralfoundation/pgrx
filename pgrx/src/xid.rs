@@ -9,6 +9,13 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::pg_sys;
 
+#[cfg(all(xid8, feature = "unsafe-postgres"))]
+#[inline]
+pub fn xid_to_64bit(xid: pg_sys::TransactionId) -> u64 {
+    xid
+}
+
+#[cfg(not(xid8))]
 #[inline]
 pub fn xid_to_64bit(xid: pg_sys::TransactionId) -> u64 {
     let full_xid = unsafe { pg_sys::ReadNextFullTransactionId() };
@@ -19,6 +26,7 @@ pub fn xid_to_64bit(xid: pg_sys::TransactionId) -> u64 {
     convert_xid_common(xid, last_xid, epoch)
 }
 
+#[cfg(not(xid8))]
 #[inline]
 fn convert_xid_common(xid: pg_sys::TransactionId, last_xid: u32, epoch: u32) -> u64 {
     /* return special xid's as-is */
