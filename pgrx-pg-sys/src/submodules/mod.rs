@@ -8,6 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 pub mod datum;
+pub mod transaction_id;
 #[macro_use]
 pub mod elog;
 pub mod cmp;
@@ -27,6 +28,7 @@ pub mod utils;
 mod sql_translatable;
 
 pub use datum::Datum;
+pub use transaction_id::{MultiXactId, TransactionId};
 
 pub use htup::*;
 pub use oids::*;

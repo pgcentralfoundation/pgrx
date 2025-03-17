@@ -21,7 +21,7 @@ mod tests {
 
     #[pg_test]
     fn test_convert_xid_to_u64() {
-        let xid = xid_to_64bit(32768);
+        let xid = xid_to_64bit(32768.into());
         assert_eq!(xid, 32768)
     }
 }

@@ -24,7 +24,7 @@ use std::process::{Command, Output};
 use std::rc::Rc;
 use syn::{Item, ItemConst};
 
-const BLOCKLISTED_TYPES: [&str; 3] = ["Datum", "NullableDatum", "Oid"];
+const BLOCKLISTED_TYPES: [&str; 4] = ["Datum", "NullableDatum", "Oid", "TransactionId"];
 
 // These postgres versions were effectively "yanked" by the community, even tho they still exist
 // in the wild.  pgrx will refuse to compile against them
@@ -348,7 +348,7 @@ fn generate_bindings(
             &bindings_file,
             quote! {
                 use crate as pg_sys;
-                use crate::{Datum, Oid, PgNode};
+                use crate::{Datum, MultiXactId, Oid, PgNode, TransactionId};
             },
             is_for_release,
         )
@@ -864,6 +864,8 @@ pub const {module}_{variant}: {ty} = {value};"#,
 fn add_blocklists(bind: bindgen::Builder) -> bindgen::Builder {
     bind.blocklist_type("Datum") // manually wrapping datum for correctness
         .blocklist_type("Oid") // "Oid" is not just any u32
+        .blocklist_type("TransactionId") // "TransactionId" is not just any u32
+        .blocklist_type("MultiXactId") // it's an alias of "TransactionId"
         .blocklist_var("CONFIGURE_ARGS") // configuration during build is hopefully irrelevant
         .blocklist_var("_*(?:HAVE|have)_.*") // header tracking metadata
         .blocklist_var("_[A-Z_]+_H") // more header metadata

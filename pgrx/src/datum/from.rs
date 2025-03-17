@@ -209,6 +209,21 @@ impl FromDatum for pg_sys::Oid {
     }
 }
 
+impl FromDatum for pg_sys::TransactionId {
+    #[inline]
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: pg_sys::Oid,
+    ) -> Option<Self> {
+        if is_null {
+            None
+        } else {
+            datum.value().try_into().ok().map(Self::from_u32)
+        }
+    }
+}
+
 /// for bool
 impl FromDatum for bool {
     #[inline]

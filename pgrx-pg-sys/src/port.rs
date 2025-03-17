@@ -10,13 +10,13 @@ pub const MaxOffsetNumber: super::OffsetNumber =
     (super::BLCKSZ as usize / std::mem::size_of::<super::ItemIdData>()) as super::OffsetNumber;
 pub const InvalidBlockNumber: u32 = 0xFFFF_FFFF as crate::BlockNumber;
 pub const VARHDRSZ: usize = std::mem::size_of::<super::int32>();
-pub const InvalidTransactionId: super::TransactionId = 0 as super::TransactionId;
 pub const InvalidCommandId: super::CommandId = (!(0 as super::CommandId)) as super::CommandId;
 pub const FirstCommandId: super::CommandId = 0 as super::CommandId;
-pub const BootstrapTransactionId: super::TransactionId = 1 as super::TransactionId;
-pub const FrozenTransactionId: super::TransactionId = 2 as super::TransactionId;
-pub const FirstNormalTransactionId: super::TransactionId = 3 as super::TransactionId;
-pub const MaxTransactionId: super::TransactionId = 0xFFFF_FFFF as super::TransactionId;
+pub const InvalidTransactionId: crate::TransactionId = crate::TransactionId::INVALID;
+pub const BootstrapTransactionId: crate::TransactionId = crate::TransactionId::BOOTSTRAP;
+pub const FrozenTransactionId: crate::TransactionId = crate::TransactionId::FROZEN;
+pub const FirstNormalTransactionId: crate::TransactionId = crate::TransactionId::FIRST_NORMAL;
+pub const MaxTransactionId: crate::TransactionId = crate::TransactionId::MAX;
 
 /// Given a valid HeapTuple pointer, return address of the user data
 ///
