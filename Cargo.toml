@@ -62,7 +62,7 @@ pgrx-pg-config = { path = "./pgrx-pg-config", version = "=0.13.1" }
 pgrx-bindgen = { path = "./pgrx-bindgen", version = "=0.13.1" }
 
 cargo_metadata = "0.18.0"
-cargo-edit = "=0.13.1" # format-preserving edits to cargo.toml
+cargo-edit = "=0.13.2" # format-preserving edits to cargo.toml
 cargo_toml = "0.21" # used for building projects
 clap-cargo = { version = "0.14.0", features = ["cargo_metadata"] }
 eyre = "~0.6.12" # simplifies error-handling
