@@ -1197,9 +1197,28 @@ fn rust_fmt(path: &Path) -> eyre::Result<()> {
     // We shouldn't hit this path in a case where we care about it, but... just
     // in case we probably should respect RUSTFMT.
     let rustfmt = env_tracked("RUSTFMT").unwrap_or_else(|| "rustfmt".into());
-    let out = run_command(Command::new(rustfmt).arg(path).current_dir("."), "[bindings_diff]");
+    let mut command = Command::new(rustfmt);
+    command.arg(path).args(&["--edition", "2024"]).current_dir(".");
+
+    let out = run_command(&mut command, "[bindings_diff]");
     match out {
-        Ok(_) => Ok(()),
+        Ok(output) if output.status.success() => Ok(()),
+        Ok(output) => {
+            let rustfmt_output = format!(
+                r#"Problems running rustfmt: {command:?}:
+                {}
+                {}"#,
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr)
+            );
+
+            for line in rustfmt_output.lines() {
+                println!("cargo:warning={}", line);
+            }
+
+            // we won't fail the build because rustfmt failed
+            Ok(())
+        }
         Err(e)
             if e.downcast_ref::<std::io::Error>()
                 .ok_or(eyre!("Couldn't downcast error ref"))?
