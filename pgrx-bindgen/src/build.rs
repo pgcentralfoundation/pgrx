@@ -1009,11 +1009,14 @@ fn build_shim(
     std::fs::copy(shim_src, shim_dst).unwrap();
 
     let mut build = cc::Build::new();
-    if let Some("msvc") = env_tracked("CARGO_CFG_TARGET_ENV").as_deref() {
-        // without this, pgrx_embed would be linked to postgres.lib
-        build.compiler("clang");
-        build.archiver("llvm-lib");
-        build.flag("-flto=thin");
+    let compiler = build.get_compiler();
+    if compiler.is_like_gnu() || compiler.is_like_clang() {
+        build.flag("-ffunction-sections");
+        build.flag("-fdata-sections");
+    }
+    if compiler.is_like_msvc() {
+        build.flag("/Gy");
+        build.flag("/Gw");
     }
     for pg_target_include in pg_target_includes(major_version, pg_config)?.iter() {
         build.flag(&format!("-I{pg_target_include}"));
