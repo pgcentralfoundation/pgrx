@@ -17,6 +17,25 @@ use pgrx_sql_entity_graph::metadata::{
 use std::ops::Deref;
 use std::os::raw::c_char;
 
+macro_rules! pgstat_count_impl {
+    ($name:ident, $new_field:ident, $old_field:ident) => {
+        pub fn $name(&mut self) {
+            let info = self.pgstat_info;
+            unsafe {
+                #[cfg(any(feature = "pg16", feature = "pg17"))]
+                if self.should_count_relation() {
+                    (*info).counts.$new_field += 1;
+                }
+
+                #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+                if self.should_count_relation() {
+                    (*info).t_counts.$old_field += 1;
+                }
+            }
+        }
+    };
+}
+
 pub struct PgRelation {
     boxed: PgBox<pg_sys::RelationData>,
     need_close: bool,
@@ -289,6 +308,46 @@ impl PgRelation {
     pub fn to_owned(mut self) -> Self {
         self.need_close = true;
         self
+    }
+
+    #[inline(always)]
+    fn should_count_relation(&mut self) -> bool {
+        if !self.pgstat_info.is_null() {
+            return true;
+        }
+
+        #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+        if self.pgstat_enabled {
+            unsafe {
+                pg_sys::pgstat_assoc_relation(self.as_ptr());
+                assert!(!self.pgstat_info.is_null());
+                return true;
+            }
+        }
+
+        false
+    }
+
+    pgstat_count_impl!(count_heap_scan, numscans, t_numscans);
+    pgstat_count_impl!(count_heap_getnext, tuples_returned, t_tuples_returned);
+    pgstat_count_impl!(count_heap_fetch, tuples_fetched, t_tuples_fetched);
+    pgstat_count_impl!(count_index_scan, numscans, t_numscans);
+    pgstat_count_impl!(count_buffer_read, blocks_fetched, t_blocks_fetched);
+    pgstat_count_impl!(count_buffer_hit, blocks_hit, t_blocks_hit);
+
+    pub fn count_index_tuples(&mut self, n: i64) {
+        let info = self.pgstat_info;
+        unsafe {
+            #[cfg(any(feature = "pg16", feature = "pg17"))]
+            if self.should_count_relation() {
+                (*info).counts.tuples_returned += n;
+            }
+
+            #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+            if self.should_count_relation() {
+                (*info).t_counts.t_tuples_returned += n;
+            }
+        }
     }
 }
 
