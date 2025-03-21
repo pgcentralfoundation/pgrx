@@ -746,7 +746,7 @@ impl<'fcx> FcInfo<'fcx> {
     pub fn get_collation(&self) -> Option<pg_sys::Oid> {
         // SAFETY: see FcInfo::from_ptr
         let fcinfo = unsafe { self.0.as_mut() }.unwrap();
-        (fcinfo.fncollation.as_u32() != 0).then_some(fcinfo.fncollation)
+        (fcinfo.fncollation.to_u32() != 0).then_some(fcinfo.fncollation)
     }
 
     /// Retrieve the type (as an Oid) of argument number `num`.

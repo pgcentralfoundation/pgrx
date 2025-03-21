@@ -24,7 +24,7 @@ mod tests {
     fn test_reasonable_oid() -> spi::Result<()> {
         let oid = Spi::get_one::<pg_sys::Oid>("SELECT tests.oid_roundtrip(42)")?
             .expect("SPI result was null");
-        assert_eq!(oid.as_u32(), 42);
+        assert_eq!(oid.to_u32(), 42);
         Ok(())
     }
 
@@ -33,7 +33,7 @@ mod tests {
         // nb:  this stupid value is greater than i32::MAX
         let oid = Spi::get_one::<pg_sys::Oid>("SELECT tests.oid_roundtrip(2147483648)")?
             .expect("SPI result was null");
-        assert_eq!(oid.as_u32(), 2_147_483_648);
+        assert_eq!(oid.to_u32(), 2_147_483_648);
         Ok(())
     }
 }

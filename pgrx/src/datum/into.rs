@@ -226,7 +226,7 @@ impl IntoDatum for pg_sys::Oid {
         if self == pg_sys::Oid::INVALID {
             None
         } else {
-            Some(pg_sys::Datum::from(self.as_u32()))
+            Some(pg_sys::Datum::from(self.to_u32()))
         }
     }
 
