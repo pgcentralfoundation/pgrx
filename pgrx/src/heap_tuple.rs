@@ -381,11 +381,31 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
                 }
             }
 
+            self.set_by_index_unchecked(attno, value.into_datum());
+            Ok(())
+        }
+    }
+
+    /// Given the index for an attribute in this [PgHeapTuple], change its value.
+    ///
+    /// Attribute numbers start at 1, not 0.
+    ///
+    /// This will not check if the datum is compatible with the attribute's type.
+    ///
+    /// ## Safety
+    ///
+    /// This function is unsafe as it does not check if the datum is compatible with the attribute's type.
+    pub unsafe fn set_by_index_unchecked(
+        &mut self,
+        attno: NonZeroUsize,
+        value: Option<pg_sys::Datum>,
+    ) {
+        unsafe {
             let mut datums = (0..self.tupdesc.len()).map(pg_sys::Datum::from).collect::<Vec<_>>();
             let mut nulls = (0..self.tupdesc.len()).map(|_| false).collect::<Vec<_>>();
             let mut do_replace = (0..self.tupdesc.len()).map(|_| false).collect::<Vec<_>>();
 
-            let datum = value.into_datum();
+            let datum = value;
             let attno = attno.get() - 1;
 
             nulls[attno] = datum.is_none();
@@ -403,7 +423,6 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
             );
             let old_tuple = std::mem::replace(&mut self.tuple, new_tuple);
             drop(old_tuple);
-            Ok(())
         }
     }
 }
