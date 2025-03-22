@@ -401,10 +401,8 @@ const DATE_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum
 
 #[cfg(any(feature = "pg12", feature = "pg13"))]
 mod pg12_13 {
-    use crate as pgrx; // for [pg_guard]
     use crate::prelude::*;
 
-    #[pg_guard]
     pub(super) unsafe fn date_part(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         // we need to first convert the `date` value into a `timestamp` value
         // then call the `timestamp_part` function.
