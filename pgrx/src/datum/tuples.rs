@@ -15,8 +15,8 @@ where
     B: IntoDatum,
 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let vec = vec![self.0.into_datum(), self.1.into_datum()];
-        vec.into_datum()
+        let arr = [self.0.into_datum(), self.1.into_datum()];
+        arr.into_datum()
     }
 
     fn type_oid() -> pg_sys::Oid {
@@ -31,8 +31,8 @@ where
     C: IntoDatum,
 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let vec = vec![self.0.into_datum(), self.1.into_datum(), self.2.into_datum()];
-        vec.into_datum()
+        let arr = [self.0.into_datum(), self.1.into_datum(), self.2.into_datum()];
+        arr.into_datum()
     }
 
     fn type_oid() -> pg_sys::Oid {
