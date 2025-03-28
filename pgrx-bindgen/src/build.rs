@@ -1198,7 +1198,7 @@ fn rust_fmt(path: &Path) -> eyre::Result<()> {
     // in case we probably should respect RUSTFMT.
     let rustfmt = env_tracked("RUSTFMT").unwrap_or_else(|| "rustfmt".into());
     let mut command = Command::new(rustfmt);
-    command.arg(path).args(&["--edition", "2024"]).current_dir(".");
+    command.arg(path).args(&["--edition", "2021"]).current_dir(".");
 
     let out = run_command(&mut command, "[bindings_diff]");
     match out {
