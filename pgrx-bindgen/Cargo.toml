@@ -22,3 +22,4 @@ clang-sys = { version = "1", features = ["clang_6_0", "runtime"] }
 quote = "1.0.38"
 shlex = "1.3" # shell lexing, also used by many of our deps
 cc = "1.2"
+prettyplease = "0.2.31"
