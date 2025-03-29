@@ -14,7 +14,7 @@ use pgrx_sql_entity_graph::metadata::{
 pub type MultiXactId = TransactionId;
 
 /// An `xid` type from PostgreSQL
-#[repr(C)]
+#[repr(transparent)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct TransactionId(u32);
