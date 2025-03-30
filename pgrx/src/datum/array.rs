@@ -1019,6 +1019,7 @@ fn array_datum_from_iter<T: IntoDatum>(elements: impl Iterator<Item = T>) -> Opt
         pg_sys::initArrayResult(
             T::type_oid(),
             PgMemoryContexts::CurrentMemoryContext.value(),
+            // All elements use the same memory context
             false,
         )
     };
@@ -1037,14 +1038,10 @@ fn array_datum_from_iter<T: IntoDatum>(elements: impl Iterator<Item = T>) -> Opt
         }
     }
 
-    if state.is_null() {
-        // shouldn't happen
-        None
-    } else {
-        Some(unsafe {
-            pg_sys::makeArrayResult(state, PgMemoryContexts::CurrentMemoryContext.value())
-        })
-    }
+    // Should not happen: {init, accum}ArrayResult both return non-null pointers
+    assert!(!state.is_null());
+
+    Some(unsafe { pg_sys::makeArrayResult(state, PgMemoryContexts::CurrentMemoryContext.value()) })
 }
 
 impl<T> IntoDatum for Vec<T>
