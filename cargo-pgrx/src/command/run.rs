@@ -91,7 +91,7 @@ impl CommandExecute for Run {
             self.pgcli,
             &self.features,
             self.install_only,
-            self.target.as_ref().map(|x| x.as_str())
+            self.target.as_ref().map(|x| x.as_str()),
         )
     }
 }

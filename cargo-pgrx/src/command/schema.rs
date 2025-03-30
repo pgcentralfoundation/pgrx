@@ -222,7 +222,11 @@ pub(crate) fn generate_schema(
     Ok(())
 }
 
-fn compute_symbols(profile: &CargoProfile, lib_filename: &str, target: Option<&str>) -> eyre::Result<Vec<String>> {
+fn compute_symbols(
+    profile: &CargoProfile,
+    lib_filename: &str,
+    target: Option<&str>,
+) -> eyre::Result<Vec<String>> {
     use object::Object;
     use std::collections::HashSet;
 
