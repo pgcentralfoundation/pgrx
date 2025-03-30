@@ -188,6 +188,26 @@ my_extension=# SELECT hello_my_extension();
 
 For more details on how to manage pgrx extensions see [Managing pgrx extensions](cargo-pgrx/README.md).
 
+## Cross-compiling
+
+So far, cross-compiling extensions with pgrx has only been demonstrated under [nix](https://nixos.org/).
+Proper support in nixpkgs is still in flux, so watch this space.
+
+In order to cross-compile outside of nix, you will need two ingredients:
+
+1) A sysroot for the cross architecture, with rust configured to invoke the linker with flags to link against this sysroot.
+2) A `pg_config` program that provides values associated with postgres compiled for the desired cross architecture.
+   This can be achieved by either emulating pg_config with qemu-user or similar, or replicating pg_config with a shell script.
+
+Then, modify the standard build process in the following ways:
+
+1) Pass `--no-run` to `cargo pgrx init`, since we cannot run postgres for the cross machine.
+2) Pass one of the `--pgXX` flags to `cargo pgrx init` with the aforementioned `pg_config`.
+3) Pass the `--pg-config` flag to `cargo pgrx package` with the aforementioned `pg_config`.
+4) Pass the `--target` flag to `cargo pgrx package` with the rust triple of the cross machine.
+
+`cargo pgrx run` will not not work.
+
 ## Upgrading
 
 As new Postgres versions are supported by `pgrx`, you can re-run the `pgrx init` process to download and compile them:
