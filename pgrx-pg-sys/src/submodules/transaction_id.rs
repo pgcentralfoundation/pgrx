@@ -21,19 +21,17 @@ pub type MultiXactId = TransactionId;
 pub struct TransactionId(u32);
 
 impl TransactionId {
-    pub const INVALID: Self = Self::from_u32(0);
-    pub const BOOTSTRAP: Self = Self::from_u32(1);
-    pub const FROZEN: Self = Self::from_u32(2);
-    pub const FIRST_NORMAL: Self = Self::from_u32(3);
-    pub const MAX: Self = Self::from_u32(u32::MAX);
+    pub const INVALID: Self = Self(0);
+    pub const BOOTSTRAP: Self = Self(1);
+    pub const FROZEN: Self = Self(2);
+    pub const FIRST_NORMAL: Self = Self(3);
+    pub const MAX: Self = Self(u32::MAX);
 
-    #[inline]
-    pub const fn from_u32(xid: u32) -> Self {
+    pub const fn from_inner(xid: u32) -> Self {
         Self(xid)
     }
 
-    #[inline]
-    pub const fn to_u32(self) -> u32 {
+    pub const fn into_inner(self) -> u32 {
         self.0
     }
 }
@@ -47,20 +45,20 @@ impl Default for TransactionId {
 impl From<u32> for TransactionId {
     #[inline]
     fn from(xid: u32) -> Self {
-        Self::from_u32(xid)
+        Self::from_inner(xid)
     }
 }
 
 impl From<TransactionId> for u32 {
     #[inline]
     fn from(xid: TransactionId) -> Self {
-        xid.to_u32()
+        xid.into_inner()
     }
 }
 
 impl From<TransactionId> for crate::Datum {
     fn from(xid: TransactionId) -> Self {
-        xid.to_u32().into()
+        xid.into_inner().into()
     }
 }
 

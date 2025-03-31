@@ -27,7 +27,7 @@ fn convert_xid_common(
 ) -> u64 {
     /* return special xid's as-is */
     if !pg_sys::TransactionIdIsNormal(xid) {
-        return xid.to_u32() as u64;
+        return xid.into_inner() as u64;
     }
 
     /* xid can be on either side when near wrap-around */
@@ -38,5 +38,5 @@ fn convert_xid_common(
         epoch += 1;
     }
 
-    (epoch << 32) | xid.to_u32() as u64
+    (epoch << 32) | xid.into_inner() as u64
 }

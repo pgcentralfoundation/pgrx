@@ -219,7 +219,7 @@ impl FromDatum for pg_sys::TransactionId {
         if is_null {
             None
         } else {
-            datum.value().try_into().ok().map(Self::from_u32)
+            datum.value().try_into().ok().map(Self::from_inner)
         }
     }
 }
