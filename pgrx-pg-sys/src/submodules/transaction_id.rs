@@ -10,12 +10,13 @@
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
+use std::fmt::{Debug, Display, Formatter};
 
 pub type MultiXactId = TransactionId;
 
 /// An `xid` type from PostgreSQL
 #[repr(transparent)]
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct TransactionId(u32);
 
@@ -70,5 +71,17 @@ unsafe impl SqlTranslatable for TransactionId {
 
     fn return_sql() -> Result<Returns, ReturnsError> {
         Ok(Returns::One(SqlMapping::literal("xid")))
+    }
+}
+
+impl Debug for TransactionId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        Debug::fmt(&self.0, f)
+    }
+}
+
+impl Display for TransactionId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        Display::fmt(&self.0, f)
     }
 }
