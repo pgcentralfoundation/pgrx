@@ -193,6 +193,7 @@
 #include "utils/selfuncs.h"
 #include "utils/snapmgr.h"
 #include "utils/sortsupport.h"
+#include "utils/spccache.h"
 #include "utils/catcache.h"
 #include "utils/syscache.h"
 #include "utils/tuplestore.h"
