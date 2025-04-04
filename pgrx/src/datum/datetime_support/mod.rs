@@ -205,7 +205,7 @@ pub trait HasExtractableParts: Clone + IntoDatum + seal::DateTimeType {
             );
             // don't leak the TEXT datum we made
             pg_sys::pfree(field_datum.unwrap().cast_mut_ptr());
-            field_value.map(|v| v.try_into().unwrap())
+            field_value
         }
     }
 }
@@ -517,9 +517,7 @@ impl_wrappers!(
 /// if the `zone` is "CEST", which is GMT+2, then the result is `7200`.
 ///
 /// ## Errors
-///
 /// Returns a [`DateTimeConversionError`] if the specified timezone is unknown to Postgres
-
 #[cfg(any(feature = "pg16", feature = "pg17"))]
 pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, DateTimeConversionError> {
     let zone = zone.as_ref();

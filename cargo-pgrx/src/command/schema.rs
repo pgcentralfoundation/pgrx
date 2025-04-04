@@ -342,7 +342,7 @@ fn first_build(
     }
 
     command.arg("--package");
-    command.arg(format!("{package_name}"));
+    command.arg(package_name);
 
     if let Some(user_manifest_path) = user_manifest_path.as_ref() {
         command.arg("--manifest-path");
@@ -507,7 +507,7 @@ fn second_build(
     command.arg(format!("pgrx_embed_{package_name}"));
 
     command.arg("--package");
-    command.arg(format!("{package_name}"));
+    command.arg(package_name);
 
     if let Some(user_manifest_path) = user_manifest_path.as_ref() {
         command.arg("--manifest-path");

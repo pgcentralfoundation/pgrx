@@ -91,7 +91,7 @@ It is currently expected to work on other "Unix" OS with possible small changes,
  ‡ A local PostgreSQL server installation is not required. On Linux and MacOS, `cargo pgrx` can download and compile PostgreSQL versions on its own. On Windows, `cargo pgrx` downloads precompiled PostgreSQL versions from EnterpriseDB.
 
  ⹋ PGRX has not been tested to work on 32-bit, but the library attempts to handle conversion of `pg_sys::Datum`
-to and from `int8` and `double` types. Use it only for your own risk. We do not plan to add offical support
+to and from `int8` and `double` types. Use it only for your own risk. We do not plan to add official support
 without considerable ongoing technical and financial contributions.
 
 ### macOS

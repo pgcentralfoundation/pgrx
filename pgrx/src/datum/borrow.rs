@@ -79,8 +79,7 @@ where
         // Ptr<Datum> derefs to Datum which to Ptr
         PassBy::Ref => unsafe {
             let datum = ptr.read();
-            let ptr = ptr::NonNull::new(datum.sans_lifetime().cast_mut_ptr());
-            ptr
+            ptr::NonNull::new(datum.sans_lifetime().cast_mut_ptr())
         },
     }
 }

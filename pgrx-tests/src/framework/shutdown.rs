@@ -16,10 +16,7 @@ use std::{any, mem, process};
 /// Note that shutdown hooks are only run on the client, so must be added from
 /// your `setup` function, not the `#[pg_test]` itself.
 #[track_caller]
-pub fn add_shutdown_hook<F: FnOnce()>(func: F)
-where
-    F: Send + 'static,
-{
+pub fn add_shutdown_hook<F: FnOnce() + Send + 'static>(func: F) {
     SHUTDOWN_HOOKS
         .lock()
         .unwrap_or_else(PoisonError::into_inner)

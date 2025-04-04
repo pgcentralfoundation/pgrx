@@ -125,15 +125,15 @@ impl bindgen::callbacks::ParseCallbacks for BindingOverride {
     ) -> Option<bindgen::callbacks::EnumVariantCustomBehavior> {
         enum_name.inspect(|name| match name.strip_prefix("enum").unwrap_or(name).trim() {
             // specifically overridden enum
-            "NodeTag" => return,
-            name if name.contains("unnamed at") || name.contains("anonymous at") => return,
+            "NodeTag" => (),
+            name if name.contains("unnamed at") || name.contains("anonymous at") => (),
             // to prevent problems with BuiltinOid
-            _ if variant_name.contains("OID") => return,
+            _ if variant_name.contains("OID") => (),
             name => self
                 .enum_names
                 .borrow_mut()
                 .entry(name.to_string())
-                .or_insert(Vec::new())
+                .or_default()
                 .push((variant_name.to_string(), variant_value)),
         });
         None
@@ -1020,7 +1020,7 @@ fn build_shim(
         build.flag("/Gw");
     }
     for pg_target_include in pg_target_includes(major_version, pg_config)?.iter() {
-        build.flag(&format!("-I{pg_target_include}"));
+        build.flag(format!("-I{pg_target_include}"));
     }
     for flag in extra_bindgen_clang_args(pg_config)? {
         build.flag(&flag);
@@ -1202,7 +1202,7 @@ fn rust_fmt(path: &Path) -> eyre::Result<()> {
     // in case we probably should respect RUSTFMT.
     let rustfmt = env_tracked("RUSTFMT").unwrap_or_else(|| "rustfmt".into());
     let mut command = Command::new(rustfmt);
-    command.arg(path).args(&["--edition", "2021"]).current_dir(".");
+    command.arg(path).args(["--edition", "2021"]).current_dir(".");
 
     let out = run_command(&mut command, "[bindings_diff]");
     match out {

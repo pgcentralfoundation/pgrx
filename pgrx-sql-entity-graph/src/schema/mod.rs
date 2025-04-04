@@ -18,7 +18,7 @@
 pub mod entity;
 
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{format_ident, quote, ToTokens, TokenStreamExt};
+use quote::{quote, ToTokens, TokenStreamExt};
 use syn::parse::{Parse, ParseStream};
 use syn::ItemMod;
 
@@ -78,7 +78,7 @@ impl Schema {
         };
 
         let sql_graph_entity_fn_name =
-            format_ident!("__pgrx_internals_schema_{}_{}", ident, postfix);
+            quote::format_ident!("__pgrx_internals_schema_{ident}_{postfix}");
         quote! {
             #[no_mangle]
             #[doc(hidden)]

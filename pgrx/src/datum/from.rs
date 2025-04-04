@@ -447,7 +447,7 @@ impl FromDatum for String {
         _typoid: pg_sys::Oid,
     ) -> Option<String> {
         if is_null || datum.is_null() {
-            return None;
+            None
         } else {
             let varlena = pg_sys::pg_detoast_datum_packed(datum.cast_mut_ptr());
             let converted_varlena = convert_varlena_to_str_memoized(varlena);

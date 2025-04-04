@@ -568,16 +568,17 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
         None
     };
 
-    let mut postmaster_args = Vec::new();
-    postmaster_args.push("-i".into());
-    postmaster_args.push("-p".into());
-    postmaster_args.push(pg_config.test_port().expect("unable to determine test port").to_string());
-    postmaster_args.push("-h".into());
-    postmaster_args.push(pg_config.host().into());
-    postmaster_args.push("-c".into());
-    postmaster_args.push("log_destination=stderr".into());
-    postmaster_args.push("-c".into());
-    postmaster_args.push("logging_collector=off".into());
+    let postmaster_args = vec![
+        "-i".into(),
+        "-p".into(),
+        pg_config.test_port().expect("unable to determine test port").to_string(),
+        "-h".into(),
+        pg_config.host().into(),
+        "-c".into(),
+        "log_destination=stderr".into(),
+        "-c".into(),
+        "logging_collector=off".into(),
+    ];
 
     let mut command = if let Some(runas) = get_runas() {
         #[inline]
@@ -711,7 +712,7 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
 
             if line.contains("database system is ready to accept connections") {
                 // Postgres says it's ready to go
-                if let Err(_) = sender.send(session_id.clone()) {
+                if sender.send(session_id.clone()).is_err() {
                     // The channel is closed.  This is really early in the startup process
                     // and likely indicates that a test crashed Postgres
                     panic!("{}: `monitor_pg()`:  failed to send back session_id `{session_id}`.  Did Postgres crash?", "ERROR".red().bold());
@@ -850,9 +851,8 @@ fn get_extension_name() -> eyre::Result<String> {
 fn get_pgdata_path() -> eyre::Result<PathBuf> {
     // Note that this path is turned into an entry in the unix_socket_directories config.
     // Each path has a low limit in maximum bytes, so we should avoid adding needless characters.
-    let mut pgdata_base = std::env::var("CARGO_PGRX_TEST_PGDATA")
-        .map(|path| PathBuf::from(path))
-        .unwrap_or_else(|_| {
+    let mut pgdata_base =
+        std::env::var("CARGO_PGRX_TEST_PGDATA").map(PathBuf::from).unwrap_or_else(|_| {
             let mut target_dir = get_target_dir()
                 .unwrap_or_else(|e| panic!("Failed to determine the crate target directory: {e}"));
             // ./test-data or ./pgdata both seem too cryptic
@@ -861,7 +861,7 @@ fn get_pgdata_path() -> eyre::Result<PathBuf> {
         });
 
     // append the postgres version number
-    pgdata_base.push(&format!("{}", pg_sys::get_pg_major_version_num()));
+    pgdata_base.push(format!("{}", pg_sys::get_pg_major_version_num()));
     Ok(pgdata_base)
 }
 
@@ -966,12 +966,7 @@ fn get_cargo_args() -> Vec<String> {
                 && !process.cmd().iter().any(|arg| arg == "pgrx")
             {
                 // ... do we want its args
-                return process
-                    .cmd()
-                    .to_vec()
-                    .into_iter()
-                    .map(|s| s.to_string_lossy().into_owned())
-                    .collect();
+                return process.cmd().iter().map(|s| s.to_string_lossy().into_owned()).collect();
             }
         }
 
@@ -1011,7 +1006,7 @@ fn find_on_path(program: &str) -> Option<PathBuf> {
 }
 
 fn use_valgrind() -> bool {
-    std::env::var_os("USE_VALGRIND").is_some_and(|s| s.len() > 0)
+    std::env::var_os("USE_VALGRIND").is_some_and(|s| !s.is_empty())
 }
 
 /// Create a [`Command`] pre-configured to what the caller decides using `sudo`

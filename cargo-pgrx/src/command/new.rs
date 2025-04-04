@@ -143,7 +143,7 @@ fn create_git_ignore(mut filename: PathBuf, _name: &str) -> Result<(), std::io::
 fn create_pgrx_embed_rs(mut filename: PathBuf) -> Result<(), std::io::Error> {
     filename.push("src");
     filename.push("bin");
-    filename.push(format!("pgrx_embed.rs"));
+    filename.push("pgrx_embed.rs");
     let mut file = std::fs::File::create(filename)?;
     file.write_all(include_bytes!("../templates/pgrx_embed_rs"))?;
     Ok(())

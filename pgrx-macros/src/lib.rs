@@ -208,7 +208,7 @@ pub fn pg_cast(attr: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        let pg_extern = PgExtern::new(pg_extern_attrs.into(), item.clone().into())?.0;
+        let pg_extern = PgExtern::new(pg_extern_attrs, item.clone().into())?.0;
         Ok(CodeEnrichment(pg_extern.as_cast(cast.unwrap_or_default())).to_token_stream().into())
     }
 

@@ -197,14 +197,14 @@ impl RawArray {
         // hoping that doesn't also overflow on multiplication.
         // Also integer promotion doesn't real, so bitcast negatives.
         let dims = self.dims();
-        if dims.len() == 0 {
+        if dims.is_empty() {
             0
         } else {
             // bindgen whiffs MaxArraySize AND MaxAllocSize!
             const MAX_ARRAY_SIZE: u32 = 0x3fffffff / 8;
-            dims.into_iter()
+            dims.iter()
                 .map(|i| *i as u32) // treat negatives as huge
-                .fold(Some(1u32), |prod, d| prod.and_then(|m| m.checked_mul(d)))
+                .try_fold(1u32, |prod, d| prod.checked_mul(d))
                 .filter(|prod| prod <= &MAX_ARRAY_SIZE)
                 .expect("product of array dimensions must be < 2.pow(27)") as usize
         }
@@ -321,6 +321,7 @@ impl RawArray {
     * non-null
     * aligned
     * **validly initialized**, except in the case of [MaybeUninit] types
+
     It is reasonable to assume data Postgres exposes logically to SQL is initialized,
     but it may be incorrect to assume data Postgres has marked "null"
     otherwise follows Rust-level initialization requirements.
