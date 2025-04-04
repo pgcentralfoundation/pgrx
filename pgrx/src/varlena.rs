@@ -109,7 +109,6 @@ pub unsafe fn vartag_size(tag: pg_sys::vartag_external::Type) -> usize {
 /// #define VARSIZE_4B(PTR) \
 /// ((((varattrib_4b *) (PTR))->va_4byte.va_header >> 2) & 0x3FFFFFFF)
 /// ```
-
 #[allow(clippy::cast_ptr_alignment)]
 #[inline]
 pub unsafe fn varsize_4b(ptr: *const pg_sys::varlena) -> usize {
@@ -156,7 +155,6 @@ pub unsafe fn varatt_is_4b(ptr: *const pg_sys::varlena) -> bool {
 /// #define VARATT_IS_4B_U(PTR) \
 /// ((((varattrib_1b *) (PTR))->va_header & 0x03) == 0x00)
 /// ```
-
 #[allow(clippy::verbose_bit_mask)]
 #[inline]
 pub unsafe fn varatt_is_4b_u(ptr: *const pg_sys::varlena) -> bool {

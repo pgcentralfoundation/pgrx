@@ -160,7 +160,7 @@ fn prepare<'conn>(
         pg_sys::SPI_prepare(
             cmd.as_ptr(),
             args.len() as i32,
-            args.into_iter().map(|arg| arg.value()).collect::<Vec<_>>().as_mut_ptr(),
+            args.iter().map(|arg| arg.value()).collect::<Vec<_>>().as_mut_ptr(),
         )
     };
     Ok(PreparedStatement {
@@ -325,7 +325,7 @@ impl<'conn> PreparedStatement<'conn> {
         let expected = unsafe { pg_sys::SPI_getargcount(self.plan.as_ptr()) } as usize;
 
         if expected == actual {
-            Ok(args.into_iter().map(prepare_datum).unzip())
+            Ok(args.iter().map(prepare_datum).unzip())
         } else {
             Err(SpiError::PreparedStatementArgumentMismatch { expected, got: actual })
         }

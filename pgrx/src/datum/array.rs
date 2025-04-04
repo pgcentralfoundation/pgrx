@@ -229,11 +229,11 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
         }
         match self.null_slice.get_inner().map(|v| (v, v.is_null(index))) {
             // No null_slice, strict array.
-            None => self.get_strict_inner(index).map(|elem| Some(elem)),
+            None => self.get_strict_inner(index).map(Some),
             // self.null_slice exists but index is not in bounds.
-            Some((_, None)) => return None,
+            Some((_, None)) => None,
             // Elem is null
-            Some((_, Some(true))) => return Some(None),
+            Some((_, Some(true))) => Some(None),
             // Elem is not null.
             Some((nulls, Some(false))) => self.get_nullable_inner(nulls, index),
         }

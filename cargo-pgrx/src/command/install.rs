@@ -402,7 +402,7 @@ fn copy_sql_files(
 #[tracing::instrument(level = "error", skip_all)]
 pub(crate) fn find_library_file(
     manifest: &Manifest,
-    build_command_messages: &Vec<CargoMessage>,
+    build_command_messages: &[CargoMessage],
 ) -> eyre::Result<PathBuf> {
     use std::env::consts::{DLL_EXTENSION, DLL_SUFFIX};
 
@@ -415,7 +415,7 @@ pub(crate) fn find_library_file(
     // you might think this is being silly but they do periodically change outputs. these changes
     // often seem to be unintentional, but they're real, so...
     let library_file = build_command_messages
-        .into_iter()
+        .iter()
         .filter_map(|msg| match msg {
             CargoMessage::CompilerArtifact(artifact) => Some(artifact),
             _ => None,

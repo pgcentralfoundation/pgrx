@@ -65,7 +65,7 @@ pub unsafe trait ArgAbi<'fcx>: Sized {
     ///
     /// # Safety
     /// - The argument's datum must have the matching "logical type" that can be "unboxed" from the
-    /// datum's object type.
+    ///   datum's object type.
     /// - Calling this with a null argument and a non-null type is *undefined behavior*.
     unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self;
 
@@ -73,7 +73,7 @@ pub unsafe trait ArgAbi<'fcx>: Sized {
     ///
     /// # Safety
     /// - The argument's datum must have the matching "logical type" that can be "unboxed" from the
-    /// datum's object type.
+    ///   datum's object type.
     /// - Calling this with a null argument and a non-null type is *undefined behavior*.
     ///
     /// # Note to implementers
@@ -469,16 +469,14 @@ where
     }
 
     unsafe fn fill_fcinfo_fcx(&self, fcinfo: pg_sys::FunctionCallInfo) {
-        match self {
-            Ok(value) => unsafe { value.fill_fcinfo_fcx(fcinfo) },
-            Err(_) => (),
+        if let Ok(value) = self {
+            unsafe { value.fill_fcinfo_fcx(fcinfo) }
         }
     }
 
     unsafe fn move_into_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
-        match self {
-            Ok(value) => unsafe { value.move_into_fcinfo_fcx(fcinfo) },
-            Err(_) => (),
+        if let Ok(value) = self {
+            unsafe { value.move_into_fcinfo_fcx(fcinfo) }
         }
     }
 
@@ -806,7 +804,7 @@ impl<'fcx> FcInfo<'fcx> {
     pub unsafe fn init_multi_func_call(&mut self) -> &'fcx mut pg_sys::FuncCallContext {
         unsafe {
             let fcx: *mut pg_sys::FuncCallContext = pg_sys::init_MultiFuncCall(self.0);
-            debug_assert!(fcx.is_null() == false);
+            debug_assert!(!fcx.is_null());
             &mut *fcx
         }
     }
@@ -820,7 +818,7 @@ impl<'fcx> FcInfo<'fcx> {
     pub(crate) unsafe fn deref_fcx(&mut self) -> &'fcx mut pg_sys::FuncCallContext {
         unsafe {
             let fcx: *mut pg_sys::FuncCallContext = (*(*self.0).flinfo).fn_extra.cast();
-            debug_assert!(fcx.is_null() == false);
+            debug_assert!(!fcx.is_null());
             &mut *fcx
         }
     }
@@ -887,9 +885,9 @@ impl<'a, 'fcx> Arg<'a, 'fcx> {
 
     /// # Safety
     /// - The argument's datum must have the matching "logical type" that can be "unboxed" from the
-    /// datum's object type.
+    ///   datum's object type.
     /// - If `T` cannot represent null arguments, calling this if the next arg is null is
-    /// *undefined behavior*.
+    ///   *undefined behavior*.
     /// - If `T` is pass-by-reference, calling this if the next arg is null is *undefined behavior*.
     pub unsafe fn unbox_unchecked<T: ArgAbi<'fcx>>(self) -> T {
         unsafe { <T as ArgAbi<'fcx>>::unbox_arg_unchecked(self) }
@@ -925,9 +923,9 @@ impl<'a, 'fcx> Args<'a, 'fcx> {
 
     /// # Safety
     /// - The argument's datum must have the matching "logical type" that can be "unboxed" from the
-    /// datum's object type.
+    ///   datum's object type.
     /// - In particular, if `T` cannot represent null arguments, calling this if the next arg is null is
-    /// *undefined behavior*.
+    ///   *undefined behavior*.
     pub unsafe fn next_arg_unchecked<T: ArgAbi<'fcx>>(&mut self) -> Option<T> {
         if T::is_virtual_arg() {
             // SAFETY: trivial condition
@@ -940,7 +938,7 @@ impl<'a, 'fcx> Args<'a, 'fcx> {
 
     /// # Safety
     /// - The argument's datum must have the matching "logical type" that can be "unboxed" from the
-    /// datum's object type.
+    ///   datum's object type.
     pub unsafe fn next_arg<T: ArgAbi<'fcx>>(&mut self) -> Option<Nullable<T>> {
         if T::is_virtual_arg() {
             // SAFETY: trivial condition

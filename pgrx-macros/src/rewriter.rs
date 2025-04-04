@@ -47,7 +47,7 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
     let attrs = mem::take(&mut func.attrs);
     let generics = func.sig.generics.clone();
 
-    if !sig.abi.clone().and_then(|abi| abi.name).is_some_and(|name| name.value() == "C-unwind") {
+    if sig.abi.clone().and_then(|abi| abi.name).is_none_or(|name| name.value() != "C-unwind") {
         panic!("#[pg_guard] must be combined with extern \"C-unwind\"");
     }
 
