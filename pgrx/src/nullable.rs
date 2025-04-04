@@ -253,7 +253,7 @@ where
 /// because of the skip behavior
 pub struct BitSliceNulls<'a>(pub &'a BitSlice<u8>);
 
-impl<'a> NullLayout<usize> for BitSliceNulls<'a> {
+impl NullLayout<usize> for BitSliceNulls<'_> {
     /// Returns true if this container has any nulls, checked at run-time.
     /// # Performance
     /// This implementation should be very fast, since all it needs to do
@@ -287,7 +287,7 @@ impl<'a> NullLayout<usize> for BitSliceNulls<'a> {
 
 pub struct BoolSliceNulls<'a>(pub &'a [bool]);
 
-impl<'a> NullLayout<usize> for BoolSliceNulls<'a> {
+impl NullLayout<usize> for BoolSliceNulls<'_> {
     /// Returns true if this container has any nulls, checked at run-time.
     /// # Performance
     /// This implementation requires iterating over one boolean per

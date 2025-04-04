@@ -361,7 +361,7 @@ pub struct Drain<'a, 'cx, T> {
     raw: *mut pg_sys::List,
 }
 
-impl<'a, 'cx, T> Drop for Drain<'a, 'cx, T> {
+impl<T> Drop for Drain<'_, '_, T> {
     fn drop(&mut self) {
         if self.raw.is_null() {
             return;
@@ -425,7 +425,7 @@ impl<'a, T: Enlist> IntoIterator for List<'a, T> {
     }
 }
 
-impl<'a, T> Drop for ListIter<'a, T> {
+impl<T> Drop for ListIter<'_, T> {
     fn drop(&mut self) {
         if let List::Cons(head) = &mut self.list {
             unsafe { destroy_list(head.list.as_ptr()) }
