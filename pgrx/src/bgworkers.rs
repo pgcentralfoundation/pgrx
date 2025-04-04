@@ -683,7 +683,7 @@ type RpgffiChar = RpgffiChar96;
 #[allow(dead_code)]
 struct RpgffiChar64([c_char; 64]);
 
-impl<'a> From<&'a str> for RpgffiChar64 {
+impl From<&str> for RpgffiChar64 {
     fn from(string: &str) -> Self {
         let mut r = [0; 64];
         for (dest, src) in r.iter_mut().zip(string.as_bytes()) {
@@ -695,7 +695,7 @@ impl<'a> From<&'a str> for RpgffiChar64 {
 
 struct RpgffiChar96([c_char; 96]);
 
-impl<'a> From<&'a str> for RpgffiChar96 {
+impl From<&str> for RpgffiChar96 {
     fn from(string: &str) -> Self {
         let mut r = [0; 96];
         for (dest, src) in r.iter_mut().zip(string.as_bytes()) {
@@ -707,7 +707,7 @@ impl<'a> From<&'a str> for RpgffiChar96 {
 
 struct RpgffiChar128([c_char; 128]);
 
-impl<'a> From<&'a str> for RpgffiChar128 {
+impl From<&str> for RpgffiChar128 {
     fn from(string: &str) -> Self {
         let mut r = [0; 128];
         for (dest, src) in r.iter_mut().zip(string.as_bytes()) {
@@ -720,7 +720,7 @@ impl<'a> From<&'a str> for RpgffiChar128 {
 #[allow(dead_code)]
 struct RpgffiChar1024([c_char; 1024]);
 
-impl<'a> From<&'a str> for RpgffiChar1024 {
+impl From<&str> for RpgffiChar1024 {
     fn from(string: &str) -> Self {
         let mut r = [0; 1024];
         for (dest, src) in r.iter_mut().zip(string.as_bytes()) {

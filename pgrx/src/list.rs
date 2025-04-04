@@ -132,7 +132,7 @@ impl<T: Enlist> List<'_, T> {
     }
 }
 
-impl<'cx, T> List<'cx, T> {
+impl<T> List<'_, T> {
     #[inline]
     pub fn len(&self) -> usize {
         match self {

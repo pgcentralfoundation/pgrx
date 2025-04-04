@@ -6,7 +6,7 @@ pub trait AsPgCStr {
     fn as_pg_cstr(self) -> *mut ffi::c_char;
 }
 
-impl<'a> AsPgCStr for &'a str {
+impl AsPgCStr for &str {
     fn as_pg_cstr(self) -> *mut ffi::c_char {
         let self_bytes = self.as_bytes();
         let pg_cstr = unsafe { crate::palloc0(self_bytes.len() + 1) as *mut u8 };
@@ -16,7 +16,7 @@ impl<'a> AsPgCStr for &'a str {
     }
 }
 
-impl<'a> AsPgCStr for Option<&'a str> {
+impl AsPgCStr for Option<&str> {
     fn as_pg_cstr(self) -> *mut ffi::c_char {
         match self {
             Some(s) => s.as_pg_cstr(),

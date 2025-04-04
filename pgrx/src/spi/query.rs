@@ -64,9 +64,9 @@ pub trait PreparableQuery<'conn>: Query<'conn> {
     ) -> SpiResult<PreparedStatement<'conn>>;
 }
 
-fn execute<'conn, 'mcx>(
+fn execute<'conn>(
     cmd: &CStr,
-    args: &[DatumWithOid<'mcx>],
+    args: &[DatumWithOid<'_>],
     limit: Option<libc::c_long>,
 ) -> SpiResult<SpiTupleTable<'conn>> {
     // SAFETY: no concurrent access
@@ -100,10 +100,7 @@ fn execute<'conn, 'mcx>(
     SpiClient::prepare_tuple_table(status_code)
 }
 
-fn open_cursor<'conn, 'mcx>(
-    cmd: &CStr,
-    args: &[DatumWithOid<'mcx>],
-) -> SpiResult<SpiCursor<'conn>> {
+fn open_cursor<'conn>(cmd: &CStr, args: &[DatumWithOid<'_>]) -> SpiResult<SpiCursor<'conn>> {
     let nargs = args.len();
     let (mut argtypes, mut datums, nulls) = args_to_datums(args);
 
@@ -125,8 +122,8 @@ fn open_cursor<'conn, 'mcx>(
     Ok(SpiCursor { ptr, __marker: PhantomData })
 }
 
-fn args_to_datums<'mcx>(
-    args: &[DatumWithOid<'mcx>],
+fn args_to_datums(
+    args: &[DatumWithOid<'_>],
 ) -> (Vec<pg_sys::Oid>, Vec<pg_sys::Datum>, Vec<c_char>) {
     let mut argtypes = Vec::with_capacity(args.len());
     let mut datums = Vec::with_capacity(args.len());
@@ -143,7 +140,7 @@ fn args_to_datums<'mcx>(
     (argtypes, datums, nulls)
 }
 
-fn prepare_datum<'mcx>(datum: &DatumWithOid<'mcx>) -> (pg_sys::Datum, std::os::raw::c_char) {
+fn prepare_datum(datum: &DatumWithOid<'_>) -> (pg_sys::Datum, std::os::raw::c_char) {
     match datum.datum() {
         Some(datum) => (datum.sans_lifetime(), ' ' as std::os::raw::c_char),
         None => (pg_sys::Datum::from(0usize), 'n' as std::os::raw::c_char),
@@ -299,7 +296,7 @@ impl<'conn> Query<'conn> for OwnedPreparedStatement {
     }
 }
 
-impl<'conn> PreparedStatement<'conn> {
+impl PreparedStatement<'_> {
     /// Converts prepared statement into an owned prepared statement
     ///
     /// These statements have static lifetime and are freed only when dropped
@@ -317,9 +314,9 @@ impl<'conn> PreparedStatement<'conn> {
         })
     }
 
-    fn args_to_datums<'mcx>(
+    fn args_to_datums(
         &self,
-        args: &[DatumWithOid<'mcx>],
+        args: &[DatumWithOid<'_>],
     ) -> SpiResult<(Vec<pg_sys::Datum>, Vec<std::os::raw::c_char>)> {
         let actual = args.len();
         let expected = unsafe { pg_sys::SPI_getargcount(self.plan.as_ptr()) } as usize;

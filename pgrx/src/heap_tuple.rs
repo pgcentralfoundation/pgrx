@@ -427,7 +427,7 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
     }
 }
 
-impl<'mcx, AllocatedBy: WhoAllocated> IntoDatum for PgHeapTuple<'mcx, AllocatedBy> {
+impl<AllocatedBy: WhoAllocated> IntoDatum for PgHeapTuple<'_, AllocatedBy> {
     // Delegate to `into_composite_datum()` as this will normally be used with composite types.
     // See `into_trigger_datum()` if using as a trigger.
     fn into_datum(self) -> Option<pg_sys::Datum> {
@@ -453,7 +453,7 @@ impl<'mcx, AllocatedBy: WhoAllocated> IntoDatum for PgHeapTuple<'mcx, AllocatedB
     }
 }
 
-impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
+impl<AllocatedBy: WhoAllocated> PgHeapTuple<'_, AllocatedBy> {
     /// Consume this [`PgHeapTuple`] and return a composite Datum representation, containing the tuple
     /// data and the corresponding tuple descriptor information.
     pub fn into_composite_datum(self) -> Option<pg_sys::Datum> {

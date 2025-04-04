@@ -520,7 +520,7 @@ unsafe impl BoxRet for f64 {
     }
 }
 
-unsafe impl<'a> BoxRet for &'a [u8] {
+unsafe impl BoxRet for &[u8] {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
         match self.into_datum() {
             Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
@@ -529,7 +529,7 @@ unsafe impl<'a> BoxRet for &'a [u8] {
     }
 }
 
-unsafe impl<'a> BoxRet for &'a str {
+unsafe impl BoxRet for &str {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
         match self.into_datum() {
             Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
@@ -538,7 +538,7 @@ unsafe impl<'a> BoxRet for &'a str {
     }
 }
 
-unsafe impl<'a> BoxRet for &'a CStr {
+unsafe impl BoxRet for &CStr {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
         match self.into_datum() {
             Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
@@ -609,7 +609,7 @@ unsafe impl<T: Copy> BoxRet for PgVarlena<T> {
     }
 }
 
-unsafe impl<'mcx, A> BoxRet for PgHeapTuple<'mcx, A>
+unsafe impl<A> BoxRet for PgHeapTuple<'_, A>
 where
     A: WhoAllocated,
 {
@@ -861,7 +861,7 @@ impl<'fcx> FcInfo<'fcx> {
 // TODO: rebadge this as AnyElement
 pub struct Arg<'a, 'fcx>(&'a FcInfo<'fcx>, usize, &'a pg_sys::NullableDatum);
 
-impl<'a, 'fcx> Arg<'a, 'fcx> {
+impl<'fcx> Arg<'_, 'fcx> {
     /// # Performance note
     /// This uses an FFI call to obtain the Oid, so avoid calling it if not necessary.
     pub fn raw_oid(&self) -> pg_sys::Oid {

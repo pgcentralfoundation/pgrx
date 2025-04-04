@@ -69,7 +69,7 @@ impl<'a, T: 'a> SetOfIterator<'a, T> {
     }
 }
 
-impl<'a, T> Iterator for SetOfIterator<'a, T> {
+impl<T> Iterator for SetOfIterator<'_, T> {
     type Item = T;
 
     #[inline]
@@ -79,7 +79,7 @@ impl<'a, T> Iterator for SetOfIterator<'a, T> {
 }
 
 /// `SetOfIterator<'_, T>` differs from `TableIterator<'a, (T,)>` in generated SQL
-unsafe impl<'a, T> SqlTranslatable for SetOfIterator<'a, T>
+unsafe impl<T> SqlTranslatable for SetOfIterator<'_, T>
 where
     T: SqlTranslatable,
 {
@@ -156,7 +156,7 @@ impl<'a, Row: 'a> TableIterator<'a, Row> {
     }
 }
 
-impl<'a, Row> Iterator for TableIterator<'a, Row> {
+impl<Row> Iterator for TableIterator<'_, Row> {
     type Item = Row;
 
     #[inline]
@@ -182,7 +182,7 @@ where
     }
 }
 
-unsafe impl<'a, T> RetAbi for SetOfIterator<'a, T>
+unsafe impl<T> RetAbi for SetOfIterator<'_, T>
 where
     T: BoxRet,
 {
@@ -230,7 +230,7 @@ where
     }
 }
 
-unsafe impl<'a, Row> RetAbi for TableIterator<'a, Row>
+unsafe impl<Row> RetAbi for TableIterator<'_, Row>
 where
     Row: RetAbi,
 {

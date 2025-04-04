@@ -82,14 +82,14 @@ pub struct PgSpinLockGuard<'a, T: 'a> {
 
 unsafe impl<T: Sync> Sync for PgSpinLockGuard<'_, T> {}
 
-impl<'a, T> Drop for PgSpinLockGuard<'a, T> {
+impl<T> Drop for PgSpinLockGuard<'_, T> {
     #[inline]
     fn drop(&mut self) {
         unsafe { pg_sys::SpinLockRelease(self.lock.lock.get()) };
     }
 }
 
-impl<'a, T> core::ops::Deref for PgSpinLockGuard<'a, T> {
+impl<T> core::ops::Deref for PgSpinLockGuard<'_, T> {
     type Target = T;
     #[inline]
     fn deref(&self) -> &T {
@@ -98,7 +98,7 @@ impl<'a, T> core::ops::Deref for PgSpinLockGuard<'a, T> {
     }
 }
 
-impl<'a, T> core::ops::DerefMut for PgSpinLockGuard<'a, T> {
+impl<T> core::ops::DerefMut for PgSpinLockGuard<'_, T> {
     #[inline]
     fn deref_mut(&mut self) -> &mut T {
         // Safety: The guard's existence enforces that the lock is locked.
