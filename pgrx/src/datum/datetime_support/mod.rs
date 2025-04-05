@@ -205,7 +205,7 @@ pub trait HasExtractableParts: Clone + IntoDatum + seal::DateTimeType {
             );
             // don't leak the TEXT datum we made
             pg_sys::pfree(field_datum.unwrap().cast_mut_ptr());
-            field_value
+            field_value.map(|v| v.try_into().unwrap())
         }
     }
 }
