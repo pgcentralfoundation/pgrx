@@ -24,7 +24,6 @@ build = "bindgen.rs"
 
 [features]
 default = []
-pg12 = []
 pg13 = []
 pg14 = []
 pg15 = []

@@ -30,7 +30,6 @@ path = "./src/bin/pgrx_embed.rs"
 
 [features]
 default = ["proptest"]
-pg12 = ["pgrx/pg12"]
 pg13 = ["pgrx/pg13"]
 pg14 = ["pgrx/pg14"]
 pg15 = ["pgrx/pg15"]

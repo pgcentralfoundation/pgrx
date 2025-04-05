@@ -37,7 +37,6 @@ const YANKED_POSTGRES_VERSIONS: &[PgVersion] = &[
     PgVersion::new(15, PgMinorVersion::Release(9), None),
     PgVersion::new(14, PgMinorVersion::Release(14), None),
     PgVersion::new(13, PgMinorVersion::Release(17), None),
-    PgVersion::new(12, PgMinorVersion::Release(21), None),
 ];
 
 pub(super) mod clang;

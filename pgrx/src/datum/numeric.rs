@@ -150,8 +150,7 @@ impl AnyNumeric {
         unsafe { direct_function_call(pg_sys::numeric_floor, &[self.as_datum()]).unwrap() }
     }
 
-    /// Calculate the greatest common divisor of this and another [`AnyNumeric`]
-    #[cfg(not(feature = "pg12"))]
+    /// Calculate the greatest common divisor of this an another [`AnyNumeric`]
     pub fn gcd(&self, n: &AnyNumeric) -> AnyNumeric {
         unsafe {
             direct_function_call(pg_sys::numeric_gcd, &[self.as_datum(), n.as_datum()]).unwrap()

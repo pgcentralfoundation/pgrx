@@ -20,16 +20,7 @@ use core::marker::PhantomData;
 use core::mem;
 use core::ptr::{self, NonNull};
 
-#[cfg(any(
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15",
-    feature = "pg16",
-    feature = "pg17"
-))]
 mod flat_list;
-#[cfg(feature = "pg12")]
-mod linked_list;
 
 #[cfg(feature = "cshim")]
 pub mod old_list;
@@ -98,13 +89,6 @@ pub unsafe trait Enlist: Sealed + Sized {
     /// but this way I don't have to wonder, as this is a safe function.
     #[doc(hidden)]
     fn endocytosis(cell: &mut pg_sys::ListCell, value: Self);
-
-    #[cfg(feature = "pg12")]
-    fn mitosis(cell: &pg_sys::ListCell) -> (&Self, Option<&ListCell<Self>>);
-
-    #[cfg(feature = "pg12")]
-    #[doc(hidden)]
-    fn mitosis_mut(cell: &mut pg_sys::ListCell) -> (&mut Self, Option<&mut ListCell<Self>>);
 }
 
 /// Note the absence of `impl Default for ListHead`:

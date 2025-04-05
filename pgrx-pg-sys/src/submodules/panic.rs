@@ -518,122 +518,64 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
         fn errcontext_msg(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
     }
 
-    /// do_ereport impl for postgres 13 and later
-    /// In this case, we only allocate file, lineno and funcname if `errstart` returns true
-    #[inline(always)]
-    #[rustfmt::skip]    // my opinion wins
-    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
-    fn do_ereport_impl(ereport: ErrorReportWithLevel) {
-
-        #[cfg_attr(target_os = "windows", link(name = "postgres"))]
-        extern "C-unwind" {
-            fn errstart(elevel: ::std::os::raw::c_int, domain: *const ::std::os::raw::c_char) -> bool;
-            fn errfinish(filename: *const ::std::os::raw::c_char, lineno: ::std::os::raw::c_int, funcname: *const ::std::os::raw::c_char);
-        }
-
-        let level = ereport.level();
-        unsafe {
-            if errstart(level as _, DOMAIN) {
-
-                let sqlerrcode = ereport.sql_error_code();
-                let message = ereport.message().as_pg_cstr();
-                let detail = ereport.detail_with_backtrace().as_pg_cstr();
-                let hint = ereport.hint().as_pg_cstr();
-                let context = ereport.context_message().as_pg_cstr();
-                let lineno = ereport.line_number();
-
-                // SAFETY:  We know that `crate::ErrorContext` is a valid memory context pointer and one
-                // that Postgres will clean up for us in the event of an ERROR, and we know it'll live long
-                // enough for Postgres to use `file` and `funcname`, which it expects to be `const char *`s
-
-                let prev_cxt = MemoryContextSwitchTo(crate::ErrorContext);
-                let file = ereport.file().as_pg_cstr();
-                let funcname = ereport.function_name().as_pg_cstr();
-                MemoryContextSwitchTo(prev_cxt);
-
-                // do not leak the Rust `ErrorReportWithLocation` instance
-                drop(ereport);
-
-                // SAFETY
-                //
-                // The following functions are all FFI into Postgres, so they're inherently unsafe.
-                //
-                // The various pointers used as arguments to these functions might have been allocated above
-                // or they might be the null pointer, so we guard against that possibility for each usage.
-                errcode(sqlerrcode as _);
-                if !message.is_null() { errmsg(PERCENT_S.as_ptr(), message);         pfree(message.cast()); }
-                if !detail.is_null()  { errdetail(PERCENT_S.as_ptr(), detail);       pfree(detail.cast());  }
-                if !hint.is_null()    { errhint(PERCENT_S.as_ptr(), hint);           pfree(hint.cast());    }
-                if !context.is_null() { errcontext_msg(PERCENT_S.as_ptr(), context); pfree(context.cast()); }
-
-                errfinish(file, lineno as _, funcname);
-
-                if level >= PgLogLevel::ERROR {
-                    // SAFETY:  `crate::errstart() is guaranteed to have returned true if >=ERROR and
-                    // `crate::errfinish()` is guaranteed to not have not returned at all if >= ERROR, which
-                    // means we won't either
-                    unreachable_unchecked()
-                } else {
-                    // if it wasn't an ERROR we need to free up the things that Postgres wouldn't have
-                    if !file.is_null()     { pfree(file.cast());     }
-                    if !funcname.is_null() { pfree(funcname.cast()); }
-                }
-            }
-        }
+    // we only allocate file, lineno and funcname if `errstart` returns true
+    #[cfg_attr(target_os = "windows", link(name = "postgres"))]
+    extern "C-unwind" {
+        fn errstart(elevel: ::std::os::raw::c_int, domain: *const ::std::os::raw::c_char) -> bool;
+        fn errfinish(
+            filename: *const ::std::os::raw::c_char,
+            lineno: ::std::os::raw::c_int,
+            funcname: *const ::std::os::raw::c_char,
+        );
     }
 
-    /// do_ereport impl for postgres up to 12
-    /// In this case, `errstart` takes file, lineno and funcname, which need special handling
-    /// to be freed in case level < ERROR
-    #[inline(always)]
-    #[rustfmt::skip]    // my opinion wins
-    #[cfg(feature = "pg12")]
-    fn do_ereport_impl(ereport: ErrorReportWithLevel) {
+    let level = ereport.level();
+    unsafe {
+        if errstart(level as _, DOMAIN) {
+            let sqlerrcode = ereport.sql_error_code();
+            let message = ereport.message().as_pg_cstr();
+            let detail = ereport.detail_with_backtrace().as_pg_cstr();
+            let hint = ereport.hint().as_pg_cstr();
+            let context = ereport.context_message().as_pg_cstr();
+            let lineno = ereport.line_number();
 
-        #[cfg_attr(target_os = "windows", link(name = "postgres"))]
-        extern "C-unwind" {
-            fn errstart(elevel: ::std::os::raw::c_int, filename: *const ::std::os::raw::c_char, lineno: ::std::os::raw::c_int, funcname: *const ::std::os::raw::c_char, domain: *const ::std::os::raw::c_char) -> bool;
-            fn errfinish(dummy: ::std::os::raw::c_int, ...);
-        }
-
-        unsafe {
             // SAFETY:  We know that `crate::ErrorContext` is a valid memory context pointer and one
             // that Postgres will clean up for us in the event of an ERROR, and we know it'll live long
             // enough for Postgres to use `file` and `funcname`, which it expects to be `const char *`s
 
             let prev_cxt = MemoryContextSwitchTo(crate::ErrorContext);
             let file = ereport.file().as_pg_cstr();
-            let lineno = ereport.line_number();
             let funcname = ereport.function_name().as_pg_cstr();
             MemoryContextSwitchTo(prev_cxt);
 
-            let level = ereport.level();
-            if errstart(level as _, file, lineno as _, funcname, DOMAIN) {
+            // do not leak the Rust `ErrorReportWithLocation` instance
+            drop(ereport);
 
-                let sqlerrcode = ereport.sql_error_code();
-                let message = ereport.message().as_pg_cstr();
-                let detail = ereport.detail_with_backtrace().as_pg_cstr();
-                let hint = ereport.hint().as_pg_cstr();
-                let context = ereport.context_message().as_pg_cstr();
-
-
-                // do not leak the Rust `ErrorReportWithLocation` instance
-                drop(ereport);
-
-                // SAFETY
-                //
-                // The following functions are all FFI into Postgres, so they're inherently unsafe.
-                //
-                // The various pointers used as arguments to these functions might have been allocated above
-                // or they might be the null pointer, so we guard against that possibility for each usage.
-                errcode(sqlerrcode as _);
-                if !message.is_null() { errmsg(PERCENT_S.as_ptr(), message);         pfree(message.cast()); }
-                if !detail.is_null()  { errdetail(PERCENT_S.as_ptr(), detail);       pfree(detail.cast());  }
-                if !hint.is_null()    { errhint(PERCENT_S.as_ptr(), hint);           pfree(hint.cast());    }
-                if !context.is_null() { errcontext_msg(PERCENT_S.as_ptr(), context); pfree(context.cast()); }
-
-                errfinish(0);
+            // SAFETY
+            //
+            // The following functions are all FFI into Postgres, so they're inherently unsafe.
+            //
+            // The various pointers used as arguments to these functions might have been allocated above
+            // or they might be the null pointer, so we guard against that possibility for each usage.
+            errcode(sqlerrcode as _);
+            if !message.is_null() {
+                errmsg(PERCENT_S.as_ptr(), message);
+                pfree(message.cast());
             }
+            if !detail.is_null() {
+                errdetail(PERCENT_S.as_ptr(), detail);
+                pfree(detail.cast());
+            }
+            if !hint.is_null() {
+                errhint(PERCENT_S.as_ptr(), hint);
+                pfree(hint.cast());
+            }
+            if !context.is_null() {
+                errcontext_msg(PERCENT_S.as_ptr(), context);
+                pfree(context.cast());
+            }
+
+            errfinish(file, lineno as _, funcname);
 
             if level >= PgLogLevel::ERROR {
                 // SAFETY:  `crate::errstart() is guaranteed to have returned true if >=ERROR and
@@ -642,11 +584,13 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
                 unreachable_unchecked()
             } else {
                 // if it wasn't an ERROR we need to free up the things that Postgres wouldn't have
-                if !file.is_null()     { pfree(file.cast());     }
-                if !funcname.is_null() { pfree(funcname.cast()); }
+                if !file.is_null() {
+                    pfree(file.cast());
+                }
+                if !funcname.is_null() {
+                    pfree(funcname.cast());
+                }
             }
         }
     }
-
-    do_ereport_impl(ereport)
 }

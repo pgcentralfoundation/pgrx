@@ -284,7 +284,6 @@ pub unsafe fn release_tupdesc(ptr: pg_sys::TupleDesc) {
 
 /// `attno` is 0-based
 #[cfg(any(
-    feature = "pg12",
     feature = "pg13",
     feature = "pg14",
     feature = "pg15",
