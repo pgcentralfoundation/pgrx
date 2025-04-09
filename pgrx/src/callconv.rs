@@ -968,7 +968,7 @@ impl<'fcx> ReturnSetInfoWrapper<'fcx> {
     /// [`pg_sys::ReturnSetInfo`] pointer.  This is your responsibility.
     #[inline]
     pub unsafe fn from_ptr(retinfo: *mut pg_sys::ReturnSetInfo) -> ReturnSetInfoWrapper<'fcx> {
-        let _nullptr_check = NonNull::new(retinfo).expect("fcinfo pointer must be non-null");
+        let _nullptr_check = NonNull::new(retinfo).expect("retinfo pointer must be non-null");
         Self(retinfo, PhantomData)
     }
     /*
