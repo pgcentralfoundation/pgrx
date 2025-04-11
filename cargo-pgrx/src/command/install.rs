@@ -100,7 +100,7 @@ impl CommandExecute for Install {
         install_extension(
             self.manifest_path.as_ref(),
             self.package.as_ref(),
-            package_manifest_path,
+            &package_manifest_path,
             &pg_config,
             &profile,
             self.test,
@@ -121,7 +121,7 @@ impl CommandExecute for Install {
 pub(crate) fn install_extension(
     user_manifest_path: Option<impl AsRef<Path>>,
     user_package: Option<&String>,
-    package_manifest_path: impl AsRef<Path>,
+    package_manifest_path: &Path,
     pg_config: &PgConfig,
     profile: &CargoProfile,
     is_test: bool,
@@ -144,7 +144,7 @@ pub(crate) fn install_extension(
         build_command_stream.collect::<Result<Vec<_>, std::io::Error>>()?;
 
     println!("{} extension", "  Installing".bold().green());
-    let shlibpath = find_library_file(&manifest, &build_command_messages)?;
+    let shlibpath = find_library_file(&manifest, &package_manifest_path, &build_command_messages)?;
 
     let extdir = if let Some(base_directory) = base_directory.as_ref() {
         base_directory.join(make_relative_extdir(pg_config.extension_dir()?))
@@ -402,6 +402,7 @@ fn copy_sql_files(
 #[tracing::instrument(level = "error", skip_all)]
 pub(crate) fn find_library_file(
     manifest: &Manifest,
+    manifest_path: &Path,
     build_command_messages: &Vec<CargoMessage>,
 ) -> eyre::Result<PathBuf> {
     use std::env::consts::{DLL_EXTENSION, DLL_SUFFIX};
@@ -409,6 +410,7 @@ pub(crate) fn find_library_file(
     // cargo sometimes decides to change whether targets are kebab-case or snake_case in metadata,
     // so normalize away the difference
     let target_name = manifest.target_name()?.replace('-', "_");
+    let manifest_path = std::path::absolute(manifest_path)?;
 
     // no hard and fast rule for the lib.so output filename exists, so we implement this routine
     // which is essentially a cope for cargo's disinterest in writing down any docs so far.
@@ -421,7 +423,7 @@ pub(crate) fn find_library_file(
             _ => None,
         })
         // normalize being flattened and low to the ground
-        .find(|artifact| target_name == artifact.target.name.replace('-', "_"))
+        .find(|artifact| manifest_path == artifact.manifest_path)
         .and_then(|artifact| {
             artifact
                 .filenames

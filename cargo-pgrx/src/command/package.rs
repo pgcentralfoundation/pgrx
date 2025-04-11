@@ -113,7 +113,7 @@ impl CommandExecute for Package {
 pub(crate) fn package_extension(
     user_manifest_path: Option<impl AsRef<Path>>,
     user_package: Option<&String>,
-    package_manifest_path: impl AsRef<Path>,
+    package_manifest_path: &Path,
     pg_config: &PgConfig,
     out_dir: PathBuf,
     profile: &CargoProfile,
@@ -131,7 +131,7 @@ pub(crate) fn package_extension(
     install_extension(
         user_manifest_path,
         user_package,
-        &package_manifest_path,
+        package_manifest_path,
         pg_config,
         profile,
         is_test,
