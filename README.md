@@ -17,7 +17,7 @@
 
 ## Want to chat with us or get a question answered?
 
-   + **Please join our [Discord Server](https://discord.gg/PMrpdJsqcJ).**
+   + **Please join our [Discord Server][Discord].**
 
    + **We are also in need of financial [sponsorship](https://checkout.square.site/merchant/MLHG5M9GAXQPV/checkout/2OW2SULDQBSZ2JLHSLRZQLZH).**
 
@@ -379,5 +379,5 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 ```
 
-[Discord]: https://discord.gg/hPb93Y9
+[Discord]: https://discord.gg/PMrpdJsqcJ
 [timecrate]: https://crates.io/crates/time
