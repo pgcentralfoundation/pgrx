@@ -418,7 +418,7 @@ pub(crate) fn find_library_file(
     manifest_path: &Path,
     build_command_messages: &Vec<CargoMessage>,
 ) -> eyre::Result<PathBuf> {
-    use std::env::consts::{DLL_EXTENSION, DLL_SUFFIX};
+    use std::env::consts::{DLL_EXTENSION, DLL_PREFIX, DLL_SUFFIX};
 
     // cargo sometimes decides to change whether targets are kebab-case or snake_case in metadata,
     // so normalize away the difference
@@ -445,7 +445,7 @@ pub(crate) fn find_library_file(
                 .map(|filename| filename.to_string())
         })
         .ok_or_else(|| {
-            eyre!("Could not get shared object file `{target_name}{DLL_SUFFIX}` from Cargo output.")
+            eyre!("Could not get shared object file `{DLL_PREFIX}{target_name}{DLL_SUFFIX}` from Cargo output.")
         })?;
     let library_file_path = PathBuf::from(library_file);
 
