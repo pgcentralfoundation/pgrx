@@ -215,9 +215,10 @@ pub(crate) fn generate_schema(
         &flags,
         embed.path(),
         &package_name,
+        &manifest,
     )?;
 
-    compute_sql(&package_name, &manifest)?;
+    compute_sql(&manifest)?;
 
     Ok(())
 }
@@ -494,6 +495,7 @@ fn second_build(
     flags: &str,
     embed_path: impl AsRef<Path>,
     package_name: &str,
+    manifest: &Manifest,
 ) -> eyre::Result<()> {
     let mut command = crate::env::cargo();
     command.stdin(Stdio::null());
@@ -504,7 +506,7 @@ fn second_build(
     // The only cargo command respecting our need is `cargo rustc`
     command.arg("rustc");
     command.arg("--bin");
-    command.arg(format!("pgrx_embed_{package_name}"));
+    command.arg(pgrx_embed_name(manifest)?);
 
     command.arg("--package");
     command.arg(format!("{package_name}"));
@@ -562,10 +564,10 @@ fn second_build(
     Ok(())
 }
 
-fn compute_sql(package_name: &str, manifest: &Manifest) -> eyre::Result<()> {
+fn compute_sql(manifest: &Manifest) -> eyre::Result<()> {
     let mut bin = get_target_dir()?;
     bin.push("debug"); // pgrx_embed_ is always compiled in debug mode
-    bin.push(format!("pgrx_embed_{package_name}"));
+    bin.push(pgrx_embed_name(manifest)?);
 
     let mut command = std::process::Command::new(bin);
     command.stdin(Stdio::inherit());
@@ -591,6 +593,10 @@ fn compute_sql(package_name: &str, manifest: &Manifest) -> eyre::Result<()> {
     }
 
     Ok(())
+}
+
+fn pgrx_embed_name(manifest: &Manifest) -> eyre::Result<String> {
+    Ok(format!("pgrx_embed_{}", manifest.lib_name()?))
 }
 
 fn parse_object(data: &[u8]) -> object::Result<object::File> {
