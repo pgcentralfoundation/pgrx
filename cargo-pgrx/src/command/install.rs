@@ -418,12 +418,12 @@ pub(crate) fn find_library_file(
     manifest_path: &Path,
     build_command_messages: &Vec<CargoMessage>,
 ) -> eyre::Result<PathBuf> {
-    use std::env::consts::{DLL_EXTENSION, DLL_PREFIX, DLL_SUFFIX};
+    use std::env::consts::DLL_EXTENSION;
 
     // cargo sometimes decides to change whether targets are kebab-case or snake_case in metadata,
     // so normalize away the difference
-    let target_name = manifest.target_name()?.replace('-', "_");
     let manifest_path = std::path::absolute(manifest_path)?;
+    let lib_filename = manifest.lib_filename()?;
 
     // no hard and fast rule for the lib.so output filename exists, so we implement this routine
     // which is essentially a cope for cargo's disinterest in writing down any docs so far.
@@ -445,7 +445,7 @@ pub(crate) fn find_library_file(
                 .map(|filename| filename.to_string())
         })
         .ok_or_else(|| {
-            eyre!("Could not get shared object file `{DLL_PREFIX}{target_name}{DLL_SUFFIX}` from Cargo output.")
+            eyre!("Could not get shared object file `{lib_filename}` from Cargo output.",)
         })?;
     let library_file_path = PathBuf::from(library_file);
 
