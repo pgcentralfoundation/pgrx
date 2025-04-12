@@ -38,8 +38,8 @@ toml_edit.workspace = true
 
 clap = { version = "4.4.2", features = ["env", "suggestions", "cargo", "derive", "wrap_help"] }
 jobslot = "0.2.20" # as seen in gmake -j{N}
-semver = "1.0.25" # checking pgrx versions match
-tempfile = "3.17.1"
+semver = "1.0.26" # checking pgrx versions match
+tempfile = "3.19.1"
 
 # emit better diagnostics
 color-eyre = "0.6.3"
@@ -50,14 +50,14 @@ tracing-error = "0.2.1"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 
 # for downloading/unpacking things from the Postgres file servers
-bzip2 = "0.5.1"
+bzip2 = "0.5.2"
 env_proxy = "0.4.1"
 serde.workspace = true
 serde-xml-rs = "0.6.0"
 tar = "0.4.44"
-ureq = { version = "3.0.6", default-features = false, features = ["gzip"] }
+ureq = { version = "3.0.10", default-features = false, features = ["gzip"] }
 url.workspace = true
-zip-extract = "0.2.1"
+zip-extract = "0.2.2"
 
 # SQL schema generation
 proc-macro2.workspace = true
