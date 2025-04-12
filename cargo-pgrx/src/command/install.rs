@@ -436,7 +436,10 @@ pub(crate) fn find_library_file(
             _ => None,
         })
         // normalize being flattened and low to the ground
-        .find(|artifact| manifest_path == artifact.manifest_path)
+        .find(|artifact| {
+            artifact.manifest_path == manifest_path
+                && artifact.target.crate_types.iter().any(|s| s == "cdylib")
+        })
         .and_then(|artifact| {
             artifact
                 .filenames
