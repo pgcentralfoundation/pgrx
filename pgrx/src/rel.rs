@@ -335,10 +335,7 @@ impl PgRelation {
     pgstat_count_impl!(count_buffer_read, blocks_fetched, t_blocks_fetched);
     pgstat_count_impl!(count_buffer_hit, blocks_hit, t_blocks_hit);
 
-    pub fn count_index_tuples(
-        &mut self,
-        n: i64,
-    ) {
+    pub fn count_index_tuples(&mut self, n: i64) {
         if self.should_count_relation() {
             let info = self.pgstat_info;
             #[cfg(any(feature = "pg16", feature = "pg17"))]
