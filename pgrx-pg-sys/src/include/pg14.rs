@@ -5,7 +5,7 @@ easy to reference on docs.rs. Bindings are regenerated for your
 build of pgrx, and the values of your Postgres version may differ.
 */
 use crate as pg_sys;
-use crate::{Datum, Oid, PgNode};
+use crate::{Datum, MultiXactId, Oid, PgNode, TransactionId};
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct __BindgenBitfieldUnit<Storage> {
@@ -2237,6 +2237,25 @@ pub const LOGICALREP_COLUMN_UNCHANGED: u8 = 117u8;
 pub const LOGICALREP_COLUMN_TEXT: u8 = 116u8;
 pub const LOGICALREP_COLUMN_BINARY: u8 = 98u8;
 pub const MAXCONNINFO: u32 = 1024;
+pub const BUF_REFCOUNT_ONE: u32 = 1;
+pub const BUF_REFCOUNT_MASK: u32 = 262143;
+pub const BUF_USAGECOUNT_MASK: u32 = 3932160;
+pub const BUF_USAGECOUNT_ONE: u32 = 262144;
+pub const BUF_USAGECOUNT_SHIFT: u32 = 18;
+pub const BUF_FLAG_MASK: u32 = 4290772992;
+pub const BM_LOCKED: u32 = 4194304;
+pub const BM_DIRTY: u32 = 8388608;
+pub const BM_VALID: u32 = 16777216;
+pub const BM_TAG_VALID: u32 = 33554432;
+pub const BM_IO_IN_PROGRESS: u32 = 67108864;
+pub const BM_IO_ERROR: u32 = 134217728;
+pub const BM_JUST_DIRTIED: u32 = 268435456;
+pub const BM_PIN_COUNT_WAITER: u32 = 536870912;
+pub const BM_CHECKPOINT_NEEDED: u32 = 1073741824;
+pub const BM_PERMANENT: u32 = 2147483648;
+pub const BM_MAX_USAGE_COUNT: u32 = 5;
+pub const FREENEXT_END_OF_LIST: i32 = -1;
+pub const FREENEXT_NOT_IN_LIST: i32 = -2;
 pub const XLOG_STANDBY_LOCK: u32 = 0;
 pub const XLOG_RUNNING_XACTS: u32 = 16;
 pub const XLOG_INVALIDATIONS: u32 = 32;
@@ -5737,7 +5756,7 @@ pub struct timespec {
     pub tv_sec: __time_t,
     pub tv_nsec: __syscall_slong_t,
 }
-pub type pg_funcptr_t = ::core::option::Option<unsafe extern "C" fn()>;
+pub type pg_funcptr_t = ::core::option::Option<unsafe extern "C-unwind" fn()>;
 pub type Pointer = *mut ::core::ffi::c_char;
 pub type int8 = ::core::ffi::c_schar;
 pub type int16 = ::core::ffi::c_short;
@@ -5759,10 +5778,8 @@ pub type float4 = f32;
 pub type float8 = f64;
 pub type regproc = Oid;
 pub type RegProcedure = regproc;
-pub type TransactionId = uint32;
 pub type LocalTransactionId = uint32;
 pub type SubTransactionId = uint32;
-pub type MultiXactId = TransactionId;
 pub type MultiXactOffset = uint32;
 pub type CommandId = uint32;
 #[repr(C)]
@@ -5936,13 +5953,13 @@ impl Default for passwd {
 }
 pub type pgsocket = ::core::ffi::c_int;
 pub type qsort_arg_comparator = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         a: *const ::core::ffi::c_void,
         b: *const ::core::ffi::c_void,
         arg: *mut ::core::ffi::c_void,
     ) -> ::core::ffi::c_int,
 >;
-pub type pqsigfunc = ::core::option::Option<unsafe extern "C" fn(signo: ::core::ffi::c_int)>;
+pub type pqsigfunc = ::core::option::Option<unsafe extern "C-unwind" fn(signo: ::core::ffi::c_int)>;
 pub type __jmp_buf = [::core::ffi::c_long; 8usize];
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -5956,7 +5973,8 @@ pub type sigjmp_buf = [__jmp_buf_tag; 1usize];
 #[derive(Debug, Copy, Clone)]
 pub struct ErrorContextCallback {
     pub previous: *mut ErrorContextCallback,
-    pub callback: ::core::option::Option<unsafe extern "C" fn(arg: *mut ::core::ffi::c_void)>,
+    pub callback:
+        ::core::option::Option<unsafe extern "C-unwind" fn(arg: *mut ::core::ffi::c_void)>,
     pub arg: *mut ::core::ffi::c_void,
 }
 impl Default for ErrorContextCallback {
@@ -6009,7 +6027,8 @@ impl Default for ErrorData {
         }
     }
 }
-pub type emit_log_hook_type = ::core::option::Option<unsafe extern "C" fn(edata: *mut ErrorData)>;
+pub type emit_log_hook_type =
+    ::core::option::Option<unsafe extern "C-unwind" fn(edata: *mut ErrorData)>;
 pub mod PGErrorVerbosity {
     pub type Type = ::core::ffi::c_uint;
     pub const PGERROR_TERSE: Type = 0;
@@ -6018,7 +6037,7 @@ pub mod PGErrorVerbosity {
 }
 pub type MemoryContext = *mut MemoryContextData;
 pub type MemoryContextCallbackFunction =
-    ::core::option::Option<unsafe extern "C" fn(arg: *mut ::core::ffi::c_void)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(arg: *mut ::core::ffi::c_void)>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct MemoryContextCallback {
@@ -6826,7 +6845,7 @@ impl Default for ForFiveState {
     }
 }
 pub type list_sort_comparator = ::core::option::Option<
-    unsafe extern "C" fn(a: *const ListCell, b: *const ListCell) -> ::core::ffi::c_int,
+    unsafe extern "C-unwind" fn(a: *const ListCell, b: *const ListCell) -> ::core::ffi::c_int,
 >;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -7130,7 +7149,7 @@ pub struct PageXLogRecPtr {
     pub xrecoff: uint32,
 }
 #[repr(C)]
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct PageHeaderData {
     pub pd_lsn: PageXLogRecPtr,
     pub pd_checksum: uint16,
@@ -7141,6 +7160,15 @@ pub struct PageHeaderData {
     pub pd_pagesize_version: uint16,
     pub pd_prune_xid: TransactionId,
     pub pd_linp: __IncompleteArrayField<ItemIdData>,
+}
+impl Default for PageHeaderData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 pub type PageHeader = *mut PageHeaderData;
 #[repr(C)]
@@ -7267,31 +7295,33 @@ impl Default for TupleTableSlot {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct TupleTableSlotOps {
     pub base_slot_size: usize,
-    pub init: ::core::option::Option<unsafe extern "C" fn(slot: *mut TupleTableSlot)>,
-    pub release: ::core::option::Option<unsafe extern "C" fn(slot: *mut TupleTableSlot)>,
-    pub clear: ::core::option::Option<unsafe extern "C" fn(slot: *mut TupleTableSlot)>,
+    pub init: ::core::option::Option<unsafe extern "C-unwind" fn(slot: *mut TupleTableSlot)>,
+    pub release: ::core::option::Option<unsafe extern "C-unwind" fn(slot: *mut TupleTableSlot)>,
+    pub clear: ::core::option::Option<unsafe extern "C-unwind" fn(slot: *mut TupleTableSlot)>,
     pub getsomeattrs: ::core::option::Option<
-        unsafe extern "C" fn(slot: *mut TupleTableSlot, natts: ::core::ffi::c_int),
+        unsafe extern "C-unwind" fn(slot: *mut TupleTableSlot, natts: ::core::ffi::c_int),
     >,
     pub getsysattr: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             slot: *mut TupleTableSlot,
             attnum: ::core::ffi::c_int,
             isnull: *mut bool,
         ) -> Datum,
     >,
-    pub materialize: ::core::option::Option<unsafe extern "C" fn(slot: *mut TupleTableSlot)>,
+    pub materialize: ::core::option::Option<unsafe extern "C-unwind" fn(slot: *mut TupleTableSlot)>,
     pub copyslot: ::core::option::Option<
-        unsafe extern "C" fn(dstslot: *mut TupleTableSlot, srcslot: *mut TupleTableSlot),
+        unsafe extern "C-unwind" fn(dstslot: *mut TupleTableSlot, srcslot: *mut TupleTableSlot),
     >,
     pub get_heap_tuple:
-        ::core::option::Option<unsafe extern "C" fn(slot: *mut TupleTableSlot) -> HeapTuple>,
-    pub get_minimal_tuple:
-        ::core::option::Option<unsafe extern "C" fn(slot: *mut TupleTableSlot) -> MinimalTuple>,
+        ::core::option::Option<unsafe extern "C-unwind" fn(slot: *mut TupleTableSlot) -> HeapTuple>,
+    pub get_minimal_tuple: ::core::option::Option<
+        unsafe extern "C-unwind" fn(slot: *mut TupleTableSlot) -> MinimalTuple,
+    >,
     pub copy_heap_tuple:
-        ::core::option::Option<unsafe extern "C" fn(slot: *mut TupleTableSlot) -> HeapTuple>,
-    pub copy_minimal_tuple:
-        ::core::option::Option<unsafe extern "C" fn(slot: *mut TupleTableSlot) -> MinimalTuple>,
+        ::core::option::Option<unsafe extern "C-unwind" fn(slot: *mut TupleTableSlot) -> HeapTuple>,
+    pub copy_minimal_tuple: ::core::option::Option<
+        unsafe extern "C-unwind" fn(slot: *mut TupleTableSlot) -> MinimalTuple,
+    >,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -7463,11 +7493,12 @@ pub struct WorkerInstrumentation {
 }
 pub type fmNodePtr = *mut Node;
 pub type fmAggrefPtr = *mut Aggref;
-pub type fmExprContextCallbackFunction = ::core::option::Option<unsafe extern "C" fn(arg: Datum)>;
+pub type fmExprContextCallbackFunction =
+    ::core::option::Option<unsafe extern "C-unwind" fn(arg: Datum)>;
 pub type fmStringInfo = *mut StringInfoData;
 pub type FunctionCallInfo = *mut FunctionCallInfoBaseData;
 pub type PGFunction =
-    ::core::option::Option<unsafe extern "C" fn(fcinfo: FunctionCallInfo) -> Datum>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(fcinfo: FunctionCallInfo) -> Datum>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct FmgrInfo {
@@ -7515,7 +7546,8 @@ impl Default for FunctionCallInfoBaseData {
 pub struct Pg_finfo_record {
     pub api_version: ::core::ffi::c_int,
 }
-pub type PGFInfoFunction = ::core::option::Option<unsafe extern "C" fn() -> *const Pg_finfo_record>;
+pub type PGFInfoFunction =
+    ::core::option::Option<unsafe extern "C-unwind" fn() -> *const Pg_finfo_record>;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct Pg_magic_struct {
@@ -7527,16 +7559,21 @@ pub struct Pg_magic_struct {
     pub float8byval: ::core::ffi::c_int,
 }
 pub type PGModuleMagicFunction =
-    ::core::option::Option<unsafe extern "C" fn() -> *const Pg_magic_struct>;
+    ::core::option::Option<unsafe extern "C-unwind" fn() -> *const Pg_magic_struct>;
 pub mod FmgrHookEventType {
     pub type Type = ::core::ffi::c_uint;
     pub const FHET_START: Type = 0;
     pub const FHET_END: Type = 1;
     pub const FHET_ABORT: Type = 2;
 }
-pub type needs_fmgr_hook_type = ::core::option::Option<unsafe extern "C" fn(fn_oid: Oid) -> bool>;
+pub type needs_fmgr_hook_type =
+    ::core::option::Option<unsafe extern "C-unwind" fn(fn_oid: Oid) -> bool>;
 pub type fmgr_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(event: FmgrHookEventType::Type, flinfo: *mut FmgrInfo, arg: *mut Datum),
+    unsafe extern "C-unwind" fn(
+        event: FmgrHookEventType::Type,
+        flinfo: *mut FmgrInfo,
+        arg: *mut Datum,
+    ),
 >;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -7691,7 +7728,7 @@ impl Default for pairingheap_node {
     }
 }
 pub type pairingheap_comparator = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         a: *const pairingheap_node,
         b: *const pairingheap_node,
         arg: *mut ::core::ffi::c_void,
@@ -7732,7 +7769,7 @@ impl Default for ParamExternData {
 }
 pub type ParamListInfo = *mut ParamListInfoData;
 pub type ParamFetchHook = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         params: ParamListInfo,
         paramid: ::core::ffi::c_int,
         speculative: bool,
@@ -7740,7 +7777,7 @@ pub type ParamFetchHook = ::core::option::Option<
     ) -> *mut ParamExternData,
 >;
 pub type ParamCompileHook = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         params: ParamListInfo,
         param: *mut Param,
         state: *mut ExprState,
@@ -7749,7 +7786,7 @@ pub type ParamCompileHook = ::core::option::Option<
     ),
 >;
 pub type ParserSetupHook = ::core::option::Option<
-    unsafe extern "C" fn(pstate: *mut ParseState, arg: *mut ::core::ffi::c_void),
+    unsafe extern "C-unwind" fn(pstate: *mut ParseState, arg: *mut ::core::ffi::c_void),
 >;
 #[repr(C)]
 #[derive(Debug)]
@@ -9981,7 +10018,7 @@ pub struct PGShmemHeader {
     _unused: [u8; 0],
 }
 pub type on_dsm_detach_callback =
-    ::core::option::Option<unsafe extern "C" fn(arg1: *mut dsm_segment, arg: Datum)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(arg1: *mut dsm_segment, arg: Datum)>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct dsa_area {
@@ -10013,11 +10050,6 @@ pub struct TBMIterateResult {
     pub recheck: bool,
     pub offsets: __IncompleteArrayField<OffsetNumber>,
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PartitionBoundInfoData {
-    _unused: [u8; 0],
-}
 pub type PartitionBoundInfo = *mut PartitionBoundInfoData;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -10025,11 +10057,6 @@ pub struct PartitionKeyData {
     _unused: [u8; 0],
 }
 pub type PartitionKey = *mut PartitionKeyData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PartitionDescData {
-    _unused: [u8; 0],
-}
 pub type PartitionDesc = *mut PartitionDescData;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -10097,24 +10124,24 @@ impl Default for ConditionVariableMinimallyPadded {
     }
 }
 pub type HashValueFunc = ::core::option::Option<
-    unsafe extern "C" fn(key: *const ::core::ffi::c_void, keysize: Size) -> uint32,
+    unsafe extern "C-unwind" fn(key: *const ::core::ffi::c_void, keysize: Size) -> uint32,
 >;
 pub type HashCompareFunc = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         key1: *const ::core::ffi::c_void,
         key2: *const ::core::ffi::c_void,
         keysize: Size,
     ) -> ::core::ffi::c_int,
 >;
 pub type HashCopyFunc = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         dest: *mut ::core::ffi::c_void,
         src: *const ::core::ffi::c_void,
         keysize: Size,
     ) -> *mut ::core::ffi::c_void,
 >;
 pub type HashAllocFunc =
-    ::core::option::Option<unsafe extern "C" fn(request: Size) -> *mut ::core::ffi::c_void>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(request: Size) -> *mut ::core::ffi::c_void>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct HASHELEMENT {
@@ -10433,16 +10460,17 @@ pub struct SortSupportData {
     pub ssup_attno: AttrNumber,
     pub ssup_extra: *mut ::core::ffi::c_void,
     pub comparator: ::core::option::Option<
-        unsafe extern "C" fn(x: Datum, y: Datum, ssup: SortSupport) -> ::core::ffi::c_int,
+        unsafe extern "C-unwind" fn(x: Datum, y: Datum, ssup: SortSupport) -> ::core::ffi::c_int,
     >,
     pub abbreviate: bool,
-    pub abbrev_converter:
-        ::core::option::Option<unsafe extern "C" fn(original: Datum, ssup: SortSupport) -> Datum>,
+    pub abbrev_converter: ::core::option::Option<
+        unsafe extern "C-unwind" fn(original: Datum, ssup: SortSupport) -> Datum,
+    >,
     pub abbrev_abort: ::core::option::Option<
-        unsafe extern "C" fn(memtupcount: ::core::ffi::c_int, ssup: SortSupport) -> bool,
+        unsafe extern "C-unwind" fn(memtupcount: ::core::ffi::c_int, ssup: SortSupport) -> bool,
     >,
     pub abbrev_full_comparator: ::core::option::Option<
-        unsafe extern "C" fn(x: Datum, y: Datum, ssup: SortSupport) -> ::core::ffi::c_int,
+        unsafe extern "C-unwind" fn(x: Datum, y: Datum, ssup: SortSupport) -> ::core::ffi::c_int,
     >,
 }
 impl Default for SortSupportData {
@@ -10539,7 +10567,7 @@ pub struct CopyMultiInsertBuffer {
     _unused: [u8; 0],
 }
 pub type ExprStateEvalFunc = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         expression: *mut ExprState,
         econtext: *mut ExprContext,
         isNull: *mut bool,
@@ -10611,7 +10639,8 @@ impl Default for IndexInfo {
         }
     }
 }
-pub type ExprContextCallbackFunction = ::core::option::Option<unsafe extern "C" fn(arg: Datum)>;
+pub type ExprContextCallbackFunction =
+    ::core::option::Option<unsafe extern "C-unwind" fn(arg: Datum)>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ExprContext_CB {
@@ -11113,8 +11142,9 @@ impl Default for DomainConstraintState {
         }
     }
 }
-pub type ExecProcNodeMtd =
-    ::core::option::Option<unsafe extern "C" fn(pstate: *mut PlanState) -> *mut TupleTableSlot>;
+pub type ExecProcNodeMtd = ::core::option::Option<
+    unsafe extern "C-unwind" fn(pstate: *mut PlanState) -> *mut TupleTableSlot,
+>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PlanState {
@@ -11300,7 +11330,7 @@ pub struct AppendState {
     pub as_valid_subplans: *mut Bitmapset,
     pub as_valid_asyncplans: *mut Bitmapset,
     pub choose_next_subplan:
-        ::core::option::Option<unsafe extern "C" fn(arg1: *mut AppendState) -> bool>,
+        ::core::option::Option<unsafe extern "C-unwind" fn(arg1: *mut AppendState) -> bool>,
 }
 impl Default for AppendState {
     fn default() -> Self {
@@ -12750,17 +12780,17 @@ pub type DestReceiver = _DestReceiver;
 #[derive(Debug, Copy, Clone)]
 pub struct _DestReceiver {
     pub receiveSlot: ::core::option::Option<
-        unsafe extern "C" fn(slot: *mut TupleTableSlot, self_: *mut DestReceiver) -> bool,
+        unsafe extern "C-unwind" fn(slot: *mut TupleTableSlot, self_: *mut DestReceiver) -> bool,
     >,
     pub rStartup: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             self_: *mut DestReceiver,
             operation: ::core::ffi::c_int,
             typeinfo: TupleDesc,
         ),
     >,
-    pub rShutdown: ::core::option::Option<unsafe extern "C" fn(self_: *mut DestReceiver)>,
-    pub rDestroy: ::core::option::Option<unsafe extern "C" fn(self_: *mut DestReceiver)>,
+    pub rShutdown: ::core::option::Option<unsafe extern "C-unwind" fn(self_: *mut DestReceiver)>,
+    pub rDestroy: ::core::option::Option<unsafe extern "C-unwind" fn(self_: *mut DestReceiver)>,
     pub mydest: CommandDest::Type,
 }
 impl Default for _DestReceiver {
@@ -16503,7 +16533,7 @@ pub struct MemoryContextCounters {
     pub freespace: Size,
 }
 pub type MemoryStatsPrintFunc = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         context: MemoryContext,
         passthru: *mut ::core::ffi::c_void,
         stats_string: *const ::core::ffi::c_char,
@@ -16514,26 +16544,30 @@ pub type MemoryStatsPrintFunc = ::core::option::Option<
 #[derive(Debug, Default, Copy, Clone)]
 pub struct MemoryContextMethods {
     pub alloc: ::core::option::Option<
-        unsafe extern "C" fn(context: MemoryContext, size: Size) -> *mut ::core::ffi::c_void,
+        unsafe extern "C-unwind" fn(context: MemoryContext, size: Size) -> *mut ::core::ffi::c_void,
     >,
     pub free_p: ::core::option::Option<
-        unsafe extern "C" fn(context: MemoryContext, pointer: *mut ::core::ffi::c_void),
+        unsafe extern "C-unwind" fn(context: MemoryContext, pointer: *mut ::core::ffi::c_void),
     >,
     pub realloc: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             context: MemoryContext,
             pointer: *mut ::core::ffi::c_void,
             size: Size,
         ) -> *mut ::core::ffi::c_void,
     >,
-    pub reset: ::core::option::Option<unsafe extern "C" fn(context: MemoryContext)>,
-    pub delete_context: ::core::option::Option<unsafe extern "C" fn(context: MemoryContext)>,
+    pub reset: ::core::option::Option<unsafe extern "C-unwind" fn(context: MemoryContext)>,
+    pub delete_context: ::core::option::Option<unsafe extern "C-unwind" fn(context: MemoryContext)>,
     pub get_chunk_space: ::core::option::Option<
-        unsafe extern "C" fn(context: MemoryContext, pointer: *mut ::core::ffi::c_void) -> Size,
+        unsafe extern "C-unwind" fn(
+            context: MemoryContext,
+            pointer: *mut ::core::ffi::c_void,
+        ) -> Size,
     >,
-    pub is_empty: ::core::option::Option<unsafe extern "C" fn(context: MemoryContext) -> bool>,
+    pub is_empty:
+        ::core::option::Option<unsafe extern "C-unwind" fn(context: MemoryContext) -> bool>,
     pub stats: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             context: MemoryContext,
             printfunc: MemoryStatsPrintFunc,
             passthru: *mut ::core::ffi::c_void,
@@ -16541,7 +16575,7 @@ pub struct MemoryContextMethods {
             print_to_stderr: bool,
         ),
     >,
-    pub check: ::core::option::Option<unsafe extern "C" fn(context: MemoryContext)>,
+    pub check: ::core::option::Option<unsafe extern "C-unwind" fn(context: MemoryContext)>,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -16569,10 +16603,10 @@ impl Default for MemoryContextData {
     }
 }
 pub type ExecutorStart_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(queryDesc: *mut QueryDesc, eflags: ::core::ffi::c_int),
+    unsafe extern "C-unwind" fn(queryDesc: *mut QueryDesc, eflags: ::core::ffi::c_int),
 >;
 pub type ExecutorRun_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         queryDesc: *mut QueryDesc,
         direction: ScanDirection::Type,
         count: uint64,
@@ -16580,15 +16614,16 @@ pub type ExecutorRun_hook_type = ::core::option::Option<
     ),
 >;
 pub type ExecutorFinish_hook_type =
-    ::core::option::Option<unsafe extern "C" fn(queryDesc: *mut QueryDesc)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(queryDesc: *mut QueryDesc)>;
 pub type ExecutorEnd_hook_type =
-    ::core::option::Option<unsafe extern "C" fn(queryDesc: *mut QueryDesc)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(queryDesc: *mut QueryDesc)>;
 pub type ExecutorCheckPerms_hook_type =
-    ::core::option::Option<unsafe extern "C" fn(arg1: *mut List, arg2: bool) -> bool>;
-pub type ExecScanAccessMtd =
-    ::core::option::Option<unsafe extern "C" fn(node: *mut ScanState) -> *mut TupleTableSlot>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(arg1: *mut List, arg2: bool) -> bool>;
+pub type ExecScanAccessMtd = ::core::option::Option<
+    unsafe extern "C-unwind" fn(node: *mut ScanState) -> *mut TupleTableSlot,
+>;
 pub type ExecScanRecheckMtd = ::core::option::Option<
-    unsafe extern "C" fn(node: *mut ScanState, slot: *mut TupleTableSlot) -> bool,
+    unsafe extern "C-unwind" fn(node: *mut ScanState, slot: *mut TupleTableSlot) -> bool,
 >;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -17992,7 +18027,7 @@ pub struct IndexBulkDeleteResult {
     pub pages_free: BlockNumber,
 }
 pub type IndexBulkDeleteCallback = ::core::option::Option<
-    unsafe extern "C" fn(itemptr: ItemPointer, state: *mut ::core::ffi::c_void) -> bool,
+    unsafe extern "C-unwind" fn(itemptr: ItemPointer, state: *mut ::core::ffi::c_void) -> bool,
 >;
 pub type IndexScanDesc = *mut IndexScanDescData;
 pub type SysScanDesc = *mut SysScanDescData;
@@ -18055,16 +18090,16 @@ impl Default for OpFamilyMember {
     }
 }
 pub type ambuild_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         heapRelation: Relation,
         indexRelation: Relation,
         indexInfo: *mut IndexInfo,
     ) -> *mut IndexBuildResult,
 >;
 pub type ambuildempty_function =
-    ::core::option::Option<unsafe extern "C" fn(indexRelation: Relation)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(indexRelation: Relation)>;
 pub type aminsert_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         indexRelation: Relation,
         values: *mut Datum,
         isnull: *mut bool,
@@ -18076,7 +18111,7 @@ pub type aminsert_function = ::core::option::Option<
     ) -> bool,
 >;
 pub type ambulkdelete_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         info: *mut IndexVacuumInfo,
         stats: *mut IndexBulkDeleteResult,
         callback: IndexBulkDeleteCallback,
@@ -18084,16 +18119,16 @@ pub type ambulkdelete_function = ::core::option::Option<
     ) -> *mut IndexBulkDeleteResult,
 >;
 pub type amvacuumcleanup_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         info: *mut IndexVacuumInfo,
         stats: *mut IndexBulkDeleteResult,
     ) -> *mut IndexBulkDeleteResult,
 >;
 pub type amcanreturn_function = ::core::option::Option<
-    unsafe extern "C" fn(indexRelation: Relation, attno: ::core::ffi::c_int) -> bool,
+    unsafe extern "C-unwind" fn(indexRelation: Relation, attno: ::core::ffi::c_int) -> bool,
 >;
 pub type amcostestimate_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         path: *mut IndexPath,
         loop_count: f64,
@@ -18104,10 +18139,11 @@ pub type amcostestimate_function = ::core::option::Option<
         indexPages: *mut f64,
     ),
 >;
-pub type amoptions_function =
-    ::core::option::Option<unsafe extern "C" fn(reloptions: Datum, validate: bool) -> *mut bytea>;
+pub type amoptions_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(reloptions: Datum, validate: bool) -> *mut bytea,
+>;
 pub type amproperty_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         index_oid: Oid,
         attno: ::core::ffi::c_int,
         prop: IndexAMProperty::Type,
@@ -18116,12 +18152,13 @@ pub type amproperty_function = ::core::option::Option<
         isnull: *mut bool,
     ) -> bool,
 >;
-pub type ambuildphasename_function =
-    ::core::option::Option<unsafe extern "C" fn(phasenum: int64) -> *mut ::core::ffi::c_char>;
+pub type ambuildphasename_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(phasenum: int64) -> *mut ::core::ffi::c_char,
+>;
 pub type amvalidate_function =
-    ::core::option::Option<unsafe extern "C" fn(opclassoid: Oid) -> bool>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(opclassoid: Oid) -> bool>;
 pub type amadjustmembers_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         opfamilyoid: Oid,
         opclassoid: Oid,
         operators: *mut List,
@@ -18129,14 +18166,14 @@ pub type amadjustmembers_function = ::core::option::Option<
     ),
 >;
 pub type ambeginscan_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         indexRelation: Relation,
         nkeys: ::core::ffi::c_int,
         norderbys: ::core::ffi::c_int,
     ) -> IndexScanDesc,
 >;
 pub type amrescan_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         scan: IndexScanDesc,
         keys: ScanKey,
         nkeys: ::core::ffi::c_int,
@@ -18145,18 +18182,23 @@ pub type amrescan_function = ::core::option::Option<
     ),
 >;
 pub type amgettuple_function = ::core::option::Option<
-    unsafe extern "C" fn(scan: IndexScanDesc, direction: ScanDirection::Type) -> bool,
+    unsafe extern "C-unwind" fn(scan: IndexScanDesc, direction: ScanDirection::Type) -> bool,
 >;
-pub type amgetbitmap_function =
-    ::core::option::Option<unsafe extern "C" fn(scan: IndexScanDesc, tbm: *mut TIDBitmap) -> int64>;
-pub type amendscan_function = ::core::option::Option<unsafe extern "C" fn(scan: IndexScanDesc)>;
-pub type ammarkpos_function = ::core::option::Option<unsafe extern "C" fn(scan: IndexScanDesc)>;
-pub type amrestrpos_function = ::core::option::Option<unsafe extern "C" fn(scan: IndexScanDesc)>;
-pub type amestimateparallelscan_function = ::core::option::Option<unsafe extern "C" fn() -> Size>;
+pub type amgetbitmap_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(scan: IndexScanDesc, tbm: *mut TIDBitmap) -> int64,
+>;
+pub type amendscan_function =
+    ::core::option::Option<unsafe extern "C-unwind" fn(scan: IndexScanDesc)>;
+pub type ammarkpos_function =
+    ::core::option::Option<unsafe extern "C-unwind" fn(scan: IndexScanDesc)>;
+pub type amrestrpos_function =
+    ::core::option::Option<unsafe extern "C-unwind" fn(scan: IndexScanDesc)>;
+pub type amestimateparallelscan_function =
+    ::core::option::Option<unsafe extern "C-unwind" fn() -> Size>;
 pub type aminitparallelscan_function =
-    ::core::option::Option<unsafe extern "C" fn(target: *mut ::core::ffi::c_void)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(target: *mut ::core::ffi::c_void)>;
 pub type amparallelrescan_function =
-    ::core::option::Option<unsafe extern "C" fn(scan: IndexScanDesc)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(scan: IndexScanDesc)>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct IndexAmRoutine {
@@ -18281,7 +18323,7 @@ impl Default for RelFileNodeBackend {
 }
 pub type pg_crc32c = uint32;
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct XLogRecord {
     pub xl_tot_len: uint32,
     pub xl_xid: TransactionId,
@@ -18289,6 +18331,15 @@ pub struct XLogRecord {
     pub xl_info: uint8,
     pub xl_rmid: RmgrId,
     pub xl_crc: pg_crc32c,
+}
+impl Default for XLogRecord {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -18343,7 +18394,7 @@ impl Default for WALSegmentContext {
     }
 }
 pub type XLogPageReadCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         xlogreader: *mut XLogReaderState,
         targetPagePtr: XLogRecPtr,
         reqLen: ::core::ffi::c_int,
@@ -18352,14 +18403,14 @@ pub type XLogPageReadCB = ::core::option::Option<
     ) -> ::core::ffi::c_int,
 >;
 pub type WALSegmentOpenCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         xlogreader: *mut XLogReaderState,
         nextSegNo: XLogSegNo,
         tli_p: *mut TimeLineID,
     ),
 >;
 pub type WALSegmentCloseCB =
-    ::core::option::Option<unsafe extern "C" fn(xlogreader: *mut XLogReaderState)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(xlogreader: *mut XLogReaderState)>;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct XLogReaderRoutine {
@@ -18609,15 +18660,17 @@ pub mod RecoveryTargetAction {
 #[derive(Debug, Copy, Clone)]
 pub struct RmgrData {
     pub rm_name: *const ::core::ffi::c_char,
-    pub rm_redo: ::core::option::Option<unsafe extern "C" fn(record: *mut XLogReaderState)>,
-    pub rm_desc:
-        ::core::option::Option<unsafe extern "C" fn(buf: StringInfo, record: *mut XLogReaderState)>,
-    pub rm_identify:
-        ::core::option::Option<unsafe extern "C" fn(info: uint8) -> *const ::core::ffi::c_char>,
-    pub rm_startup: ::core::option::Option<unsafe extern "C" fn()>,
-    pub rm_cleanup: ::core::option::Option<unsafe extern "C" fn()>,
+    pub rm_redo: ::core::option::Option<unsafe extern "C-unwind" fn(record: *mut XLogReaderState)>,
+    pub rm_desc: ::core::option::Option<
+        unsafe extern "C-unwind" fn(buf: StringInfo, record: *mut XLogReaderState),
+    >,
+    pub rm_identify: ::core::option::Option<
+        unsafe extern "C-unwind" fn(info: uint8) -> *const ::core::ffi::c_char,
+    >,
+    pub rm_startup: ::core::option::Option<unsafe extern "C-unwind" fn()>,
+    pub rm_cleanup: ::core::option::Option<unsafe extern "C-unwind" fn()>,
     pub rm_mask: ::core::option::Option<
-        unsafe extern "C" fn(pagedata: *mut ::core::ffi::c_char, blkno: BlockNumber),
+        unsafe extern "C-unwind" fn(pagedata: *mut ::core::ffi::c_char, blkno: BlockNumber),
     >,
 }
 impl Default for RmgrData {
@@ -19404,7 +19457,7 @@ pub mod XactEvent {
     pub const XACT_EVENT_PRE_PREPARE: Type = 7;
 }
 pub type XactCallback = ::core::option::Option<
-    unsafe extern "C" fn(event: XactEvent::Type, arg: *mut ::core::ffi::c_void),
+    unsafe extern "C-unwind" fn(event: XactEvent::Type, arg: *mut ::core::ffi::c_void),
 >;
 pub mod SubXactEvent {
     pub type Type = ::core::ffi::c_uint;
@@ -19414,7 +19467,7 @@ pub mod SubXactEvent {
     pub const SUBXACT_EVENT_PRE_COMMIT_SUB: Type = 3;
 }
 pub type SubXactCallback = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         event: SubXactEvent::Type,
         mySubid: SubTransactionId,
         parentSubid: SubTransactionId,
@@ -19422,11 +19475,20 @@ pub type SubXactCallback = ::core::option::Option<
     ),
 >;
 #[repr(C)]
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct xl_xact_assignment {
     pub xtop: TransactionId,
     pub nsubxacts: ::core::ffi::c_int,
     pub xsub: __IncompleteArrayField<TransactionId>,
+}
+impl Default for xl_xact_assignment {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -19449,10 +19511,19 @@ impl Default for xl_xact_dbinfo {
     }
 }
 #[repr(C)]
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct xl_xact_subxacts {
     pub nsubxacts: ::core::ffi::c_int,
     pub subxacts: __IncompleteArrayField<TransactionId>,
+}
+impl Default for xl_xact_subxacts {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 #[repr(C)]
 #[derive(Debug)]
@@ -19484,9 +19555,18 @@ impl Default for xl_xact_invals {
     }
 }
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct xl_xact_twophase {
     pub xid: TransactionId,
+}
+impl Default for xl_xact_twophase {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -19587,9 +19667,9 @@ impl Default for xl_xact_parsed_abort {
     }
 }
 pub type EOM_get_flat_size_method =
-    ::core::option::Option<unsafe extern "C" fn(eohptr: *mut ExpandedObjectHeader) -> Size>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(eohptr: *mut ExpandedObjectHeader) -> Size>;
 pub type EOM_flatten_into_method = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         eohptr: *mut ExpandedObjectHeader,
         result: *mut ::core::ffi::c_void,
         allocated_size: Size,
@@ -19852,54 +19932,60 @@ impl Default for config_enum_entry {
     }
 }
 pub type GucBoolCheckHook = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         newval: *mut bool,
         extra: *mut *mut ::core::ffi::c_void,
         source: GucSource::Type,
     ) -> bool,
 >;
 pub type GucIntCheckHook = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         newval: *mut ::core::ffi::c_int,
         extra: *mut *mut ::core::ffi::c_void,
         source: GucSource::Type,
     ) -> bool,
 >;
 pub type GucRealCheckHook = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         newval: *mut f64,
         extra: *mut *mut ::core::ffi::c_void,
         source: GucSource::Type,
     ) -> bool,
 >;
 pub type GucStringCheckHook = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         newval: *mut *mut ::core::ffi::c_char,
         extra: *mut *mut ::core::ffi::c_void,
         source: GucSource::Type,
     ) -> bool,
 >;
 pub type GucEnumCheckHook = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         newval: *mut ::core::ffi::c_int,
         extra: *mut *mut ::core::ffi::c_void,
         source: GucSource::Type,
     ) -> bool,
 >;
-pub type GucBoolAssignHook =
-    ::core::option::Option<unsafe extern "C" fn(newval: bool, extra: *mut ::core::ffi::c_void)>;
-pub type GucIntAssignHook = ::core::option::Option<
-    unsafe extern "C" fn(newval: ::core::ffi::c_int, extra: *mut ::core::ffi::c_void),
+pub type GucBoolAssignHook = ::core::option::Option<
+    unsafe extern "C-unwind" fn(newval: bool, extra: *mut ::core::ffi::c_void),
 >;
-pub type GucRealAssignHook =
-    ::core::option::Option<unsafe extern "C" fn(newval: f64, extra: *mut ::core::ffi::c_void)>;
+pub type GucIntAssignHook = ::core::option::Option<
+    unsafe extern "C-unwind" fn(newval: ::core::ffi::c_int, extra: *mut ::core::ffi::c_void),
+>;
+pub type GucRealAssignHook = ::core::option::Option<
+    unsafe extern "C-unwind" fn(newval: f64, extra: *mut ::core::ffi::c_void),
+>;
 pub type GucStringAssignHook = ::core::option::Option<
-    unsafe extern "C" fn(newval: *const ::core::ffi::c_char, extra: *mut ::core::ffi::c_void),
+    unsafe extern "C-unwind" fn(
+        newval: *const ::core::ffi::c_char,
+        extra: *mut ::core::ffi::c_void,
+    ),
 >;
 pub type GucEnumAssignHook = ::core::option::Option<
-    unsafe extern "C" fn(newval: ::core::ffi::c_int, extra: *mut ::core::ffi::c_void),
+    unsafe extern "C-unwind" fn(newval: ::core::ffi::c_int, extra: *mut ::core::ffi::c_void),
 >;
-pub type GucShowHook = ::core::option::Option<unsafe extern "C" fn() -> *const ::core::ffi::c_char>;
+pub type GucShowHook =
+    ::core::option::Option<unsafe extern "C-unwind" fn() -> *const ::core::ffi::c_char>;
 pub mod GucAction {
     pub type Type = ::core::ffi::c_uint;
     pub const GUC_ACTION_SET: Type = 0;
@@ -19935,12 +20021,21 @@ pub mod TM_Result {
     pub const TM_WouldBlock: Type = 6;
 }
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct TM_FailureData {
     pub ctid: ItemPointerData,
     pub xmax: TransactionId,
     pub cmax: CommandId,
     pub traversed: bool,
+}
+impl Default for TM_FailureData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -19975,7 +20070,7 @@ impl Default for TM_IndexDeleteOp {
     }
 }
 pub type IndexBuildCallback = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         index: Relation,
         tid: ItemPointer,
         values: *mut Datum,
@@ -19988,10 +20083,11 @@ pub type IndexBuildCallback = ::core::option::Option<
 #[derive(Debug, Copy, Clone)]
 pub struct TableAmRoutine {
     pub type_: NodeTag,
-    pub slot_callbacks:
-        ::core::option::Option<unsafe extern "C" fn(rel: Relation) -> *const TupleTableSlotOps>,
+    pub slot_callbacks: ::core::option::Option<
+        unsafe extern "C-unwind" fn(rel: Relation) -> *const TupleTableSlotOps,
+    >,
     pub scan_begin: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             rel: Relation,
             snapshot: Snapshot,
             nkeys: ::core::ffi::c_int,
@@ -20000,9 +20096,9 @@ pub struct TableAmRoutine {
             flags: uint32,
         ) -> TableScanDesc,
     >,
-    pub scan_end: ::core::option::Option<unsafe extern "C" fn(scan: TableScanDesc)>,
+    pub scan_end: ::core::option::Option<unsafe extern "C-unwind" fn(scan: TableScanDesc)>,
     pub scan_rescan: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             scan: TableScanDesc,
             key: *mut ScanKeyData,
             set_params: bool,
@@ -20012,36 +20108,39 @@ pub struct TableAmRoutine {
         ),
     >,
     pub scan_getnextslot: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             scan: TableScanDesc,
             direction: ScanDirection::Type,
             slot: *mut TupleTableSlot,
         ) -> bool,
     >,
     pub scan_set_tidrange: ::core::option::Option<
-        unsafe extern "C" fn(scan: TableScanDesc, mintid: ItemPointer, maxtid: ItemPointer),
+        unsafe extern "C-unwind" fn(scan: TableScanDesc, mintid: ItemPointer, maxtid: ItemPointer),
     >,
     pub scan_getnextslot_tidrange: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             scan: TableScanDesc,
             direction: ScanDirection::Type,
             slot: *mut TupleTableSlot,
         ) -> bool,
     >,
-    pub parallelscan_estimate: ::core::option::Option<unsafe extern "C" fn(rel: Relation) -> Size>,
+    pub parallelscan_estimate:
+        ::core::option::Option<unsafe extern "C-unwind" fn(rel: Relation) -> Size>,
     pub parallelscan_initialize: ::core::option::Option<
-        unsafe extern "C" fn(rel: Relation, pscan: ParallelTableScanDesc) -> Size,
+        unsafe extern "C-unwind" fn(rel: Relation, pscan: ParallelTableScanDesc) -> Size,
     >,
-    pub parallelscan_reinitialize:
-        ::core::option::Option<unsafe extern "C" fn(rel: Relation, pscan: ParallelTableScanDesc)>,
-    pub index_fetch_begin:
-        ::core::option::Option<unsafe extern "C" fn(rel: Relation) -> *mut IndexFetchTableData>,
+    pub parallelscan_reinitialize: ::core::option::Option<
+        unsafe extern "C-unwind" fn(rel: Relation, pscan: ParallelTableScanDesc),
+    >,
+    pub index_fetch_begin: ::core::option::Option<
+        unsafe extern "C-unwind" fn(rel: Relation) -> *mut IndexFetchTableData,
+    >,
     pub index_fetch_reset:
-        ::core::option::Option<unsafe extern "C" fn(data: *mut IndexFetchTableData)>,
+        ::core::option::Option<unsafe extern "C-unwind" fn(data: *mut IndexFetchTableData)>,
     pub index_fetch_end:
-        ::core::option::Option<unsafe extern "C" fn(data: *mut IndexFetchTableData)>,
+        ::core::option::Option<unsafe extern "C-unwind" fn(data: *mut IndexFetchTableData)>,
     pub index_fetch_tuple: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             scan: *mut IndexFetchTableData,
             tid: ItemPointer,
             snapshot: Snapshot,
@@ -20051,25 +20150,33 @@ pub struct TableAmRoutine {
         ) -> bool,
     >,
     pub tuple_fetch_row_version: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             rel: Relation,
             tid: ItemPointer,
             snapshot: Snapshot,
             slot: *mut TupleTableSlot,
         ) -> bool,
     >,
-    pub tuple_tid_valid:
-        ::core::option::Option<unsafe extern "C" fn(scan: TableScanDesc, tid: ItemPointer) -> bool>,
+    pub tuple_tid_valid: ::core::option::Option<
+        unsafe extern "C-unwind" fn(scan: TableScanDesc, tid: ItemPointer) -> bool,
+    >,
     pub tuple_get_latest_tid:
-        ::core::option::Option<unsafe extern "C" fn(scan: TableScanDesc, tid: ItemPointer)>,
+        ::core::option::Option<unsafe extern "C-unwind" fn(scan: TableScanDesc, tid: ItemPointer)>,
     pub tuple_satisfies_snapshot: ::core::option::Option<
-        unsafe extern "C" fn(rel: Relation, slot: *mut TupleTableSlot, snapshot: Snapshot) -> bool,
+        unsafe extern "C-unwind" fn(
+            rel: Relation,
+            slot: *mut TupleTableSlot,
+            snapshot: Snapshot,
+        ) -> bool,
     >,
     pub index_delete_tuples: ::core::option::Option<
-        unsafe extern "C" fn(rel: Relation, delstate: *mut TM_IndexDeleteOp) -> TransactionId,
+        unsafe extern "C-unwind" fn(
+            rel: Relation,
+            delstate: *mut TM_IndexDeleteOp,
+        ) -> TransactionId,
     >,
     pub tuple_insert: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             rel: Relation,
             slot: *mut TupleTableSlot,
             cid: CommandId,
@@ -20078,7 +20185,7 @@ pub struct TableAmRoutine {
         ),
     >,
     pub tuple_insert_speculative: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             rel: Relation,
             slot: *mut TupleTableSlot,
             cid: CommandId,
@@ -20088,7 +20195,7 @@ pub struct TableAmRoutine {
         ),
     >,
     pub tuple_complete_speculative: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             rel: Relation,
             slot: *mut TupleTableSlot,
             specToken: uint32,
@@ -20096,7 +20203,7 @@ pub struct TableAmRoutine {
         ),
     >,
     pub multi_insert: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             rel: Relation,
             slots: *mut *mut TupleTableSlot,
             nslots: ::core::ffi::c_int,
@@ -20106,7 +20213,7 @@ pub struct TableAmRoutine {
         ),
     >,
     pub tuple_delete: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             rel: Relation,
             tid: ItemPointer,
             cid: CommandId,
@@ -20118,7 +20225,7 @@ pub struct TableAmRoutine {
         ) -> TM_Result::Type,
     >,
     pub tuple_update: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             rel: Relation,
             otid: ItemPointer,
             slot: *mut TupleTableSlot,
@@ -20132,7 +20239,7 @@ pub struct TableAmRoutine {
         ) -> TM_Result::Type,
     >,
     pub tuple_lock: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             rel: Relation,
             tid: ItemPointer,
             snapshot: Snapshot,
@@ -20144,10 +20251,11 @@ pub struct TableAmRoutine {
             tmfd: *mut TM_FailureData,
         ) -> TM_Result::Type,
     >,
-    pub finish_bulk_insert:
-        ::core::option::Option<unsafe extern "C" fn(rel: Relation, options: ::core::ffi::c_int)>,
+    pub finish_bulk_insert: ::core::option::Option<
+        unsafe extern "C-unwind" fn(rel: Relation, options: ::core::ffi::c_int),
+    >,
     pub relation_set_new_filenode: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             rel: Relation,
             newrnode: *const RelFileNode,
             persistence: ::core::ffi::c_char,
@@ -20156,11 +20264,12 @@ pub struct TableAmRoutine {
         ),
     >,
     pub relation_nontransactional_truncate:
-        ::core::option::Option<unsafe extern "C" fn(rel: Relation)>,
-    pub relation_copy_data:
-        ::core::option::Option<unsafe extern "C" fn(rel: Relation, newrnode: *const RelFileNode)>,
+        ::core::option::Option<unsafe extern "C-unwind" fn(rel: Relation)>,
+    pub relation_copy_data: ::core::option::Option<
+        unsafe extern "C-unwind" fn(rel: Relation, newrnode: *const RelFileNode),
+    >,
     pub relation_copy_for_cluster: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             OldTable: Relation,
             NewTable: Relation,
             OldIndex: Relation,
@@ -20174,21 +20283,21 @@ pub struct TableAmRoutine {
         ),
     >,
     pub relation_vacuum: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             rel: Relation,
             params: *mut VacuumParams,
             bstrategy: BufferAccessStrategy,
         ),
     >,
     pub scan_analyze_next_block: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             scan: TableScanDesc,
             blockno: BlockNumber,
             bstrategy: BufferAccessStrategy,
         ) -> bool,
     >,
     pub scan_analyze_next_tuple: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             scan: TableScanDesc,
             OldestXmin: TransactionId,
             liverows: *mut f64,
@@ -20197,7 +20306,7 @@ pub struct TableAmRoutine {
         ) -> bool,
     >,
     pub index_build_range_scan: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             table_rel: Relation,
             index_rel: Relation,
             index_info: *mut IndexInfo,
@@ -20212,7 +20321,7 @@ pub struct TableAmRoutine {
         ) -> f64,
     >,
     pub index_validate_scan: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             table_rel: Relation,
             index_rel: Relation,
             index_info: *mut IndexInfo,
@@ -20221,13 +20330,14 @@ pub struct TableAmRoutine {
         ),
     >,
     pub relation_size: ::core::option::Option<
-        unsafe extern "C" fn(rel: Relation, forkNumber: ForkNumber::Type) -> uint64,
+        unsafe extern "C-unwind" fn(rel: Relation, forkNumber: ForkNumber::Type) -> uint64,
     >,
     pub relation_needs_toast_table:
-        ::core::option::Option<unsafe extern "C" fn(rel: Relation) -> bool>,
-    pub relation_toast_am: ::core::option::Option<unsafe extern "C" fn(rel: Relation) -> Oid>,
+        ::core::option::Option<unsafe extern "C-unwind" fn(rel: Relation) -> bool>,
+    pub relation_toast_am:
+        ::core::option::Option<unsafe extern "C-unwind" fn(rel: Relation) -> Oid>,
     pub relation_fetch_toast_slice: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             toastrel: Relation,
             valueid: Oid,
             attrsize: int32,
@@ -20237,7 +20347,7 @@ pub struct TableAmRoutine {
         ),
     >,
     pub relation_estimate_size: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             rel: Relation,
             attr_widths: *mut int32,
             pages: *mut BlockNumber,
@@ -20246,20 +20356,20 @@ pub struct TableAmRoutine {
         ),
     >,
     pub scan_bitmap_next_block: ::core::option::Option<
-        unsafe extern "C" fn(scan: TableScanDesc, tbmres: *mut TBMIterateResult) -> bool,
+        unsafe extern "C-unwind" fn(scan: TableScanDesc, tbmres: *mut TBMIterateResult) -> bool,
     >,
     pub scan_bitmap_next_tuple: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             scan: TableScanDesc,
             tbmres: *mut TBMIterateResult,
             slot: *mut TupleTableSlot,
         ) -> bool,
     >,
     pub scan_sample_next_block: ::core::option::Option<
-        unsafe extern "C" fn(scan: TableScanDesc, scanstate: *mut SampleScanState) -> bool,
+        unsafe extern "C-unwind" fn(scan: TableScanDesc, scanstate: *mut SampleScanState) -> bool,
     >,
     pub scan_sample_next_tuple: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             scan: TableScanDesc,
             scanstate: *mut SampleScanState,
             slot: *mut TupleTableSlot,
@@ -20432,7 +20542,6 @@ impl Default for MultiXactMember {
     }
 }
 #[repr(C)]
-#[derive(Debug)]
 pub struct xl_multixact_create {
     pub mid: MultiXactId,
     pub moff: MultiXactOffset,
@@ -20449,7 +20558,6 @@ impl Default for xl_multixact_create {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct xl_multixact_truncate {
     pub oldestMultiDB: Oid,
     pub startTruncOff: MultiXactId,
@@ -20943,12 +21051,15 @@ impl Default for relopt_enum {
     }
 }
 pub type validate_string_relopt =
-    ::core::option::Option<unsafe extern "C" fn(value: *const ::core::ffi::c_char)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(value: *const ::core::ffi::c_char)>;
 pub type fill_string_relopt = ::core::option::Option<
-    unsafe extern "C" fn(value: *const ::core::ffi::c_char, ptr: *mut ::core::ffi::c_void) -> Size,
+    unsafe extern "C-unwind" fn(
+        value: *const ::core::ffi::c_char,
+        ptr: *mut ::core::ffi::c_void,
+    ) -> Size,
 >;
 pub type relopts_validator = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         parsed_options: *mut ::core::ffi::c_void,
         vals: *mut relopt_value,
         nvals: ::core::ffi::c_int,
@@ -21028,7 +21139,7 @@ pub mod ResourceReleasePhase {
     pub const RESOURCE_RELEASE_AFTER_LOCKS: Type = 2;
 }
 pub type ResourceReleaseCallback = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         phase: ResourceReleasePhase::Type,
         isCommit: bool,
         isTopLevel: bool,
@@ -21056,11 +21167,6 @@ pub mod ReadBufferMode {
 pub struct PrefetchBufferResult {
     pub recent_buffer: Buffer,
     pub initiated_io: bool,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct WritebackContext {
-    _unused: [u8; 0],
 }
 pub mod XLogRedoAction {
     pub type Type = ::core::ffi::c_uint;
@@ -21228,7 +21334,7 @@ pub mod RVROption {
     pub const RVR_SKIP_LOCKED: Type = 4;
 }
 pub type RangeVarGetRelidCallback = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         relation: *const RangeVar,
         relId: Oid,
         oldRelId: Oid,
@@ -21276,7 +21382,7 @@ pub struct ObjectAccessNamespaceSearch {
     pub result: bool,
 }
 pub type object_access_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         access: ObjectAccessType::Type,
         classId: Oid,
         objectId: Oid,
@@ -21661,20 +21767,20 @@ pub mod ParseExprKind {
     pub const EXPR_KIND_CYCLE_MARK: Type = 42;
 }
 pub type PreParseColumnRefHook = ::core::option::Option<
-    unsafe extern "C" fn(pstate: *mut ParseState, cref: *mut ColumnRef) -> *mut Node,
+    unsafe extern "C-unwind" fn(pstate: *mut ParseState, cref: *mut ColumnRef) -> *mut Node,
 >;
 pub type PostParseColumnRefHook = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         pstate: *mut ParseState,
         cref: *mut ColumnRef,
         var: *mut Node,
     ) -> *mut Node,
 >;
 pub type ParseParamRefHook = ::core::option::Option<
-    unsafe extern "C" fn(pstate: *mut ParseState, pref: *mut ParamRef) -> *mut Node,
+    unsafe extern "C-unwind" fn(pstate: *mut ParseState, pref: *mut ParamRef) -> *mut Node,
 >;
 pub type CoerceParamHook = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         pstate: *mut ParseState,
         param: *mut Param,
         targetTypeId: Oid,
@@ -21998,7 +22104,7 @@ pub struct CopyToStateData {
 }
 pub type CopyToState = *mut CopyToStateData;
 pub type copy_data_source_cb = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         outbuf: *mut ::core::ffi::c_void,
         minread: ::core::ffi::c_int,
         maxread: ::core::ffi::c_int,
@@ -22291,7 +22397,7 @@ impl Default for ExplainState {
     }
 }
 pub type ExplainOneQuery_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         query: *mut Query,
         cursorOptions: ::core::ffi::c_int,
         into: *mut IntoClause,
@@ -22302,7 +22408,7 @@ pub type ExplainOneQuery_hook_type = ::core::option::Option<
     ),
 >;
 pub type explain_get_index_name_hook_type =
-    ::core::option::Option<unsafe extern "C" fn(indexId: Oid) -> *const ::core::ffi::c_char>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(indexId: Oid) -> *const ::core::ffi::c_char>;
 pub mod PlanCacheMode {
     pub type Type = ::core::ffi::c_uint;
     pub const PLAN_CACHE_MODE_AUTO: Type = 0;
@@ -22415,7 +22521,7 @@ impl Default for PreparedStatement {
     }
 }
 pub type check_object_relabel_type = ::core::option::Option<
-    unsafe extern "C" fn(object: *const ObjectAddress, seclabel: *const ::core::ffi::c_char),
+    unsafe extern "C-unwind" fn(object: *const ObjectAddress, seclabel: *const ::core::ffi::c_char),
 >;
 #[repr(C)]
 #[derive(Debug)]
@@ -22511,7 +22617,7 @@ pub mod PasswordType {
     pub const PASSWORD_TYPE_SCRAM_SHA_256: Type = 2;
 }
 pub type check_password_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         username: *const ::core::ffi::c_char,
         shadow_pass: *const ::core::ffi::c_char,
         password_type: PasswordType::Type,
@@ -22556,14 +22662,14 @@ impl Default for FormData_pg_statistic {
 pub type Form_pg_statistic = *mut FormData_pg_statistic;
 pub type VacAttrStatsP = *mut VacAttrStats;
 pub type AnalyzeAttrFetchFunc = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         stats: VacAttrStatsP,
         rownum: ::core::ffi::c_int,
         isNull: *mut bool,
     ) -> Datum,
 >;
 pub type AnalyzeAttrComputeStatsFunc = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         stats: VacAttrStatsP,
         fetchfunc: AnalyzeAttrFetchFunc,
         samplerows: ::core::ffi::c_int,
@@ -22659,7 +22765,6 @@ impl Default for ConfigData {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct CheckPoint {
     pub redo: XLogRecPtr,
     pub ThisTimeLineID: TimeLineID,
@@ -22698,7 +22803,6 @@ pub mod DBState {
     pub const DB_IN_PRODUCTION: Type = 6;
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct ControlFileData {
     pub system_identifier: uint64,
     pub pg_control_version: uint32,
@@ -22745,7 +22849,7 @@ impl Default for ControlFileData {
         }
     }
 }
-pub type bgworker_main_type = ::core::option::Option<unsafe extern "C" fn(main_arg: Datum)>;
+pub type bgworker_main_type = ::core::option::Option<unsafe extern "C-unwind" fn(main_arg: Datum)>;
 pub mod BgWorkerStartTime {
     pub type Type = ::core::ffi::c_uint;
     pub const BgWorkerStart_PostmasterStart: Type = 0;
@@ -22989,7 +23093,7 @@ pub mod shm_mq_result {
     pub const SHM_MQ_DETACHED: Type = 2;
 }
 pub type parallel_worker_main_type =
-    ::core::option::Option<unsafe extern "C" fn(seg: *mut dsm_segment, toc: *mut shm_toc)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(seg: *mut dsm_segment, toc: *mut shm_toc)>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ParallelWorkerInfo {
@@ -23185,10 +23289,14 @@ pub struct ScalarArrayOpExprHashTable {
     _unused: [u8; 0],
 }
 pub type ExecEvalSubroutine = ::core::option::Option<
-    unsafe extern "C" fn(state: *mut ExprState, op: *mut ExprEvalStep, econtext: *mut ExprContext),
+    unsafe extern "C-unwind" fn(
+        state: *mut ExprState,
+        op: *mut ExprEvalStep,
+        econtext: *mut ExprContext,
+    ),
 >;
 pub type ExecEvalBoolSubroutine = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         state: *mut ExprState,
         op: *mut ExprEvalStep,
         econtext: *mut ExprContext,
@@ -24057,7 +24165,7 @@ pub struct PortalData {
     pub prepStmtName: *const ::core::ffi::c_char,
     pub portalContext: MemoryContext,
     pub resowner: ResourceOwner,
-    pub cleanup: ::core::option::Option<unsafe extern "C" fn(portal: Portal)>,
+    pub cleanup: ::core::option::Option<unsafe extern "C-unwind" fn(portal: Portal)>,
     pub createSubid: SubTransactionId,
     pub activeSubid: SubTransactionId,
     pub sourceText: *const ::core::ffi::c_char,
@@ -24464,7 +24572,7 @@ pub struct IndexOptInfo {
     pub amhasgetbitmap: bool,
     pub amcanparallel: bool,
     pub amcanmarkpos: bool,
-    pub amcostestimate: ::core::option::Option<unsafe extern "C" fn()>,
+    pub amcostestimate: ::core::option::Option<unsafe extern "C-unwind" fn()>,
 }
 impl Default for IndexOptInfo {
     fn default() -> Self {
@@ -25648,13 +25756,21 @@ impl Default for AggTransInfo {
     }
 }
 pub type GetForeignRelSize_function = ::core::option::Option<
-    unsafe extern "C" fn(root: *mut PlannerInfo, baserel: *mut RelOptInfo, foreigntableid: Oid),
+    unsafe extern "C-unwind" fn(
+        root: *mut PlannerInfo,
+        baserel: *mut RelOptInfo,
+        foreigntableid: Oid,
+    ),
 >;
 pub type GetForeignPaths_function = ::core::option::Option<
-    unsafe extern "C" fn(root: *mut PlannerInfo, baserel: *mut RelOptInfo, foreigntableid: Oid),
+    unsafe extern "C-unwind" fn(
+        root: *mut PlannerInfo,
+        baserel: *mut RelOptInfo,
+        foreigntableid: Oid,
+    ),
 >;
 pub type GetForeignPlan_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         baserel: *mut RelOptInfo,
         foreigntableid: Oid,
@@ -25665,20 +25781,20 @@ pub type GetForeignPlan_function = ::core::option::Option<
     ) -> *mut ForeignScan,
 >;
 pub type BeginForeignScan_function = ::core::option::Option<
-    unsafe extern "C" fn(node: *mut ForeignScanState, eflags: ::core::ffi::c_int),
+    unsafe extern "C-unwind" fn(node: *mut ForeignScanState, eflags: ::core::ffi::c_int),
 >;
 pub type IterateForeignScan_function = ::core::option::Option<
-    unsafe extern "C" fn(node: *mut ForeignScanState) -> *mut TupleTableSlot,
+    unsafe extern "C-unwind" fn(node: *mut ForeignScanState) -> *mut TupleTableSlot,
 >;
 pub type RecheckForeignScan_function = ::core::option::Option<
-    unsafe extern "C" fn(node: *mut ForeignScanState, slot: *mut TupleTableSlot) -> bool,
+    unsafe extern "C-unwind" fn(node: *mut ForeignScanState, slot: *mut TupleTableSlot) -> bool,
 >;
 pub type ReScanForeignScan_function =
-    ::core::option::Option<unsafe extern "C" fn(node: *mut ForeignScanState)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(node: *mut ForeignScanState)>;
 pub type EndForeignScan_function =
-    ::core::option::Option<unsafe extern "C" fn(node: *mut ForeignScanState)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(node: *mut ForeignScanState)>;
 pub type GetForeignJoinPaths_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         joinrel: *mut RelOptInfo,
         outerrel: *mut RelOptInfo,
@@ -25688,7 +25804,7 @@ pub type GetForeignJoinPaths_function = ::core::option::Option<
     ),
 >;
 pub type GetForeignUpperPaths_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         stage: UpperRelationKind::Type,
         input_rel: *mut RelOptInfo,
@@ -25697,7 +25813,7 @@ pub type GetForeignUpperPaths_function = ::core::option::Option<
     ),
 >;
 pub type AddForeignUpdateTargets_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         rtindex: Index,
         target_rte: *mut RangeTblEntry,
@@ -25705,7 +25821,7 @@ pub type AddForeignUpdateTargets_function = ::core::option::Option<
     ),
 >;
 pub type PlanForeignModify_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         plan: *mut ModifyTable,
         resultRelation: Index,
@@ -25713,7 +25829,7 @@ pub type PlanForeignModify_function = ::core::option::Option<
     ) -> *mut List,
 >;
 pub type BeginForeignModify_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         mtstate: *mut ModifyTableState,
         rinfo: *mut ResultRelInfo,
         fdw_private: *mut List,
@@ -25722,7 +25838,7 @@ pub type BeginForeignModify_function = ::core::option::Option<
     ),
 >;
 pub type ExecForeignInsert_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         estate: *mut EState,
         rinfo: *mut ResultRelInfo,
         slot: *mut TupleTableSlot,
@@ -25730,7 +25846,7 @@ pub type ExecForeignInsert_function = ::core::option::Option<
     ) -> *mut TupleTableSlot,
 >;
 pub type ExecForeignBatchInsert_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         estate: *mut EState,
         rinfo: *mut ResultRelInfo,
         slots: *mut *mut TupleTableSlot,
@@ -25738,10 +25854,11 @@ pub type ExecForeignBatchInsert_function = ::core::option::Option<
         numSlots: *mut ::core::ffi::c_int,
     ) -> *mut *mut TupleTableSlot,
 >;
-pub type GetForeignModifyBatchSize_function =
-    ::core::option::Option<unsafe extern "C" fn(rinfo: *mut ResultRelInfo) -> ::core::ffi::c_int>;
+pub type GetForeignModifyBatchSize_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(rinfo: *mut ResultRelInfo) -> ::core::ffi::c_int,
+>;
 pub type ExecForeignUpdate_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         estate: *mut EState,
         rinfo: *mut ResultRelInfo,
         slot: *mut TupleTableSlot,
@@ -25749,24 +25866,26 @@ pub type ExecForeignUpdate_function = ::core::option::Option<
     ) -> *mut TupleTableSlot,
 >;
 pub type ExecForeignDelete_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         estate: *mut EState,
         rinfo: *mut ResultRelInfo,
         slot: *mut TupleTableSlot,
         planSlot: *mut TupleTableSlot,
     ) -> *mut TupleTableSlot,
 >;
-pub type EndForeignModify_function =
-    ::core::option::Option<unsafe extern "C" fn(estate: *mut EState, rinfo: *mut ResultRelInfo)>;
-pub type BeginForeignInsert_function = ::core::option::Option<
-    unsafe extern "C" fn(mtstate: *mut ModifyTableState, rinfo: *mut ResultRelInfo),
+pub type EndForeignModify_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(estate: *mut EState, rinfo: *mut ResultRelInfo),
 >;
-pub type EndForeignInsert_function =
-    ::core::option::Option<unsafe extern "C" fn(estate: *mut EState, rinfo: *mut ResultRelInfo)>;
+pub type BeginForeignInsert_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(mtstate: *mut ModifyTableState, rinfo: *mut ResultRelInfo),
+>;
+pub type EndForeignInsert_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(estate: *mut EState, rinfo: *mut ResultRelInfo),
+>;
 pub type IsForeignRelUpdatable_function =
-    ::core::option::Option<unsafe extern "C" fn(rel: Relation) -> ::core::ffi::c_int>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(rel: Relation) -> ::core::ffi::c_int>;
 pub type PlanDirectModify_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         plan: *mut ModifyTable,
         resultRelation: Index,
@@ -25774,21 +25893,21 @@ pub type PlanDirectModify_function = ::core::option::Option<
     ) -> bool,
 >;
 pub type BeginDirectModify_function = ::core::option::Option<
-    unsafe extern "C" fn(node: *mut ForeignScanState, eflags: ::core::ffi::c_int),
+    unsafe extern "C-unwind" fn(node: *mut ForeignScanState, eflags: ::core::ffi::c_int),
 >;
 pub type IterateDirectModify_function = ::core::option::Option<
-    unsafe extern "C" fn(node: *mut ForeignScanState) -> *mut TupleTableSlot,
+    unsafe extern "C-unwind" fn(node: *mut ForeignScanState) -> *mut TupleTableSlot,
 >;
 pub type EndDirectModify_function =
-    ::core::option::Option<unsafe extern "C" fn(node: *mut ForeignScanState)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(node: *mut ForeignScanState)>;
 pub type GetForeignRowMarkType_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         rte: *mut RangeTblEntry,
         strength: LockClauseStrength::Type,
     ) -> RowMarkType::Type,
 >;
 pub type RefetchForeignRow_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         estate: *mut EState,
         erm: *mut ExecRowMark,
         rowid: Datum,
@@ -25797,10 +25916,10 @@ pub type RefetchForeignRow_function = ::core::option::Option<
     ),
 >;
 pub type ExplainForeignScan_function = ::core::option::Option<
-    unsafe extern "C" fn(node: *mut ForeignScanState, es: *mut ExplainState),
+    unsafe extern "C-unwind" fn(node: *mut ForeignScanState, es: *mut ExplainState),
 >;
 pub type ExplainForeignModify_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         mtstate: *mut ModifyTableState,
         rinfo: *mut ResultRelInfo,
         fdw_private: *mut List,
@@ -25809,10 +25928,10 @@ pub type ExplainForeignModify_function = ::core::option::Option<
     ),
 >;
 pub type ExplainDirectModify_function = ::core::option::Option<
-    unsafe extern "C" fn(node: *mut ForeignScanState, es: *mut ExplainState),
+    unsafe extern "C-unwind" fn(node: *mut ForeignScanState, es: *mut ExplainState),
 >;
 pub type AcquireSampleRowsFunc = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         relation: Relation,
         elevel: ::core::ffi::c_int,
         rows: *mut HeapTuple,
@@ -25822,66 +25941,66 @@ pub type AcquireSampleRowsFunc = ::core::option::Option<
     ) -> ::core::ffi::c_int,
 >;
 pub type AnalyzeForeignTable_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         relation: Relation,
         func: *mut AcquireSampleRowsFunc,
         totalpages: *mut BlockNumber,
     ) -> bool,
 >;
 pub type ImportForeignSchema_function = ::core::option::Option<
-    unsafe extern "C" fn(stmt: *mut ImportForeignSchemaStmt, serverOid: Oid) -> *mut List,
+    unsafe extern "C-unwind" fn(stmt: *mut ImportForeignSchemaStmt, serverOid: Oid) -> *mut List,
 >;
 pub type ExecForeignTruncate_function = ::core::option::Option<
-    unsafe extern "C" fn(rels: *mut List, behavior: DropBehavior::Type, restart_seqs: bool),
+    unsafe extern "C-unwind" fn(rels: *mut List, behavior: DropBehavior::Type, restart_seqs: bool),
 >;
 pub type EstimateDSMForeignScan_function = ::core::option::Option<
-    unsafe extern "C" fn(node: *mut ForeignScanState, pcxt: *mut ParallelContext) -> Size,
+    unsafe extern "C-unwind" fn(node: *mut ForeignScanState, pcxt: *mut ParallelContext) -> Size,
 >;
 pub type InitializeDSMForeignScan_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         node: *mut ForeignScanState,
         pcxt: *mut ParallelContext,
         coordinate: *mut ::core::ffi::c_void,
     ),
 >;
 pub type ReInitializeDSMForeignScan_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         node: *mut ForeignScanState,
         pcxt: *mut ParallelContext,
         coordinate: *mut ::core::ffi::c_void,
     ),
 >;
 pub type InitializeWorkerForeignScan_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         node: *mut ForeignScanState,
         toc: *mut shm_toc,
         coordinate: *mut ::core::ffi::c_void,
     ),
 >;
 pub type ShutdownForeignScan_function =
-    ::core::option::Option<unsafe extern "C" fn(node: *mut ForeignScanState)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(node: *mut ForeignScanState)>;
 pub type IsForeignScanParallelSafe_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         rel: *mut RelOptInfo,
         rte: *mut RangeTblEntry,
     ) -> bool,
 >;
 pub type ReparameterizeForeignPathByChild_function = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         fdw_private: *mut List,
         child_rel: *mut RelOptInfo,
     ) -> *mut List,
 >;
 pub type IsForeignPathAsyncCapable_function =
-    ::core::option::Option<unsafe extern "C" fn(path: *mut ForeignPath) -> bool>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(path: *mut ForeignPath) -> bool>;
 pub type ForeignAsyncRequest_function =
-    ::core::option::Option<unsafe extern "C" fn(areq: *mut AsyncRequest)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(areq: *mut AsyncRequest)>;
 pub type ForeignAsyncConfigureWait_function =
-    ::core::option::Option<unsafe extern "C" fn(areq: *mut AsyncRequest)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(areq: *mut AsyncRequest)>;
 pub type ForeignAsyncNotify_function =
-    ::core::option::Option<unsafe extern "C" fn(areq: *mut AsyncRequest)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(areq: *mut AsyncRequest)>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct FdwRoutine {
@@ -26045,12 +26164,12 @@ impl Default for JitContext {
     }
 }
 pub type JitProviderInit =
-    ::core::option::Option<unsafe extern "C" fn(cb: *mut JitProviderCallbacks)>;
-pub type JitProviderResetAfterErrorCB = ::core::option::Option<unsafe extern "C" fn()>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(cb: *mut JitProviderCallbacks)>;
+pub type JitProviderResetAfterErrorCB = ::core::option::Option<unsafe extern "C-unwind" fn()>;
 pub type JitProviderReleaseContextCB =
-    ::core::option::Option<unsafe extern "C" fn(context: *mut JitContext)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(context: *mut JitContext)>;
 pub type JitProviderCompileExprCB =
-    ::core::option::Option<unsafe extern "C" fn(state: *mut ExprState) -> bool>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(state: *mut ExprState) -> bool>;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct JitProviderCallbacks {
@@ -26136,36 +26255,36 @@ impl Default for pg_enc2gettext {
     }
 }
 pub type mb2wchar_with_len_converter = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         from: *const ::core::ffi::c_uchar,
         to: *mut pg_wchar,
         len: ::core::ffi::c_int,
     ) -> ::core::ffi::c_int,
 >;
 pub type wchar2mb_with_len_converter = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         from: *const pg_wchar,
         to: *mut ::core::ffi::c_uchar,
         len: ::core::ffi::c_int,
     ) -> ::core::ffi::c_int,
 >;
 pub type mblen_converter = ::core::option::Option<
-    unsafe extern "C" fn(mbstr: *const ::core::ffi::c_uchar) -> ::core::ffi::c_int,
+    unsafe extern "C-unwind" fn(mbstr: *const ::core::ffi::c_uchar) -> ::core::ffi::c_int,
 >;
 pub type mbdisplaylen_converter = ::core::option::Option<
-    unsafe extern "C" fn(mbstr: *const ::core::ffi::c_uchar) -> ::core::ffi::c_int,
+    unsafe extern "C-unwind" fn(mbstr: *const ::core::ffi::c_uchar) -> ::core::ffi::c_int,
 >;
 pub type mbcharacter_incrementer = ::core::option::Option<
-    unsafe extern "C" fn(mbstr: *mut ::core::ffi::c_uchar, len: ::core::ffi::c_int) -> bool,
+    unsafe extern "C-unwind" fn(mbstr: *mut ::core::ffi::c_uchar, len: ::core::ffi::c_int) -> bool,
 >;
 pub type mbchar_verifier = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         mbstr: *const ::core::ffi::c_uchar,
         len: ::core::ffi::c_int,
     ) -> ::core::ffi::c_int,
 >;
 pub type mbstr_verifier = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         mbstr: *const ::core::ffi::c_uchar,
         len: ::core::ffi::c_int,
     ) -> ::core::ffi::c_int,
@@ -26235,7 +26354,7 @@ pub struct pg_local_to_utf_combined {
     pub utf2: uint32,
 }
 pub type utf_local_conversion_func =
-    ::core::option::Option<unsafe extern "C" fn(code: uint32) -> uint32>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(code: uint32) -> uint32>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ExtensibleNode {
@@ -26257,15 +26376,15 @@ pub struct ExtensibleNodeMethods {
     pub extnodename: *const ::core::ffi::c_char,
     pub node_size: Size,
     pub nodeCopy: ::core::option::Option<
-        unsafe extern "C" fn(newnode: *mut ExtensibleNode, oldnode: *const ExtensibleNode),
+        unsafe extern "C-unwind" fn(newnode: *mut ExtensibleNode, oldnode: *const ExtensibleNode),
     >,
     pub nodeEqual: ::core::option::Option<
-        unsafe extern "C" fn(a: *const ExtensibleNode, b: *const ExtensibleNode) -> bool,
+        unsafe extern "C-unwind" fn(a: *const ExtensibleNode, b: *const ExtensibleNode) -> bool,
     >,
     pub nodeOut: ::core::option::Option<
-        unsafe extern "C" fn(str_: *mut StringInfoData, node: *const ExtensibleNode),
+        unsafe extern "C-unwind" fn(str_: *mut StringInfoData, node: *const ExtensibleNode),
     >,
-    pub nodeRead: ::core::option::Option<unsafe extern "C" fn(node: *mut ExtensibleNode)>,
+    pub nodeRead: ::core::option::Option<unsafe extern "C-unwind" fn(node: *mut ExtensibleNode)>,
 }
 impl Default for ExtensibleNodeMethods {
     fn default() -> Self {
@@ -26281,7 +26400,7 @@ impl Default for ExtensibleNodeMethods {
 pub struct CustomPathMethods {
     pub CustomName: *const ::core::ffi::c_char,
     pub PlanCustomPath: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             root: *mut PlannerInfo,
             rel: *mut RelOptInfo,
             best_path: *mut CustomPath,
@@ -26291,7 +26410,7 @@ pub struct CustomPathMethods {
         ) -> *mut Plan,
     >,
     pub ReparameterizeCustomPathByChild: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             root: *mut PlannerInfo,
             custom_private: *mut List,
             child_rel: *mut RelOptInfo,
@@ -26312,7 +26431,7 @@ impl Default for CustomPathMethods {
 pub struct CustomScanMethods {
     pub CustomName: *const ::core::ffi::c_char,
     pub CreateCustomScanState:
-        ::core::option::Option<unsafe extern "C" fn(cscan: *mut CustomScan) -> *mut Node>,
+        ::core::option::Option<unsafe extern "C-unwind" fn(cscan: *mut CustomScan) -> *mut Node>,
 }
 impl Default for CustomScanMethods {
     fn default() -> Self {
@@ -26328,48 +26447,51 @@ impl Default for CustomScanMethods {
 pub struct CustomExecMethods {
     pub CustomName: *const ::core::ffi::c_char,
     pub BeginCustomScan: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             node: *mut CustomScanState,
             estate: *mut EState,
             eflags: ::core::ffi::c_int,
         ),
     >,
     pub ExecCustomScan: ::core::option::Option<
-        unsafe extern "C" fn(node: *mut CustomScanState) -> *mut TupleTableSlot,
+        unsafe extern "C-unwind" fn(node: *mut CustomScanState) -> *mut TupleTableSlot,
     >,
-    pub EndCustomScan: ::core::option::Option<unsafe extern "C" fn(node: *mut CustomScanState)>,
-    pub ReScanCustomScan: ::core::option::Option<unsafe extern "C" fn(node: *mut CustomScanState)>,
-    pub MarkPosCustomScan: ::core::option::Option<unsafe extern "C" fn(node: *mut CustomScanState)>,
+    pub EndCustomScan:
+        ::core::option::Option<unsafe extern "C-unwind" fn(node: *mut CustomScanState)>,
+    pub ReScanCustomScan:
+        ::core::option::Option<unsafe extern "C-unwind" fn(node: *mut CustomScanState)>,
+    pub MarkPosCustomScan:
+        ::core::option::Option<unsafe extern "C-unwind" fn(node: *mut CustomScanState)>,
     pub RestrPosCustomScan:
-        ::core::option::Option<unsafe extern "C" fn(node: *mut CustomScanState)>,
+        ::core::option::Option<unsafe extern "C-unwind" fn(node: *mut CustomScanState)>,
     pub EstimateDSMCustomScan: ::core::option::Option<
-        unsafe extern "C" fn(node: *mut CustomScanState, pcxt: *mut ParallelContext) -> Size,
+        unsafe extern "C-unwind" fn(node: *mut CustomScanState, pcxt: *mut ParallelContext) -> Size,
     >,
     pub InitializeDSMCustomScan: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             node: *mut CustomScanState,
             pcxt: *mut ParallelContext,
             coordinate: *mut ::core::ffi::c_void,
         ),
     >,
     pub ReInitializeDSMCustomScan: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             node: *mut CustomScanState,
             pcxt: *mut ParallelContext,
             coordinate: *mut ::core::ffi::c_void,
         ),
     >,
     pub InitializeWorkerCustomScan: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             node: *mut CustomScanState,
             toc: *mut shm_toc,
             coordinate: *mut ::core::ffi::c_void,
         ),
     >,
     pub ShutdownCustomScan:
-        ::core::option::Option<unsafe extern "C" fn(node: *mut CustomScanState)>,
+        ::core::option::Option<unsafe extern "C-unwind" fn(node: *mut CustomScanState)>,
     pub ExplainCustomScan: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             node: *mut CustomScanState,
             ancestors: *mut List,
             es: *mut ExplainState,
@@ -26386,7 +26508,7 @@ impl Default for CustomExecMethods {
     }
 }
 pub type check_function_callback = ::core::option::Option<
-    unsafe extern "C" fn(func_id: Oid, context: *mut ::core::ffi::c_void) -> bool,
+    unsafe extern "C-unwind" fn(func_id: Oid, context: *mut ::core::ffi::c_void) -> bool,
 >;
 pub mod ReplicationKind {
     pub type Type = ::core::ffi::c_uint;
@@ -26506,7 +26628,7 @@ impl Default for SQLCmd {
     }
 }
 pub type SubscriptTransform = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         sbsref: *mut SubscriptingRef,
         indirection: *mut List,
         pstate: *mut ParseState,
@@ -26515,7 +26637,7 @@ pub type SubscriptTransform = ::core::option::Option<
     ),
 >;
 pub type SubscriptExecSetup = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         sbsref: *const SubscriptingRef,
         sbsrefstate: *mut SubscriptingRefState,
         methods: *mut SubscriptExecSteps,
@@ -26658,7 +26780,7 @@ pub mod ForceParallelMode {
     pub const FORCE_PARALLEL_REGRESS: Type = 2;
 }
 pub type set_rel_pathlist_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         rel: *mut RelOptInfo,
         rti: Index,
@@ -26666,7 +26788,7 @@ pub type set_rel_pathlist_hook_type = ::core::option::Option<
     ),
 >;
 pub type set_join_pathlist_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         joinrel: *mut RelOptInfo,
         outerrel: *mut RelOptInfo,
@@ -26676,14 +26798,14 @@ pub type set_join_pathlist_hook_type = ::core::option::Option<
     ),
 >;
 pub type join_search_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         levels_needed: ::core::ffi::c_int,
         initial_rels: *mut List,
     ) -> *mut RelOptInfo,
 >;
 pub type ec_matches_callback_type = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         rel: *mut RelOptInfo,
         ec: *mut EquivalenceClass,
@@ -26699,7 +26821,7 @@ pub mod PathKeysComparison {
     pub const PATHKEYS_DIFFERENT: Type = 3;
 }
 pub type get_relation_info_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         relationObjectId: Oid,
         inhparent: bool,
@@ -26707,10 +26829,10 @@ pub type get_relation_info_hook_type = ::core::option::Option<
     ),
 >;
 pub type query_pathkeys_callback = ::core::option::Option<
-    unsafe extern "C" fn(root: *mut PlannerInfo, extra: *mut ::core::ffi::c_void),
+    unsafe extern "C-unwind" fn(root: *mut PlannerInfo, extra: *mut ::core::ffi::c_void),
 >;
 pub type planner_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         parse: *mut Query,
         query_string: *const ::core::ffi::c_char,
         cursorOptions: ::core::ffi::c_int,
@@ -26718,7 +26840,7 @@ pub type planner_hook_type = ::core::option::Option<
     ) -> *mut PlannedStmt,
 >;
 pub type create_upper_paths_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         stage: UpperRelationKind::Type,
         input_rel: *mut RelOptInfo,
@@ -26759,7 +26881,11 @@ pub mod ComputeQueryIdType {
     pub const COMPUTE_QUERY_ID_REGRESS: Type = 3;
 }
 pub type post_parse_analyze_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(pstate: *mut ParseState, query: *mut Query, jstate: *mut JumbleState),
+    unsafe extern "C-unwind" fn(
+        pstate: *mut ParseState,
+        query: *mut Query,
+        jstate: *mut JumbleState,
+    ),
 >;
 pub mod FuncDetailCode {
     pub type Type = ::core::ffi::c_uint;
@@ -26781,6 +26907,68 @@ pub mod CoercionPathType {
     pub const COERCION_PATH_RELABELTYPE: Type = 2;
     pub const COERCION_PATH_ARRAYCOERCE: Type = 3;
     pub const COERCION_PATH_COERCEVIAIO: Type = 4;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionBoundInfoData {
+    pub strategy: ::core::ffi::c_char,
+    pub ndatums: ::core::ffi::c_int,
+    pub datums: *mut *mut Datum,
+    pub kind: *mut *mut PartitionRangeDatumKind::Type,
+    pub nindexes: ::core::ffi::c_int,
+    pub indexes: *mut ::core::ffi::c_int,
+    pub null_index: ::core::ffi::c_int,
+    pub default_index: ::core::ffi::c_int,
+}
+impl Default for PartitionBoundInfoData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionDescData {
+    pub nparts: ::core::ffi::c_int,
+    pub detached_exist: bool,
+    pub oids: *mut Oid,
+    pub is_leaf: *mut bool,
+    pub boundinfo: PartitionBoundInfo,
+}
+impl Default for PartitionDescData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionPruneContext {
+    pub strategy: ::core::ffi::c_char,
+    pub partnatts: ::core::ffi::c_int,
+    pub nparts: ::core::ffi::c_int,
+    pub boundinfo: PartitionBoundInfo,
+    pub partcollation: *mut Oid,
+    pub partsupfunc: *mut FmgrInfo,
+    pub stepcmpfuncs: *mut FmgrInfo,
+    pub ppccontext: MemoryContext,
+    pub planstate: *mut PlanState,
+    pub exprstates: *mut *mut ExprState,
+}
+impl Default for PartitionPruneContext {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -28035,23 +28223,24 @@ impl Default for PLpgSQL_execstate {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct PLpgSQL_plugin {
     pub func_setup: ::core::option::Option<
-        unsafe extern "C" fn(estate: *mut PLpgSQL_execstate, func: *mut PLpgSQL_function),
+        unsafe extern "C-unwind" fn(estate: *mut PLpgSQL_execstate, func: *mut PLpgSQL_function),
     >,
     pub func_beg: ::core::option::Option<
-        unsafe extern "C" fn(estate: *mut PLpgSQL_execstate, func: *mut PLpgSQL_function),
+        unsafe extern "C-unwind" fn(estate: *mut PLpgSQL_execstate, func: *mut PLpgSQL_function),
     >,
     pub func_end: ::core::option::Option<
-        unsafe extern "C" fn(estate: *mut PLpgSQL_execstate, func: *mut PLpgSQL_function),
+        unsafe extern "C-unwind" fn(estate: *mut PLpgSQL_execstate, func: *mut PLpgSQL_function),
     >,
     pub stmt_beg: ::core::option::Option<
-        unsafe extern "C" fn(estate: *mut PLpgSQL_execstate, stmt: *mut PLpgSQL_stmt),
+        unsafe extern "C-unwind" fn(estate: *mut PLpgSQL_execstate, stmt: *mut PLpgSQL_stmt),
     >,
     pub stmt_end: ::core::option::Option<
-        unsafe extern "C" fn(estate: *mut PLpgSQL_execstate, stmt: *mut PLpgSQL_stmt),
+        unsafe extern "C-unwind" fn(estate: *mut PLpgSQL_execstate, stmt: *mut PLpgSQL_stmt),
     >,
-    pub error_callback: ::core::option::Option<unsafe extern "C" fn(arg: *mut ::core::ffi::c_void)>,
+    pub error_callback:
+        ::core::option::Option<unsafe extern "C-unwind" fn(arg: *mut ::core::ffi::c_void)>,
     pub assign_expr: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             estate: *mut PLpgSQL_execstate,
             target: *mut PLpgSQL_datum,
             expr: *mut PLpgSQL_expr,
@@ -28334,7 +28523,7 @@ impl Default for ReorderBufferTXN {
     }
 }
 pub type ReorderBufferApplyChangeCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         rb: *mut ReorderBuffer,
         txn: *mut ReorderBufferTXN,
         relation: Relation,
@@ -28342,7 +28531,7 @@ pub type ReorderBufferApplyChangeCB = ::core::option::Option<
     ),
 >;
 pub type ReorderBufferApplyTruncateCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         rb: *mut ReorderBuffer,
         txn: *mut ReorderBufferTXN,
         nrelations: ::core::ffi::c_int,
@@ -28351,17 +28540,17 @@ pub type ReorderBufferApplyTruncateCB = ::core::option::Option<
     ),
 >;
 pub type ReorderBufferBeginCB = ::core::option::Option<
-    unsafe extern "C" fn(rb: *mut ReorderBuffer, txn: *mut ReorderBufferTXN),
+    unsafe extern "C-unwind" fn(rb: *mut ReorderBuffer, txn: *mut ReorderBufferTXN),
 >;
 pub type ReorderBufferCommitCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         rb: *mut ReorderBuffer,
         txn: *mut ReorderBufferTXN,
         commit_lsn: XLogRecPtr,
     ),
 >;
 pub type ReorderBufferMessageCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         rb: *mut ReorderBuffer,
         txn: *mut ReorderBufferTXN,
         message_lsn: XLogRecPtr,
@@ -28372,24 +28561,24 @@ pub type ReorderBufferMessageCB = ::core::option::Option<
     ),
 >;
 pub type ReorderBufferBeginPrepareCB = ::core::option::Option<
-    unsafe extern "C" fn(rb: *mut ReorderBuffer, txn: *mut ReorderBufferTXN),
+    unsafe extern "C-unwind" fn(rb: *mut ReorderBuffer, txn: *mut ReorderBufferTXN),
 >;
 pub type ReorderBufferPrepareCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         rb: *mut ReorderBuffer,
         txn: *mut ReorderBufferTXN,
         prepare_lsn: XLogRecPtr,
     ),
 >;
 pub type ReorderBufferCommitPreparedCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         rb: *mut ReorderBuffer,
         txn: *mut ReorderBufferTXN,
         commit_lsn: XLogRecPtr,
     ),
 >;
 pub type ReorderBufferRollbackPreparedCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         rb: *mut ReorderBuffer,
         txn: *mut ReorderBufferTXN,
         prepare_end_lsn: XLogRecPtr,
@@ -28397,30 +28586,42 @@ pub type ReorderBufferRollbackPreparedCB = ::core::option::Option<
     ),
 >;
 pub type ReorderBufferStreamStartCB = ::core::option::Option<
-    unsafe extern "C" fn(rb: *mut ReorderBuffer, txn: *mut ReorderBufferTXN, first_lsn: XLogRecPtr),
+    unsafe extern "C-unwind" fn(
+        rb: *mut ReorderBuffer,
+        txn: *mut ReorderBufferTXN,
+        first_lsn: XLogRecPtr,
+    ),
 >;
 pub type ReorderBufferStreamStopCB = ::core::option::Option<
-    unsafe extern "C" fn(rb: *mut ReorderBuffer, txn: *mut ReorderBufferTXN, last_lsn: XLogRecPtr),
+    unsafe extern "C-unwind" fn(
+        rb: *mut ReorderBuffer,
+        txn: *mut ReorderBufferTXN,
+        last_lsn: XLogRecPtr,
+    ),
 >;
 pub type ReorderBufferStreamAbortCB = ::core::option::Option<
-    unsafe extern "C" fn(rb: *mut ReorderBuffer, txn: *mut ReorderBufferTXN, abort_lsn: XLogRecPtr),
+    unsafe extern "C-unwind" fn(
+        rb: *mut ReorderBuffer,
+        txn: *mut ReorderBufferTXN,
+        abort_lsn: XLogRecPtr,
+    ),
 >;
 pub type ReorderBufferStreamPrepareCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         rb: *mut ReorderBuffer,
         txn: *mut ReorderBufferTXN,
         prepare_lsn: XLogRecPtr,
     ),
 >;
 pub type ReorderBufferStreamCommitCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         rb: *mut ReorderBuffer,
         txn: *mut ReorderBufferTXN,
         commit_lsn: XLogRecPtr,
     ),
 >;
 pub type ReorderBufferStreamChangeCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         rb: *mut ReorderBuffer,
         txn: *mut ReorderBufferTXN,
         relation: Relation,
@@ -28428,7 +28629,7 @@ pub type ReorderBufferStreamChangeCB = ::core::option::Option<
     ),
 >;
 pub type ReorderBufferStreamMessageCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         rb: *mut ReorderBuffer,
         txn: *mut ReorderBufferTXN,
         message_lsn: XLogRecPtr,
@@ -28439,7 +28640,7 @@ pub type ReorderBufferStreamMessageCB = ::core::option::Option<
     ),
 >;
 pub type ReorderBufferStreamTruncateCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         rb: *mut ReorderBuffer,
         txn: *mut ReorderBufferTXN,
         nrelations: ::core::ffi::c_int,
@@ -28521,19 +28722,19 @@ impl Default for OutputPluginOptions {
     }
 }
 pub type LogicalOutputPluginInit =
-    ::core::option::Option<unsafe extern "C" fn(cb: *mut OutputPluginCallbacks)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(cb: *mut OutputPluginCallbacks)>;
 pub type LogicalDecodeStartupCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         ctx: *mut LogicalDecodingContext,
         options: *mut OutputPluginOptions,
         is_init: bool,
     ),
 >;
 pub type LogicalDecodeBeginCB = ::core::option::Option<
-    unsafe extern "C" fn(ctx: *mut LogicalDecodingContext, txn: *mut ReorderBufferTXN),
+    unsafe extern "C-unwind" fn(ctx: *mut LogicalDecodingContext, txn: *mut ReorderBufferTXN),
 >;
 pub type LogicalDecodeChangeCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         ctx: *mut LogicalDecodingContext,
         txn: *mut ReorderBufferTXN,
         relation: Relation,
@@ -28541,7 +28742,7 @@ pub type LogicalDecodeChangeCB = ::core::option::Option<
     ),
 >;
 pub type LogicalDecodeTruncateCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         ctx: *mut LogicalDecodingContext,
         txn: *mut ReorderBufferTXN,
         nrelations: ::core::ffi::c_int,
@@ -28550,14 +28751,14 @@ pub type LogicalDecodeTruncateCB = ::core::option::Option<
     ),
 >;
 pub type LogicalDecodeCommitCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         ctx: *mut LogicalDecodingContext,
         txn: *mut ReorderBufferTXN,
         commit_lsn: XLogRecPtr,
     ),
 >;
 pub type LogicalDecodeMessageCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         ctx: *mut LogicalDecodingContext,
         txn: *mut ReorderBufferTXN,
         message_lsn: XLogRecPtr,
@@ -28568,36 +28769,36 @@ pub type LogicalDecodeMessageCB = ::core::option::Option<
     ),
 >;
 pub type LogicalDecodeFilterByOriginCB = ::core::option::Option<
-    unsafe extern "C" fn(ctx: *mut LogicalDecodingContext, origin_id: RepOriginId) -> bool,
+    unsafe extern "C-unwind" fn(ctx: *mut LogicalDecodingContext, origin_id: RepOriginId) -> bool,
 >;
 pub type LogicalDecodeShutdownCB =
-    ::core::option::Option<unsafe extern "C" fn(ctx: *mut LogicalDecodingContext)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(ctx: *mut LogicalDecodingContext)>;
 pub type LogicalDecodeFilterPrepareCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         ctx: *mut LogicalDecodingContext,
         xid: TransactionId,
         gid: *const ::core::ffi::c_char,
     ) -> bool,
 >;
 pub type LogicalDecodeBeginPrepareCB = ::core::option::Option<
-    unsafe extern "C" fn(ctx: *mut LogicalDecodingContext, txn: *mut ReorderBufferTXN),
+    unsafe extern "C-unwind" fn(ctx: *mut LogicalDecodingContext, txn: *mut ReorderBufferTXN),
 >;
 pub type LogicalDecodePrepareCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         ctx: *mut LogicalDecodingContext,
         txn: *mut ReorderBufferTXN,
         prepare_lsn: XLogRecPtr,
     ),
 >;
 pub type LogicalDecodeCommitPreparedCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         ctx: *mut LogicalDecodingContext,
         txn: *mut ReorderBufferTXN,
         commit_lsn: XLogRecPtr,
     ),
 >;
 pub type LogicalDecodeRollbackPreparedCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         ctx: *mut LogicalDecodingContext,
         txn: *mut ReorderBufferTXN,
         prepare_end_lsn: XLogRecPtr,
@@ -28605,34 +28806,34 @@ pub type LogicalDecodeRollbackPreparedCB = ::core::option::Option<
     ),
 >;
 pub type LogicalDecodeStreamStartCB = ::core::option::Option<
-    unsafe extern "C" fn(ctx: *mut LogicalDecodingContext, txn: *mut ReorderBufferTXN),
+    unsafe extern "C-unwind" fn(ctx: *mut LogicalDecodingContext, txn: *mut ReorderBufferTXN),
 >;
 pub type LogicalDecodeStreamStopCB = ::core::option::Option<
-    unsafe extern "C" fn(ctx: *mut LogicalDecodingContext, txn: *mut ReorderBufferTXN),
+    unsafe extern "C-unwind" fn(ctx: *mut LogicalDecodingContext, txn: *mut ReorderBufferTXN),
 >;
 pub type LogicalDecodeStreamAbortCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         ctx: *mut LogicalDecodingContext,
         txn: *mut ReorderBufferTXN,
         abort_lsn: XLogRecPtr,
     ),
 >;
 pub type LogicalDecodeStreamPrepareCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         ctx: *mut LogicalDecodingContext,
         txn: *mut ReorderBufferTXN,
         prepare_lsn: XLogRecPtr,
     ),
 >;
 pub type LogicalDecodeStreamCommitCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         ctx: *mut LogicalDecodingContext,
         txn: *mut ReorderBufferTXN,
         commit_lsn: XLogRecPtr,
     ),
 >;
 pub type LogicalDecodeStreamChangeCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         ctx: *mut LogicalDecodingContext,
         txn: *mut ReorderBufferTXN,
         relation: Relation,
@@ -28640,7 +28841,7 @@ pub type LogicalDecodeStreamChangeCB = ::core::option::Option<
     ),
 >;
 pub type LogicalDecodeStreamMessageCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         ctx: *mut LogicalDecodingContext,
         txn: *mut ReorderBufferTXN,
         message_lsn: XLogRecPtr,
@@ -28651,7 +28852,7 @@ pub type LogicalDecodeStreamMessageCB = ::core::option::Option<
     ),
 >;
 pub type LogicalDecodeStreamTruncateCB = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         ctx: *mut LogicalDecodingContext,
         txn: *mut ReorderBufferTXN,
         nrelations: ::core::ffi::c_int,
@@ -28757,11 +28958,20 @@ impl Default for LogicalRepTyp {
     }
 }
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct LogicalRepBeginData {
     pub final_lsn: XLogRecPtr,
     pub committime: TimestampTz,
     pub xid: TransactionId,
+}
+impl Default for LogicalRepBeginData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -28908,7 +29118,7 @@ impl Default for WalRcvExecResult {
     }
 }
 pub type walrcv_connect_fn = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         conninfo: *const ::core::ffi::c_char,
         logical: bool,
         appname: *const ::core::ffi::c_char,
@@ -28916,27 +29126,28 @@ pub type walrcv_connect_fn = ::core::option::Option<
     ) -> *mut WalReceiverConn,
 >;
 pub type walrcv_check_conninfo_fn =
-    ::core::option::Option<unsafe extern "C" fn(conninfo: *const ::core::ffi::c_char)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(conninfo: *const ::core::ffi::c_char)>;
 pub type walrcv_get_conninfo_fn = ::core::option::Option<
-    unsafe extern "C" fn(conn: *mut WalReceiverConn) -> *mut ::core::ffi::c_char,
+    unsafe extern "C-unwind" fn(conn: *mut WalReceiverConn) -> *mut ::core::ffi::c_char,
 >;
 pub type walrcv_get_senderinfo_fn = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         conn: *mut WalReceiverConn,
         sender_host: *mut *mut ::core::ffi::c_char,
         sender_port: *mut ::core::ffi::c_int,
     ),
 >;
 pub type walrcv_identify_system_fn = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         conn: *mut WalReceiverConn,
         primary_tli: *mut TimeLineID,
     ) -> *mut ::core::ffi::c_char,
 >;
-pub type walrcv_server_version_fn =
-    ::core::option::Option<unsafe extern "C" fn(conn: *mut WalReceiverConn) -> ::core::ffi::c_int>;
+pub type walrcv_server_version_fn = ::core::option::Option<
+    unsafe extern "C-unwind" fn(conn: *mut WalReceiverConn) -> ::core::ffi::c_int,
+>;
 pub type walrcv_readtimelinehistoryfile_fn = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         conn: *mut WalReceiverConn,
         tli: TimeLineID,
         filename: *mut *mut ::core::ffi::c_char,
@@ -28945,27 +29156,30 @@ pub type walrcv_readtimelinehistoryfile_fn = ::core::option::Option<
     ),
 >;
 pub type walrcv_startstreaming_fn = ::core::option::Option<
-    unsafe extern "C" fn(conn: *mut WalReceiverConn, options: *const WalRcvStreamOptions) -> bool,
+    unsafe extern "C-unwind" fn(
+        conn: *mut WalReceiverConn,
+        options: *const WalRcvStreamOptions,
+    ) -> bool,
 >;
 pub type walrcv_endstreaming_fn = ::core::option::Option<
-    unsafe extern "C" fn(conn: *mut WalReceiverConn, next_tli: *mut TimeLineID),
+    unsafe extern "C-unwind" fn(conn: *mut WalReceiverConn, next_tli: *mut TimeLineID),
 >;
 pub type walrcv_receive_fn = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         conn: *mut WalReceiverConn,
         buffer: *mut *mut ::core::ffi::c_char,
         wait_fd: *mut pgsocket,
     ) -> ::core::ffi::c_int,
 >;
 pub type walrcv_send_fn = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         conn: *mut WalReceiverConn,
         buffer: *const ::core::ffi::c_char,
         nbytes: ::core::ffi::c_int,
     ),
 >;
 pub type walrcv_create_slot_fn = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         conn: *mut WalReceiverConn,
         slotname: *const ::core::ffi::c_char,
         temporary: bool,
@@ -28974,9 +29188,9 @@ pub type walrcv_create_slot_fn = ::core::option::Option<
     ) -> *mut ::core::ffi::c_char,
 >;
 pub type walrcv_get_backend_pid_fn =
-    ::core::option::Option<unsafe extern "C" fn(conn: *mut WalReceiverConn) -> pid_t>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(conn: *mut WalReceiverConn) -> pid_t>;
 pub type walrcv_exec_fn = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         conn: *mut WalReceiverConn,
         query: *const ::core::ffi::c_char,
         nRetTypes: ::core::ffi::c_int,
@@ -28984,7 +29198,7 @@ pub type walrcv_exec_fn = ::core::option::Option<
     ) -> *mut WalRcvExecResult,
 >;
 pub type walrcv_disconnect_fn =
-    ::core::option::Option<unsafe extern "C" fn(conn: *mut WalReceiverConn)>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(conn: *mut WalReceiverConn)>;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct WalReceiverFunctionsType {
@@ -29076,7 +29290,7 @@ impl Default for ReplicationSlotCtlData {
     }
 }
 pub type LogicalOutputPluginWriterWrite = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         lr: *mut LogicalDecodingContext,
         Ptr: XLogRecPtr,
         xid: TransactionId,
@@ -29085,7 +29299,11 @@ pub type LogicalOutputPluginWriterWrite = ::core::option::Option<
 >;
 pub type LogicalOutputPluginWriterPrepareWrite = LogicalOutputPluginWriterWrite;
 pub type LogicalOutputPluginWriterUpdateProgress = ::core::option::Option<
-    unsafe extern "C" fn(lr: *mut LogicalDecodingContext, Ptr: XLogRecPtr, xid: TransactionId),
+    unsafe extern "C-unwind" fn(
+        lr: *mut LogicalDecodingContext,
+        Ptr: XLogRecPtr,
+        xid: TransactionId,
+    ),
 >;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -29159,16 +29377,115 @@ impl Default for RowSecurityDesc {
     }
 }
 pub type row_security_policy_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(cmdtype: CmdType::Type, relation: Relation) -> *mut List,
+    unsafe extern "C-unwind" fn(cmdtype: CmdType::Type, relation: Relation) -> *mut List,
 >;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct buftag {
+    pub rnode: RelFileNode,
+    pub forkNum: ForkNumber::Type,
+    pub blockNum: BlockNumber,
+}
+impl Default for buftag {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type BufferTag = buftag;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct BufferDesc {
+    pub tag: BufferTag,
+    pub buf_id: ::core::ffi::c_int,
+    pub state: pg_atomic_uint32,
+    pub wait_backend_pid: ::core::ffi::c_int,
+    pub freeNext: ::core::ffi::c_int,
+    pub content_lock: LWLock,
+}
+impl Default for BufferDesc {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union BufferDescPadded {
+    pub bufferdesc: BufferDesc,
+    pub pad: [::core::ffi::c_char; 64usize],
+}
+impl Default for BufferDescPadded {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PendingWriteback {
+    pub tag: BufferTag,
+}
+impl Default for PendingWriteback {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WritebackContext {
+    pub max_pending: *mut ::core::ffi::c_int,
+    pub nr_pending: ::core::ffi::c_int,
+    pub pending_writebacks: [PendingWriteback; 256usize],
+}
+impl Default for WritebackContext {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CkptSortItem {
+    pub tsId: Oid,
+    pub relNode: Oid,
+    pub forkNum: ForkNumber::Type,
+    pub blockNum: BlockNumber,
+    pub buf_id: ::core::ffi::c_int,
+}
+impl Default for CkptSortItem {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct BufFile {
     _unused: [u8; 0],
 }
 pub type pg_on_exit_callback =
-    ::core::option::Option<unsafe extern "C" fn(code: ::core::ffi::c_int, arg: Datum)>;
-pub type shmem_startup_hook_type = ::core::option::Option<unsafe extern "C" fn()>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(code: ::core::ffi::c_int, arg: Datum)>;
+pub type shmem_startup_hook_type = ::core::option::Option<unsafe extern "C-unwind" fn()>;
 pub mod XLTW_Oper {
     pub type Type = ::core::ffi::c_uint;
     pub const XLTW_None: Type = 0;
@@ -29217,7 +29534,7 @@ impl Default for xl_standby_locks {
     }
 }
 #[repr(C)]
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct xl_running_xacts {
     pub xcnt: ::core::ffi::c_int,
     pub subxcnt: ::core::ffi::c_int,
@@ -29226,6 +29543,15 @@ pub struct xl_running_xacts {
     pub oldestRunningXid: TransactionId,
     pub latestCompletedXid: TransactionId,
     pub xids: __IncompleteArrayField<TransactionId>,
+}
+impl Default for xl_running_xacts {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 #[repr(C)]
 pub struct xl_invalidations {
@@ -29304,7 +29630,7 @@ impl Default for AlterTableUtilityContext {
     }
 }
 pub type ProcessUtility_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         pstmt: *mut PlannedStmt,
         queryString: *const ::core::ffi::c_char,
         readOnlyTree: bool,
@@ -29315,6 +29641,97 @@ pub type ProcessUtility_hook_type = ::core::option::Option<
         qc: *mut QueryCompletion,
     ),
 >;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TSAnyCacheEntry {
+    pub objId: Oid,
+    pub isvalid: bool,
+}
+impl Default for TSAnyCacheEntry {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TSParserCacheEntry {
+    pub prsId: Oid,
+    pub isvalid: bool,
+    pub startOid: Oid,
+    pub tokenOid: Oid,
+    pub endOid: Oid,
+    pub headlineOid: Oid,
+    pub lextypeOid: Oid,
+    pub prsstart: FmgrInfo,
+    pub prstoken: FmgrInfo,
+    pub prsend: FmgrInfo,
+    pub prsheadline: FmgrInfo,
+}
+impl Default for TSParserCacheEntry {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TSDictionaryCacheEntry {
+    pub dictId: Oid,
+    pub isvalid: bool,
+    pub lexizeOid: Oid,
+    pub lexize: FmgrInfo,
+    pub dictCtx: MemoryContext,
+    pub dictData: *mut ::core::ffi::c_void,
+}
+impl Default for TSDictionaryCacheEntry {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ListDictionary {
+    pub len: ::core::ffi::c_int,
+    pub dictIds: *mut Oid,
+}
+impl Default for ListDictionary {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TSConfigCacheEntry {
+    pub cfgId: Oid,
+    pub isvalid: bool,
+    pub prsId: Oid,
+    pub lenmap: ::core::ffi::c_int,
+    pub map: *mut ListDictionary,
+}
+impl Default for TSConfigCacheEntry {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct WordEntry {
@@ -30017,7 +30434,7 @@ pub struct TSQueryParserStateData {
 }
 pub type TSQueryParserState = *mut TSQueryParserStateData;
 pub type PushFunction = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         opaque: Datum,
         state: TSQueryParserState,
         token: *mut ::core::ffi::c_char,
@@ -30102,7 +30519,7 @@ impl Default for ExecPhraseData {
     }
 }
 pub type TSExecuteCallback = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         arg: *mut ::core::ffi::c_void,
         val: *mut QueryOperand,
         data: *mut ExecPhraseData,
@@ -30481,9 +30898,10 @@ impl Default for AttStatsSlot {
     }
 }
 pub type get_attavgwidth_hook_type =
-    ::core::option::Option<unsafe extern "C" fn(relid: Oid, attnum: AttrNumber) -> int32>;
-pub type CCHashFN = ::core::option::Option<unsafe extern "C" fn(datum: Datum) -> uint32>;
-pub type CCFastEqualFN = ::core::option::Option<unsafe extern "C" fn(a: Datum, b: Datum) -> bool>;
+    ::core::option::Option<unsafe extern "C-unwind" fn(relid: Oid, attnum: AttrNumber) -> int32>;
+pub type CCHashFN = ::core::option::Option<unsafe extern "C-unwind" fn(datum: Datum) -> uint32>;
+pub type CCFastEqualFN =
+    ::core::option::Option<unsafe extern "C-unwind" fn(a: Datum, b: Datum) -> bool>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct catcache {
@@ -30614,7 +31032,7 @@ pub struct VariableStatData {
     pub var: *mut Node,
     pub rel: *mut RelOptInfo,
     pub statsTuple: HeapTuple,
-    pub freefunc: ::core::option::Option<unsafe extern "C" fn(tuple: HeapTuple)>,
+    pub freefunc: ::core::option::Option<unsafe extern "C-unwind" fn(tuple: HeapTuple)>,
     pub vartype: Oid,
     pub atttype: Oid,
     pub atttypmod: int32,
@@ -30643,7 +31061,7 @@ pub struct GenericCosts {
     pub num_sa_scans: f64,
 }
 pub type get_relation_stats_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         rte: *mut RangeTblEntry,
         attnum: AttrNumber,
@@ -30651,7 +31069,7 @@ pub type get_relation_stats_hook_type = ::core::option::Option<
     ) -> bool,
 >;
 pub type get_index_stats_hook_type = ::core::option::Option<
-    unsafe extern "C" fn(
+    unsafe extern "C-unwind" fn(
         root: *mut PlannerInfo,
         indexOid: Oid,
         indexattnum: AttrNumber,
@@ -30866,7 +31284,7 @@ pub struct SnapBuild {
     pub _address: u8,
 }
 #[pgrx_macros::pg_guard]
-unsafe extern "C" {
+unsafe extern "C-unwind" {
     pub fn ExceptionalCondition(
         conditionName: *const ::core::ffi::c_char,
         errorType: *const ::core::ffi::c_char,
@@ -31072,7 +31490,7 @@ unsafe extern "C" {
         nel: usize,
         elsize: usize,
         cmp: ::core::option::Option<
-            unsafe extern "C" fn(
+            unsafe extern "C-unwind" fn(
                 arg1: *const ::core::ffi::c_void,
                 arg2: *const ::core::ffi::c_void,
             ) -> ::core::ffi::c_int,
@@ -31102,7 +31520,7 @@ unsafe extern "C" {
         nmemb: usize,
         size: usize,
         compar: ::core::option::Option<
-            unsafe extern "C" fn(
+            unsafe extern "C-unwind" fn(
                 arg1: *const ::core::ffi::c_void,
                 arg2: *const ::core::ffi::c_void,
                 arg3: *mut ::core::ffi::c_void,
@@ -32702,9 +33120,9 @@ unsafe extern "C" {
     pub static pg_rightmost_one_pos: [uint8; 256usize];
     pub static pg_number_of_ones: [uint8; 256usize];
     pub static mut pg_popcount32:
-        ::core::option::Option<unsafe extern "C" fn(word: uint32) -> ::core::ffi::c_int>;
+        ::core::option::Option<unsafe extern "C-unwind" fn(word: uint32) -> ::core::ffi::c_int>;
     pub static mut pg_popcount64:
-        ::core::option::Option<unsafe extern "C" fn(word: uint64) -> ::core::ffi::c_int>;
+        ::core::option::Option<unsafe extern "C-unwind" fn(word: uint64) -> ::core::ffi::c_int>;
     pub fn pg_popcount(buf: *const ::core::ffi::c_char, bytes: ::core::ffi::c_int) -> uint64;
     pub fn tuplehash_create(
         ctx: MemoryContext,
@@ -33945,7 +34363,7 @@ unsafe extern "C" {
         len: usize,
     ) -> pg_crc32c;
     pub static mut pg_comp_crc32c: ::core::option::Option<
-        unsafe extern "C" fn(
+        unsafe extern "C-unwind" fn(
             crc: pg_crc32c,
             data: *const ::core::ffi::c_void,
             len: usize,
@@ -34338,9 +34756,9 @@ unsafe extern "C" {
     pub fn SendSharedInvalidMessages(msgs: *const SharedInvalidationMessage, n: ::core::ffi::c_int);
     pub fn ReceiveSharedInvalidMessages(
         invalFunction: ::core::option::Option<
-            unsafe extern "C" fn(msg: *mut SharedInvalidationMessage),
+            unsafe extern "C-unwind" fn(msg: *mut SharedInvalidationMessage),
         >,
-        resetFunction: ::core::option::Option<unsafe extern "C" fn()>,
+        resetFunction: ::core::option::Option<unsafe extern "C-unwind" fn()>,
     );
     pub fn HandleCatchupInterrupt();
     pub fn ProcessCatchupInterrupt();
@@ -35218,7 +35636,7 @@ unsafe extern "C" {
         oldtup_ptr: HeapTuple,
         buffer: Buffer,
         release_callback: ::core::option::Option<
-            unsafe extern "C" fn(arg1: *mut ::core::ffi::c_void),
+            unsafe extern "C-unwind" fn(arg1: *mut ::core::ffi::c_void),
         >,
         arg: *mut ::core::ffi::c_void,
     ) -> bool;
@@ -38884,24 +39302,24 @@ unsafe extern "C" {
     ) -> bool;
     pub fn expression_tree_mutator(
         node: *mut Node,
-        mutator: ::core::option::Option<unsafe extern "C" fn() -> *mut Node>,
+        mutator: ::core::option::Option<unsafe extern "C-unwind" fn() -> *mut Node>,
         context: *mut ::core::ffi::c_void,
     ) -> *mut Node;
     pub fn query_tree_mutator(
         query: *mut Query,
-        mutator: ::core::option::Option<unsafe extern "C" fn() -> *mut Node>,
+        mutator: ::core::option::Option<unsafe extern "C-unwind" fn() -> *mut Node>,
         context: *mut ::core::ffi::c_void,
         flags: ::core::ffi::c_int,
     ) -> *mut Query;
     pub fn range_table_mutator(
         rtable: *mut List,
-        mutator: ::core::option::Option<unsafe extern "C" fn() -> *mut Node>,
+        mutator: ::core::option::Option<unsafe extern "C-unwind" fn() -> *mut Node>,
         context: *mut ::core::ffi::c_void,
         flags: ::core::ffi::c_int,
     ) -> *mut List;
     pub fn query_or_expression_tree_mutator(
         node: *mut Node,
-        mutator: ::core::option::Option<unsafe extern "C" fn() -> *mut Node>,
+        mutator: ::core::option::Option<unsafe extern "C-unwind" fn() -> *mut Node>,
         context: *mut ::core::ffi::c_void,
         flags: ::core::ffi::c_int,
     ) -> *mut Node;
@@ -41016,6 +41434,103 @@ unsafe extern "C" {
         warn: bool,
     );
     pub fn scanner_isspace(ch: ::core::ffi::c_char) -> bool;
+    pub fn get_hash_partition_greatest_modulus(b: PartitionBoundInfo) -> ::core::ffi::c_int;
+    pub fn compute_partition_hash_value(
+        partnatts: ::core::ffi::c_int,
+        partsupfunc: *mut FmgrInfo,
+        partcollation: *mut Oid,
+        values: *mut Datum,
+        isnull: *mut bool,
+    ) -> uint64;
+    pub fn get_qual_from_partbound(
+        rel: Relation,
+        parent: Relation,
+        spec: *mut PartitionBoundSpec,
+    ) -> *mut List;
+    pub fn partition_bounds_create(
+        boundspecs: *mut *mut PartitionBoundSpec,
+        nparts: ::core::ffi::c_int,
+        key: PartitionKey,
+        mapping: *mut *mut ::core::ffi::c_int,
+    ) -> PartitionBoundInfo;
+    pub fn partition_bounds_equal(
+        partnatts: ::core::ffi::c_int,
+        parttyplen: *mut int16,
+        parttypbyval: *mut bool,
+        b1: PartitionBoundInfo,
+        b2: PartitionBoundInfo,
+    ) -> bool;
+    pub fn partition_bounds_copy(src: PartitionBoundInfo, key: PartitionKey) -> PartitionBoundInfo;
+    pub fn partition_bounds_merge(
+        partnatts: ::core::ffi::c_int,
+        partsupfunc: *mut FmgrInfo,
+        partcollation: *mut Oid,
+        outer_rel: *mut RelOptInfo,
+        inner_rel: *mut RelOptInfo,
+        jointype: JoinType::Type,
+        outer_parts: *mut *mut List,
+        inner_parts: *mut *mut List,
+    ) -> PartitionBoundInfo;
+    pub fn partitions_are_ordered(
+        boundinfo: PartitionBoundInfo,
+        nparts: ::core::ffi::c_int,
+    ) -> bool;
+    pub fn check_new_partition_bound(
+        relname: *mut ::core::ffi::c_char,
+        parent: Relation,
+        spec: *mut PartitionBoundSpec,
+        pstate: *mut ParseState,
+    );
+    pub fn check_default_partition_contents(
+        parent: Relation,
+        defaultRel: Relation,
+        new_spec: *mut PartitionBoundSpec,
+    );
+    pub fn partition_rbound_datum_cmp(
+        partsupfunc: *mut FmgrInfo,
+        partcollation: *mut Oid,
+        rb_datums: *mut Datum,
+        rb_kind: *mut PartitionRangeDatumKind::Type,
+        tuple_datums: *mut Datum,
+        n_tuple_datums: ::core::ffi::c_int,
+    ) -> int32;
+    pub fn partition_list_bsearch(
+        partsupfunc: *mut FmgrInfo,
+        partcollation: *mut Oid,
+        boundinfo: PartitionBoundInfo,
+        value: Datum,
+        is_equal: *mut bool,
+    ) -> ::core::ffi::c_int;
+    pub fn partition_range_datum_bsearch(
+        partsupfunc: *mut FmgrInfo,
+        partcollation: *mut Oid,
+        boundinfo: PartitionBoundInfo,
+        nvalues: ::core::ffi::c_int,
+        values: *mut Datum,
+        is_equal: *mut bool,
+    ) -> ::core::ffi::c_int;
+    pub fn partition_hash_bsearch(
+        boundinfo: PartitionBoundInfo,
+        modulus: ::core::ffi::c_int,
+        remainder: ::core::ffi::c_int,
+    ) -> ::core::ffi::c_int;
+    pub fn RelationGetPartitionDesc(rel: Relation, omit_detached: bool) -> PartitionDesc;
+    pub fn CreatePartitionDirectory(mcxt: MemoryContext, omit_detached: bool)
+        -> PartitionDirectory;
+    pub fn PartitionDirectoryLookup(arg1: PartitionDirectory, arg2: Relation) -> PartitionDesc;
+    pub fn DestroyPartitionDirectory(pdir: PartitionDirectory);
+    pub fn get_default_oid_from_partdesc(partdesc: PartitionDesc) -> Oid;
+    pub fn make_partition_pruneinfo(
+        root: *mut PlannerInfo,
+        parentrel: *mut RelOptInfo,
+        subpaths: *mut List,
+        prunequal: *mut List,
+    ) -> *mut PartitionPruneInfo;
+    pub fn prune_append_rel_partitions(rel: *mut RelOptInfo) -> *mut Bitmapset;
+    pub fn get_matching_partitions(
+        context: *mut PartitionPruneContext,
+        pruning_steps: *mut List,
+    ) -> *mut Bitmapset;
     pub fn make_expanded_record_from_typeid(
         type_id: Oid,
         typmod: int32,
@@ -41699,6 +42214,61 @@ unsafe extern "C" {
         hasRowSecurity: *mut bool,
         hasSubLinks: *mut bool,
     );
+    pub static mut BufferIOCVArray: *mut ConditionVariableMinimallyPadded;
+    pub fn LockBufHdr(desc: *mut BufferDesc) -> uint32;
+    pub static mut BufferDescriptors: *mut BufferDescPadded;
+    pub static mut BackendWritebackContext: WritebackContext;
+    pub static mut LocalBufferDescriptors: *mut BufferDesc;
+    pub static mut CkptBufferIds: *mut CkptSortItem;
+    pub fn WritebackContextInit(
+        context: *mut WritebackContext,
+        max_pending: *mut ::core::ffi::c_int,
+    );
+    pub fn IssuePendingWritebacks(context: *mut WritebackContext);
+    pub fn ScheduleBufferTagForWriteback(context: *mut WritebackContext, tag: *mut BufferTag);
+    pub fn StrategyGetBuffer(
+        strategy: BufferAccessStrategy,
+        buf_state: *mut uint32,
+    ) -> *mut BufferDesc;
+    pub fn StrategyFreeBuffer(buf: *mut BufferDesc);
+    pub fn StrategyRejectBuffer(strategy: BufferAccessStrategy, buf: *mut BufferDesc) -> bool;
+    pub fn StrategySyncStart(
+        complete_passes: *mut uint32,
+        num_buf_alloc: *mut uint32,
+    ) -> ::core::ffi::c_int;
+    pub fn StrategyNotifyBgWriter(bgwprocno: ::core::ffi::c_int);
+    pub fn StrategyShmemSize() -> Size;
+    pub fn StrategyInitialize(init: bool);
+    pub fn have_free_buffer() -> bool;
+    pub fn BufTableShmemSize(size: ::core::ffi::c_int) -> Size;
+    pub fn InitBufTable(size: ::core::ffi::c_int);
+    pub fn BufTableHashCode(tagPtr: *mut BufferTag) -> uint32;
+    pub fn BufTableLookup(tagPtr: *mut BufferTag, hashcode: uint32) -> ::core::ffi::c_int;
+    pub fn BufTableInsert(
+        tagPtr: *mut BufferTag,
+        hashcode: uint32,
+        buf_id: ::core::ffi::c_int,
+    ) -> ::core::ffi::c_int;
+    pub fn BufTableDelete(tagPtr: *mut BufferTag, hashcode: uint32);
+    pub fn PrefetchLocalBuffer(
+        smgr: SMgrRelation,
+        forkNum: ForkNumber::Type,
+        blockNum: BlockNumber,
+    ) -> PrefetchBufferResult;
+    pub fn LocalBufferAlloc(
+        smgr: SMgrRelation,
+        forkNum: ForkNumber::Type,
+        blockNum: BlockNumber,
+        foundPtr: *mut bool,
+    ) -> *mut BufferDesc;
+    pub fn MarkLocalBufferDirty(buffer: Buffer);
+    pub fn DropRelFileNodeLocalBuffers(
+        rnode: RelFileNode,
+        forkNum: ForkNumber::Type,
+        firstDelBlock: BlockNumber,
+    );
+    pub fn DropRelFileNodeAllLocalBuffers(rnode: RelFileNode);
+    pub fn AtEOXact_LocalBuffers(isCommit: bool);
     pub fn BufFileCreateTemp(interXact: bool) -> *mut BufFile;
     pub fn BufFileClose(file: *mut BufFile);
     pub fn BufFileRead(file: *mut BufFile, ptr: *mut ::core::ffi::c_void, size: usize) -> usize;
@@ -42135,6 +42705,20 @@ unsafe extern "C" {
     pub fn CreateCommandTag(parsetree: *mut Node) -> CommandTag::Type;
     pub fn GetCommandLogLevel(parsetree: *mut Node) -> LogStmtLevel::Type;
     pub fn CommandIsReadOnly(pstmt: *mut PlannedStmt) -> bool;
+    pub static mut TSCurrentConfig: *mut ::core::ffi::c_char;
+    pub fn lookup_ts_parser_cache(prsId: Oid) -> *mut TSParserCacheEntry;
+    pub fn lookup_ts_dictionary_cache(dictId: Oid) -> *mut TSDictionaryCacheEntry;
+    pub fn lookup_ts_config_cache(cfgId: Oid) -> *mut TSConfigCacheEntry;
+    pub fn getTSCurrentConfig(emitError: bool) -> Oid;
+    pub fn check_TSCurrentConfig(
+        newval: *mut *mut ::core::ffi::c_char,
+        extra: *mut *mut ::core::ffi::c_void,
+        source: GucSource::Type,
+    ) -> bool;
+    pub fn assign_TSCurrentConfig(
+        newval: *const ::core::ffi::c_char,
+        extra: *mut ::core::ffi::c_void,
+    );
     pub fn compareWordEntryPos(
         a: *const ::core::ffi::c_void,
         b: *const ::core::ffi::c_void,
@@ -42148,7 +42732,9 @@ unsafe extern "C" {
         fname: *const ::core::ffi::c_char,
         s: *mut StopList,
         wordop: ::core::option::Option<
-            unsafe extern "C" fn(arg1: *const ::core::ffi::c_char) -> *mut ::core::ffi::c_char,
+            unsafe extern "C-unwind" fn(
+                arg1: *const ::core::ffi::c_char,
+            ) -> *mut ::core::ffi::c_char,
         >,
     );
     pub fn searchstoplist(s: *mut StopList, key: *mut ::core::ffi::c_char) -> bool;
@@ -45673,7 +46259,7 @@ unsafe extern "C" {
         tuple: HeapTuple,
         newtuple: HeapTuple,
         function: ::core::option::Option<
-            unsafe extern "C" fn(arg1: ::core::ffi::c_int, arg2: uint32, arg3: Oid),
+            unsafe extern "C-unwind" fn(arg1: ::core::ffi::c_int, arg2: uint32, arg3: Oid),
         >,
     );
     pub fn PrintCatCacheLeakWarning(tuple: HeapTuple);
@@ -45938,6 +46524,13 @@ unsafe extern "C" {
         useOr: bool,
         varRelid: ::core::ffi::c_int,
     ) -> Selectivity;
+    pub fn get_tablespace_page_costs(
+        spcid: Oid,
+        spc_random_page_cost: *mut float8,
+        spc_seq_page_cost: *mut float8,
+    );
+    pub fn get_tablespace_io_concurrency(spcid: Oid) -> ::core::ffi::c_int;
+    pub fn get_tablespace_maintenance_io_concurrency(spcid: Oid) -> ::core::ffi::c_int;
     pub fn InitCatalogCache();
     pub fn InitCatalogCachePhase2();
     pub fn SearchSysCache(
