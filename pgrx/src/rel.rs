@@ -20,7 +20,6 @@ use std::os::raw::c_char;
 macro_rules! pgstat_count_impl {
     ($name:ident, $new_field:ident, $old_field:ident) => {
         pub fn $name(&mut self) {
-            #[cfg(not(feature = "pg12"))]
             if self.should_count_relation() {
                 let info = self.pgstat_info;
 
@@ -312,7 +311,6 @@ impl PgRelation {
     }
 
     #[inline(always)]
-    #[cfg(not(feature = "pg12"))]
     fn should_count_relation(&mut self) -> bool {
         if !self.pgstat_info.is_null() {
             return true;
@@ -337,11 +335,7 @@ impl PgRelation {
     pgstat_count_impl!(count_buffer_read, blocks_fetched, t_blocks_fetched);
     pgstat_count_impl!(count_buffer_hit, blocks_hit, t_blocks_hit);
 
-    pub fn count_index_tuples(
-        &mut self,
-        #[cfg_attr(feature = "pg12", allow(unused_variables))] n: i64,
-    ) {
-        #[cfg(not(feature = "pg12"))]
+    pub fn count_index_tuples(&mut self, n: i64) {
         if self.should_count_relation() {
             let info = self.pgstat_info;
             #[cfg(any(feature = "pg16", feature = "pg17"))]
