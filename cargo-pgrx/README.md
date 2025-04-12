@@ -163,8 +163,6 @@ Initialize pgrx development environment for the first time
 Usage: cargo pgrx init [OPTIONS]
 
 Options:
-      --pg12 <PG12>                            If installed locally, the path to PG12's `pgconfig` tool, or `download`
-                                               to have pgrx download/compile/install it [env: PG12_PG_CONFIG=]
       --pg13 <PG13>                            If installed locally, the path to PG13's `pgconfig` tool, or `download`
                                                to have pgrx download/compile/install it [env: PG13_PG_CONFIG=]
   -v, --verbose...                             Enable info logs, -vv for debug, -vvv for trace
@@ -174,15 +172,15 @@ Options:
                                                to have pgrx download/compile/install it [env: PG15_PG_CONFIG=]
       --pg16 <PG16>                            If installed locally, the path to PG16's `pgconfig` tool, or `download`
                                                to have pgrx download/compile/install it [env: PG16_PG_CONFIG=]
+      --pg17 <PG17>                            If installed locally, the path to PG17's `pgconfig` tool, or `download`
+                                               to have pgrx download/compile/install it [env: PG17_PG_CONFIG=]
       --base-port <BASE_PORT>                  Base port number
       --base-testing-port <BASE_TESTING_PORT>  Base testing port number
       --configure-flag <CONFIGURE_FLAG>        Additional flags to pass to the configure script
-      --valgrind                               Compile PostgreSQL with the necessary flags to detect a good amount of
-                                               memory errors when run under Valgrind
+      --valgrind                               Compile PostgreSQL with the necessary flags to detect a good amount of memory errors when run under Valgrind
   -j, --jobs <JOBS>                            Allow N make jobs at once
   -h, --help                                   Print help (see more with '--help')
-  -V, --version                                Print version
-```
+  -V, --version                                Print version```
 
 ## Creating a new Extension
 
@@ -317,7 +315,7 @@ strings=# select strings.to_lowercase('PGRX');
 (1 row)
 ```
 
-`cargo pgrx run <pg12 | pg13 | pg14 | pg15 | pg16>` is the primary interface into compiling and interactively testing/using your extension during development.
+`cargo pgrx run <pg13 | pg14 | pg15 | pg16 | pg17>` is the primary interface into compiling and interactively testing/using your extension during development.
 
 The very first time you execute `cargo pgrx run pgXX`, it needs to compile not only your extension, but pgrx itself, along with all its dependencies. Depending on your computer, this could take a bit of time (`pgrx` is nearly 200k lines of Rust when counting the generated bindings for Postgres). Afterwards, however (as seen in the above screenshot), it's fairly fast.
 
@@ -339,7 +337,7 @@ Compile/install extension to a pgrx-managed Postgres instance and start psql
 Usage: cargo pgrx run [OPTIONS] [PG_VERSION] [DBNAME]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg12, pg13, pg14, pg15, pg16, or pg17? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, or pg17? [env: PG_VERSION=]
   [DBNAME]      The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
 
 Options:
@@ -375,7 +373,7 @@ strings=#
 ```
 
 If you'd simply like to connect to a managed version of Postgres without re-compiling and installing
-your extension, use `cargo pgrx connect <pg12 | pg13 | pg14 | pg15 | pg16>`.
+your extension, use `cargo pgrx connect <pg13 | pg14 | pg15 | pg16 | pg17>`.
 
 This command will use the default database named for your extension, or you can specify another
 database name as the final argument.
@@ -390,7 +388,7 @@ Connect, via psql, to a Postgres instance
 Usage: cargo pgrx connect [OPTIONS] [PG_VERSION] [DBNAME]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg12, pg13, pg14, pg15, pg16, or pg17 [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, or pg17? [env: PG_VERSION=]
   [DBNAME]      The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name [env: DBNAME=]
 
 Options:
@@ -508,7 +506,7 @@ Run the test suite for this crate
 Usage: cargo pgrx test [OPTIONS] [PG_VERSION] [TESTNAME]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg12, pg13, pg14, pg15, pg16, pg17 or all? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, or all? [env: PG_VERSION=]
   [TESTNAME]    If specified, only run tests containing this string in their names
 
 Options:
@@ -595,7 +593,7 @@ Generate extension schema files
 Usage: cargo pgrx schema [OPTIONS] [PG_VERSION]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg12, pg13, pg14, pg15, pg16, or pg17?
+  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, or pg17?
 
 Options:
   -p, --package <PACKAGE>              Package to build (see `cargo help pkgid`)

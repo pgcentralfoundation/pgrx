@@ -34,7 +34,7 @@ pub(crate) struct Schema {
     /// Build in test mode (for `cargo pgrx test`)
     #[clap(long)]
     test: bool,
-    /// Do you want to run against pg12, pg13, pg14, pg15, pg16, or pg17?
+    /// Do you want to run against pg13, pg14, pg15, pg16, or pg17?
     pg_version: Option<String>,
     /// Compile for release mode (default is debug)
     #[clap(long, short)]
@@ -53,6 +53,8 @@ pub(crate) struct Schema {
     /// A path to output a produced GraphViz DOT file
     #[clap(long, short, value_parser)]
     dot: Option<PathBuf>,
+    #[clap(long)]
+    target: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
     verbose: u8,
     /// Skip building a fresh extension shared object.
@@ -101,6 +103,7 @@ impl CommandExecute for Schema {
             &profile,
             self.test,
             &self.features,
+            self.target.as_ref().map(|x| x.as_str()),
             self.out.as_ref(),
             self.dot,
             log_level,
@@ -126,6 +129,7 @@ pub(crate) fn generate_schema(
     profile: &CargoProfile,
     is_test: bool,
     features: &clap_cargo::Features,
+    target: Option<&str>,
     path: Option<impl AsRef<std::path::Path>>,
     dot: Option<impl AsRef<std::path::Path>>,
     log_level: Option<String>,
@@ -157,11 +161,12 @@ pub(crate) fn generate_schema(
             is_test,
             &features_arg,
             &flags,
+            target,
             &package_name,
         )?;
     };
 
-    let symbols = compute_symbols(profile, &lib_filename)?;
+    let symbols = compute_symbols(profile, &lib_filename, target)?;
 
     let mut out_path = None;
     if let Some(path) = path.as_ref() {
@@ -217,12 +222,19 @@ pub(crate) fn generate_schema(
     Ok(())
 }
 
-fn compute_symbols(profile: &CargoProfile, lib_filename: &str) -> eyre::Result<Vec<String>> {
+fn compute_symbols(
+    profile: &CargoProfile,
+    lib_filename: &str,
+    target: Option<&str>,
+) -> eyre::Result<Vec<String>> {
     use object::Object;
     use std::collections::HashSet;
 
     // Inspect the symbol table for a list of `__pgrx_internals` we should have the generator call
     let mut lib_so = get_target_dir()?;
+    if let Some(target) = target {
+        lib_so.push(target);
+    }
     lib_so.push(profile.target_subdir());
     lib_so.push(lib_filename);
 
@@ -313,6 +325,7 @@ fn first_build(
     is_test: bool,
     features_arg: &str,
     flags: &str,
+    target: Option<&str>,
     package_name: &str,
 ) -> eyre::Result<()> {
     let mut command = crate::env::cargo();
@@ -357,6 +370,11 @@ fn first_build(
 
     for arg in flags.split_ascii_whitespace() {
         command.arg(arg);
+    }
+
+    if let Some(target) = target {
+        command.arg("--target");
+        command.arg(target);
     }
 
     let command_str = format!("{command:?}");

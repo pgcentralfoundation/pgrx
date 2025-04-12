@@ -19,7 +19,7 @@ use std::num::NonZeroUsize;
 /// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
 #[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
 pub enum TryFromDatumError {
-    #[error("Postgres type {datum_type} ({datum_oid:?}) is not compatible with the Rust type {rust_type} ({rust_oid:?})")]
+    #[error("Postgres type {datum_type} (Oid({datum_oid})) is not compatible with the Rust type {rust_type} (Oid({rust_oid}))")]
     IncompatibleTypes {
         rust_type: &'static str,
         rust_oid: pg_sys::Oid,
@@ -205,6 +205,21 @@ impl FromDatum for pg_sys::Oid {
 
             let oid_as_u32 = datum.value() as u32;
             Some(pg_sys::Oid::from(oid_as_u32))
+        }
+    }
+}
+
+impl FromDatum for pg_sys::TransactionId {
+    #[inline]
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: pg_sys::Oid,
+    ) -> Option<Self> {
+        if is_null {
+            None
+        } else {
+            datum.value().try_into().ok().map(Self::from_inner)
         }
     }
 }

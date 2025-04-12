@@ -16,14 +16,18 @@ pub fn xid_to_64bit(xid: pg_sys::TransactionId) -> u64 {
     let last_xid = full_xid.value as u32;
     let epoch = (full_xid.value >> 32) as u32;
 
-    convert_xid_common(xid, last_xid, epoch)
+    convert_xid_common(xid, last_xid.into(), epoch)
 }
 
 #[inline]
-fn convert_xid_common(xid: pg_sys::TransactionId, last_xid: u32, epoch: u32) -> u64 {
+fn convert_xid_common(
+    xid: pg_sys::TransactionId,
+    last_xid: pgrx_pg_sys::TransactionId,
+    epoch: u32,
+) -> u64 {
     /* return special xid's as-is */
     if !pg_sys::TransactionIdIsNormal(xid) {
-        return xid as u64;
+        return xid.into_inner() as u64;
     }
 
     /* xid can be on either side when near wrap-around */
@@ -34,5 +38,5 @@ fn convert_xid_common(xid: pg_sys::TransactionId, last_xid: u32, epoch: u32) -> 
         epoch += 1;
     }
 
-    (epoch << 32) | xid as u64
+    (epoch << 32) | xid.into_inner() as u64
 }

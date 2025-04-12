@@ -17,7 +17,6 @@ use pgrx_sql_entity_graph::metadata::{
     feature = "pg15",
     feature = "pg14",
     feature = "pg13",
-    feature = "pg12"
 ))]
 unsafe impl SqlTranslatable for crate::FunctionCallInfoBaseData {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {

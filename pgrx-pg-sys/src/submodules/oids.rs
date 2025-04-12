@@ -8,6 +8,8 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(non_camel_case_types)]
+use std::fmt;
+
 use crate as pg_sys;
 use crate::BuiltinOid;
 use crate::Datum;
@@ -25,7 +27,7 @@ use pgrx_sql_entity_graph::metadata::{
 ///
 /// [pg_docs_oid]: https://www.postgresql.org/docs/current/datatype-oid.html
 #[repr(transparent)]
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct Oid(pub(crate) u32);
 
@@ -82,7 +84,7 @@ impl Oid {
         }
     }
 
-    pub const fn as_u32(self) -> u32 {
+    pub const fn to_u32(self) -> u32 {
         self.0
     }
 }
@@ -90,6 +92,18 @@ impl Oid {
 impl Default for Oid {
     fn default() -> Oid {
         Oid::INVALID
+    }
+}
+
+impl fmt::Debug for Oid {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(&self.0, f)
+    }
+}
+
+impl fmt::Display for Oid {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&self.0, f)
     }
 }
 

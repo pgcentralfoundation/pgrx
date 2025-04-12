@@ -107,7 +107,7 @@ jobs:
 
     strategy:
       matrix:
-        postgres: [ 12, 13, 14, 15, 16, 17 ]
+        postgres: [ 13, 14, 15, 16, 17 ]
         include:
           - postgres: 16
             rust: "beta"

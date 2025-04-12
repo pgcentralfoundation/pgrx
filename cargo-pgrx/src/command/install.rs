@@ -55,6 +55,8 @@ pub(crate) struct Install {
     sudo: bool,
     #[clap(flatten)]
     pub(crate) features: clap_cargo::Features,
+    #[clap(long)]
+    pub(crate) target: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
     pub(crate) verbose: u8,
 }
@@ -100,12 +102,13 @@ impl CommandExecute for Install {
         install_extension(
             self.manifest_path.as_ref(),
             self.package.as_ref(),
-            package_manifest_path,
+            &package_manifest_path,
             &pg_config,
             &profile,
             self.test,
             None,
             &self.features,
+            self.target.as_ref().map(|x| x.as_str()),
         )?;
         Ok(())
     }
@@ -121,12 +124,13 @@ impl CommandExecute for Install {
 pub(crate) fn install_extension(
     user_manifest_path: Option<impl AsRef<Path>>,
     user_package: Option<&String>,
-    package_manifest_path: impl AsRef<Path>,
+    package_manifest_path: &Path,
     pg_config: &PgConfig,
     profile: &CargoProfile,
     is_test: bool,
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
+    target: Option<&str>,
 ) -> eyre::Result<Vec<PathBuf>> {
     let mut output_tracking = Vec::new();
 
@@ -136,7 +140,7 @@ pub(crate) fn install_extension(
     let versioned_so = get_property(&package_manifest_path, "module_pathname")?.is_none();
 
     let build_command_output =
-        build_extension(user_manifest_path.as_ref(), user_package, profile, features)?;
+        build_extension(user_manifest_path.as_ref(), user_package, profile, features, target)?;
     let build_command_bytes = build_command_output.stdout;
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = CargoMessage::parse_stream(build_command_reader);
@@ -144,7 +148,7 @@ pub(crate) fn install_extension(
         build_command_stream.collect::<Result<Vec<_>, std::io::Error>>()?;
 
     println!("{} extension", "  Installing".bold().green());
-    let shlibpath = find_library_file(&manifest, &build_command_messages)?;
+    let shlibpath = find_library_file(&manifest, &package_manifest_path, &build_command_messages)?;
 
     let extdir = if let Some(base_directory) = base_directory.as_ref() {
         base_directory.join(make_relative_extdir(pg_config.extension_dir()?))
@@ -225,6 +229,7 @@ pub(crate) fn install_extension(
         profile,
         is_test,
         features,
+        target,
         &extdir,
         true,
         &mut output_tracking,
@@ -288,6 +293,7 @@ pub(crate) fn build_extension(
     user_package: Option<&String>,
     profile: &CargoProfile,
     features: &clap_cargo::Features,
+    target: Option<&str>,
 ) -> eyre::Result<std::process::Output> {
     let flags = std::env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
 
@@ -326,6 +332,11 @@ pub(crate) fn build_extension(
         command.arg(arg);
     }
 
+    if let Some(target) = target {
+        command.arg("--target");
+        command.arg(target);
+    }
+
     let command = command.stderr(Stdio::inherit());
     let command_str = format!("{command:?}");
     println!("{} extension with features {}", "    Building".bold().green(), features_arg.cyan());
@@ -348,6 +359,7 @@ fn copy_sql_files(
     profile: &CargoProfile,
     is_test: bool,
     features: &clap_cargo::Features,
+    target: Option<&str>,
     extdir: &Path,
     skip_build: bool,
     output_tracking: &mut Vec<PathBuf>,
@@ -366,6 +378,7 @@ fn copy_sql_files(
             profile,
             is_test,
             features,
+            target,
             Some(&dest),
             Option::<String>::None,
             None,
@@ -402,6 +415,7 @@ fn copy_sql_files(
 #[tracing::instrument(level = "error", skip_all)]
 pub(crate) fn find_library_file(
     manifest: &Manifest,
+    manifest_path: &Path,
     build_command_messages: &[CargoMessage],
 ) -> eyre::Result<PathBuf> {
     use std::env::consts::{DLL_EXTENSION, DLL_SUFFIX};
@@ -409,6 +423,7 @@ pub(crate) fn find_library_file(
     // cargo sometimes decides to change whether targets are kebab-case or snake_case in metadata,
     // so normalize away the difference
     let target_name = manifest.target_name()?.replace('-', "_");
+    let manifest_path = std::path::absolute(manifest_path)?;
 
     // no hard and fast rule for the lib.so output filename exists, so we implement this routine
     // which is essentially a cope for cargo's disinterest in writing down any docs so far.
@@ -421,7 +436,7 @@ pub(crate) fn find_library_file(
             _ => None,
         })
         // normalize being flattened and low to the ground
-        .find(|artifact| target_name == artifact.target.name.replace('-', "_"))
+        .find(|artifact| manifest_path == artifact.manifest_path)
         .and_then(|artifact| {
             artifact
                 .filenames

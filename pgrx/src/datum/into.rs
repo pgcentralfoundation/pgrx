@@ -226,13 +226,29 @@ impl IntoDatum for pg_sys::Oid {
         if self == pg_sys::Oid::INVALID {
             None
         } else {
-            Some(pg_sys::Datum::from(self.as_u32()))
+            Some(pg_sys::Datum::from(self.to_u32()))
         }
     }
 
     #[inline]
     fn type_oid() -> pg_sys::Oid {
         pg_sys::OIDOID
+    }
+}
+
+impl IntoDatum for pg_sys::TransactionId {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        if self == Self::INVALID {
+            None
+        } else {
+            Some(self.into())
+        }
+    }
+
+    #[inline]
+    fn type_oid() -> pg_sys::Oid {
+        pg_sys::XIDOID
     }
 }
 

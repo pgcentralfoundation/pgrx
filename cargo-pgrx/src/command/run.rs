@@ -23,7 +23,7 @@ use std::path::Path;
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Run {
-    /// Do you want to run against pg12, pg13, pg14, pg15, pg16, or pg17?
+    /// Do you want to run against pg13, pg14, pg15, pg16, or pg17?
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
     /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
@@ -42,6 +42,8 @@ pub(crate) struct Run {
     profile: Option<String>,
     #[clap(flatten)]
     features: clap_cargo::Features,
+    #[clap(long)]
+    target: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
     verbose: u8,
     /// Use an existing `pgcli` on the $PATH.
@@ -83,12 +85,13 @@ impl CommandExecute for Run {
             &pg_config,
             self.manifest_path.as_ref(),
             self.package.as_ref(),
-            package_manifest_path,
+            &package_manifest_path,
             &dbname,
             &profile,
             self.pgcli,
             &self.features,
             self.install_only,
+            self.target.as_ref().map(|x| x.as_str()),
         )
     }
 }
@@ -102,12 +105,13 @@ pub(crate) fn run(
     pg_config: &PgConfig,
     user_manifest_path: Option<impl AsRef<Path>>,
     user_package: Option<&String>,
-    package_manifest_path: impl AsRef<Path>,
+    package_manifest_path: &Path,
     dbname: &str,
     profile: &CargoProfile,
     pgcli: bool,
     features: &clap_cargo::Features,
     install_only: bool,
+    target: Option<&str>,
 ) -> eyre::Result<()> {
     // stop postgres
     stop_postgres(pg_config)?;
@@ -122,6 +126,7 @@ pub(crate) fn run(
         false,
         None,
         features,
+        target,
     )?;
 
     if install_only {

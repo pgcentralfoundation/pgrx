@@ -125,6 +125,7 @@ mod tests {
     roundtrip!(rt_point, test_rt_point, pg_sys::Point, pg_sys::Point { x: 1.0, y: 2.0 });
     roundtrip!(rt_string, test_rt_string, String, String::from("string"));
     roundtrip!(rt_oid, test_rt_oid, pg_sys::Oid, pg_sys::Oid::from(BuiltinOid::ANYOID));
+    roundtrip!(rt_xid, test_rt_xid, pg_sys::TransactionId, pg_sys::TransactionId::FIRST_NORMAL);
     roundtrip!(rt_i16, test_rt_i16, i16, i16::MAX);
     roundtrip!(rt_f64, test_rt_f64, f64, f64::MAX);
     roundtrip!(

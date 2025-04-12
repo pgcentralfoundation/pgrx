@@ -46,9 +46,6 @@ static PROCESS_ENV_DENYLIST: &[&str] = &[
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Init {
-    /// If installed locally, the path to PG12's `pgconfig` tool, or `download` to have pgrx download/compile/install it
-    #[clap(env = "PG12_PG_CONFIG", long)]
-    pg12: Option<String>,
     /// If installed locally, the path to PG13's `pgconfig` tool, or `download` to have pgrx download/compile/install it
     #[clap(env = "PG13_PG_CONFIG", long)]
     pg13: Option<String>,
@@ -72,6 +69,9 @@ pub(crate) struct Init {
     base_testing_port: Option<u16>,
     #[clap(long, help = "Additional flags to pass to the configure script")]
     configure_flag: Vec<String>,
+    /// Do not attempt to run any compiled postgresql binaries. Useful for cross compiling.
+    #[clap(long)]
+    no_run: bool,
     /// Compile PostgreSQL with the necessary flags to detect a good amount of
     /// memory errors when run under Valgrind.
     ///
@@ -103,9 +103,6 @@ impl CommandExecute for Init {
 
         let mut versions = HashMap::new();
 
-        if let Some(ref version) = self.pg12 {
-            versions.insert("pg12", version.clone());
-        }
         if let Some(ref version) = self.pg13 {
             versions.insert("pg13", version.clone());
         }
@@ -220,13 +217,15 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
     for pg_config in output_configs.iter() {
         validate_pg_config(pg_config)?;
 
-        if is_root_user() {
-            println!("{} initdb as current user is root user", "   Skipping".bold().green());
-        } else {
-            let datadir = pg_config.data_dir()?;
-            let bindir = pg_config.bin_dir()?;
-            if !datadir.try_exists()? {
-                initdb(&bindir, &datadir)?;
+        if !init.no_run {
+            if is_root_user() {
+                println!("{} initdb as current user is root user", "   Skipping".bold().green());
+            } else {
+                let datadir = pg_config.data_dir()?;
+                let bindir = pg_config.bin_dir()?;
+                if !datadir.try_exists()? {
+                    initdb(&bindir, &datadir)?;
+                }
             }
         }
     }
