@@ -21,7 +21,8 @@ categories = ["database"]
 keywords = ["database", "postgres", "postgresql", "extension"]
 readme = "../README.md"
 edition = "2021"
-include = ["src/**/*"]
+include = ["src/**/*", "build.rs"]
+links = "pgrx"
 
 [lib]
 crate-type = ["rlib"]

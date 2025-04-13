@@ -37,6 +37,9 @@ pgrx = { path = "../../pgrx", default-features = false }
 [dev-dependencies]
 pgrx-tests = { path = "../../pgrx-tests" }
 
+[build-dependencies]
+pgrx-pg-config = { path = "../../pgrx-pg-config" }
+
 # uncomment these if compiling outside of 'pgrx'
 # [profile.dev]
 # panic = "unwind"

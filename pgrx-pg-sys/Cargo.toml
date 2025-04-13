@@ -21,6 +21,7 @@ readme = "README.md"
 edition = "2021"
 include = ["src/**/*", "README.md", "include/*", "pgrx-cshim.c", "bindgen.rs"]
 build = "bindgen.rs"
+links = "postgres"
 
 [features]
 default = []

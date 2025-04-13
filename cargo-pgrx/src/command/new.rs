@@ -54,18 +54,17 @@ pub(crate) fn create_crate_template(
     create_directory_structure(path.clone())?;
     create_control_file(path.clone(), name)?;
     create_cargo_toml(path.clone(), name)?;
-    create_dotcargo_config_toml(path.clone(), name)?;
     create_lib_rs(path.clone(), name, is_bgworker)?;
     create_git_ignore(path.clone(), name)?;
     create_pgrx_embed_rs(path.clone())?;
     create_setup_sql(path.clone(), name)?;
     create_setup_out(path.clone(), name)?;
+    create_build_rs(path)?;
 
     Ok(())
 }
 
 fn create_directory_structure(root: PathBuf) -> Result<(), std::io::Error> {
-    std::fs::create_dir_all(root.join(".cargo"))?;
     std::fs::create_dir_all(root.join("src").join("bin"))?;
     std::fs::create_dir_all(root.join("pg_regress").join("expected"))?;
     std::fs::create_dir_all(root.join("pg_regress").join("sql"))?;
@@ -88,16 +87,6 @@ fn create_cargo_toml(mut filename: PathBuf, name: &str) -> Result<(), std::io::E
     let mut file = std::fs::File::create(filename)?;
 
     file.write_all(format!(include_str!("../templates/cargo_toml"), name = name).as_bytes())?;
-
-    Ok(())
-}
-
-fn create_dotcargo_config_toml(mut filename: PathBuf, _name: &str) -> Result<(), std::io::Error> {
-    filename.push(".cargo");
-    filename.push("config.toml");
-    let mut file = std::fs::File::create(filename)?;
-
-    file.write_all(include_bytes!("../templates/cargo_config_toml"))?;
 
     Ok(())
 }
@@ -155,5 +144,12 @@ fn create_setup_out(mut filename: PathBuf, name: &str) -> Result<(), std::io::Er
     filename.push("setup.out");
     let mut file = std::fs::File::create(filename)?;
     file.write_all(format!(include_str!("../templates/setup_out"), name = name).as_bytes())?;
+    Ok(())
+}
+
+fn create_build_rs(mut filename: PathBuf) -> Result<(), std::io::Error> {
+    filename.push("build.rs");
+    let mut file = std::fs::File::create(filename)?;
+    file.write_all(include_bytes!("../templates/build_rs"))?;
     Ok(())
 }

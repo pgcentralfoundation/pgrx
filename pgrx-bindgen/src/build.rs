@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use bindgen::callbacks::{DeriveTrait, EnumVariantValue, ImplementsTrait, MacroParsingBehavior};
 use bindgen::NonCopyUnionStyle;
-use eyre::{eyre, WrapErr};
+use eyre::{eyre, ContextCompat, WrapErr};
 use pgrx_pg_config::{
     is_supported_major_version, PgConfig, PgConfigSelector, PgMinorVersion, PgVersion, Pgrx,
     SUPPORTED_VERSIONS,
@@ -171,6 +171,38 @@ pub fn main() -> eyre::Result<()> {
 
     emit_rerun_if_changed();
 
+    let found_ver = {
+        let mut found = Vec::new();
+        for pgver in SUPPORTED_VERSIONS() {
+            if env_tracked(&format!("CARGO_FEATURE_PG{}", pgver.major)).is_some() {
+                found.push(pgver);
+            }
+        }
+        match &found[..] {
+            [ver] => ver.clone(),
+            [] => {
+                return Err(eyre!(
+                    "Did not find `pg$VERSION` feature. `pgrx-pg-sys` requires one of {} to be set",
+                    SUPPORTED_VERSIONS()
+                        .iter()
+                        .map(|pgver| format!("`pg{}`", pgver.major))
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                ))
+            }
+            versions => {
+                return Err(eyre!(
+                    "Multiple `pg$VERSION` features found.\n`--no-default-features` may be required.\nFound: {}",
+                    versions
+                        .iter()
+                        .map(|version| format!("pg{}", version.major))
+                        .collect::<Vec<String>>()
+                        .join(", ")
+                ))
+            }
+        }
+    };
+
     let pg_configs: Vec<(u16, PgConfig)> = if is_for_release {
         // This does not cross-check config.toml and Cargo.toml versions, as it is release infra.
         Pgrx::from_config()?.iter(PgConfigSelector::All)
@@ -192,36 +224,6 @@ pub fn main() -> eyre::Result<()> {
             })
             .collect()
     } else {
-        let mut found = Vec::new();
-        for pgver in SUPPORTED_VERSIONS() {
-            if env_tracked(&format!("CARGO_FEATURE_PG{}", pgver.major)).is_some() {
-                found.push(pgver);
-            }
-        }
-        let found_ver = match &found[..] {
-            [ver] => ver,
-            [] => {
-                return Err(eyre!(
-                    "Did not find `pg$VERSION` feature. `pgrx-pg-sys` requires one of {} to be set",
-                    SUPPORTED_VERSIONS()
-                        .iter()
-                        .map(|pgver| format!("`pg{}`", pgver.major))
-                        .collect::<Vec<_>>()
-                        .join(", ")
-                ))
-            }
-            versions => {
-                return Err(eyre!(
-                    "Multiple `pg$VERSION` features found.\n`--no-default-features` may be required.\nFound: {}",
-                    versions
-                        .iter()
-                        .map(|version| format!("pg{}", version.major))
-                        .collect::<Vec<String>>()
-                        .join(", ")
-                ))
-            }
-        };
-
         let found_major = found_ver.major;
         if let Ok(pg_config) = PgConfig::from_env() {
             let major_version = pg_config.major_version()?;
@@ -235,6 +237,20 @@ pub fn main() -> eyre::Result<()> {
             vec![(found_ver.major, specific)]
         }
     };
+
+    for (_, pg_config) in pg_configs.iter().filter(|(major, _)| *major == found_ver.major) {
+        let lib_dir = pg_config.lib_dir()?;
+        println!(
+            "cargo:rustc-link-search={}",
+            lib_dir.to_str().ok_or(eyre!("{lib_dir:?} is not valid UTF-8 string"))?
+        );
+
+        let pg_config_path = pg_config.path().wrap_err("failed to get pg_config path")?;
+        println!(
+            "cargo:PG_CONFIG={}",
+            pg_config_path.to_str().ok_or(eyre!("{pg_config_path:?} is not valid UTF-8 string"))?
+        );
+    }
 
     // make sure we're not trying to build any of the yanked postgres versions
     for (_, pg_config) in &pg_configs {
@@ -369,12 +385,6 @@ fn generate_bindings(
             )
         })?;
     }
-
-    let lib_dir = pg_config.lib_dir()?;
-    println!(
-        "cargo:rustc-link-search={}",
-        lib_dir.to_str().ok_or(eyre!("{lib_dir:?} is not valid UTF-8 string"))?
-    );
     Ok(())
 }
 

@@ -414,9 +414,9 @@ fn compute_codegen(
             .to_str()
             .expect(".control file filename should be valid UTF8");
         let mut out = quote::quote! {
-            // call the marker.  Primarily this ensures that rustc will actually link to the library
+            // Primarily this ensures that rustc will actually link to the library
             // during the "pgrx_embed" build initiated by `cargo-pgrx schema` generation
-            #lib_name_ident::__pgrx_marker();
+            extern crate #lib_name_ident as _;
 
             let mut entities = Vec::new();
             let control_file_path = std::path::PathBuf::from(#control_file_path);

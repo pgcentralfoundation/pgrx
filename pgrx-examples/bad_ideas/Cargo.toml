@@ -38,6 +38,9 @@ ureq = "3.0.10"
 [dev-dependencies]
 pgrx-tests = { path = "../../pgrx-tests" }
 
+[build-dependencies]
+pgrx-pg-config = { path = "../../pgrx-pg-config" }
+
 # uncomment these if compiling outside of 'pgrx'
 # [profile.dev]
 # panic = "unwind"

@@ -466,10 +466,15 @@ jobs:
       # hack Cargo.toml to use this version of pgrx from github
       - name: hack Cargo.toml
         run: |
-          echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
-          echo "pgrx        = { path = \"${GITHUB_WORKSPACE}/pgrx\"        }" >> /tmp/sample/Cargo.toml
-          echo "pgrx-macros = { path = \"${GITHUB_WORKSPACE}/pgrx-macros\" }" >> /tmp/sample/Cargo.toml
-          echo "pgrx-tests  = { path = \"${GITHUB_WORKSPACE}/pgrx-tests\"  }" >> /tmp/sample/Cargo.toml
+          cat <<EOF >> /tmp/sample/Cargo.toml
+          [patch.crates-io]
+          pgrx = { path = "${GITHUB_WORKSPACE}/pgrx" }
+          pgrx-macros = { path = "${GITHUB_WORKSPACE}/pgrx-macros" }
+          pgrx-pg-config = { path = "${GITHUB_WORKSPACE}/pgrx-pg-config" }
+          pgrx-pg-sys = { path = "${GITHUB_WORKSPACE}/pgrx-pg-sys" }
+          pgrx-sql-entity-graph = { path = "${GITHUB_WORKSPACE}/pgrx-sql-entity-graph" }
+          pgrx-tests = { path = "${GITHUB_WORKSPACE}/pgrx-tests" }
+          EOF
 
       - name: show Cargo.toml
         run: cat /tmp/sample/Cargo.toml

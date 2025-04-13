@@ -183,15 +183,10 @@ const _: () = {
 #[macro_export]
 macro_rules! pg_module_magic {
     () => {
-        $crate::pg_magic_func!();
+        #[cfg(not(pgrx))]
+        compile_error!("`pgrx_pg_config::main` does not run in the build script");
 
-        // A marker function which must exist in the root of the extension for proper linking by the
-        // "pgrx_embed" binary during `cargo-pgrx schema` generation.
-        #[inline(never)] /* we don't want DCE to remove this as it *could* cause the compiler to decide to not link to us */
-        #[doc(hidden)]
-        pub fn __pgrx_marker() {
-            // noop
-        }
+        $crate::pg_magic_func!();
     };
 }
 

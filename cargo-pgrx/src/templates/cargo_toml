@@ -25,6 +25,9 @@ pgrx = "=0.14.3"
 [dev-dependencies]
 pgrx-tests = "=0.14.3"
 
+[build-dependencies]
+pgrx-pg-config = "=0.14.3"
+
 [profile.dev]
 panic = "unwind"
 
