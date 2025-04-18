@@ -420,8 +420,6 @@ pub(crate) fn find_library_file(
 ) -> eyre::Result<PathBuf> {
     use std::env::consts::DLL_EXTENSION;
 
-    // cargo sometimes decides to change whether targets are kebab-case or snake_case in metadata,
-    // so normalize away the difference
     let manifest_path = std::path::absolute(manifest_path)?;
     let lib_filename = manifest.lib_filename()?;
 
