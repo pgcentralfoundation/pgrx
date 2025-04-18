@@ -844,7 +844,7 @@ fn get_extension_name() -> eyre::Result<String> {
     // https://github.com/rust-lang/cargo/issues/45
     let path = PathBuf::from(dir).join("Cargo.toml");
     let name = pgrx_pg_config::cargo::read_manifest(path)?.lib_name()?;
-    Ok(name.replace('-', "_"))
+    Ok(name)
 }
 
 fn get_pgdata_path() -> eyre::Result<PathBuf> {

@@ -12,7 +12,7 @@ use crate::manifest::{get_package_manifest, pg_config_and_version};
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
 use cargo_toml::Manifest;
-use eyre::WrapErr;
+use eyre::{eyre, WrapErr};
 use object::read::macho::MachOFatFile32;
 use owo_colors::OwoColorize;
 use pgrx_pg_config::cargo::PgrxManifestExt;
@@ -596,7 +596,22 @@ fn compute_sql(manifest: &Manifest) -> eyre::Result<()> {
 }
 
 fn pgrx_embed_name(manifest: &Manifest) -> eyre::Result<String> {
-    Ok(format!("pgrx_embed_{}", manifest.lib_name()?))
+    fn name_from(s: &str) -> String {
+        format!("pgrx_embed_{s}")
+    }
+
+    let package_name = name_from(&manifest.package_name()?);
+    let lib_name = name_from(&manifest.lib_name()?);
+    (&manifest.bin)
+        .into_iter()
+        .find(|bin| {
+            // As cargo_anifest autofills lib.name if it's empty, it's impossible to
+            // check only against one name. Perhaps, cargo-util-schemas can help with that.
+            bin.name.as_ref().is_some_and(|name| name == &package_name || name == &lib_name)
+        })
+        .map(|bin| bin.name.to_owned())
+        .flatten()
+        .ok_or_else(|| eyre!("Failed to find a pgrx_embed binary."))
 }
 
 fn parse_object(data: &[u8]) -> object::Result<object::File> {
