@@ -95,7 +95,7 @@ bitflags! {
         const UNIT_MIN = pg_sys::GUC_UNIT_MIN as i32;
         /// Include in `EXPLAIN` output
         const EXPLAIN = pg_sys::GUC_EXPLAIN as i32;
-        #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+        #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
         /// `RUNTIME_COMPUTED` is intended for runtime-computed GUCs that are only available via
         /// `postgres -C` if the server is not running
         const RUNTIME_COMPUTED = pg_sys::GUC_RUNTIME_COMPUTED as i32;

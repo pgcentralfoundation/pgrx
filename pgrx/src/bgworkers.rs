@@ -76,7 +76,8 @@ impl BackgroundWorker {
             feature = "pg14",
             feature = "pg15",
             feature = "pg16",
-            feature = "pg17"
+            feature = "pg17",
+            feature = "pg18"
         ))]
         const LEN: usize = 96;
 
@@ -197,7 +198,8 @@ impl BackgroundWorker {
                 feature = "pg14",
                 feature = "pg15",
                 feature = "pg16",
-                feature = "pg17"
+                feature = "pg17",
+                feature = "pg18"
             ))]
             pg_sys::BackgroundWorkerInitializeConnection(db, user, 0);
         };
@@ -216,16 +218,52 @@ impl BackgroundWorker {
         unsafe {
             assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
             if wake.contains(SignalWakeFlags::SIGHUP) {
+                #[cfg(any(
+                    feature = "pg13",
+                    feature = "pg14",
+                    feature = "pg15",
+                    feature = "pg16",
+                    feature = "pg17"
+                ))]
                 pg_sys::pqsignal(pg_sys::SIGHUP as i32, Some(worker_spi_sighup));
+                #[cfg(feature = "pg18")]
+                pg_sys::pqsignal_be(pg_sys::SIGHUP as i32, Some(worker_spi_sighup));
             }
             if wake.contains(SignalWakeFlags::SIGTERM) {
+                #[cfg(any(
+                    feature = "pg13",
+                    feature = "pg14",
+                    feature = "pg15",
+                    feature = "pg16",
+                    feature = "pg17"
+                ))]
                 pg_sys::pqsignal(pg_sys::SIGTERM as i32, Some(worker_spi_sigterm));
+                #[cfg(feature = "pg18")]
+                pg_sys::pqsignal_be(pg_sys::SIGTERM as i32, Some(worker_spi_sigterm));
             }
             if wake.contains(SignalWakeFlags::SIGINT) {
+                #[cfg(any(
+                    feature = "pg13",
+                    feature = "pg14",
+                    feature = "pg15",
+                    feature = "pg16",
+                    feature = "pg17"
+                ))]
                 pg_sys::pqsignal(pg_sys::SIGINT as i32, Some(worker_spi_sigint));
+                #[cfg(feature = "pg18")]
+                pg_sys::pqsignal_be(pg_sys::SIGINT as i32, Some(worker_spi_sigint));
             }
             if wake.contains(SignalWakeFlags::SIGCHLD) {
+                #[cfg(any(
+                    feature = "pg13",
+                    feature = "pg14",
+                    feature = "pg15",
+                    feature = "pg16",
+                    feature = "pg17"
+                ))]
                 pg_sys::pqsignal(pg_sys::SIGCHLD as i32, Some(worker_spi_sigchld));
+                #[cfg(feature = "pg18")]
+                pg_sys::pqsignal_be(pg_sys::SIGCHLD as i32, Some(worker_spi_sigchld));
             }
             pg_sys::BackgroundWorkerUnblockSignals();
         }
@@ -624,7 +662,8 @@ impl<'a> From<&'a BackgroundWorkerBuilder> for pg_sys::BackgroundWorker {
             feature = "pg14",
             feature = "pg15",
             feature = "pg16",
-            feature = "pg17"
+            feature = "pg17",
+            feature = "pg18"
         ))]
         let bgw = pg_sys::BackgroundWorker {
             bgw_name: RpgffiChar::from(&builder.bgw_name[..]).0,
@@ -636,12 +675,12 @@ impl<'a> From<&'a BackgroundWorkerBuilder> for pg_sys::BackgroundWorker {
                 Some(d) => d.as_secs() as i32,
             },
             bgw_library_name: {
-                #[cfg(not(feature = "pg17"))]
+                #[cfg(not(any(feature = "pg17", feature = "pg18")))]
                 {
                     RpgffiChar::from(&builder.bgw_library_name[..]).0
                 }
 
-                #[cfg(feature = "pg17")]
+                #[cfg(any(feature = "pg17", feature = "pg18"))]
                 {
                     RpgffiChar1024::from(&builder.bgw_library_name[..]).0
                 }
@@ -676,7 +715,8 @@ fn wait_latch(timeout: libc::c_long, wakeup_flags: WLflags) -> i32 {
     feature = "pg14",
     feature = "pg15",
     feature = "pg16",
-    feature = "pg17"
+    feature = "pg17",
+    feature = "pg18"
 ))]
 type RpgffiChar = RpgffiChar96;
 
