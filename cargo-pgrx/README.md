@@ -699,7 +699,7 @@ AS 'MODULE_PATHNAME', 'hello_extension_wrapper';
 ```
 
 `MODULE_PATHNAME` is replaced by Postgres with the configured value in the `.control` file. For pgrx-based extensions,
-this is  usually set to `$libdir/<extension-name>`.
+this is  usually set to `<extension-name>`.
 
 When using versioned shared-object support, the same SQL would look as follows:
 
@@ -707,7 +707,7 @@ When using versioned shared-object support, the same SQL would look as follows:
 CREATE OR REPLACE FUNCTION "hello_extension"() RETURNS text /* &str */
 STRICT
 LANGUAGE c /* Rust */
-AS '$libdir/extension-0.0.0', 'hello_extension_wrapper';
+AS 'extension-0.0.0', 'hello_extension_wrapper';
 ```
 
 Note that the versioned shared library is hard-coded in the function definition. This corresponds to the
@@ -722,7 +722,7 @@ produce the following SQL for the above function:
 CREATE OR REPLACE FUNCTION "hello_extension"() RETURNS text /* &str */
 STRICT
 LANGUAGE c /* Rust */
-AS '$libdir/extension-0.1.0', 'hello_extension_wrapper';
+AS 'extension-0.1.0', 'hello_extension_wrapper';
 ```
 
 This SQL must be used in the upgrade script from `0.0.0` to `0.1.0` in order to point the `hello_extension` function to

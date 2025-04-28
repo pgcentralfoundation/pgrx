@@ -456,7 +456,7 @@ impl PgrxSql {
             let extname = &self.extension_name;
             let extver = &self.control.default_version;
             // Note: versioned so-name format must agree with cargo pgrx
-            format!("$libdir/{extname}-{extver}")
+            format!("{extname}-{extver}")
         } else {
             String::from("MODULE_PATHNAME")
         }
