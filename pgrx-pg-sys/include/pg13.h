@@ -143,6 +143,7 @@
 #include "replication/output_plugin.h"
 #include "rewrite/rewriteHandler.h"
 #include "rewrite/rowsecurity.h"
+#include "statistics/statistics.h"
 #include "storage/block.h"
 #include "storage/buf_internals.h"
 #include "storage/bufmgr.h"
