@@ -27,6 +27,9 @@ pub use cstr::AsPgCStr;
 pub use include::*;
 pub use node::PgNode;
 pub use port::*;
+
+// For postgres 18+, some functions will reexport when enabling `cshim` feature
+#[allow(ambiguous_glob_reexports)]
 pub use submodules::*;
 
 mod seal {

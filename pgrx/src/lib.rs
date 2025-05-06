@@ -193,8 +193,18 @@ macro_rules! pg_module_magic {
             // noop
         }
     };
-    ($name:expr) => {
-        $crate::pg_magic_func!($name);
+}
+
+/// A macro for marking a library compatible with [`pgrx`][crate].
+/// Similar to [`pg_module_magic!()`](pg_module_magic), but for Postgres 18+, which has a different
+/// API to add extension name and postgres version.
+/// 
+/// name and version are passed as C strings.
+#[cfg(feature = "pg18")]
+#[macro_export]
+macro_rules! pg_module_magic_ext {
+    ($name:expr, $version:expr) => {
+        $crate::pg_magic_func!($name, $version);
 
         // A marker function which must exist in the root of the extension for proper linking by the
         // "pgrx_embed" binary during `cargo-pgrx schema` generation.
@@ -308,8 +318,8 @@ macro_rules! pg_magic_func {
                             abi
                         },
                     },
-                    name: c"".as_ptr(),
-                    version: ::pgrx::pg_sys::PG_VERSION.as_ptr(),
+                    name: std::ptr::null(),
+                    version: std::ptr::null(),
                 });
 
                 // since Postgres calls this first, register our panic handler now
@@ -322,7 +332,7 @@ macro_rules! pg_magic_func {
         }
     };
 
-    ($name:expr) => {
+    ($name:expr, $version:expr) => {
         #[cfg(any(
             feature = "pg13",
             feature = "pg14",
@@ -330,7 +340,7 @@ macro_rules! pg_magic_func {
             feature = "pg16",
             feature = "pg17"
         ))]
-        compile_error!("pg_magic_func!() does not accept a name argument in this version of pgrx. Use pg_module_magic!() instead.");
+        compile_error!("pg_magic_func!() does not accept name and version arguments in this version of pgrx. Use pg_module_magic!() instead.");
 
         #[no_mangle]
         #[allow(non_snake_case, unexpected_cfgs)]
@@ -359,8 +369,8 @@ macro_rules! pg_magic_func {
                         abi
                     },
                 },
-                name: concat!($name, "\0").as_ptr().cast(),
-                version: ::pgrx::pg_sys::PG_VERSION.as_ptr(),
+                name: $name.as_ptr(),
+                version: $version.as_ptr(),
             });
 
             // since Postgres calls this first, register our panic handler now
