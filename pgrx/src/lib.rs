@@ -198,7 +198,7 @@ macro_rules! pg_module_magic {
 /// A macro for marking a library compatible with [`pgrx`][crate].
 /// Similar to [`pg_module_magic!()`](pg_module_magic), but for Postgres 18+, which has a different
 /// API to add extension name and postgres version.
-/// 
+///
 /// name and version are passed as C strings.
 #[cfg(feature = "pg18")]
 #[macro_export]
