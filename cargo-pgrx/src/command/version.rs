@@ -7,13 +7,14 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use pgrx_pg_config::{PgConfig, Pgrx, SUPPORTED_VERSIONS};
+use pgrx_pg_config::{PgConfig, PgMinorVersion, Pgrx, SUPPORTED_VERSIONS};
 
 pub(crate) fn pgrx_default() -> eyre::Result<Pgrx> {
     let mut pgrx = Pgrx::default();
 
     rss::PostgreSQLVersionRss::new(&SUPPORTED_VERSIONS())?
         .into_iter()
+        .filter(|version| version.minor != PgMinorVersion::Devel)
         .for_each(|version| pgrx.push(PgConfig::from(version)));
 
     Ok(pgrx)

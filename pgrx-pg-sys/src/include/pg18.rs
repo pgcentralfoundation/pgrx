@@ -18,11 +18,7 @@ where
 {
     #[inline]
     fn extract_bit(byte: u8, index: usize) -> bool {
-        let bit_index = if cfg!(target_endian = "big") {
-            7 - (index % 8)
-        } else {
-            index % 8
-        };
+        let bit_index = if cfg!(target_endian = "big") { 7 - (index % 8) } else { index % 8 };
         let mask = 1 << bit_index;
         byte & mask == mask
     }
@@ -42,13 +38,13 @@ where
     }
     #[inline]
     fn change_bit(byte: u8, index: usize, val: bool) -> u8 {
-        let bit_index = if cfg!(target_endian = "big") {
-            7 - (index % 8)
-        } else {
-            index % 8
-        };
+        let bit_index = if cfg!(target_endian = "big") { 7 - (index % 8) } else { index % 8 };
         let mask = 1 << bit_index;
-        if val { byte | mask } else { byte & !mask }
+        if val {
+            byte | mask
+        } else {
+            byte & !mask
+        }
     }
     #[inline]
     pub fn set_bit(&mut self, index: usize, val: bool) {
@@ -73,11 +69,8 @@ where
         let mut val = 0;
         for i in 0..(bit_width as usize) {
             if self.get_bit(i + bit_offset) {
-                let index = if cfg!(target_endian = "big") {
-                    bit_width as usize - 1 - i
-                } else {
-                    i
-                };
+                let index =
+                    if cfg!(target_endian = "big") { bit_width as usize - 1 - i } else { i };
                 val |= 1 << index;
             }
         }
@@ -91,11 +84,8 @@ where
         let mut val = 0;
         for i in 0..(bit_width as usize) {
             if Self::raw_get_bit(this, i + bit_offset) {
-                let index = if cfg!(target_endian = "big") {
-                    bit_width as usize - 1 - i
-                } else {
-                    i
-                };
+                let index =
+                    if cfg!(target_endian = "big") { bit_width as usize - 1 - i } else { i };
                 val |= 1 << index;
             }
         }
@@ -109,11 +99,7 @@ where
         for i in 0..(bit_width as usize) {
             let mask = 1 << i;
             let val_bit_is_set = val & mask == mask;
-            let index = if cfg!(target_endian = "big") {
-                bit_width as usize - 1 - i
-            } else {
-                i
-            };
+            let index = if cfg!(target_endian = "big") { bit_width as usize - 1 - i } else { i };
             self.set_bit(index + bit_offset, val_bit_is_set);
         }
     }
@@ -125,11 +111,7 @@ where
         for i in 0..(bit_width as usize) {
             let mask = 1 << i;
             let val_bit_is_set = val & mask == mask;
-            let index = if cfg!(target_endian = "big") {
-                bit_width as usize - 1 - i
-            } else {
-                i
-            };
+            let index = if cfg!(target_endian = "big") { bit_width as usize - 1 - i } else { i };
             Self::raw_set_bit(this, index + bit_offset, val_bit_is_set);
         }
     }
@@ -35116,18 +35098,6 @@ unsafe extern "C-unwind" {
     pub fn makeStringInfoExt(initsize: ::core::ffi::c_int) -> StringInfo;
     pub fn initStringInfo(str_: StringInfo);
     pub fn initStringInfoExt(str_: StringInfo, initsize: ::core::ffi::c_int);
-    #[link_name = "initReadOnlyStringInfo__pgrx_cshim"]
-    pub fn initReadOnlyStringInfo(
-        str_: StringInfo,
-        data: *mut ::core::ffi::c_char,
-        len: ::core::ffi::c_int,
-    );
-    #[link_name = "initStringInfoFromString__pgrx_cshim"]
-    pub fn initStringInfoFromString(
-        str_: StringInfo,
-        data: *mut ::core::ffi::c_char,
-        len: ::core::ffi::c_int,
-    );
     pub fn resetStringInfo(str_: StringInfo);
     pub fn appendStringInfo(str_: StringInfo, fmt: *const ::core::ffi::c_char, ...);
     pub fn appendStringInfoVA(
@@ -35282,7 +35252,7 @@ unsafe extern "C-unwind" {
     pub fn pfree(pointer: *mut ::core::ffi::c_void);
     pub fn MemoryContextAllocHuge(context: MemoryContext, size: Size) -> *mut ::core::ffi::c_void;
     pub fn repalloc_huge(pointer: *mut ::core::ffi::c_void, size: Size)
-    -> *mut ::core::ffi::c_void;
+        -> *mut ::core::ffi::c_void;
     pub fn MemoryContextRegisterResetCallback(
         context: MemoryContext,
         cb: *mut MemoryContextCallback,
@@ -35301,83 +35271,7 @@ unsafe extern "C-unwind" {
         fmt: *const ::core::ffi::c_char,
         args: *mut __va_list_tag,
     ) -> usize;
-    #[link_name = "DatumGetBool__pgrx_cshim"]
-    pub fn DatumGetBool(X: Datum) -> bool;
-    #[link_name = "BoolGetDatum__pgrx_cshim"]
-    pub fn BoolGetDatum(X: bool) -> Datum;
-    #[link_name = "DatumGetChar__pgrx_cshim"]
-    pub fn DatumGetChar(X: Datum) -> ::core::ffi::c_char;
-    #[link_name = "CharGetDatum__pgrx_cshim"]
-    pub fn CharGetDatum(X: ::core::ffi::c_char) -> Datum;
-    #[link_name = "Int8GetDatum__pgrx_cshim"]
-    pub fn Int8GetDatum(X: int8) -> Datum;
-    #[link_name = "DatumGetUInt8__pgrx_cshim"]
-    pub fn DatumGetUInt8(X: Datum) -> uint8;
-    #[link_name = "UInt8GetDatum__pgrx_cshim"]
-    pub fn UInt8GetDatum(X: uint8) -> Datum;
-    #[link_name = "DatumGetInt16__pgrx_cshim"]
-    pub fn DatumGetInt16(X: Datum) -> int16;
-    #[link_name = "Int16GetDatum__pgrx_cshim"]
-    pub fn Int16GetDatum(X: int16) -> Datum;
-    #[link_name = "DatumGetUInt16__pgrx_cshim"]
-    pub fn DatumGetUInt16(X: Datum) -> uint16;
-    #[link_name = "UInt16GetDatum__pgrx_cshim"]
-    pub fn UInt16GetDatum(X: uint16) -> Datum;
-    #[link_name = "DatumGetInt32__pgrx_cshim"]
-    pub fn DatumGetInt32(X: Datum) -> int32;
-    #[link_name = "Int32GetDatum__pgrx_cshim"]
-    pub fn Int32GetDatum(X: int32) -> Datum;
-    #[link_name = "DatumGetUInt32__pgrx_cshim"]
-    pub fn DatumGetUInt32(X: Datum) -> uint32;
-    #[link_name = "UInt32GetDatum__pgrx_cshim"]
-    pub fn UInt32GetDatum(X: uint32) -> Datum;
-    #[link_name = "DatumGetObjectId__pgrx_cshim"]
-    pub fn DatumGetObjectId(X: Datum) -> Oid;
-    #[link_name = "ObjectIdGetDatum__pgrx_cshim"]
-    pub fn ObjectIdGetDatum(X: Oid) -> Datum;
-    #[link_name = "DatumGetTransactionId__pgrx_cshim"]
-    pub fn DatumGetTransactionId(X: Datum) -> TransactionId;
-    #[link_name = "TransactionIdGetDatum__pgrx_cshim"]
-    pub fn TransactionIdGetDatum(X: TransactionId) -> Datum;
-    #[link_name = "MultiXactIdGetDatum__pgrx_cshim"]
-    pub fn MultiXactIdGetDatum(X: MultiXactId) -> Datum;
-    #[link_name = "DatumGetCommandId__pgrx_cshim"]
-    pub fn DatumGetCommandId(X: Datum) -> CommandId;
-    #[link_name = "CommandIdGetDatum__pgrx_cshim"]
-    pub fn CommandIdGetDatum(X: CommandId) -> Datum;
-    #[link_name = "DatumGetPointer__pgrx_cshim"]
-    pub fn DatumGetPointer(X: Datum) -> Pointer;
-    #[link_name = "PointerGetDatum__pgrx_cshim"]
-    pub fn PointerGetDatum(X: *const ::core::ffi::c_void) -> Datum;
-    #[link_name = "DatumGetCString__pgrx_cshim"]
-    pub fn DatumGetCString(X: Datum) -> *mut ::core::ffi::c_char;
-    #[link_name = "CStringGetDatum__pgrx_cshim"]
-    pub fn CStringGetDatum(X: *const ::core::ffi::c_char) -> Datum;
-    #[link_name = "DatumGetName__pgrx_cshim"]
-    pub fn DatumGetName(X: Datum) -> Name;
-    #[link_name = "NameGetDatum__pgrx_cshim"]
-    pub fn NameGetDatum(X: *const NameData) -> Datum;
-    #[link_name = "DatumGetInt64__pgrx_cshim"]
-    pub fn DatumGetInt64(X: Datum) -> int64;
-    #[link_name = "Int64GetDatum__pgrx_cshim"]
-    pub fn Int64GetDatum(X: int64) -> Datum;
-    #[link_name = "DatumGetUInt64__pgrx_cshim"]
-    pub fn DatumGetUInt64(X: Datum) -> uint64;
-    #[link_name = "UInt64GetDatum__pgrx_cshim"]
-    pub fn UInt64GetDatum(X: uint64) -> Datum;
-    #[link_name = "DatumGetFloat4__pgrx_cshim"]
-    pub fn DatumGetFloat4(X: Datum) -> float4;
-    #[link_name = "Float4GetDatum__pgrx_cshim"]
-    pub fn Float4GetDatum(X: float4) -> Datum;
-    #[link_name = "DatumGetFloat8__pgrx_cshim"]
-    pub fn DatumGetFloat8(X: Datum) -> float8;
-    #[link_name = "Float8GetDatum__pgrx_cshim"]
-    pub fn Float8GetDatum(X: float8) -> Datum;
     pub static mut no_such_variable: ::core::ffi::c_int;
-    #[link_name = "newNode__pgrx_cshim"]
-    pub fn newNode(size: usize, tag: NodeTag) -> *mut Node;
-    #[link_name = "castNodeImpl__pgrx_cshim"]
-    pub fn castNodeImpl(type_: NodeTag, ptr: *mut ::core::ffi::c_void) -> *mut Node;
     pub fn outNode(str_: *mut StringInfoData, obj: *const ::core::ffi::c_void);
     pub fn outToken(str_: *mut StringInfoData, s: *const ::core::ffi::c_char);
     pub fn outBitmapset(str_: *mut StringInfoData, bms: *const Bitmapset);
@@ -35400,39 +35294,6 @@ unsafe extern "C-unwind" {
     pub fn readAttrNumberCols(numCols: ::core::ffi::c_int) -> *mut int16;
     pub fn copyObjectImpl(from: *const ::core::ffi::c_void) -> *mut ::core::ffi::c_void;
     pub fn equal(a: *const ::core::ffi::c_void, b: *const ::core::ffi::c_void) -> bool;
-    #[link_name = "list_head__pgrx_cshim"]
-    pub fn list_head(l: *const List) -> *mut ListCell;
-    #[link_name = "list_tail__pgrx_cshim"]
-    pub fn list_tail(l: *const List) -> *mut ListCell;
-    #[link_name = "list_second_cell__pgrx_cshim"]
-    pub fn list_second_cell(l: *const List) -> *mut ListCell;
-    #[link_name = "list_length__pgrx_cshim"]
-    pub fn list_length(l: *const List) -> ::core::ffi::c_int;
-    #[link_name = "list_nth_cell__pgrx_cshim"]
-    pub fn list_nth_cell(list: *const List, n: ::core::ffi::c_int) -> *mut ListCell;
-    #[link_name = "list_last_cell__pgrx_cshim"]
-    pub fn list_last_cell(list: *const List) -> *mut ListCell;
-    #[link_name = "list_nth__pgrx_cshim"]
-    pub fn list_nth(list: *const List, n: ::core::ffi::c_int) -> *mut ::core::ffi::c_void;
-    #[link_name = "list_nth_int__pgrx_cshim"]
-    pub fn list_nth_int(list: *const List, n: ::core::ffi::c_int) -> ::core::ffi::c_int;
-    #[link_name = "list_nth_oid__pgrx_cshim"]
-    pub fn list_nth_oid(list: *const List, n: ::core::ffi::c_int) -> Oid;
-    #[link_name = "list_cell_number__pgrx_cshim"]
-    pub fn list_cell_number(l: *const List, c: *const ListCell) -> ::core::ffi::c_int;
-    #[link_name = "lnext__pgrx_cshim"]
-    pub fn lnext(l: *const List, c: *const ListCell) -> *mut ListCell;
-    #[link_name = "for_each_from_setup__pgrx_cshim"]
-    pub fn for_each_from_setup(lst: *const List, N: ::core::ffi::c_int) -> ForEachState;
-    #[link_name = "for_each_cell_setup__pgrx_cshim"]
-    pub fn for_each_cell_setup(lst: *const List, initcell: *const ListCell) -> ForEachState;
-    #[link_name = "for_both_cell_setup__pgrx_cshim"]
-    pub fn for_both_cell_setup(
-        list1: *const List,
-        initcell1: *const ListCell,
-        list2: *const List,
-        initcell2: *const ListCell,
-    ) -> ForBothCellState;
     pub fn list_make1_impl(t: NodeTag, datum1: ListCell) -> *mut List;
     pub fn list_make2_impl(t: NodeTag, datum1: ListCell, datum2: ListCell) -> *mut List;
     pub fn list_make3_impl(
@@ -35520,17 +35381,12 @@ unsafe extern "C-unwind" {
     pub fn list_int_cmp(p1: *const ListCell, p2: *const ListCell) -> ::core::ffi::c_int;
     pub fn list_oid_cmp(p1: *const ListCell, p2: *const ListCell) -> ::core::ffi::c_int;
     pub fn populate_compact_attribute(tupdesc: TupleDesc, attnum: ::core::ffi::c_int);
-    #[link_name = "TupleDescAttr__pgrx_cshim"]
-    pub fn TupleDescAttr(tupdesc: TupleDesc, i: ::core::ffi::c_int) -> *mut FormData_pg_attribute;
     pub fn verify_compact_attribute(arg1: TupleDesc, attnum: ::core::ffi::c_int);
-    #[link_name = "TupleDescCompactAttr__pgrx_cshim"]
-    pub fn TupleDescCompactAttr(tupdesc: TupleDesc, i: ::core::ffi::c_int)
-    -> *mut CompactAttribute;
     pub fn CreateTemplateTupleDesc(natts: ::core::ffi::c_int) -> TupleDesc;
     pub fn CreateTupleDesc(natts: ::core::ffi::c_int, attrs: *mut Form_pg_attribute) -> TupleDesc;
     pub fn CreateTupleDescCopy(tupdesc: TupleDesc) -> TupleDesc;
     pub fn CreateTupleDescTruncatedCopy(tupdesc: TupleDesc, natts: ::core::ffi::c_int)
-    -> TupleDesc;
+        -> TupleDesc;
     pub fn CreateTupleDescCopyConstr(tupdesc: TupleDesc) -> TupleDesc;
     pub fn TupleDescCopy(dst: TupleDesc, src: TupleDesc);
     pub fn TupleDescCopyEntry(
@@ -35590,50 +35446,10 @@ unsafe extern "C-unwind" {
         outdesc: TupleDesc,
         msg: *const ::core::ffi::c_char,
     ) -> *mut AttrMap;
-    #[link_name = "BlockNumberIsValid__pgrx_cshim"]
-    pub fn BlockNumberIsValid(blockNumber: BlockNumber) -> bool;
-    #[link_name = "BlockIdSet__pgrx_cshim"]
-    pub fn BlockIdSet(blockId: *mut BlockIdData, blockNumber: BlockNumber);
-    #[link_name = "BlockIdEquals__pgrx_cshim"]
-    pub fn BlockIdEquals(blockId1: *const BlockIdData, blockId2: *const BlockIdData) -> bool;
-    #[link_name = "BlockIdGetBlockNumber__pgrx_cshim"]
-    pub fn BlockIdGetBlockNumber(blockId: *const BlockIdData) -> BlockNumber;
-    #[link_name = "ItemPointerIsValid__pgrx_cshim"]
-    pub fn ItemPointerIsValid(pointer: *const ItemPointerData) -> bool;
-    #[link_name = "ItemPointerGetBlockNumberNoCheck__pgrx_cshim"]
-    pub fn ItemPointerGetBlockNumberNoCheck(pointer: *const ItemPointerData) -> BlockNumber;
-    #[link_name = "ItemPointerGetBlockNumber__pgrx_cshim"]
-    pub fn ItemPointerGetBlockNumber(pointer: *const ItemPointerData) -> BlockNumber;
-    #[link_name = "ItemPointerGetOffsetNumberNoCheck__pgrx_cshim"]
-    pub fn ItemPointerGetOffsetNumberNoCheck(pointer: *const ItemPointerData) -> OffsetNumber;
-    #[link_name = "ItemPointerGetOffsetNumber__pgrx_cshim"]
-    pub fn ItemPointerGetOffsetNumber(pointer: *const ItemPointerData) -> OffsetNumber;
-    #[link_name = "ItemPointerSet__pgrx_cshim"]
-    pub fn ItemPointerSet(
-        pointer: *mut ItemPointerData,
-        blockNumber: BlockNumber,
-        offNum: OffsetNumber,
-    );
-    #[link_name = "ItemPointerSetBlockNumber__pgrx_cshim"]
-    pub fn ItemPointerSetBlockNumber(pointer: *mut ItemPointerData, blockNumber: BlockNumber);
-    #[link_name = "ItemPointerSetOffsetNumber__pgrx_cshim"]
-    pub fn ItemPointerSetOffsetNumber(pointer: *mut ItemPointerData, offsetNumber: OffsetNumber);
-    #[link_name = "ItemPointerCopy__pgrx_cshim"]
-    pub fn ItemPointerCopy(fromPointer: *const ItemPointerData, toPointer: *mut ItemPointerData);
-    #[link_name = "ItemPointerSetInvalid__pgrx_cshim"]
-    pub fn ItemPointerSetInvalid(pointer: *mut ItemPointerData);
-    #[link_name = "ItemPointerIndicatesMovedPartitions__pgrx_cshim"]
-    pub fn ItemPointerIndicatesMovedPartitions(pointer: *const ItemPointerData) -> bool;
-    #[link_name = "ItemPointerSetMovedPartitions__pgrx_cshim"]
-    pub fn ItemPointerSetMovedPartitions(pointer: *mut ItemPointerData);
     pub fn ItemPointerEquals(pointer1: ItemPointer, pointer2: ItemPointer) -> bool;
     pub fn ItemPointerCompare(arg1: ItemPointer, arg2: ItemPointer) -> int32;
     pub fn ItemPointerInc(pointer: ItemPointer);
     pub fn ItemPointerDec(pointer: ItemPointer);
-    #[link_name = "DatumGetItemPointer__pgrx_cshim"]
-    pub fn DatumGetItemPointer(X: Datum) -> ItemPointer;
-    #[link_name = "ItemPointerGetDatum__pgrx_cshim"]
-    pub fn ItemPointerGetDatum(X: *const ItemPointerData) -> Datum;
     pub fn HeapTupleHeaderGetCmin(tup: *const HeapTupleHeaderData) -> CommandId;
     pub fn HeapTupleHeaderGetCmax(tup: *const HeapTupleHeaderData) -> CommandId;
     pub fn HeapTupleHeaderAdjustCmax(
@@ -35642,15 +35458,6 @@ unsafe extern "C-unwind" {
         iscombo: *mut bool,
     );
     pub fn HeapTupleGetUpdateXid(tup: *const HeapTupleHeaderData) -> TransactionId;
-    #[link_name = "FullTransactionIdFromEpochAndXid__pgrx_cshim"]
-    pub fn FullTransactionIdFromEpochAndXid(epoch: uint32, xid: TransactionId)
-    -> FullTransactionId;
-    #[link_name = "FullTransactionIdFromU64__pgrx_cshim"]
-    pub fn FullTransactionIdFromU64(value: uint64) -> FullTransactionId;
-    #[link_name = "FullTransactionIdRetreat__pgrx_cshim"]
-    pub fn FullTransactionIdRetreat(dest: *mut FullTransactionId);
-    #[link_name = "FullTransactionIdAdvance__pgrx_cshim"]
-    pub fn FullTransactionIdAdvance(dest: *mut FullTransactionId);
     pub fn TransactionStartedDuringRecovery() -> bool;
     pub static mut TransamVariables: *mut TransamVariablesData;
     pub fn TransactionIdDidCommit(transactionId: TransactionId) -> bool;
@@ -35692,82 +35499,7 @@ unsafe extern "C-unwind" {
     pub fn GetNewObjectId() -> Oid;
     pub fn StopGeneratingPinnedObjectIds();
     pub fn AssertTransactionIdInAllowableRange(xid: TransactionId);
-    #[link_name = "ReadNextTransactionId__pgrx_cshim"]
-    pub fn ReadNextTransactionId() -> TransactionId;
-    #[link_name = "TransactionIdRetreatedBy__pgrx_cshim"]
-    pub fn TransactionIdRetreatedBy(xid: TransactionId, amount: uint32) -> TransactionId;
-    #[link_name = "TransactionIdOlder__pgrx_cshim"]
-    pub fn TransactionIdOlder(a: TransactionId, b: TransactionId) -> TransactionId;
-    #[link_name = "NormalTransactionIdOlder__pgrx_cshim"]
-    pub fn NormalTransactionIdOlder(a: TransactionId, b: TransactionId) -> TransactionId;
-    #[link_name = "FullTransactionIdNewer__pgrx_cshim"]
-    pub fn FullTransactionIdNewer(a: FullTransactionId, b: FullTransactionId) -> FullTransactionId;
-    #[link_name = "FullTransactionIdFromAllowableAt__pgrx_cshim"]
-    pub fn FullTransactionIdFromAllowableAt(
-        nextFullXid: FullTransactionId,
-        xid: TransactionId,
-    ) -> FullTransactionId;
-    #[link_name = "att_isnull__pgrx_cshim"]
-    pub fn att_isnull(ATT: ::core::ffi::c_int, BITS: *const bits8) -> bool;
-    #[link_name = "fetch_att__pgrx_cshim"]
-    pub fn fetch_att(
-        T: *const ::core::ffi::c_void,
-        attbyval: bool,
-        attlen: ::core::ffi::c_int,
-    ) -> Datum;
-    #[link_name = "store_att_byval__pgrx_cshim"]
-    pub fn store_att_byval(
-        T: *mut ::core::ffi::c_void,
-        newdatum: Datum,
-        attlen: ::core::ffi::c_int,
-    );
     pub static mut ignore_checksum_failure: bool;
-    #[link_name = "PageXLogRecPtrGet__pgrx_cshim"]
-    pub fn PageXLogRecPtrGet(val: PageXLogRecPtr) -> XLogRecPtr;
-    #[link_name = "PageIsEmpty__pgrx_cshim"]
-    pub fn PageIsEmpty(page: *const PageData) -> bool;
-    #[link_name = "PageIsNew__pgrx_cshim"]
-    pub fn PageIsNew(page: *const PageData) -> bool;
-    #[link_name = "PageGetItemId__pgrx_cshim"]
-    pub fn PageGetItemId(page: Page, offsetNumber: OffsetNumber) -> ItemId;
-    #[link_name = "PageGetContents__pgrx_cshim"]
-    pub fn PageGetContents(page: Page) -> *mut ::core::ffi::c_char;
-    #[link_name = "PageGetPageSize__pgrx_cshim"]
-    pub fn PageGetPageSize(page: *const PageData) -> Size;
-    #[link_name = "PageGetPageLayoutVersion__pgrx_cshim"]
-    pub fn PageGetPageLayoutVersion(page: *const PageData) -> uint8;
-    #[link_name = "PageSetPageSizeAndVersion__pgrx_cshim"]
-    pub fn PageSetPageSizeAndVersion(page: Page, size: Size, version: uint8);
-    #[link_name = "PageGetSpecialSize__pgrx_cshim"]
-    pub fn PageGetSpecialSize(page: *const PageData) -> uint16;
-    #[link_name = "PageValidateSpecialPointer__pgrx_cshim"]
-    pub fn PageValidateSpecialPointer(page: *const PageData);
-    #[link_name = "PageGetItem__pgrx_cshim"]
-    pub fn PageGetItem(page: *const PageData, itemId: *const ItemIdData) -> Item;
-    #[link_name = "PageGetMaxOffsetNumber__pgrx_cshim"]
-    pub fn PageGetMaxOffsetNumber(page: *const PageData) -> OffsetNumber;
-    #[link_name = "PageGetLSN__pgrx_cshim"]
-    pub fn PageGetLSN(page: *const PageData) -> XLogRecPtr;
-    #[link_name = "PageSetLSN__pgrx_cshim"]
-    pub fn PageSetLSN(page: Page, lsn: XLogRecPtr);
-    #[link_name = "PageHasFreeLinePointers__pgrx_cshim"]
-    pub fn PageHasFreeLinePointers(page: *const PageData) -> bool;
-    #[link_name = "PageSetHasFreeLinePointers__pgrx_cshim"]
-    pub fn PageSetHasFreeLinePointers(page: Page);
-    #[link_name = "PageClearHasFreeLinePointers__pgrx_cshim"]
-    pub fn PageClearHasFreeLinePointers(page: Page);
-    #[link_name = "PageIsFull__pgrx_cshim"]
-    pub fn PageIsFull(page: *const PageData) -> bool;
-    #[link_name = "PageSetFull__pgrx_cshim"]
-    pub fn PageSetFull(page: Page);
-    #[link_name = "PageClearFull__pgrx_cshim"]
-    pub fn PageClearFull(page: Page);
-    #[link_name = "PageIsAllVisible__pgrx_cshim"]
-    pub fn PageIsAllVisible(page: *const PageData) -> bool;
-    #[link_name = "PageSetAllVisible__pgrx_cshim"]
-    pub fn PageSetAllVisible(page: Page);
-    #[link_name = "PageClearAllVisible__pgrx_cshim"]
-    pub fn PageClearAllVisible(page: Page);
     pub fn PageInit(page: Page, pageSize: Size, specialSize: Size);
     pub fn PageIsVerified(
         page: *mut PageData,
@@ -35806,114 +35538,6 @@ unsafe extern "C-unwind" {
     ) -> bool;
     pub fn PageSetChecksumCopy(page: Page, blkno: BlockNumber) -> *mut ::core::ffi::c_char;
     pub fn PageSetChecksumInplace(page: Page, blkno: BlockNumber);
-    #[link_name = "HEAP_XMAX_IS_LOCKED_ONLY__pgrx_cshim"]
-    pub fn HEAP_XMAX_IS_LOCKED_ONLY(infomask: uint16) -> bool;
-    #[link_name = "HEAP_LOCKED_UPGRADED__pgrx_cshim"]
-    pub fn HEAP_LOCKED_UPGRADED(infomask: uint16) -> bool;
-    #[link_name = "HEAP_XMAX_IS_SHR_LOCKED__pgrx_cshim"]
-    pub fn HEAP_XMAX_IS_SHR_LOCKED(infomask: int16) -> bool;
-    #[link_name = "HEAP_XMAX_IS_EXCL_LOCKED__pgrx_cshim"]
-    pub fn HEAP_XMAX_IS_EXCL_LOCKED(infomask: int16) -> bool;
-    #[link_name = "HEAP_XMAX_IS_KEYSHR_LOCKED__pgrx_cshim"]
-    pub fn HEAP_XMAX_IS_KEYSHR_LOCKED(infomask: int16) -> bool;
-    #[link_name = "HeapTupleHeaderXminFrozen__pgrx_cshim"]
-    pub fn HeapTupleHeaderXminFrozen(tup: *const HeapTupleHeaderData) -> bool;
-    #[link_name = "HeapTupleHeaderGetRawXmin__pgrx_cshim"]
-    pub fn HeapTupleHeaderGetRawXmin(tup: *const HeapTupleHeaderData) -> TransactionId;
-    #[link_name = "HeapTupleHeaderGetXmin__pgrx_cshim"]
-    pub fn HeapTupleHeaderGetXmin(tup: *const HeapTupleHeaderData) -> TransactionId;
-    #[link_name = "HeapTupleHeaderSetXmin__pgrx_cshim"]
-    pub fn HeapTupleHeaderSetXmin(tup: *mut HeapTupleHeaderData, xid: TransactionId);
-    #[link_name = "HeapTupleHeaderXminCommitted__pgrx_cshim"]
-    pub fn HeapTupleHeaderXminCommitted(tup: *const HeapTupleHeaderData) -> bool;
-    #[link_name = "HeapTupleHeaderXminInvalid__pgrx_cshim"]
-    pub fn HeapTupleHeaderXminInvalid(tup: *const HeapTupleHeaderData) -> bool;
-    #[link_name = "HeapTupleHeaderSetXminCommitted__pgrx_cshim"]
-    pub fn HeapTupleHeaderSetXminCommitted(tup: *mut HeapTupleHeaderData);
-    #[link_name = "HeapTupleHeaderSetXminInvalid__pgrx_cshim"]
-    pub fn HeapTupleHeaderSetXminInvalid(tup: *mut HeapTupleHeaderData);
-    #[link_name = "HeapTupleHeaderSetXminFrozen__pgrx_cshim"]
-    pub fn HeapTupleHeaderSetXminFrozen(tup: *mut HeapTupleHeaderData);
-    #[link_name = "HeapTupleHeaderGetRawXmax__pgrx_cshim"]
-    pub fn HeapTupleHeaderGetRawXmax(tup: *const HeapTupleHeaderData) -> TransactionId;
-    #[link_name = "HeapTupleHeaderSetXmax__pgrx_cshim"]
-    pub fn HeapTupleHeaderSetXmax(tup: *mut HeapTupleHeaderData, xid: TransactionId);
-    #[link_name = "HeapTupleHeaderGetUpdateXid__pgrx_cshim"]
-    pub fn HeapTupleHeaderGetUpdateXid(tup: *const HeapTupleHeaderData) -> TransactionId;
-    #[link_name = "HeapTupleHeaderGetRawCommandId__pgrx_cshim"]
-    pub fn HeapTupleHeaderGetRawCommandId(tup: *const HeapTupleHeaderData) -> CommandId;
-    #[link_name = "HeapTupleHeaderSetCmin__pgrx_cshim"]
-    pub fn HeapTupleHeaderSetCmin(tup: *mut HeapTupleHeaderData, cid: CommandId);
-    #[link_name = "HeapTupleHeaderSetCmax__pgrx_cshim"]
-    pub fn HeapTupleHeaderSetCmax(tup: *mut HeapTupleHeaderData, cid: CommandId, iscombo: bool);
-    #[link_name = "HeapTupleHeaderGetXvac__pgrx_cshim"]
-    pub fn HeapTupleHeaderGetXvac(tup: *const HeapTupleHeaderData) -> TransactionId;
-    #[link_name = "HeapTupleHeaderSetXvac__pgrx_cshim"]
-    pub fn HeapTupleHeaderSetXvac(tup: *mut HeapTupleHeaderData, xid: TransactionId);
-    #[link_name = "HeapTupleHeaderIsSpeculative__pgrx_cshim"]
-    pub fn HeapTupleHeaderIsSpeculative(tup: *const HeapTupleHeaderData) -> bool;
-    #[link_name = "HeapTupleHeaderGetSpeculativeToken__pgrx_cshim"]
-    pub fn HeapTupleHeaderGetSpeculativeToken(tup: *const HeapTupleHeaderData) -> BlockNumber;
-    #[link_name = "HeapTupleHeaderSetSpeculativeToken__pgrx_cshim"]
-    pub fn HeapTupleHeaderSetSpeculativeToken(tup: *mut HeapTupleHeaderData, token: BlockNumber);
-    #[link_name = "HeapTupleHeaderIndicatesMovedPartitions__pgrx_cshim"]
-    pub fn HeapTupleHeaderIndicatesMovedPartitions(tup: *const HeapTupleHeaderData) -> bool;
-    #[link_name = "HeapTupleHeaderSetMovedPartitions__pgrx_cshim"]
-    pub fn HeapTupleHeaderSetMovedPartitions(tup: *mut HeapTupleHeaderData);
-    #[link_name = "HeapTupleHeaderGetDatumLength__pgrx_cshim"]
-    pub fn HeapTupleHeaderGetDatumLength(tup: *const HeapTupleHeaderData) -> uint32;
-    #[link_name = "HeapTupleHeaderSetDatumLength__pgrx_cshim"]
-    pub fn HeapTupleHeaderSetDatumLength(tup: *mut HeapTupleHeaderData, len: uint32);
-    #[link_name = "HeapTupleHeaderGetTypeId__pgrx_cshim"]
-    pub fn HeapTupleHeaderGetTypeId(tup: *const HeapTupleHeaderData) -> Oid;
-    #[link_name = "HeapTupleHeaderSetTypeId__pgrx_cshim"]
-    pub fn HeapTupleHeaderSetTypeId(tup: *mut HeapTupleHeaderData, datum_typeid: Oid);
-    #[link_name = "HeapTupleHeaderGetTypMod__pgrx_cshim"]
-    pub fn HeapTupleHeaderGetTypMod(tup: *const HeapTupleHeaderData) -> int32;
-    #[link_name = "HeapTupleHeaderSetTypMod__pgrx_cshim"]
-    pub fn HeapTupleHeaderSetTypMod(tup: *mut HeapTupleHeaderData, typmod: int32);
-    #[link_name = "HeapTupleHeaderIsHotUpdated__pgrx_cshim"]
-    pub fn HeapTupleHeaderIsHotUpdated(tup: *const HeapTupleHeaderData) -> bool;
-    #[link_name = "HeapTupleHeaderSetHotUpdated__pgrx_cshim"]
-    pub fn HeapTupleHeaderSetHotUpdated(tup: *mut HeapTupleHeaderData);
-    #[link_name = "HeapTupleHeaderClearHotUpdated__pgrx_cshim"]
-    pub fn HeapTupleHeaderClearHotUpdated(tup: *mut HeapTupleHeaderData);
-    #[link_name = "HeapTupleHeaderIsHeapOnly__pgrx_cshim"]
-    pub fn HeapTupleHeaderIsHeapOnly(tup: *const HeapTupleHeaderData) -> bool;
-    #[link_name = "HeapTupleHeaderSetHeapOnly__pgrx_cshim"]
-    pub fn HeapTupleHeaderSetHeapOnly(tup: *mut HeapTupleHeaderData);
-    #[link_name = "HeapTupleHeaderClearHeapOnly__pgrx_cshim"]
-    pub fn HeapTupleHeaderClearHeapOnly(tup: *mut HeapTupleHeaderData);
-    #[link_name = "BITMAPLEN__pgrx_cshim"]
-    pub fn BITMAPLEN(NATTS: ::core::ffi::c_int) -> ::core::ffi::c_int;
-    #[link_name = "HeapTupleHeaderHasMatch__pgrx_cshim"]
-    pub fn HeapTupleHeaderHasMatch(tup: *const MinimalTupleData) -> bool;
-    #[link_name = "HeapTupleHeaderSetMatch__pgrx_cshim"]
-    pub fn HeapTupleHeaderSetMatch(tup: *mut MinimalTupleData);
-    #[link_name = "HeapTupleHeaderClearMatch__pgrx_cshim"]
-    pub fn HeapTupleHeaderClearMatch(tup: *mut MinimalTupleData);
-    #[link_name = "HeapTupleHasNulls__pgrx_cshim"]
-    pub fn HeapTupleHasNulls(tuple: *const HeapTupleData) -> bool;
-    #[link_name = "HeapTupleNoNulls__pgrx_cshim"]
-    pub fn HeapTupleNoNulls(tuple: *const HeapTupleData) -> bool;
-    #[link_name = "HeapTupleHasVarWidth__pgrx_cshim"]
-    pub fn HeapTupleHasVarWidth(tuple: *const HeapTupleData) -> bool;
-    #[link_name = "HeapTupleAllFixed__pgrx_cshim"]
-    pub fn HeapTupleAllFixed(tuple: *const HeapTupleData) -> bool;
-    #[link_name = "HeapTupleHasExternal__pgrx_cshim"]
-    pub fn HeapTupleHasExternal(tuple: *const HeapTupleData) -> bool;
-    #[link_name = "HeapTupleIsHotUpdated__pgrx_cshim"]
-    pub fn HeapTupleIsHotUpdated(tuple: *const HeapTupleData) -> bool;
-    #[link_name = "HeapTupleSetHotUpdated__pgrx_cshim"]
-    pub fn HeapTupleSetHotUpdated(tuple: *const HeapTupleData);
-    #[link_name = "HeapTupleClearHotUpdated__pgrx_cshim"]
-    pub fn HeapTupleClearHotUpdated(tuple: *const HeapTupleData);
-    #[link_name = "HeapTupleIsHeapOnly__pgrx_cshim"]
-    pub fn HeapTupleIsHeapOnly(tuple: *const HeapTupleData) -> bool;
-    #[link_name = "HeapTupleSetHeapOnly__pgrx_cshim"]
-    pub fn HeapTupleSetHeapOnly(tuple: *const HeapTupleData);
-    #[link_name = "HeapTupleClearHeapOnly__pgrx_cshim"]
-    pub fn HeapTupleClearHeapOnly(tuple: *const HeapTupleData);
     pub fn heap_compute_data_size(
         tupleDesc: TupleDesc,
         values: *const Datum,
@@ -35929,7 +35553,7 @@ unsafe extern "C-unwind" {
         bit: *mut bits8,
     );
     pub fn heap_attisnull(tup: HeapTuple, attnum: ::core::ffi::c_int, tupleDesc: TupleDesc)
-    -> bool;
+        -> bool;
     pub fn nocachegetattr(
         tup: HeapTuple,
         attnum: ::core::ffi::c_int,
@@ -35988,13 +35612,6 @@ unsafe extern "C-unwind" {
     pub fn minimal_tuple_from_heap_tuple(htup: HeapTuple, extra: Size) -> MinimalTuple;
     pub fn heap_expand_tuple(sourceTuple: HeapTuple, tupleDesc: TupleDesc) -> HeapTuple;
     pub fn minimal_expand_tuple(sourceTuple: HeapTuple, tupleDesc: TupleDesc) -> MinimalTuple;
-    #[link_name = "fastgetattr__pgrx_cshim"]
-    pub fn fastgetattr(
-        tup: HeapTuple,
-        attnum: ::core::ffi::c_int,
-        tupleDesc: TupleDesc,
-        isnull: *mut bool,
-    ) -> Datum;
     pub static TTSOpsVirtual: TupleTableSlotOps;
     pub static TTSOpsHeapTuple: TupleTableSlotOps;
     pub static TTSOpsMinimalTuple: TupleTableSlotOps;
@@ -36060,41 +35677,6 @@ unsafe extern "C-unwind" {
         lastAttNum: ::core::ffi::c_int,
     );
     pub fn slot_getsomeattrs_int(slot: *mut TupleTableSlot, attnum: ::core::ffi::c_int);
-    #[link_name = "slot_getsomeattrs__pgrx_cshim"]
-    pub fn slot_getsomeattrs(slot: *mut TupleTableSlot, attnum: ::core::ffi::c_int);
-    #[link_name = "slot_getallattrs__pgrx_cshim"]
-    pub fn slot_getallattrs(slot: *mut TupleTableSlot);
-    #[link_name = "slot_attisnull__pgrx_cshim"]
-    pub fn slot_attisnull(slot: *mut TupleTableSlot, attnum: ::core::ffi::c_int) -> bool;
-    #[link_name = "slot_getattr__pgrx_cshim"]
-    pub fn slot_getattr(
-        slot: *mut TupleTableSlot,
-        attnum: ::core::ffi::c_int,
-        isnull: *mut bool,
-    ) -> Datum;
-    #[link_name = "slot_getsysattr__pgrx_cshim"]
-    pub fn slot_getsysattr(
-        slot: *mut TupleTableSlot,
-        attnum: ::core::ffi::c_int,
-        isnull: *mut bool,
-    ) -> Datum;
-    #[link_name = "slot_is_current_xact_tuple__pgrx_cshim"]
-    pub fn slot_is_current_xact_tuple(slot: *mut TupleTableSlot) -> bool;
-    #[link_name = "ExecClearTuple__pgrx_cshim"]
-    pub fn ExecClearTuple(slot: *mut TupleTableSlot) -> *mut TupleTableSlot;
-    #[link_name = "ExecMaterializeSlot__pgrx_cshim"]
-    pub fn ExecMaterializeSlot(slot: *mut TupleTableSlot);
-    #[link_name = "ExecCopySlotHeapTuple__pgrx_cshim"]
-    pub fn ExecCopySlotHeapTuple(slot: *mut TupleTableSlot) -> HeapTuple;
-    #[link_name = "ExecCopySlotMinimalTuple__pgrx_cshim"]
-    pub fn ExecCopySlotMinimalTuple(slot: *mut TupleTableSlot) -> MinimalTuple;
-    #[link_name = "ExecCopySlotMinimalTupleExtra__pgrx_cshim"]
-    pub fn ExecCopySlotMinimalTupleExtra(slot: *mut TupleTableSlot, extra: Size) -> MinimalTuple;
-    #[link_name = "ExecCopySlot__pgrx_cshim"]
-    pub fn ExecCopySlot(
-        dstslot: *mut TupleTableSlot,
-        srcslot: *mut TupleTableSlot,
-    ) -> *mut TupleTableSlot;
     pub fn bms_copy(a: *const Bitmapset) -> *mut Bitmapset;
     pub fn bms_equal(a: *const Bitmapset, b: *const Bitmapset) -> bool;
     pub fn bms_compare(a: *const Bitmapset, b: *const Bitmapset) -> ::core::ffi::c_int;
@@ -36141,7 +35723,7 @@ unsafe extern "C-unwind" {
         msg: *const ::core::ffi::c_char,
     ) -> *mut TupleConversionMap;
     pub fn convert_tuples_by_name(indesc: TupleDesc, outdesc: TupleDesc)
-    -> *mut TupleConversionMap;
+        -> *mut TupleConversionMap;
     pub fn convert_tuples_by_name_attrmap(
         indesc: TupleDesc,
         outdesc: TupleDesc,
@@ -36155,8 +35737,6 @@ unsafe extern "C-unwind" {
     ) -> *mut TupleTableSlot;
     pub fn execute_attr_map_cols(attrMap: *mut AttrMap, in_cols: *mut Bitmapset) -> *mut Bitmapset;
     pub fn free_conversion_map(map: *mut TupleConversionMap);
-    #[link_name = "pg_clock_gettime_ns__pgrx_cshim"]
-    pub fn pg_clock_gettime_ns() -> instr_time;
     pub static mut pgBufferUsage: BufferUsage;
     pub static mut pgWalUsage: WalUsage;
     pub fn InstrAlloc(
@@ -36363,7 +35943,7 @@ unsafe extern "C-unwind" {
     pub fn OidFunctionCall0Coll(functionId: Oid, collation: Oid) -> Datum;
     pub fn OidFunctionCall1Coll(functionId: Oid, collation: Oid, arg1: Datum) -> Datum;
     pub fn OidFunctionCall2Coll(functionId: Oid, collation: Oid, arg1: Datum, arg2: Datum)
-    -> Datum;
+        -> Datum;
     pub fn OidFunctionCall3Coll(
         functionId: Oid,
         collation: Oid,
@@ -36546,120 +36126,6 @@ unsafe extern "C-unwind" {
     pub static mut needs_fmgr_hook: needs_fmgr_hook_type;
     pub static mut fmgr_hook: fmgr_hook_type;
     pub fn slist_delete(head: *mut slist_head, node: *const slist_node);
-    #[link_name = "dlist_init__pgrx_cshim"]
-    pub fn dlist_init(head: *mut dlist_head);
-    #[link_name = "dlist_node_init__pgrx_cshim"]
-    pub fn dlist_node_init(node: *mut dlist_node);
-    #[link_name = "dlist_is_empty__pgrx_cshim"]
-    pub fn dlist_is_empty(head: *const dlist_head) -> bool;
-    #[link_name = "dlist_push_head__pgrx_cshim"]
-    pub fn dlist_push_head(head: *mut dlist_head, node: *mut dlist_node);
-    #[link_name = "dlist_push_tail__pgrx_cshim"]
-    pub fn dlist_push_tail(head: *mut dlist_head, node: *mut dlist_node);
-    #[link_name = "dlist_insert_after__pgrx_cshim"]
-    pub fn dlist_insert_after(after: *mut dlist_node, node: *mut dlist_node);
-    #[link_name = "dlist_insert_before__pgrx_cshim"]
-    pub fn dlist_insert_before(before: *mut dlist_node, node: *mut dlist_node);
-    #[link_name = "dlist_delete__pgrx_cshim"]
-    pub fn dlist_delete(node: *mut dlist_node);
-    #[link_name = "dlist_delete_thoroughly__pgrx_cshim"]
-    pub fn dlist_delete_thoroughly(node: *mut dlist_node);
-    #[link_name = "dlist_delete_from__pgrx_cshim"]
-    pub fn dlist_delete_from(head: *mut dlist_head, node: *mut dlist_node);
-    #[link_name = "dlist_delete_from_thoroughly__pgrx_cshim"]
-    pub fn dlist_delete_from_thoroughly(head: *mut dlist_head, node: *mut dlist_node);
-    #[link_name = "dlist_pop_head_node__pgrx_cshim"]
-    pub fn dlist_pop_head_node(head: *mut dlist_head) -> *mut dlist_node;
-    #[link_name = "dlist_move_head__pgrx_cshim"]
-    pub fn dlist_move_head(head: *mut dlist_head, node: *mut dlist_node);
-    #[link_name = "dlist_move_tail__pgrx_cshim"]
-    pub fn dlist_move_tail(head: *mut dlist_head, node: *mut dlist_node);
-    #[link_name = "dlist_has_next__pgrx_cshim"]
-    pub fn dlist_has_next(head: *const dlist_head, node: *const dlist_node) -> bool;
-    #[link_name = "dlist_has_prev__pgrx_cshim"]
-    pub fn dlist_has_prev(head: *const dlist_head, node: *const dlist_node) -> bool;
-    #[link_name = "dlist_node_is_detached__pgrx_cshim"]
-    pub fn dlist_node_is_detached(node: *const dlist_node) -> bool;
-    #[link_name = "dlist_next_node__pgrx_cshim"]
-    pub fn dlist_next_node(head: *mut dlist_head, node: *mut dlist_node) -> *mut dlist_node;
-    #[link_name = "dlist_prev_node__pgrx_cshim"]
-    pub fn dlist_prev_node(head: *mut dlist_head, node: *mut dlist_node) -> *mut dlist_node;
-    #[link_name = "dlist_head_element_off__pgrx_cshim"]
-    pub fn dlist_head_element_off(head: *mut dlist_head, off: usize) -> *mut ::core::ffi::c_void;
-    #[link_name = "dlist_head_node__pgrx_cshim"]
-    pub fn dlist_head_node(head: *mut dlist_head) -> *mut dlist_node;
-    #[link_name = "dlist_tail_element_off__pgrx_cshim"]
-    pub fn dlist_tail_element_off(head: *mut dlist_head, off: usize) -> *mut ::core::ffi::c_void;
-    #[link_name = "dlist_tail_node__pgrx_cshim"]
-    pub fn dlist_tail_node(head: *mut dlist_head) -> *mut dlist_node;
-    #[link_name = "dclist_init__pgrx_cshim"]
-    pub fn dclist_init(head: *mut dclist_head);
-    #[link_name = "dclist_is_empty__pgrx_cshim"]
-    pub fn dclist_is_empty(head: *const dclist_head) -> bool;
-    #[link_name = "dclist_push_head__pgrx_cshim"]
-    pub fn dclist_push_head(head: *mut dclist_head, node: *mut dlist_node);
-    #[link_name = "dclist_push_tail__pgrx_cshim"]
-    pub fn dclist_push_tail(head: *mut dclist_head, node: *mut dlist_node);
-    #[link_name = "dclist_insert_after__pgrx_cshim"]
-    pub fn dclist_insert_after(
-        head: *mut dclist_head,
-        after: *mut dlist_node,
-        node: *mut dlist_node,
-    );
-    #[link_name = "dclist_insert_before__pgrx_cshim"]
-    pub fn dclist_insert_before(
-        head: *mut dclist_head,
-        before: *mut dlist_node,
-        node: *mut dlist_node,
-    );
-    #[link_name = "dclist_delete_from__pgrx_cshim"]
-    pub fn dclist_delete_from(head: *mut dclist_head, node: *mut dlist_node);
-    #[link_name = "dclist_delete_from_thoroughly__pgrx_cshim"]
-    pub fn dclist_delete_from_thoroughly(head: *mut dclist_head, node: *mut dlist_node);
-    #[link_name = "dclist_pop_head_node__pgrx_cshim"]
-    pub fn dclist_pop_head_node(head: *mut dclist_head) -> *mut dlist_node;
-    #[link_name = "dclist_move_head__pgrx_cshim"]
-    pub fn dclist_move_head(head: *mut dclist_head, node: *mut dlist_node);
-    #[link_name = "dclist_move_tail__pgrx_cshim"]
-    pub fn dclist_move_tail(head: *mut dclist_head, node: *mut dlist_node);
-    #[link_name = "dclist_has_next__pgrx_cshim"]
-    pub fn dclist_has_next(head: *const dclist_head, node: *const dlist_node) -> bool;
-    #[link_name = "dclist_has_prev__pgrx_cshim"]
-    pub fn dclist_has_prev(head: *const dclist_head, node: *const dlist_node) -> bool;
-    #[link_name = "dclist_next_node__pgrx_cshim"]
-    pub fn dclist_next_node(head: *mut dclist_head, node: *mut dlist_node) -> *mut dlist_node;
-    #[link_name = "dclist_prev_node__pgrx_cshim"]
-    pub fn dclist_prev_node(head: *mut dclist_head, node: *mut dlist_node) -> *mut dlist_node;
-    #[link_name = "dclist_head_element_off__pgrx_cshim"]
-    pub fn dclist_head_element_off(head: *mut dclist_head, off: usize) -> *mut ::core::ffi::c_void;
-    #[link_name = "dclist_head_node__pgrx_cshim"]
-    pub fn dclist_head_node(head: *mut dclist_head) -> *mut dlist_node;
-    #[link_name = "dclist_tail_element_off__pgrx_cshim"]
-    pub fn dclist_tail_element_off(head: *mut dclist_head, off: usize) -> *mut ::core::ffi::c_void;
-    #[link_name = "dclist_tail_node__pgrx_cshim"]
-    pub fn dclist_tail_node(head: *mut dclist_head) -> *mut dlist_node;
-    #[link_name = "dclist_count__pgrx_cshim"]
-    pub fn dclist_count(head: *const dclist_head) -> uint32;
-    #[link_name = "slist_init__pgrx_cshim"]
-    pub fn slist_init(head: *mut slist_head);
-    #[link_name = "slist_is_empty__pgrx_cshim"]
-    pub fn slist_is_empty(head: *const slist_head) -> bool;
-    #[link_name = "slist_push_head__pgrx_cshim"]
-    pub fn slist_push_head(head: *mut slist_head, node: *mut slist_node);
-    #[link_name = "slist_insert_after__pgrx_cshim"]
-    pub fn slist_insert_after(after: *mut slist_node, node: *mut slist_node);
-    #[link_name = "slist_pop_head_node__pgrx_cshim"]
-    pub fn slist_pop_head_node(head: *mut slist_head) -> *mut slist_node;
-    #[link_name = "slist_has_next__pgrx_cshim"]
-    pub fn slist_has_next(head: *const slist_head, node: *const slist_node) -> bool;
-    #[link_name = "slist_next_node__pgrx_cshim"]
-    pub fn slist_next_node(head: *mut slist_head, node: *mut slist_node) -> *mut slist_node;
-    #[link_name = "slist_head_element_off__pgrx_cshim"]
-    pub fn slist_head_element_off(head: *mut slist_head, off: usize) -> *mut ::core::ffi::c_void;
-    #[link_name = "slist_head_node__pgrx_cshim"]
-    pub fn slist_head_node(head: *mut slist_head) -> *mut slist_node;
-    #[link_name = "slist_delete_current__pgrx_cshim"]
-    pub fn slist_delete_current(iter: *mut slist_mutable_iter);
     pub fn pairingheap_allocate(
         compare: pairingheap_comparator,
         arg: *mut ::core::ffi::c_void,
@@ -36694,150 +36160,6 @@ unsafe extern "C-unwind" {
         procNumber: ::core::ffi::c_int,
         forkNumber: ForkNumber::Type,
     ) -> RelPathStr;
-    #[link_name = "pg_spin_delay_impl__pgrx_cshim"]
-    pub fn pg_spin_delay_impl();
-    #[link_name = "pg_atomic_test_set_flag_impl__pgrx_cshim"]
-    pub fn pg_atomic_test_set_flag_impl(ptr: *mut pg_atomic_flag) -> bool;
-    #[link_name = "pg_atomic_clear_flag_impl__pgrx_cshim"]
-    pub fn pg_atomic_clear_flag_impl(ptr: *mut pg_atomic_flag);
-    #[link_name = "pg_atomic_compare_exchange_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_compare_exchange_u32_impl(
-        ptr: *mut pg_atomic_uint32,
-        expected: *mut uint32,
-        newval: uint32,
-    ) -> bool;
-    #[link_name = "pg_atomic_fetch_add_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_fetch_add_u32_impl(ptr: *mut pg_atomic_uint32, add_: int32) -> uint32;
-    #[link_name = "pg_atomic_compare_exchange_u64_impl__pgrx_cshim"]
-    pub fn pg_atomic_compare_exchange_u64_impl(
-        ptr: *mut pg_atomic_uint64,
-        expected: *mut uint64,
-        newval: uint64,
-    ) -> bool;
-    #[link_name = "pg_atomic_fetch_add_u64_impl__pgrx_cshim"]
-    pub fn pg_atomic_fetch_add_u64_impl(ptr: *mut pg_atomic_uint64, add_: int64) -> uint64;
-    #[link_name = "pg_atomic_unlocked_test_flag_impl__pgrx_cshim"]
-    pub fn pg_atomic_unlocked_test_flag_impl(ptr: *mut pg_atomic_flag) -> bool;
-    #[link_name = "pg_atomic_init_flag_impl__pgrx_cshim"]
-    pub fn pg_atomic_init_flag_impl(ptr: *mut pg_atomic_flag);
-    #[link_name = "pg_atomic_exchange_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_exchange_u32_impl(ptr: *mut pg_atomic_uint32, newval: uint32) -> uint32;
-    #[link_name = "pg_atomic_fetch_sub_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_fetch_sub_u32_impl(ptr: *mut pg_atomic_uint32, sub_: int32) -> uint32;
-    #[link_name = "pg_atomic_fetch_and_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_fetch_and_u32_impl(ptr: *mut pg_atomic_uint32, and_: uint32) -> uint32;
-    #[link_name = "pg_atomic_fetch_or_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_fetch_or_u32_impl(ptr: *mut pg_atomic_uint32, or_: uint32) -> uint32;
-    #[link_name = "pg_atomic_exchange_u64_impl__pgrx_cshim"]
-    pub fn pg_atomic_exchange_u64_impl(ptr: *mut pg_atomic_uint64, newval: uint64) -> uint64;
-    #[link_name = "pg_atomic_fetch_sub_u64_impl__pgrx_cshim"]
-    pub fn pg_atomic_fetch_sub_u64_impl(ptr: *mut pg_atomic_uint64, sub_: int64) -> uint64;
-    #[link_name = "pg_atomic_fetch_and_u64_impl__pgrx_cshim"]
-    pub fn pg_atomic_fetch_and_u64_impl(ptr: *mut pg_atomic_uint64, and_: uint64) -> uint64;
-    #[link_name = "pg_atomic_fetch_or_u64_impl__pgrx_cshim"]
-    pub fn pg_atomic_fetch_or_u64_impl(ptr: *mut pg_atomic_uint64, or_: uint64) -> uint64;
-    #[link_name = "pg_atomic_read_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_read_u32_impl(ptr: *mut pg_atomic_uint32) -> uint32;
-    #[link_name = "pg_atomic_write_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_write_u32_impl(ptr: *mut pg_atomic_uint32, val: uint32);
-    #[link_name = "pg_atomic_unlocked_write_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_unlocked_write_u32_impl(ptr: *mut pg_atomic_uint32, val: uint32);
-    #[link_name = "pg_atomic_init_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_init_u32_impl(ptr: *mut pg_atomic_uint32, val_: uint32);
-    #[link_name = "pg_atomic_add_fetch_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_add_fetch_u32_impl(ptr: *mut pg_atomic_uint32, add_: int32) -> uint32;
-    #[link_name = "pg_atomic_sub_fetch_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_sub_fetch_u32_impl(ptr: *mut pg_atomic_uint32, sub_: int32) -> uint32;
-    #[link_name = "pg_atomic_read_membarrier_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_read_membarrier_u32_impl(ptr: *mut pg_atomic_uint32) -> uint32;
-    #[link_name = "pg_atomic_write_membarrier_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_write_membarrier_u32_impl(ptr: *mut pg_atomic_uint32, val: uint32);
-    #[link_name = "pg_atomic_write_u64_impl__pgrx_cshim"]
-    pub fn pg_atomic_write_u64_impl(ptr: *mut pg_atomic_uint64, val: uint64);
-    #[link_name = "pg_atomic_read_u64_impl__pgrx_cshim"]
-    pub fn pg_atomic_read_u64_impl(ptr: *mut pg_atomic_uint64) -> uint64;
-    #[link_name = "pg_atomic_init_u64_impl__pgrx_cshim"]
-    pub fn pg_atomic_init_u64_impl(ptr: *mut pg_atomic_uint64, val_: uint64);
-    #[link_name = "pg_atomic_add_fetch_u64_impl__pgrx_cshim"]
-    pub fn pg_atomic_add_fetch_u64_impl(ptr: *mut pg_atomic_uint64, add_: int64) -> uint64;
-    #[link_name = "pg_atomic_sub_fetch_u64_impl__pgrx_cshim"]
-    pub fn pg_atomic_sub_fetch_u64_impl(ptr: *mut pg_atomic_uint64, sub_: int64) -> uint64;
-    #[link_name = "pg_atomic_read_membarrier_u64_impl__pgrx_cshim"]
-    pub fn pg_atomic_read_membarrier_u64_impl(ptr: *mut pg_atomic_uint64) -> uint64;
-    #[link_name = "pg_atomic_write_membarrier_u64_impl__pgrx_cshim"]
-    pub fn pg_atomic_write_membarrier_u64_impl(ptr: *mut pg_atomic_uint64, val: uint64);
-    #[link_name = "pg_atomic_init_flag__pgrx_cshim"]
-    pub fn pg_atomic_init_flag(ptr: *mut pg_atomic_flag);
-    #[link_name = "pg_atomic_test_set_flag__pgrx_cshim"]
-    pub fn pg_atomic_test_set_flag(ptr: *mut pg_atomic_flag) -> bool;
-    #[link_name = "pg_atomic_unlocked_test_flag__pgrx_cshim"]
-    pub fn pg_atomic_unlocked_test_flag(ptr: *mut pg_atomic_flag) -> bool;
-    #[link_name = "pg_atomic_clear_flag__pgrx_cshim"]
-    pub fn pg_atomic_clear_flag(ptr: *mut pg_atomic_flag);
-    #[link_name = "pg_atomic_init_u32__pgrx_cshim"]
-    pub fn pg_atomic_init_u32(ptr: *mut pg_atomic_uint32, val: uint32);
-    #[link_name = "pg_atomic_read_u32__pgrx_cshim"]
-    pub fn pg_atomic_read_u32(ptr: *mut pg_atomic_uint32) -> uint32;
-    #[link_name = "pg_atomic_read_membarrier_u32__pgrx_cshim"]
-    pub fn pg_atomic_read_membarrier_u32(ptr: *mut pg_atomic_uint32) -> uint32;
-    #[link_name = "pg_atomic_write_u32__pgrx_cshim"]
-    pub fn pg_atomic_write_u32(ptr: *mut pg_atomic_uint32, val: uint32);
-    #[link_name = "pg_atomic_unlocked_write_u32__pgrx_cshim"]
-    pub fn pg_atomic_unlocked_write_u32(ptr: *mut pg_atomic_uint32, val: uint32);
-    #[link_name = "pg_atomic_write_membarrier_u32__pgrx_cshim"]
-    pub fn pg_atomic_write_membarrier_u32(ptr: *mut pg_atomic_uint32, val: uint32);
-    #[link_name = "pg_atomic_exchange_u32__pgrx_cshim"]
-    pub fn pg_atomic_exchange_u32(ptr: *mut pg_atomic_uint32, newval: uint32) -> uint32;
-    #[link_name = "pg_atomic_compare_exchange_u32__pgrx_cshim"]
-    pub fn pg_atomic_compare_exchange_u32(
-        ptr: *mut pg_atomic_uint32,
-        expected: *mut uint32,
-        newval: uint32,
-    ) -> bool;
-    #[link_name = "pg_atomic_fetch_add_u32__pgrx_cshim"]
-    pub fn pg_atomic_fetch_add_u32(ptr: *mut pg_atomic_uint32, add_: int32) -> uint32;
-    #[link_name = "pg_atomic_fetch_sub_u32__pgrx_cshim"]
-    pub fn pg_atomic_fetch_sub_u32(ptr: *mut pg_atomic_uint32, sub_: int32) -> uint32;
-    #[link_name = "pg_atomic_fetch_and_u32__pgrx_cshim"]
-    pub fn pg_atomic_fetch_and_u32(ptr: *mut pg_atomic_uint32, and_: uint32) -> uint32;
-    #[link_name = "pg_atomic_fetch_or_u32__pgrx_cshim"]
-    pub fn pg_atomic_fetch_or_u32(ptr: *mut pg_atomic_uint32, or_: uint32) -> uint32;
-    #[link_name = "pg_atomic_add_fetch_u32__pgrx_cshim"]
-    pub fn pg_atomic_add_fetch_u32(ptr: *mut pg_atomic_uint32, add_: int32) -> uint32;
-    #[link_name = "pg_atomic_sub_fetch_u32__pgrx_cshim"]
-    pub fn pg_atomic_sub_fetch_u32(ptr: *mut pg_atomic_uint32, sub_: int32) -> uint32;
-    #[link_name = "pg_atomic_init_u64__pgrx_cshim"]
-    pub fn pg_atomic_init_u64(ptr: *mut pg_atomic_uint64, val: uint64);
-    #[link_name = "pg_atomic_read_u64__pgrx_cshim"]
-    pub fn pg_atomic_read_u64(ptr: *mut pg_atomic_uint64) -> uint64;
-    #[link_name = "pg_atomic_read_membarrier_u64__pgrx_cshim"]
-    pub fn pg_atomic_read_membarrier_u64(ptr: *mut pg_atomic_uint64) -> uint64;
-    #[link_name = "pg_atomic_write_u64__pgrx_cshim"]
-    pub fn pg_atomic_write_u64(ptr: *mut pg_atomic_uint64, val: uint64);
-    #[link_name = "pg_atomic_write_membarrier_u64__pgrx_cshim"]
-    pub fn pg_atomic_write_membarrier_u64(ptr: *mut pg_atomic_uint64, val: uint64);
-    #[link_name = "pg_atomic_exchange_u64__pgrx_cshim"]
-    pub fn pg_atomic_exchange_u64(ptr: *mut pg_atomic_uint64, newval: uint64) -> uint64;
-    #[link_name = "pg_atomic_compare_exchange_u64__pgrx_cshim"]
-    pub fn pg_atomic_compare_exchange_u64(
-        ptr: *mut pg_atomic_uint64,
-        expected: *mut uint64,
-        newval: uint64,
-    ) -> bool;
-    #[link_name = "pg_atomic_fetch_add_u64__pgrx_cshim"]
-    pub fn pg_atomic_fetch_add_u64(ptr: *mut pg_atomic_uint64, add_: int64) -> uint64;
-    #[link_name = "pg_atomic_fetch_sub_u64__pgrx_cshim"]
-    pub fn pg_atomic_fetch_sub_u64(ptr: *mut pg_atomic_uint64, sub_: int64) -> uint64;
-    #[link_name = "pg_atomic_fetch_and_u64__pgrx_cshim"]
-    pub fn pg_atomic_fetch_and_u64(ptr: *mut pg_atomic_uint64, and_: uint64) -> uint64;
-    #[link_name = "pg_atomic_fetch_or_u64__pgrx_cshim"]
-    pub fn pg_atomic_fetch_or_u64(ptr: *mut pg_atomic_uint64, or_: uint64) -> uint64;
-    #[link_name = "pg_atomic_add_fetch_u64__pgrx_cshim"]
-    pub fn pg_atomic_add_fetch_u64(ptr: *mut pg_atomic_uint64, add_: int64) -> uint64;
-    #[link_name = "pg_atomic_sub_fetch_u64__pgrx_cshim"]
-    pub fn pg_atomic_sub_fetch_u64(ptr: *mut pg_atomic_uint64, sub_: int64) -> uint64;
-    #[link_name = "pg_atomic_monotonic_advance_u64__pgrx_cshim"]
-    pub fn pg_atomic_monotonic_advance_u64(ptr: *mut pg_atomic_uint64, target: uint64) -> uint64;
     pub static mut dynamic_shared_memory_type: ::core::ffi::c_int;
     pub static mut min_dynamic_shared_memory: ::core::ffi::c_int;
     pub fn dsm_impl_op(
@@ -36948,7 +36270,7 @@ unsafe extern "C-unwind" {
     pub fn tbm_end_private_iterate(iterator: *mut TBMPrivateIterator);
     pub fn tbm_end_shared_iterate(iterator: *mut TBMSharedIterator);
     pub fn tbm_attach_shared_iterate(dsa: *mut dsa_area, dp: dsa_pointer)
-    -> *mut TBMSharedIterator;
+        -> *mut TBMSharedIterator;
     pub fn tbm_calculate_entries(maxbytes: Size) -> ::core::ffi::c_int;
     pub fn tbm_begin_iterate(
         tbm: *mut TIDBitmap,
@@ -36957,14 +36279,8 @@ unsafe extern "C-unwind" {
     ) -> TBMIterator;
     pub fn tbm_end_iterate(iterator: *mut TBMIterator);
     pub fn tbm_iterate(iterator: *mut TBMIterator, tbmres: *mut TBMIterateResult) -> bool;
-    #[link_name = "tbm_exhausted__pgrx_cshim"]
-    pub fn tbm_exhausted(iterator: *mut TBMIterator) -> bool;
     pub static mut MyProcNumber: ProcNumber;
     pub static mut ParallelLeaderProcNumber: ProcNumber;
-    #[link_name = "tas__pgrx_cshim"]
-    pub fn tas(lock: *mut slock_t) -> ::core::ffi::c_int;
-    #[link_name = "spin_delay__pgrx_cshim"]
-    pub fn spin_delay();
     pub fn s_lock(
         lock: *mut slock_t,
         file: *const ::core::ffi::c_char,
@@ -36973,14 +36289,7 @@ unsafe extern "C-unwind" {
     ) -> ::core::ffi::c_int;
     pub fn set_spins_per_delay(shared_spins_per_delay: ::core::ffi::c_int);
     pub fn update_spins_per_delay(shared_spins_per_delay: ::core::ffi::c_int)
-    -> ::core::ffi::c_int;
-    #[link_name = "init_spin_delay__pgrx_cshim"]
-    pub fn init_spin_delay(
-        status: *mut SpinDelayStatus,
-        file: *const ::core::ffi::c_char,
-        line: ::core::ffi::c_int,
-        func: *const ::core::ffi::c_char,
-    );
+        -> ::core::ffi::c_int;
     pub fn perform_spin_delay(status: *mut SpinDelayStatus);
     pub fn finish_spin_delay(status: *mut SpinDelayStatus);
     pub fn ConditionVariableInit(cv: *mut ConditionVariable);
@@ -37053,14 +36362,6 @@ unsafe extern "C-unwind" {
     pub fn makeBoolean(val: bool) -> *mut Boolean;
     pub fn makeString(str_: *mut ::core::ffi::c_char) -> *mut String;
     pub fn makeBitString(str_: *mut ::core::ffi::c_char) -> *mut BitString;
-    #[link_name = "SetQueryCompletion__pgrx_cshim"]
-    pub fn SetQueryCompletion(
-        qc: *mut QueryCompletion,
-        commandTag: CommandTag::Type,
-        nprocessed: uint64,
-    );
-    #[link_name = "CopyQueryCompletion__pgrx_cshim"]
-    pub fn CopyQueryCompletion(dst: *mut QueryCompletion, src: *const QueryCompletion);
     pub fn InitializeQueryCompletion(qc: *mut QueryCompletion);
     pub fn GetCommandTagName(commandTag: CommandTag::Type) -> *const ::core::ffi::c_char;
     pub fn GetCommandTagNameAndLen(
@@ -37183,24 +36484,6 @@ unsafe extern "C-unwind" {
     ) -> bool;
     pub fn GetCachedExpression(expr: *mut Node) -> *mut CachedExpression;
     pub fn FreeCachedExpression(cexpr: *mut CachedExpression);
-    #[link_name = "CachedPlanRequiresLocking__pgrx_cshim"]
-    pub fn CachedPlanRequiresLocking(cplan: *mut CachedPlan) -> bool;
-    #[link_name = "CachedPlanValid__pgrx_cshim"]
-    pub fn CachedPlanValid(cplan: *mut CachedPlan) -> bool;
-    #[link_name = "pg_preadv__pgrx_cshim"]
-    pub fn pg_preadv(
-        fd: ::core::ffi::c_int,
-        iov: *const iovec,
-        iovcnt: ::core::ffi::c_int,
-        offset: off_t,
-    ) -> isize;
-    #[link_name = "pg_pwritev__pgrx_cshim"]
-    pub fn pg_pwritev(
-        fd: ::core::ffi::c_int,
-        iov: *const iovec,
-        iovcnt: ::core::ffi::c_int,
-        offset: off_t,
-    ) -> isize;
     pub static mut max_files_per_process: ::core::ffi::c_int;
     pub static mut data_sync_retry: bool;
     pub static mut recovery_init_sync_method: ::core::ffi::c_int;
@@ -37372,22 +36655,6 @@ unsafe extern "C-unwind" {
     ) -> ::core::ffi::c_int;
     pub fn SyncDataDirectory();
     pub fn data_sync_elevel(elevel: ::core::ffi::c_int) -> ::core::ffi::c_int;
-    #[link_name = "FileRead__pgrx_cshim"]
-    pub fn FileRead(
-        file: File,
-        buffer: *mut ::core::ffi::c_void,
-        amount: usize,
-        offset: off_t,
-        wait_event_info: uint32,
-    ) -> isize;
-    #[link_name = "FileWrite__pgrx_cshim"]
-    pub fn FileWrite(
-        file: File,
-        buffer: *const ::core::ffi::c_void,
-        amount: usize,
-        offset: off_t,
-        wait_event_info: uint32,
-    ) -> isize;
     pub fn FileSetInit(fileset: *mut FileSet);
     pub fn FileSetCreate(fileset: *mut FileSet, name: *const ::core::ffi::c_char) -> File;
     pub fn FileSetOpen(
@@ -37502,46 +36769,6 @@ unsafe extern "C-unwind" {
     pub fn RelationCacheInitFileRemove();
     pub static mut criticalRelcachesBuilt: bool;
     pub static mut criticalSharedRelcachesBuilt: bool;
-    #[link_name = "ApplySortComparator__pgrx_cshim"]
-    pub fn ApplySortComparator(
-        datum1: Datum,
-        isNull1: bool,
-        datum2: Datum,
-        isNull2: bool,
-        ssup: SortSupport,
-    ) -> ::core::ffi::c_int;
-    #[link_name = "ApplyUnsignedSortComparator__pgrx_cshim"]
-    pub fn ApplyUnsignedSortComparator(
-        datum1: Datum,
-        isNull1: bool,
-        datum2: Datum,
-        isNull2: bool,
-        ssup: SortSupport,
-    ) -> ::core::ffi::c_int;
-    #[link_name = "ApplySignedSortComparator__pgrx_cshim"]
-    pub fn ApplySignedSortComparator(
-        datum1: Datum,
-        isNull1: bool,
-        datum2: Datum,
-        isNull2: bool,
-        ssup: SortSupport,
-    ) -> ::core::ffi::c_int;
-    #[link_name = "ApplyInt32SortComparator__pgrx_cshim"]
-    pub fn ApplyInt32SortComparator(
-        datum1: Datum,
-        isNull1: bool,
-        datum2: Datum,
-        isNull2: bool,
-        ssup: SortSupport,
-    ) -> ::core::ffi::c_int;
-    #[link_name = "ApplySortAbbrevFullComparator__pgrx_cshim"]
-    pub fn ApplySortAbbrevFullComparator(
-        datum1: Datum,
-        isNull1: bool,
-        datum2: Datum,
-        isNull2: bool,
-        ssup: SortSupport,
-    ) -> ::core::ffi::c_int;
     pub fn ssup_datum_unsigned_cmp(x: Datum, y: Datum, ssup: SortSupport) -> ::core::ffi::c_int;
     pub fn ssup_datum_signed_cmp(x: Datum, y: Datum, ssup: SortSupport) -> ::core::ffi::c_int;
     pub fn ssup_datum_int32_cmp(x: Datum, y: Datum, ssup: SortSupport) -> ::core::ffi::c_int;
@@ -37851,19 +37078,11 @@ unsafe extern "C-unwind" {
         dMemtuple: *mut BrinMemTuple,
     ) -> *mut BrinMemTuple;
     pub fn GinPageIsRecyclable(page: Page) -> bool;
-    #[link_name = "GinTupleGetFirst__pgrx_cshim"]
-    pub fn GinTupleGetFirst(tup: *mut GinTuple) -> ItemPointer;
     pub fn _gin_compare_tuples(
         a: *mut GinTuple,
         b: *mut GinTuple,
         ssup: SortSupport,
     ) -> ::core::ffi::c_int;
-    #[link_name = "IndexTupleSize__pgrx_cshim"]
-    pub fn IndexTupleSize(itup: *const IndexTupleData) -> Size;
-    #[link_name = "IndexTupleHasNulls__pgrx_cshim"]
-    pub fn IndexTupleHasNulls(itup: *const IndexTupleData) -> bool;
-    #[link_name = "IndexTupleHasVarwidths__pgrx_cshim"]
-    pub fn IndexTupleHasVarwidths(itup: *const IndexTupleData) -> bool;
     pub fn index_form_tuple(
         tupleDescriptor: TupleDesc,
         values: *const Datum,
@@ -37900,15 +37119,6 @@ unsafe extern "C-unwind" {
         source: IndexTuple,
         leavenatts: ::core::ffi::c_int,
     ) -> IndexTuple;
-    #[link_name = "IndexInfoFindDataOffset__pgrx_cshim"]
-    pub fn IndexInfoFindDataOffset(t_info: ::core::ffi::c_ushort) -> Size;
-    #[link_name = "index_getattr__pgrx_cshim"]
-    pub fn index_getattr(
-        tup: IndexTuple,
-        attnum: ::core::ffi::c_int,
-        tupleDesc: TupleDesc,
-        isnull: *mut bool,
-    ) -> Datum;
     pub fn LogicalTapeSetCreate(
         preallocate: bool,
         fileset: *mut SharedFileSet,
@@ -38134,26 +37344,6 @@ unsafe extern "C-unwind" {
     pub static pg_leftmost_one_pos: [uint8; 256usize];
     pub static pg_rightmost_one_pos: [uint8; 256usize];
     pub static pg_number_of_ones: [uint8; 256usize];
-    #[link_name = "pg_leftmost_one_pos32__pgrx_cshim"]
-    pub fn pg_leftmost_one_pos32(word: uint32) -> ::core::ffi::c_int;
-    #[link_name = "pg_leftmost_one_pos64__pgrx_cshim"]
-    pub fn pg_leftmost_one_pos64(word: uint64) -> ::core::ffi::c_int;
-    #[link_name = "pg_rightmost_one_pos32__pgrx_cshim"]
-    pub fn pg_rightmost_one_pos32(word: uint32) -> ::core::ffi::c_int;
-    #[link_name = "pg_rightmost_one_pos64__pgrx_cshim"]
-    pub fn pg_rightmost_one_pos64(word: uint64) -> ::core::ffi::c_int;
-    #[link_name = "pg_nextpower2_32__pgrx_cshim"]
-    pub fn pg_nextpower2_32(num: uint32) -> uint32;
-    #[link_name = "pg_nextpower2_64__pgrx_cshim"]
-    pub fn pg_nextpower2_64(num: uint64) -> uint64;
-    #[link_name = "pg_prevpower2_32__pgrx_cshim"]
-    pub fn pg_prevpower2_32(num: uint32) -> uint32;
-    #[link_name = "pg_prevpower2_64__pgrx_cshim"]
-    pub fn pg_prevpower2_64(num: uint64) -> uint64;
-    #[link_name = "pg_ceil_log2_32__pgrx_cshim"]
-    pub fn pg_ceil_log2_32(num: uint32) -> uint32;
-    #[link_name = "pg_ceil_log2_64__pgrx_cshim"]
-    pub fn pg_ceil_log2_64(num: uint64) -> uint64;
     pub static mut pg_popcount32:
         ::core::option::Option<unsafe extern "C-unwind" fn(word: uint32) -> ::core::ffi::c_int>;
     pub static mut pg_popcount64:
@@ -38173,24 +37363,12 @@ unsafe extern "C-unwind" {
     >;
     pub fn pg_popcount_avx512_available() -> bool;
     pub fn pg_popcount_avx512(buf: *const ::core::ffi::c_char, bytes: ::core::ffi::c_int)
-    -> uint64;
+        -> uint64;
     pub fn pg_popcount_masked_avx512(
         buf: *const ::core::ffi::c_char,
         bytes: ::core::ffi::c_int,
         mask: bits8,
     ) -> uint64;
-    #[link_name = "pg_popcount__pgrx_cshim"]
-    pub fn pg_popcount(buf: *const ::core::ffi::c_char, bytes: ::core::ffi::c_int) -> uint64;
-    #[link_name = "pg_popcount_masked__pgrx_cshim"]
-    pub fn pg_popcount_masked(
-        buf: *const ::core::ffi::c_char,
-        bytes: ::core::ffi::c_int,
-        mask: bits8,
-    ) -> uint64;
-    #[link_name = "pg_rotate_right32__pgrx_cshim"]
-    pub fn pg_rotate_right32(word: uint32, n: ::core::ffi::c_int) -> uint32;
-    #[link_name = "pg_rotate_left32__pgrx_cshim"]
-    pub fn pg_rotate_left32(word: uint32, n: ::core::ffi::c_int) -> uint32;
     pub fn tuplehash_create(
         ctx: MemoryContext,
         nelements: uint32,
@@ -38368,23 +37546,6 @@ unsafe extern "C-unwind" {
     pub fn pg_tzenumerate_start() -> *mut pg_tzenum;
     pub fn pg_tzenumerate_next(dir: *mut pg_tzenum) -> *mut pg_tz;
     pub fn pg_tzenumerate_end(dir: *mut pg_tzenum);
-    #[link_name = "DatumGetTimestamp__pgrx_cshim"]
-    pub fn DatumGetTimestamp(X: Datum) -> Timestamp;
-    #[link_name = "DatumGetTimestampTz__pgrx_cshim"]
-    pub fn DatumGetTimestampTz(X: Datum) -> TimestampTz;
-    #[link_name = "DatumGetIntervalP__pgrx_cshim"]
-    pub fn DatumGetIntervalP(X: Datum) -> *mut Interval;
-    #[link_name = "TimestampGetDatum__pgrx_cshim"]
-    pub fn TimestampGetDatum(X: Timestamp) -> Datum;
-    #[link_name = "TimestampTzGetDatum__pgrx_cshim"]
-    pub fn TimestampTzGetDatum(X: TimestampTz) -> Datum;
-    #[link_name = "IntervalPGetDatum__pgrx_cshim"]
-    pub fn IntervalPGetDatum(X: *const Interval) -> Datum;
-    #[link_name = "TimestampDifferenceMicroseconds__pgrx_cshim"]
-    pub fn TimestampDifferenceMicroseconds(
-        start_time: TimestampTz,
-        stop_time: TimestampTz,
-    ) -> uint64;
     pub static mut PgStartTime: TimestampTz;
     pub static mut PgReloadTime: TimestampTz;
     pub fn anytimestamp_typmod_check(istz: bool, typmod: int32) -> int32;
@@ -38909,21 +38070,6 @@ unsafe extern "C-unwind" {
     pub fn smgrregistersync(reln: SMgrRelation, forknum: ForkNumber::Type);
     pub fn AtEOXact_SMgr();
     pub fn ProcessBarrierSmgrRelease() -> bool;
-    #[link_name = "smgrread__pgrx_cshim"]
-    pub fn smgrread(
-        reln: SMgrRelation,
-        forknum: ForkNumber::Type,
-        blocknum: BlockNumber,
-        buffer: *mut ::core::ffi::c_void,
-    );
-    #[link_name = "smgrwrite__pgrx_cshim"]
-    pub fn smgrwrite(
-        reln: SMgrRelation,
-        forknum: ForkNumber::Type,
-        blocknum: BlockNumber,
-        buffer: *const ::core::ffi::c_void,
-        skipFsync: bool,
-    );
     pub fn pgaio_io_set_target_smgr(
         ioh: *mut PgAioHandle,
         smgr: *mut SMgrRelationData,
@@ -38932,10 +38078,6 @@ unsafe extern "C-unwind" {
         nblocks: ::core::ffi::c_int,
         skip_fsync: bool,
     );
-    #[link_name = "RelationGetSmgr__pgrx_cshim"]
-    pub fn RelationGetSmgr(rel: Relation) -> SMgrRelation;
-    #[link_name = "RelationCloseSmgr__pgrx_cshim"]
-    pub fn RelationCloseSmgr(relation: Relation);
     pub fn RelationIncrementReferenceCount(rel: Relation);
     pub fn RelationDecrementReferenceCount(rel: Relation);
     pub fn RelationInitLockInfo(relation: Relation);
@@ -39087,8 +38229,6 @@ unsafe extern "C-unwind" {
         initBlockSize: Size,
         maxBlockSize: Size,
     ) -> MemoryContext;
-    #[link_name = "pg_memory_is_all_zeros__pgrx_cshim"]
-    pub fn pg_memory_is_all_zeros(ptr: *const ::core::ffi::c_void, len: usize) -> bool;
     pub static mut memCxtState: *mut MemoryStatsBackendState;
     pub static mut memCxtArea: *mut MemoryStatsCtl;
     pub static mut MemoryStatsDsaArea: *mut dsa_area;
@@ -39165,15 +38305,6 @@ unsafe extern "C-unwind" {
         hashexpr: *mut ExprState,
     ) -> TupleHashEntry;
     pub fn ResetTupleHashTable(hashtable: TupleHashTable);
-    #[link_name = "TupleHashEntrySize__pgrx_cshim"]
-    pub fn TupleHashEntrySize() -> usize;
-    #[link_name = "TupleHashEntryGetTuple__pgrx_cshim"]
-    pub fn TupleHashEntryGetTuple(entry: TupleHashEntry) -> MinimalTuple;
-    #[link_name = "TupleHashEntryGetAdditional__pgrx_cshim"]
-    pub fn TupleHashEntryGetAdditional(
-        hashtable: TupleHashTable,
-        entry: TupleHashEntry,
-    ) -> *mut ::core::ffi::c_void;
     pub fn ExecInitJunkFilter(targetList: *mut List, slot: *mut TupleTableSlot) -> *mut JunkFilter;
     pub fn ExecInitJunkFilterConversion(
         targetList: *mut List,
@@ -39192,12 +38323,6 @@ unsafe extern "C-unwind" {
         junkfilter: *mut JunkFilter,
         slot: *mut TupleTableSlot,
     ) -> *mut TupleTableSlot;
-    #[link_name = "ExecGetJunkAttribute__pgrx_cshim"]
-    pub fn ExecGetJunkAttribute(
-        slot: *mut TupleTableSlot,
-        attno: AttrNumber,
-        isNull: *mut bool,
-    ) -> Datum;
     pub fn ExecutorStart(queryDesc: *mut QueryDesc, eflags: ::core::ffi::c_int) -> bool;
     pub fn ExecutorStartCachedPlan(
         queryDesc: *mut QueryDesc,
@@ -39284,7 +38409,7 @@ unsafe extern "C-unwind" {
     ) -> LockTupleMode::Type;
     pub fn ExecFindRowMark(estate: *mut EState, rti: Index, missing_ok: bool) -> *mut ExecRowMark;
     pub fn ExecBuildAuxRowMark(erm: *mut ExecRowMark, targetlist: *mut List)
-    -> *mut ExecAuxRowMark;
+        -> *mut ExecAuxRowMark;
     pub fn EvalPlanQual(
         epqstate: *mut EPQState,
         relation: Relation,
@@ -39323,12 +38448,6 @@ unsafe extern "C-unwind" {
     pub fn ExecEndNode(node: *mut PlanState);
     pub fn ExecShutdownNode(node: *mut PlanState);
     pub fn ExecSetTupleBound(tuples_needed: int64, child_node: *mut PlanState);
-    #[link_name = "ExecPlanStillValid__pgrx_cshim"]
-    pub fn ExecPlanStillValid(estate: *mut EState) -> bool;
-    #[link_name = "ExecShouldLockRelations__pgrx_cshim"]
-    pub fn ExecShouldLockRelations(estate: *mut EState) -> bool;
-    #[link_name = "ExecProcNode__pgrx_cshim"]
-    pub fn ExecProcNode(node: *mut PlanState) -> *mut TupleTableSlot;
     pub fn ExecInitExpr(node: *mut Expr, parent: *mut PlanState) -> *mut ExprState;
     pub fn ExecInitExprWithParams(node: *mut Expr, ext_params: ParamListInfo) -> *mut ExprState;
     pub fn ExecInitQual(qual: *mut List, parent: *mut PlanState) -> *mut ExprState;
@@ -39402,28 +38521,6 @@ unsafe extern "C-unwind" {
     pub fn ExecPrepareQual(qual: *mut List, estate: *mut EState) -> *mut ExprState;
     pub fn ExecPrepareCheck(qual: *mut List, estate: *mut EState) -> *mut ExprState;
     pub fn ExecPrepareExprList(nodes: *mut List, estate: *mut EState) -> *mut List;
-    #[link_name = "ExecEvalExpr__pgrx_cshim"]
-    pub fn ExecEvalExpr(
-        state: *mut ExprState,
-        econtext: *mut ExprContext,
-        isNull: *mut bool,
-    ) -> Datum;
-    #[link_name = "ExecEvalExprNoReturn__pgrx_cshim"]
-    pub fn ExecEvalExprNoReturn(state: *mut ExprState, econtext: *mut ExprContext);
-    #[link_name = "ExecEvalExprSwitchContext__pgrx_cshim"]
-    pub fn ExecEvalExprSwitchContext(
-        state: *mut ExprState,
-        econtext: *mut ExprContext,
-        isNull: *mut bool,
-    ) -> Datum;
-    #[link_name = "ExecEvalExprNoReturnSwitchContext__pgrx_cshim"]
-    pub fn ExecEvalExprNoReturnSwitchContext(state: *mut ExprState, econtext: *mut ExprContext);
-    #[link_name = "ExecProject__pgrx_cshim"]
-    pub fn ExecProject(projInfo: *mut ProjectionInfo) -> *mut TupleTableSlot;
-    #[link_name = "ExecQual__pgrx_cshim"]
-    pub fn ExecQual(state: *mut ExprState, econtext: *mut ExprContext) -> bool;
-    #[link_name = "ExecQualAndReset__pgrx_cshim"]
-    pub fn ExecQualAndReset(state: *mut ExprState, econtext: *mut ExprContext) -> bool;
     pub fn ExecCheck(state: *mut ExprState, econtext: *mut ExprContext) -> bool;
     pub fn ExecInitTableFunctionResult(
         expr: *mut Expr,
@@ -39534,8 +38631,6 @@ unsafe extern "C-unwind" {
     );
     pub fn ExecCloseRangeTableRelations(estate: *mut EState);
     pub fn ExecCloseResultRelations(estate: *mut EState);
-    #[link_name = "exec_rt_fetch__pgrx_cshim"]
-    pub fn exec_rt_fetch(rti: Index, estate: *mut EState) -> *mut RangeTblEntry;
     pub fn ExecGetRangeTableRelation(
         estate: *mut EState,
         rti: Index,
@@ -39733,8 +38828,6 @@ unsafe extern "C-unwind" {
         values: *mut *mut ::core::ffi::c_char,
     ) -> HeapTuple;
     pub fn HeapTupleHeaderGetDatum(tuple: HeapTupleHeader) -> Datum;
-    #[link_name = "HeapTupleGetDatum__pgrx_cshim"]
-    pub fn HeapTupleGetDatum(tuple: *const HeapTupleData) -> Datum;
     pub fn InitMaterializedSRF(fcinfo: FunctionCallInfo, flags: bits32);
     pub fn init_MultiFuncCall(fcinfo: FunctionCallInfo) -> *mut FuncCallContext;
     pub fn per_MultiFuncCall(fcinfo: FunctionCallInfo) -> *mut FuncCallContext;
@@ -39942,8 +39035,6 @@ unsafe extern "C-unwind" {
         val: *const int64,
     );
     pub fn pgstat_progress_end_command();
-    #[link_name = "is_unixsock_path__pgrx_cshim"]
-    pub fn is_unixsock_path(path: *const ::core::ffi::c_char) -> bool;
     pub static mut pgstat_track_activities: bool;
     pub static mut pgstat_track_activity_query_size: ::core::ffi::c_int;
     pub static mut MyBEEntry: *mut PgBackendStatus;
@@ -39981,16 +39072,8 @@ unsafe extern "C-unwind" {
     pub fn pgstat_clip_activity(
         raw_activity: *const ::core::ffi::c_char,
     ) -> *mut ::core::ffi::c_char;
-    #[link_name = "pgstat_is_kind_builtin__pgrx_cshim"]
-    pub fn pgstat_is_kind_builtin(kind: uint32) -> bool;
-    #[link_name = "pgstat_is_kind_custom__pgrx_cshim"]
-    pub fn pgstat_is_kind_custom(kind: uint32) -> bool;
     pub fn pgstat_get_wait_event(wait_event_info: uint32) -> *const ::core::ffi::c_char;
     pub fn pgstat_get_wait_event_type(wait_event_info: uint32) -> *const ::core::ffi::c_char;
-    #[link_name = "pgstat_report_wait_start__pgrx_cshim"]
-    pub fn pgstat_report_wait_start(wait_event_info: uint32);
-    #[link_name = "pgstat_report_wait_end__pgrx_cshim"]
-    pub fn pgstat_report_wait_end();
     pub fn pgstat_set_wait_event_storage(wait_event_info: *mut uint32);
     pub fn pgstat_reset_wait_event_storage();
     pub static mut my_wait_event_info: *mut uint32;
@@ -40198,10 +39281,6 @@ unsafe extern "C-unwind" {
     ) -> *mut varlena;
     pub fn toast_raw_datum_size(value: Datum) -> Size;
     pub fn toast_datum_size(value: Datum) -> Size;
-    #[link_name = "RmgrIdIsBuiltin__pgrx_cshim"]
-    pub fn RmgrIdIsBuiltin(rmid: ::core::ffi::c_int) -> bool;
-    #[link_name = "RmgrIdIsCustom__pgrx_cshim"]
-    pub fn RmgrIdIsCustom(rmid: ::core::ffi::c_int) -> bool;
     pub fn pg_comp_crc32c_sb8(
         crc: pg_crc32c,
         data: *const ::core::ffi::c_void,
@@ -40224,8 +39303,6 @@ unsafe extern "C-unwind" {
         data: *const ::core::ffi::c_void,
         length: usize,
     ) -> pg_crc32c;
-    #[link_name = "XLogReaderHasQueuedRecordOrError__pgrx_cshim"]
-    pub fn XLogReaderHasQueuedRecordOrError(state: *mut XLogReaderState) -> bool;
     pub fn XLogReaderAllocate(
         wal_segment_size: ::core::ffi::c_int,
         waldir: *const ::core::ffi::c_char,
@@ -40367,19 +39444,11 @@ unsafe extern "C-unwind" {
         noError: bool,
     ) -> *mut ::core::ffi::c_void;
     pub fn shm_toc_estimate(e: *mut shm_toc_estimator) -> Size;
-    #[link_name = "DatumGetGinTernaryValue__pgrx_cshim"]
-    pub fn DatumGetGinTernaryValue(X: Datum) -> GinTernaryValue;
-    #[link_name = "GinTernaryValueGetDatum__pgrx_cshim"]
-    pub fn GinTernaryValueGetDatum(X: GinTernaryValue) -> Datum;
     pub static mut GinFuzzySearchLimit: ::core::ffi::c_int;
     pub static mut gin_pending_list_limit: ::core::ffi::c_int;
     pub fn ginGetStats(index: Relation, stats: *mut GinStatsData);
     pub fn ginUpdateStats(index: Relation, stats: *const GinStatsData, is_build: bool);
     pub fn _gin_parallel_build_main(seg: *mut dsm_segment, toc: *mut shm_toc);
-    #[link_name = "GistPageSetDeleted__pgrx_cshim"]
-    pub fn GistPageSetDeleted(page: Page, deletexid: FullTransactionId);
-    #[link_name = "GistPageGetDeleteXid__pgrx_cshim"]
-    pub fn GistPageGetDeleteXid(page: Page) -> FullTransactionId;
     pub fn gisttranslatecmptype(cmptype: CompareType::Type, opfamily: Oid) -> StrategyNumber;
     pub static mut SharedInvalidMessageCounter: uint64;
     pub static mut catchupInterruptPending: sig_atomic_t;
@@ -40804,10 +39873,6 @@ unsafe extern "C-unwind" {
     pub fn GetAccessStrategyBufferCount(strategy: BufferAccessStrategy) -> ::core::ffi::c_int;
     pub fn GetAccessStrategyPinLimit(strategy: BufferAccessStrategy) -> ::core::ffi::c_int;
     pub fn FreeAccessStrategy(strategy: BufferAccessStrategy);
-    #[link_name = "BufferIsValid__pgrx_cshim"]
-    pub fn BufferIsValid(bufnum: Buffer) -> bool;
-    #[link_name = "BufferGetPageSize__pgrx_cshim"]
-    pub fn BufferGetPageSize(buffer: Buffer) -> Size;
     pub fn block_range_read_stream_cb(
         stream: *mut ReadStream,
         callback_private_data: *mut ::core::ffi::c_void,
@@ -40846,81 +39911,11 @@ unsafe extern "C-unwind" {
     pub static mut synchronize_seqscans: bool;
     pub fn table_slot_callbacks(relation: Relation) -> *const TupleTableSlotOps;
     pub fn table_slot_create(relation: Relation, reglist: *mut *mut List) -> *mut TupleTableSlot;
-    #[link_name = "table_beginscan__pgrx_cshim"]
-    pub fn table_beginscan(
-        rel: Relation,
-        snapshot: Snapshot,
-        nkeys: ::core::ffi::c_int,
-        key: *mut ScanKeyData,
-    ) -> TableScanDesc;
     pub fn table_beginscan_catalog(
         relation: Relation,
         nkeys: ::core::ffi::c_int,
         key: *mut ScanKeyData,
     ) -> TableScanDesc;
-    #[link_name = "table_beginscan_strat__pgrx_cshim"]
-    pub fn table_beginscan_strat(
-        rel: Relation,
-        snapshot: Snapshot,
-        nkeys: ::core::ffi::c_int,
-        key: *mut ScanKeyData,
-        allow_strat: bool,
-        allow_sync: bool,
-    ) -> TableScanDesc;
-    #[link_name = "table_beginscan_bm__pgrx_cshim"]
-    pub fn table_beginscan_bm(
-        rel: Relation,
-        snapshot: Snapshot,
-        nkeys: ::core::ffi::c_int,
-        key: *mut ScanKeyData,
-    ) -> TableScanDesc;
-    #[link_name = "table_beginscan_sampling__pgrx_cshim"]
-    pub fn table_beginscan_sampling(
-        rel: Relation,
-        snapshot: Snapshot,
-        nkeys: ::core::ffi::c_int,
-        key: *mut ScanKeyData,
-        allow_strat: bool,
-        allow_sync: bool,
-        allow_pagemode: bool,
-    ) -> TableScanDesc;
-    #[link_name = "table_beginscan_tid__pgrx_cshim"]
-    pub fn table_beginscan_tid(rel: Relation, snapshot: Snapshot) -> TableScanDesc;
-    #[link_name = "table_beginscan_analyze__pgrx_cshim"]
-    pub fn table_beginscan_analyze(rel: Relation) -> TableScanDesc;
-    #[link_name = "table_endscan__pgrx_cshim"]
-    pub fn table_endscan(scan: TableScanDesc);
-    #[link_name = "table_rescan__pgrx_cshim"]
-    pub fn table_rescan(scan: TableScanDesc, key: *mut ScanKeyData);
-    #[link_name = "table_rescan_set_params__pgrx_cshim"]
-    pub fn table_rescan_set_params(
-        scan: TableScanDesc,
-        key: *mut ScanKeyData,
-        allow_strat: bool,
-        allow_sync: bool,
-        allow_pagemode: bool,
-    );
-    #[link_name = "table_scan_getnextslot__pgrx_cshim"]
-    pub fn table_scan_getnextslot(
-        sscan: TableScanDesc,
-        direction: ScanDirection::Type,
-        slot: *mut TupleTableSlot,
-    ) -> bool;
-    #[link_name = "table_beginscan_tidrange__pgrx_cshim"]
-    pub fn table_beginscan_tidrange(
-        rel: Relation,
-        snapshot: Snapshot,
-        mintid: ItemPointer,
-        maxtid: ItemPointer,
-    ) -> TableScanDesc;
-    #[link_name = "table_rescan_tidrange__pgrx_cshim"]
-    pub fn table_rescan_tidrange(sscan: TableScanDesc, mintid: ItemPointer, maxtid: ItemPointer);
-    #[link_name = "table_scan_getnextslot_tidrange__pgrx_cshim"]
-    pub fn table_scan_getnextslot_tidrange(
-        sscan: TableScanDesc,
-        direction: ScanDirection::Type,
-        slot: *mut TupleTableSlot,
-    ) -> bool;
     pub fn table_parallelscan_estimate(rel: Relation, snapshot: Snapshot) -> Size;
     pub fn table_parallelscan_initialize(
         rel: Relation,
@@ -40931,237 +39926,13 @@ unsafe extern "C-unwind" {
         relation: Relation,
         pscan: ParallelTableScanDesc,
     ) -> TableScanDesc;
-    #[link_name = "table_parallelscan_reinitialize__pgrx_cshim"]
-    pub fn table_parallelscan_reinitialize(rel: Relation, pscan: ParallelTableScanDesc);
-    #[link_name = "table_index_fetch_begin__pgrx_cshim"]
-    pub fn table_index_fetch_begin(rel: Relation) -> *mut IndexFetchTableData;
-    #[link_name = "table_index_fetch_reset__pgrx_cshim"]
-    pub fn table_index_fetch_reset(scan: *mut IndexFetchTableData);
-    #[link_name = "table_index_fetch_end__pgrx_cshim"]
-    pub fn table_index_fetch_end(scan: *mut IndexFetchTableData);
-    #[link_name = "table_index_fetch_tuple__pgrx_cshim"]
-    pub fn table_index_fetch_tuple(
-        scan: *mut IndexFetchTableData,
-        tid: ItemPointer,
-        snapshot: Snapshot,
-        slot: *mut TupleTableSlot,
-        call_again: *mut bool,
-        all_dead: *mut bool,
-    ) -> bool;
     pub fn table_index_fetch_tuple_check(
         rel: Relation,
         tid: ItemPointer,
         snapshot: Snapshot,
         all_dead: *mut bool,
     ) -> bool;
-    #[link_name = "table_tuple_fetch_row_version__pgrx_cshim"]
-    pub fn table_tuple_fetch_row_version(
-        rel: Relation,
-        tid: ItemPointer,
-        snapshot: Snapshot,
-        slot: *mut TupleTableSlot,
-    ) -> bool;
-    #[link_name = "table_tuple_tid_valid__pgrx_cshim"]
-    pub fn table_tuple_tid_valid(scan: TableScanDesc, tid: ItemPointer) -> bool;
     pub fn table_tuple_get_latest_tid(scan: TableScanDesc, tid: ItemPointer);
-    #[link_name = "table_tuple_satisfies_snapshot__pgrx_cshim"]
-    pub fn table_tuple_satisfies_snapshot(
-        rel: Relation,
-        slot: *mut TupleTableSlot,
-        snapshot: Snapshot,
-    ) -> bool;
-    #[link_name = "table_index_delete_tuples__pgrx_cshim"]
-    pub fn table_index_delete_tuples(
-        rel: Relation,
-        delstate: *mut TM_IndexDeleteOp,
-    ) -> TransactionId;
-    #[link_name = "table_tuple_insert__pgrx_cshim"]
-    pub fn table_tuple_insert(
-        rel: Relation,
-        slot: *mut TupleTableSlot,
-        cid: CommandId,
-        options: ::core::ffi::c_int,
-        bistate: *mut BulkInsertStateData,
-    );
-    #[link_name = "table_tuple_insert_speculative__pgrx_cshim"]
-    pub fn table_tuple_insert_speculative(
-        rel: Relation,
-        slot: *mut TupleTableSlot,
-        cid: CommandId,
-        options: ::core::ffi::c_int,
-        bistate: *mut BulkInsertStateData,
-        specToken: uint32,
-    );
-    #[link_name = "table_tuple_complete_speculative__pgrx_cshim"]
-    pub fn table_tuple_complete_speculative(
-        rel: Relation,
-        slot: *mut TupleTableSlot,
-        specToken: uint32,
-        succeeded: bool,
-    );
-    #[link_name = "table_multi_insert__pgrx_cshim"]
-    pub fn table_multi_insert(
-        rel: Relation,
-        slots: *mut *mut TupleTableSlot,
-        nslots: ::core::ffi::c_int,
-        cid: CommandId,
-        options: ::core::ffi::c_int,
-        bistate: *mut BulkInsertStateData,
-    );
-    #[link_name = "table_tuple_delete__pgrx_cshim"]
-    pub fn table_tuple_delete(
-        rel: Relation,
-        tid: ItemPointer,
-        cid: CommandId,
-        snapshot: Snapshot,
-        crosscheck: Snapshot,
-        wait: bool,
-        tmfd: *mut TM_FailureData,
-        changingPart: bool,
-    ) -> TM_Result::Type;
-    #[link_name = "table_tuple_update__pgrx_cshim"]
-    pub fn table_tuple_update(
-        rel: Relation,
-        otid: ItemPointer,
-        slot: *mut TupleTableSlot,
-        cid: CommandId,
-        snapshot: Snapshot,
-        crosscheck: Snapshot,
-        wait: bool,
-        tmfd: *mut TM_FailureData,
-        lockmode: *mut LockTupleMode::Type,
-        update_indexes: *mut TU_UpdateIndexes::Type,
-    ) -> TM_Result::Type;
-    #[link_name = "table_tuple_lock__pgrx_cshim"]
-    pub fn table_tuple_lock(
-        rel: Relation,
-        tid: ItemPointer,
-        snapshot: Snapshot,
-        slot: *mut TupleTableSlot,
-        cid: CommandId,
-        mode: LockTupleMode::Type,
-        wait_policy: LockWaitPolicy::Type,
-        flags: uint8,
-        tmfd: *mut TM_FailureData,
-    ) -> TM_Result::Type;
-    #[link_name = "table_finish_bulk_insert__pgrx_cshim"]
-    pub fn table_finish_bulk_insert(rel: Relation, options: ::core::ffi::c_int);
-    #[link_name = "table_relation_set_new_filelocator__pgrx_cshim"]
-    pub fn table_relation_set_new_filelocator(
-        rel: Relation,
-        newrlocator: *const RelFileLocator,
-        persistence: ::core::ffi::c_char,
-        freezeXid: *mut TransactionId,
-        minmulti: *mut MultiXactId,
-    );
-    #[link_name = "table_relation_nontransactional_truncate__pgrx_cshim"]
-    pub fn table_relation_nontransactional_truncate(rel: Relation);
-    #[link_name = "table_relation_copy_data__pgrx_cshim"]
-    pub fn table_relation_copy_data(rel: Relation, newrlocator: *const RelFileLocator);
-    #[link_name = "table_relation_copy_for_cluster__pgrx_cshim"]
-    pub fn table_relation_copy_for_cluster(
-        OldTable: Relation,
-        NewTable: Relation,
-        OldIndex: Relation,
-        use_sort: bool,
-        OldestXmin: TransactionId,
-        xid_cutoff: *mut TransactionId,
-        multi_cutoff: *mut MultiXactId,
-        num_tuples: *mut f64,
-        tups_vacuumed: *mut f64,
-        tups_recently_dead: *mut f64,
-    );
-    #[link_name = "table_relation_vacuum__pgrx_cshim"]
-    pub fn table_relation_vacuum(
-        rel: Relation,
-        params: *mut VacuumParams,
-        bstrategy: BufferAccessStrategy,
-    );
-    #[link_name = "table_scan_analyze_next_block__pgrx_cshim"]
-    pub fn table_scan_analyze_next_block(scan: TableScanDesc, stream: *mut ReadStream) -> bool;
-    #[link_name = "table_scan_analyze_next_tuple__pgrx_cshim"]
-    pub fn table_scan_analyze_next_tuple(
-        scan: TableScanDesc,
-        OldestXmin: TransactionId,
-        liverows: *mut f64,
-        deadrows: *mut f64,
-        slot: *mut TupleTableSlot,
-    ) -> bool;
-    #[link_name = "table_index_build_scan__pgrx_cshim"]
-    pub fn table_index_build_scan(
-        table_rel: Relation,
-        index_rel: Relation,
-        index_info: *mut IndexInfo,
-        allow_sync: bool,
-        progress: bool,
-        callback: IndexBuildCallback,
-        callback_state: *mut ::core::ffi::c_void,
-        scan: TableScanDesc,
-    ) -> f64;
-    #[link_name = "table_index_build_range_scan__pgrx_cshim"]
-    pub fn table_index_build_range_scan(
-        table_rel: Relation,
-        index_rel: Relation,
-        index_info: *mut IndexInfo,
-        allow_sync: bool,
-        anyvisible: bool,
-        progress: bool,
-        start_blockno: BlockNumber,
-        numblocks: BlockNumber,
-        callback: IndexBuildCallback,
-        callback_state: *mut ::core::ffi::c_void,
-        scan: TableScanDesc,
-    ) -> f64;
-    #[link_name = "table_index_validate_scan__pgrx_cshim"]
-    pub fn table_index_validate_scan(
-        table_rel: Relation,
-        index_rel: Relation,
-        index_info: *mut IndexInfo,
-        snapshot: Snapshot,
-        state: *mut ValidateIndexState,
-    );
-    #[link_name = "table_relation_size__pgrx_cshim"]
-    pub fn table_relation_size(rel: Relation, forkNumber: ForkNumber::Type) -> uint64;
-    #[link_name = "table_relation_needs_toast_table__pgrx_cshim"]
-    pub fn table_relation_needs_toast_table(rel: Relation) -> bool;
-    #[link_name = "table_relation_toast_am__pgrx_cshim"]
-    pub fn table_relation_toast_am(rel: Relation) -> Oid;
-    #[link_name = "table_relation_fetch_toast_slice__pgrx_cshim"]
-    pub fn table_relation_fetch_toast_slice(
-        toastrel: Relation,
-        valueid: Oid,
-        attrsize: int32,
-        sliceoffset: int32,
-        slicelength: int32,
-        result: *mut varlena,
-    );
-    #[link_name = "table_relation_estimate_size__pgrx_cshim"]
-    pub fn table_relation_estimate_size(
-        rel: Relation,
-        attr_widths: *mut int32,
-        pages: *mut BlockNumber,
-        tuples: *mut f64,
-        allvisfrac: *mut f64,
-    );
-    #[link_name = "table_scan_bitmap_next_tuple__pgrx_cshim"]
-    pub fn table_scan_bitmap_next_tuple(
-        scan: TableScanDesc,
-        slot: *mut TupleTableSlot,
-        recheck: *mut bool,
-        lossy_pages: *mut uint64,
-        exact_pages: *mut uint64,
-    ) -> bool;
-    #[link_name = "table_scan_sample_next_block__pgrx_cshim"]
-    pub fn table_scan_sample_next_block(
-        scan: TableScanDesc,
-        scanstate: *mut SampleScanState,
-    ) -> bool;
-    #[link_name = "table_scan_sample_next_tuple__pgrx_cshim"]
-    pub fn table_scan_sample_next_tuple(
-        scan: TableScanDesc,
-        scanstate: *mut SampleScanState,
-        slot: *mut TupleTableSlot,
-    ) -> bool;
     pub fn simple_table_tuple_insert(rel: Relation, slot: *mut TupleTableSlot);
     pub fn simple_table_tuple_delete(rel: Relation, tid: ItemPointer, snapshot: Snapshot);
     pub fn simple_table_tuple_update(
@@ -41173,7 +39944,7 @@ unsafe extern "C-unwind" {
     );
     pub fn table_block_parallelscan_estimate(rel: Relation) -> Size;
     pub fn table_block_parallelscan_initialize(rel: Relation, pscan: ParallelTableScanDesc)
-    -> Size;
+        -> Size;
     pub fn table_block_parallelscan_reinitialize(rel: Relation, pscan: ParallelTableScanDesc);
     pub fn table_block_parallelscan_nextpage(
         rel: Relation,
@@ -41441,8 +40212,6 @@ unsafe extern "C-unwind" {
         buffer: Buffer,
         snapshot: Snapshot,
     );
-    #[link_name = "heap_execute_freeze_tuple__pgrx_cshim"]
-    pub fn heap_execute_freeze_tuple(tuple: HeapTupleHeader, frz: *mut HeapTupleFreeze);
     pub fn InitSync();
     pub fn SyncPreCheckpoint();
     pub fn SyncPostCheckpoint();
@@ -41704,77 +40473,11 @@ unsafe extern "C-unwind" {
         all_frozen: *mut BlockNumber,
     );
     pub fn visibilitymap_prepare_truncate(rel: Relation, nheapblocks: BlockNumber) -> BlockNumber;
-    #[link_name = "XLogFileName__pgrx_cshim"]
-    pub fn XLogFileName(
-        fname: *mut ::core::ffi::c_char,
-        tli: TimeLineID,
-        logSegNo: XLogSegNo,
-        wal_segsz_bytes: ::core::ffi::c_int,
-    );
-    #[link_name = "XLogFileNameById__pgrx_cshim"]
-    pub fn XLogFileNameById(
-        fname: *mut ::core::ffi::c_char,
-        tli: TimeLineID,
-        log: uint32,
-        seg: uint32,
-    );
-    #[link_name = "IsXLogFileName__pgrx_cshim"]
-    pub fn IsXLogFileName(fname: *const ::core::ffi::c_char) -> bool;
-    #[link_name = "IsPartialXLogFileName__pgrx_cshim"]
-    pub fn IsPartialXLogFileName(fname: *const ::core::ffi::c_char) -> bool;
-    #[link_name = "XLogFromFileName__pgrx_cshim"]
-    pub fn XLogFromFileName(
-        fname: *const ::core::ffi::c_char,
-        tli: *mut TimeLineID,
-        logSegNo: *mut XLogSegNo,
-        wal_segsz_bytes: ::core::ffi::c_int,
-    );
-    #[link_name = "XLogFilePath__pgrx_cshim"]
-    pub fn XLogFilePath(
-        path: *mut ::core::ffi::c_char,
-        tli: TimeLineID,
-        logSegNo: XLogSegNo,
-        wal_segsz_bytes: ::core::ffi::c_int,
-    );
-    #[link_name = "TLHistoryFileName__pgrx_cshim"]
-    pub fn TLHistoryFileName(fname: *mut ::core::ffi::c_char, tli: TimeLineID);
-    #[link_name = "IsTLHistoryFileName__pgrx_cshim"]
-    pub fn IsTLHistoryFileName(fname: *const ::core::ffi::c_char) -> bool;
-    #[link_name = "TLHistoryFilePath__pgrx_cshim"]
-    pub fn TLHistoryFilePath(path: *mut ::core::ffi::c_char, tli: TimeLineID);
-    #[link_name = "StatusFilePath__pgrx_cshim"]
-    pub fn StatusFilePath(
-        path: *mut ::core::ffi::c_char,
-        xlog: *const ::core::ffi::c_char,
-        suffix: *const ::core::ffi::c_char,
-    );
-    #[link_name = "BackupHistoryFileName__pgrx_cshim"]
-    pub fn BackupHistoryFileName(
-        fname: *mut ::core::ffi::c_char,
-        tli: TimeLineID,
-        logSegNo: XLogSegNo,
-        startpoint: XLogRecPtr,
-        wal_segsz_bytes: ::core::ffi::c_int,
-    );
-    #[link_name = "IsBackupHistoryFileName__pgrx_cshim"]
-    pub fn IsBackupHistoryFileName(fname: *const ::core::ffi::c_char) -> bool;
-    #[link_name = "BackupHistoryFilePath__pgrx_cshim"]
-    pub fn BackupHistoryFilePath(
-        path: *mut ::core::ffi::c_char,
-        tli: TimeLineID,
-        logSegNo: XLogSegNo,
-        startpoint: XLogRecPtr,
-        wal_segsz_bytes: ::core::ffi::c_int,
-    );
     pub static mut RmgrTable: [RmgrData; 0usize];
     pub fn RmgrStartup();
     pub fn RmgrCleanup();
     pub fn RmgrNotFound(rmid: RmgrId);
     pub fn RegisterCustomRmgr(rmid: RmgrId, rmgr: *const RmgrData);
-    #[link_name = "RmgrIdExists__pgrx_cshim"]
-    pub fn RmgrIdExists(rmid: RmgrId) -> bool;
-    #[link_name = "GetRmgr__pgrx_cshim"]
-    pub fn GetRmgr(rmid: RmgrId) -> RmgrData;
     pub fn GetLastSegSwitchData(lastSwitchLSN: *mut XLogRecPtr) -> pg_time_t;
     pub fn RequestXLogSwitch(mark_unimportant: bool) -> XLogRecPtr;
     pub fn GetOldestRestartPoint(oldrecptr: *mut XLogRecPtr, oldtli: *mut TimeLineID);
@@ -42141,10 +40844,6 @@ unsafe extern "C-unwind" {
     pub fn SerializeReindexState(maxsize: Size, start_address: *mut ::core::ffi::c_char);
     pub fn RestoreReindexState(reindexstate: *const ::core::ffi::c_void);
     pub fn IndexSetParentIndex(partitionIdx: Relation, parentOid: Oid);
-    #[link_name = "itemptr_encode__pgrx_cshim"]
-    pub fn itemptr_encode(itemptr: ItemPointer) -> int64;
-    #[link_name = "itemptr_decode__pgrx_cshim"]
-    pub fn itemptr_decode(itemptr: ItemPointer, encoded: int64);
     pub fn CatalogOpenIndexes(heapRel: Relation) -> CatalogIndexState;
     pub fn CatalogCloseIndexes(indstate: CatalogIndexState);
     pub fn CatalogTupleInsert(heapRel: Relation, tup: HeapTuple);
@@ -42317,8 +41016,6 @@ unsafe extern "C-unwind" {
         ereport_on_violation: bool,
     ) -> bool;
     pub fn RunFunctionExecuteHookStr(objectName: *const ::core::ffi::c_char);
-    #[link_name = "collprovider_name__pgrx_cshim"]
-    pub fn collprovider_name(c: ::core::ffi::c_char) -> *const ::core::ffi::c_char;
     pub fn CollationCreate(
         collname: *const ::core::ffi::c_char,
         collnamespace: Oid,
@@ -42769,7 +41466,7 @@ unsafe extern "C-unwind" {
     pub fn AlterDatabaseRefreshColl(stmt: *mut AlterDatabaseRefreshCollStmt) -> ObjectAddress;
     pub fn AlterDatabaseSet(stmt: *mut AlterDatabaseSetStmt) -> Oid;
     pub fn AlterDatabaseOwner(dbname: *const ::core::ffi::c_char, newOwnerId: Oid)
-    -> ObjectAddress;
+        -> ObjectAddress;
     pub fn get_database_oid(dbname: *const ::core::ffi::c_char, missing_ok: bool) -> Oid;
     pub fn get_database_name(dbid: Oid) -> *mut ::core::ffi::c_char;
     pub fn have_createdb_privilege() -> bool;
@@ -42778,10 +41475,6 @@ unsafe extern "C-unwind" {
         collate: *const ::core::ffi::c_char,
         ctype: *const ::core::ffi::c_char,
     );
-    #[link_name = "EOHPGetRWDatum__pgrx_cshim"]
-    pub fn EOHPGetRWDatum(eohptr: *const ExpandedObjectHeader) -> Datum;
-    #[link_name = "EOHPGetRODatum__pgrx_cshim"]
-    pub fn EOHPGetRODatum(eohptr: *const ExpandedObjectHeader) -> Datum;
     pub fn DatumGetEOHP(d: Datum) -> *mut ExpandedObjectHeader;
     pub fn EOH_init_header(
         eohptr: *mut ExpandedObjectHeader,
@@ -44794,7 +43487,7 @@ unsafe extern "C-unwind" {
         Nulls: *const ::core::ffi::c_char,
     ) -> HeapTuple;
     pub fn SPI_fnumber(tupdesc: TupleDesc, fname: *const ::core::ffi::c_char)
-    -> ::core::ffi::c_int;
+        -> ::core::ffi::c_int;
     pub fn SPI_fname(tupdesc: TupleDesc, fnumber: ::core::ffi::c_int) -> *mut ::core::ffi::c_char;
     pub fn SPI_getvalue(
         tuple: HeapTuple,
@@ -44808,7 +43501,7 @@ unsafe extern "C-unwind" {
         isnull: *mut bool,
     ) -> Datum;
     pub fn SPI_gettype(tupdesc: TupleDesc, fnumber: ::core::ffi::c_int)
-    -> *mut ::core::ffi::c_char;
+        -> *mut ::core::ffi::c_char;
     pub fn SPI_gettypeid(tupdesc: TupleDesc, fnumber: ::core::ffi::c_int) -> Oid;
     pub fn SPI_getrelname(rel: Relation) -> *mut ::core::ffi::c_char;
     pub fn SPI_getnspname(rel: Relation) -> *mut ::core::ffi::c_char;
@@ -44920,23 +43613,6 @@ unsafe extern "C-unwind" {
     pub static pg_enc2name_tbl: [pg_enc2name; 0usize];
     pub static mut pg_enc2gettext_tbl: [*const ::core::ffi::c_char; 0usize];
     pub static pg_wchar_table: [pg_wchar_tbl; 0usize];
-    #[link_name = "is_valid_unicode_codepoint__pgrx_cshim"]
-    pub fn is_valid_unicode_codepoint(c: pg_wchar) -> bool;
-    #[link_name = "is_utf16_surrogate_first__pgrx_cshim"]
-    pub fn is_utf16_surrogate_first(c: pg_wchar) -> bool;
-    #[link_name = "is_utf16_surrogate_second__pgrx_cshim"]
-    pub fn is_utf16_surrogate_second(c: pg_wchar) -> bool;
-    #[link_name = "surrogate_pair_to_codepoint__pgrx_cshim"]
-    pub fn surrogate_pair_to_codepoint(first: pg_wchar, second: pg_wchar) -> pg_wchar;
-    #[link_name = "utf8_to_unicode__pgrx_cshim"]
-    pub fn utf8_to_unicode(c: *const ::core::ffi::c_uchar) -> pg_wchar;
-    #[link_name = "unicode_to_utf8__pgrx_cshim"]
-    pub fn unicode_to_utf8(
-        c: pg_wchar,
-        utf8string: *mut ::core::ffi::c_uchar,
-    ) -> *mut ::core::ffi::c_uchar;
-    #[link_name = "unicode_utf8len__pgrx_cshim"]
-    pub fn unicode_utf8len(c: pg_wchar) -> ::core::ffi::c_int;
     pub fn pg_char_to_encoding_private(name: *const ::core::ffi::c_char) -> ::core::ffi::c_int;
     pub fn pg_encoding_to_char_private(encoding: ::core::ffi::c_int) -> *const ::core::ffi::c_char;
     pub fn pg_valid_server_encoding_id_private(encoding: ::core::ffi::c_int) -> ::core::ffi::c_int;
@@ -44966,11 +43642,11 @@ unsafe extern "C-unwind" {
     pub fn pg_encoding_max_length(encoding: ::core::ffi::c_int) -> ::core::ffi::c_int;
     pub fn pg_valid_client_encoding(name: *const ::core::ffi::c_char) -> ::core::ffi::c_int;
     pub fn pg_valid_server_encoding_private(name: *const ::core::ffi::c_char)
-    -> ::core::ffi::c_int;
+        -> ::core::ffi::c_int;
     pub fn is_encoding_supported_by_icu(encoding: ::core::ffi::c_int) -> bool;
     pub fn get_encoding_name_for_icu(encoding: ::core::ffi::c_int) -> *const ::core::ffi::c_char;
     pub fn pg_utf8_islegal(source: *const ::core::ffi::c_uchar, length: ::core::ffi::c_int)
-    -> bool;
+        -> bool;
     pub fn pg_utf_mblen_private(s: *const ::core::ffi::c_uchar) -> ::core::ffi::c_int;
     pub fn pg_mule_mblen(s: *const ::core::ffi::c_uchar) -> ::core::ffi::c_int;
     pub fn pg_mb2wchar(from: *const ::core::ffi::c_char, to: *mut pg_wchar) -> ::core::ffi::c_int;
@@ -45088,7 +43764,7 @@ unsafe extern "C-unwind" {
         lc: *mut ::core::ffi::c_uchar,
     ) -> ::core::ffi::c_ushort;
     pub fn CNStoBIG5(cns: ::core::ffi::c_ushort, lc: ::core::ffi::c_uchar)
-    -> ::core::ffi::c_ushort;
+        -> ::core::ffi::c_ushort;
     pub fn UtfToLocal(
         utf: *const ::core::ffi::c_uchar,
         len: ::core::ffi::c_int,
@@ -45208,28 +43884,6 @@ unsafe extern "C-unwind" {
     pub fn pq_send_ascii_string(buf: StringInfo, str_: *const ::core::ffi::c_char);
     pub fn pq_sendfloat4(buf: StringInfo, f: float4);
     pub fn pq_sendfloat8(buf: StringInfo, f: float8);
-    #[link_name = "pq_writeint8__pgrx_cshim"]
-    pub fn pq_writeint8(buf: *mut StringInfoData, i: uint8);
-    #[link_name = "pq_writeint16__pgrx_cshim"]
-    pub fn pq_writeint16(buf: *mut StringInfoData, i: uint16);
-    #[link_name = "pq_writeint32__pgrx_cshim"]
-    pub fn pq_writeint32(buf: *mut StringInfoData, i: uint32);
-    #[link_name = "pq_writeint64__pgrx_cshim"]
-    pub fn pq_writeint64(buf: *mut StringInfoData, i: uint64);
-    #[link_name = "pq_writestring__pgrx_cshim"]
-    pub fn pq_writestring(buf: *mut StringInfoData, str_: *const ::core::ffi::c_char);
-    #[link_name = "pq_sendint8__pgrx_cshim"]
-    pub fn pq_sendint8(buf: StringInfo, i: uint8);
-    #[link_name = "pq_sendint16__pgrx_cshim"]
-    pub fn pq_sendint16(buf: StringInfo, i: uint16);
-    #[link_name = "pq_sendint32__pgrx_cshim"]
-    pub fn pq_sendint32(buf: StringInfo, i: uint32);
-    #[link_name = "pq_sendint64__pgrx_cshim"]
-    pub fn pq_sendint64(buf: StringInfo, i: uint64);
-    #[link_name = "pq_sendbyte__pgrx_cshim"]
-    pub fn pq_sendbyte(buf: StringInfo, byt: uint8);
-    #[link_name = "pq_sendint__pgrx_cshim"]
-    pub fn pq_sendint(buf: StringInfo, i: uint32, b: ::core::ffi::c_int);
     pub fn pq_begintypsend(buf: StringInfo);
     pub fn pq_endtypsend(buf: StringInfo) -> *mut bytea;
     pub fn pq_puttextmessage(msgtype: ::core::ffi::c_char, str_: *const ::core::ffi::c_char);
@@ -45466,22 +44120,6 @@ unsafe extern "C-unwind" {
     pub fn fix_opfuncids(node: *mut Node);
     pub fn set_opfuncid(opexpr: *mut OpExpr);
     pub fn set_sa_opfuncid(opexpr: *mut ScalarArrayOpExpr);
-    #[link_name = "is_funcclause__pgrx_cshim"]
-    pub fn is_funcclause(clause: *const ::core::ffi::c_void) -> bool;
-    #[link_name = "is_opclause__pgrx_cshim"]
-    pub fn is_opclause(clause: *const ::core::ffi::c_void) -> bool;
-    #[link_name = "get_leftop__pgrx_cshim"]
-    pub fn get_leftop(clause: *const ::core::ffi::c_void) -> *mut Node;
-    #[link_name = "get_rightop__pgrx_cshim"]
-    pub fn get_rightop(clause: *const ::core::ffi::c_void) -> *mut Node;
-    #[link_name = "is_andclause__pgrx_cshim"]
-    pub fn is_andclause(clause: *const ::core::ffi::c_void) -> bool;
-    #[link_name = "is_orclause__pgrx_cshim"]
-    pub fn is_orclause(clause: *const ::core::ffi::c_void) -> bool;
-    #[link_name = "is_notclause__pgrx_cshim"]
-    pub fn is_notclause(clause: *const ::core::ffi::c_void) -> bool;
-    #[link_name = "get_notclausearg__pgrx_cshim"]
-    pub fn get_notclausearg(notclause: *const ::core::ffi::c_void) -> *mut Expr;
     pub fn check_functions_in_node(
         node: *mut Node,
         checker: check_function_callback,
@@ -46103,7 +44741,7 @@ unsafe extern "C-unwind" {
     pub fn contain_vars_of_level(node: *mut Node, levelsup: ::core::ffi::c_int) -> bool;
     pub fn contain_vars_returning_old_or_new(node: *mut Node) -> bool;
     pub fn locate_var_of_level(node: *mut Node, levelsup: ::core::ffi::c_int)
-    -> ::core::ffi::c_int;
+        -> ::core::ffi::c_int;
     pub fn pull_var_clause(node: *mut Node, flags: ::core::ffi::c_int) -> *mut List;
     pub fn flatten_join_alias_vars(
         root: *mut PlannerInfo,
@@ -46347,7 +44985,7 @@ unsafe extern "C-unwind" {
         inner_paramrels: Relids,
     ) -> Relids;
     pub fn calc_non_nestloop_required_outer(outer_path: *mut Path, inner_path: *mut Path)
-    -> Relids;
+        -> Relids;
     pub fn create_nestloop_path(
         root: *mut PlannerInfo,
         joinrel: *mut RelOptInfo,
@@ -46608,7 +45246,7 @@ unsafe extern "C-unwind" {
         required_outer: Relids,
     ) -> *mut ParamPathInfo;
     pub fn find_param_path_info(rel: *mut RelOptInfo, required_outer: Relids)
-    -> *mut ParamPathInfo;
+        -> *mut ParamPathInfo;
     pub fn get_param_path_clause_serials(path: *mut Path) -> *mut Bitmapset;
     pub fn build_child_join_rel(
         root: *mut PlannerInfo,
@@ -47206,12 +45844,6 @@ unsafe extern "C-unwind" {
         currentrelids: Relids,
         current_and_outer: Relids,
     ) -> bool;
-    #[link_name = "clause_sides_match_join__pgrx_cshim"]
-    pub fn clause_sides_match_join(
-        rinfo: *mut RestrictInfo,
-        outerrelids: Relids,
-        innerrelids: Relids,
-    ) -> bool;
     pub fn tlist_member(node: *mut Expr, targetlist: *mut List) -> *mut TargetEntry;
     pub fn add_to_flat_tlist(tlist: *mut List, exprs: *mut List) -> *mut List;
     pub fn get_tlist_exprs(tlist: *mut List, includeJunk: bool) -> *mut List;
@@ -47307,14 +45939,14 @@ unsafe extern "C-unwind" {
         pushedDown: bool,
     );
     pub fn BuildOnConflictExcludedTargetlist(targetrel: Relation, exclRelIndex: Index)
-    -> *mut List;
+        -> *mut List;
     pub fn makeSortGroupClauseForSetOp(rescoltype: Oid, require_hash: bool)
-    -> *mut SortGroupClause;
+        -> *mut SortGroupClause;
     pub fn assign_query_collations(pstate: *mut ParseState, query: *mut Query);
     pub fn assign_list_collations(pstate: *mut ParseState, exprs: *mut List);
     pub fn assign_expr_collations(pstate: *mut ParseState, expr: *mut Node);
     pub fn select_common_collation(pstate: *mut ParseState, exprs: *mut List, none_ok: bool)
-    -> Oid;
+        -> Oid;
     pub static mut Transform_null_equals: bool;
     pub fn transformExpr(
         pstate: *mut ParseState,
@@ -47925,7 +46557,7 @@ unsafe extern "C-unwind" {
     ) -> ::core::ffi::c_int;
     pub fn RelationGetPartitionDesc(rel: Relation, omit_detached: bool) -> PartitionDesc;
     pub fn CreatePartitionDirectory(mcxt: MemoryContext, omit_detached: bool)
-    -> PartitionDirectory;
+        -> PartitionDirectory;
     pub fn PartitionDirectoryLookup(arg1: PartitionDirectory, arg2: Relation) -> PartitionDesc;
     pub fn DestroyPartitionDirectory(pdir: PartitionDirectory);
     pub fn get_default_oid_from_partdesc(partdesc: PartitionDesc) -> Oid;
@@ -47940,10 +46572,6 @@ unsafe extern "C-unwind" {
         context: *mut PartitionPruneContext,
         pruning_steps: *mut List,
     ) -> *mut Bitmapset;
-    #[link_name = "ExpandedRecordGetDatum__pgrx_cshim"]
-    pub fn ExpandedRecordGetDatum(erh: *const ExpandedRecordHeader) -> Datum;
-    #[link_name = "ExpandedRecordGetRODatum__pgrx_cshim"]
-    pub fn ExpandedRecordGetRODatum(erh: *const ExpandedRecordHeader) -> Datum;
     pub fn make_expanded_record_from_typeid(
         type_id: Oid,
         typmod: int32,
@@ -47995,14 +46623,6 @@ unsafe extern "C-unwind" {
         isnulls: *const bool,
         expand_external: bool,
     );
-    #[link_name = "expanded_record_get_tupdesc__pgrx_cshim"]
-    pub fn expanded_record_get_tupdesc(erh: *mut ExpandedRecordHeader) -> TupleDesc;
-    #[link_name = "expanded_record_get_field__pgrx_cshim"]
-    pub fn expanded_record_get_field(
-        erh: *mut ExpandedRecordHeader,
-        fnumber: ::core::ffi::c_int,
-        isnull: *mut bool,
-    ) -> Datum;
     pub fn cached_function_compile(
         fcinfo: FunctionCallInfo,
         function: *mut CachedFunction,
@@ -48150,7 +46770,7 @@ unsafe extern "C-unwind" {
     pub fn plpgsql_ns_find_nearest_loop(ns_cur: *mut PLpgSQL_nsitem) -> *mut PLpgSQL_nsitem;
     pub fn plpgsql_stmt_typename(stmt: *mut PLpgSQL_stmt) -> *const ::core::ffi::c_char;
     pub fn plpgsql_getdiag_kindname(kind: PLpgSQL_getdiag_kind::Type)
-    -> *const ::core::ffi::c_char;
+        -> *const ::core::ffi::c_char;
     pub fn plpgsql_mark_local_assignment_targets(func: *mut PLpgSQL_function);
     pub fn plpgsql_free_function_memory(func: *mut PLpgSQL_function);
     pub fn plpgsql_delete_callback(cfunc: *mut CachedFunction);
@@ -48549,7 +47169,7 @@ unsafe extern "C-unwind" {
     pub fn logicalrep_read_typ(in_: StringInfo, ltyp: *mut LogicalRepTyp);
     pub fn logicalrep_write_stream_start(out: StringInfo, xid: TransactionId, first_segment: bool);
     pub fn logicalrep_read_stream_start(in_: StringInfo, first_segment: *mut bool)
-    -> TransactionId;
+        -> TransactionId;
     pub fn logicalrep_write_stream_stop(out: StringInfo);
     pub fn logicalrep_write_stream_commit(
         out: StringInfo,
@@ -48599,15 +47219,11 @@ unsafe extern "C-unwind" {
     pub fn WalSndWaitStopping();
     pub fn HandleWalSndInitStopping();
     pub fn WalSndRqstFileReload();
-    #[link_name = "WalSndWakeupProcessRequests__pgrx_cshim"]
-    pub fn WalSndWakeupProcessRequests(physical: bool, logical: bool);
     pub static mut wal_receiver_status_interval: ::core::ffi::c_int;
     pub static mut wal_receiver_timeout: ::core::ffi::c_int;
     pub static mut hot_standby_feedback: bool;
     pub static mut WalRcv: *mut WalRcvData;
     pub static mut WalReceiverFunctions: *mut WalReceiverFunctionsType;
-    #[link_name = "walrcv_clear_result__pgrx_cshim"]
-    pub fn walrcv_clear_result(walres: *mut WalRcvExecResult);
     pub fn WalReceiverMain(startup_data: *const ::core::ffi::c_void, startup_data_len: usize);
     pub fn WalRcvForceReply();
     pub fn WalRcvShmemSize() -> Size;
@@ -48629,12 +47245,6 @@ unsafe extern "C-unwind" {
     pub fn GetWalRcvWriteRecPtr() -> XLogRecPtr;
     pub fn GetReplicationApplyDelay() -> ::core::ffi::c_int;
     pub fn GetReplicationTransferLatency() -> ::core::ffi::c_int;
-    #[link_name = "ReplicationSlotSetInactiveSince__pgrx_cshim"]
-    pub fn ReplicationSlotSetInactiveSince(
-        s: *mut ReplicationSlot,
-        ts: TimestampTz,
-        acquire_lock: bool,
-    );
     pub static mut ReplicationSlotCtl: *mut ReplicationSlotCtlData;
     pub static mut MyReplicationSlot: *mut ReplicationSlot;
     pub static mut max_replication_slots: ::core::ffi::c_int;
@@ -48812,68 +47422,14 @@ unsafe extern "C-unwind" {
         hasRowSecurity: *mut bool,
         hasSubLinks: *mut bool,
     );
-    #[link_name = "BufTagGetRelNumber__pgrx_cshim"]
-    pub fn BufTagGetRelNumber(tag: *const BufferTag) -> RelFileNumber;
-    #[link_name = "BufTagGetForkNum__pgrx_cshim"]
-    pub fn BufTagGetForkNum(tag: *const BufferTag) -> ForkNumber::Type;
-    #[link_name = "BufTagSetRelForkDetails__pgrx_cshim"]
-    pub fn BufTagSetRelForkDetails(
-        tag: *mut BufferTag,
-        relnumber: RelFileNumber,
-        forknum: ForkNumber::Type,
-    );
-    #[link_name = "BufTagGetRelFileLocator__pgrx_cshim"]
-    pub fn BufTagGetRelFileLocator(tag: *const BufferTag) -> RelFileLocator;
-    #[link_name = "ClearBufferTag__pgrx_cshim"]
-    pub fn ClearBufferTag(tag: *mut BufferTag);
-    #[link_name = "InitBufferTag__pgrx_cshim"]
-    pub fn InitBufferTag(
-        tag: *mut BufferTag,
-        rlocator: *const RelFileLocator,
-        forkNum: ForkNumber::Type,
-        blockNum: BlockNumber,
-    );
-    #[link_name = "BufferTagsEqual__pgrx_cshim"]
-    pub fn BufferTagsEqual(tag1: *const BufferTag, tag2: *const BufferTag) -> bool;
-    #[link_name = "BufTagMatchesRelFileLocator__pgrx_cshim"]
-    pub fn BufTagMatchesRelFileLocator(
-        tag: *const BufferTag,
-        rlocator: *const RelFileLocator,
-    ) -> bool;
-    #[link_name = "BufTableHashPartition__pgrx_cshim"]
-    pub fn BufTableHashPartition(hashcode: uint32) -> uint32;
-    #[link_name = "BufMappingPartitionLock__pgrx_cshim"]
-    pub fn BufMappingPartitionLock(hashcode: uint32) -> *mut LWLock;
-    #[link_name = "BufMappingPartitionLockByIndex__pgrx_cshim"]
-    pub fn BufMappingPartitionLockByIndex(index: uint32) -> *mut LWLock;
     pub static mut BufferDescriptors: *mut BufferDescPadded;
     pub static mut BufferIOCVArray: *mut ConditionVariableMinimallyPadded;
     pub static mut BackendWritebackContext: WritebackContext;
     pub static mut LocalBufferDescriptors: *mut BufferDesc;
-    #[link_name = "GetBufferDescriptor__pgrx_cshim"]
-    pub fn GetBufferDescriptor(id: uint32) -> *mut BufferDesc;
-    #[link_name = "GetLocalBufferDescriptor__pgrx_cshim"]
-    pub fn GetLocalBufferDescriptor(id: uint32) -> *mut BufferDesc;
-    #[link_name = "BufferDescriptorGetBuffer__pgrx_cshim"]
-    pub fn BufferDescriptorGetBuffer(bdesc: *const BufferDesc) -> Buffer;
-    #[link_name = "BufferDescriptorGetIOCV__pgrx_cshim"]
-    pub fn BufferDescriptorGetIOCV(bdesc: *const BufferDesc) -> *mut ConditionVariable;
-    #[link_name = "BufferDescriptorGetContentLock__pgrx_cshim"]
-    pub fn BufferDescriptorGetContentLock(bdesc: *const BufferDesc) -> *mut LWLock;
     pub fn LockBufHdr(desc: *mut BufferDesc) -> uint32;
-    #[link_name = "UnlockBufHdr__pgrx_cshim"]
-    pub fn UnlockBufHdr(desc: *mut BufferDesc, buf_state: uint32);
     pub static mut CkptBufferIds: *mut CkptSortItem;
     pub static buffer_io_resowner_desc: ResourceOwnerDesc;
     pub static buffer_pin_resowner_desc: ResourceOwnerDesc;
-    #[link_name = "ResourceOwnerRememberBuffer__pgrx_cshim"]
-    pub fn ResourceOwnerRememberBuffer(owner: ResourceOwner, buffer: Buffer);
-    #[link_name = "ResourceOwnerForgetBuffer__pgrx_cshim"]
-    pub fn ResourceOwnerForgetBuffer(owner: ResourceOwner, buffer: Buffer);
-    #[link_name = "ResourceOwnerRememberBufferIO__pgrx_cshim"]
-    pub fn ResourceOwnerRememberBufferIO(owner: ResourceOwner, buffer: Buffer);
-    #[link_name = "ResourceOwnerForgetBufferIO__pgrx_cshim"]
-    pub fn ResourceOwnerForgetBufferIO(owner: ResourceOwner, buffer: Buffer);
     pub fn WritebackContextInit(
         context: *mut WritebackContext,
         max_pending: *mut ::core::ffi::c_int,
@@ -49350,8 +47906,6 @@ unsafe extern "C-unwind" {
     pub fn UtilityTupleDescriptor(parsetree: *mut Node) -> TupleDesc;
     pub fn UtilityContainsQuery(parsetree: *mut Node) -> *mut Query;
     pub fn CreateCommandTag(parsetree: *mut Node) -> CommandTag::Type;
-    #[link_name = "CreateCommandName__pgrx_cshim"]
-    pub fn CreateCommandName(parsetree: *mut Node) -> *const ::core::ffi::c_char;
     pub fn GetCommandLogLevel(parsetree: *mut Node) -> LogStmtLevel::Type;
     pub fn CommandIsReadOnly(pstmt: *mut PlannedStmt) -> bool;
     pub static mut TSCurrentConfig: *mut ::core::ffi::c_char;
@@ -49363,19 +47917,7 @@ unsafe extern "C-unwind" {
         a: *const ::core::ffi::c_void,
         b: *const ::core::ffi::c_void,
     ) -> ::core::ffi::c_int;
-    #[link_name = "DatumGetTSVector__pgrx_cshim"]
-    pub fn DatumGetTSVector(X: Datum) -> TSVector;
-    #[link_name = "DatumGetTSVectorCopy__pgrx_cshim"]
-    pub fn DatumGetTSVectorCopy(X: Datum) -> TSVector;
-    #[link_name = "TSVectorGetDatum__pgrx_cshim"]
-    pub fn TSVectorGetDatum(X: *const TSVectorData) -> Datum;
     pub static tsearch_op_priority: [::core::ffi::c_int; 4usize];
-    #[link_name = "DatumGetTSQuery__pgrx_cshim"]
-    pub fn DatumGetTSQuery(X: Datum) -> TSQuery;
-    #[link_name = "DatumGetTSQueryCopy__pgrx_cshim"]
-    pub fn DatumGetTSQueryCopy(X: Datum) -> TSQuery;
-    #[link_name = "TSQueryGetDatum__pgrx_cshim"]
-    pub fn TSQueryGetDatum(X: *const TSQueryData) -> Datum;
     pub fn get_tsearch_config_filename(
         basename: *const ::core::ffi::c_char,
         extension: *const ::core::ffi::c_char,
@@ -49466,10 +48008,6 @@ unsafe extern "C-unwind" {
     ) -> int32;
     pub fn clean_NOT(ptr: *mut QueryItem, len: *mut int32) -> *mut QueryItem;
     pub fn cleanup_tsquery_stopwords(in_: TSQuery, noisy: bool) -> TSQuery;
-    #[link_name = "TSQuerySignGetDatum__pgrx_cshim"]
-    pub fn TSQuerySignGetDatum(X: TSQuerySign) -> Datum;
-    #[link_name = "DatumGetTSQuerySign__pgrx_cshim"]
-    pub fn DatumGetTSQuerySign(X: Datum) -> TSQuerySign;
     pub fn QT2QTN(in_: *mut QueryItem, operand: *mut ::core::ffi::c_char) -> *mut QTNode;
     pub fn QTN2QT(in_: *mut QTNode) -> TSQuery;
     pub fn QTNFree(in_: *mut QTNode);
@@ -52592,18 +51130,6 @@ unsafe extern "C-unwind" {
     pub fn format_type_with_typemod(type_oid: Oid, typemod: int32) -> *mut ::core::ffi::c_char;
     pub fn type_maximum_size(type_oid: Oid, typemod: int32) -> int32;
     pub fn quote_literal_cstr(rawstr: *const ::core::ffi::c_char) -> *mut ::core::ffi::c_char;
-    #[link_name = "DatumGetDateADT__pgrx_cshim"]
-    pub fn DatumGetDateADT(X: Datum) -> DateADT;
-    #[link_name = "DatumGetTimeADT__pgrx_cshim"]
-    pub fn DatumGetTimeADT(X: Datum) -> TimeADT;
-    #[link_name = "DatumGetTimeTzADTP__pgrx_cshim"]
-    pub fn DatumGetTimeTzADTP(X: Datum) -> *mut TimeTzADT;
-    #[link_name = "DateADTGetDatum__pgrx_cshim"]
-    pub fn DateADTGetDatum(X: DateADT) -> Datum;
-    #[link_name = "TimeADTGetDatum__pgrx_cshim"]
-    pub fn TimeADTGetDatum(X: TimeADT) -> Datum;
-    #[link_name = "TimeTzADTPGetDatum__pgrx_cshim"]
-    pub fn TimeTzADTPGetDatum(X: *const TimeTzADT) -> Datum;
     pub fn anytime_typmod_check(istz: bool, typmod: int32) -> int32;
     pub fn date2timestamp_no_overflow(dateVal: DateADT) -> f64;
     pub fn date2timestamp_opt_overflow(
@@ -52827,106 +51353,6 @@ unsafe extern "C-unwind" {
     pub fn float8out_internal(num: float8) -> *mut ::core::ffi::c_char;
     pub fn float4_cmp_internal(a: float4, b: float4) -> ::core::ffi::c_int;
     pub fn float8_cmp_internal(a: float8, b: float8) -> ::core::ffi::c_int;
-    #[link_name = "get_float4_infinity__pgrx_cshim"]
-    pub fn get_float4_infinity() -> float4;
-    #[link_name = "get_float8_infinity__pgrx_cshim"]
-    pub fn get_float8_infinity() -> float8;
-    #[link_name = "get_float4_nan__pgrx_cshim"]
-    pub fn get_float4_nan() -> float4;
-    #[link_name = "get_float8_nan__pgrx_cshim"]
-    pub fn get_float8_nan() -> float8;
-    #[link_name = "float4_pl__pgrx_cshim"]
-    pub fn float4_pl(val1: float4, val2: float4) -> float4;
-    #[link_name = "float8_pl__pgrx_cshim"]
-    pub fn float8_pl(val1: float8, val2: float8) -> float8;
-    #[link_name = "float4_mi__pgrx_cshim"]
-    pub fn float4_mi(val1: float4, val2: float4) -> float4;
-    #[link_name = "float8_mi__pgrx_cshim"]
-    pub fn float8_mi(val1: float8, val2: float8) -> float8;
-    #[link_name = "float4_mul__pgrx_cshim"]
-    pub fn float4_mul(val1: float4, val2: float4) -> float4;
-    #[link_name = "float8_mul__pgrx_cshim"]
-    pub fn float8_mul(val1: float8, val2: float8) -> float8;
-    #[link_name = "float4_div__pgrx_cshim"]
-    pub fn float4_div(val1: float4, val2: float4) -> float4;
-    #[link_name = "float8_div__pgrx_cshim"]
-    pub fn float8_div(val1: float8, val2: float8) -> float8;
-    #[link_name = "float4_eq__pgrx_cshim"]
-    pub fn float4_eq(val1: float4, val2: float4) -> bool;
-    #[link_name = "float8_eq__pgrx_cshim"]
-    pub fn float8_eq(val1: float8, val2: float8) -> bool;
-    #[link_name = "float4_ne__pgrx_cshim"]
-    pub fn float4_ne(val1: float4, val2: float4) -> bool;
-    #[link_name = "float8_ne__pgrx_cshim"]
-    pub fn float8_ne(val1: float8, val2: float8) -> bool;
-    #[link_name = "float4_lt__pgrx_cshim"]
-    pub fn float4_lt(val1: float4, val2: float4) -> bool;
-    #[link_name = "float8_lt__pgrx_cshim"]
-    pub fn float8_lt(val1: float8, val2: float8) -> bool;
-    #[link_name = "float4_le__pgrx_cshim"]
-    pub fn float4_le(val1: float4, val2: float4) -> bool;
-    #[link_name = "float8_le__pgrx_cshim"]
-    pub fn float8_le(val1: float8, val2: float8) -> bool;
-    #[link_name = "float4_gt__pgrx_cshim"]
-    pub fn float4_gt(val1: float4, val2: float4) -> bool;
-    #[link_name = "float8_gt__pgrx_cshim"]
-    pub fn float8_gt(val1: float8, val2: float8) -> bool;
-    #[link_name = "float4_ge__pgrx_cshim"]
-    pub fn float4_ge(val1: float4, val2: float4) -> bool;
-    #[link_name = "float8_ge__pgrx_cshim"]
-    pub fn float8_ge(val1: float8, val2: float8) -> bool;
-    #[link_name = "float4_min__pgrx_cshim"]
-    pub fn float4_min(val1: float4, val2: float4) -> float4;
-    #[link_name = "float8_min__pgrx_cshim"]
-    pub fn float8_min(val1: float8, val2: float8) -> float8;
-    #[link_name = "float4_max__pgrx_cshim"]
-    pub fn float4_max(val1: float4, val2: float4) -> float4;
-    #[link_name = "float8_max__pgrx_cshim"]
-    pub fn float8_max(val1: float8, val2: float8) -> float8;
-    #[link_name = "FPeq__pgrx_cshim"]
-    pub fn FPeq(A: f64, B: f64) -> bool;
-    #[link_name = "FPne__pgrx_cshim"]
-    pub fn FPne(A: f64, B: f64) -> bool;
-    #[link_name = "FPlt__pgrx_cshim"]
-    pub fn FPlt(A: f64, B: f64) -> bool;
-    #[link_name = "FPle__pgrx_cshim"]
-    pub fn FPle(A: f64, B: f64) -> bool;
-    #[link_name = "FPgt__pgrx_cshim"]
-    pub fn FPgt(A: f64, B: f64) -> bool;
-    #[link_name = "FPge__pgrx_cshim"]
-    pub fn FPge(A: f64, B: f64) -> bool;
-    #[link_name = "DatumGetPointP__pgrx_cshim"]
-    pub fn DatumGetPointP(X: Datum) -> *mut Point;
-    #[link_name = "PointPGetDatum__pgrx_cshim"]
-    pub fn PointPGetDatum(X: *const Point) -> Datum;
-    #[link_name = "DatumGetLsegP__pgrx_cshim"]
-    pub fn DatumGetLsegP(X: Datum) -> *mut LSEG;
-    #[link_name = "LsegPGetDatum__pgrx_cshim"]
-    pub fn LsegPGetDatum(X: *const LSEG) -> Datum;
-    #[link_name = "DatumGetPathP__pgrx_cshim"]
-    pub fn DatumGetPathP(X: Datum) -> *mut PATH;
-    #[link_name = "DatumGetPathPCopy__pgrx_cshim"]
-    pub fn DatumGetPathPCopy(X: Datum) -> *mut PATH;
-    #[link_name = "PathPGetDatum__pgrx_cshim"]
-    pub fn PathPGetDatum(X: *const PATH) -> Datum;
-    #[link_name = "DatumGetLineP__pgrx_cshim"]
-    pub fn DatumGetLineP(X: Datum) -> *mut LINE;
-    #[link_name = "LinePGetDatum__pgrx_cshim"]
-    pub fn LinePGetDatum(X: *const LINE) -> Datum;
-    #[link_name = "DatumGetBoxP__pgrx_cshim"]
-    pub fn DatumGetBoxP(X: Datum) -> *mut BOX;
-    #[link_name = "BoxPGetDatum__pgrx_cshim"]
-    pub fn BoxPGetDatum(X: *const BOX) -> Datum;
-    #[link_name = "DatumGetPolygonP__pgrx_cshim"]
-    pub fn DatumGetPolygonP(X: Datum) -> *mut POLYGON;
-    #[link_name = "DatumGetPolygonPCopy__pgrx_cshim"]
-    pub fn DatumGetPolygonPCopy(X: Datum) -> *mut POLYGON;
-    #[link_name = "PolygonPGetDatum__pgrx_cshim"]
-    pub fn PolygonPGetDatum(X: *const POLYGON) -> Datum;
-    #[link_name = "DatumGetCircleP__pgrx_cshim"]
-    pub fn DatumGetCircleP(X: Datum) -> *mut CIRCLE;
-    #[link_name = "CirclePGetDatum__pgrx_cshim"]
-    pub fn CirclePGetDatum(X: *const CIRCLE) -> Datum;
     pub fn pg_hypot(x: float8, y: float8) -> float8;
     pub fn escape_json(buf: StringInfo, str_: *const ::core::ffi::c_char);
     pub fn escape_json_with_len(
@@ -52973,12 +51399,6 @@ unsafe extern "C-unwind" {
     pub fn pg_prng_double(state: *mut pg_prng_state) -> f64;
     pub fn pg_prng_double_normal(state: *mut pg_prng_state) -> f64;
     pub fn pg_prng_bool(state: *mut pg_prng_state) -> bool;
-    #[link_name = "DatumGetNumeric__pgrx_cshim"]
-    pub fn DatumGetNumeric(X: Datum) -> Numeric;
-    #[link_name = "DatumGetNumericCopy__pgrx_cshim"]
-    pub fn DatumGetNumericCopy(X: Datum) -> Numeric;
-    #[link_name = "NumericGetDatum__pgrx_cshim"]
-    pub fn NumericGetDatum(X: Numeric) -> Datum;
     pub fn numeric_is_nan(num: Numeric) -> bool;
     pub fn numeric_is_inf(num: Numeric) -> bool;
     pub fn numeric_maximum_size(typmod: int32) -> int32;
@@ -52994,12 +51414,6 @@ unsafe extern "C-unwind" {
     pub fn numeric_int4_opt_error(num: Numeric, have_error: *mut bool) -> int32;
     pub fn numeric_int8_opt_error(num: Numeric, have_error: *mut bool) -> int64;
     pub fn random_numeric(state: *mut pg_prng_state, rmin: Numeric, rmax: Numeric) -> Numeric;
-    #[link_name = "DatumGetJsonbP__pgrx_cshim"]
-    pub fn DatumGetJsonbP(d: Datum) -> *mut Jsonb;
-    #[link_name = "DatumGetJsonbPCopy__pgrx_cshim"]
-    pub fn DatumGetJsonbPCopy(d: Datum) -> *mut Jsonb;
-    #[link_name = "JsonbPGetDatum__pgrx_cshim"]
-    pub fn JsonbPGetDatum(p: *const Jsonb) -> Datum;
     pub fn getJsonbOffset(jc: *const JsonbContainer, index: ::core::ffi::c_int) -> uint32;
     pub fn getJsonbLength(jc: *const JsonbContainer, index: ::core::ffi::c_int) -> uint32;
     pub fn compareJsonbContainers(
@@ -53120,7 +51534,7 @@ unsafe extern "C-unwind" {
     pub fn get_ordering_op_for_equality_op(opno: Oid, use_lhs_type: bool) -> Oid;
     pub fn get_mergejoin_opfamilies(opno: Oid) -> *mut List;
     pub fn get_compatible_hash_operators(opno: Oid, lhs_opno: *mut Oid, rhs_opno: *mut Oid)
-    -> bool;
+        -> bool;
     pub fn get_op_hash_functions(
         opno: Oid,
         lhs_procno: *mut RegProcedure,
@@ -53277,7 +51691,7 @@ unsafe extern "C-unwind" {
     pub fn get_subscription_oid(subname: *const ::core::ffi::c_char, missing_ok: bool) -> Oid;
     pub fn get_subscription_name(subid: Oid, missing_ok: bool) -> *mut ::core::ffi::c_char;
     pub fn format_procedure_extended(procedure_oid: Oid, flags: bits16)
-    -> *mut ::core::ffi::c_char;
+        -> *mut ::core::ffi::c_char;
     pub fn format_operator_extended(operator_oid: Oid, flags: bits16) -> *mut ::core::ffi::c_char;
     pub fn stringToQualifiedNameList(
         string: *const ::core::ffi::c_char,
@@ -53683,12 +52097,6 @@ unsafe extern "C-unwind" {
     pub fn RelationInvalidatesSnapshotsOnly(relid: Oid) -> bool;
     pub fn RelationHasSysCache(relid: Oid) -> bool;
     pub fn RelationSupportsSysCache(relid: Oid) -> bool;
-    #[link_name = "DatumGetRangeTypeP__pgrx_cshim"]
-    pub fn DatumGetRangeTypeP(X: Datum) -> *mut RangeType;
-    #[link_name = "DatumGetRangeTypePCopy__pgrx_cshim"]
-    pub fn DatumGetRangeTypePCopy(X: Datum) -> *mut RangeType;
-    #[link_name = "RangeTypePGetDatum__pgrx_cshim"]
-    pub fn RangeTypePGetDatum(X: *const RangeType) -> Datum;
     pub fn range_contains_elem_internal(
         typcache: *mut TypeCacheEntry,
         r: *const RangeType,
@@ -53880,15 +52288,9 @@ pub const A_Expr_Kind_AEXPR_OP: u32 = 0;
 pub const A_Expr_Kind_AEXPR_OP_ANY: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_OP_ALL")]
 pub const A_Expr_Kind_AEXPR_OP_ALL: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::A_Expr_Kind::AEXPR_DISTINCT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_DISTINCT")]
 pub const A_Expr_Kind_AEXPR_DISTINCT: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::A_Expr_Kind::AEXPR_NOT_DISTINCT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_NOT_DISTINCT")]
 pub const A_Expr_Kind_AEXPR_NOT_DISTINCT: u32 = 4;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_NULLIF")]
 pub const A_Expr_Kind_AEXPR_NULLIF: u32 = 5;
@@ -53902,20 +52304,11 @@ pub const A_Expr_Kind_AEXPR_ILIKE: u32 = 8;
 pub const A_Expr_Kind_AEXPR_SIMILAR: u32 = 9;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_BETWEEN")]
 pub const A_Expr_Kind_AEXPR_BETWEEN: u32 = 10;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::A_Expr_Kind::AEXPR_NOT_BETWEEN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_NOT_BETWEEN")]
 pub const A_Expr_Kind_AEXPR_NOT_BETWEEN: u32 = 11;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::A_Expr_Kind::AEXPR_BETWEEN_SYM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_BETWEEN_SYM")]
 pub const A_Expr_Kind_AEXPR_BETWEEN_SYM: u32 = 12;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::A_Expr_Kind::AEXPR_NOT_BETWEEN_SYM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::A_Expr_Kind::AEXPR_NOT_BETWEEN_SYM")]
 pub const A_Expr_Kind_AEXPR_NOT_BETWEEN_SYM: u32 = 13;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::AclMaskHow::ACLMASK_ALL")]
 pub const AclMaskHow_ACLMASK_ALL: u32 = 0;
@@ -53923,27 +52316,15 @@ pub const AclMaskHow_ACLMASK_ALL: u32 = 0;
 pub const AclMaskHow_ACLMASK_ANY: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::AclResult::ACLCHECK_OK")]
 pub const AclResult_ACLCHECK_OK: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AclResult::ACLCHECK_NO_PRIV"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AclResult::ACLCHECK_NO_PRIV")]
 pub const AclResult_ACLCHECK_NO_PRIV: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AclResult::ACLCHECK_NOT_OWNER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AclResult::ACLCHECK_NOT_OWNER")]
 pub const AclResult_ACLCHECK_NOT_OWNER: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::AggSplit::AGGSPLIT_SIMPLE")]
 pub const AggSplit_AGGSPLIT_SIMPLE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AggSplit::AGGSPLIT_INITIAL_SERIAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AggSplit::AGGSPLIT_INITIAL_SERIAL")]
 pub const AggSplit_AGGSPLIT_INITIAL_SERIAL: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AggSplit::AGGSPLIT_FINAL_DESERIAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AggSplit::AGGSPLIT_FINAL_DESERIAL")]
 pub const AggSplit_AGGSPLIT_FINAL_DESERIAL: u32 = 9;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::AggStrategy::AGG_PLAIN")]
 pub const AggStrategy_AGG_PLAIN: u32 = 0;
@@ -53953,20 +52334,11 @@ pub const AggStrategy_AGG_SORTED: u32 = 1;
 pub const AggStrategy_AGG_HASHED: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::AggStrategy::AGG_MIXED")]
 pub const AggStrategy_AGG_MIXED: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterPublicationAction::AP_AddObjects"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterPublicationAction::AP_AddObjects")]
 pub const AlterPublicationAction_AP_AddObjects: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterPublicationAction::AP_DropObjects"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterPublicationAction::AP_DropObjects")]
 pub const AlterPublicationAction_AP_DropObjects: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterPublicationAction::AP_SetObjects"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterPublicationAction::AP_SetObjects")]
 pub const AlterPublicationAction_AP_SetObjects: u32 = 2;
 #[deprecated(
     since = "0.12.0",
@@ -54033,483 +52405,222 @@ pub const AlterTSConfigType_ALTER_TSCONFIG_REPLACE_DICT_FOR_TOKEN: u32 = 3;
     note = "you want pg_sys::AlterTSConfigType::ALTER_TSCONFIG_DROP_MAPPING"
 )]
 pub const AlterTSConfigType_ALTER_TSCONFIG_DROP_MAPPING: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_AddColumn"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddColumn")]
 pub const AlterTableType_AT_AddColumn: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_AddColumnToView"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddColumnToView")]
 pub const AlterTableType_AT_AddColumnToView: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_ColumnDefault"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ColumnDefault")]
 pub const AlterTableType_AT_ColumnDefault: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_CookedColumnDefault"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_CookedColumnDefault")]
 pub const AlterTableType_AT_CookedColumnDefault: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_DropNotNull"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropNotNull")]
 pub const AlterTableType_AT_DropNotNull: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_SetNotNull"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetNotNull")]
 pub const AlterTableType_AT_SetNotNull: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_SetExpression"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetExpression")]
 pub const AlterTableType_AT_SetExpression: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_DropExpression"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropExpression")]
 pub const AlterTableType_AT_DropExpression: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_SetStatistics"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetStatistics")]
 pub const AlterTableType_AT_SetStatistics: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_SetOptions"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetOptions")]
 pub const AlterTableType_AT_SetOptions: u32 = 9;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_ResetOptions"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ResetOptions")]
 pub const AlterTableType_AT_ResetOptions: u32 = 10;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_SetStorage"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetStorage")]
 pub const AlterTableType_AT_SetStorage: u32 = 11;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_SetCompression"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetCompression")]
 pub const AlterTableType_AT_SetCompression: u32 = 12;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_DropColumn"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropColumn")]
 pub const AlterTableType_AT_DropColumn: u32 = 13;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_AddIndex"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddIndex")]
 pub const AlterTableType_AT_AddIndex: u32 = 14;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_ReAddIndex"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ReAddIndex")]
 pub const AlterTableType_AT_ReAddIndex: u32 = 15;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_AddConstraint"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddConstraint")]
 pub const AlterTableType_AT_AddConstraint: u32 = 16;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_ReAddConstraint"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ReAddConstraint")]
 pub const AlterTableType_AT_ReAddConstraint: u32 = 17;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_ReAddDomainConstraint"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ReAddDomainConstraint")]
 pub const AlterTableType_AT_ReAddDomainConstraint: u32 = 18;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_AlterConstraint"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AlterConstraint")]
 pub const AlterTableType_AT_AlterConstraint: u32 = 19;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_ValidateConstraint"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ValidateConstraint")]
 pub const AlterTableType_AT_ValidateConstraint: u32 = 20;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_AddIndexConstraint"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddIndexConstraint")]
 pub const AlterTableType_AT_AddIndexConstraint: u32 = 21;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_DropConstraint"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropConstraint")]
 pub const AlterTableType_AT_DropConstraint: u32 = 22;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_ReAddComment"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ReAddComment")]
 pub const AlterTableType_AT_ReAddComment: u32 = 23;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_AlterColumnType"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AlterColumnType")]
 pub const AlterTableType_AT_AlterColumnType: u32 = 24;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::AlterTableType::AT_AlterColumnGenericOptions"
 )]
 pub const AlterTableType_AT_AlterColumnGenericOptions: u32 = 25;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_ChangeOwner"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ChangeOwner")]
 pub const AlterTableType_AT_ChangeOwner: u32 = 26;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_ClusterOn"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ClusterOn")]
 pub const AlterTableType_AT_ClusterOn: u32 = 27;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_DropCluster"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropCluster")]
 pub const AlterTableType_AT_DropCluster: u32 = 28;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_SetLogged"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetLogged")]
 pub const AlterTableType_AT_SetLogged: u32 = 29;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_SetUnLogged"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetUnLogged")]
 pub const AlterTableType_AT_SetUnLogged: u32 = 30;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_DropOids"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropOids")]
 pub const AlterTableType_AT_DropOids: u32 = 31;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_SetAccessMethod"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetAccessMethod")]
 pub const AlterTableType_AT_SetAccessMethod: u32 = 32;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_SetTableSpace"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetTableSpace")]
 pub const AlterTableType_AT_SetTableSpace: u32 = 33;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_SetRelOptions"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetRelOptions")]
 pub const AlterTableType_AT_SetRelOptions: u32 = 34;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_ResetRelOptions"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ResetRelOptions")]
 pub const AlterTableType_AT_ResetRelOptions: u32 = 35;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_ReplaceRelOptions"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ReplaceRelOptions")]
 pub const AlterTableType_AT_ReplaceRelOptions: u32 = 36;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_EnableTrig"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableTrig")]
 pub const AlterTableType_AT_EnableTrig: u32 = 37;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_EnableAlwaysTrig"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableAlwaysTrig")]
 pub const AlterTableType_AT_EnableAlwaysTrig: u32 = 38;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_EnableReplicaTrig"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableReplicaTrig")]
 pub const AlterTableType_AT_EnableReplicaTrig: u32 = 39;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_DisableTrig"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DisableTrig")]
 pub const AlterTableType_AT_DisableTrig: u32 = 40;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_EnableTrigAll"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableTrigAll")]
 pub const AlterTableType_AT_EnableTrigAll: u32 = 41;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_DisableTrigAll"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DisableTrigAll")]
 pub const AlterTableType_AT_DisableTrigAll: u32 = 42;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_EnableTrigUser"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableTrigUser")]
 pub const AlterTableType_AT_EnableTrigUser: u32 = 43;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_DisableTrigUser"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DisableTrigUser")]
 pub const AlterTableType_AT_DisableTrigUser: u32 = 44;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_EnableRule"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableRule")]
 pub const AlterTableType_AT_EnableRule: u32 = 45;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_EnableAlwaysRule"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableAlwaysRule")]
 pub const AlterTableType_AT_EnableAlwaysRule: u32 = 46;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_EnableReplicaRule"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableReplicaRule")]
 pub const AlterTableType_AT_EnableReplicaRule: u32 = 47;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_DisableRule"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DisableRule")]
 pub const AlterTableType_AT_DisableRule: u32 = 48;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_AddInherit"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddInherit")]
 pub const AlterTableType_AT_AddInherit: u32 = 49;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_DropInherit"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropInherit")]
 pub const AlterTableType_AT_DropInherit: u32 = 50;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddOf")]
 pub const AlterTableType_AT_AddOf: u32 = 51;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropOf")]
 pub const AlterTableType_AT_DropOf: u32 = 52;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_ReplicaIdentity"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ReplicaIdentity")]
 pub const AlterTableType_AT_ReplicaIdentity: u32 = 53;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_EnableRowSecurity"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_EnableRowSecurity")]
 pub const AlterTableType_AT_EnableRowSecurity: u32 = 54;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_DisableRowSecurity"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DisableRowSecurity")]
 pub const AlterTableType_AT_DisableRowSecurity: u32 = 55;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_ForceRowSecurity"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ForceRowSecurity")]
 pub const AlterTableType_AT_ForceRowSecurity: u32 = 56;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_NoForceRowSecurity"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_NoForceRowSecurity")]
 pub const AlterTableType_AT_NoForceRowSecurity: u32 = 57;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_GenericOptions"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_GenericOptions")]
 pub const AlterTableType_AT_GenericOptions: u32 = 58;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_AttachPartition"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AttachPartition")]
 pub const AlterTableType_AT_AttachPartition: u32 = 59;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_DetachPartition"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DetachPartition")]
 pub const AlterTableType_AT_DetachPartition: u32 = 60;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::AlterTableType::AT_DetachPartitionFinalize"
 )]
 pub const AlterTableType_AT_DetachPartitionFinalize: u32 = 61;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_AddIdentity"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_AddIdentity")]
 pub const AlterTableType_AT_AddIdentity: u32 = 62;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_SetIdentity"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_SetIdentity")]
 pub const AlterTableType_AT_SetIdentity: u32 = 63;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_DropIdentity"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_DropIdentity")]
 pub const AlterTableType_AT_DropIdentity: u32 = 64;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::AlterTableType::AT_ReAddStatistics"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::AlterTableType::AT_ReAddStatistics")]
 pub const AlterTableType_AT_ReAddStatistics: u32 = 65;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ArchiveMode::ARCHIVE_MODE_OFF"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ArchiveMode::ARCHIVE_MODE_OFF")]
 pub const ArchiveMode_ARCHIVE_MODE_OFF: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ArchiveMode::ARCHIVE_MODE_ON"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ArchiveMode::ARCHIVE_MODE_ON")]
 pub const ArchiveMode_ARCHIVE_MODE_ON: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ArchiveMode::ARCHIVE_MODE_ALWAYS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ArchiveMode::ARCHIVE_MODE_ALWAYS")]
 pub const ArchiveMode_ARCHIVE_MODE_ALWAYS: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::BMS_Comparison::BMS_EQUAL")]
 pub const BMS_Comparison_BMS_EQUAL: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BMS_Comparison::BMS_SUBSET1"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BMS_Comparison::BMS_SUBSET1")]
 pub const BMS_Comparison_BMS_SUBSET1: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BMS_Comparison::BMS_SUBSET2"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BMS_Comparison::BMS_SUBSET2")]
 pub const BMS_Comparison_BMS_SUBSET2: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BMS_Comparison::BMS_DIFFERENT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BMS_Comparison::BMS_DIFFERENT")]
 pub const BMS_Comparison_BMS_DIFFERENT: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BMS_Membership::BMS_EMPTY_SET"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BMS_Membership::BMS_EMPTY_SET")]
 pub const BMS_Membership_BMS_EMPTY_SET: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BMS_Membership::BMS_SINGLETON"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BMS_Membership::BMS_SINGLETON")]
 pub const BMS_Membership_BMS_SINGLETON: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BMS_Membership::BMS_MULTIPLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BMS_Membership::BMS_MULTIPLE")]
 pub const BMS_Membership_BMS_MULTIPLE: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BackendState::STATE_UNDEFINED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendState::STATE_UNDEFINED")]
 pub const BackendState_STATE_UNDEFINED: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BackendState::STATE_STARTING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendState::STATE_STARTING")]
 pub const BackendState_STATE_STARTING: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::BackendState::STATE_IDLE")]
 pub const BackendState_STATE_IDLE: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BackendState::STATE_RUNNING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendState::STATE_RUNNING")]
 pub const BackendState_STATE_RUNNING: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BackendState::STATE_IDLEINTRANSACTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendState::STATE_IDLEINTRANSACTION")]
 pub const BackendState_STATE_IDLEINTRANSACTION: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BackendState::STATE_FASTPATH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendState::STATE_FASTPATH")]
 pub const BackendState_STATE_FASTPATH: u32 = 5;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::BackendState::STATE_IDLEINTRANSACTION_ABORTED"
 )]
 pub const BackendState_STATE_IDLEINTRANSACTION_ABORTED: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BackendState::STATE_DISABLED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendState::STATE_DISABLED")]
 pub const BackendState_STATE_DISABLED: u32 = 7;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_INVALID")]
 pub const BackendType_B_INVALID: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_BACKEND")]
 pub const BackendType_B_BACKEND: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BackendType::B_DEAD_END_BACKEND"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_DEAD_END_BACKEND")]
 pub const BackendType_B_DEAD_END_BACKEND: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BackendType::B_AUTOVAC_LAUNCHER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_AUTOVAC_LAUNCHER")]
 pub const BackendType_B_AUTOVAC_LAUNCHER: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BackendType::B_AUTOVAC_WORKER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_AUTOVAC_WORKER")]
 pub const BackendType_B_AUTOVAC_WORKER: u32 = 4;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_BG_WORKER")]
 pub const BackendType_B_BG_WORKER: u32 = 5;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_WAL_SENDER")]
 pub const BackendType_B_WAL_SENDER: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BackendType::B_SLOTSYNC_WORKER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_SLOTSYNC_WORKER")]
 pub const BackendType_B_SLOTSYNC_WORKER: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BackendType::B_STANDALONE_BACKEND"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_STANDALONE_BACKEND")]
 pub const BackendType_B_STANDALONE_BACKEND: u32 = 8;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_ARCHIVER")]
 pub const BackendType_B_ARCHIVER: u32 = 9;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_BG_WRITER")]
 pub const BackendType_B_BG_WRITER: u32 = 10;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BackendType::B_CHECKPOINTER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_CHECKPOINTER")]
 pub const BackendType_B_CHECKPOINTER: u32 = 11;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_IO_WORKER")]
 pub const BackendType_B_IO_WORKER: u32 = 12;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_STARTUP")]
 pub const BackendType_B_STARTUP: u32 = 13;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BackendType::B_WAL_RECEIVER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_WAL_RECEIVER")]
 pub const BackendType_B_WAL_RECEIVER: u32 = 14;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BackendType::B_WAL_SUMMARIZER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_WAL_SUMMARIZER")]
 pub const BackendType_B_WAL_SUMMARIZER: u32 = 15;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_WAL_WRITER")]
 pub const BackendType_B_WAL_WRITER: u32 = 16;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::BackendType::B_LOGGER")]
 pub const BackendType_B_LOGGER: u32 = 17;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BackslashQuoteType::BACKSLASH_QUOTE_OFF"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackslashQuoteType::BACKSLASH_QUOTE_OFF")]
 pub const BackslashQuoteType_BACKSLASH_QUOTE_OFF: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BackslashQuoteType::BACKSLASH_QUOTE_ON"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BackslashQuoteType::BACKSLASH_QUOTE_ON")]
 pub const BackslashQuoteType_BACKSLASH_QUOTE_ON: u32 = 1;
 #[deprecated(
     since = "0.12.0",
@@ -54531,25 +52642,13 @@ pub const BgWorkerStartTime_BgWorkerStart_ConsistentState: u32 = 1;
     note = "you want pg_sys::BgWorkerStartTime::BgWorkerStart_RecoveryFinished"
 )]
 pub const BgWorkerStartTime_BgWorkerStart_RecoveryFinished: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BgwHandleStatus::BGWH_STARTED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BgwHandleStatus::BGWH_STARTED")]
 pub const BgwHandleStatus_BGWH_STARTED: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BgwHandleStatus::BGWH_NOT_YET_STARTED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BgwHandleStatus::BGWH_NOT_YET_STARTED")]
 pub const BgwHandleStatus_BGWH_NOT_YET_STARTED: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BgwHandleStatus::BGWH_STOPPED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BgwHandleStatus::BGWH_STOPPED")]
 pub const BgwHandleStatus_BGWH_STOPPED: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BgwHandleStatus::BGWH_POSTMASTER_DIED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BgwHandleStatus::BGWH_POSTMASTER_DIED")]
 pub const BgwHandleStatus_BGWH_POSTMASTER_DIED: u32 = 3;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::BoolExprType::AND_EXPR")]
 pub const BoolExprType_AND_EXPR: u32 = 0;
@@ -54567,35 +52666,17 @@ pub const BoolTestType_IS_FALSE: u32 = 2;
 pub const BoolTestType_IS_NOT_FALSE: u32 = 3;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::BoolTestType::IS_UNKNOWN")]
 pub const BoolTestType_IS_UNKNOWN: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BoolTestType::IS_NOT_UNKNOWN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BoolTestType::IS_NOT_UNKNOWN")]
 pub const BoolTestType_IS_NOT_UNKNOWN: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BufferAccessStrategyType::BAS_NORMAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BufferAccessStrategyType::BAS_NORMAL")]
 pub const BufferAccessStrategyType_BAS_NORMAL: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BufferAccessStrategyType::BAS_BULKREAD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BufferAccessStrategyType::BAS_BULKREAD")]
 pub const BufferAccessStrategyType_BAS_BULKREAD: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BufferAccessStrategyType::BAS_BULKWRITE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BufferAccessStrategyType::BAS_BULKWRITE")]
 pub const BufferAccessStrategyType_BAS_BULKWRITE: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BufferAccessStrategyType::BAS_VACUUM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BufferAccessStrategyType::BAS_VACUUM")]
 pub const BufferAccessStrategyType_BAS_VACUUM: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_XACT_BUFFER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_XACT_BUFFER")]
 pub const BuiltinTrancheIds_LWTRANCHE_XACT_BUFFER: u32 = 54;
 #[deprecated(
     since = "0.12.0",
@@ -54627,10 +52708,7 @@ pub const BuiltinTrancheIds_LWTRANCHE_NOTIFY_BUFFER: u32 = 59;
     note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_SERIAL_BUFFER"
 )]
 pub const BuiltinTrancheIds_LWTRANCHE_SERIAL_BUFFER: u32 = 60;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_WAL_INSERT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_WAL_INSERT")]
 pub const BuiltinTrancheIds_LWTRANCHE_WAL_INSERT: u32 = 61;
 #[deprecated(
     since = "0.12.0",
@@ -54657,10 +52735,7 @@ pub const BuiltinTrancheIds_LWTRANCHE_LOCK_FASTPATH: u32 = 65;
     note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_BUFFER_MAPPING"
 )]
 pub const BuiltinTrancheIds_LWTRANCHE_BUFFER_MAPPING: u32 = 66;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_LOCK_MANAGER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_LOCK_MANAGER")]
 pub const BuiltinTrancheIds_LWTRANCHE_LOCK_MANAGER: u32 = 67;
 #[deprecated(
     since = "0.12.0",
@@ -54717,25 +52792,13 @@ pub const BuiltinTrancheIds_LWTRANCHE_PARALLEL_APPEND: u32 = 77;
     note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PER_XACT_PREDICATE_LIST"
 )]
 pub const BuiltinTrancheIds_LWTRANCHE_PER_XACT_PREDICATE_LIST: u32 = 78;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PGSTATS_DSA"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PGSTATS_DSA")]
 pub const BuiltinTrancheIds_LWTRANCHE_PGSTATS_DSA: u32 = 79;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PGSTATS_HASH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PGSTATS_HASH")]
 pub const BuiltinTrancheIds_LWTRANCHE_PGSTATS_HASH: u32 = 80;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PGSTATS_DATA"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_PGSTATS_DATA")]
 pub const BuiltinTrancheIds_LWTRANCHE_PGSTATS_DATA: u32 = 81;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_LAUNCHER_DSA"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_LAUNCHER_DSA")]
 pub const BuiltinTrancheIds_LWTRANCHE_LAUNCHER_DSA: u32 = 82;
 #[deprecated(
     since = "0.12.0",
@@ -54767,25 +52830,16 @@ pub const BuiltinTrancheIds_LWTRANCHE_MULTIXACTMEMBER_SLRU: u32 = 87;
     note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_MULTIXACTOFFSET_SLRU"
 )]
 pub const BuiltinTrancheIds_LWTRANCHE_MULTIXACTOFFSET_SLRU: u32 = 88;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_NOTIFY_SLRU"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_NOTIFY_SLRU")]
 pub const BuiltinTrancheIds_LWTRANCHE_NOTIFY_SLRU: u32 = 89;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_SERIAL_SLRU"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_SERIAL_SLRU")]
 pub const BuiltinTrancheIds_LWTRANCHE_SERIAL_SLRU: u32 = 90;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_SUBTRANS_SLRU"
 )]
 pub const BuiltinTrancheIds_LWTRANCHE_SUBTRANS_SLRU: u32 = 91;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_XACT_SLRU"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_XACT_SLRU")]
 pub const BuiltinTrancheIds_LWTRANCHE_XACT_SLRU: u32 = 92;
 #[deprecated(
     since = "0.12.0",
@@ -54812,50 +52866,23 @@ pub const BuiltinTrancheIds_LWTRANCHE_MEMORY_CONTEXT_REPORTING_PROC: u32 = 96;
     note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_FIRST_USER_DEFINED"
 )]
 pub const BuiltinTrancheIds_LWTRANCHE_FIRST_USER_DEFINED: u32 = 97;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CRSSnapshotAction::CRS_EXPORT_SNAPSHOT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CRSSnapshotAction::CRS_EXPORT_SNAPSHOT")]
 pub const CRSSnapshotAction_CRS_EXPORT_SNAPSHOT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CRSSnapshotAction::CRS_NOEXPORT_SNAPSHOT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CRSSnapshotAction::CRS_NOEXPORT_SNAPSHOT")]
 pub const CRSSnapshotAction_CRS_NOEXPORT_SNAPSHOT: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CRSSnapshotAction::CRS_USE_SNAPSHOT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CRSSnapshotAction::CRS_USE_SNAPSHOT")]
 pub const CRSSnapshotAction_CRS_USE_SNAPSHOT: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CTEMaterialize::CTEMaterializeDefault"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CTEMaterialize::CTEMaterializeDefault")]
 pub const CTEMaterialize_CTEMaterializeDefault: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CTEMaterialize::CTEMaterializeAlways"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CTEMaterialize::CTEMaterializeAlways")]
 pub const CTEMaterialize_CTEMaterializeAlways: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CTEMaterialize::CTEMaterializeNever"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CTEMaterialize::CTEMaterializeNever")]
 pub const CTEMaterialize_CTEMaterializeNever: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CheckEnableRlsResult::RLS_NONE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CheckEnableRlsResult::RLS_NONE")]
 pub const CheckEnableRlsResult_RLS_NONE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CheckEnableRlsResult::RLS_NONE_ENV"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CheckEnableRlsResult::RLS_NONE_ENV")]
 pub const CheckEnableRlsResult_RLS_NONE_ENV: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CheckEnableRlsResult::RLS_ENABLED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CheckEnableRlsResult::RLS_ENABLED")]
 pub const CheckEnableRlsResult_RLS_ENABLED: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CmdType::CMD_UNKNOWN")]
 pub const CmdType_CMD_UNKNOWN: u32 = 0;
@@ -54873,55 +52900,25 @@ pub const CmdType_CMD_MERGE: u32 = 5;
 pub const CmdType_CMD_UTILITY: u32 = 6;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CmdType::CMD_NOTHING")]
 pub const CmdType_CMD_NOTHING: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CoercionContext::COERCION_IMPLICIT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionContext::COERCION_IMPLICIT")]
 pub const CoercionContext_COERCION_IMPLICIT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CoercionContext::COERCION_ASSIGNMENT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionContext::COERCION_ASSIGNMENT")]
 pub const CoercionContext_COERCION_ASSIGNMENT: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CoercionContext::COERCION_PLPGSQL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionContext::COERCION_PLPGSQL")]
 pub const CoercionContext_COERCION_PLPGSQL: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CoercionContext::COERCION_EXPLICIT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionContext::COERCION_EXPLICIT")]
 pub const CoercionContext_COERCION_EXPLICIT: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CoercionForm::COERCE_EXPLICIT_CALL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionForm::COERCE_EXPLICIT_CALL")]
 pub const CoercionForm_COERCE_EXPLICIT_CALL: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CoercionForm::COERCE_EXPLICIT_CAST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionForm::COERCE_EXPLICIT_CAST")]
 pub const CoercionForm_COERCE_EXPLICIT_CAST: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CoercionForm::COERCE_IMPLICIT_CAST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionForm::COERCE_IMPLICIT_CAST")]
 pub const CoercionForm_COERCE_IMPLICIT_CAST: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CoercionForm::COERCE_SQL_SYNTAX"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionForm::COERCE_SQL_SYNTAX")]
 pub const CoercionForm_COERCE_SQL_SYNTAX: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CoercionPathType::COERCION_PATH_NONE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionPathType::COERCION_PATH_NONE")]
 pub const CoercionPathType_COERCION_PATH_NONE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CoercionPathType::COERCION_PATH_FUNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CoercionPathType::COERCION_PATH_FUNC")]
 pub const CoercionPathType_COERCION_PATH_FUNC: u32 = 1;
 #[deprecated(
     since = "0.12.0",
@@ -54938,40 +52935,22 @@ pub const CoercionPathType_COERCION_PATH_ARRAYCOERCE: u32 = 3;
     note = "you want pg_sys::CoercionPathType::COERCION_PATH_COERCEVIAIO"
 )]
 pub const CoercionPathType_COERCION_PATH_COERCEVIAIO: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CollectedCommandType::SCT_Simple"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CollectedCommandType::SCT_Simple")]
 pub const CollectedCommandType_SCT_Simple: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CollectedCommandType::SCT_AlterTable"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CollectedCommandType::SCT_AlterTable")]
 pub const CollectedCommandType_SCT_AlterTable: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CollectedCommandType::SCT_Grant"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CollectedCommandType::SCT_Grant")]
 pub const CollectedCommandType_SCT_Grant: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CollectedCommandType::SCT_AlterOpFamily"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CollectedCommandType::SCT_AlterOpFamily")]
 pub const CollectedCommandType_SCT_AlterOpFamily: u32 = 3;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::CollectedCommandType::SCT_AlterDefaultPrivileges"
 )]
 pub const CollectedCommandType_SCT_AlterDefaultPrivileges: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CollectedCommandType::SCT_CreateOpClass"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CollectedCommandType::SCT_CreateOpClass")]
 pub const CollectedCommandType_SCT_CreateOpClass: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CollectedCommandType::SCT_AlterTSConfig"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CollectedCommandType::SCT_AlterTSConfig")]
 pub const CollectedCommandType_SCT_AlterTSConfig: u32 = 6;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestNone")]
 pub const CommandDest_DestNone: u32 = 0;
@@ -54979,223 +52958,106 @@ pub const CommandDest_DestNone: u32 = 0;
 pub const CommandDest_DestDebug: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestRemote")]
 pub const CommandDest_DestRemote: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandDest::DestRemoteExecute"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestRemoteExecute")]
 pub const CommandDest_DestRemoteExecute: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandDest::DestRemoteSimple"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestRemoteSimple")]
 pub const CommandDest_DestRemoteSimple: u32 = 4;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestSPI")]
 pub const CommandDest_DestSPI: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandDest::DestTuplestore"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestTuplestore")]
 pub const CommandDest_DestTuplestore: u32 = 6;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestIntoRel")]
 pub const CommandDest_DestIntoRel: u32 = 7;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestCopyOut")]
 pub const CommandDest_DestCopyOut: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandDest::DestSQLFunction"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestSQLFunction")]
 pub const CommandDest_DestSQLFunction: u32 = 9;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandDest::DestTransientRel"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestTransientRel")]
 pub const CommandDest_DestTransientRel: u32 = 10;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandDest::DestTupleQueue"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestTupleQueue")]
 pub const CommandDest_DestTupleQueue: u32 = 11;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandDest::DestExplainSerialize"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandDest::DestExplainSerialize")]
 pub const CommandDest_DestExplainSerialize: u32 = 12;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_UNKNOWN")]
 pub const CommandTag_CMDTAG_UNKNOWN: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_ACCESS_METHOD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_ACCESS_METHOD")]
 pub const CommandTag_CMDTAG_ALTER_ACCESS_METHOD: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_AGGREGATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_AGGREGATE")]
 pub const CommandTag_CMDTAG_ALTER_AGGREGATE: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_CAST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_CAST")]
 pub const CommandTag_CMDTAG_ALTER_CAST: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_COLLATION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_COLLATION")]
 pub const CommandTag_CMDTAG_ALTER_COLLATION: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_CONSTRAINT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_CONSTRAINT")]
 pub const CommandTag_CMDTAG_ALTER_CONSTRAINT: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_CONVERSION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_CONVERSION")]
 pub const CommandTag_CMDTAG_ALTER_CONVERSION: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_DATABASE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_DATABASE")]
 pub const CommandTag_CMDTAG_ALTER_DATABASE: u32 = 7;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::CommandTag::CMDTAG_ALTER_DEFAULT_PRIVILEGES"
 )]
 pub const CommandTag_CMDTAG_ALTER_DEFAULT_PRIVILEGES: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_DOMAIN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_DOMAIN")]
 pub const CommandTag_CMDTAG_ALTER_DOMAIN: u32 = 9;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_EVENT_TRIGGER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_EVENT_TRIGGER")]
 pub const CommandTag_CMDTAG_ALTER_EVENT_TRIGGER: u32 = 10;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_EXTENSION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_EXTENSION")]
 pub const CommandTag_CMDTAG_ALTER_EXTENSION: u32 = 11;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::CommandTag::CMDTAG_ALTER_FOREIGN_DATA_WRAPPER"
 )]
 pub const CommandTag_CMDTAG_ALTER_FOREIGN_DATA_WRAPPER: u32 = 12;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_FOREIGN_TABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_FOREIGN_TABLE")]
 pub const CommandTag_CMDTAG_ALTER_FOREIGN_TABLE: u32 = 13;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_FUNCTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_FUNCTION")]
 pub const CommandTag_CMDTAG_ALTER_FUNCTION: u32 = 14;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_INDEX"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_INDEX")]
 pub const CommandTag_CMDTAG_ALTER_INDEX: u32 = 15;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_LANGUAGE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_LANGUAGE")]
 pub const CommandTag_CMDTAG_ALTER_LANGUAGE: u32 = 16;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_LARGE_OBJECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_LARGE_OBJECT")]
 pub const CommandTag_CMDTAG_ALTER_LARGE_OBJECT: u32 = 17;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::CommandTag::CMDTAG_ALTER_MATERIALIZED_VIEW"
 )]
 pub const CommandTag_CMDTAG_ALTER_MATERIALIZED_VIEW: u32 = 18;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_OPERATOR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_OPERATOR")]
 pub const CommandTag_CMDTAG_ALTER_OPERATOR: u32 = 19;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_OPERATOR_CLASS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_OPERATOR_CLASS")]
 pub const CommandTag_CMDTAG_ALTER_OPERATOR_CLASS: u32 = 20;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_OPERATOR_FAMILY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_OPERATOR_FAMILY")]
 pub const CommandTag_CMDTAG_ALTER_OPERATOR_FAMILY: u32 = 21;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_POLICY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_POLICY")]
 pub const CommandTag_CMDTAG_ALTER_POLICY: u32 = 22;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_PROCEDURE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_PROCEDURE")]
 pub const CommandTag_CMDTAG_ALTER_PROCEDURE: u32 = 23;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_PUBLICATION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_PUBLICATION")]
 pub const CommandTag_CMDTAG_ALTER_PUBLICATION: u32 = 24;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_ROLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_ROLE")]
 pub const CommandTag_CMDTAG_ALTER_ROLE: u32 = 25;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_ROUTINE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_ROUTINE")]
 pub const CommandTag_CMDTAG_ALTER_ROUTINE: u32 = 26;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_RULE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_RULE")]
 pub const CommandTag_CMDTAG_ALTER_RULE: u32 = 27;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_SCHEMA"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_SCHEMA")]
 pub const CommandTag_CMDTAG_ALTER_SCHEMA: u32 = 28;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_SEQUENCE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_SEQUENCE")]
 pub const CommandTag_CMDTAG_ALTER_SEQUENCE: u32 = 29;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_SERVER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_SERVER")]
 pub const CommandTag_CMDTAG_ALTER_SERVER: u32 = 30;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_STATISTICS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_STATISTICS")]
 pub const CommandTag_CMDTAG_ALTER_STATISTICS: u32 = 31;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_SUBSCRIPTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_SUBSCRIPTION")]
 pub const CommandTag_CMDTAG_ALTER_SUBSCRIPTION: u32 = 32;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_SYSTEM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_SYSTEM")]
 pub const CommandTag_CMDTAG_ALTER_SYSTEM: u32 = 33;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TABLE")]
 pub const CommandTag_CMDTAG_ALTER_TABLE: u32 = 34;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TABLESPACE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TABLESPACE")]
 pub const CommandTag_CMDTAG_ALTER_TABLESPACE: u32 = 35;
 #[deprecated(
     since = "0.12.0",
@@ -55217,30 +53079,15 @@ pub const CommandTag_CMDTAG_ALTER_TEXT_SEARCH_PARSER: u32 = 38;
     note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TEXT_SEARCH_TEMPLATE"
 )]
 pub const CommandTag_CMDTAG_ALTER_TEXT_SEARCH_TEMPLATE: u32 = 39;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TRANSFORM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TRANSFORM")]
 pub const CommandTag_CMDTAG_ALTER_TRANSFORM: u32 = 40;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TRIGGER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TRIGGER")]
 pub const CommandTag_CMDTAG_ALTER_TRIGGER: u32 = 41;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TYPE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_TYPE")]
 pub const CommandTag_CMDTAG_ALTER_TYPE: u32 = 42;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_USER_MAPPING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_USER_MAPPING")]
 pub const CommandTag_CMDTAG_ALTER_USER_MAPPING: u32 = 43;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ALTER_VIEW"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ALTER_VIEW")]
 pub const CommandTag_CMDTAG_ALTER_VIEW: u32 = 44;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ANALYZE")]
 pub const CommandTag_CMDTAG_ANALYZE: u32 = 45;
@@ -55248,22 +53095,13 @@ pub const CommandTag_CMDTAG_ANALYZE: u32 = 45;
 pub const CommandTag_CMDTAG_BEGIN: u32 = 46;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CALL")]
 pub const CommandTag_CMDTAG_CALL: u32 = 47;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CHECKPOINT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CHECKPOINT")]
 pub const CommandTag_CMDTAG_CHECKPOINT: u32 = 48;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CLOSE")]
 pub const CommandTag_CMDTAG_CLOSE: u32 = 49;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CLOSE_CURSOR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CLOSE_CURSOR")]
 pub const CommandTag_CMDTAG_CLOSE_CURSOR: u32 = 50;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CLOSE_CURSOR_ALL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CLOSE_CURSOR_ALL")]
 pub const CommandTag_CMDTAG_CLOSE_CURSOR_ALL: u32 = 51;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CLUSTER")]
 pub const CommandTag_CMDTAG_CLUSTER: u32 = 52;
@@ -55271,182 +53109,83 @@ pub const CommandTag_CMDTAG_CLUSTER: u32 = 52;
 pub const CommandTag_CMDTAG_COMMENT: u32 = 53;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_COMMIT")]
 pub const CommandTag_CMDTAG_COMMIT: u32 = 54;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_COMMIT_PREPARED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_COMMIT_PREPARED")]
 pub const CommandTag_CMDTAG_COMMIT_PREPARED: u32 = 55;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_COPY")]
 pub const CommandTag_CMDTAG_COPY: u32 = 56;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_COPY_FROM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_COPY_FROM")]
 pub const CommandTag_CMDTAG_COPY_FROM: u32 = 57;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_ACCESS_METHOD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_ACCESS_METHOD")]
 pub const CommandTag_CMDTAG_CREATE_ACCESS_METHOD: u32 = 58;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_AGGREGATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_AGGREGATE")]
 pub const CommandTag_CMDTAG_CREATE_AGGREGATE: u32 = 59;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_CAST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_CAST")]
 pub const CommandTag_CMDTAG_CREATE_CAST: u32 = 60;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_COLLATION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_COLLATION")]
 pub const CommandTag_CMDTAG_CREATE_COLLATION: u32 = 61;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_CONSTRAINT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_CONSTRAINT")]
 pub const CommandTag_CMDTAG_CREATE_CONSTRAINT: u32 = 62;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_CONVERSION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_CONVERSION")]
 pub const CommandTag_CMDTAG_CREATE_CONVERSION: u32 = 63;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_DATABASE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_DATABASE")]
 pub const CommandTag_CMDTAG_CREATE_DATABASE: u32 = 64;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_DOMAIN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_DOMAIN")]
 pub const CommandTag_CMDTAG_CREATE_DOMAIN: u32 = 65;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_EVENT_TRIGGER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_EVENT_TRIGGER")]
 pub const CommandTag_CMDTAG_CREATE_EVENT_TRIGGER: u32 = 66;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_EXTENSION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_EXTENSION")]
 pub const CommandTag_CMDTAG_CREATE_EXTENSION: u32 = 67;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::CommandTag::CMDTAG_CREATE_FOREIGN_DATA_WRAPPER"
 )]
 pub const CommandTag_CMDTAG_CREATE_FOREIGN_DATA_WRAPPER: u32 = 68;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_FOREIGN_TABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_FOREIGN_TABLE")]
 pub const CommandTag_CMDTAG_CREATE_FOREIGN_TABLE: u32 = 69;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_FUNCTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_FUNCTION")]
 pub const CommandTag_CMDTAG_CREATE_FUNCTION: u32 = 70;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_INDEX"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_INDEX")]
 pub const CommandTag_CMDTAG_CREATE_INDEX: u32 = 71;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_LANGUAGE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_LANGUAGE")]
 pub const CommandTag_CMDTAG_CREATE_LANGUAGE: u32 = 72;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::CommandTag::CMDTAG_CREATE_MATERIALIZED_VIEW"
 )]
 pub const CommandTag_CMDTAG_CREATE_MATERIALIZED_VIEW: u32 = 73;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_OPERATOR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_OPERATOR")]
 pub const CommandTag_CMDTAG_CREATE_OPERATOR: u32 = 74;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_OPERATOR_CLASS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_OPERATOR_CLASS")]
 pub const CommandTag_CMDTAG_CREATE_OPERATOR_CLASS: u32 = 75;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_OPERATOR_FAMILY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_OPERATOR_FAMILY")]
 pub const CommandTag_CMDTAG_CREATE_OPERATOR_FAMILY: u32 = 76;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_POLICY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_POLICY")]
 pub const CommandTag_CMDTAG_CREATE_POLICY: u32 = 77;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_PROCEDURE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_PROCEDURE")]
 pub const CommandTag_CMDTAG_CREATE_PROCEDURE: u32 = 78;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_PUBLICATION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_PUBLICATION")]
 pub const CommandTag_CMDTAG_CREATE_PUBLICATION: u32 = 79;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_ROLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_ROLE")]
 pub const CommandTag_CMDTAG_CREATE_ROLE: u32 = 80;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_ROUTINE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_ROUTINE")]
 pub const CommandTag_CMDTAG_CREATE_ROUTINE: u32 = 81;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_RULE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_RULE")]
 pub const CommandTag_CMDTAG_CREATE_RULE: u32 = 82;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_SCHEMA"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_SCHEMA")]
 pub const CommandTag_CMDTAG_CREATE_SCHEMA: u32 = 83;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_SEQUENCE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_SEQUENCE")]
 pub const CommandTag_CMDTAG_CREATE_SEQUENCE: u32 = 84;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_SERVER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_SERVER")]
 pub const CommandTag_CMDTAG_CREATE_SERVER: u32 = 85;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_STATISTICS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_STATISTICS")]
 pub const CommandTag_CMDTAG_CREATE_STATISTICS: u32 = 86;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_SUBSCRIPTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_SUBSCRIPTION")]
 pub const CommandTag_CMDTAG_CREATE_SUBSCRIPTION: u32 = 87;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TABLE")]
 pub const CommandTag_CMDTAG_CREATE_TABLE: u32 = 88;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TABLE_AS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TABLE_AS")]
 pub const CommandTag_CMDTAG_CREATE_TABLE_AS: u32 = 89;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TABLESPACE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TABLESPACE")]
 pub const CommandTag_CMDTAG_CREATE_TABLESPACE: u32 = 90;
 #[deprecated(
     since = "0.12.0",
@@ -55468,236 +53207,104 @@ pub const CommandTag_CMDTAG_CREATE_TEXT_SEARCH_PARSER: u32 = 93;
     note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TEXT_SEARCH_TEMPLATE"
 )]
 pub const CommandTag_CMDTAG_CREATE_TEXT_SEARCH_TEMPLATE: u32 = 94;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TRANSFORM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TRANSFORM")]
 pub const CommandTag_CMDTAG_CREATE_TRANSFORM: u32 = 95;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TRIGGER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TRIGGER")]
 pub const CommandTag_CMDTAG_CREATE_TRIGGER: u32 = 96;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TYPE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_TYPE")]
 pub const CommandTag_CMDTAG_CREATE_TYPE: u32 = 97;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_USER_MAPPING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_USER_MAPPING")]
 pub const CommandTag_CMDTAG_CREATE_USER_MAPPING: u32 = 98;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_CREATE_VIEW"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_CREATE_VIEW")]
 pub const CommandTag_CMDTAG_CREATE_VIEW: u32 = 99;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DEALLOCATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DEALLOCATE")]
 pub const CommandTag_CMDTAG_DEALLOCATE: u32 = 100;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DEALLOCATE_ALL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DEALLOCATE_ALL")]
 pub const CommandTag_CMDTAG_DEALLOCATE_ALL: u32 = 101;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DECLARE_CURSOR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DECLARE_CURSOR")]
 pub const CommandTag_CMDTAG_DECLARE_CURSOR: u32 = 102;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DELETE")]
 pub const CommandTag_CMDTAG_DELETE: u32 = 103;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DISCARD")]
 pub const CommandTag_CMDTAG_DISCARD: u32 = 104;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DISCARD_ALL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DISCARD_ALL")]
 pub const CommandTag_CMDTAG_DISCARD_ALL: u32 = 105;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DISCARD_PLANS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DISCARD_PLANS")]
 pub const CommandTag_CMDTAG_DISCARD_PLANS: u32 = 106;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DISCARD_SEQUENCES"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DISCARD_SEQUENCES")]
 pub const CommandTag_CMDTAG_DISCARD_SEQUENCES: u32 = 107;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DISCARD_TEMP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DISCARD_TEMP")]
 pub const CommandTag_CMDTAG_DISCARD_TEMP: u32 = 108;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DO")]
 pub const CommandTag_CMDTAG_DO: u32 = 109;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_ACCESS_METHOD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_ACCESS_METHOD")]
 pub const CommandTag_CMDTAG_DROP_ACCESS_METHOD: u32 = 110;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_AGGREGATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_AGGREGATE")]
 pub const CommandTag_CMDTAG_DROP_AGGREGATE: u32 = 111;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_CAST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_CAST")]
 pub const CommandTag_CMDTAG_DROP_CAST: u32 = 112;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_COLLATION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_COLLATION")]
 pub const CommandTag_CMDTAG_DROP_COLLATION: u32 = 113;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_CONSTRAINT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_CONSTRAINT")]
 pub const CommandTag_CMDTAG_DROP_CONSTRAINT: u32 = 114;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_CONVERSION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_CONVERSION")]
 pub const CommandTag_CMDTAG_DROP_CONVERSION: u32 = 115;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_DATABASE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_DATABASE")]
 pub const CommandTag_CMDTAG_DROP_DATABASE: u32 = 116;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_DOMAIN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_DOMAIN")]
 pub const CommandTag_CMDTAG_DROP_DOMAIN: u32 = 117;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_EVENT_TRIGGER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_EVENT_TRIGGER")]
 pub const CommandTag_CMDTAG_DROP_EVENT_TRIGGER: u32 = 118;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_EXTENSION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_EXTENSION")]
 pub const CommandTag_CMDTAG_DROP_EXTENSION: u32 = 119;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::CommandTag::CMDTAG_DROP_FOREIGN_DATA_WRAPPER"
 )]
 pub const CommandTag_CMDTAG_DROP_FOREIGN_DATA_WRAPPER: u32 = 120;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_FOREIGN_TABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_FOREIGN_TABLE")]
 pub const CommandTag_CMDTAG_DROP_FOREIGN_TABLE: u32 = 121;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_FUNCTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_FUNCTION")]
 pub const CommandTag_CMDTAG_DROP_FUNCTION: u32 = 122;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_INDEX"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_INDEX")]
 pub const CommandTag_CMDTAG_DROP_INDEX: u32 = 123;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_LANGUAGE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_LANGUAGE")]
 pub const CommandTag_CMDTAG_DROP_LANGUAGE: u32 = 124;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_MATERIALIZED_VIEW"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_MATERIALIZED_VIEW")]
 pub const CommandTag_CMDTAG_DROP_MATERIALIZED_VIEW: u32 = 125;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_OPERATOR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_OPERATOR")]
 pub const CommandTag_CMDTAG_DROP_OPERATOR: u32 = 126;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_OPERATOR_CLASS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_OPERATOR_CLASS")]
 pub const CommandTag_CMDTAG_DROP_OPERATOR_CLASS: u32 = 127;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_OPERATOR_FAMILY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_OPERATOR_FAMILY")]
 pub const CommandTag_CMDTAG_DROP_OPERATOR_FAMILY: u32 = 128;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_OWNED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_OWNED")]
 pub const CommandTag_CMDTAG_DROP_OWNED: u32 = 129;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_POLICY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_POLICY")]
 pub const CommandTag_CMDTAG_DROP_POLICY: u32 = 130;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_PROCEDURE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_PROCEDURE")]
 pub const CommandTag_CMDTAG_DROP_PROCEDURE: u32 = 131;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_PUBLICATION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_PUBLICATION")]
 pub const CommandTag_CMDTAG_DROP_PUBLICATION: u32 = 132;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_ROLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_ROLE")]
 pub const CommandTag_CMDTAG_DROP_ROLE: u32 = 133;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_ROUTINE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_ROUTINE")]
 pub const CommandTag_CMDTAG_DROP_ROUTINE: u32 = 134;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_RULE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_RULE")]
 pub const CommandTag_CMDTAG_DROP_RULE: u32 = 135;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_SCHEMA"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_SCHEMA")]
 pub const CommandTag_CMDTAG_DROP_SCHEMA: u32 = 136;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_SEQUENCE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_SEQUENCE")]
 pub const CommandTag_CMDTAG_DROP_SEQUENCE: u32 = 137;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_SERVER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_SERVER")]
 pub const CommandTag_CMDTAG_DROP_SERVER: u32 = 138;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_STATISTICS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_STATISTICS")]
 pub const CommandTag_CMDTAG_DROP_STATISTICS: u32 = 139;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_SUBSCRIPTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_SUBSCRIPTION")]
 pub const CommandTag_CMDTAG_DROP_SUBSCRIPTION: u32 = 140;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_TABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_TABLE")]
 pub const CommandTag_CMDTAG_DROP_TABLE: u32 = 141;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_TABLESPACE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_TABLESPACE")]
 pub const CommandTag_CMDTAG_DROP_TABLESPACE: u32 = 142;
 #[deprecated(
     since = "0.12.0",
@@ -55719,30 +53326,15 @@ pub const CommandTag_CMDTAG_DROP_TEXT_SEARCH_PARSER: u32 = 145;
     note = "you want pg_sys::CommandTag::CMDTAG_DROP_TEXT_SEARCH_TEMPLATE"
 )]
 pub const CommandTag_CMDTAG_DROP_TEXT_SEARCH_TEMPLATE: u32 = 146;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_TRANSFORM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_TRANSFORM")]
 pub const CommandTag_CMDTAG_DROP_TRANSFORM: u32 = 147;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_TRIGGER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_TRIGGER")]
 pub const CommandTag_CMDTAG_DROP_TRIGGER: u32 = 148;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_TYPE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_TYPE")]
 pub const CommandTag_CMDTAG_DROP_TYPE: u32 = 149;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_USER_MAPPING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_USER_MAPPING")]
 pub const CommandTag_CMDTAG_DROP_USER_MAPPING: u32 = 150;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_DROP_VIEW"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_DROP_VIEW")]
 pub const CommandTag_CMDTAG_DROP_VIEW: u32 = 151;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_EXECUTE")]
 pub const CommandTag_CMDTAG_EXECUTE: u32 = 152;
@@ -55752,15 +53344,9 @@ pub const CommandTag_CMDTAG_EXPLAIN: u32 = 153;
 pub const CommandTag_CMDTAG_FETCH: u32 = 154;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_GRANT")]
 pub const CommandTag_CMDTAG_GRANT: u32 = 155;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_GRANT_ROLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_GRANT_ROLE")]
 pub const CommandTag_CMDTAG_GRANT_ROLE: u32 = 156;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_IMPORT_FOREIGN_SCHEMA"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_IMPORT_FOREIGN_SCHEMA")]
 pub const CommandTag_CMDTAG_IMPORT_FOREIGN_SCHEMA: u32 = 157;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_INSERT")]
 pub const CommandTag_CMDTAG_INSERT: u32 = 158;
@@ -55768,10 +53354,7 @@ pub const CommandTag_CMDTAG_INSERT: u32 = 158;
 pub const CommandTag_CMDTAG_LISTEN: u32 = 159;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_LOAD")]
 pub const CommandTag_CMDTAG_LOAD: u32 = 160;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_LOCK_TABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_LOCK_TABLE")]
 pub const CommandTag_CMDTAG_LOCK_TABLE: u32 = 161;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_LOGIN")]
 pub const CommandTag_CMDTAG_LOGIN: u32 = 162;
@@ -55783,15 +53366,9 @@ pub const CommandTag_CMDTAG_MOVE: u32 = 164;
 pub const CommandTag_CMDTAG_NOTIFY: u32 = 165;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_PREPARE")]
 pub const CommandTag_CMDTAG_PREPARE: u32 = 166;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_PREPARE_TRANSACTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_PREPARE_TRANSACTION")]
 pub const CommandTag_CMDTAG_PREPARE_TRANSACTION: u32 = 167;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_REASSIGN_OWNED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_REASSIGN_OWNED")]
 pub const CommandTag_CMDTAG_REASSIGN_OWNED: u32 = 168;
 #[deprecated(
     since = "0.12.0",
@@ -55806,90 +53383,48 @@ pub const CommandTag_CMDTAG_RELEASE: u32 = 171;
 pub const CommandTag_CMDTAG_RESET: u32 = 172;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_REVOKE")]
 pub const CommandTag_CMDTAG_REVOKE: u32 = 173;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_REVOKE_ROLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_REVOKE_ROLE")]
 pub const CommandTag_CMDTAG_REVOKE_ROLE: u32 = 174;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ROLLBACK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ROLLBACK")]
 pub const CommandTag_CMDTAG_ROLLBACK: u32 = 175;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_ROLLBACK_PREPARED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_ROLLBACK_PREPARED")]
 pub const CommandTag_CMDTAG_ROLLBACK_PREPARED: u32 = 176;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_SAVEPOINT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SAVEPOINT")]
 pub const CommandTag_CMDTAG_SAVEPOINT: u32 = 177;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_SECURITY_LABEL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SECURITY_LABEL")]
 pub const CommandTag_CMDTAG_SECURITY_LABEL: u32 = 178;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SELECT")]
 pub const CommandTag_CMDTAG_SELECT: u32 = 179;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_SELECT_FOR_KEY_SHARE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SELECT_FOR_KEY_SHARE")]
 pub const CommandTag_CMDTAG_SELECT_FOR_KEY_SHARE: u32 = 180;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::CommandTag::CMDTAG_SELECT_FOR_NO_KEY_UPDATE"
 )]
 pub const CommandTag_CMDTAG_SELECT_FOR_NO_KEY_UPDATE: u32 = 181;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_SELECT_FOR_SHARE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SELECT_FOR_SHARE")]
 pub const CommandTag_CMDTAG_SELECT_FOR_SHARE: u32 = 182;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_SELECT_FOR_UPDATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SELECT_FOR_UPDATE")]
 pub const CommandTag_CMDTAG_SELECT_FOR_UPDATE: u32 = 183;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_SELECT_INTO"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SELECT_INTO")]
 pub const CommandTag_CMDTAG_SELECT_INTO: u32 = 184;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SET")]
 pub const CommandTag_CMDTAG_SET: u32 = 185;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_SET_CONSTRAINTS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SET_CONSTRAINTS")]
 pub const CommandTag_CMDTAG_SET_CONSTRAINTS: u32 = 186;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_SHOW")]
 pub const CommandTag_CMDTAG_SHOW: u32 = 187;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_START_TRANSACTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_START_TRANSACTION")]
 pub const CommandTag_CMDTAG_START_TRANSACTION: u32 = 188;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_TRUNCATE_TABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_TRUNCATE_TABLE")]
 pub const CommandTag_CMDTAG_TRUNCATE_TABLE: u32 = 189;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CommandTag::CMDTAG_UNLISTEN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_UNLISTEN")]
 pub const CommandTag_CMDTAG_UNLISTEN: u32 = 190;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_UPDATE")]
 pub const CommandTag_CMDTAG_UPDATE: u32 = 191;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CommandTag::CMDTAG_VACUUM")]
 pub const CommandTag_CMDTAG_VACUUM: u32 = 192;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CompareType::COMPARE_INVALID"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CompareType::COMPARE_INVALID")]
 pub const CompareType_COMPARE_INVALID: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CompareType::COMPARE_LT")]
 pub const CompareType_COMPARE_LT: u32 = 1;
@@ -55903,65 +53438,32 @@ pub const CompareType_COMPARE_GE: u32 = 4;
 pub const CompareType_COMPARE_GT: u32 = 5;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CompareType::COMPARE_NE")]
 pub const CompareType_COMPARE_NE: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CompareType::COMPARE_OVERLAP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CompareType::COMPARE_OVERLAP")]
 pub const CompareType_COMPARE_OVERLAP: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CompareType::COMPARE_CONTAINED_BY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CompareType::COMPARE_CONTAINED_BY")]
 pub const CompareType_COMPARE_CONTAINED_BY: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ComputeQueryIdType::COMPUTE_QUERY_ID_OFF"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ComputeQueryIdType::COMPUTE_QUERY_ID_OFF")]
 pub const ComputeQueryIdType_COMPUTE_QUERY_ID_OFF: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ComputeQueryIdType::COMPUTE_QUERY_ID_ON"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ComputeQueryIdType::COMPUTE_QUERY_ID_ON")]
 pub const ComputeQueryIdType_COMPUTE_QUERY_ID_ON: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ComputeQueryIdType::COMPUTE_QUERY_ID_AUTO"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ComputeQueryIdType::COMPUTE_QUERY_ID_AUTO")]
 pub const ComputeQueryIdType_COMPUTE_QUERY_ID_AUTO: u32 = 2;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::ComputeQueryIdType::COMPUTE_QUERY_ID_REGRESS"
 )]
 pub const ComputeQueryIdType_COMPUTE_QUERY_ID_REGRESS: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ConflictType::CT_INSERT_EXISTS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConflictType::CT_INSERT_EXISTS")]
 pub const ConflictType_CT_INSERT_EXISTS: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ConflictType::CT_UPDATE_ORIGIN_DIFFERS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConflictType::CT_UPDATE_ORIGIN_DIFFERS")]
 pub const ConflictType_CT_UPDATE_ORIGIN_DIFFERS: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ConflictType::CT_UPDATE_EXISTS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConflictType::CT_UPDATE_EXISTS")]
 pub const ConflictType_CT_UPDATE_EXISTS: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ConflictType::CT_UPDATE_MISSING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConflictType::CT_UPDATE_MISSING")]
 pub const ConflictType_CT_UPDATE_MISSING: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ConflictType::CT_DELETE_ORIGIN_DIFFERS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConflictType::CT_DELETE_ORIGIN_DIFFERS")]
 pub const ConflictType_CT_DELETE_ORIGIN_DIFFERS: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ConflictType::CT_DELETE_MISSING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConflictType::CT_DELETE_MISSING")]
 pub const ConflictType_CT_DELETE_MISSING: u32 = 5;
 #[deprecated(
     since = "0.12.0",
@@ -55974,15 +53476,9 @@ pub const ConstrType_CONSTR_NULL: u32 = 0;
 pub const ConstrType_CONSTR_NOTNULL: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_DEFAULT")]
 pub const ConstrType_CONSTR_DEFAULT: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ConstrType::CONSTR_IDENTITY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_IDENTITY")]
 pub const ConstrType_CONSTR_IDENTITY: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ConstrType::CONSTR_GENERATED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_GENERATED")]
 pub const ConstrType_CONSTR_GENERATED: u32 = 4;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_CHECK")]
 pub const ConstrType_CONSTR_CHECK: u32 = 5;
@@ -55990,42 +53486,21 @@ pub const ConstrType_CONSTR_CHECK: u32 = 5;
 pub const ConstrType_CONSTR_PRIMARY: u32 = 6;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_UNIQUE")]
 pub const ConstrType_CONSTR_UNIQUE: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ConstrType::CONSTR_EXCLUSION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_EXCLUSION")]
 pub const ConstrType_CONSTR_EXCLUSION: u32 = 8;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_FOREIGN")]
 pub const ConstrType_CONSTR_FOREIGN: u32 = 9;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ConstrType::CONSTR_ATTR_DEFERRABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_ATTR_DEFERRABLE")]
 pub const ConstrType_CONSTR_ATTR_DEFERRABLE: u32 = 10;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ConstrType::CONSTR_ATTR_NOT_DEFERRABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_ATTR_NOT_DEFERRABLE")]
 pub const ConstrType_CONSTR_ATTR_NOT_DEFERRABLE: u32 = 11;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ConstrType::CONSTR_ATTR_DEFERRED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_ATTR_DEFERRED")]
 pub const ConstrType_CONSTR_ATTR_DEFERRED: u32 = 12;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ConstrType::CONSTR_ATTR_IMMEDIATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_ATTR_IMMEDIATE")]
 pub const ConstrType_CONSTR_ATTR_IMMEDIATE: u32 = 13;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ConstrType::CONSTR_ATTR_ENFORCED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_ATTR_ENFORCED")]
 pub const ConstrType_CONSTR_ATTR_ENFORCED: u32 = 14;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ConstrType::CONSTR_ATTR_NOT_ENFORCED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ConstrType::CONSTR_ATTR_NOT_ENFORCED")]
 pub const ConstrType_CONSTR_ATTR_NOT_ENFORCED: u32 = 15;
 #[deprecated(
     since = "0.12.0",
@@ -56042,20 +53517,11 @@ pub const ConstraintExclusionType_CONSTRAINT_EXCLUSION_ON: u32 = 1;
     note = "you want pg_sys::ConstraintExclusionType::CONSTRAINT_EXCLUSION_PARTITION"
 )]
 pub const ConstraintExclusionType_CONSTRAINT_EXCLUSION_PARTITION: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CopyHeaderChoice::COPY_HEADER_FALSE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CopyHeaderChoice::COPY_HEADER_FALSE")]
 pub const CopyHeaderChoice_COPY_HEADER_FALSE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CopyHeaderChoice::COPY_HEADER_TRUE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CopyHeaderChoice::COPY_HEADER_TRUE")]
 pub const CopyHeaderChoice_COPY_HEADER_TRUE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CopyHeaderChoice::COPY_HEADER_MATCH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CopyHeaderChoice::COPY_HEADER_MATCH")]
 pub const CopyHeaderChoice_COPY_HEADER_MATCH: u32 = 2;
 #[deprecated(
     since = "0.12.0",
@@ -56072,15 +53538,9 @@ pub const CopyLogVerbosityChoice_COPY_LOG_VERBOSITY_DEFAULT: i32 = 0;
     note = "you want pg_sys::CopyLogVerbosityChoice::COPY_LOG_VERBOSITY_VERBOSE"
 )]
 pub const CopyLogVerbosityChoice_COPY_LOG_VERBOSITY_VERBOSE: i32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CopyOnErrorChoice::COPY_ON_ERROR_STOP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CopyOnErrorChoice::COPY_ON_ERROR_STOP")]
 pub const CopyOnErrorChoice_COPY_ON_ERROR_STOP: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::CopyOnErrorChoice::COPY_ON_ERROR_IGNORE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::CopyOnErrorChoice::COPY_ON_ERROR_IGNORE")]
 pub const CopyOnErrorChoice_COPY_ON_ERROR_IGNORE: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CostSelector::STARTUP_COST")]
 pub const CostSelector_STARTUP_COST: u32 = 0;
@@ -56090,49 +53550,25 @@ pub const CostSelector_TOTAL_COST: u32 = 1;
 pub const DBState_DB_STARTUP: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::DBState::DB_SHUTDOWNED")]
 pub const DBState_DB_SHUTDOWNED: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DBState::DB_SHUTDOWNED_IN_RECOVERY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DBState::DB_SHUTDOWNED_IN_RECOVERY")]
 pub const DBState_DB_SHUTDOWNED_IN_RECOVERY: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::DBState::DB_SHUTDOWNING")]
 pub const DBState_DB_SHUTDOWNING: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DBState::DB_IN_CRASH_RECOVERY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DBState::DB_IN_CRASH_RECOVERY")]
 pub const DBState_DB_IN_CRASH_RECOVERY: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DBState::DB_IN_ARCHIVE_RECOVERY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DBState::DB_IN_ARCHIVE_RECOVERY")]
 pub const DBState_DB_IN_ARCHIVE_RECOVERY: u32 = 5;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::DBState::DB_IN_PRODUCTION")]
 pub const DBState_DB_IN_PRODUCTION: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DeadLockState::DS_NOT_YET_CHECKED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DeadLockState::DS_NOT_YET_CHECKED")]
 pub const DeadLockState_DS_NOT_YET_CHECKED: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DeadLockState::DS_NO_DEADLOCK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DeadLockState::DS_NO_DEADLOCK")]
 pub const DeadLockState_DS_NO_DEADLOCK: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DeadLockState::DS_SOFT_DEADLOCK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DeadLockState::DS_SOFT_DEADLOCK")]
 pub const DeadLockState_DS_SOFT_DEADLOCK: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DeadLockState::DS_HARD_DEADLOCK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DeadLockState::DS_HARD_DEADLOCK")]
 pub const DeadLockState_DS_HARD_DEADLOCK: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DeadLockState::DS_BLOCKED_BY_AUTOVACUUM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DeadLockState::DS_BLOCKED_BY_AUTOVACUUM")]
 pub const DeadLockState_DS_BLOCKED_BY_AUTOVACUUM: u32 = 4;
 #[deprecated(
     since = "0.12.0",
@@ -56144,110 +53580,53 @@ pub const DebugLogicalRepStreamingMode_DEBUG_LOGICAL_REP_STREAMING_BUFFERED: u32
     note = "you want pg_sys::DebugLogicalRepStreamingMode::DEBUG_LOGICAL_REP_STREAMING_IMMEDIATE"
 )]
 pub const DebugLogicalRepStreamingMode_DEBUG_LOGICAL_REP_STREAMING_IMMEDIATE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DebugParallelMode::DEBUG_PARALLEL_OFF"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DebugParallelMode::DEBUG_PARALLEL_OFF")]
 pub const DebugParallelMode_DEBUG_PARALLEL_OFF: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DebugParallelMode::DEBUG_PARALLEL_ON"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DebugParallelMode::DEBUG_PARALLEL_ON")]
 pub const DebugParallelMode_DEBUG_PARALLEL_ON: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DebugParallelMode::DEBUG_PARALLEL_REGRESS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DebugParallelMode::DEBUG_PARALLEL_REGRESS")]
 pub const DebugParallelMode_DEBUG_PARALLEL_REGRESS: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DefElemAction::DEFELEM_UNSPEC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DefElemAction::DEFELEM_UNSPEC")]
 pub const DefElemAction_DEFELEM_UNSPEC: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::DefElemAction::DEFELEM_SET")]
 pub const DefElemAction_DEFELEM_SET: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::DefElemAction::DEFELEM_ADD")]
 pub const DefElemAction_DEFELEM_ADD: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DefElemAction::DEFELEM_DROP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DefElemAction::DEFELEM_DROP")]
 pub const DefElemAction_DEFELEM_DROP: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DependencyType::DEPENDENCY_NORMAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DependencyType::DEPENDENCY_NORMAL")]
 pub const DependencyType_DEPENDENCY_NORMAL: u32 = 110;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DependencyType::DEPENDENCY_AUTO"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DependencyType::DEPENDENCY_AUTO")]
 pub const DependencyType_DEPENDENCY_AUTO: u32 = 97;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DependencyType::DEPENDENCY_INTERNAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DependencyType::DEPENDENCY_INTERNAL")]
 pub const DependencyType_DEPENDENCY_INTERNAL: u32 = 105;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DependencyType::DEPENDENCY_PARTITION_PRI"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DependencyType::DEPENDENCY_PARTITION_PRI")]
 pub const DependencyType_DEPENDENCY_PARTITION_PRI: u32 = 80;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DependencyType::DEPENDENCY_PARTITION_SEC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DependencyType::DEPENDENCY_PARTITION_SEC")]
 pub const DependencyType_DEPENDENCY_PARTITION_SEC: u32 = 83;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DependencyType::DEPENDENCY_EXTENSION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DependencyType::DEPENDENCY_EXTENSION")]
 pub const DependencyType_DEPENDENCY_EXTENSION: u32 = 101;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DependencyType::DEPENDENCY_AUTO_EXTENSION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DependencyType::DEPENDENCY_AUTO_EXTENSION")]
 pub const DependencyType_DEPENDENCY_AUTO_EXTENSION: u32 = 120;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::DiscardMode::DISCARD_ALL")]
 pub const DiscardMode_DISCARD_ALL: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::DiscardMode::DISCARD_PLANS")]
 pub const DiscardMode_DISCARD_PLANS: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DiscardMode::DISCARD_SEQUENCES"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DiscardMode::DISCARD_SEQUENCES")]
 pub const DiscardMode_DISCARD_SEQUENCES: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::DiscardMode::DISCARD_TEMP")]
 pub const DiscardMode_DISCARD_TEMP: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DispatchOption::DISPATCH_CHECK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DispatchOption::DISPATCH_CHECK")]
 pub const DispatchOption_DISPATCH_CHECK: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DispatchOption::DISPATCH_BOOT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DispatchOption::DISPATCH_BOOT")]
 pub const DispatchOption_DISPATCH_BOOT: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DispatchOption::DISPATCH_FORKCHILD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DispatchOption::DISPATCH_FORKCHILD")]
 pub const DispatchOption_DISPATCH_FORKCHILD: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DispatchOption::DISPATCH_DESCRIBE_CONFIG"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DispatchOption::DISPATCH_DESCRIBE_CONFIG")]
 pub const DispatchOption_DISPATCH_DESCRIBE_CONFIG: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DispatchOption::DISPATCH_SINGLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DispatchOption::DISPATCH_SINGLE")]
 pub const DispatchOption_DISPATCH_SINGLE: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DispatchOption::DISPATCH_POSTMASTER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DispatchOption::DISPATCH_POSTMASTER")]
 pub const DispatchOption_DISPATCH_POSTMASTER: u32 = 5;
 #[deprecated(
     since = "0.12.0",
@@ -56259,10 +53638,7 @@ pub const DomainConstraintType_DOM_CONSTRAINT_NOTNULL: u32 = 0;
     note = "you want pg_sys::DomainConstraintType::DOM_CONSTRAINT_CHECK"
 )]
 pub const DomainConstraintType_DOM_CONSTRAINT_CHECK: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::DropBehavior::DROP_RESTRICT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::DropBehavior::DROP_RESTRICT")]
 pub const DropBehavior_DROP_RESTRICT: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::DropBehavior::DROP_CASCADE")]
 pub const DropBehavior_DROP_CASCADE: u32 = 1;
@@ -56271,25 +53647,13 @@ pub const DropBehavior_DROP_CASCADE: u32 = 1;
     note = "you want pg_sys::EphemeralNameRelationType::ENR_NAMED_TUPLESTORE"
 )]
 pub const EphemeralNameRelationType_ENR_NAMED_TUPLESTORE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExplainFormat::EXPLAIN_FORMAT_TEXT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExplainFormat::EXPLAIN_FORMAT_TEXT")]
 pub const ExplainFormat_EXPLAIN_FORMAT_TEXT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExplainFormat::EXPLAIN_FORMAT_XML"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExplainFormat::EXPLAIN_FORMAT_XML")]
 pub const ExplainFormat_EXPLAIN_FORMAT_XML: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExplainFormat::EXPLAIN_FORMAT_JSON"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExplainFormat::EXPLAIN_FORMAT_JSON")]
 pub const ExplainFormat_EXPLAIN_FORMAT_JSON: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExplainFormat::EXPLAIN_FORMAT_YAML"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExplainFormat::EXPLAIN_FORMAT_YAML")]
 pub const ExplainFormat_EXPLAIN_FORMAT_YAML: u32 = 3;
 #[deprecated(
     since = "0.12.0",
@@ -56306,55 +53670,25 @@ pub const ExplainSerializeOption_EXPLAIN_SERIALIZE_TEXT: u32 = 1;
     note = "you want pg_sys::ExplainSerializeOption::EXPLAIN_SERIALIZE_BINARY"
 )]
 pub const ExplainSerializeOption_EXPLAIN_SERIALIZE_BINARY: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprDoneCond::ExprSingleResult"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprDoneCond::ExprSingleResult")]
 pub const ExprDoneCond_ExprSingleResult: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprDoneCond::ExprMultipleResult"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprDoneCond::ExprMultipleResult")]
 pub const ExprDoneCond_ExprMultipleResult: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprDoneCond::ExprEndResult"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprDoneCond::ExprEndResult")]
 pub const ExprDoneCond_ExprEndResult: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_DONE_RETURN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_DONE_RETURN")]
 pub const ExprEvalOp_EEOP_DONE_RETURN: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_DONE_NO_RETURN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_DONE_NO_RETURN")]
 pub const ExprEvalOp_EEOP_DONE_NO_RETURN: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_INNER_FETCHSOME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_INNER_FETCHSOME")]
 pub const ExprEvalOp_EEOP_INNER_FETCHSOME: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_OUTER_FETCHSOME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_OUTER_FETCHSOME")]
 pub const ExprEvalOp_EEOP_OUTER_FETCHSOME: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_SCAN_FETCHSOME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SCAN_FETCHSOME")]
 pub const ExprEvalOp_EEOP_SCAN_FETCHSOME: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_OLD_FETCHSOME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_OLD_FETCHSOME")]
 pub const ExprEvalOp_EEOP_OLD_FETCHSOME: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_NEW_FETCHSOME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NEW_FETCHSOME")]
 pub const ExprEvalOp_EEOP_NEW_FETCHSOME: u32 = 6;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_INNER_VAR")]
 pub const ExprEvalOp_EEOP_INNER_VAR: u32 = 7;
@@ -56366,427 +53700,193 @@ pub const ExprEvalOp_EEOP_SCAN_VAR: u32 = 9;
 pub const ExprEvalOp_EEOP_OLD_VAR: u32 = 10;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NEW_VAR")]
 pub const ExprEvalOp_EEOP_NEW_VAR: u32 = 11;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_INNER_SYSVAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_INNER_SYSVAR")]
 pub const ExprEvalOp_EEOP_INNER_SYSVAR: u32 = 12;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_OUTER_SYSVAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_OUTER_SYSVAR")]
 pub const ExprEvalOp_EEOP_OUTER_SYSVAR: u32 = 13;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_SCAN_SYSVAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SCAN_SYSVAR")]
 pub const ExprEvalOp_EEOP_SCAN_SYSVAR: u32 = 14;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_OLD_SYSVAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_OLD_SYSVAR")]
 pub const ExprEvalOp_EEOP_OLD_SYSVAR: u32 = 15;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_NEW_SYSVAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NEW_SYSVAR")]
 pub const ExprEvalOp_EEOP_NEW_SYSVAR: u32 = 16;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_WHOLEROW")]
 pub const ExprEvalOp_EEOP_WHOLEROW: u32 = 17;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_INNER_VAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_INNER_VAR")]
 pub const ExprEvalOp_EEOP_ASSIGN_INNER_VAR: u32 = 18;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_OUTER_VAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_OUTER_VAR")]
 pub const ExprEvalOp_EEOP_ASSIGN_OUTER_VAR: u32 = 19;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_SCAN_VAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_SCAN_VAR")]
 pub const ExprEvalOp_EEOP_ASSIGN_SCAN_VAR: u32 = 20;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_OLD_VAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_OLD_VAR")]
 pub const ExprEvalOp_EEOP_ASSIGN_OLD_VAR: u32 = 21;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_NEW_VAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_NEW_VAR")]
 pub const ExprEvalOp_EEOP_ASSIGN_NEW_VAR: u32 = 22;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_TMP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_TMP")]
 pub const ExprEvalOp_EEOP_ASSIGN_TMP: u32 = 23;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_TMP_MAKE_RO"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ASSIGN_TMP_MAKE_RO")]
 pub const ExprEvalOp_EEOP_ASSIGN_TMP_MAKE_RO: u32 = 24;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_CONST")]
 pub const ExprEvalOp_EEOP_CONST: u32 = 25;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_FUNCEXPR")]
 pub const ExprEvalOp_EEOP_FUNCEXPR: u32 = 26;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_FUNCEXPR_STRICT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_FUNCEXPR_STRICT")]
 pub const ExprEvalOp_EEOP_FUNCEXPR_STRICT: u32 = 27;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_FUNCEXPR_STRICT_1"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_FUNCEXPR_STRICT_1")]
 pub const ExprEvalOp_EEOP_FUNCEXPR_STRICT_1: u32 = 28;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_FUNCEXPR_STRICT_2"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_FUNCEXPR_STRICT_2")]
 pub const ExprEvalOp_EEOP_FUNCEXPR_STRICT_2: u32 = 29;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_FUNCEXPR_FUSAGE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_FUNCEXPR_FUSAGE")]
 pub const ExprEvalOp_EEOP_FUNCEXPR_FUSAGE: u32 = 30;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_FUNCEXPR_STRICT_FUSAGE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_FUNCEXPR_STRICT_FUSAGE")]
 pub const ExprEvalOp_EEOP_FUNCEXPR_STRICT_FUSAGE: u32 = 31;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_AND_STEP_FIRST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_AND_STEP_FIRST")]
 pub const ExprEvalOp_EEOP_BOOL_AND_STEP_FIRST: u32 = 32;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_AND_STEP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_AND_STEP")]
 pub const ExprEvalOp_EEOP_BOOL_AND_STEP: u32 = 33;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_AND_STEP_LAST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_AND_STEP_LAST")]
 pub const ExprEvalOp_EEOP_BOOL_AND_STEP_LAST: u32 = 34;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_OR_STEP_FIRST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_OR_STEP_FIRST")]
 pub const ExprEvalOp_EEOP_BOOL_OR_STEP_FIRST: u32 = 35;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_OR_STEP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_OR_STEP")]
 pub const ExprEvalOp_EEOP_BOOL_OR_STEP: u32 = 36;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_OR_STEP_LAST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_OR_STEP_LAST")]
 pub const ExprEvalOp_EEOP_BOOL_OR_STEP_LAST: u32 = 37;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_NOT_STEP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOL_NOT_STEP")]
 pub const ExprEvalOp_EEOP_BOOL_NOT_STEP: u32 = 38;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_QUAL")]
 pub const ExprEvalOp_EEOP_QUAL: u32 = 39;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_JUMP")]
 pub const ExprEvalOp_EEOP_JUMP: u32 = 40;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_JUMP_IF_NULL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_JUMP_IF_NULL")]
 pub const ExprEvalOp_EEOP_JUMP_IF_NULL: u32 = 41;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_JUMP_IF_NOT_NULL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_JUMP_IF_NOT_NULL")]
 pub const ExprEvalOp_EEOP_JUMP_IF_NOT_NULL: u32 = 42;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_JUMP_IF_NOT_TRUE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_JUMP_IF_NOT_TRUE")]
 pub const ExprEvalOp_EEOP_JUMP_IF_NOT_TRUE: u32 = 43;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_NULLTEST_ISNULL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NULLTEST_ISNULL")]
 pub const ExprEvalOp_EEOP_NULLTEST_ISNULL: u32 = 44;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_NULLTEST_ISNOTNULL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NULLTEST_ISNOTNULL")]
 pub const ExprEvalOp_EEOP_NULLTEST_ISNOTNULL: u32 = 45;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_NULLTEST_ROWISNULL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NULLTEST_ROWISNULL")]
 pub const ExprEvalOp_EEOP_NULLTEST_ROWISNULL: u32 = 46;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_NULLTEST_ROWISNOTNULL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NULLTEST_ROWISNOTNULL")]
 pub const ExprEvalOp_EEOP_NULLTEST_ROWISNOTNULL: u32 = 47;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_BOOLTEST_IS_TRUE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOLTEST_IS_TRUE")]
 pub const ExprEvalOp_EEOP_BOOLTEST_IS_TRUE: u32 = 48;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_BOOLTEST_IS_NOT_TRUE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOLTEST_IS_NOT_TRUE")]
 pub const ExprEvalOp_EEOP_BOOLTEST_IS_NOT_TRUE: u32 = 49;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_BOOLTEST_IS_FALSE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOLTEST_IS_FALSE")]
 pub const ExprEvalOp_EEOP_BOOLTEST_IS_FALSE: u32 = 50;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_BOOLTEST_IS_NOT_FALSE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_BOOLTEST_IS_NOT_FALSE")]
 pub const ExprEvalOp_EEOP_BOOLTEST_IS_NOT_FALSE: u32 = 51;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_PARAM_EXEC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_PARAM_EXEC")]
 pub const ExprEvalOp_EEOP_PARAM_EXEC: u32 = 52;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_PARAM_EXTERN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_PARAM_EXTERN")]
 pub const ExprEvalOp_EEOP_PARAM_EXTERN: u32 = 53;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_PARAM_CALLBACK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_PARAM_CALLBACK")]
 pub const ExprEvalOp_EEOP_PARAM_CALLBACK: u32 = 54;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_PARAM_SET")]
 pub const ExprEvalOp_EEOP_PARAM_SET: u32 = 55;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_CASE_TESTVAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_CASE_TESTVAL")]
 pub const ExprEvalOp_EEOP_CASE_TESTVAL: u32 = 56;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_CASE_TESTVAL_EXT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_CASE_TESTVAL_EXT")]
 pub const ExprEvalOp_EEOP_CASE_TESTVAL_EXT: u32 = 57;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_MAKE_READONLY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_MAKE_READONLY")]
 pub const ExprEvalOp_EEOP_MAKE_READONLY: u32 = 58;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_IOCOERCE")]
 pub const ExprEvalOp_EEOP_IOCOERCE: u32 = 59;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_IOCOERCE_SAFE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_IOCOERCE_SAFE")]
 pub const ExprEvalOp_EEOP_IOCOERCE_SAFE: u32 = 60;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_DISTINCT")]
 pub const ExprEvalOp_EEOP_DISTINCT: u32 = 61;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_NOT_DISTINCT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NOT_DISTINCT")]
 pub const ExprEvalOp_EEOP_NOT_DISTINCT: u32 = 62;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NULLIF")]
 pub const ExprEvalOp_EEOP_NULLIF: u32 = 63;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_SQLVALUEFUNCTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SQLVALUEFUNCTION")]
 pub const ExprEvalOp_EEOP_SQLVALUEFUNCTION: u32 = 64;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_CURRENTOFEXPR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_CURRENTOFEXPR")]
 pub const ExprEvalOp_EEOP_CURRENTOFEXPR: u32 = 65;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_NEXTVALUEEXPR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_NEXTVALUEEXPR")]
 pub const ExprEvalOp_EEOP_NEXTVALUEEXPR: u32 = 66;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_RETURNINGEXPR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_RETURNINGEXPR")]
 pub const ExprEvalOp_EEOP_RETURNINGEXPR: u32 = 67;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ARRAYEXPR")]
 pub const ExprEvalOp_EEOP_ARRAYEXPR: u32 = 68;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_ARRAYCOERCE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ARRAYCOERCE")]
 pub const ExprEvalOp_EEOP_ARRAYCOERCE: u32 = 69;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ROW")]
 pub const ExprEvalOp_EEOP_ROW: u32 = 70;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_ROWCOMPARE_STEP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ROWCOMPARE_STEP")]
 pub const ExprEvalOp_EEOP_ROWCOMPARE_STEP: u32 = 71;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_ROWCOMPARE_FINAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_ROWCOMPARE_FINAL")]
 pub const ExprEvalOp_EEOP_ROWCOMPARE_FINAL: u32 = 72;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_MINMAX")]
 pub const ExprEvalOp_EEOP_MINMAX: u32 = 73;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_FIELDSELECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_FIELDSELECT")]
 pub const ExprEvalOp_EEOP_FIELDSELECT: u32 = 74;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_FIELDSTORE_DEFORM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_FIELDSTORE_DEFORM")]
 pub const ExprEvalOp_EEOP_FIELDSTORE_DEFORM: u32 = 75;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_FIELDSTORE_FORM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_FIELDSTORE_FORM")]
 pub const ExprEvalOp_EEOP_FIELDSTORE_FORM: u32 = 76;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_SBSREF_SUBSCRIPTS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SBSREF_SUBSCRIPTS")]
 pub const ExprEvalOp_EEOP_SBSREF_SUBSCRIPTS: u32 = 77;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_SBSREF_OLD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SBSREF_OLD")]
 pub const ExprEvalOp_EEOP_SBSREF_OLD: u32 = 78;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_SBSREF_ASSIGN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SBSREF_ASSIGN")]
 pub const ExprEvalOp_EEOP_SBSREF_ASSIGN: u32 = 79;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_SBSREF_FETCH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SBSREF_FETCH")]
 pub const ExprEvalOp_EEOP_SBSREF_FETCH: u32 = 80;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_DOMAIN_TESTVAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_DOMAIN_TESTVAL")]
 pub const ExprEvalOp_EEOP_DOMAIN_TESTVAL: u32 = 81;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_DOMAIN_TESTVAL_EXT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_DOMAIN_TESTVAL_EXT")]
 pub const ExprEvalOp_EEOP_DOMAIN_TESTVAL_EXT: u32 = 82;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_DOMAIN_NOTNULL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_DOMAIN_NOTNULL")]
 pub const ExprEvalOp_EEOP_DOMAIN_NOTNULL: u32 = 83;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_DOMAIN_CHECK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_DOMAIN_CHECK")]
 pub const ExprEvalOp_EEOP_DOMAIN_CHECK: u32 = 84;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_HASHDATUM_SET_INITVAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_HASHDATUM_SET_INITVAL")]
 pub const ExprEvalOp_EEOP_HASHDATUM_SET_INITVAL: u32 = 85;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_HASHDATUM_FIRST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_HASHDATUM_FIRST")]
 pub const ExprEvalOp_EEOP_HASHDATUM_FIRST: u32 = 86;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_HASHDATUM_FIRST_STRICT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_HASHDATUM_FIRST_STRICT")]
 pub const ExprEvalOp_EEOP_HASHDATUM_FIRST_STRICT: u32 = 87;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_HASHDATUM_NEXT32"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_HASHDATUM_NEXT32")]
 pub const ExprEvalOp_EEOP_HASHDATUM_NEXT32: u32 = 88;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_HASHDATUM_NEXT32_STRICT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_HASHDATUM_NEXT32_STRICT")]
 pub const ExprEvalOp_EEOP_HASHDATUM_NEXT32_STRICT: u32 = 89;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_CONVERT_ROWTYPE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_CONVERT_ROWTYPE")]
 pub const ExprEvalOp_EEOP_CONVERT_ROWTYPE: u32 = 90;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_SCALARARRAYOP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SCALARARRAYOP")]
 pub const ExprEvalOp_EEOP_SCALARARRAYOP: u32 = 91;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_HASHED_SCALARARRAYOP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_HASHED_SCALARARRAYOP")]
 pub const ExprEvalOp_EEOP_HASHED_SCALARARRAYOP: u32 = 92;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_XMLEXPR")]
 pub const ExprEvalOp_EEOP_XMLEXPR: u32 = 93;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_JSON_CONSTRUCTOR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_JSON_CONSTRUCTOR")]
 pub const ExprEvalOp_EEOP_JSON_CONSTRUCTOR: u32 = 94;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_IS_JSON")]
 pub const ExprEvalOp_EEOP_IS_JSON: u32 = 95;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_JSONEXPR_PATH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_JSONEXPR_PATH")]
 pub const ExprEvalOp_EEOP_JSONEXPR_PATH: u32 = 96;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_JSONEXPR_COERCION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_JSONEXPR_COERCION")]
 pub const ExprEvalOp_EEOP_JSONEXPR_COERCION: u32 = 97;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_JSONEXPR_COERCION_FINISH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_JSONEXPR_COERCION_FINISH")]
 pub const ExprEvalOp_EEOP_JSONEXPR_COERCION_FINISH: u32 = 98;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_AGGREF")]
 pub const ExprEvalOp_EEOP_AGGREF: u32 = 99;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_GROUPING_FUNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_GROUPING_FUNC")]
 pub const ExprEvalOp_EEOP_GROUPING_FUNC: u32 = 100;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_WINDOW_FUNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_WINDOW_FUNC")]
 pub const ExprEvalOp_EEOP_WINDOW_FUNC: u32 = 101;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_MERGE_SUPPORT_FUNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_MERGE_SUPPORT_FUNC")]
 pub const ExprEvalOp_EEOP_MERGE_SUPPORT_FUNC: u32 = 102;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_SUBPLAN")]
 pub const ExprEvalOp_EEOP_SUBPLAN: u32 = 103;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_AGG_STRICT_DESERIALIZE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_AGG_STRICT_DESERIALIZE")]
 pub const ExprEvalOp_EEOP_AGG_STRICT_DESERIALIZE: u32 = 104;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_AGG_DESERIALIZE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_AGG_DESERIALIZE")]
 pub const ExprEvalOp_EEOP_AGG_DESERIALIZE: u32 = 105;
 #[deprecated(
     since = "0.12.0",
@@ -56818,10 +53918,7 @@ pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_INIT_STRICT_BYVAL: u32 = 110;
     note = "you want pg_sys::ExprEvalOp::EEOP_AGG_PLAIN_TRANS_STRICT_BYVAL"
 )]
 pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_STRICT_BYVAL: u32 = 111;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_AGG_PLAIN_TRANS_BYVAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_AGG_PLAIN_TRANS_BYVAL")]
 pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_BYVAL: u32 = 112;
 #[deprecated(
     since = "0.12.0",
@@ -56833,10 +53930,7 @@ pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_INIT_STRICT_BYREF: u32 = 113;
     note = "you want pg_sys::ExprEvalOp::EEOP_AGG_PLAIN_TRANS_STRICT_BYREF"
 )]
 pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_STRICT_BYREF: u32 = 114;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_AGG_PLAIN_TRANS_BYREF"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_AGG_PLAIN_TRANS_BYREF")]
 pub const ExprEvalOp_EEOP_AGG_PLAIN_TRANS_BYREF: u32 = 115;
 #[deprecated(
     since = "0.12.0",
@@ -56848,15 +53942,9 @@ pub const ExprEvalOp_EEOP_AGG_PRESORTED_DISTINCT_SINGLE: u32 = 116;
     note = "you want pg_sys::ExprEvalOp::EEOP_AGG_PRESORTED_DISTINCT_MULTI"
 )]
 pub const ExprEvalOp_EEOP_AGG_PRESORTED_DISTINCT_MULTI: u32 = 117;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_AGG_ORDERED_TRANS_DATUM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_AGG_ORDERED_TRANS_DATUM")]
 pub const ExprEvalOp_EEOP_AGG_ORDERED_TRANS_DATUM: u32 = 118;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExprEvalOp::EEOP_AGG_ORDERED_TRANS_TUPLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_AGG_ORDERED_TRANS_TUPLE")]
 pub const ExprEvalOp_EEOP_AGG_ORDERED_TRANS_TUPLE: u32 = 119;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ExprEvalOp::EEOP_LAST")]
 pub const ExprEvalOp_EEOP_LAST: u32 = 120;
@@ -56875,183 +53963,84 @@ pub const ExtendBufferedFlags_EB_PERFORMING_RECOVERY: u32 = 2;
     note = "you want pg_sys::ExtendBufferedFlags::EB_CREATE_FORK_IF_NEEDED"
 )]
 pub const ExtendBufferedFlags_EB_CREATE_FORK_IF_NEEDED: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExtendBufferedFlags::EB_LOCK_FIRST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExtendBufferedFlags::EB_LOCK_FIRST")]
 pub const ExtendBufferedFlags_EB_LOCK_FIRST: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExtendBufferedFlags::EB_CLEAR_SIZE_CACHE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExtendBufferedFlags::EB_CLEAR_SIZE_CACHE")]
 pub const ExtendBufferedFlags_EB_CLEAR_SIZE_CACHE: u32 = 16;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ExtendBufferedFlags::EB_LOCK_TARGET"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ExtendBufferedFlags::EB_LOCK_TARGET")]
 pub const ExtendBufferedFlags_EB_LOCK_TARGET: u32 = 32;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FetchDirection::FETCH_FORWARD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FetchDirection::FETCH_FORWARD")]
 pub const FetchDirection_FETCH_FORWARD: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FetchDirection::FETCH_BACKWARD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FetchDirection::FETCH_BACKWARD")]
 pub const FetchDirection_FETCH_BACKWARD: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FetchDirection::FETCH_ABSOLUTE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FetchDirection::FETCH_ABSOLUTE")]
 pub const FetchDirection_FETCH_ABSOLUTE: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FetchDirection::FETCH_RELATIVE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FetchDirection::FETCH_RELATIVE")]
 pub const FetchDirection_FETCH_RELATIVE: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FmgrHookEventType::FHET_START"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FmgrHookEventType::FHET_START")]
 pub const FmgrHookEventType_FHET_START: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FmgrHookEventType::FHET_END"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FmgrHookEventType::FHET_END")]
 pub const FmgrHookEventType_FHET_END: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FmgrHookEventType::FHET_ABORT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FmgrHookEventType::FHET_ABORT")]
 pub const FmgrHookEventType_FHET_ABORT: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ForkNumber::InvalidForkNumber"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ForkNumber::InvalidForkNumber")]
 pub const ForkNumber_InvalidForkNumber: i32 = -1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ForkNumber::MAIN_FORKNUM")]
 pub const ForkNumber_MAIN_FORKNUM: i32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ForkNumber::FSM_FORKNUM")]
 pub const ForkNumber_FSM_FORKNUM: i32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ForkNumber::VISIBILITYMAP_FORKNUM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ForkNumber::VISIBILITYMAP_FORKNUM")]
 pub const ForkNumber_VISIBILITYMAP_FORKNUM: i32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ForkNumber::INIT_FORKNUM")]
 pub const ForkNumber_INIT_FORKNUM: i32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_NOTFOUND"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_NOTFOUND")]
 pub const FuncDetailCode_FUNCDETAIL_NOTFOUND: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_MULTIPLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_MULTIPLE")]
 pub const FuncDetailCode_FUNCDETAIL_MULTIPLE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_NORMAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_NORMAL")]
 pub const FuncDetailCode_FUNCDETAIL_NORMAL: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_PROCEDURE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_PROCEDURE")]
 pub const FuncDetailCode_FUNCDETAIL_PROCEDURE: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_AGGREGATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_AGGREGATE")]
 pub const FuncDetailCode_FUNCDETAIL_AGGREGATE: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_WINDOWFUNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_WINDOWFUNC")]
 pub const FuncDetailCode_FUNCDETAIL_WINDOWFUNC: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_COERCION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FuncDetailCode::FUNCDETAIL_COERCION")]
 pub const FuncDetailCode_FUNCDETAIL_COERCION: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_IN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_IN")]
 pub const FunctionParameterMode_FUNC_PARAM_IN: u32 = 105;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_OUT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_OUT")]
 pub const FunctionParameterMode_FUNC_PARAM_OUT: u32 = 111;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_INOUT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_INOUT")]
 pub const FunctionParameterMode_FUNC_PARAM_INOUT: u32 = 98;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_VARIADIC"
 )]
 pub const FunctionParameterMode_FUNC_PARAM_VARIADIC: u32 = 118;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_TABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_TABLE")]
 pub const FunctionParameterMode_FUNC_PARAM_TABLE: u32 = 116;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_DEFAULT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::FunctionParameterMode::FUNC_PARAM_DEFAULT")]
 pub const FunctionParameterMode_FUNC_PARAM_DEFAULT: u32 = 100;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::GrantTargetType::ACL_TARGET_OBJECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GrantTargetType::ACL_TARGET_OBJECT")]
 pub const GrantTargetType_ACL_TARGET_OBJECT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::GrantTargetType::ACL_TARGET_ALL_IN_SCHEMA"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GrantTargetType::ACL_TARGET_ALL_IN_SCHEMA")]
 pub const GrantTargetType_ACL_TARGET_ALL_IN_SCHEMA: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::GrantTargetType::ACL_TARGET_DEFAULTS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GrantTargetType::ACL_TARGET_DEFAULTS")]
 pub const GrantTargetType_ACL_TARGET_DEFAULTS: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::GroupingSetKind::GROUPING_SET_EMPTY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GroupingSetKind::GROUPING_SET_EMPTY")]
 pub const GroupingSetKind_GROUPING_SET_EMPTY: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::GroupingSetKind::GROUPING_SET_SIMPLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GroupingSetKind::GROUPING_SET_SIMPLE")]
 pub const GroupingSetKind_GROUPING_SET_SIMPLE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::GroupingSetKind::GROUPING_SET_ROLLUP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GroupingSetKind::GROUPING_SET_ROLLUP")]
 pub const GroupingSetKind_GROUPING_SET_ROLLUP: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::GroupingSetKind::GROUPING_SET_CUBE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GroupingSetKind::GROUPING_SET_CUBE")]
 pub const GroupingSetKind_GROUPING_SET_CUBE: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::GroupingSetKind::GROUPING_SET_SETS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GroupingSetKind::GROUPING_SET_SETS")]
 pub const GroupingSetKind_GROUPING_SET_SETS: u32 = 4;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::GucAction::GUC_ACTION_SET")]
 pub const GucAction_GUC_ACTION_SET: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::GucAction::GUC_ACTION_LOCAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucAction::GUC_ACTION_LOCAL")]
 pub const GucAction_GUC_ACTION_LOCAL: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::GucAction::GUC_ACTION_SAVE")]
 pub const GucAction_GUC_ACTION_SAVE: u32 = 2;
@@ -57071,10 +54060,7 @@ pub const GucContext_PGC_SUSET: u32 = 5;
 pub const GucContext_PGC_USERSET: u32 = 6;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_DEFAULT")]
 pub const GucSource_PGC_S_DEFAULT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::GucSource::PGC_S_DYNAMIC_DEFAULT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_DYNAMIC_DEFAULT")]
 pub const GucSource_PGC_S_DYNAMIC_DEFAULT: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_ENV_VAR")]
 pub const GucSource_PGC_S_ENV_VAR: u32 = 2;
@@ -57088,19 +54074,13 @@ pub const GucSource_PGC_S_GLOBAL: u32 = 5;
 pub const GucSource_PGC_S_DATABASE: u32 = 6;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_USER")]
 pub const GucSource_PGC_S_USER: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::GucSource::PGC_S_DATABASE_USER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_DATABASE_USER")]
 pub const GucSource_PGC_S_DATABASE_USER: u32 = 8;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_CLIENT")]
 pub const GucSource_PGC_S_CLIENT: u32 = 9;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_OVERRIDE")]
 pub const GucSource_PGC_S_OVERRIDE: u32 = 10;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::GucSource::PGC_S_INTERACTIVE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_INTERACTIVE")]
 pub const GucSource_PGC_S_INTERACTIVE: u32 = 11;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::GucSource::PGC_S_TEST")]
 pub const GucSource_PGC_S_TEST: u32 = 12;
@@ -57112,107 +54092,47 @@ pub const HASHACTION_HASH_FIND: u32 = 0;
 pub const HASHACTION_HASH_ENTER: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::HASHACTION::HASH_REMOVE")]
 pub const HASHACTION_HASH_REMOVE: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::HASHACTION::HASH_ENTER_NULL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HASHACTION::HASH_ENTER_NULL")]
 pub const HASHACTION_HASH_ENTER_NULL: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::HTSV_Result::HEAPTUPLE_DEAD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HTSV_Result::HEAPTUPLE_DEAD")]
 pub const HTSV_Result_HEAPTUPLE_DEAD: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::HTSV_Result::HEAPTUPLE_LIVE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HTSV_Result::HEAPTUPLE_LIVE")]
 pub const HTSV_Result_HEAPTUPLE_LIVE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::HTSV_Result::HEAPTUPLE_RECENTLY_DEAD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HTSV_Result::HEAPTUPLE_RECENTLY_DEAD")]
 pub const HTSV_Result_HEAPTUPLE_RECENTLY_DEAD: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::HTSV_Result::HEAPTUPLE_INSERT_IN_PROGRESS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HTSV_Result::HEAPTUPLE_INSERT_IN_PROGRESS")]
 pub const HTSV_Result_HEAPTUPLE_INSERT_IN_PROGRESS: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::HTSV_Result::HEAPTUPLE_DELETE_IN_PROGRESS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HTSV_Result::HEAPTUPLE_DELETE_IN_PROGRESS")]
 pub const HTSV_Result_HEAPTUPLE_DELETE_IN_PROGRESS: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::HotStandbyState::STANDBY_DISABLED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HotStandbyState::STANDBY_DISABLED")]
 pub const HotStandbyState_STANDBY_DISABLED: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::HotStandbyState::STANDBY_INITIALIZED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HotStandbyState::STANDBY_INITIALIZED")]
 pub const HotStandbyState_STANDBY_INITIALIZED: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::HotStandbyState::STANDBY_SNAPSHOT_PENDING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HotStandbyState::STANDBY_SNAPSHOT_PENDING")]
 pub const HotStandbyState_STANDBY_SNAPSHOT_PENDING: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::HotStandbyState::STANDBY_SNAPSHOT_READY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::HotStandbyState::STANDBY_SNAPSHOT_READY")]
 pub const HotStandbyState_STANDBY_SNAPSHOT_READY: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IOContext::IOCONTEXT_BULKREAD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOContext::IOCONTEXT_BULKREAD")]
 pub const IOContext_IOCONTEXT_BULKREAD: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IOContext::IOCONTEXT_BULKWRITE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOContext::IOCONTEXT_BULKWRITE")]
 pub const IOContext_IOCONTEXT_BULKWRITE: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::IOContext::IOCONTEXT_INIT")]
 pub const IOContext_IOCONTEXT_INIT: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IOContext::IOCONTEXT_NORMAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOContext::IOCONTEXT_NORMAL")]
 pub const IOContext_IOCONTEXT_NORMAL: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IOContext::IOCONTEXT_VACUUM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOContext::IOCONTEXT_VACUUM")]
 pub const IOContext_IOCONTEXT_VACUUM: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IOFuncSelector::IOFunc_input"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOFuncSelector::IOFunc_input")]
 pub const IOFuncSelector_IOFunc_input: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IOFuncSelector::IOFunc_output"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOFuncSelector::IOFunc_output")]
 pub const IOFuncSelector_IOFunc_output: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IOFuncSelector::IOFunc_receive"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOFuncSelector::IOFunc_receive")]
 pub const IOFuncSelector_IOFunc_receive: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IOFuncSelector::IOFunc_send"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOFuncSelector::IOFunc_send")]
 pub const IOFuncSelector_IOFunc_send: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IOObject::IOOBJECT_RELATION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOObject::IOOBJECT_RELATION")]
 pub const IOObject_IOOBJECT_RELATION: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IOObject::IOOBJECT_TEMP_RELATION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IOObject::IOOBJECT_TEMP_RELATION")]
 pub const IOObject_IOOBJECT_TEMP_RELATION: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::IOObject::IOOBJECT_WAL")]
 pub const IOObject_IOOBJECT_WAL: u32 = 2;
@@ -57242,10 +54162,7 @@ pub const IdentifierLookup_IDENTIFIER_LOOKUP_NORMAL: u32 = 0;
     note = "you want pg_sys::IdentifierLookup::IDENTIFIER_LOOKUP_DECLARE"
 )]
 pub const IdentifierLookup_IDENTIFIER_LOOKUP_DECLARE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IdentifierLookup::IDENTIFIER_LOOKUP_EXPR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IdentifierLookup::IDENTIFIER_LOOKUP_EXPR")]
 pub const IdentifierLookup_IDENTIFIER_LOOKUP_EXPR: u32 = 2;
 #[deprecated(
     since = "0.12.0",
@@ -57282,100 +54199,46 @@ pub const IncrementalSortExecutionStatus_INCSORT_READFULLSORT: u32 = 2;
     note = "you want pg_sys::IncrementalSortExecutionStatus::INCSORT_READPREFIXSORT"
 )]
 pub const IncrementalSortExecutionStatus_INCSORT_READPREFIXSORT: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_UNKNOWN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_UNKNOWN")]
 pub const IndexAMProperty_AMPROP_UNKNOWN: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_ASC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_ASC")]
 pub const IndexAMProperty_AMPROP_ASC: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_DESC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_DESC")]
 pub const IndexAMProperty_AMPROP_DESC: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_NULLS_FIRST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_NULLS_FIRST")]
 pub const IndexAMProperty_AMPROP_NULLS_FIRST: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_NULLS_LAST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_NULLS_LAST")]
 pub const IndexAMProperty_AMPROP_NULLS_LAST: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_ORDERABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_ORDERABLE")]
 pub const IndexAMProperty_AMPROP_ORDERABLE: u32 = 5;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::IndexAMProperty::AMPROP_DISTANCE_ORDERABLE"
 )]
 pub const IndexAMProperty_AMPROP_DISTANCE_ORDERABLE: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_RETURNABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_RETURNABLE")]
 pub const IndexAMProperty_AMPROP_RETURNABLE: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_SEARCH_ARRAY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_SEARCH_ARRAY")]
 pub const IndexAMProperty_AMPROP_SEARCH_ARRAY: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_SEARCH_NULLS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_SEARCH_NULLS")]
 pub const IndexAMProperty_AMPROP_SEARCH_NULLS: u32 = 9;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_CLUSTERABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_CLUSTERABLE")]
 pub const IndexAMProperty_AMPROP_CLUSTERABLE: u32 = 10;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_INDEX_SCAN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_INDEX_SCAN")]
 pub const IndexAMProperty_AMPROP_INDEX_SCAN: u32 = 11;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_BITMAP_SCAN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_BITMAP_SCAN")]
 pub const IndexAMProperty_AMPROP_BITMAP_SCAN: u32 = 12;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_BACKWARD_SCAN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_BACKWARD_SCAN")]
 pub const IndexAMProperty_AMPROP_BACKWARD_SCAN: u32 = 13;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_CAN_ORDER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_CAN_ORDER")]
 pub const IndexAMProperty_AMPROP_CAN_ORDER: u32 = 14;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_CAN_UNIQUE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_CAN_UNIQUE")]
 pub const IndexAMProperty_AMPROP_CAN_UNIQUE: u32 = 15;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_CAN_MULTI_COL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_CAN_MULTI_COL")]
 pub const IndexAMProperty_AMPROP_CAN_MULTI_COL: u32 = 16;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_CAN_EXCLUDE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_CAN_EXCLUDE")]
 pub const IndexAMProperty_AMPROP_CAN_EXCLUDE: u32 = 17;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexAMProperty::AMPROP_CAN_INCLUDE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexAMProperty::AMPROP_CAN_INCLUDE")]
 pub const IndexAMProperty_AMPROP_CAN_INCLUDE: u32 = 18;
 #[deprecated(
     since = "0.12.0",
@@ -57422,50 +54285,23 @@ pub const IndexStateFlagsAction_INDEX_DROP_CLEAR_VALID: u32 = 2;
     note = "you want pg_sys::IndexStateFlagsAction::INDEX_DROP_SET_DEAD"
 )]
 pub const IndexStateFlagsAction_INDEX_DROP_SET_DEAD: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexUniqueCheck::UNIQUE_CHECK_NO"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexUniqueCheck::UNIQUE_CHECK_NO")]
 pub const IndexUniqueCheck_UNIQUE_CHECK_NO: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexUniqueCheck::UNIQUE_CHECK_YES"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexUniqueCheck::UNIQUE_CHECK_YES")]
 pub const IndexUniqueCheck_UNIQUE_CHECK_YES: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexUniqueCheck::UNIQUE_CHECK_PARTIAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexUniqueCheck::UNIQUE_CHECK_PARTIAL")]
 pub const IndexUniqueCheck_UNIQUE_CHECK_PARTIAL: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::IndexUniqueCheck::UNIQUE_CHECK_EXISTING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::IndexUniqueCheck::UNIQUE_CHECK_EXISTING")]
 pub const IndexUniqueCheck_UNIQUE_CHECK_EXISTING: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::InstrumentOption::INSTRUMENT_TIMER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::InstrumentOption::INSTRUMENT_TIMER")]
 pub const InstrumentOption_INSTRUMENT_TIMER: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::InstrumentOption::INSTRUMENT_BUFFERS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::InstrumentOption::INSTRUMENT_BUFFERS")]
 pub const InstrumentOption_INSTRUMENT_BUFFERS: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::InstrumentOption::INSTRUMENT_ROWS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::InstrumentOption::INSTRUMENT_ROWS")]
 pub const InstrumentOption_INSTRUMENT_ROWS: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::InstrumentOption::INSTRUMENT_WAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::InstrumentOption::INSTRUMENT_WAL")]
 pub const InstrumentOption_INSTRUMENT_WAL: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::InstrumentOption::INSTRUMENT_ALL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::InstrumentOption::INSTRUMENT_ALL")]
 pub const InstrumentOption_INSTRUMENT_ALL: u32 = 2147483647;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::JoinType::JOIN_INNER")]
 pub const JoinType_JOIN_INNER: u32 = 0;
@@ -57483,45 +54319,21 @@ pub const JoinType_JOIN_ANTI: u32 = 5;
 pub const JoinType_JOIN_RIGHT_SEMI: u32 = 6;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::JoinType::JOIN_RIGHT_ANTI")]
 pub const JoinType_JOIN_RIGHT_ANTI: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JoinType::JOIN_UNIQUE_OUTER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JoinType::JOIN_UNIQUE_OUTER")]
 pub const JoinType_JOIN_UNIQUE_OUTER: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JoinType::JOIN_UNIQUE_INNER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JoinType::JOIN_UNIQUE_INNER")]
 pub const JoinType_JOIN_UNIQUE_INNER: u32 = 9;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonBehaviorType::JSON_BEHAVIOR_NULL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonBehaviorType::JSON_BEHAVIOR_NULL")]
 pub const JsonBehaviorType_JSON_BEHAVIOR_NULL: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonBehaviorType::JSON_BEHAVIOR_ERROR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonBehaviorType::JSON_BEHAVIOR_ERROR")]
 pub const JsonBehaviorType_JSON_BEHAVIOR_ERROR: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonBehaviorType::JSON_BEHAVIOR_EMPTY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonBehaviorType::JSON_BEHAVIOR_EMPTY")]
 pub const JsonBehaviorType_JSON_BEHAVIOR_EMPTY: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonBehaviorType::JSON_BEHAVIOR_TRUE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonBehaviorType::JSON_BEHAVIOR_TRUE")]
 pub const JsonBehaviorType_JSON_BEHAVIOR_TRUE: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonBehaviorType::JSON_BEHAVIOR_FALSE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonBehaviorType::JSON_BEHAVIOR_FALSE")]
 pub const JsonBehaviorType_JSON_BEHAVIOR_FALSE: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonBehaviorType::JSON_BEHAVIOR_UNKNOWN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonBehaviorType::JSON_BEHAVIOR_UNKNOWN")]
 pub const JsonBehaviorType_JSON_BEHAVIOR_UNKNOWN: u32 = 5;
 #[deprecated(
     since = "0.12.0",
@@ -57533,50 +54345,29 @@ pub const JsonBehaviorType_JSON_BEHAVIOR_EMPTY_ARRAY: u32 = 6;
     note = "you want pg_sys::JsonBehaviorType::JSON_BEHAVIOR_EMPTY_OBJECT"
 )]
 pub const JsonBehaviorType_JSON_BEHAVIOR_EMPTY_OBJECT: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonBehaviorType::JSON_BEHAVIOR_DEFAULT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonBehaviorType::JSON_BEHAVIOR_DEFAULT")]
 pub const JsonBehaviorType_JSON_BEHAVIOR_DEFAULT: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonConstructorType::JSCTOR_JSON_OBJECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonConstructorType::JSCTOR_JSON_OBJECT")]
 pub const JsonConstructorType_JSCTOR_JSON_OBJECT: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonConstructorType::JSCTOR_JSON_ARRAY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonConstructorType::JSCTOR_JSON_ARRAY")]
 pub const JsonConstructorType_JSCTOR_JSON_ARRAY: u32 = 2;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::JsonConstructorType::JSCTOR_JSON_OBJECTAGG"
 )]
 pub const JsonConstructorType_JSCTOR_JSON_OBJECTAGG: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonConstructorType::JSCTOR_JSON_ARRAYAGG"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonConstructorType::JSCTOR_JSON_ARRAYAGG")]
 pub const JsonConstructorType_JSCTOR_JSON_ARRAYAGG: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonConstructorType::JSCTOR_JSON_PARSE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonConstructorType::JSCTOR_JSON_PARSE")]
 pub const JsonConstructorType_JSCTOR_JSON_PARSE: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonConstructorType::JSCTOR_JSON_SCALAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonConstructorType::JSCTOR_JSON_SCALAR")]
 pub const JsonConstructorType_JSCTOR_JSON_SCALAR: u32 = 6;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::JsonConstructorType::JSCTOR_JSON_SERIALIZE"
 )]
 pub const JsonConstructorType_JSCTOR_JSON_SERIALIZE: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonEncoding::JS_ENC_DEFAULT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonEncoding::JS_ENC_DEFAULT")]
 pub const JsonEncoding_JS_ENC_DEFAULT: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::JsonEncoding::JS_ENC_UTF8")]
 pub const JsonEncoding_JS_ENC_UTF8: u32 = 1;
@@ -57592,234 +54383,105 @@ pub const JsonExprOp_JSON_QUERY_OP: u32 = 1;
 pub const JsonExprOp_JSON_VALUE_OP: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::JsonExprOp::JSON_TABLE_OP")]
 pub const JsonExprOp_JSON_TABLE_OP: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonFormatType::JS_FORMAT_DEFAULT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonFormatType::JS_FORMAT_DEFAULT")]
 pub const JsonFormatType_JS_FORMAT_DEFAULT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonFormatType::JS_FORMAT_JSON"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonFormatType::JS_FORMAT_JSON")]
 pub const JsonFormatType_JS_FORMAT_JSON: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonFormatType::JS_FORMAT_JSONB"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonFormatType::JS_FORMAT_JSONB")]
 pub const JsonFormatType_JS_FORMAT_JSONB: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonQuotes::JS_QUOTES_UNSPEC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonQuotes::JS_QUOTES_UNSPEC")]
 pub const JsonQuotes_JS_QUOTES_UNSPEC: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::JsonQuotes::JS_QUOTES_KEEP")]
 pub const JsonQuotes_JS_QUOTES_KEEP: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::JsonQuotes::JS_QUOTES_OMIT")]
 pub const JsonQuotes_JS_QUOTES_OMIT: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonTableColumnType::JTC_FOR_ORDINALITY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonTableColumnType::JTC_FOR_ORDINALITY")]
 pub const JsonTableColumnType_JTC_FOR_ORDINALITY: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonTableColumnType::JTC_REGULAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonTableColumnType::JTC_REGULAR")]
 pub const JsonTableColumnType_JTC_REGULAR: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonTableColumnType::JTC_EXISTS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonTableColumnType::JTC_EXISTS")]
 pub const JsonTableColumnType_JTC_EXISTS: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonTableColumnType::JTC_FORMATTED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonTableColumnType::JTC_FORMATTED")]
 pub const JsonTableColumnType_JTC_FORMATTED: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonTableColumnType::JTC_NESTED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonTableColumnType::JTC_NESTED")]
 pub const JsonTableColumnType_JTC_NESTED: u32 = 4;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::JsonValueType::JS_TYPE_ANY")]
 pub const JsonValueType_JS_TYPE_ANY: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonValueType::JS_TYPE_OBJECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonValueType::JS_TYPE_OBJECT")]
 pub const JsonValueType_JS_TYPE_OBJECT: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonValueType::JS_TYPE_ARRAY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonValueType::JS_TYPE_ARRAY")]
 pub const JsonValueType_JS_TYPE_ARRAY: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonValueType::JS_TYPE_SCALAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonValueType::JS_TYPE_SCALAR")]
 pub const JsonValueType_JS_TYPE_SCALAR: u32 = 3;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::JsonWrapper::JSW_UNSPEC")]
 pub const JsonWrapper_JSW_UNSPEC: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::JsonWrapper::JSW_NONE")]
 pub const JsonWrapper_JSW_NONE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonWrapper::JSW_CONDITIONAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonWrapper::JSW_CONDITIONAL")]
 pub const JsonWrapper_JSW_CONDITIONAL: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonWrapper::JSW_UNCONDITIONAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonWrapper::JSW_UNCONDITIONAL")]
 pub const JsonWrapper_JSW_UNCONDITIONAL: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonbIterState::JBI_ARRAY_START"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIterState::JBI_ARRAY_START")]
 pub const JsonbIterState_JBI_ARRAY_START: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonbIterState::JBI_ARRAY_ELEM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIterState::JBI_ARRAY_ELEM")]
 pub const JsonbIterState_JBI_ARRAY_ELEM: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonbIterState::JBI_OBJECT_START"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIterState::JBI_OBJECT_START")]
 pub const JsonbIterState_JBI_OBJECT_START: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonbIterState::JBI_OBJECT_KEY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIterState::JBI_OBJECT_KEY")]
 pub const JsonbIterState_JBI_OBJECT_KEY: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonbIterState::JBI_OBJECT_VALUE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIterState::JBI_OBJECT_VALUE")]
 pub const JsonbIterState_JBI_OBJECT_VALUE: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonbIteratorToken::WJB_DONE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIteratorToken::WJB_DONE")]
 pub const JsonbIteratorToken_WJB_DONE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonbIteratorToken::WJB_KEY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIteratorToken::WJB_KEY")]
 pub const JsonbIteratorToken_WJB_KEY: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonbIteratorToken::WJB_VALUE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIteratorToken::WJB_VALUE")]
 pub const JsonbIteratorToken_WJB_VALUE: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonbIteratorToken::WJB_ELEM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIteratorToken::WJB_ELEM")]
 pub const JsonbIteratorToken_WJB_ELEM: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonbIteratorToken::WJB_BEGIN_ARRAY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIteratorToken::WJB_BEGIN_ARRAY")]
 pub const JsonbIteratorToken_WJB_BEGIN_ARRAY: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonbIteratorToken::WJB_END_ARRAY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIteratorToken::WJB_END_ARRAY")]
 pub const JsonbIteratorToken_WJB_END_ARRAY: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonbIteratorToken::WJB_BEGIN_OBJECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIteratorToken::WJB_BEGIN_OBJECT")]
 pub const JsonbIteratorToken_WJB_BEGIN_OBJECT: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::JsonbIteratorToken::WJB_END_OBJECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::JsonbIteratorToken::WJB_END_OBJECT")]
 pub const JsonbIteratorToken_WJB_END_OBJECT: u32 = 7;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::LWLockMode::LW_EXCLUSIVE")]
 pub const LWLockMode_LW_EXCLUSIVE: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::LWLockMode::LW_SHARED")]
 pub const LWLockMode_LW_SHARED: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LWLockMode::LW_WAIT_UNTIL_FREE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LWLockMode::LW_WAIT_UNTIL_FREE")]
 pub const LWLockMode_LW_WAIT_UNTIL_FREE: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LWLockWaitState::LW_WS_NOT_WAITING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LWLockWaitState::LW_WS_NOT_WAITING")]
 pub const LWLockWaitState_LW_WS_NOT_WAITING: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LWLockWaitState::LW_WS_WAITING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LWLockWaitState::LW_WS_WAITING")]
 pub const LWLockWaitState_LW_WS_WAITING: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LWLockWaitState::LW_WS_PENDING_WAKEUP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LWLockWaitState::LW_WS_PENDING_WAKEUP")]
 pub const LWLockWaitState_LW_WS_PENDING_WAKEUP: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LimitOption::LIMIT_OPTION_COUNT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitOption::LIMIT_OPTION_COUNT")]
 pub const LimitOption_LIMIT_OPTION_COUNT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LimitOption::LIMIT_OPTION_WITH_TIES"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitOption::LIMIT_OPTION_WITH_TIES")]
 pub const LimitOption_LIMIT_OPTION_WITH_TIES: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LimitStateCond::LIMIT_INITIAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_INITIAL")]
 pub const LimitStateCond_LIMIT_INITIAL: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LimitStateCond::LIMIT_RESCAN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_RESCAN")]
 pub const LimitStateCond_LIMIT_RESCAN: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LimitStateCond::LIMIT_EMPTY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_EMPTY")]
 pub const LimitStateCond_LIMIT_EMPTY: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LimitStateCond::LIMIT_INWINDOW"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_INWINDOW")]
 pub const LimitStateCond_LIMIT_INWINDOW: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LimitStateCond::LIMIT_WINDOWEND_TIES"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_WINDOWEND_TIES")]
 pub const LimitStateCond_LIMIT_WINDOWEND_TIES: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LimitStateCond::LIMIT_SUBPLANEOF"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_SUBPLANEOF")]
 pub const LimitStateCond_LIMIT_SUBPLANEOF: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LimitStateCond::LIMIT_WINDOWEND"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_WINDOWEND")]
 pub const LimitStateCond_LIMIT_WINDOWEND: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LimitStateCond::LIMIT_WINDOWSTART"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LimitStateCond::LIMIT_WINDOWSTART")]
 pub const LimitStateCond_LIMIT_WINDOWSTART: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockAcquireResult::LOCKACQUIRE_NOT_AVAIL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockAcquireResult::LOCKACQUIRE_NOT_AVAIL")]
 pub const LockAcquireResult_LOCKACQUIRE_NOT_AVAIL: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockAcquireResult::LOCKACQUIRE_OK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockAcquireResult::LOCKACQUIRE_OK")]
 pub const LockAcquireResult_LOCKACQUIRE_OK: u32 = 1;
 #[deprecated(
     since = "0.12.0",
@@ -57831,119 +54493,53 @@ pub const LockAcquireResult_LOCKACQUIRE_ALREADY_HELD: u32 = 2;
     note = "you want pg_sys::LockAcquireResult::LOCKACQUIRE_ALREADY_CLEAR"
 )]
 pub const LockAcquireResult_LOCKACQUIRE_ALREADY_CLEAR: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockClauseStrength::LCS_NONE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockClauseStrength::LCS_NONE")]
 pub const LockClauseStrength_LCS_NONE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockClauseStrength::LCS_FORKEYSHARE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockClauseStrength::LCS_FORKEYSHARE")]
 pub const LockClauseStrength_LCS_FORKEYSHARE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockClauseStrength::LCS_FORSHARE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockClauseStrength::LCS_FORSHARE")]
 pub const LockClauseStrength_LCS_FORSHARE: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockClauseStrength::LCS_FORNOKEYUPDATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockClauseStrength::LCS_FORNOKEYUPDATE")]
 pub const LockClauseStrength_LCS_FORNOKEYUPDATE: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockClauseStrength::LCS_FORUPDATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockClauseStrength::LCS_FORUPDATE")]
 pub const LockClauseStrength_LCS_FORUPDATE: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockTagType::LOCKTAG_RELATION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_RELATION")]
 pub const LockTagType_LOCKTAG_RELATION: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockTagType::LOCKTAG_RELATION_EXTEND"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_RELATION_EXTEND")]
 pub const LockTagType_LOCKTAG_RELATION_EXTEND: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockTagType::LOCKTAG_DATABASE_FROZEN_IDS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_DATABASE_FROZEN_IDS")]
 pub const LockTagType_LOCKTAG_DATABASE_FROZEN_IDS: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_PAGE")]
 pub const LockTagType_LOCKTAG_PAGE: u32 = 3;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_TUPLE")]
 pub const LockTagType_LOCKTAG_TUPLE: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockTagType::LOCKTAG_TRANSACTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_TRANSACTION")]
 pub const LockTagType_LOCKTAG_TRANSACTION: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockTagType::LOCKTAG_VIRTUALTRANSACTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_VIRTUALTRANSACTION")]
 pub const LockTagType_LOCKTAG_VIRTUALTRANSACTION: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockTagType::LOCKTAG_SPECULATIVE_TOKEN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_SPECULATIVE_TOKEN")]
 pub const LockTagType_LOCKTAG_SPECULATIVE_TOKEN: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockTagType::LOCKTAG_OBJECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_OBJECT")]
 pub const LockTagType_LOCKTAG_OBJECT: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockTagType::LOCKTAG_USERLOCK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_USERLOCK")]
 pub const LockTagType_LOCKTAG_USERLOCK: u32 = 9;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockTagType::LOCKTAG_ADVISORY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_ADVISORY")]
 pub const LockTagType_LOCKTAG_ADVISORY: u32 = 10;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockTagType::LOCKTAG_APPLY_TRANSACTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTagType::LOCKTAG_APPLY_TRANSACTION")]
 pub const LockTagType_LOCKTAG_APPLY_TRANSACTION: u32 = 11;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockTupleMode::LockTupleKeyShare"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTupleMode::LockTupleKeyShare")]
 pub const LockTupleMode_LockTupleKeyShare: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockTupleMode::LockTupleShare"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTupleMode::LockTupleShare")]
 pub const LockTupleMode_LockTupleShare: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockTupleMode::LockTupleNoKeyExclusive"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTupleMode::LockTupleNoKeyExclusive")]
 pub const LockTupleMode_LockTupleNoKeyExclusive: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockTupleMode::LockTupleExclusive"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockTupleMode::LockTupleExclusive")]
 pub const LockTupleMode_LockTupleExclusive: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockWaitPolicy::LockWaitBlock"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockWaitPolicy::LockWaitBlock")]
 pub const LockWaitPolicy_LockWaitBlock: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockWaitPolicy::LockWaitSkip"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockWaitPolicy::LockWaitSkip")]
 pub const LockWaitPolicy_LockWaitSkip: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LockWaitPolicy::LockWaitError"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LockWaitPolicy::LockWaitError")]
 pub const LockWaitPolicy_LockWaitError: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::LogStmtLevel::LOGSTMT_NONE")]
 pub const LogStmtLevel_LOGSTMT_NONE: u32 = 0;
@@ -57953,35 +54549,17 @@ pub const LogStmtLevel_LOGSTMT_DDL: u32 = 1;
 pub const LogStmtLevel_LOGSTMT_MOD: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::LogStmtLevel::LOGSTMT_ALL")]
 pub const LogStmtLevel_LOGSTMT_ALL: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_BEGIN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_BEGIN")]
 pub const LogicalRepMsgType_LOGICAL_REP_MSG_BEGIN: u32 = 66;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_COMMIT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_COMMIT")]
 pub const LogicalRepMsgType_LOGICAL_REP_MSG_COMMIT: u32 = 67;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_ORIGIN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_ORIGIN")]
 pub const LogicalRepMsgType_LOGICAL_REP_MSG_ORIGIN: u32 = 79;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_INSERT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_INSERT")]
 pub const LogicalRepMsgType_LOGICAL_REP_MSG_INSERT: u32 = 73;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_UPDATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_UPDATE")]
 pub const LogicalRepMsgType_LOGICAL_REP_MSG_UPDATE: u32 = 85;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_DELETE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_DELETE")]
 pub const LogicalRepMsgType_LOGICAL_REP_MSG_DELETE: u32 = 68;
 #[deprecated(
     since = "0.12.0",
@@ -57993,10 +54571,7 @@ pub const LogicalRepMsgType_LOGICAL_REP_MSG_TRUNCATE: u32 = 84;
     note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_RELATION"
 )]
 pub const LogicalRepMsgType_LOGICAL_REP_MSG_RELATION: u32 = 82;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_TYPE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_TYPE")]
 pub const LogicalRepMsgType_LOGICAL_REP_MSG_TYPE: u32 = 89;
 #[deprecated(
     since = "0.12.0",
@@ -58048,10 +54623,7 @@ pub const LogicalRepMsgType_LOGICAL_REP_MSG_STREAM_ABORT: u32 = 65;
     note = "you want pg_sys::LogicalRepMsgType::LOGICAL_REP_MSG_STREAM_PREPARE"
 )]
 pub const LogicalRepMsgType_LOGICAL_REP_MSG_STREAM_PREPARE: u32 = 112;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::MergeMatchKind::MERGE_WHEN_MATCHED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::MergeMatchKind::MERGE_WHEN_MATCHED")]
 pub const MergeMatchKind_MERGE_WHEN_MATCHED: u32 = 0;
 #[deprecated(
     since = "0.12.0",
@@ -58067,10 +54639,7 @@ pub const MergeMatchKind_MERGE_WHEN_NOT_MATCHED_BY_TARGET: u32 = 2;
 pub const MinMaxOp_IS_GREATEST: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::MinMaxOp::IS_LEAST")]
 pub const MinMaxOp_IS_LEAST: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::MonotonicFunction::MONOTONICFUNC_NONE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::MonotonicFunction::MONOTONICFUNC_NONE")]
 pub const MonotonicFunction_MONOTONICFUNC_NONE: u32 = 0;
 #[deprecated(
     since = "0.12.0",
@@ -58082,109 +54651,64 @@ pub const MonotonicFunction_MONOTONICFUNC_INCREASING: u32 = 1;
     note = "you want pg_sys::MonotonicFunction::MONOTONICFUNC_DECREASING"
 )]
 pub const MonotonicFunction_MONOTONICFUNC_DECREASING: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::MonotonicFunction::MONOTONICFUNC_BOTH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::MonotonicFunction::MONOTONICFUNC_BOTH")]
 pub const MonotonicFunction_MONOTONICFUNC_BOTH: u32 = 3;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::MultiXactStatus::MultiXactStatusForKeyShare"
 )]
 pub const MultiXactStatus_MultiXactStatusForKeyShare: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::MultiXactStatus::MultiXactStatusForShare"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::MultiXactStatus::MultiXactStatusForShare")]
 pub const MultiXactStatus_MultiXactStatusForShare: u32 = 1;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::MultiXactStatus::MultiXactStatusForNoKeyUpdate"
 )]
 pub const MultiXactStatus_MultiXactStatusForNoKeyUpdate: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::MultiXactStatus::MultiXactStatusForUpdate"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::MultiXactStatus::MultiXactStatusForUpdate")]
 pub const MultiXactStatus_MultiXactStatusForUpdate: u32 = 3;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::MultiXactStatus::MultiXactStatusNoKeyUpdate"
 )]
 pub const MultiXactStatus_MultiXactStatusNoKeyUpdate: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::MultiXactStatus::MultiXactStatusUpdate"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::MultiXactStatus::MultiXactStatusUpdate")]
 pub const MultiXactStatus_MultiXactStatusUpdate: u32 = 5;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::NullTestType::IS_NULL")]
 pub const NullTestType_IS_NULL: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::NullTestType::IS_NOT_NULL")]
 pub const NullTestType_IS_NOT_NULL: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectAccessType::OAT_POST_CREATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectAccessType::OAT_POST_CREATE")]
 pub const ObjectAccessType_OAT_POST_CREATE: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectAccessType::OAT_DROP")]
 pub const ObjectAccessType_OAT_DROP: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectAccessType::OAT_POST_ALTER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectAccessType::OAT_POST_ALTER")]
 pub const ObjectAccessType_OAT_POST_ALTER: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectAccessType::OAT_NAMESPACE_SEARCH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectAccessType::OAT_NAMESPACE_SEARCH")]
 pub const ObjectAccessType_OAT_NAMESPACE_SEARCH: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectAccessType::OAT_FUNCTION_EXECUTE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectAccessType::OAT_FUNCTION_EXECUTE")]
 pub const ObjectAccessType_OAT_FUNCTION_EXECUTE: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectAccessType::OAT_TRUNCATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectAccessType::OAT_TRUNCATE")]
 pub const ObjectAccessType_OAT_TRUNCATE: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_ACCESS_METHOD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_ACCESS_METHOD")]
 pub const ObjectType_OBJECT_ACCESS_METHOD: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_AGGREGATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_AGGREGATE")]
 pub const ObjectType_OBJECT_AGGREGATE: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_AMOP")]
 pub const ObjectType_OBJECT_AMOP: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_AMPROC")]
 pub const ObjectType_OBJECT_AMPROC: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_ATTRIBUTE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_ATTRIBUTE")]
 pub const ObjectType_OBJECT_ATTRIBUTE: u32 = 4;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_CAST")]
 pub const ObjectType_OBJECT_CAST: u32 = 5;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_COLUMN")]
 pub const ObjectType_OBJECT_COLUMN: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_COLLATION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_COLLATION")]
 pub const ObjectType_OBJECT_COLLATION: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_CONVERSION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_CONVERSION")]
 pub const ObjectType_OBJECT_CONVERSION: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_DATABASE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_DATABASE")]
 pub const ObjectType_OBJECT_DATABASE: u32 = 9;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_DEFAULT")]
 pub const ObjectType_OBJECT_DEFAULT: u32 = 10;
@@ -58192,90 +54716,45 @@ pub const ObjectType_OBJECT_DEFAULT: u32 = 10;
 pub const ObjectType_OBJECT_DEFACL: u32 = 11;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_DOMAIN")]
 pub const ObjectType_OBJECT_DOMAIN: u32 = 12;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_DOMCONSTRAINT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_DOMCONSTRAINT")]
 pub const ObjectType_OBJECT_DOMCONSTRAINT: u32 = 13;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_EVENT_TRIGGER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_EVENT_TRIGGER")]
 pub const ObjectType_OBJECT_EVENT_TRIGGER: u32 = 14;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_EXTENSION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_EXTENSION")]
 pub const ObjectType_OBJECT_EXTENSION: u32 = 15;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_FDW")]
 pub const ObjectType_OBJECT_FDW: u32 = 16;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_FOREIGN_SERVER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_FOREIGN_SERVER")]
 pub const ObjectType_OBJECT_FOREIGN_SERVER: u32 = 17;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_FOREIGN_TABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_FOREIGN_TABLE")]
 pub const ObjectType_OBJECT_FOREIGN_TABLE: u32 = 18;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_FUNCTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_FUNCTION")]
 pub const ObjectType_OBJECT_FUNCTION: u32 = 19;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_INDEX")]
 pub const ObjectType_OBJECT_INDEX: u32 = 20;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_LANGUAGE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_LANGUAGE")]
 pub const ObjectType_OBJECT_LANGUAGE: u32 = 21;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_LARGEOBJECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_LARGEOBJECT")]
 pub const ObjectType_OBJECT_LARGEOBJECT: u32 = 22;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_MATVIEW")]
 pub const ObjectType_OBJECT_MATVIEW: u32 = 23;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_OPCLASS")]
 pub const ObjectType_OBJECT_OPCLASS: u32 = 24;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_OPERATOR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_OPERATOR")]
 pub const ObjectType_OBJECT_OPERATOR: u32 = 25;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_OPFAMILY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_OPFAMILY")]
 pub const ObjectType_OBJECT_OPFAMILY: u32 = 26;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_PARAMETER_ACL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_PARAMETER_ACL")]
 pub const ObjectType_OBJECT_PARAMETER_ACL: u32 = 27;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_POLICY")]
 pub const ObjectType_OBJECT_POLICY: u32 = 28;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_PROCEDURE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_PROCEDURE")]
 pub const ObjectType_OBJECT_PROCEDURE: u32 = 29;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_PUBLICATION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_PUBLICATION")]
 pub const ObjectType_OBJECT_PUBLICATION: u32 = 30;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_PUBLICATION_NAMESPACE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_PUBLICATION_NAMESPACE")]
 pub const ObjectType_OBJECT_PUBLICATION_NAMESPACE: u32 = 31;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_PUBLICATION_REL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_PUBLICATION_REL")]
 pub const ObjectType_OBJECT_PUBLICATION_REL: u32 = 32;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_ROLE")]
 pub const ObjectType_OBJECT_ROLE: u32 = 33;
@@ -58285,103 +54764,49 @@ pub const ObjectType_OBJECT_ROUTINE: u32 = 34;
 pub const ObjectType_OBJECT_RULE: u32 = 35;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_SCHEMA")]
 pub const ObjectType_OBJECT_SCHEMA: u32 = 36;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_SEQUENCE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_SEQUENCE")]
 pub const ObjectType_OBJECT_SEQUENCE: u32 = 37;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_SUBSCRIPTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_SUBSCRIPTION")]
 pub const ObjectType_OBJECT_SUBSCRIPTION: u32 = 38;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_STATISTIC_EXT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_STATISTIC_EXT")]
 pub const ObjectType_OBJECT_STATISTIC_EXT: u32 = 39;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_TABCONSTRAINT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TABCONSTRAINT")]
 pub const ObjectType_OBJECT_TABCONSTRAINT: u32 = 40;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TABLE")]
 pub const ObjectType_OBJECT_TABLE: u32 = 41;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_TABLESPACE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TABLESPACE")]
 pub const ObjectType_OBJECT_TABLESPACE: u32 = 42;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_TRANSFORM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TRANSFORM")]
 pub const ObjectType_OBJECT_TRANSFORM: u32 = 43;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TRIGGER")]
 pub const ObjectType_OBJECT_TRIGGER: u32 = 44;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_TSCONFIGURATION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TSCONFIGURATION")]
 pub const ObjectType_OBJECT_TSCONFIGURATION: u32 = 45;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_TSDICTIONARY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TSDICTIONARY")]
 pub const ObjectType_OBJECT_TSDICTIONARY: u32 = 46;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_TSPARSER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TSPARSER")]
 pub const ObjectType_OBJECT_TSPARSER: u32 = 47;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_TSTEMPLATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TSTEMPLATE")]
 pub const ObjectType_OBJECT_TSTEMPLATE: u32 = 48;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_TYPE")]
 pub const ObjectType_OBJECT_TYPE: u32 = 49;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ObjectType::OBJECT_USER_MAPPING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_USER_MAPPING")]
 pub const ObjectType_OBJECT_USER_MAPPING: u32 = 50;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ObjectType::OBJECT_VIEW")]
 pub const ObjectType_OBJECT_VIEW: u32 = 51;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::OnCommitAction::ONCOMMIT_NOOP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OnCommitAction::ONCOMMIT_NOOP")]
 pub const OnCommitAction_ONCOMMIT_NOOP: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::OnCommitAction::ONCOMMIT_PRESERVE_ROWS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OnCommitAction::ONCOMMIT_PRESERVE_ROWS")]
 pub const OnCommitAction_ONCOMMIT_PRESERVE_ROWS: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::OnCommitAction::ONCOMMIT_DELETE_ROWS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OnCommitAction::ONCOMMIT_DELETE_ROWS")]
 pub const OnCommitAction_ONCOMMIT_DELETE_ROWS: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::OnCommitAction::ONCOMMIT_DROP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OnCommitAction::ONCOMMIT_DROP")]
 pub const OnCommitAction_ONCOMMIT_DROP: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::OnConflictAction::ONCONFLICT_NONE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OnConflictAction::ONCONFLICT_NONE")]
 pub const OnConflictAction_ONCONFLICT_NONE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::OnConflictAction::ONCONFLICT_NOTHING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OnConflictAction::ONCONFLICT_NOTHING")]
 pub const OnConflictAction_ONCONFLICT_NOTHING: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::OnConflictAction::ONCONFLICT_UPDATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OnConflictAction::ONCONFLICT_UPDATE")]
 pub const OnConflictAction_ONCONFLICT_UPDATE: u32 = 2;
 #[deprecated(
     since = "0.12.0",
@@ -58393,60 +54818,30 @@ pub const OutputPluginOutputType_OUTPUT_PLUGIN_BINARY_OUTPUT: u32 = 0;
     note = "you want pg_sys::OutputPluginOutputType::OUTPUT_PLUGIN_TEXTUAL_OUTPUT"
 )]
 pub const OutputPluginOutputType_OUTPUT_PLUGIN_TEXTUAL_OUTPUT: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::OverridingKind::OVERRIDING_NOT_SET"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OverridingKind::OVERRIDING_NOT_SET")]
 pub const OverridingKind_OVERRIDING_NOT_SET: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::OverridingKind::OVERRIDING_USER_VALUE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OverridingKind::OVERRIDING_USER_VALUE")]
 pub const OverridingKind_OVERRIDING_USER_VALUE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::OverridingKind::OVERRIDING_SYSTEM_VALUE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::OverridingKind::OVERRIDING_SYSTEM_VALUE")]
 pub const OverridingKind_OVERRIDING_SYSTEM_VALUE: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PGErrorVerbosity::PGERROR_TERSE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PGErrorVerbosity::PGERROR_TERSE")]
 pub const PGErrorVerbosity_PGERROR_TERSE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PGErrorVerbosity::PGERROR_DEFAULT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PGErrorVerbosity::PGERROR_DEFAULT")]
 pub const PGErrorVerbosity_PGERROR_DEFAULT: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PGErrorVerbosity::PGERROR_VERBOSE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PGErrorVerbosity::PGERROR_VERBOSE")]
 pub const PGErrorVerbosity_PGERROR_VERBOSE: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_datum_type::PLPGSQL_DTYPE_VAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_datum_type::PLPGSQL_DTYPE_VAR")]
 pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_VAR: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_datum_type::PLPGSQL_DTYPE_ROW"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_datum_type::PLPGSQL_DTYPE_ROW")]
 pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_ROW: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_datum_type::PLPGSQL_DTYPE_REC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_datum_type::PLPGSQL_DTYPE_REC")]
 pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_REC: u32 = 2;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::PLpgSQL_datum_type::PLPGSQL_DTYPE_RECFIELD"
 )]
 pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_RECFIELD: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_datum_type::PLPGSQL_DTYPE_PROMISE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_datum_type::PLPGSQL_DTYPE_PROMISE")]
 pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_PROMISE: u32 = 4;
 #[deprecated(
     since = "0.12.0",
@@ -58508,35 +54903,17 @@ pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_TABLE_NAME: u32 = 11;
     note = "you want pg_sys::PLpgSQL_getdiag_kind::PLPGSQL_GETDIAG_SCHEMA_NAME"
 )]
 pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_SCHEMA_NAME: u32 = 12;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_label_type::PLPGSQL_LABEL_BLOCK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_label_type::PLPGSQL_LABEL_BLOCK")]
 pub const PLpgSQL_label_type_PLPGSQL_LABEL_BLOCK: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_label_type::PLPGSQL_LABEL_LOOP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_label_type::PLPGSQL_LABEL_LOOP")]
 pub const PLpgSQL_label_type_PLPGSQL_LABEL_LOOP: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_label_type::PLPGSQL_LABEL_OTHER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_label_type::PLPGSQL_LABEL_OTHER")]
 pub const PLpgSQL_label_type_PLPGSQL_LABEL_OTHER: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_nsitem_type::PLPGSQL_NSTYPE_LABEL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_nsitem_type::PLPGSQL_NSTYPE_LABEL")]
 pub const PLpgSQL_nsitem_type_PLPGSQL_NSTYPE_LABEL: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_nsitem_type::PLPGSQL_NSTYPE_VAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_nsitem_type::PLPGSQL_NSTYPE_VAR")]
 pub const PLpgSQL_nsitem_type_PLPGSQL_NSTYPE_VAR: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_nsitem_type::PLPGSQL_NSTYPE_REC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_nsitem_type::PLPGSQL_NSTYPE_REC")]
 pub const PLpgSQL_nsitem_type_PLPGSQL_NSTYPE_REC: u32 = 2;
 #[deprecated(
     since = "0.12.0",
@@ -58658,85 +55035,37 @@ pub const PLpgSQL_resolve_option_PLPGSQL_RESOLVE_VARIABLE: u32 = 1;
     note = "you want pg_sys::PLpgSQL_resolve_option::PLPGSQL_RESOLVE_COLUMN"
 )]
 pub const PLpgSQL_resolve_option_PLPGSQL_RESOLVE_COLUMN: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_rwopt::PLPGSQL_RWOPT_UNKNOWN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_rwopt::PLPGSQL_RWOPT_UNKNOWN")]
 pub const PLpgSQL_rwopt_PLPGSQL_RWOPT_UNKNOWN: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_rwopt::PLPGSQL_RWOPT_NOPE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_rwopt::PLPGSQL_RWOPT_NOPE")]
 pub const PLpgSQL_rwopt_PLPGSQL_RWOPT_NOPE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_rwopt::PLPGSQL_RWOPT_TRANSFER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_rwopt::PLPGSQL_RWOPT_TRANSFER")]
 pub const PLpgSQL_rwopt_PLPGSQL_RWOPT_TRANSFER: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_rwopt::PLPGSQL_RWOPT_INPLACE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_rwopt::PLPGSQL_RWOPT_INPLACE")]
 pub const PLpgSQL_rwopt_PLPGSQL_RWOPT_INPLACE: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_BLOCK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_BLOCK")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_BLOCK: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_ASSIGN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_ASSIGN")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_ASSIGN: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_IF"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_IF")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_IF: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_CASE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_CASE")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_CASE: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_LOOP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_LOOP")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_LOOP: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_WHILE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_WHILE")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_WHILE: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_FORI"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_FORI")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FORI: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_FORS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_FORS")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FORS: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_FORC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_FORC")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FORC: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_FOREACH_A"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_FOREACH_A")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FOREACH_A: u32 = 9;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_EXIT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_EXIT")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_EXIT: u32 = 10;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_RETURN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_RETURN")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_RETURN: u32 = 11;
 #[deprecated(
     since = "0.12.0",
@@ -58748,100 +55077,46 @@ pub const PLpgSQL_stmt_type_PLPGSQL_STMT_RETURN_NEXT: u32 = 12;
     note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_RETURN_QUERY"
 )]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_RETURN_QUERY: u32 = 13;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_RAISE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_RAISE")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_RAISE: u32 = 14;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_ASSERT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_ASSERT")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_ASSERT: u32 = 15;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_EXECSQL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_EXECSQL")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_EXECSQL: u32 = 16;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_DYNEXECUTE"
 )]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_DYNEXECUTE: u32 = 17;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_DYNFORS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_DYNFORS")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_DYNFORS: u32 = 18;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_GETDIAG"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_GETDIAG")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_GETDIAG: u32 = 19;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_OPEN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_OPEN")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_OPEN: u32 = 20;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_FETCH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_FETCH")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FETCH: u32 = 21;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_CLOSE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_CLOSE")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_CLOSE: u32 = 22;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_PERFORM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_PERFORM")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_PERFORM: u32 = 23;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_CALL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_CALL")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_CALL: u32 = 24;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_COMMIT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_COMMIT")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_COMMIT: u32 = 25;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_ROLLBACK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_stmt_type::PLPGSQL_STMT_ROLLBACK")]
 pub const PLpgSQL_stmt_type_PLPGSQL_STMT_ROLLBACK: u32 = 26;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_trigtype::PLPGSQL_DML_TRIGGER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_trigtype::PLPGSQL_DML_TRIGGER")]
 pub const PLpgSQL_trigtype_PLPGSQL_DML_TRIGGER: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_trigtype::PLPGSQL_EVENT_TRIGGER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_trigtype::PLPGSQL_EVENT_TRIGGER")]
 pub const PLpgSQL_trigtype_PLPGSQL_EVENT_TRIGGER: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_trigtype::PLPGSQL_NOT_TRIGGER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_trigtype::PLPGSQL_NOT_TRIGGER")]
 pub const PLpgSQL_trigtype_PLPGSQL_NOT_TRIGGER: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_type_type::PLPGSQL_TTYPE_SCALAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_type_type::PLPGSQL_TTYPE_SCALAR")]
 pub const PLpgSQL_type_type_PLPGSQL_TTYPE_SCALAR: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_type_type::PLPGSQL_TTYPE_REC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_type_type::PLPGSQL_TTYPE_REC")]
 pub const PLpgSQL_type_type_PLPGSQL_TTYPE_REC: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PLpgSQL_type_type::PLPGSQL_TTYPE_PSEUDO"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PLpgSQL_type_type::PLPGSQL_TTYPE_PSEUDO")]
 pub const PLpgSQL_type_type_PLPGSQL_TTYPE_PSEUDO: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ParamKind::PARAM_EXTERN")]
 pub const ParamKind_PARAM_EXTERN: u32 = 0;
@@ -58851,60 +55126,27 @@ pub const ParamKind_PARAM_EXEC: u32 = 1;
 pub const ParamKind_PARAM_SUBLINK: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ParamKind::PARAM_MULTIEXPR")]
 pub const ParamKind_PARAM_MULTIEXPR: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_NONE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_NONE")]
 pub const ParseExprKind_EXPR_KIND_NONE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_OTHER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_OTHER")]
 pub const ParseExprKind_EXPR_KIND_OTHER: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_JOIN_ON"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_JOIN_ON")]
 pub const ParseExprKind_EXPR_KIND_JOIN_ON: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_JOIN_USING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_JOIN_USING")]
 pub const ParseExprKind_EXPR_KIND_JOIN_USING: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_FROM_SUBSELECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_FROM_SUBSELECT")]
 pub const ParseExprKind_EXPR_KIND_FROM_SUBSELECT: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_FROM_FUNCTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_FROM_FUNCTION")]
 pub const ParseExprKind_EXPR_KIND_FROM_FUNCTION: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_WHERE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_WHERE")]
 pub const ParseExprKind_EXPR_KIND_WHERE: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_HAVING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_HAVING")]
 pub const ParseExprKind_EXPR_KIND_HAVING: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_FILTER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_FILTER")]
 pub const ParseExprKind_EXPR_KIND_FILTER: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_WINDOW_PARTITION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_WINDOW_PARTITION")]
 pub const ParseExprKind_EXPR_KIND_WINDOW_PARTITION: u32 = 9;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_WINDOW_ORDER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_WINDOW_ORDER")]
 pub const ParseExprKind_EXPR_KIND_WINDOW_ORDER: u32 = 10;
 #[deprecated(
     since = "0.12.0",
@@ -58921,110 +55163,47 @@ pub const ParseExprKind_EXPR_KIND_WINDOW_FRAME_ROWS: u32 = 12;
     note = "you want pg_sys::ParseExprKind::EXPR_KIND_WINDOW_FRAME_GROUPS"
 )]
 pub const ParseExprKind_EXPR_KIND_WINDOW_FRAME_GROUPS: u32 = 13;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_SELECT_TARGET"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_SELECT_TARGET")]
 pub const ParseExprKind_EXPR_KIND_SELECT_TARGET: u32 = 14;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_INSERT_TARGET"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_INSERT_TARGET")]
 pub const ParseExprKind_EXPR_KIND_INSERT_TARGET: u32 = 15;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_UPDATE_SOURCE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_UPDATE_SOURCE")]
 pub const ParseExprKind_EXPR_KIND_UPDATE_SOURCE: u32 = 16;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_UPDATE_TARGET"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_UPDATE_TARGET")]
 pub const ParseExprKind_EXPR_KIND_UPDATE_TARGET: u32 = 17;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_MERGE_WHEN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_MERGE_WHEN")]
 pub const ParseExprKind_EXPR_KIND_MERGE_WHEN: u32 = 18;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_GROUP_BY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_GROUP_BY")]
 pub const ParseExprKind_EXPR_KIND_GROUP_BY: u32 = 19;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_ORDER_BY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_ORDER_BY")]
 pub const ParseExprKind_EXPR_KIND_ORDER_BY: u32 = 20;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_DISTINCT_ON"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_DISTINCT_ON")]
 pub const ParseExprKind_EXPR_KIND_DISTINCT_ON: u32 = 21;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_LIMIT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_LIMIT")]
 pub const ParseExprKind_EXPR_KIND_LIMIT: u32 = 22;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_OFFSET"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_OFFSET")]
 pub const ParseExprKind_EXPR_KIND_OFFSET: u32 = 23;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_RETURNING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_RETURNING")]
 pub const ParseExprKind_EXPR_KIND_RETURNING: u32 = 24;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_MERGE_RETURNING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_MERGE_RETURNING")]
 pub const ParseExprKind_EXPR_KIND_MERGE_RETURNING: u32 = 25;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_VALUES"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_VALUES")]
 pub const ParseExprKind_EXPR_KIND_VALUES: u32 = 26;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_VALUES_SINGLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_VALUES_SINGLE")]
 pub const ParseExprKind_EXPR_KIND_VALUES_SINGLE: u32 = 27;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_CHECK_CONSTRAINT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_CHECK_CONSTRAINT")]
 pub const ParseExprKind_EXPR_KIND_CHECK_CONSTRAINT: u32 = 28;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_DOMAIN_CHECK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_DOMAIN_CHECK")]
 pub const ParseExprKind_EXPR_KIND_DOMAIN_CHECK: u32 = 29;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_COLUMN_DEFAULT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_COLUMN_DEFAULT")]
 pub const ParseExprKind_EXPR_KIND_COLUMN_DEFAULT: u32 = 30;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_FUNCTION_DEFAULT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_FUNCTION_DEFAULT")]
 pub const ParseExprKind_EXPR_KIND_FUNCTION_DEFAULT: u32 = 31;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_INDEX_EXPRESSION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_INDEX_EXPRESSION")]
 pub const ParseExprKind_EXPR_KIND_INDEX_EXPRESSION: u32 = 32;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_INDEX_PREDICATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_INDEX_PREDICATE")]
 pub const ParseExprKind_EXPR_KIND_INDEX_PREDICATE: u32 = 33;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_STATS_EXPRESSION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_STATS_EXPRESSION")]
 pub const ParseExprKind_EXPR_KIND_STATS_EXPRESSION: u32 = 34;
 #[deprecated(
     since = "0.12.0",
@@ -59036,45 +55215,24 @@ pub const ParseExprKind_EXPR_KIND_ALTER_COL_TRANSFORM: u32 = 35;
     note = "you want pg_sys::ParseExprKind::EXPR_KIND_EXECUTE_PARAMETER"
 )]
 pub const ParseExprKind_EXPR_KIND_EXECUTE_PARAMETER: u32 = 36;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_TRIGGER_WHEN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_TRIGGER_WHEN")]
 pub const ParseExprKind_EXPR_KIND_TRIGGER_WHEN: u32 = 37;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_POLICY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_POLICY")]
 pub const ParseExprKind_EXPR_KIND_POLICY: u32 = 38;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_PARTITION_BOUND"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_PARTITION_BOUND")]
 pub const ParseExprKind_EXPR_KIND_PARTITION_BOUND: u32 = 39;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::ParseExprKind::EXPR_KIND_PARTITION_EXPRESSION"
 )]
 pub const ParseExprKind_EXPR_KIND_PARTITION_EXPRESSION: u32 = 40;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_CALL_ARGUMENT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_CALL_ARGUMENT")]
 pub const ParseExprKind_EXPR_KIND_CALL_ARGUMENT: u32 = 41;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_COPY_WHERE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_COPY_WHERE")]
 pub const ParseExprKind_EXPR_KIND_COPY_WHERE: u32 = 42;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_GENERATED_COLUMN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_GENERATED_COLUMN")]
 pub const ParseExprKind_EXPR_KIND_GENERATED_COLUMN: u32 = 43;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ParseExprKind::EXPR_KIND_CYCLE_MARK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ParseExprKind::EXPR_KIND_CYCLE_MARK")]
 pub const ParseExprKind_EXPR_KIND_CYCLE_MARK: u32 = 44;
 #[deprecated(
     since = "0.12.0",
@@ -59131,65 +55289,29 @@ pub const PartitionwiseAggregateType_PARTITIONWISE_AGGREGATE_FULL: u32 = 1;
     note = "you want pg_sys::PartitionwiseAggregateType::PARTITIONWISE_AGGREGATE_PARTIAL"
 )]
 pub const PartitionwiseAggregateType_PARTITIONWISE_AGGREGATE_PARTIAL: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PasswordType::PASSWORD_TYPE_PLAINTEXT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PasswordType::PASSWORD_TYPE_PLAINTEXT")]
 pub const PasswordType_PASSWORD_TYPE_PLAINTEXT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PasswordType::PASSWORD_TYPE_MD5"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PasswordType::PASSWORD_TYPE_MD5")]
 pub const PasswordType_PASSWORD_TYPE_MD5: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PasswordType::PASSWORD_TYPE_SCRAM_SHA_256"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PasswordType::PASSWORD_TYPE_SCRAM_SHA_256")]
 pub const PasswordType_PASSWORD_TYPE_SCRAM_SHA_256: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PathKeysComparison::PATHKEYS_EQUAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PathKeysComparison::PATHKEYS_EQUAL")]
 pub const PathKeysComparison_PATHKEYS_EQUAL: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PathKeysComparison::PATHKEYS_BETTER1"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PathKeysComparison::PATHKEYS_BETTER1")]
 pub const PathKeysComparison_PATHKEYS_BETTER1: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PathKeysComparison::PATHKEYS_BETTER2"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PathKeysComparison::PATHKEYS_BETTER2")]
 pub const PathKeysComparison_PATHKEYS_BETTER2: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PathKeysComparison::PATHKEYS_DIFFERENT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PathKeysComparison::PATHKEYS_DIFFERENT")]
 pub const PathKeysComparison_PATHKEYS_DIFFERENT: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PgAioResultStatus::PGAIO_RS_UNKNOWN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgAioResultStatus::PGAIO_RS_UNKNOWN")]
 pub const PgAioResultStatus_PGAIO_RS_UNKNOWN: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PgAioResultStatus::PGAIO_RS_OK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgAioResultStatus::PGAIO_RS_OK")]
 pub const PgAioResultStatus_PGAIO_RS_OK: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PgAioResultStatus::PGAIO_RS_PARTIAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgAioResultStatus::PGAIO_RS_PARTIAL")]
 pub const PgAioResultStatus_PGAIO_RS_PARTIAL: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PgAioResultStatus::PGAIO_RS_WARNING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgAioResultStatus::PGAIO_RS_WARNING")]
 pub const PgAioResultStatus_PGAIO_RS_WARNING: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PgAioResultStatus::PGAIO_RS_ERROR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PgAioResultStatus::PGAIO_RS_ERROR")]
 pub const PgAioResultStatus_PGAIO_RS_ERROR: u32 = 4;
 #[deprecated(
     since = "0.12.0",
@@ -59206,10 +55328,7 @@ pub const PgStat_FetchConsistency_PGSTAT_FETCH_CONSISTENCY_CACHE: u32 = 1;
     note = "you want pg_sys::PgStat_FetchConsistency::PGSTAT_FETCH_CONSISTENCY_SNAPSHOT"
 )]
 pub const PgStat_FetchConsistency_PGSTAT_FETCH_CONSISTENCY_SNAPSHOT: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PlanCacheMode::PLAN_CACHE_MODE_AUTO"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PlanCacheMode::PLAN_CACHE_MODE_AUTO")]
 pub const PlanCacheMode_PLAN_CACHE_MODE_AUTO: u32 = 0;
 #[deprecated(
     since = "0.12.0",
@@ -59223,49 +55342,25 @@ pub const PlanCacheMode_PLAN_CACHE_MODE_FORCE_GENERIC_PLAN: u32 = 1;
 pub const PlanCacheMode_PLAN_CACHE_MODE_FORCE_CUSTOM_PLAN: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStatus::PORTAL_NEW")]
 pub const PortalStatus_PORTAL_NEW: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PortalStatus::PORTAL_DEFINED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStatus::PORTAL_DEFINED")]
 pub const PortalStatus_PORTAL_DEFINED: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStatus::PORTAL_READY")]
 pub const PortalStatus_PORTAL_READY: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PortalStatus::PORTAL_ACTIVE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStatus::PORTAL_ACTIVE")]
 pub const PortalStatus_PORTAL_ACTIVE: u32 = 3;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStatus::PORTAL_DONE")]
 pub const PortalStatus_PORTAL_DONE: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PortalStatus::PORTAL_FAILED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStatus::PORTAL_FAILED")]
 pub const PortalStatus_PORTAL_FAILED: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PortalStrategy::PORTAL_ONE_SELECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStrategy::PORTAL_ONE_SELECT")]
 pub const PortalStrategy_PORTAL_ONE_SELECT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PortalStrategy::PORTAL_ONE_RETURNING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStrategy::PORTAL_ONE_RETURNING")]
 pub const PortalStrategy_PORTAL_ONE_RETURNING: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PortalStrategy::PORTAL_ONE_MOD_WITH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStrategy::PORTAL_ONE_MOD_WITH")]
 pub const PortalStrategy_PORTAL_ONE_MOD_WITH: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PortalStrategy::PORTAL_UTIL_SELECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStrategy::PORTAL_UTIL_SELECT")]
 pub const PortalStrategy_PORTAL_UTIL_SELECT: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PortalStrategy::PORTAL_MULTI_QUERY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PortalStrategy::PORTAL_MULTI_QUERY")]
 pub const PortalStrategy_PORTAL_MULTI_QUERY: u32 = 4;
 #[deprecated(
     since = "0.12.0",
@@ -59292,10 +55387,7 @@ pub const ProcSignalReason_PROCSIG_PARALLEL_MESSAGE: u32 = 2;
     note = "you want pg_sys::ProcSignalReason::PROCSIG_WALSND_INIT_STOPPING"
 )]
 pub const ProcSignalReason_PROCSIG_WALSND_INIT_STOPPING: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ProcSignalReason::PROCSIG_BARRIER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ProcSignalReason::PROCSIG_BARRIER")]
 pub const ProcSignalReason_PROCSIG_BARRIER: u32 = 4;
 #[deprecated(
     since = "0.12.0",
@@ -59357,20 +55449,11 @@ pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_STARTUP_DEADLOCK: u32 = 14;
     note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_LAST"
 )]
 pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_LAST: u32 = 14;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ProcWaitStatus::PROC_WAIT_STATUS_OK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ProcWaitStatus::PROC_WAIT_STATUS_OK")]
 pub const ProcWaitStatus_PROC_WAIT_STATUS_OK: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ProcWaitStatus::PROC_WAIT_STATUS_WAITING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ProcWaitStatus::PROC_WAIT_STATUS_WAITING")]
 pub const ProcWaitStatus_PROC_WAIT_STATUS_WAITING: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ProcWaitStatus::PROC_WAIT_STATUS_ERROR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ProcWaitStatus::PROC_WAIT_STATUS_ERROR")]
 pub const ProcWaitStatus_PROC_WAIT_STATUS_ERROR: u32 = 2;
 #[deprecated(
     since = "0.12.0",
@@ -59392,20 +55475,11 @@ pub const ProcessUtilityContext_PROCESS_UTILITY_QUERY_NONATOMIC: u32 = 2;
     note = "you want pg_sys::ProcessUtilityContext::PROCESS_UTILITY_SUBCOMMAND"
 )]
 pub const ProcessUtilityContext_PROCESS_UTILITY_SUBCOMMAND: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ProcessingMode::BootstrapProcessing"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ProcessingMode::BootstrapProcessing")]
 pub const ProcessingMode_BootstrapProcessing: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ProcessingMode::InitProcessing"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ProcessingMode::InitProcessing")]
 pub const ProcessingMode_InitProcessing: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ProcessingMode::NormalProcessing"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ProcessingMode::NormalProcessing")]
 pub const ProcessingMode_NormalProcessing: u32 = 2;
 #[deprecated(
     since = "0.12.0",
@@ -59442,20 +55516,11 @@ pub const ProgressCommandType_PROGRESS_COMMAND_BASEBACKUP: u32 = 5;
     note = "you want pg_sys::ProgressCommandType::PROGRESS_COMMAND_COPY"
 )]
 pub const ProgressCommandType_PROGRESS_COMMAND_COPY: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PruneReason::PRUNE_ON_ACCESS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PruneReason::PRUNE_ON_ACCESS")]
 pub const PruneReason_PRUNE_ON_ACCESS: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PruneReason::PRUNE_VACUUM_SCAN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PruneReason::PRUNE_VACUUM_SCAN")]
 pub const PruneReason_PRUNE_VACUUM_SCAN: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PruneReason::PRUNE_VACUUM_CLEANUP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PruneReason::PRUNE_VACUUM_CLEANUP")]
 pub const PruneReason_PRUNE_VACUUM_CLEANUP: u32 = 2;
 #[deprecated(
     since = "0.12.0",
@@ -59477,25 +55542,13 @@ pub const PublicationObjSpecType_PUBLICATIONOBJ_TABLES_IN_CUR_SCHEMA: u32 = 2;
     note = "you want pg_sys::PublicationObjSpecType::PUBLICATIONOBJ_CONTINUATION"
 )]
 pub const PublicationObjSpecType_PUBLICATIONOBJ_CONTINUATION: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PublicationPartOpt::PUBLICATION_PART_ROOT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PublicationPartOpt::PUBLICATION_PART_ROOT")]
 pub const PublicationPartOpt_PUBLICATION_PART_ROOT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PublicationPartOpt::PUBLICATION_PART_LEAF"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PublicationPartOpt::PUBLICATION_PART_LEAF")]
 pub const PublicationPartOpt_PUBLICATION_PART_LEAF: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PublicationPartOpt::PUBLICATION_PART_ALL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PublicationPartOpt::PUBLICATION_PART_ALL")]
 pub const PublicationPartOpt_PUBLICATION_PART_ALL: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::PublishGencolsType::PUBLISH_GENCOLS_NONE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::PublishGencolsType::PUBLISH_GENCOLS_NONE")]
 pub const PublishGencolsType_PUBLISH_GENCOLS_NONE: u32 = 110;
 #[deprecated(
     since = "0.12.0",
@@ -59506,20 +55559,11 @@ pub const PublishGencolsType_PUBLISH_GENCOLS_STORED: u32 = 115;
 pub const QuerySource_QSRC_ORIGINAL: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::QuerySource::QSRC_PARSER")]
 pub const QuerySource_QSRC_PARSER: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::QuerySource::QSRC_INSTEAD_RULE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::QuerySource::QSRC_INSTEAD_RULE")]
 pub const QuerySource_QSRC_INSTEAD_RULE: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::QuerySource::QSRC_QUAL_INSTEAD_RULE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::QuerySource::QSRC_QUAL_INSTEAD_RULE")]
 pub const QuerySource_QSRC_QUAL_INSTEAD_RULE: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::QuerySource::QSRC_NON_INSTEAD_RULE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::QuerySource::QSRC_NON_INSTEAD_RULE")]
 pub const QuerySource_QSRC_NON_INSTEAD_RULE: u32 = 4;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::RTEKind::RTE_RELATION")]
 pub const RTEKind_RTE_RELATION: u32 = 0;
@@ -59535,10 +55579,7 @@ pub const RTEKind_RTE_TABLEFUNC: u32 = 4;
 pub const RTEKind_RTE_VALUES: u32 = 5;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::RTEKind::RTE_CTE")]
 pub const RTEKind_RTE_CTE: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RTEKind::RTE_NAMEDTUPLESTORE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RTEKind::RTE_NAMEDTUPLESTORE")]
 pub const RTEKind_RTE_NAMEDTUPLESTORE: u32 = 7;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::RTEKind::RTE_RESULT")]
 pub const RTEKind_RTE_RESULT: u32 = 8;
@@ -59550,87 +55591,42 @@ pub const RVROption_RVR_MISSING_OK: u32 = 1;
 pub const RVROption_RVR_NOWAIT: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::RVROption::RVR_SKIP_LOCKED")]
 pub const RVROption_RVR_SKIP_LOCKED: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RawParseMode::RAW_PARSE_DEFAULT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RawParseMode::RAW_PARSE_DEFAULT")]
 pub const RawParseMode_RAW_PARSE_DEFAULT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RawParseMode::RAW_PARSE_TYPE_NAME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RawParseMode::RAW_PARSE_TYPE_NAME")]
 pub const RawParseMode_RAW_PARSE_TYPE_NAME: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RawParseMode::RAW_PARSE_PLPGSQL_EXPR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RawParseMode::RAW_PARSE_PLPGSQL_EXPR")]
 pub const RawParseMode_RAW_PARSE_PLPGSQL_EXPR: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RawParseMode::RAW_PARSE_PLPGSQL_ASSIGN1"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RawParseMode::RAW_PARSE_PLPGSQL_ASSIGN1")]
 pub const RawParseMode_RAW_PARSE_PLPGSQL_ASSIGN1: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RawParseMode::RAW_PARSE_PLPGSQL_ASSIGN2"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RawParseMode::RAW_PARSE_PLPGSQL_ASSIGN2")]
 pub const RawParseMode_RAW_PARSE_PLPGSQL_ASSIGN2: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RawParseMode::RAW_PARSE_PLPGSQL_ASSIGN3"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RawParseMode::RAW_PARSE_PLPGSQL_ASSIGN3")]
 pub const RawParseMode_RAW_PARSE_PLPGSQL_ASSIGN3: u32 = 5;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ReadBufferMode::RBM_NORMAL")]
 pub const ReadBufferMode_RBM_NORMAL: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ReadBufferMode::RBM_ZERO_AND_LOCK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReadBufferMode::RBM_ZERO_AND_LOCK")]
 pub const ReadBufferMode_RBM_ZERO_AND_LOCK: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ReadBufferMode::RBM_ZERO_AND_CLEANUP_LOCK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReadBufferMode::RBM_ZERO_AND_CLEANUP_LOCK")]
 pub const ReadBufferMode_RBM_ZERO_AND_CLEANUP_LOCK: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ReadBufferMode::RBM_ZERO_ON_ERROR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReadBufferMode::RBM_ZERO_ON_ERROR")]
 pub const ReadBufferMode_RBM_ZERO_ON_ERROR: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ReadBufferMode::RBM_NORMAL_NO_LOG"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReadBufferMode::RBM_NORMAL_NO_LOG")]
 pub const ReadBufferMode_RBM_NORMAL_NO_LOG: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RecoveryPauseState::RECOVERY_NOT_PAUSED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryPauseState::RECOVERY_NOT_PAUSED")]
 pub const RecoveryPauseState_RECOVERY_NOT_PAUSED: u32 = 0;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::RecoveryPauseState::RECOVERY_PAUSE_REQUESTED"
 )]
 pub const RecoveryPauseState_RECOVERY_PAUSE_REQUESTED: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RecoveryPauseState::RECOVERY_PAUSED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryPauseState::RECOVERY_PAUSED")]
 pub const RecoveryPauseState_RECOVERY_PAUSED: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RecoveryState::RECOVERY_STATE_CRASH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryState::RECOVERY_STATE_CRASH")]
 pub const RecoveryState_RECOVERY_STATE_CRASH: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RecoveryState::RECOVERY_STATE_ARCHIVE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryState::RECOVERY_STATE_ARCHIVE")]
 pub const RecoveryState_RECOVERY_STATE_ARCHIVE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RecoveryState::RECOVERY_STATE_DONE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryState::RECOVERY_STATE_DONE")]
 pub const RecoveryState_RECOVERY_STATE_DONE: u32 = 2;
 #[deprecated(
     since = "0.12.0",
@@ -59662,55 +55658,28 @@ pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_LATEST: u32 = 1;
     note = "you want pg_sys::RecoveryTargetTimeLineGoal::RECOVERY_TARGET_TIMELINE_NUMERIC"
 )]
 pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_NUMERIC: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_UNSET"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_UNSET")]
 pub const RecoveryTargetType_RECOVERY_TARGET_UNSET: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_XID"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_XID")]
 pub const RecoveryTargetType_RECOVERY_TARGET_XID: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_TIME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_TIME")]
 pub const RecoveryTargetType_RECOVERY_TARGET_TIME: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_NAME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_NAME")]
 pub const RecoveryTargetType_RECOVERY_TARGET_NAME: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_LSN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_LSN")]
 pub const RecoveryTargetType_RECOVERY_TARGET_LSN: u32 = 4;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::RecoveryTargetType::RECOVERY_TARGET_IMMEDIATE"
 )]
 pub const RecoveryTargetType_RECOVERY_TARGET_IMMEDIATE: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ReindexObjectType::REINDEX_OBJECT_INDEX"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReindexObjectType::REINDEX_OBJECT_INDEX")]
 pub const ReindexObjectType_REINDEX_OBJECT_INDEX: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ReindexObjectType::REINDEX_OBJECT_TABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReindexObjectType::REINDEX_OBJECT_TABLE")]
 pub const ReindexObjectType_REINDEX_OBJECT_TABLE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ReindexObjectType::REINDEX_OBJECT_SCHEMA"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReindexObjectType::REINDEX_OBJECT_SCHEMA")]
 pub const ReindexObjectType_REINDEX_OBJECT_SCHEMA: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ReindexObjectType::REINDEX_OBJECT_SYSTEM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReindexObjectType::REINDEX_OBJECT_SYSTEM")]
 pub const ReindexObjectType_REINDEX_OBJECT_SYSTEM: u32 = 3;
 #[deprecated(
     since = "0.12.0",
@@ -59721,25 +55690,13 @@ pub const ReindexObjectType_REINDEX_OBJECT_DATABASE: u32 = 4;
 pub const RelOptKind_RELOPT_BASEREL: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::RelOptKind::RELOPT_JOINREL")]
 pub const RelOptKind_RELOPT_JOINREL: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RelOptKind::RELOPT_OTHER_MEMBER_REL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RelOptKind::RELOPT_OTHER_MEMBER_REL")]
 pub const RelOptKind_RELOPT_OTHER_MEMBER_REL: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RelOptKind::RELOPT_OTHER_JOINREL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RelOptKind::RELOPT_OTHER_JOINREL")]
 pub const RelOptKind_RELOPT_OTHER_JOINREL: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RelOptKind::RELOPT_UPPER_REL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RelOptKind::RELOPT_UPPER_REL")]
 pub const RelOptKind_RELOPT_UPPER_REL: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RelOptKind::RELOPT_OTHER_UPPER_REL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RelOptKind::RELOPT_OTHER_UPPER_REL")]
 pub const RelOptKind_RELOPT_OTHER_UPPER_REL: u32 = 5;
 #[deprecated(
     since = "0.12.0",
@@ -59806,10 +55763,7 @@ pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_TRUNCATE: u32 = 11;
     note = "you want pg_sys::ReplicationKind::REPLICATION_KIND_PHYSICAL"
 )]
 pub const ReplicationKind_REPLICATION_KIND_PHYSICAL: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ReplicationKind::REPLICATION_KIND_LOGICAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReplicationKind::REPLICATION_KIND_LOGICAL")]
 pub const ReplicationKind_REPLICATION_KIND_LOGICAL: u32 = 1;
 #[deprecated(
     since = "0.12.0",
@@ -59836,20 +55790,11 @@ pub const ReplicationSlotInvalidationCause_RS_INVAL_WAL_LEVEL: u32 = 4;
     note = "you want pg_sys::ReplicationSlotInvalidationCause::RS_INVAL_IDLE_TIMEOUT"
 )]
 pub const ReplicationSlotInvalidationCause_RS_INVAL_IDLE_TIMEOUT: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ReplicationSlotPersistency::RS_PERSISTENT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReplicationSlotPersistency::RS_PERSISTENT")]
 pub const ReplicationSlotPersistency_RS_PERSISTENT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ReplicationSlotPersistency::RS_EPHEMERAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReplicationSlotPersistency::RS_EPHEMERAL")]
 pub const ReplicationSlotPersistency_RS_EPHEMERAL: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ReplicationSlotPersistency::RS_TEMPORARY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReplicationSlotPersistency::RS_TEMPORARY")]
 pub const ReplicationSlotPersistency_RS_TEMPORARY: u32 = 2;
 #[deprecated(
     since = "0.12.0",
@@ -59866,15 +55811,9 @@ pub const ResourceReleasePhase_RESOURCE_RELEASE_LOCKS: u32 = 2;
     note = "you want pg_sys::ResourceReleasePhase::RESOURCE_RELEASE_AFTER_LOCKS"
 )]
 pub const ResourceReleasePhase_RESOURCE_RELEASE_AFTER_LOCKS: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ReturningOptionKind::RETURNING_OPTION_OLD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReturningOptionKind::RETURNING_OPTION_OLD")]
 pub const ReturningOptionKind_RETURNING_OPTION_OLD: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ReturningOptionKind::RETURNING_OPTION_NEW"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ReturningOptionKind::RETURNING_OPTION_NEW")]
 pub const ReturningOptionKind_RETURNING_OPTION_NEW: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_XLOG_ID")]
 pub const RmgrIds_RM_XLOG_ID: u32 = 0;
@@ -59922,87 +55861,39 @@ pub const RmgrIds_RM_GENERIC_ID: u32 = 20;
 pub const RmgrIds_RM_LOGICALMSG_ID: u32 = 21;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::RmgrIds::RM_NEXT_ID")]
 pub const RmgrIds_RM_NEXT_ID: u32 = 22;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RoleSpecType::ROLESPEC_CSTRING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RoleSpecType::ROLESPEC_CSTRING")]
 pub const RoleSpecType_ROLESPEC_CSTRING: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RoleSpecType::ROLESPEC_CURRENT_ROLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RoleSpecType::ROLESPEC_CURRENT_ROLE")]
 pub const RoleSpecType_ROLESPEC_CURRENT_ROLE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RoleSpecType::ROLESPEC_CURRENT_USER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RoleSpecType::ROLESPEC_CURRENT_USER")]
 pub const RoleSpecType_ROLESPEC_CURRENT_USER: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RoleSpecType::ROLESPEC_SESSION_USER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RoleSpecType::ROLESPEC_SESSION_USER")]
 pub const RoleSpecType_ROLESPEC_SESSION_USER: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RoleSpecType::ROLESPEC_PUBLIC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RoleSpecType::ROLESPEC_PUBLIC")]
 pub const RoleSpecType_ROLESPEC_PUBLIC: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RoleStmtType::ROLESTMT_ROLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RoleStmtType::ROLESTMT_ROLE")]
 pub const RoleStmtType_ROLESTMT_ROLE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RoleStmtType::ROLESTMT_USER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RoleStmtType::ROLESTMT_USER")]
 pub const RoleStmtType_ROLESTMT_USER: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RoleStmtType::ROLESTMT_GROUP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RoleStmtType::ROLESTMT_GROUP")]
 pub const RoleStmtType_ROLESTMT_GROUP: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RowMarkType::ROW_MARK_EXCLUSIVE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowMarkType::ROW_MARK_EXCLUSIVE")]
 pub const RowMarkType_ROW_MARK_EXCLUSIVE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RowMarkType::ROW_MARK_NOKEYEXCLUSIVE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowMarkType::ROW_MARK_NOKEYEXCLUSIVE")]
 pub const RowMarkType_ROW_MARK_NOKEYEXCLUSIVE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RowMarkType::ROW_MARK_SHARE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowMarkType::ROW_MARK_SHARE")]
 pub const RowMarkType_ROW_MARK_SHARE: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RowMarkType::ROW_MARK_KEYSHARE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowMarkType::ROW_MARK_KEYSHARE")]
 pub const RowMarkType_ROW_MARK_KEYSHARE: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::RowMarkType::ROW_MARK_REFERENCE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::RowMarkType::ROW_MARK_REFERENCE")]
 pub const RowMarkType_ROW_MARK_REFERENCE: u32 = 4;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::RowMarkType::ROW_MARK_COPY")]
 pub const RowMarkType_ROW_MARK_COPY: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_DATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_DATE")]
 pub const SQLValueFunctionOp_SVFOP_CURRENT_DATE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_TIME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_TIME")]
 pub const SQLValueFunctionOp_SVFOP_CURRENT_TIME: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_TIME_N"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_TIME_N")]
 pub const SQLValueFunctionOp_SVFOP_CURRENT_TIME_N: u32 = 2;
 #[deprecated(
     since = "0.12.0",
@@ -60014,162 +55905,75 @@ pub const SQLValueFunctionOp_SVFOP_CURRENT_TIMESTAMP: u32 = 3;
     note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_TIMESTAMP_N"
 )]
 pub const SQLValueFunctionOp_SVFOP_CURRENT_TIMESTAMP_N: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SQLValueFunctionOp::SVFOP_LOCALTIME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_LOCALTIME")]
 pub const SQLValueFunctionOp_SVFOP_LOCALTIME: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SQLValueFunctionOp::SVFOP_LOCALTIME_N"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_LOCALTIME_N")]
 pub const SQLValueFunctionOp_SVFOP_LOCALTIME_N: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SQLValueFunctionOp::SVFOP_LOCALTIMESTAMP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_LOCALTIMESTAMP")]
 pub const SQLValueFunctionOp_SVFOP_LOCALTIMESTAMP: u32 = 7;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::SQLValueFunctionOp::SVFOP_LOCALTIMESTAMP_N"
 )]
 pub const SQLValueFunctionOp_SVFOP_LOCALTIMESTAMP_N: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_ROLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_ROLE")]
 pub const SQLValueFunctionOp_SVFOP_CURRENT_ROLE: u32 = 9;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_USER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_USER")]
 pub const SQLValueFunctionOp_SVFOP_CURRENT_USER: u32 = 10;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SQLValueFunctionOp::SVFOP_USER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_USER")]
 pub const SQLValueFunctionOp_SVFOP_USER: u32 = 11;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SQLValueFunctionOp::SVFOP_SESSION_USER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_SESSION_USER")]
 pub const SQLValueFunctionOp_SVFOP_SESSION_USER: u32 = 12;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_CATALOG"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_CATALOG")]
 pub const SQLValueFunctionOp_SVFOP_CURRENT_CATALOG: u32 = 13;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_SCHEMA"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SQLValueFunctionOp::SVFOP_CURRENT_SCHEMA")]
 pub const SQLValueFunctionOp_SVFOP_CURRENT_SCHEMA: u32 = 14;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ScanDirection::BackwardScanDirection"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanDirection::BackwardScanDirection")]
 pub const ScanDirection_BackwardScanDirection: i32 = -1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ScanDirection::NoMovementScanDirection"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanDirection::NoMovementScanDirection")]
 pub const ScanDirection_NoMovementScanDirection: i32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ScanDirection::ForwardScanDirection"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanDirection::ForwardScanDirection")]
 pub const ScanDirection_ForwardScanDirection: i32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ScanOptions::SO_TYPE_SEQSCAN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_TYPE_SEQSCAN")]
 pub const ScanOptions_SO_TYPE_SEQSCAN: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ScanOptions::SO_TYPE_BITMAPSCAN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_TYPE_BITMAPSCAN")]
 pub const ScanOptions_SO_TYPE_BITMAPSCAN: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ScanOptions::SO_TYPE_SAMPLESCAN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_TYPE_SAMPLESCAN")]
 pub const ScanOptions_SO_TYPE_SAMPLESCAN: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ScanOptions::SO_TYPE_TIDSCAN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_TYPE_TIDSCAN")]
 pub const ScanOptions_SO_TYPE_TIDSCAN: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ScanOptions::SO_TYPE_TIDRANGESCAN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_TYPE_TIDRANGESCAN")]
 pub const ScanOptions_SO_TYPE_TIDRANGESCAN: u32 = 16;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ScanOptions::SO_TYPE_ANALYZE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_TYPE_ANALYZE")]
 pub const ScanOptions_SO_TYPE_ANALYZE: u32 = 32;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ScanOptions::SO_ALLOW_STRAT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_ALLOW_STRAT")]
 pub const ScanOptions_SO_ALLOW_STRAT: u32 = 64;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_ALLOW_SYNC")]
 pub const ScanOptions_SO_ALLOW_SYNC: u32 = 128;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ScanOptions::SO_ALLOW_PAGEMODE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_ALLOW_PAGEMODE")]
 pub const ScanOptions_SO_ALLOW_PAGEMODE: u32 = 256;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ScanOptions::SO_TEMP_SNAPSHOT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ScanOptions::SO_TEMP_SNAPSHOT")]
 pub const ScanOptions_SO_TEMP_SNAPSHOT: u32 = 512;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SessionBackupState::SESSION_BACKUP_NONE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SessionBackupState::SESSION_BACKUP_NONE")]
 pub const SessionBackupState_SESSION_BACKUP_NONE: u32 = 0;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::SessionBackupState::SESSION_BACKUP_RUNNING"
 )]
 pub const SessionBackupState_SESSION_BACKUP_RUNNING: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SessionEndType::DISCONNECT_NOT_YET"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SessionEndType::DISCONNECT_NOT_YET")]
 pub const SessionEndType_DISCONNECT_NOT_YET: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SessionEndType::DISCONNECT_NORMAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SessionEndType::DISCONNECT_NORMAL")]
 pub const SessionEndType_DISCONNECT_NORMAL: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SessionEndType::DISCONNECT_CLIENT_EOF"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SessionEndType::DISCONNECT_CLIENT_EOF")]
 pub const SessionEndType_DISCONNECT_CLIENT_EOF: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SessionEndType::DISCONNECT_FATAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SessionEndType::DISCONNECT_FATAL")]
 pub const SessionEndType_DISCONNECT_FATAL: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SessionEndType::DISCONNECT_KILLED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SessionEndType::DISCONNECT_KILLED")]
 pub const SessionEndType_DISCONNECT_KILLED: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SetFunctionReturnMode::SFRM_ValuePerCall"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetFunctionReturnMode::SFRM_ValuePerCall")]
 pub const SetFunctionReturnMode_SFRM_ValuePerCall: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SetFunctionReturnMode::SFRM_Materialize"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetFunctionReturnMode::SFRM_Materialize")]
 pub const SetFunctionReturnMode_SFRM_Materialize: u32 = 2;
 #[deprecated(
     since = "0.12.0",
@@ -60181,73 +55985,37 @@ pub const SetFunctionReturnMode_SFRM_Materialize_Random: u32 = 4;
     note = "you want pg_sys::SetFunctionReturnMode::SFRM_Materialize_Preferred"
 )]
 pub const SetFunctionReturnMode_SFRM_Materialize_Preferred: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SetOpCmd::SETOPCMD_INTERSECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetOpCmd::SETOPCMD_INTERSECT")]
 pub const SetOpCmd_SETOPCMD_INTERSECT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SetOpCmd::SETOPCMD_INTERSECT_ALL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetOpCmd::SETOPCMD_INTERSECT_ALL")]
 pub const SetOpCmd_SETOPCMD_INTERSECT_ALL: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::SetOpCmd::SETOPCMD_EXCEPT")]
 pub const SetOpCmd_SETOPCMD_EXCEPT: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SetOpCmd::SETOPCMD_EXCEPT_ALL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetOpCmd::SETOPCMD_EXCEPT_ALL")]
 pub const SetOpCmd_SETOPCMD_EXCEPT_ALL: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SetOpStrategy::SETOP_SORTED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetOpStrategy::SETOP_SORTED")]
 pub const SetOpStrategy_SETOP_SORTED: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SetOpStrategy::SETOP_HASHED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetOpStrategy::SETOP_HASHED")]
 pub const SetOpStrategy_SETOP_HASHED: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::SetOperation::SETOP_NONE")]
 pub const SetOperation_SETOP_NONE: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::SetOperation::SETOP_UNION")]
 pub const SetOperation_SETOP_UNION: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SetOperation::SETOP_INTERSECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetOperation::SETOP_INTERSECT")]
 pub const SetOperation_SETOP_INTERSECT: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::SetOperation::SETOP_EXCEPT")]
 pub const SetOperation_SETOP_EXCEPT: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SetQuantifier::SET_QUANTIFIER_DEFAULT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetQuantifier::SET_QUANTIFIER_DEFAULT")]
 pub const SetQuantifier_SET_QUANTIFIER_DEFAULT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SetQuantifier::SET_QUANTIFIER_ALL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetQuantifier::SET_QUANTIFIER_ALL")]
 pub const SetQuantifier_SET_QUANTIFIER_ALL: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SetQuantifier::SET_QUANTIFIER_DISTINCT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SetQuantifier::SET_QUANTIFIER_DISTINCT")]
 pub const SetQuantifier_SET_QUANTIFIER_DISTINCT: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SharedBitmapState::BM_INITIAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SharedBitmapState::BM_INITIAL")]
 pub const SharedBitmapState_BM_INITIAL: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SharedBitmapState::BM_INPROGRESS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SharedBitmapState::BM_INPROGRESS")]
 pub const SharedBitmapState_BM_INPROGRESS: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SharedBitmapState::BM_FINISHED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SharedBitmapState::BM_FINISHED")]
 pub const SharedBitmapState_BM_FINISHED: u32 = 2;
 #[deprecated(
     since = "0.12.0",
@@ -60279,37 +56047,19 @@ pub const SharedDependencyType_SHARED_DEPENDENCY_TABLESPACE: u32 = 116;
     note = "you want pg_sys::SharedDependencyType::SHARED_DEPENDENCY_INVALID"
 )]
 pub const SharedDependencyType_SHARED_DEPENDENCY_INVALID: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SnapshotType::SNAPSHOT_MVCC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SnapshotType::SNAPSHOT_MVCC")]
 pub const SnapshotType_SNAPSHOT_MVCC: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SnapshotType::SNAPSHOT_SELF"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SnapshotType::SNAPSHOT_SELF")]
 pub const SnapshotType_SNAPSHOT_SELF: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::SnapshotType::SNAPSHOT_ANY")]
 pub const SnapshotType_SNAPSHOT_ANY: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SnapshotType::SNAPSHOT_TOAST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SnapshotType::SNAPSHOT_TOAST")]
 pub const SnapshotType_SNAPSHOT_TOAST: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SnapshotType::SNAPSHOT_DIRTY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SnapshotType::SNAPSHOT_DIRTY")]
 pub const SnapshotType_SNAPSHOT_DIRTY: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SnapshotType::SNAPSHOT_HISTORIC_MVCC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SnapshotType::SNAPSHOT_HISTORIC_MVCC")]
 pub const SnapshotType_SNAPSHOT_HISTORIC_MVCC: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SnapshotType::SNAPSHOT_NON_VACUUMABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SnapshotType::SNAPSHOT_NON_VACUUMABLE")]
 pub const SnapshotType_SNAPSHOT_NON_VACUUMABLE: u32 = 6;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::SortByDir::SORTBY_DEFAULT")]
 pub const SortByDir_SORTBY_DEFAULT: u32 = 0;
@@ -60319,20 +56069,11 @@ pub const SortByDir_SORTBY_ASC: u32 = 1;
 pub const SortByDir_SORTBY_DESC: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::SortByDir::SORTBY_USING")]
 pub const SortByDir_SORTBY_USING: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SortByNulls::SORTBY_NULLS_DEFAULT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SortByNulls::SORTBY_NULLS_DEFAULT")]
 pub const SortByNulls_SORTBY_NULLS_DEFAULT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SortByNulls::SORTBY_NULLS_FIRST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SortByNulls::SORTBY_NULLS_FIRST")]
 pub const SortByNulls_SORTBY_NULLS_FIRST: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SortByNulls::SORTBY_NULLS_LAST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SortByNulls::SORTBY_NULLS_LAST")]
 pub const SortByNulls_SORTBY_NULLS_LAST: u32 = 2;
 #[deprecated(
     since = "0.12.0",
@@ -60349,70 +56090,43 @@ pub const StdRdOptIndexCleanup_STDRD_OPTION_VACUUM_INDEX_CLEANUP_OFF: u32 = 1;
     note = "you want pg_sys::StdRdOptIndexCleanup::STDRD_OPTION_VACUUM_INDEX_CLEANUP_ON"
 )]
 pub const StdRdOptIndexCleanup_STDRD_OPTION_VACUUM_INDEX_CLEANUP_ON: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SubLinkType::EXISTS_SUBLINK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubLinkType::EXISTS_SUBLINK")]
 pub const SubLinkType_EXISTS_SUBLINK: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::SubLinkType::ALL_SUBLINK")]
 pub const SubLinkType_ALL_SUBLINK: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::SubLinkType::ANY_SUBLINK")]
 pub const SubLinkType_ANY_SUBLINK: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SubLinkType::ROWCOMPARE_SUBLINK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubLinkType::ROWCOMPARE_SUBLINK")]
 pub const SubLinkType_ROWCOMPARE_SUBLINK: u32 = 3;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::SubLinkType::EXPR_SUBLINK")]
 pub const SubLinkType_EXPR_SUBLINK: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SubLinkType::MULTIEXPR_SUBLINK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubLinkType::MULTIEXPR_SUBLINK")]
 pub const SubLinkType_MULTIEXPR_SUBLINK: u32 = 5;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::SubLinkType::ARRAY_SUBLINK")]
 pub const SubLinkType_ARRAY_SUBLINK: u32 = 6;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::SubLinkType::CTE_SUBLINK")]
 pub const SubLinkType_CTE_SUBLINK: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SubXactEvent::SUBXACT_EVENT_START_SUB"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubXactEvent::SUBXACT_EVENT_START_SUB")]
 pub const SubXactEvent_SUBXACT_EVENT_START_SUB: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SubXactEvent::SUBXACT_EVENT_COMMIT_SUB"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubXactEvent::SUBXACT_EVENT_COMMIT_SUB")]
 pub const SubXactEvent_SUBXACT_EVENT_COMMIT_SUB: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SubXactEvent::SUBXACT_EVENT_ABORT_SUB"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubXactEvent::SUBXACT_EVENT_ABORT_SUB")]
 pub const SubXactEvent_SUBXACT_EVENT_ABORT_SUB: u32 = 2;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::SubXactEvent::SUBXACT_EVENT_PRE_COMMIT_SUB"
 )]
 pub const SubXactEvent_SUBXACT_EVENT_PRE_COMMIT_SUB: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SubqueryScanStatus::SUBQUERY_SCAN_UNKNOWN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubqueryScanStatus::SUBQUERY_SCAN_UNKNOWN")]
 pub const SubqueryScanStatus_SUBQUERY_SCAN_UNKNOWN: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SubqueryScanStatus::SUBQUERY_SCAN_TRIVIAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SubqueryScanStatus::SUBQUERY_SCAN_TRIVIAL")]
 pub const SubqueryScanStatus_SUBQUERY_SCAN_TRIVIAL: u32 = 1;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::SubqueryScanStatus::SUBQUERY_SCAN_NONTRIVIAL"
 )]
 pub const SubqueryScanStatus_SUBQUERY_SCAN_NONTRIVIAL: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SyncCommitLevel::SYNCHRONOUS_COMMIT_OFF"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SyncCommitLevel::SYNCHRONOUS_COMMIT_OFF")]
 pub const SyncCommitLevel_SYNCHRONOUS_COMMIT_OFF: u32 = 0;
 #[deprecated(
     since = "0.12.0",
@@ -60434,15 +56148,9 @@ pub const SyncCommitLevel_SYNCHRONOUS_COMMIT_REMOTE_FLUSH: u32 = 3;
     note = "you want pg_sys::SyncCommitLevel::SYNCHRONOUS_COMMIT_REMOTE_APPLY"
 )]
 pub const SyncCommitLevel_SYNCHRONOUS_COMMIT_REMOTE_APPLY: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SyncRequestHandler::SYNC_HANDLER_MD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SyncRequestHandler::SYNC_HANDLER_MD")]
 pub const SyncRequestHandler_SYNC_HANDLER_MD: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SyncRequestHandler::SYNC_HANDLER_CLOG"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SyncRequestHandler::SYNC_HANDLER_CLOG")]
 pub const SyncRequestHandler_SYNC_HANDLER_CLOG: u32 = 1;
 #[deprecated(
     since = "0.12.0",
@@ -60459,284 +56167,125 @@ pub const SyncRequestHandler_SYNC_HANDLER_MULTIXACT_OFFSET: u32 = 3;
     note = "you want pg_sys::SyncRequestHandler::SYNC_HANDLER_MULTIXACT_MEMBER"
 )]
 pub const SyncRequestHandler_SYNC_HANDLER_MULTIXACT_MEMBER: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SyncRequestHandler::SYNC_HANDLER_NONE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SyncRequestHandler::SYNC_HANDLER_NONE")]
 pub const SyncRequestHandler_SYNC_HANDLER_NONE: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SyncRequestType::SYNC_REQUEST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SyncRequestType::SYNC_REQUEST")]
 pub const SyncRequestType_SYNC_REQUEST: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SyncRequestType::SYNC_UNLINK_REQUEST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SyncRequestType::SYNC_UNLINK_REQUEST")]
 pub const SyncRequestType_SYNC_UNLINK_REQUEST: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SyncRequestType::SYNC_FORGET_REQUEST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SyncRequestType::SYNC_FORGET_REQUEST")]
 pub const SyncRequestType_SYNC_FORGET_REQUEST: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SyncRequestType::SYNC_FILTER_REQUEST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SyncRequestType::SYNC_FILTER_REQUEST")]
 pub const SyncRequestType_SYNC_FILTER_REQUEST: u32 = 3;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::AMNAME")]
 pub const SysCacheIdentifier_AMNAME: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::AMOPOPID"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::AMOPOPID")]
 pub const SysCacheIdentifier_AMOPOPID: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::AMOPSTRATEGY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::AMOPSTRATEGY")]
 pub const SysCacheIdentifier_AMOPSTRATEGY: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::AMPROCNUM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::AMPROCNUM")]
 pub const SysCacheIdentifier_AMPROCNUM: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::ATTNAME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::ATTNAME")]
 pub const SysCacheIdentifier_ATTNAME: u32 = 6;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::ATTNUM")]
 pub const SysCacheIdentifier_ATTNUM: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::AUTHMEMMEMROLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::AUTHMEMMEMROLE")]
 pub const SysCacheIdentifier_AUTHMEMMEMROLE: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::AUTHMEMROLEMEM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::AUTHMEMROLEMEM")]
 pub const SysCacheIdentifier_AUTHMEMROLEMEM: u32 = 9;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::AUTHNAME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::AUTHNAME")]
 pub const SysCacheIdentifier_AUTHNAME: u32 = 10;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::CASTSOURCETARGET"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::CASTSOURCETARGET")]
 pub const SysCacheIdentifier_CASTSOURCETARGET: u32 = 12;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::CLAAMNAMENSP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::CLAAMNAMENSP")]
 pub const SysCacheIdentifier_CLAAMNAMENSP: u32 = 13;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::COLLNAMEENCNSP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::COLLNAMEENCNSP")]
 pub const SysCacheIdentifier_COLLNAMEENCNSP: u32 = 15;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::CONDEFAULT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::CONDEFAULT")]
 pub const SysCacheIdentifier_CONDEFAULT: u32 = 17;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::CONNAMENSP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::CONNAMENSP")]
 pub const SysCacheIdentifier_CONNAMENSP: u32 = 18;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::DEFACLROLENSPOBJ"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::DEFACLROLENSPOBJ")]
 pub const SysCacheIdentifier_DEFACLROLENSPOBJ: u32 = 22;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::EVENTTRIGGERNAME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::EVENTTRIGGERNAME")]
 pub const SysCacheIdentifier_EVENTTRIGGERNAME: u32 = 25;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::EXTENSIONNAME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::EXTENSIONNAME")]
 pub const SysCacheIdentifier_EXTENSIONNAME: u32 = 27;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::SysCacheIdentifier::FOREIGNDATAWRAPPERNAME"
 )]
 pub const SysCacheIdentifier_FOREIGNDATAWRAPPERNAME: u32 = 29;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::FOREIGNSERVERNAME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::FOREIGNSERVERNAME")]
 pub const SysCacheIdentifier_FOREIGNSERVERNAME: u32 = 31;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::FOREIGNTABLEREL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::FOREIGNTABLEREL")]
 pub const SysCacheIdentifier_FOREIGNTABLEREL: u32 = 33;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::INDEXRELID"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::INDEXRELID")]
 pub const SysCacheIdentifier_INDEXRELID: u32 = 34;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::LANGNAME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::LANGNAME")]
 pub const SysCacheIdentifier_LANGNAME: u32 = 35;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::NAMESPACENAME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::NAMESPACENAME")]
 pub const SysCacheIdentifier_NAMESPACENAME: u32 = 37;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::OPERNAMENSP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::OPERNAMENSP")]
 pub const SysCacheIdentifier_OPERNAMENSP: u32 = 39;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::OPFAMILYAMNAMENSP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::OPFAMILYAMNAMENSP")]
 pub const SysCacheIdentifier_OPFAMILYAMNAMENSP: u32 = 41;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::PARAMETERACLNAME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::PARAMETERACLNAME")]
 pub const SysCacheIdentifier_PARAMETERACLNAME: u32 = 43;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::PARTRELID"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::PARTRELID")]
 pub const SysCacheIdentifier_PARTRELID: u32 = 45;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::PROCNAMEARGSNSP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::PROCNAMEARGSNSP")]
 pub const SysCacheIdentifier_PROCNAMEARGSNSP: u32 = 46;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::PUBLICATIONNAME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::PUBLICATIONNAME")]
 pub const SysCacheIdentifier_PUBLICATIONNAME: u32 = 48;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::PUBLICATIONNAMESPACE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::PUBLICATIONNAMESPACE")]
 pub const SysCacheIdentifier_PUBLICATIONNAMESPACE: u32 = 49;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::SysCacheIdentifier::PUBLICATIONNAMESPACEMAP"
 )]
 pub const SysCacheIdentifier_PUBLICATIONNAMESPACEMAP: u32 = 50;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::PUBLICATIONREL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::PUBLICATIONREL")]
 pub const SysCacheIdentifier_PUBLICATIONREL: u32 = 52;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::PUBLICATIONRELMAP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::PUBLICATIONRELMAP")]
 pub const SysCacheIdentifier_PUBLICATIONRELMAP: u32 = 53;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::RANGEMULTIRANGE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::RANGEMULTIRANGE")]
 pub const SysCacheIdentifier_RANGEMULTIRANGE: u32 = 54;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::RANGETYPE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::RANGETYPE")]
 pub const SysCacheIdentifier_RANGETYPE: u32 = 55;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::RELNAMENSP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::RELNAMENSP")]
 pub const SysCacheIdentifier_RELNAMENSP: u32 = 56;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::REPLORIGIDENT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::REPLORIGIDENT")]
 pub const SysCacheIdentifier_REPLORIGIDENT: u32 = 58;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::REPLORIGNAME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::REPLORIGNAME")]
 pub const SysCacheIdentifier_REPLORIGNAME: u32 = 59;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::RULERELNAME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::RULERELNAME")]
 pub const SysCacheIdentifier_RULERELNAME: u32 = 60;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::SEQRELID"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::SEQRELID")]
 pub const SysCacheIdentifier_SEQRELID: u32 = 61;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::STATEXTNAMENSP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::STATEXTNAMENSP")]
 pub const SysCacheIdentifier_STATEXTNAMENSP: u32 = 63;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::STATRELATTINH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::STATRELATTINH")]
 pub const SysCacheIdentifier_STATRELATTINH: u32 = 65;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::SUBSCRIPTIONNAME"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::SUBSCRIPTIONNAME")]
 pub const SysCacheIdentifier_SUBSCRIPTIONNAME: u32 = 66;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::SUBSCRIPTIONRELMAP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::SUBSCRIPTIONRELMAP")]
 pub const SysCacheIdentifier_SUBSCRIPTIONRELMAP: u32 = 68;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::TRFTYPELANG"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::TRFTYPELANG")]
 pub const SysCacheIdentifier_TRFTYPELANG: u32 = 71;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::TSCONFIGMAP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::TSCONFIGMAP")]
 pub const SysCacheIdentifier_TSCONFIGMAP: u32 = 72;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::TSCONFIGNAMENSP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::TSCONFIGNAMENSP")]
 pub const SysCacheIdentifier_TSCONFIGNAMENSP: u32 = 73;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::TSDICTNAMENSP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::TSDICTNAMENSP")]
 pub const SysCacheIdentifier_TSDICTNAMENSP: u32 = 75;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::TSPARSERNAMENSP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::TSPARSERNAMENSP")]
 pub const SysCacheIdentifier_TSPARSERNAMENSP: u32 = 77;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::TSTEMPLATENAMENSP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::TSTEMPLATENAMENSP")]
 pub const SysCacheIdentifier_TSTEMPLATENAMENSP: u32 = 79;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::TYPENAMENSP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::TYPENAMENSP")]
 pub const SysCacheIdentifier_TYPENAMENSP: u32 = 81;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::SysCacheIdentifier::USERMAPPINGUSERSERVER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::SysCacheIdentifier::USERMAPPINGUSERSERVER")]
 pub const SysCacheIdentifier_USERMAPPINGUSERSERVER: u32 = 84;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::TM_Result::TM_Ok")]
 pub const TM_Result_TM_Ok: u32 = 0;
@@ -60748,10 +56297,7 @@ pub const TM_Result_TM_SelfModified: u32 = 2;
 pub const TM_Result_TM_Updated: u32 = 3;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::TM_Result::TM_Deleted")]
 pub const TM_Result_TM_Deleted: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TM_Result::TM_BeingModified"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TM_Result::TM_BeingModified")]
 pub const TM_Result_TM_BeingModified: u32 = 5;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::TM_Result::TM_WouldBlock")]
 pub const TM_Result_TM_WouldBlock: u32 = 6;
@@ -60765,20 +56311,11 @@ pub const TSTernaryValue_TS_MAYBE: u32 = 2;
 pub const TU_UpdateIndexes_TU_None: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::TU_UpdateIndexes::TU_All")]
 pub const TU_UpdateIndexes_TU_All: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TU_UpdateIndexes::TU_Summarizing"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TU_UpdateIndexes::TU_Summarizing")]
 pub const TU_UpdateIndexes_TU_Summarizing: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TableFuncType::TFT_XMLTABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TableFuncType::TFT_XMLTABLE")]
 pub const TableFuncType_TFT_XMLTABLE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TableFuncType::TFT_JSON_TABLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TableFuncType::TFT_JSON_TABLE")]
 pub const TableFuncType_TFT_JSON_TABLE: u32 = 1;
 #[deprecated(
     since = "0.12.0",
@@ -60825,80 +56362,44 @@ pub const TableLikeOption_CREATE_TABLE_LIKE_STATISTICS: u32 = 128;
     note = "you want pg_sys::TableLikeOption::CREATE_TABLE_LIKE_STORAGE"
 )]
 pub const TableLikeOption_CREATE_TABLE_LIKE_STORAGE: u32 = 256;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TableLikeOption::CREATE_TABLE_LIKE_ALL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TableLikeOption::CREATE_TABLE_LIKE_ALL")]
 pub const TableLikeOption_CREATE_TABLE_LIKE_ALL: u32 = 2147483647;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::TempNamespaceStatus::TEMP_NAMESPACE_NOT_TEMP"
 )]
 pub const TempNamespaceStatus_TEMP_NAMESPACE_NOT_TEMP: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TempNamespaceStatus::TEMP_NAMESPACE_IDLE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TempNamespaceStatus::TEMP_NAMESPACE_IDLE")]
 pub const TempNamespaceStatus_TEMP_NAMESPACE_IDLE: u32 = 1;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::TempNamespaceStatus::TEMP_NAMESPACE_IN_USE"
 )]
 pub const TempNamespaceStatus_TEMP_NAMESPACE_IN_USE: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TrackFunctionsLevel::TRACK_FUNC_OFF"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TrackFunctionsLevel::TRACK_FUNC_OFF")]
 pub const TrackFunctionsLevel_TRACK_FUNC_OFF: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TrackFunctionsLevel::TRACK_FUNC_PL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TrackFunctionsLevel::TRACK_FUNC_PL")]
 pub const TrackFunctionsLevel_TRACK_FUNC_PL: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TrackFunctionsLevel::TRACK_FUNC_ALL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TrackFunctionsLevel::TRACK_FUNC_ALL")]
 pub const TrackFunctionsLevel_TRACK_FUNC_ALL: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_BEGIN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_BEGIN")]
 pub const TransactionStmtKind_TRANS_STMT_BEGIN: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_START"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_START")]
 pub const TransactionStmtKind_TRANS_STMT_START: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_COMMIT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_COMMIT")]
 pub const TransactionStmtKind_TRANS_STMT_COMMIT: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_ROLLBACK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_ROLLBACK")]
 pub const TransactionStmtKind_TRANS_STMT_ROLLBACK: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_SAVEPOINT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_SAVEPOINT")]
 pub const TransactionStmtKind_TRANS_STMT_SAVEPOINT: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_RELEASE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_RELEASE")]
 pub const TransactionStmtKind_TRANS_STMT_RELEASE: u32 = 5;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_ROLLBACK_TO"
 )]
 pub const TransactionStmtKind_TRANS_STMT_ROLLBACK_TO: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_PREPARE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TransactionStmtKind::TRANS_STMT_PREPARE")]
 pub const TransactionStmtKind_TRANS_STMT_PREPARE: u32 = 7;
 #[deprecated(
     since = "0.12.0",
@@ -60915,192 +56416,90 @@ pub const TransactionStmtKind_TRANS_STMT_ROLLBACK_PREPARED: u32 = 9;
     note = "you want pg_sys::TuplesortMethod::SORT_TYPE_STILL_IN_PROGRESS"
 )]
 pub const TuplesortMethod_SORT_TYPE_STILL_IN_PROGRESS: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TuplesortMethod::SORT_TYPE_TOP_N_HEAPSORT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TuplesortMethod::SORT_TYPE_TOP_N_HEAPSORT")]
 pub const TuplesortMethod_SORT_TYPE_TOP_N_HEAPSORT: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TuplesortMethod::SORT_TYPE_QUICKSORT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TuplesortMethod::SORT_TYPE_QUICKSORT")]
 pub const TuplesortMethod_SORT_TYPE_QUICKSORT: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TuplesortMethod::SORT_TYPE_EXTERNAL_SORT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TuplesortMethod::SORT_TYPE_EXTERNAL_SORT")]
 pub const TuplesortMethod_SORT_TYPE_EXTERNAL_SORT: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TuplesortMethod::SORT_TYPE_EXTERNAL_MERGE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TuplesortMethod::SORT_TYPE_EXTERNAL_MERGE")]
 pub const TuplesortMethod_SORT_TYPE_EXTERNAL_MERGE: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TuplesortSpaceType::SORT_SPACE_TYPE_DISK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TuplesortSpaceType::SORT_SPACE_TYPE_DISK")]
 pub const TuplesortSpaceType_SORT_SPACE_TYPE_DISK: u32 = 0;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::TuplesortSpaceType::SORT_SPACE_TYPE_MEMORY"
 )]
 pub const TuplesortSpaceType_SORT_SPACE_TYPE_MEMORY: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TypeFuncClass::TYPEFUNC_SCALAR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TypeFuncClass::TYPEFUNC_SCALAR")]
 pub const TypeFuncClass_TYPEFUNC_SCALAR: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TypeFuncClass::TYPEFUNC_COMPOSITE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TypeFuncClass::TYPEFUNC_COMPOSITE")]
 pub const TypeFuncClass_TYPEFUNC_COMPOSITE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TypeFuncClass::TYPEFUNC_COMPOSITE_DOMAIN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TypeFuncClass::TYPEFUNC_COMPOSITE_DOMAIN")]
 pub const TypeFuncClass_TYPEFUNC_COMPOSITE_DOMAIN: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TypeFuncClass::TYPEFUNC_RECORD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TypeFuncClass::TYPEFUNC_RECORD")]
 pub const TypeFuncClass_TYPEFUNC_RECORD: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::TypeFuncClass::TYPEFUNC_OTHER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::TypeFuncClass::TYPEFUNC_OTHER")]
 pub const TypeFuncClass_TYPEFUNC_OTHER: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::UniquePathMethod::UNIQUE_PATH_NOOP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UniquePathMethod::UNIQUE_PATH_NOOP")]
 pub const UniquePathMethod_UNIQUE_PATH_NOOP: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::UniquePathMethod::UNIQUE_PATH_HASH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UniquePathMethod::UNIQUE_PATH_HASH")]
 pub const UniquePathMethod_UNIQUE_PATH_HASH: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::UniquePathMethod::UNIQUE_PATH_SORT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UniquePathMethod::UNIQUE_PATH_SORT")]
 pub const UniquePathMethod_UNIQUE_PATH_SORT: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::UpperRelationKind::UPPERREL_SETOP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UpperRelationKind::UPPERREL_SETOP")]
 pub const UpperRelationKind_UPPERREL_SETOP: u32 = 0;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::UpperRelationKind::UPPERREL_PARTIAL_GROUP_AGG"
 )]
 pub const UpperRelationKind_UPPERREL_PARTIAL_GROUP_AGG: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::UpperRelationKind::UPPERREL_GROUP_AGG"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UpperRelationKind::UPPERREL_GROUP_AGG")]
 pub const UpperRelationKind_UPPERREL_GROUP_AGG: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::UpperRelationKind::UPPERREL_WINDOW"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UpperRelationKind::UPPERREL_WINDOW")]
 pub const UpperRelationKind_UPPERREL_WINDOW: u32 = 3;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::UpperRelationKind::UPPERREL_PARTIAL_DISTINCT"
 )]
 pub const UpperRelationKind_UPPERREL_PARTIAL_DISTINCT: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::UpperRelationKind::UPPERREL_DISTINCT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UpperRelationKind::UPPERREL_DISTINCT")]
 pub const UpperRelationKind_UPPERREL_DISTINCT: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::UpperRelationKind::UPPERREL_ORDERED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UpperRelationKind::UPPERREL_ORDERED")]
 pub const UpperRelationKind_UPPERREL_ORDERED: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::UpperRelationKind::UPPERREL_FINAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::UpperRelationKind::UPPERREL_FINAL")]
 pub const UpperRelationKind_UPPERREL_FINAL: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::VacOptValue::VACOPTVALUE_UNSPECIFIED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VacOptValue::VACOPTVALUE_UNSPECIFIED")]
 pub const VacOptValue_VACOPTVALUE_UNSPECIFIED: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::VacOptValue::VACOPTVALUE_AUTO"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VacOptValue::VACOPTVALUE_AUTO")]
 pub const VacOptValue_VACOPTVALUE_AUTO: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::VacOptValue::VACOPTVALUE_DISABLED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VacOptValue::VACOPTVALUE_DISABLED")]
 pub const VacOptValue_VACOPTVALUE_DISABLED: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::VacOptValue::VACOPTVALUE_ENABLED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VacOptValue::VACOPTVALUE_ENABLED")]
 pub const VacOptValue_VACOPTVALUE_ENABLED: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::VarReturningType::VAR_RETURNING_DEFAULT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VarReturningType::VAR_RETURNING_DEFAULT")]
 pub const VarReturningType_VAR_RETURNING_DEFAULT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::VarReturningType::VAR_RETURNING_OLD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VarReturningType::VAR_RETURNING_OLD")]
 pub const VarReturningType_VAR_RETURNING_OLD: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::VarReturningType::VAR_RETURNING_NEW"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VarReturningType::VAR_RETURNING_NEW")]
 pub const VarReturningType_VAR_RETURNING_NEW: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::VariableSetKind::VAR_SET_VALUE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VariableSetKind::VAR_SET_VALUE")]
 pub const VariableSetKind_VAR_SET_VALUE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::VariableSetKind::VAR_SET_DEFAULT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VariableSetKind::VAR_SET_DEFAULT")]
 pub const VariableSetKind_VAR_SET_DEFAULT: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::VariableSetKind::VAR_SET_CURRENT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VariableSetKind::VAR_SET_CURRENT")]
 pub const VariableSetKind_VAR_SET_CURRENT: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::VariableSetKind::VAR_SET_MULTI"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VariableSetKind::VAR_SET_MULTI")]
 pub const VariableSetKind_VAR_SET_MULTI: u32 = 3;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::VariableSetKind::VAR_RESET")]
 pub const VariableSetKind_VAR_RESET: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::VariableSetKind::VAR_RESET_ALL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::VariableSetKind::VAR_RESET_ALL")]
 pub const VariableSetKind_VAR_RESET_ALL: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ViewCheckOption::NO_CHECK_OPTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ViewCheckOption::NO_CHECK_OPTION")]
 pub const ViewCheckOption_NO_CHECK_OPTION: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ViewCheckOption::LOCAL_CHECK_OPTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ViewCheckOption::LOCAL_CHECK_OPTION")]
 pub const ViewCheckOption_LOCAL_CHECK_OPTION: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::ViewCheckOption::CASCADED_CHECK_OPTION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::ViewCheckOption::CASCADED_CHECK_OPTION")]
 pub const ViewCheckOption_CASCADED_CHECK_OPTION: u32 = 2;
 #[deprecated(
     since = "0.12.0",
@@ -61132,57 +56531,27 @@ pub const VolatileFunctionStatus_VOLATILITY_VOLATILE: u32 = 1;
     note = "you want pg_sys::VolatileFunctionStatus::VOLATILITY_NOVOLATILE"
 )]
 pub const VolatileFunctionStatus_VOLATILITY_NOVOLATILE: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WALAvailability::WALAVAIL_INVALID_LSN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WALAvailability::WALAVAIL_INVALID_LSN")]
 pub const WALAvailability_WALAVAIL_INVALID_LSN: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WALAvailability::WALAVAIL_RESERVED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WALAvailability::WALAVAIL_RESERVED")]
 pub const WALAvailability_WALAVAIL_RESERVED: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WALAvailability::WALAVAIL_EXTENDED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WALAvailability::WALAVAIL_EXTENDED")]
 pub const WALAvailability_WALAVAIL_EXTENDED: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WALAvailability::WALAVAIL_UNRESERVED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WALAvailability::WALAVAIL_UNRESERVED")]
 pub const WALAvailability_WALAVAIL_UNRESERVED: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WALAvailability::WALAVAIL_REMOVED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WALAvailability::WALAVAIL_REMOVED")]
 pub const WALAvailability_WALAVAIL_REMOVED: u32 = 4;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::WCOKind::WCO_VIEW_CHECK")]
 pub const WCOKind_WCO_VIEW_CHECK: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WCOKind::WCO_RLS_INSERT_CHECK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WCOKind::WCO_RLS_INSERT_CHECK")]
 pub const WCOKind_WCO_RLS_INSERT_CHECK: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WCOKind::WCO_RLS_UPDATE_CHECK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WCOKind::WCO_RLS_UPDATE_CHECK")]
 pub const WCOKind_WCO_RLS_UPDATE_CHECK: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WCOKind::WCO_RLS_CONFLICT_CHECK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WCOKind::WCO_RLS_CONFLICT_CHECK")]
 pub const WCOKind_WCO_RLS_CONFLICT_CHECK: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WCOKind::WCO_RLS_MERGE_UPDATE_CHECK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WCOKind::WCO_RLS_MERGE_UPDATE_CHECK")]
 pub const WCOKind_WCO_RLS_MERGE_UPDATE_CHECK: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WCOKind::WCO_RLS_MERGE_DELETE_CHECK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WCOKind::WCO_RLS_MERGE_DELETE_CHECK")]
 pub const WCOKind_WCO_RLS_MERGE_DELETE_CHECK: u32 = 5;
 #[deprecated(
     since = "0.12.0",
@@ -61274,20 +56643,11 @@ pub const WaitEventActivity_WAIT_EVENT_WAL_SUMMARIZER_WAL: u32 = 83886096;
     note = "you want pg_sys::WaitEventActivity::WAIT_EVENT_WAL_WRITER_MAIN"
 )]
 pub const WaitEventActivity_WAIT_EVENT_WAL_WRITER_MAIN: u32 = 83886097;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventBufferPin::WAIT_EVENT_BUFFER_PIN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventBufferPin::WAIT_EVENT_BUFFER_PIN")]
 pub const WaitEventBufferPin_WAIT_EVENT_BUFFER_PIN: u32 = 67108864;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventClient::WAIT_EVENT_CLIENT_READ"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventClient::WAIT_EVENT_CLIENT_READ")]
 pub const WaitEventClient_WAIT_EVENT_CLIENT_READ: u32 = 100663296;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventClient::WAIT_EVENT_CLIENT_WRITE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventClient::WAIT_EVENT_CLIENT_WRITE")]
 pub const WaitEventClient_WAIT_EVENT_CLIENT_WRITE: u32 = 100663297;
 #[deprecated(
     since = "0.12.0",
@@ -61324,10 +56684,7 @@ pub const WaitEventClient_WAIT_EVENT_WAL_SENDER_WAIT_FOR_WAL: u32 = 100663303;
     note = "you want pg_sys::WaitEventClient::WAIT_EVENT_WAL_SENDER_WRITE_DATA"
 )]
 pub const WaitEventClient_WAIT_EVENT_WAL_SENDER_WRITE_DATA: u32 = 100663304;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_AIO_IO_COMPLETION"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_AIO_IO_COMPLETION")]
 pub const WaitEventIO_WAIT_EVENT_AIO_IO_COMPLETION: u32 = 167772160;
 #[deprecated(
     since = "0.12.0",
@@ -61339,45 +56696,21 @@ pub const WaitEventIO_WAIT_EVENT_AIO_IO_URING_EXECUTION: u32 = 167772161;
     note = "you want pg_sys::WaitEventIO::WAIT_EVENT_AIO_IO_URING_SUBMIT"
 )]
 pub const WaitEventIO_WAIT_EVENT_AIO_IO_URING_SUBMIT: u32 = 167772162;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BASEBACKUP_READ"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BASEBACKUP_READ")]
 pub const WaitEventIO_WAIT_EVENT_BASEBACKUP_READ: u32 = 167772163;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BASEBACKUP_SYNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BASEBACKUP_SYNC")]
 pub const WaitEventIO_WAIT_EVENT_BASEBACKUP_SYNC: u32 = 167772164;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BASEBACKUP_WRITE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BASEBACKUP_WRITE")]
 pub const WaitEventIO_WAIT_EVENT_BASEBACKUP_WRITE: u32 = 167772165;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BUFFILE_READ"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BUFFILE_READ")]
 pub const WaitEventIO_WAIT_EVENT_BUFFILE_READ: u32 = 167772166;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BUFFILE_TRUNCATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BUFFILE_TRUNCATE")]
 pub const WaitEventIO_WAIT_EVENT_BUFFILE_TRUNCATE: u32 = 167772167;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BUFFILE_WRITE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_BUFFILE_WRITE")]
 pub const WaitEventIO_WAIT_EVENT_BUFFILE_WRITE: u32 = 167772168;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_CONTROL_FILE_READ"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_CONTROL_FILE_READ")]
 pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_READ: u32 = 167772169;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_CONTROL_FILE_SYNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_CONTROL_FILE_SYNC")]
 pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_SYNC: u32 = 167772170;
 #[deprecated(
     since = "0.12.0",
@@ -61394,30 +56727,15 @@ pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_WRITE: u32 = 167772172;
     note = "you want pg_sys::WaitEventIO::WAIT_EVENT_CONTROL_FILE_WRITE_UPDATE"
 )]
 pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_WRITE_UPDATE: u32 = 167772173;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_COPY_FILE_COPY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_COPY_FILE_COPY")]
 pub const WaitEventIO_WAIT_EVENT_COPY_FILE_COPY: u32 = 167772174;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_COPY_FILE_READ"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_COPY_FILE_READ")]
 pub const WaitEventIO_WAIT_EVENT_COPY_FILE_READ: u32 = 167772175;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_COPY_FILE_WRITE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_COPY_FILE_WRITE")]
 pub const WaitEventIO_WAIT_EVENT_COPY_FILE_WRITE: u32 = 167772176;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_EXTEND"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_EXTEND")]
 pub const WaitEventIO_WAIT_EVENT_DATA_FILE_EXTEND: u32 = 167772177;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_FLUSH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_FLUSH")]
 pub const WaitEventIO_WAIT_EVENT_DATA_FILE_FLUSH: u32 = 167772178;
 #[deprecated(
     since = "0.12.0",
@@ -61429,30 +56747,18 @@ pub const WaitEventIO_WAIT_EVENT_DATA_FILE_IMMEDIATE_SYNC: u32 = 167772179;
     note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_PREFETCH"
 )]
 pub const WaitEventIO_WAIT_EVENT_DATA_FILE_PREFETCH: u32 = 167772180;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_READ"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_READ")]
 pub const WaitEventIO_WAIT_EVENT_DATA_FILE_READ: u32 = 167772181;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_SYNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_SYNC")]
 pub const WaitEventIO_WAIT_EVENT_DATA_FILE_SYNC: u32 = 167772182;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_TRUNCATE"
 )]
 pub const WaitEventIO_WAIT_EVENT_DATA_FILE_TRUNCATE: u32 = 167772183;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_WRITE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DATA_FILE_WRITE")]
 pub const WaitEventIO_WAIT_EVENT_DATA_FILE_WRITE: u32 = 167772184;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DSM_ALLOCATE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_DSM_ALLOCATE")]
 pub const WaitEventIO_WAIT_EVENT_DSM_ALLOCATE: u32 = 167772185;
 #[deprecated(
     since = "0.12.0",
@@ -61524,10 +56830,7 @@ pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_TRUNCATE: u32 = 167772198;
     note = "you want pg_sys::WaitEventIO::WAIT_EVENT_LOGICAL_REWRITE_WRITE"
 )]
 pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_WRITE: u32 = 167772199;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_RELATION_MAP_READ"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_RELATION_MAP_READ")]
 pub const WaitEventIO_WAIT_EVENT_RELATION_MAP_READ: u32 = 167772200;
 #[deprecated(
     since = "0.12.0",
@@ -61574,40 +56877,19 @@ pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_SYNC: u32 = 167772208;
     note = "you want pg_sys::WaitEventIO::WAIT_EVENT_REPLICATION_SLOT_WRITE"
 )]
 pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_WRITE: u32 = 167772209;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SLRU_FLUSH_SYNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SLRU_FLUSH_SYNC")]
 pub const WaitEventIO_WAIT_EVENT_SLRU_FLUSH_SYNC: u32 = 167772210;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SLRU_READ"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SLRU_READ")]
 pub const WaitEventIO_WAIT_EVENT_SLRU_READ: u32 = 167772211;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SLRU_SYNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SLRU_SYNC")]
 pub const WaitEventIO_WAIT_EVENT_SLRU_SYNC: u32 = 167772212;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SLRU_WRITE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SLRU_WRITE")]
 pub const WaitEventIO_WAIT_EVENT_SLRU_WRITE: u32 = 167772213;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SNAPBUILD_READ"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SNAPBUILD_READ")]
 pub const WaitEventIO_WAIT_EVENT_SNAPBUILD_READ: u32 = 167772214;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SNAPBUILD_SYNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SNAPBUILD_SYNC")]
 pub const WaitEventIO_WAIT_EVENT_SNAPBUILD_SYNC: u32 = 167772215;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SNAPBUILD_WRITE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_SNAPBUILD_WRITE")]
 pub const WaitEventIO_WAIT_EVENT_SNAPBUILD_WRITE: u32 = 167772216;
 #[deprecated(
     since = "0.12.0",
@@ -61649,10 +56931,7 @@ pub const WaitEventIO_WAIT_EVENT_TWOPHASE_FILE_SYNC: u32 = 167772223;
     note = "you want pg_sys::WaitEventIO::WAIT_EVENT_TWOPHASE_FILE_WRITE"
 )]
 pub const WaitEventIO_WAIT_EVENT_TWOPHASE_FILE_WRITE: u32 = 167772224;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_VERSION_FILE_SYNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_VERSION_FILE_SYNC")]
 pub const WaitEventIO_WAIT_EVENT_VERSION_FILE_SYNC: u32 = 167772225;
 #[deprecated(
     since = "0.12.0",
@@ -61674,75 +56953,39 @@ pub const WaitEventIO_WAIT_EVENT_WAL_BOOTSTRAP_SYNC: u32 = 167772228;
     note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_BOOTSTRAP_WRITE"
 )]
 pub const WaitEventIO_WAIT_EVENT_WAL_BOOTSTRAP_WRITE: u32 = 167772229;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_COPY_READ"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_COPY_READ")]
 pub const WaitEventIO_WAIT_EVENT_WAL_COPY_READ: u32 = 167772230;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_COPY_SYNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_COPY_SYNC")]
 pub const WaitEventIO_WAIT_EVENT_WAL_COPY_SYNC: u32 = 167772231;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_COPY_WRITE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_COPY_WRITE")]
 pub const WaitEventIO_WAIT_EVENT_WAL_COPY_WRITE: u32 = 167772232;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_INIT_SYNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_INIT_SYNC")]
 pub const WaitEventIO_WAIT_EVENT_WAL_INIT_SYNC: u32 = 167772233;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_INIT_WRITE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_INIT_WRITE")]
 pub const WaitEventIO_WAIT_EVENT_WAL_INIT_WRITE: u32 = 167772234;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_READ"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_READ")]
 pub const WaitEventIO_WAIT_EVENT_WAL_READ: u32 = 167772235;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_SUMMARY_READ"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_SUMMARY_READ")]
 pub const WaitEventIO_WAIT_EVENT_WAL_SUMMARY_READ: u32 = 167772236;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_SUMMARY_WRITE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_SUMMARY_WRITE")]
 pub const WaitEventIO_WAIT_EVENT_WAL_SUMMARY_WRITE: u32 = 167772237;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_SYNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_SYNC")]
 pub const WaitEventIO_WAIT_EVENT_WAL_SYNC: u32 = 167772238;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_SYNC_METHOD_ASSIGN"
 )]
 pub const WaitEventIO_WAIT_EVENT_WAL_SYNC_METHOD_ASSIGN: u32 = 167772239;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_WRITE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIO::WAIT_EVENT_WAL_WRITE")]
 pub const WaitEventIO_WAIT_EVENT_WAL_WRITE: u32 = 167772240;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_APPEND_READY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_APPEND_READY")]
 pub const WaitEventIPC_WAIT_EVENT_APPEND_READY: u32 = 134217728;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_ARCHIVE_CLEANUP_COMMAND"
 )]
 pub const WaitEventIPC_WAIT_EVENT_ARCHIVE_CLEANUP_COMMAND: u32 = 134217729;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_ARCHIVE_COMMAND"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_ARCHIVE_COMMAND")]
 pub const WaitEventIPC_WAIT_EVENT_ARCHIVE_COMMAND: u32 = 134217730;
 #[deprecated(
     since = "0.12.0",
@@ -61759,20 +57002,11 @@ pub const WaitEventIPC_WAIT_EVENT_BACKUP_WAIT_WAL_ARCHIVE: u32 = 134217732;
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_BGWORKER_SHUTDOWN"
 )]
 pub const WaitEventIPC_WAIT_EVENT_BGWORKER_SHUTDOWN: u32 = 134217733;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_BGWORKER_STARTUP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_BGWORKER_STARTUP")]
 pub const WaitEventIPC_WAIT_EVENT_BGWORKER_STARTUP: u32 = 134217734;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_BTREE_PAGE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_BTREE_PAGE")]
 pub const WaitEventIPC_WAIT_EVENT_BTREE_PAGE: u32 = 134217735;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_BUFFER_IO"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_BUFFER_IO")]
 pub const WaitEventIPC_WAIT_EVENT_BUFFER_IO: u32 = 134217736;
 #[deprecated(
     since = "0.12.0",
@@ -61784,45 +57018,27 @@ pub const WaitEventIPC_WAIT_EVENT_CHECKPOINT_DELAY_COMPLETE: u32 = 134217737;
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_CHECKPOINT_DELAY_START"
 )]
 pub const WaitEventIPC_WAIT_EVENT_CHECKPOINT_DELAY_START: u32 = 134217738;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_CHECKPOINT_DONE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_CHECKPOINT_DONE")]
 pub const WaitEventIPC_WAIT_EVENT_CHECKPOINT_DONE: u32 = 134217739;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_CHECKPOINT_START"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_CHECKPOINT_START")]
 pub const WaitEventIPC_WAIT_EVENT_CHECKPOINT_START: u32 = 134217740;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_EXECUTE_GATHER"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_EXECUTE_GATHER")]
 pub const WaitEventIPC_WAIT_EVENT_EXECUTE_GATHER: u32 = 134217741;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_BATCH_ALLOCATE"
 )]
 pub const WaitEventIPC_WAIT_EVENT_HASH_BATCH_ALLOCATE: u32 = 134217742;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_BATCH_ELECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_BATCH_ELECT")]
 pub const WaitEventIPC_WAIT_EVENT_HASH_BATCH_ELECT: u32 = 134217743;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_BATCH_LOAD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_BATCH_LOAD")]
 pub const WaitEventIPC_WAIT_EVENT_HASH_BATCH_LOAD: u32 = 134217744;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_BUILD_ALLOCATE"
 )]
 pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_ALLOCATE: u32 = 134217745;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_BUILD_ELECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_HASH_BUILD_ELECT")]
 pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_ELECT: u32 = 134217746;
 #[deprecated(
     since = "0.12.0",
@@ -61894,10 +57110,7 @@ pub const WaitEventIPC_WAIT_EVENT_LOGICAL_SYNC_DATA: u32 = 134217759;
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE"
 )]
 pub const WaitEventIPC_WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE: u32 = 134217760;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_MEM_CXT_PUBLISH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_MEM_CXT_PUBLISH")]
 pub const WaitEventIPC_WAIT_EVENT_MEM_CXT_PUBLISH: u32 = 134217761;
 #[deprecated(
     since = "0.12.0",
@@ -61934,10 +57147,7 @@ pub const WaitEventIPC_WAIT_EVENT_PARALLEL_BITMAP_SCAN: u32 = 134217767;
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN"
 )]
 pub const WaitEventIPC_WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN: u32 = 134217768;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PARALLEL_FINISH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PARALLEL_FINISH")]
 pub const WaitEventIPC_WAIT_EVENT_PARALLEL_FINISH: u32 = 134217769;
 #[deprecated(
     since = "0.12.0",
@@ -61949,10 +57159,7 @@ pub const WaitEventIPC_WAIT_EVENT_PROCARRAY_GROUP_UPDATE: u32 = 134217770;
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PROC_SIGNAL_BARRIER"
 )]
 pub const WaitEventIPC_WAIT_EVENT_PROC_SIGNAL_BARRIER: u32 = 134217771;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PROMOTE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PROMOTE")]
 pub const WaitEventIPC_WAIT_EVENT_PROMOTE: u32 = 134217772;
 #[deprecated(
     since = "0.12.0",
@@ -61969,10 +57176,7 @@ pub const WaitEventIPC_WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE: u32 = 134217774;
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_RECOVERY_END_COMMAND"
 )]
 pub const WaitEventIPC_WAIT_EVENT_RECOVERY_END_COMMAND: u32 = 134217775;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_RECOVERY_PAUSE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_RECOVERY_PAUSE")]
 pub const WaitEventIPC_WAIT_EVENT_RECOVERY_PAUSE: u32 = 134217776;
 #[deprecated(
     since = "0.12.0",
@@ -61984,25 +57188,13 @@ pub const WaitEventIPC_WAIT_EVENT_REPLICATION_ORIGIN_DROP: u32 = 134217777;
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_REPLICATION_SLOT_DROP"
 )]
 pub const WaitEventIPC_WAIT_EVENT_REPLICATION_SLOT_DROP: u32 = 134217778;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_RESTORE_COMMAND"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_RESTORE_COMMAND")]
 pub const WaitEventIPC_WAIT_EVENT_RESTORE_COMMAND: u32 = 134217779;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_SAFE_SNAPSHOT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_SAFE_SNAPSHOT")]
 pub const WaitEventIPC_WAIT_EVENT_SAFE_SNAPSHOT: u32 = 134217780;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_SYNC_REP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_SYNC_REP")]
 pub const WaitEventIPC_WAIT_EVENT_SYNC_REP: u32 = 134217781;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_WAL_BUFFER_INIT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_WAL_BUFFER_INIT")]
 pub const WaitEventIPC_WAIT_EVENT_WAL_BUFFER_INIT: u32 = 134217782;
 #[deprecated(
     since = "0.12.0",
@@ -62034,10 +57226,7 @@ pub const WaitEventTimeout_WAIT_EVENT_BASE_BACKUP_THROTTLE: u32 = 150994944;
     note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_CHECKPOINT_WRITE_DELAY"
 )]
 pub const WaitEventTimeout_WAIT_EVENT_CHECKPOINT_WRITE_DELAY: u32 = 150994945;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_PG_SLEEP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_PG_SLEEP")]
 pub const WaitEventTimeout_WAIT_EVENT_PG_SLEEP: u32 = 150994946;
 #[deprecated(
     since = "0.12.0",
@@ -62054,15 +57243,9 @@ pub const WaitEventTimeout_WAIT_EVENT_RECOVERY_RETRIEVE_RETRY_INTERVAL: u32 = 15
     note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_REGISTER_SYNC_REQUEST"
 )]
 pub const WaitEventTimeout_WAIT_EVENT_REGISTER_SYNC_REQUEST: u32 = 150994949;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_SPIN_DELAY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_SPIN_DELAY")]
 pub const WaitEventTimeout_WAIT_EVENT_SPIN_DELAY: u32 = 150994950;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_VACUUM_DELAY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_VACUUM_DELAY")]
 pub const WaitEventTimeout_WAIT_EVENT_VACUUM_DELAY: u32 = 150994951;
 #[deprecated(
     since = "0.12.0",
@@ -62074,140 +57257,62 @@ pub const WaitEventTimeout_WAIT_EVENT_VACUUM_TRUNCATE: u32 = 150994952;
     note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_WAL_SUMMARIZER_ERROR"
 )]
 pub const WaitEventTimeout_WAIT_EVENT_WAL_SUMMARIZER_ERROR: u32 = 150994953;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalCompression::WAL_COMPRESSION_NONE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalCompression::WAL_COMPRESSION_NONE")]
 pub const WalCompression_WAL_COMPRESSION_NONE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalCompression::WAL_COMPRESSION_PGLZ"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalCompression::WAL_COMPRESSION_PGLZ")]
 pub const WalCompression_WAL_COMPRESSION_PGLZ: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalCompression::WAL_COMPRESSION_LZ4"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalCompression::WAL_COMPRESSION_LZ4")]
 pub const WalCompression_WAL_COMPRESSION_LZ4: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalCompression::WAL_COMPRESSION_ZSTD"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalCompression::WAL_COMPRESSION_ZSTD")]
 pub const WalCompression_WAL_COMPRESSION_ZSTD: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalLevel::WAL_LEVEL_MINIMAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalLevel::WAL_LEVEL_MINIMAL")]
 pub const WalLevel_WAL_LEVEL_MINIMAL: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalLevel::WAL_LEVEL_REPLICA"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalLevel::WAL_LEVEL_REPLICA")]
 pub const WalLevel_WAL_LEVEL_REPLICA: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalLevel::WAL_LEVEL_LOGICAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalLevel::WAL_LEVEL_LOGICAL")]
 pub const WalLevel_WAL_LEVEL_LOGICAL: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalRcvExecStatus::WALRCV_ERROR"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvExecStatus::WALRCV_ERROR")]
 pub const WalRcvExecStatus_WALRCV_ERROR: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalRcvExecStatus::WALRCV_OK_COMMAND"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvExecStatus::WALRCV_OK_COMMAND")]
 pub const WalRcvExecStatus_WALRCV_OK_COMMAND: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalRcvExecStatus::WALRCV_OK_TUPLES"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvExecStatus::WALRCV_OK_TUPLES")]
 pub const WalRcvExecStatus_WALRCV_OK_TUPLES: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalRcvExecStatus::WALRCV_OK_COPY_IN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvExecStatus::WALRCV_OK_COPY_IN")]
 pub const WalRcvExecStatus_WALRCV_OK_COPY_IN: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalRcvExecStatus::WALRCV_OK_COPY_OUT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvExecStatus::WALRCV_OK_COPY_OUT")]
 pub const WalRcvExecStatus_WALRCV_OK_COPY_OUT: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalRcvExecStatus::WALRCV_OK_COPY_BOTH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvExecStatus::WALRCV_OK_COPY_BOTH")]
 pub const WalRcvExecStatus_WALRCV_OK_COPY_BOTH: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalRcvState::WALRCV_STOPPED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvState::WALRCV_STOPPED")]
 pub const WalRcvState_WALRCV_STOPPED: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalRcvState::WALRCV_STARTING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvState::WALRCV_STARTING")]
 pub const WalRcvState_WALRCV_STARTING: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalRcvState::WALRCV_STREAMING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvState::WALRCV_STREAMING")]
 pub const WalRcvState_WALRCV_STREAMING: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalRcvState::WALRCV_WAITING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvState::WALRCV_WAITING")]
 pub const WalRcvState_WALRCV_WAITING: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalRcvState::WALRCV_RESTARTING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvState::WALRCV_RESTARTING")]
 pub const WalRcvState_WALRCV_RESTARTING: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalRcvState::WALRCV_STOPPING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvState::WALRCV_STOPPING")]
 pub const WalRcvState_WALRCV_STOPPING: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalSyncMethod::WAL_SYNC_METHOD_FSYNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalSyncMethod::WAL_SYNC_METHOD_FSYNC")]
 pub const WalSyncMethod_WAL_SYNC_METHOD_FSYNC: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalSyncMethod::WAL_SYNC_METHOD_FDATASYNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalSyncMethod::WAL_SYNC_METHOD_FDATASYNC")]
 pub const WalSyncMethod_WAL_SYNC_METHOD_FDATASYNC: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalSyncMethod::WAL_SYNC_METHOD_OPEN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalSyncMethod::WAL_SYNC_METHOD_OPEN")]
 pub const WalSyncMethod_WAL_SYNC_METHOD_OPEN: u32 = 2;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WalSyncMethod::WAL_SYNC_METHOD_FSYNC_WRITETHROUGH"
 )]
 pub const WalSyncMethod_WAL_SYNC_METHOD_FSYNC_WRITETHROUGH: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WalSyncMethod::WAL_SYNC_METHOD_OPEN_DSYNC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalSyncMethod::WAL_SYNC_METHOD_OPEN_DSYNC")]
 pub const WalSyncMethod_WAL_SYNC_METHOD_OPEN_DSYNC: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WindowAggStatus::WINDOWAGG_DONE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WindowAggStatus::WINDOWAGG_DONE")]
 pub const WindowAggStatus_WINDOWAGG_DONE: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WindowAggStatus::WINDOWAGG_RUN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WindowAggStatus::WINDOWAGG_RUN")]
 pub const WindowAggStatus_WINDOWAGG_RUN: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::WindowAggStatus::WINDOWAGG_PASSTHROUGH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WindowAggStatus::WINDOWAGG_PASSTHROUGH")]
 pub const WindowAggStatus_WINDOWAGG_PASSTHROUGH: u32 = 2;
 #[deprecated(
     since = "0.12.0",
@@ -62222,102 +57327,45 @@ pub const XLTW_Oper_XLTW_Update: u32 = 1;
 pub const XLTW_Oper_XLTW_Delete: u32 = 2;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::XLTW_Oper::XLTW_Lock")]
 pub const XLTW_Oper_XLTW_Lock: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XLTW_Oper::XLTW_LockUpdated"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLTW_Oper::XLTW_LockUpdated")]
 pub const XLTW_Oper_XLTW_LockUpdated: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XLTW_Oper::XLTW_InsertIndex"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLTW_Oper::XLTW_InsertIndex")]
 pub const XLTW_Oper_XLTW_InsertIndex: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XLTW_Oper::XLTW_InsertIndexUnique"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLTW_Oper::XLTW_InsertIndexUnique")]
 pub const XLTW_Oper_XLTW_InsertIndexUnique: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XLTW_Oper::XLTW_FetchUpdated"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLTW_Oper::XLTW_FetchUpdated")]
 pub const XLTW_Oper_XLTW_FetchUpdated: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XLTW_Oper::XLTW_RecheckExclusionConstr"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLTW_Oper::XLTW_RecheckExclusionConstr")]
 pub const XLTW_Oper_XLTW_RecheckExclusionConstr: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XLogPageReadResult::XLREAD_SUCCESS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLogPageReadResult::XLREAD_SUCCESS")]
 pub const XLogPageReadResult_XLREAD_SUCCESS: i32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XLogPageReadResult::XLREAD_FAIL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLogPageReadResult::XLREAD_FAIL")]
 pub const XLogPageReadResult_XLREAD_FAIL: i32 = -1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XLogPageReadResult::XLREAD_WOULDBLOCK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLogPageReadResult::XLREAD_WOULDBLOCK")]
 pub const XLogPageReadResult_XLREAD_WOULDBLOCK: i32 = -2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XLogRedoAction::BLK_NEEDS_REDO"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLogRedoAction::BLK_NEEDS_REDO")]
 pub const XLogRedoAction_BLK_NEEDS_REDO: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::XLogRedoAction::BLK_DONE")]
 pub const XLogRedoAction_BLK_DONE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XLogRedoAction::BLK_RESTORED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLogRedoAction::BLK_RESTORED")]
 pub const XLogRedoAction_BLK_RESTORED: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XLogRedoAction::BLK_NOTFOUND"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XLogRedoAction::BLK_NOTFOUND")]
 pub const XLogRedoAction_BLK_NOTFOUND: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XactEvent::XACT_EVENT_COMMIT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XactEvent::XACT_EVENT_COMMIT")]
 pub const XactEvent_XACT_EVENT_COMMIT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XactEvent::XACT_EVENT_PARALLEL_COMMIT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XactEvent::XACT_EVENT_PARALLEL_COMMIT")]
 pub const XactEvent_XACT_EVENT_PARALLEL_COMMIT: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XactEvent::XACT_EVENT_ABORT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XactEvent::XACT_EVENT_ABORT")]
 pub const XactEvent_XACT_EVENT_ABORT: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XactEvent::XACT_EVENT_PARALLEL_ABORT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XactEvent::XACT_EVENT_PARALLEL_ABORT")]
 pub const XactEvent_XACT_EVENT_PARALLEL_ABORT: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XactEvent::XACT_EVENT_PREPARE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XactEvent::XACT_EVENT_PREPARE")]
 pub const XactEvent_XACT_EVENT_PREPARE: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XactEvent::XACT_EVENT_PRE_COMMIT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XactEvent::XACT_EVENT_PRE_COMMIT")]
 pub const XactEvent_XACT_EVENT_PRE_COMMIT: u32 = 5;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XactEvent::XACT_EVENT_PARALLEL_PRE_COMMIT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XactEvent::XACT_EVENT_PARALLEL_PRE_COMMIT")]
 pub const XactEvent_XACT_EVENT_PARALLEL_PRE_COMMIT: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XactEvent::XACT_EVENT_PRE_PREPARE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XactEvent::XACT_EVENT_PRE_PREPARE")]
 pub const XactEvent_XACT_EVENT_PRE_PREPARE: u32 = 7;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::XmlExprOp::IS_XMLCONCAT")]
 pub const XmlExprOp_IS_XMLCONCAT: u32 = 0;
@@ -62335,15 +57383,9 @@ pub const XmlExprOp_IS_XMLROOT: u32 = 5;
 pub const XmlExprOp_IS_XMLSERIALIZE: u32 = 6;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::XmlExprOp::IS_DOCUMENT")]
 pub const XmlExprOp_IS_DOCUMENT: u32 = 7;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XmlOptionType::XMLOPTION_DOCUMENT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XmlOptionType::XMLOPTION_DOCUMENT")]
 pub const XmlOptionType_XMLOPTION_DOCUMENT: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::XmlOptionType::XMLOPTION_CONTENT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::XmlOptionType::XMLOPTION_CONTENT")]
 pub const XmlOptionType_XMLOPTION_CONTENT: u32 = 1;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::__pid_type::F_OWNER_TID")]
 pub const __pid_type_F_OWNER_TID: u32 = 0;
@@ -62361,24 +57403,15 @@ pub const __socket_type_SOCK_DGRAM: u32 = 2;
 pub const __socket_type_SOCK_RAW: u32 = 3;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::__socket_type::SOCK_RDM")]
 pub const __socket_type_SOCK_RDM: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::__socket_type::SOCK_SEQPACKET"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::__socket_type::SOCK_SEQPACKET")]
 pub const __socket_type_SOCK_SEQPACKET: u32 = 5;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::__socket_type::SOCK_DCCP")]
 pub const __socket_type_SOCK_DCCP: u32 = 6;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::__socket_type::SOCK_PACKET")]
 pub const __socket_type_SOCK_PACKET: u32 = 10;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::__socket_type::SOCK_CLOEXEC"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::__socket_type::SOCK_CLOEXEC")]
 pub const __socket_type_SOCK_CLOEXEC: u32 = 524288;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::__socket_type::SOCK_NONBLOCK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::__socket_type::SOCK_NONBLOCK")]
 pub const __socket_type_SOCK_NONBLOCK: u32 = 2048;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::dsm_op::DSM_OP_CREATE")]
 pub const dsm_op_DSM_OP_CREATE: u32 = 0;
@@ -62490,165 +57523,69 @@ pub const pg_enc_PG_JOHAB: u32 = 40;
 pub const pg_enc_PG_SHIFT_JIS_2004: u32 = 41;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::pg_enc::_PG_LAST_ENCODING_")]
 pub const pg_enc__PG_LAST_ENCODING_: u32 = 42;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_kind::RELOPT_KIND_LOCAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_LOCAL")]
 pub const relopt_kind_RELOPT_KIND_LOCAL: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_kind::RELOPT_KIND_HEAP"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_HEAP")]
 pub const relopt_kind_RELOPT_KIND_HEAP: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_kind::RELOPT_KIND_TOAST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_TOAST")]
 pub const relopt_kind_RELOPT_KIND_TOAST: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_kind::RELOPT_KIND_BTREE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_BTREE")]
 pub const relopt_kind_RELOPT_KIND_BTREE: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_kind::RELOPT_KIND_HASH"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_HASH")]
 pub const relopt_kind_RELOPT_KIND_HASH: u32 = 8;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_kind::RELOPT_KIND_GIN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_GIN")]
 pub const relopt_kind_RELOPT_KIND_GIN: u32 = 16;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_kind::RELOPT_KIND_GIST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_GIST")]
 pub const relopt_kind_RELOPT_KIND_GIST: u32 = 32;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_kind::RELOPT_KIND_ATTRIBUTE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_ATTRIBUTE")]
 pub const relopt_kind_RELOPT_KIND_ATTRIBUTE: u32 = 64;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_kind::RELOPT_KIND_TABLESPACE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_TABLESPACE")]
 pub const relopt_kind_RELOPT_KIND_TABLESPACE: u32 = 128;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_kind::RELOPT_KIND_SPGIST"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_SPGIST")]
 pub const relopt_kind_RELOPT_KIND_SPGIST: u32 = 256;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_kind::RELOPT_KIND_VIEW"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_VIEW")]
 pub const relopt_kind_RELOPT_KIND_VIEW: u32 = 512;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_kind::RELOPT_KIND_BRIN"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_BRIN")]
 pub const relopt_kind_RELOPT_KIND_BRIN: u32 = 1024;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_kind::RELOPT_KIND_PARTITIONED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_PARTITIONED")]
 pub const relopt_kind_RELOPT_KIND_PARTITIONED: u32 = 2048;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_kind::RELOPT_KIND_LAST_DEFAULT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_LAST_DEFAULT")]
 pub const relopt_kind_RELOPT_KIND_LAST_DEFAULT: u32 = 2048;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_kind::RELOPT_KIND_MAX"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_kind::RELOPT_KIND_MAX")]
 pub const relopt_kind_RELOPT_KIND_MAX: u32 = 1073741824;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_type::RELOPT_TYPE_BOOL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_type::RELOPT_TYPE_BOOL")]
 pub const relopt_type_RELOPT_TYPE_BOOL: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_type::RELOPT_TYPE_INT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_type::RELOPT_TYPE_INT")]
 pub const relopt_type_RELOPT_TYPE_INT: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_type::RELOPT_TYPE_REAL"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_type::RELOPT_TYPE_REAL")]
 pub const relopt_type_RELOPT_TYPE_REAL: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_type::RELOPT_TYPE_ENUM"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_type::RELOPT_TYPE_ENUM")]
 pub const relopt_type_RELOPT_TYPE_ENUM: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::relopt_type::RELOPT_TYPE_STRING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::relopt_type::RELOPT_TYPE_STRING")]
 pub const relopt_type_RELOPT_TYPE_STRING: u32 = 4;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::shm_mq_result::SHM_MQ_SUCCESS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::shm_mq_result::SHM_MQ_SUCCESS")]
 pub const shm_mq_result_SHM_MQ_SUCCESS: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::shm_mq_result::SHM_MQ_WOULD_BLOCK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::shm_mq_result::SHM_MQ_WOULD_BLOCK")]
 pub const shm_mq_result_SHM_MQ_WOULD_BLOCK: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::shm_mq_result::SHM_MQ_DETACHED"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::shm_mq_result::SHM_MQ_DETACHED")]
 pub const shm_mq_result_SHM_MQ_DETACHED: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::subxids_array_status::SUBXIDS_IN_ARRAY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::subxids_array_status::SUBXIDS_IN_ARRAY")]
 pub const subxids_array_status_SUBXIDS_IN_ARRAY: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::subxids_array_status::SUBXIDS_MISSING"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::subxids_array_status::SUBXIDS_MISSING")]
 pub const subxids_array_status_SUBXIDS_MISSING: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::subxids_array_status::SUBXIDS_IN_SUBTRANS"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::subxids_array_status::SUBXIDS_IN_SUBTRANS")]
 pub const subxids_array_status_SUBXIDS_IN_SUBTRANS: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::tuplehash_status::tuplehash_SH_EMPTY"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::tuplehash_status::tuplehash_SH_EMPTY")]
 pub const tuplehash_status_tuplehash_SH_EMPTY: u32 = 0;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::tuplehash_status::tuplehash_SH_IN_USE"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::tuplehash_status::tuplehash_SH_IN_USE")]
 pub const tuplehash_status_tuplehash_SH_IN_USE: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::vartag_external::VARTAG_INDIRECT"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::vartag_external::VARTAG_INDIRECT")]
 pub const vartag_external_VARTAG_INDIRECT: u32 = 1;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::vartag_external::VARTAG_EXPANDED_RO"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::vartag_external::VARTAG_EXPANDED_RO")]
 pub const vartag_external_VARTAG_EXPANDED_RO: u32 = 2;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::vartag_external::VARTAG_EXPANDED_RW"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::vartag_external::VARTAG_EXPANDED_RW")]
 pub const vartag_external_VARTAG_EXPANDED_RW: u32 = 3;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::vartag_external::VARTAG_ONDISK"
-)]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::vartag_external::VARTAG_ONDISK")]
 pub const vartag_external_VARTAG_ONDISK: u32 = 18;
 impl pg_sys::seal::Sealed for ATAlterConstraint {}
 impl pg_sys::PgNode for ATAlterConstraint {}

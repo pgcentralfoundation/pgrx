@@ -27,7 +27,6 @@ pub use cstr::AsPgCStr;
 pub use include::*;
 pub use node::PgNode;
 pub use port::*;
-#[allow(ambiguous_glob_reexports)]
 pub use submodules::*;
 
 mod seal {

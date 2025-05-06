@@ -717,7 +717,7 @@ pub fn SUPPORTED_VERSIONS() -> Vec<PgVersion> {
         PgVersion::new(15, PgMinorVersion::Latest, None),
         PgVersion::new(16, PgMinorVersion::Latest, None),
         PgVersion::new(17, PgMinorVersion::Latest, None),
-        PgVersion::new(18, PgMinorVersion::Latest, None),
+        PgVersion::new(18, PgMinorVersion::Devel, None),
     ]
 }
 

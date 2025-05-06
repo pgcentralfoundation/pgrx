@@ -8,7 +8,10 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::{
-    bits8, getmissingattr, heap_getsysattr, nocachegetattr, CommandId, Datum, FrozenTransactionId, HeapTupleData, HeapTupleHeaderData, TransactionId, TupleDesc, HEAP_HASNULL, HEAP_HOT_UPDATED, HEAP_NATTS_MASK, HEAP_ONLY_TUPLE, HEAP_XMAX_INVALID, HEAP_XMIN_COMMITTED, HEAP_XMIN_FROZEN, HEAP_XMIN_INVALID, SIZEOF_DATUM
+    bits8, getmissingattr, heap_getsysattr, nocachegetattr, CommandId, Datum, FrozenTransactionId,
+    HeapTupleData, HeapTupleHeaderData, TransactionId, TupleDesc, HEAP_HASNULL, HEAP_HOT_UPDATED,
+    HEAP_NATTS_MASK, HEAP_ONLY_TUPLE, HEAP_XMAX_INVALID, HEAP_XMIN_COMMITTED, HEAP_XMIN_FROZEN,
+    HEAP_XMIN_INVALID, SIZEOF_DATUM,
 };
 
 /// # Safety
@@ -196,7 +199,13 @@ unsafe fn att_isnull(ATT: i32, BITS: *const bits8) -> bool {
 ///
 /// Caller is responsible for ensuring `A` is a valid [`FormData_pg_attribute`] pointer
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
+#[cfg(any(
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17"
+))]
 unsafe fn fetchatt(A: *const crate::FormData_pg_attribute, T: *mut std::os::raw::c_char) -> Datum {
     // #define fetchatt(A,T) fetch_att(T, (A)->attbyval, (A)->attlen)
 
@@ -389,10 +398,17 @@ unsafe fn fastgetattr(
     unsafe {
         *isnull = false;
         if HeapTupleNoNulls(tup) {
-            #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
+            #[cfg(any(
+                feature = "pg13",
+                feature = "pg14",
+                feature = "pg15",
+                feature = "pg16",
+                feature = "pg17"
+            ))]
             let att = &(*tupleDesc).attrs.as_slice((*tupleDesc).natts as _)[attnum as usize - 1];
             #[cfg(feature = "pg18")]
-            let att = &(*tupleDesc).compact_attrs.as_slice((*tupleDesc).natts as _)[attnum as usize - 1];
+            let att =
+                &(*tupleDesc).compact_attrs.as_slice((*tupleDesc).natts as _)[attnum as usize - 1];
             if att.attcacheoff >= 0 {
                 let t_data = (*tup).t_data;
                 fetchatt(

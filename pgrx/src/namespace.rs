@@ -32,7 +32,12 @@ impl PgQualifiedNameBuilder {
         PgQualifiedNameBuilder {
             #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
             list: PgList::<pg_sys::String>::new(),
-            #[cfg(not(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18")))]
+            #[cfg(not(any(
+                feature = "pg15",
+                feature = "pg16",
+                feature = "pg17",
+                feature = "pg18"
+            )))]
             list: PgList::<pg_sys::Value>::new(),
         }
     }

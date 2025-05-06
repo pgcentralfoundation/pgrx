@@ -64,7 +64,13 @@ pub trait PgHooks {
     }
 
     /// Hook for plugins to get control in ExecutorStart()
-    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
+    #[cfg(any(
+        feature = "pg13",
+        feature = "pg14",
+        feature = "pg15",
+        feature = "pg16",
+        feature = "pg17"
+    ))]
     fn executor_start(
         &mut self,
         query_desc: PgBox<pg_sys::QueryDesc>,
@@ -86,7 +92,13 @@ pub trait PgHooks {
     }
 
     /// Hook for plugins to get control in ExecutorRun()
-    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
+    #[cfg(any(
+        feature = "pg13",
+        feature = "pg14",
+        feature = "pg15",
+        feature = "pg16",
+        feature = "pg17"
+    ))]
     fn executor_run(
         &mut self,
         query_desc: PgBox<pg_sys::QueryDesc>,
