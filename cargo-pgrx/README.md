@@ -731,7 +731,8 @@ $ diff -U3  ~/_work/pgrx/pgrx-examples/range/pg_regress/expected/bad.out  ~/_wor
 What you wanted in the .sql file is either
 
 ```sql
-CREATE TABLE IF NOT EXISTS foo();
+DROP TABLE IF EXISTS foo;  
+CREATE TABLE foo();
 ``` 
 
 or 
