@@ -67,6 +67,10 @@ pub(crate) struct Regress {
     /// Custom `postgresql.conf` settings in the form of `key=value`, ie `log_min_messages=debug1`
     #[clap(long)]
     pub(crate) postgresql_conf: Vec<String>,
+
+    /// Automatically accept output for new tests *and* overwrite output for existing-but-failing tests
+    #[clap(long, short)]
+    pub(crate) auto: bool,
 }
 
 impl Regress {
@@ -93,6 +97,21 @@ impl Regress {
             std::fs::create_dir(&expected)?;
         }
         let mut files = std::fs::read_dir(expected)?.collect::<Result<Vec<_>, _>>()?;
+
+        let setup_file = Self::organize_files(&mut files, "out");
+
+        Ok((files, setup_file))
+    }
+
+    fn list_results_outputs(
+        &self,
+        manifest_path: impl AsRef<Path>,
+    ) -> eyre::Result<(Vec<DirEntry>, Option<DirEntry>)> {
+        let results = manifest_path_to_results_output_path(manifest_path);
+        if !results.exists() {
+            std::fs::create_dir(&results)?;
+        }
+        let mut files = std::fs::read_dir(results)?.collect::<Result<Vec<_>, _>>()?;
 
         let setup_file = Self::organize_files(&mut files, "out");
 
@@ -138,6 +157,7 @@ impl Regress {
         &self,
         manifest_path: impl AsRef<Path>,
         test_result_output: impl AsRef<Path>,
+        auto: bool,
     ) -> eyre::Result<()> {
         if !std::io::stdin().is_terminal() {
             panic!("not a terminal: cannot perform user interaction to accept tests")
@@ -151,24 +171,33 @@ impl Regress {
             .to_string();
         let test_output = std::fs::read_to_string(&test_result_output)?;
 
-        println!("-----------");
-        println!("{}", test_output.white());
-        println!("test `{}` generated the above output:", test_name.bold().green());
-        eprint!("Accept [Y, n]? ");
-
-        let mut user_input = String::new();
-        std::io::stdin().read_line(&mut user_input)?;
-        let user_input = user_input.trim();
-
         let variant_suffix: Option<String>;
-        if user_input == "Y" || user_input == "y" {
-            variant_suffix = None
-        } else if user_input.as_bytes()[0] >= b'0' && user_input.as_bytes()[0] <= b'9' {
-            // currently secret options to create a variant file
-            // however, postgres requires the original `test_name.out` to also exist
-            variant_suffix = Some(format!("_{user_input}"));
+
+        if auto {
+            variant_suffix = None;
+            println!(
+                "test `{}` is new, automatically accepting its output as expected",
+                test_name.bold().green()
+            );
         } else {
-            std::process::exit(1);
+            println!("-----------");
+            println!("{}", test_output.white());
+            println!("test `{}` generated the above output:", test_name.bold().green());
+            eprint!("Accept [Y, n]? ");
+
+            let mut user_input = String::new();
+            std::io::stdin().read_line(&mut user_input)?;
+            let user_input = user_input.trim();
+
+            if user_input == "Y" || user_input == "y" {
+                variant_suffix = None
+            } else if user_input.as_bytes()[0] >= b'0' && user_input.as_bytes()[0] <= b'9' {
+                // currently secret options to create a variant file
+                // however, postgres requires the original `test_name.out` to also exist
+                variant_suffix = Some(format!("_{user_input}"));
+            } else {
+                std::process::exit(1);
+            }
         }
 
         let expected_path = manifest_path_to_expected_tests_output_path(manifest_path)
@@ -192,22 +221,20 @@ impl Regress {
         dbname: &str,
         test_files: &[&DirEntry],
         output_files: &[&DirEntry],
+        auto: bool,
     ) -> eyre::Result<()> {
-        let test_names = test_files.iter().map(|e| make_test_name(*e)).collect::<HashSet<_>>();
         let output_names = output_files.iter().map(|e| make_test_name(*e)).collect::<HashSet<_>>();
 
-        if test_names.len() > output_names.len() {
-            // there are more tests than there are expected outputs, so figure out which ones
-            // don't have outputs and run them individually to create their outputs
+        // look for new tests (tests without a corresponding output file)
+        let new_tests = test_files
+            .iter()
+            .filter(|entry| {
+                let test_name = make_test_name(entry);
+                !output_names.contains(&test_name)
+            })
+            .collect::<Vec<_>>();
 
-            let new_tests = test_files
-                .iter()
-                .filter(|entry| {
-                    let test_name = make_test_name(entry);
-                    !output_names.contains(&test_name)
-                })
-                .collect::<Vec<_>>();
-
+        if !new_tests.is_empty() {
             println!(
                 "{} {} new tests, running each individually to create output",
                 "       Found".bold().cyan(),
@@ -221,13 +248,40 @@ impl Regress {
                     &dbname,
                     new_test,
                 )? {
-                    self.accept_new_test(&manifest_path, test_result_output)?;
+                    self.accept_new_test(&manifest_path, test_result_output, auto)?;
                 }
             }
         }
 
         // now that all tests have outputs, run them all
-        run_tests(pg_config, pgregress_path, dbname, test_files)
+        let success = run_tests(pg_config, pgregress_path, dbname, test_files)?;
+
+        if !success && auto {
+            // tests failed, but the user asked to `auto`matically accept their output as new output
+            let (results_files, _) = self.list_results_outputs(&manifest_path)?;
+
+            println!();
+            for entry in results_files {
+                let filename =
+                    entry.file_name().to_str().expect("filename should be valid UTF8").to_owned();
+                let expected_path =
+                    manifest_path_to_expected_tests_output_path(&manifest_path).join(filename);
+
+                let src = std::fs::read_to_string(entry.path())?;
+                let dst = std::fs::read_to_string(&expected_path)?;
+                if src != dst {
+                    println!(
+                        "test `{}` failed, automatically promoting its output as",
+                        make_test_name(&entry).bold().bright_red()
+                    );
+                    std::fs::copy(entry.path(), &expected_path)?;
+                }
+            }
+
+            std::process::exit(1);
+        }
+
+        Ok(())
     }
 }
 
@@ -272,7 +326,11 @@ impl CommandExecute for Regress {
 
                 // run the setup test, comparing its result to its output
                 (Some(setup_file), Some(_)) => {
-                    run_tests(&pg_config, &pgregress_path, &dbname, &[&setup_file])?
+                    let success = run_tests(&pg_config, &pgregress_path, &dbname, &[&setup_file])?;
+
+                    if !success {
+                        panic!("the `{}` test failed", "setup".bold().bright_red());
+                    }
                 }
 
                 // create the output for the setup test
@@ -285,7 +343,7 @@ impl CommandExecute for Regress {
                         &setup_file,
                     )? {
                         // and ask the user if it's good
-                        self.accept_new_test(&manifest_path, test_result_output)?;
+                        self.accept_new_test(&manifest_path, test_result_output, self.auto)?;
                     }
                 }
             }
@@ -310,6 +368,7 @@ impl CommandExecute for Regress {
             &dbname,
             &test_files.iter().collect::<Vec<_>>(),
             &output_files.iter().collect::<Vec<_>>(),
+            self.auto,
         )
     }
 }
@@ -319,9 +378,9 @@ fn run_tests(
     pg_regress_bin: impl AsRef<Path>,
     dbname: &str,
     test_files: &[&DirEntry],
-) -> eyre::Result<()> {
+) -> eyre::Result<bool> {
     if test_files.is_empty() {
-        return Ok(());
+        return Ok(true);
     }
     let input_dir = test_files[0].path();
     let input_dir = input_dir
@@ -334,11 +393,7 @@ fn run_tests(
 
     println!("{output}");
 
-    if !status.success() {
-        std::process::exit(status.code().unwrap_or(1));
-    }
-
-    Ok(())
+    Ok(status.success())
 }
 
 fn create_regress_output(
@@ -429,8 +484,7 @@ fn pg_regress(
         launcher_script
     };
 
-    let command_str = format!("{command:?}");
-    println!("{} command {}", "     Running".bold().green(), command_str.cyan());
+    tracing::trace!("running {command:?}");
 
     let output = command.output()?;
     let stdout = decorate_output(&String::from_utf8_lossy(&output.stdout));
@@ -442,7 +496,9 @@ fn pg_regress(
         stdout.to_string()
     } else {
         stderr.to_string()
-    };
+    }
+    .trim()
+    .to_string();
 
     #[cfg(not(target_os = "windows"))]
     {
@@ -484,6 +540,8 @@ fn decorate_output(input: &str) -> String {
                 decorated.push_str(line);
             }
         } else {
+            let line = line.replace("... FAILED", &"... FAILED".bold().bright_red().to_string());
+            let line = line.replace("... ok", &"... ok".bold().bright_green().to_string());
             decorated.push_str(&line);
         }
         decorated.push('\n');
@@ -502,6 +560,7 @@ fn make_test_name(entry: &DirEntry) -> String {
 fn manifest_path_to_sql_tests_path(manifest_path: impl AsRef<Path>) -> PathBuf {
     let mut path = PathBuf::from(manifest_path.as_ref());
     path.pop(); // pop `Cargo.toml`
+    path.push("tests");
     path.push("pg_regress");
     path.push("sql");
     path
@@ -510,6 +569,7 @@ fn manifest_path_to_sql_tests_path(manifest_path: impl AsRef<Path>) -> PathBuf {
 fn manifest_path_to_expected_tests_output_path(manifest_path: impl AsRef<Path>) -> PathBuf {
     let mut path = PathBuf::from(manifest_path.as_ref());
     path.pop(); // pop `Cargo.toml`
+    path.push("tests");
     path.push("pg_regress");
     path.push("expected");
     path
@@ -517,6 +577,7 @@ fn manifest_path_to_expected_tests_output_path(manifest_path: impl AsRef<Path>) 
 fn manifest_path_to_results_output_path(manifest_path: impl AsRef<Path>) -> PathBuf {
     let mut path = PathBuf::from(manifest_path.as_ref());
     path.pop(); // pop `Cargo.toml`
+    path.push("tests");
     path.push("pg_regress");
     path.push("results");
     path

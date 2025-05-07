@@ -556,11 +556,12 @@ Options:
       --no-default-features                Do not activate the `default` feature
   -F, --features <FEATURES>                Space-separated list of features to activate
       --postgresql-conf <POSTGRESQL_CONF>  Custom `postgresql.conf` settings in the form of `key=value`, ie `log_min_messages=debug1`
+  -a, --auto                               Automatically accept output for new tests *and* overwrite output for existing-but-failing tests
   -h, --help                               Print help
   -V, --version                            Print version
 ```
 
-Regression tests are split into `*.sql` files and `*.out` files.  The files themselves are organized into separate directories rooted at `./pg_regress`.
+Regression tests are split into `*.sql` files and `*.out` files.  The files themselves are organized into separate directories rooted at `./tests/pg_regress`.
 
 For example, using our [range example](../pgrx-examples/range/), the directory structure looks like this:
 
@@ -570,15 +571,16 @@ $ tree
 ├── Cargo.lock
 ├── Cargo.toml
 ├── README.md
-├── pg_regress
-│   ├── sql                    # these are the individual regression test scripts
-│   │   ├── make_range.sql
-│   │   ├── setup.sql
-│   │   └── store_ranges.sql
-│   └── expected               # these are the corresponding test output files
-│       ├── make_range.out
-│       ├── setup.out
-│       └── store_ranges.out
+├── tests
+│   └── pg_regress
+│       ├── sql                    # these are the individual regression test scripts
+│       │   ├── make_range.sql
+│       │   ├── setup.sql
+│       │   └── store_ranges.sql
+│       └── expected               # these are the corresponding test output files
+│           ├── make_range.out
+│           ├── setup.out
+│           └── store_ranges.out
 ├── range.control
 ├── results
 └── src
@@ -606,14 +608,14 @@ $ cargo pgrx regress
      Copying shared library to  ~/.pgrx/13.20/pgrx-install/lib/postgresql/range.so
   Discovered 9 SQL entities: 0 schemas (0 unique), 9 functions, 0 types, 0 enums, 0 sqls, 0 ords, 0 hashes, 0 aggregates, 0 triggers
   Rebuilding pgrx_embed, in debug mode, for SQL generation with features pg13
-   Compiling range v0.0.0 ( ~/_work/pgrx/pgrx-examples/range)
+   Compiling range v0.0.0 ( ~/_work/pgrx/tests/pgrx-examples/range)
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.70s
      Writing SQL entities to  ~/.pgrx/13.20/pgrx-install/share/postgresql/extension/range--0.1.0.sql
     Finished installing range
     Starting Postgres v13 on port 28813
     Re-using existing database range_regress
        Found 1 new tests, running each individually to create output
-     Running command cd " ~/_work/pgrx/pgrx-examples/range/pg_regress" && env -u PGDATABASE -u PGHOST -u PGPORT -u PGUSER " ~/.pgrx/13.20/pgrx-install/lib/postgresql/pgxs/src/test/regress/pg_regress" "--host" "localhost" "--port" "28813" "--use-existing" "--dbname=range_regress" "--inputdir= ~/_work/pgrx/pgrx-examples/range/pg_regress" "--outputdir= ~/_work/pgrx/pgrx-examples/range/pg_regress" "example" "--launcher=/tmp/pgrx-pg_regress-runner-2940893.sh"
+     Running command cd " ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" && env -u PGDATABASE -u PGHOST -u PGPORT -u PGUSER " ~/.pgrx/13.20/pgrx-install/lib/postgresql/pgxs/src/test/regress/pg_regress" "--host" "localhost" "--port" "28813" "--use-existing" "--dbname=range_regress" "--inputdir= ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" "--outputdir= ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" "example" "--launcher=/tmp/pgrx-pg_regress-runner-2940893.sh"
 -----------
 SELECT 1;
  ?column? 
@@ -632,8 +634,8 @@ Typing `Y` (or just pressing return) will copy the test output to the proper loc
 ...
 test `example` generated the above output:
 Accept [Y, n]? y
-     Copying test output to  ~/_work/pgrx/pgrx-examples/range/pg_regress/expected/example.out
-     Running command cd " ~/_work/pgrx/pgrx-examples/range/pg_regress" && env -u PGDATABASE -u PGHOST -u PGPORT -u PGUSER " ~/.pgrx/13.20/pgrx-install/lib/postgresql/pgxs/src/test/regress/pg_regress" "--host" "localhost" "--port" "28813" "--use-existing" "--dbname=range_regress" "--inputdir= ~/_work/pgrx/pgrx-examples/range/pg_regress" "--outputdir= ~/_work/pgrx/pgrx-examples/range/pg_regress" "example" "make_range" "store_ranges" "--launcher=/tmp/pgrx-pg_regress-runner-2940893.sh"
+     Copying test output to  ~/_work/pgrx/tests/pgrx-examples/range/pg_regress/expected/example.out
+     Running command cd " ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" && env -u PGDATABASE -u PGHOST -u PGPORT -u PGUSER " ~/.pgrx/13.20/pgrx-install/lib/postgresql/pgxs/src/test/regress/pg_regress" "--host" "localhost" "--port" "28813" "--use-existing" "--dbname=range_regress" "--inputdir= ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" "--outputdir= ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" "example" "make_range" "store_ranges" "--launcher=/tmp/pgrx-pg_regress-runner-2940893.sh"
 (using postmaster on localhost, port 28813)
 ============== running regression test queries        ==============
 test example                      ... ok            6 ms
@@ -645,6 +647,10 @@ test store_ranges                 ... ok           20 ms
 =====================
 ```
 
+Alternatively, you can run `cargo pgrx regress --auto` (or `-a`) to **automatically** accept the output generated by a new test.
+
+`--auto` will **also** copy the output of **failed **tests to the `./tests/pg_regress/expected/` directory, overwriting the existing expected test output.  This is an automated version of blindly accepting different test output as the new, expected output.
+
 ### Things to Know
 
 - `setup.sql` is only executed when tests are run for the first time, or the `--resetdb` argument is used
@@ -654,8 +660,16 @@ test store_ranges                 ... ok           20 ms
 - Postgres' documentation for `pg_regress` [begins here](https://www.postgresql.org/docs/current/regress.html).  While pgrx does not support every knob and dial, its organization is largely compatible (PRs welcome to enhance features)
 - to regenerate the expected test output, delete the `./pg_regress/expected/TEST_NAME.out` file and run `cargo pgrx regress`.  You'll be prompted to accept the new output and it'll automatically be run through `git add`
 - `pg_regress` uses `psql` to run each test and literally diffs the output against the expected output file.  pgrx does two things to help eliminate noise in the test output.  The first is it sets `client_min_messages=warning` when starting the Postgres instance and it also passes `-v VERBOSITY=terse` through to `psql`.   
-- when test output includes results from a table (ie, a SELECT statement), watch out for ordering differences between runs.  Prefer to always "ORDER BY ..." any such statements.
 
+### Diffing `psql` Output?
+
+Yes, Postgres' `pg_regress` tool plays each `test_name.sql` file through `psql`, captures the full output, and diffs that output against the test's corresponding `test_name.out` file.  It's a good idea for your tests to avoid variability in their output.
+
+Avoiding variability can mean some simple things like
+    - ensuring the results of SELECT statements that return multiple rows are always sorted in a predictable/repeatable manner
+    - avoiding outputting "random" values such as the result of the `random()` function, `txid_current()`, and others
+    
+    
 ### Be Kind to Yourself
 
 While always good advice, in the context of individual regression tests, this means that a test should not leave anything behind or should be able to tolerate leftover database objects from previous runs.  
@@ -679,14 +693,14 @@ $ cargo pgrx regress
      Copying shared library to  ~/.pgrx/13.20/pgrx-install/lib/postgresql/range.so
   Discovered 9 SQL entities: 0 schemas (0 unique), 9 functions, 0 types, 0 enums, 0 sqls, 0 ords, 0 hashes, 0 aggregates, 0 triggers
   Rebuilding pgrx_embed, in debug mode, for SQL generation with features pg13
-   Compiling range v0.0.0 ( ~/_work/pgrx/pgrx-examples/range)
+   Compiling range v0.0.0 ( ~/_work/pgrx/tests/pgrx-examples/range)
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.71s
      Writing SQL entities to  ~/.pgrx/13.20/pgrx-install/share/postgresql/extension/range--0.1.0.sql
     Finished installing range
     Starting Postgres v13 on port 28813
     Re-using existing database range_regress
        Found 1 new tests, running each individually to create output
-     Running command cd " ~/_work/pgrx/pgrx-examples/range/pg_regress" && env -u PGDATABASE -u PGHOST -u PGPORT -u PGUSER " ~/.pgrx/13.20/pgrx-install/lib/postgresql/pgxs/src/test/regress/pg_regress" "--host" "localhost" "--port" "28813" "--use-existing" "--dbname=range_regress" "--inputdir= ~/_work/pgrx/pgrx-examples/range/pg_regress" "--outputdir= ~/_work/pgrx/pgrx-examples/range/pg_regress" "bad" "--launcher=/tmp/pgrx-pg_regress-runner-2947999.sh"
+     Running command cd " ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" && env -u PGDATABASE -u PGHOST -u PGPORT -u PGUSER " ~/.pgrx/13.20/pgrx-install/lib/postgresql/pgxs/src/test/regress/pg_regress" "--host" "localhost" "--port" "28813" "--use-existing" "--dbname=range_regress" "--inputdir= ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" "--outputdir= ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" "bad" "--launcher=/tmp/pgrx-pg_regress-runner-2947999.sh"
 -----------
 CREATE TABLE foo();
 
@@ -700,8 +714,8 @@ That looks like the perfect output, so we accept it:
 ...
 test `bad` generated the above output:
 Accept [Y, n]? Y
-     Copying test output to  ~/_work/pgrx/pgrx-examples/range/pg_regress/expected/bad.out
-     Running command cd " ~/_work/pgrx/pgrx-examples/range/pg_regress" && env -u PGDATABASE -u PGHOST -u PGPORT -u PGUSER " ~/.pgrx/13.20/pgrx-install/lib/postgresql/pgxs/src/test/regress/pg_regress" "--host" "localhost" "--port" "28813" "--use-existing" "--dbname=range_regress" "--inputdir= ~/_work/pgrx/pgrx-examples/range/pg_regress" "--outputdir= ~/_work/pgrx/pgrx-examples/range/pg_regress" "bad" "make_range" "store_ranges" "--launcher=/tmp/pgrx-pg_regress-runner-2947999.sh"
+     Copying test output to  ~/_work/pgrx/tests/pgrx-examples/range/pg_regress/expected/bad.out
+     Running command cd " ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" && env -u PGDATABASE -u PGHOST -u PGPORT -u PGUSER " ~/.pgrx/13.20/pgrx-install/lib/postgresql/pgxs/src/test/regress/pg_regress" "--host" "localhost" "--port" "28813" "--use-existing" "--dbname=range_regress" "--inputdir= ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" "--outputdir= ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" "bad" "make_range" "store_ranges" "--launcher=/tmp/pgrx-pg_regress-runner-2947999.sh"
 (using postmaster on localhost, port 28813)
 ============== running regression test queries        ==============
 test bad                          ... FAILED        5 ms
@@ -713,16 +727,16 @@ test store_ranges                 ... ok           19 ms
 ======================
 
 The differences that caused some tests to fail can be viewed in the
-file " ~/_work/pgrx/pgrx-examples/range/pg_regress/regression.diffs".  A copy of the test summary that you see
-above is saved in the file " ~/_work/pgrx/pgrx-examples/range/pg_regress/regression.out".
+file " ~/_work/pgrx/tests/pgrx-examples/range/pg_regress/regression.diffs".  A copy of the test summary that you see
+above is saved in the file " ~/_work/pgrx/tests/pgrx-examples/range/pg_regress/regression.out".
 ```
 
 And you see the `bad` test immediately failed!  To see how it failed, look at the `./pg_regress/regression.diffs` file:
 
 ```console
-$ diff -U3  ~/_work/pgrx/pgrx-examples/range/pg_regress/expected/bad.out  ~/_work/pgrx/pgrx-examples/range/pg_regress/results/bad.out
----  ~/_work/pgrx/pgrx-examples/range/pg_regress/expected/bad.out	2025-05-07 12:15:10.759010127 -0400
-+++  ~/_work/pgrx/pgrx-examples/range/pg_regress/results/bad.out	2025-05-07 12:15:10.775009912 -0400
+$ diff -U3  ~/_work/pgrx/tests/pgrx-examples/range/pg_regress/expected/bad.out  ~/_work/pgrx/tests/pgrx-examples/range/pg_regress/results/bad.out
+---  ~/_work/pgrx/tests/pgrx-examples/range/pg_regress/expected/bad.out	2025-05-07 12:15:10.759010127 -0400
++++  ~/_work/pgrx/tests/pgrx-examples/range/pg_regress/results/bad.out	2025-05-07 12:15:10.775009912 -0400
 @@ -1 +1,2 @@
  CREATE TABLE foo();
 +ERROR:  relation "foo" already exists
