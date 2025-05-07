@@ -68,7 +68,7 @@ pub(crate) struct Regress {
     #[clap(long)]
     pub(crate) postgresql_conf: Vec<String>,
 
-    /// Automatically accept output for new tests *and* overwrite output for existing-but-failing tests
+    /// Automatically accept output for new tests *and* overwrite output for existing-but-failed tests
     #[clap(long, short)]
     pub(crate) auto: bool,
 }

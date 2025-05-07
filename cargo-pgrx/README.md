@@ -556,7 +556,7 @@ Options:
       --no-default-features                Do not activate the `default` feature
   -F, --features <FEATURES>                Space-separated list of features to activate
       --postgresql-conf <POSTGRESQL_CONF>  Custom `postgresql.conf` settings in the form of `key=value`, ie `log_min_messages=debug1`
-  -a, --auto                               Automatically accept output for new tests *and* overwrite output for existing-but-failing tests
+  -a, --auto                               Automatically accept output for new tests *and* overwrite output for existing-but-failed tests
   -h, --help                               Print help
   -V, --version                            Print version
 ```
