@@ -571,11 +571,11 @@ $ tree
 ├── Cargo.toml
 ├── README.md
 ├── pg_regress
-│   ├── sql                    # these are the corresponding test output files
+│   ├── sql                    # these are the individual regression test scripts
 │   │   ├── make_range.sql
 │   │   ├── setup.sql
 │   │   └── store_ranges.sql
-│   └── expected               # these are the individual regression test scripts
+│   └── expected               # these are the corresponding test output files
 │       ├── make_range.out
 │       ├── setup.out
 │       └── store_ranges.out
