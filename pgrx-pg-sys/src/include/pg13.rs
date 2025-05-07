@@ -1888,6 +1888,19 @@ pub const Anum_pg_seclabel_objsubid: u32 = 3;
 pub const Anum_pg_seclabel_provider: u32 = 4;
 pub const Anum_pg_seclabel_label: u32 = 5;
 pub const Natts_pg_seclabel: u32 = 5;
+pub const StatisticExtRelationId: Oid = Oid(3381);
+pub const Anum_pg_statistic_ext_oid: u32 = 1;
+pub const Anum_pg_statistic_ext_stxrelid: u32 = 2;
+pub const Anum_pg_statistic_ext_stxname: u32 = 3;
+pub const Anum_pg_statistic_ext_stxnamespace: u32 = 4;
+pub const Anum_pg_statistic_ext_stxowner: u32 = 5;
+pub const Anum_pg_statistic_ext_stxstattarget: u32 = 6;
+pub const Anum_pg_statistic_ext_stxkeys: u32 = 7;
+pub const Anum_pg_statistic_ext_stxkind: u32 = 8;
+pub const Natts_pg_statistic_ext: u32 = 8;
+pub const STATS_EXT_NDISTINCT: u8 = 100u8;
+pub const STATS_EXT_DEPENDENCIES: u8 = 102u8;
+pub const STATS_EXT_MCV: u8 = 109u8;
 pub const TableSpaceRelationId: Oid = Oid(1213);
 pub const Anum_pg_tablespace_oid: u32 = 1;
 pub const Anum_pg_tablespace_spcname: u32 = 2;
@@ -2295,6 +2308,14 @@ pub const LOG_METAINFO_DATAFILE_TMP: &::core::ffi::CStr = c"current_logfiles.tmp
 pub const RBTXN_HAS_CATALOG_CHANGES: u32 = 1;
 pub const RBTXN_IS_SUBXACT: u32 = 2;
 pub const RBTXN_IS_SERIALIZED: u32 = 4;
+pub const STATS_MAX_DIMENSIONS: u32 = 8;
+pub const STATS_NDISTINCT_MAGIC: u32 = 2740109220;
+pub const STATS_NDISTINCT_TYPE_BASIC: u32 = 1;
+pub const STATS_DEPS_MAGIC: u32 = 3025443372;
+pub const STATS_DEPS_TYPE_BASIC: u32 = 1;
+pub const STATS_MCV_MAGIC: u32 = 3785773506;
+pub const STATS_MCV_TYPE_BASIC: u32 = 1;
+pub const STATS_MCVLIST_MAX_ITEMS: u32 = 10000;
 pub const BUF_REFCOUNT_ONE: u32 = 1;
 pub const BUF_REFCOUNT_MASK: u32 = 262143;
 pub const BUF_USAGECOUNT_MASK: u32 = 3932160;
@@ -20934,6 +20955,27 @@ impl Default for FormData_pg_seclabel {
     }
 }
 #[repr(C)]
+#[derive(Debug)]
+pub struct FormData_pg_statistic_ext {
+    pub oid: Oid,
+    pub stxrelid: Oid,
+    pub stxname: NameData,
+    pub stxnamespace: Oid,
+    pub stxowner: Oid,
+    pub stxstattarget: int32,
+    pub stxkeys: int2vector,
+}
+impl Default for FormData_pg_statistic_ext {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type Form_pg_statistic_ext = *mut FormData_pg_statistic_ext;
+#[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct FormData_pg_tablespace {
     pub oid: Oid,
@@ -27352,6 +27394,98 @@ impl Default for RowSecurityDesc {
 pub type row_security_policy_hook_type = ::core::option::Option<
     unsafe extern "C-unwind" fn(cmdtype: CmdType::Type, relation: Relation) -> *mut List,
 >;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MVNDistinctItem {
+    pub ndistinct: f64,
+    pub attrs: *mut Bitmapset,
+}
+impl Default for MVNDistinctItem {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct MVNDistinct {
+    pub magic: uint32,
+    pub type_: uint32,
+    pub nitems: uint32,
+    pub items: __IncompleteArrayField<MVNDistinctItem>,
+}
+impl Default for MVNDistinct {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct MVDependency {
+    pub degree: f64,
+    pub nattributes: AttrNumber,
+    pub attributes: __IncompleteArrayField<AttrNumber>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct MVDependencies {
+    pub magic: uint32,
+    pub type_: uint32,
+    pub ndeps: uint32,
+    pub deps: __IncompleteArrayField<*mut MVDependency>,
+}
+impl Default for MVDependencies {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MCVItem {
+    pub frequency: f64,
+    pub base_frequency: f64,
+    pub isnull: *mut bool,
+    pub values: *mut Datum,
+}
+impl Default for MCVItem {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct MCVList {
+    pub magic: uint32,
+    pub type_: uint32,
+    pub nitems: uint32,
+    pub ndimensions: AttrNumber,
+    pub types: [Oid; 8usize],
+    pub items: __IncompleteArrayField<MCVItem>,
+}
+impl Default for MCVList {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct buftag {
@@ -39777,6 +39911,48 @@ unsafe extern "C-unwind" {
         hasRowSecurity: *mut bool,
         hasSubLinks: *mut bool,
     );
+    pub fn statext_ndistinct_load(mvoid: Oid) -> *mut MVNDistinct;
+    pub fn statext_dependencies_load(mvoid: Oid) -> *mut MVDependencies;
+    pub fn statext_mcv_load(mvoid: Oid) -> *mut MCVList;
+    pub fn BuildRelationExtStatistics(
+        onerel: Relation,
+        totalrows: f64,
+        numrows: ::core::ffi::c_int,
+        rows: *mut HeapTuple,
+        natts: ::core::ffi::c_int,
+        vacattrstats: *mut *mut VacAttrStats,
+    );
+    pub fn ComputeExtStatisticsRows(
+        onerel: Relation,
+        natts: ::core::ffi::c_int,
+        stats: *mut *mut VacAttrStats,
+    ) -> ::core::ffi::c_int;
+    pub fn statext_is_kind_built(htup: HeapTuple, kind: ::core::ffi::c_char) -> bool;
+    pub fn dependencies_clauselist_selectivity(
+        root: *mut PlannerInfo,
+        clauses: *mut List,
+        varRelid: ::core::ffi::c_int,
+        jointype: JoinType::Type,
+        sjinfo: *mut SpecialJoinInfo,
+        rel: *mut RelOptInfo,
+        estimatedclauses: *mut *mut Bitmapset,
+    ) -> Selectivity;
+    pub fn statext_clauselist_selectivity(
+        root: *mut PlannerInfo,
+        clauses: *mut List,
+        varRelid: ::core::ffi::c_int,
+        jointype: JoinType::Type,
+        sjinfo: *mut SpecialJoinInfo,
+        rel: *mut RelOptInfo,
+        estimatedclauses: *mut *mut Bitmapset,
+    ) -> Selectivity;
+    pub fn has_stats_of_kind(stats: *mut List, requiredkind: ::core::ffi::c_char) -> bool;
+    pub fn choose_best_statistics(
+        stats: *mut List,
+        requiredkind: ::core::ffi::c_char,
+        clause_attnums: *mut *mut Bitmapset,
+        nclauses: ::core::ffi::c_int,
+    ) -> *mut StatisticExtInfo;
     pub static mut BufferIOLWLockArray: *mut LWLockMinimallyPadded;
     pub fn LockBufHdr(desc: *mut BufferDesc) -> uint32;
     pub static mut BufferDescriptors: *mut BufferDescPadded;
