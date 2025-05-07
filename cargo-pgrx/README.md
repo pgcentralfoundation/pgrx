@@ -582,7 +582,6 @@ $ tree
 │           ├── setup.out
 │           └── store_ranges.out
 ├── range.control
-├── results
 └── src
     ├── bin
     │   └── pgrx_embed.rs
