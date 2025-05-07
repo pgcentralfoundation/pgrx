@@ -245,7 +245,7 @@ impl CommandExecute for Regress {
 
         // we purposely want as little noise as possible to end up in the expected test output files
         self.postgresql_conf.push("client_min_messages=warning".into());
-        let postgresql_conf = collect_postgresql_conf_settings(&self.postgresql_conf);
+        let postgresql_conf = collect_postgresql_conf_settings(&self.postgresql_conf)?;
 
         // install the extension
         let (pg_config, dbname) = Run::from(&self).install(false, &postgresql_conf)?;

@@ -63,7 +63,7 @@ impl CommandExecute for Start {
             self.manifest_path.clone(),
         )?;
 
-        let postgresql_conf = collect_postgresql_conf_settings(&self.postgresql_conf);
+        let postgresql_conf = collect_postgresql_conf_settings(&self.postgresql_conf)?;
         let pgrx = Pgrx::from_config()?;
         if self.pg_version == Some("all".into()) {
             for v in crate::manifest::all_pg_in_both_tomls(&package_manifest, &pgrx) {
@@ -78,14 +78,20 @@ impl CommandExecute for Start {
     }
 }
 
-pub(crate) fn collect_postgresql_conf_settings(settings: &Vec<String>) -> HashMap<String, String> {
+pub(crate) fn collect_postgresql_conf_settings(
+    settings: &Vec<String>,
+) -> eyre::Result<HashMap<String, String>> {
     settings
         .iter()
         .map(|setting| {
-            let Some((key, value)) = setting.split_once('=') else {
-                panic!("`--postgresql_conf` setting of `{setting}` is not in the correct format");
-            };
-            (key.to_string(), value.to_string())
+            if let Some((key, value)) = setting.split_once('=') {
+                Ok((key.to_string(), value.to_string()))
+            } else {
+                Err(eyre::eyre!(
+                    "`--postgresql_conf` setting of `{}` is not in the correct format",
+                    setting
+                ))
+            }
         })
         .collect()
 }
