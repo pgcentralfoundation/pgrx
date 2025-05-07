@@ -196,13 +196,13 @@ pub(crate) fn display_version_info(pg_config: &PgConfig, pg_version: &PgVersionS
 
 pub(crate) fn get_package_manifest(
     features: &Features,
-    package_nane: Option<&String>,
+    package_name: Option<&String>,
     manifest_path: Option<impl AsRef<std::path::Path>>,
 ) -> eyre::Result<(Manifest, PathBuf)> {
     let metadata = crate::metadata::metadata(features, manifest_path.as_ref())
         .wrap_err("couldn't get cargo metadata")?;
     crate::metadata::validate(manifest_path.as_ref(), &metadata)?;
-    let package_manifest_path = crate::manifest::manifest_path(&metadata, package_nane)
+    let package_manifest_path = crate::manifest::manifest_path(&metadata, package_name)
         .wrap_err("Couldn't get manifest path")?;
 
     Ok((

@@ -5,3 +5,6 @@
 **/*.rs.bk
 Cargo.lock
 sql/arrays-1.0.sql
+pg_regress/results
+pg_regress/regression.diffs
+pg_regress/regression.out

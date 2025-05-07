@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 //LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
 //LICENSE
 //LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
@@ -9,6 +10,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::command::get::get_property;
 use crate::command::install::install_extension;
+use crate::command::regress::Regress;
 use crate::command::start::start_postgres;
 use crate::command::stop::stop_postgres;
 use crate::manifest::{get_package_manifest, pg_config_and_version};
@@ -17,7 +19,7 @@ use crate::CommandExecute;
 use eyre::eyre;
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{createdb, PgConfig, Pgrx};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 /// Compile/install extension to a pgrx-managed Postgres instance and start psql
 #[derive(clap::Args, Debug)]
@@ -33,7 +35,7 @@ pub(crate) struct Run {
     package: Option<String>,
     /// Path to Cargo.toml
     #[clap(long)]
-    manifest_path: Option<String>,
+    manifest_path: Option<PathBuf>,
     /// Compile for release mode (default is debug)
     #[clap(long, short)]
     release: bool,
@@ -54,9 +56,30 @@ pub(crate) struct Run {
     install_only: bool,
 }
 
-impl CommandExecute for Run {
-    #[tracing::instrument(level = "error", skip(self))]
-    fn execute(mut self) -> eyre::Result<()> {
+impl From<&Regress> for Run {
+    fn from(regress: &Regress) -> Self {
+        Run {
+            pg_version: regress.pg_version.clone(),
+            dbname: regress.dbname.clone(),
+            package: regress.package.clone(),
+            manifest_path: regress.manifest_path.clone(),
+            release: regress.release,
+            profile: regress.profile.clone(),
+            features: regress.features.clone(),
+            target: None,
+            verbose: regress.verbose,
+            pgcli: false,
+            install_only: false,
+        }
+    }
+}
+
+impl Run {
+    pub(crate) fn install(
+        &mut self,
+        create_database: bool,
+        postgresql_conf: &HashMap<String, String>,
+    ) -> eyre::Result<(PgConfig, String)> {
         let pgrx = Pgrx::from_config()?;
         let (package_manifest, package_manifest_path) = get_package_manifest(
             &self.features,
@@ -71,8 +94,8 @@ impl CommandExecute for Run {
             true,
         )?;
 
-        let dbname = match self.dbname {
-            Some(dbname) => dbname,
+        let dbname = match &self.dbname {
+            Some(dbname) => dbname.clone(),
             None => get_property(&package_manifest_path, "extname")?
                 .ok_or(eyre!("could not determine extension name"))?,
         };
@@ -87,12 +110,25 @@ impl CommandExecute for Run {
             self.package.as_ref(),
             &package_manifest_path,
             &dbname,
+            create_database,
             &profile,
-            self.pgcli,
             &self.features,
             self.install_only,
             self.target.as_ref().map(|x| x.as_str()),
-        )
+            postgresql_conf,
+        )?;
+
+        Ok((pg_config, dbname))
+    }
+}
+
+impl CommandExecute for Run {
+    #[tracing::instrument(level = "error", skip(self))]
+    fn execute(mut self) -> eyre::Result<()> {
+        let (pg_config, dbname) = self.install(true, &Default::default())?;
+
+        // run psql
+        exec_psql(&pg_config, &dbname, self.pgcli)
     }
 }
 
@@ -107,11 +143,12 @@ pub(crate) fn run(
     user_package: Option<&String>,
     package_manifest_path: &Path,
     dbname: &str,
+    create_database: bool,
     profile: &CargoProfile,
-    pgcli: bool,
     features: &clap_cargo::Features,
     install_only: bool,
     target: Option<&str>,
+    postgresql_conf: &HashMap<String, String>,
 ) -> eyre::Result<()> {
     // stop postgres
     stop_postgres(pg_config)?;
@@ -134,15 +171,14 @@ pub(crate) fn run(
     }
 
     // restart postgres
-    start_postgres(pg_config)?;
+    start_postgres(pg_config, postgresql_conf)?;
 
     // create the named database
-    if !createdb(pg_config, dbname, false, true, None)? {
+    if create_database && !createdb(pg_config, dbname, false, true, None)? {
         println!("{} existing database {}", "    Re-using".bold().cyan(), dbname);
     }
 
-    // run psql
-    exec_psql(pg_config, dbname, pgcli)
+    Ok(())
 }
 
 #[cfg(unix)]

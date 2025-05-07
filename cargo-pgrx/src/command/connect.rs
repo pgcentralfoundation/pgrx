@@ -89,7 +89,7 @@ impl CommandExecute for Connect {
 ))]
 pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str, pgcli: bool) -> eyre::Result<()> {
     // restart postgres
-    start_postgres(pg_config)?;
+    start_postgres(pg_config, &Default::default())?;
 
     // create the named database
     if !createdb(pg_config, dbname, false, true, None)? {

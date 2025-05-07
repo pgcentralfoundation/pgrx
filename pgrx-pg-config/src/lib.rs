@@ -369,6 +369,21 @@ impl PgConfig {
         Ok(path)
     }
 
+    pub fn pg_regress_path(&self) -> eyre::Result<PathBuf> {
+        let mut pgxs_path = self.pgxs_path()?;
+        pgxs_path.pop(); // pop the `pgxs.mk` file at the end
+        pgxs_path.pop(); // pop the `makefiles` directory in which it lives
+        let mut pgregress_path = pgxs_path;
+        pgregress_path.push("test");
+        pgregress_path.push("regress");
+        pgregress_path.push("pg_regress");
+        Ok(pgregress_path)
+    }
+
+    pub fn pgxs_path(&self) -> eyre::Result<PathBuf> {
+        self.run("--pgxs").map(PathBuf::from)
+    }
+
     pub fn data_dir(&self) -> eyre::Result<PathBuf> {
         let mut path = Pgrx::home()?;
         path.push(format!("data-{}", self.major_version()?));
@@ -710,7 +725,7 @@ pub fn createdb(
         return Ok(false);
     }
 
-    println!("{} database {}", "     Creating".bold().green(), dbname);
+    println!("{} database {}", "    Creating".bold().green(), dbname.bold().cyan());
     let createdb_path = pg_config.createdb_path()?;
     let mut command = if let Some(runas) = runas {
         let mut cmd = Command::new("sudo");
@@ -751,6 +766,66 @@ pub fn createdb(
     if !output.status.success() {
         return Err(eyre!(
             "problem running createdb: {}\n\n{}{}",
+            command_str,
+            String::from_utf8(output.stdout).unwrap(),
+            String::from_utf8(output.stderr).unwrap()
+        ));
+    }
+
+    Ok(true)
+}
+
+pub fn dropdb(
+    pg_config: &PgConfig,
+    dbname: &str,
+    is_test: bool,
+    runas: Option<String>,
+) -> eyre::Result<bool> {
+    if !does_db_exist(pg_config, dbname)? {
+        return Ok(false);
+    }
+
+    println!("{} database {}", "    Dropping".bold().green(), dbname.bold().cyan());
+    let createdb_path = pg_config.dropdb_path()?;
+    let mut command = if let Some(runas) = runas {
+        let mut cmd = Command::new("sudo");
+        cmd.arg("-u").arg(runas).arg(createdb_path);
+        cmd
+    } else {
+        Command::new(createdb_path)
+    };
+    command
+        .env_remove("PGDATABASE")
+        .env_remove("PGHOST")
+        .env_remove("PGPORT")
+        .env_remove("PGUSER")
+        .arg("-h")
+        .arg(pg_config.host())
+        .arg("-p")
+        .arg(if is_test {
+            pg_config.test_port()?.to_string()
+        } else {
+            pg_config.port()?.to_string()
+        })
+        .arg(dbname)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+
+    let command_str = format!("{command:?}");
+
+    let child = command.spawn().wrap_err_with(|| {
+        format!("Failed to spawn process for dropping database using command: '{command_str}': ")
+    })?;
+
+    let output = child.wait_with_output().wrap_err_with(|| {
+        format!(
+            "failed waiting for spawned process to drop database using command: '{command_str}': "
+        )
+    })?;
+
+    if !output.status.success() {
+        return Err(eyre!(
+            "problem running dropdb: {}\n\n{}{}",
             command_str,
             String::from_utf8(output.stdout).unwrap(),
             String::from_utf8(output.stderr).unwrap()

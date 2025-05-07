@@ -57,6 +57,7 @@ serde-xml-rs = "0.6.0"
 tar = "0.4.44"
 ureq = { version = "3.0.10", default-features = false, features = ["gzip"] }
 url.workspace = true
+which = "7.0.3"
 zip-extract = "0.2.2"
 
 # SQL schema generation
