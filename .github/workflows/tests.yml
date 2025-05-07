@@ -313,6 +313,9 @@ jobs:
       - name: Run range example tests
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/range/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
+      - name: Run range example regression tests
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx regress pg$PG_VER --manifest-path=pgrx-examples/range/Cargo.toml
+
       - name: Run schemas example tests
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/schemas/Cargo.toml  --features "pg$PG_VER" --no-default-features
 
