@@ -338,6 +338,9 @@ impl Regress {
 impl CommandExecute for Regress {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(mut self) -> eyre::Result<()> {
+        unsafe {
+            std::env::set_var("PGRX_REGRESS_TESTING", "1");
+        }
         let (_, manifest_path) = get_package_manifest(
             &self.features,
             self.package.as_ref(),
