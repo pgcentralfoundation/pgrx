@@ -1068,7 +1068,7 @@ fn impl_guc_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     }
 
     stream.extend(quote! {
-        impl ::pgrx::guc::GucEnum<#enum_name> for #enum_name {
+        unsafe impl ::pgrx::guc::GucEnum<#enum_name> for #enum_name {
             fn from_ordinal(ordinal: i32) -> #enum_name {
                 match ordinal {
                     #from_match_arms
@@ -1081,12 +1081,12 @@ fn impl_guc_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
                 }
             }
 
-            unsafe fn config_matrix(&self) -> *const ::pgrx::pg_sys::config_enum_entry {
-                let slice = ::pgrx::memcxt::PgMemoryContexts::TopMemoryContext.palloc0_slice::<::pgrx::pg_sys::config_enum_entry>(#enum_len + 1usize);
-
-                #build_array_body
-
-                slice.as_ptr()
+            fn config_matrix() -> *const ::pgrx::pg_sys::config_enum_entry {
+                unsafe {
+                    let slice = ::pgrx::memcxt::PgMemoryContexts::TopMemoryContext.palloc0_slice::<::pgrx::pg_sys::config_enum_entry>(#enum_len + 1usize);
+                    #build_array_body
+                    slice.as_ptr()
+                }
             }
         }
     });

@@ -253,12 +253,13 @@ impl BackgroundWorker {
 
 unsafe extern "C-unwind" fn worker_spi_sighup(_signal_args: i32) {
     GOT_SIGHUP.store(true, Ordering::SeqCst);
-    pg_sys::ProcessConfigFile(pg_sys::GucContext::PGC_SIGHUP);
+    (&raw mut pg_sys::ConfigReloadPending).write_volatile(1);
     pg_sys::SetLatch(pg_sys::MyLatch);
 }
 
 unsafe extern "C-unwind" fn worker_spi_sigterm(_signal_args: i32) {
     GOT_SIGTERM.store(true, Ordering::SeqCst);
+    (&raw mut pg_sys::ShutdownRequestPending).write_volatile(1);
     pg_sys::SetLatch(pg_sys::MyLatch);
 }
 

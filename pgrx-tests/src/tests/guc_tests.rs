@@ -12,7 +12,7 @@
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
-    use std::ffi::CStr;
+    use std::ffi::CString;
 
     use pgrx::guc::*;
     use pgrx::prelude::*;
@@ -105,8 +105,8 @@ mod tests {
 
     #[pg_test]
     fn test_string_guc() {
-        static GUC: GucSetting<Option<&'static CStr>> =
-            GucSetting::<Option<&'static CStr>>::new(Some(c"this is a test"));
+        static GUC: GucSetting<Option<CString>> =
+            GucSetting::<Option<CString>>::new(Some(c"this is a test"));
         GucRegistry::define_string_guc(
             "test.string",
             "test string guc",
@@ -127,8 +127,7 @@ mod tests {
 
     #[pg_test]
     fn test_string_guc_null_default() {
-        static GUC: GucSetting<Option<&'static CStr>> =
-            GucSetting::<Option<&'static CStr>>::new(None);
+        static GUC: GucSetting<Option<CString>> = GucSetting::<Option<CString>>::new(None);
         GucRegistry::define_string_guc(
             "test.string",
             "test string guc",

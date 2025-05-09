@@ -136,6 +136,7 @@
 #include "partitioning/partprune.h"
 #include "plpgsql.h"
 #include "postmaster/bgworker.h"
+#include "postmaster/interrupt.h"
 #include "postmaster/postmaster.h"
 #include "postmaster/syslogger.h"
 #include "replication/logical.h"
