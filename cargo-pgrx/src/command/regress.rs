@@ -189,7 +189,7 @@ impl Regress {
             std::io::stdin().read_line(&mut user_input)?;
             let user_input = user_input.trim();
 
-            if user_input == "Y" || user_input == "y" {
+            if user_input == "Y" || user_input == "y" || user_input.is_empty() {
                 variant_suffix = None
             } else if user_input.as_bytes()[0] >= b'0' && user_input.as_bytes()[0] <= b'9' {
                 // currently secret options to create a variant file
