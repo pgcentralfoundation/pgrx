@@ -280,12 +280,20 @@ impl Regress {
                 let expected_path =
                     manifest_path_to_expected_tests_output_path(&manifest_path).join(filename);
 
+                if !expected_path.exists() {
+                    // this is a file from `results/test-name.out` for which we don't have an expected file
+                    // we can ignore it
+                    continue;
+                }
+
                 let src = std::fs::read_to_string(entry.path())?;
                 let dst = std::fs::read_to_string(&expected_path)?;
                 if src != dst {
                     println!(
-                        "test `{}` failed, automatically promoting its output as",
-                        make_test_name(&entry).bold().bright_red()
+                        "{} {}'s output to {}",
+                        "   Promoting".bold().yellow(),
+                        make_test_name(&entry).bold().bright_red(),
+                        expected_path.display().bold().cyan()
                     );
                     std::fs::copy(entry.path(), &expected_path)?;
                 }
