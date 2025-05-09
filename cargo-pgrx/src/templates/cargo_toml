@@ -20,10 +20,10 @@ pg17 = ["pgrx/pg17", "pgrx-tests/pg17" ]
 pg_test = []
 
 [dependencies]
-pgrx = "=0.14.2"
+pgrx = "=0.14.3"
 
 [dev-dependencies]
-pgrx-tests = "=0.14.2"
+pgrx-tests = "=0.14.3"
 
 [profile.dev]
 panic = "unwind"

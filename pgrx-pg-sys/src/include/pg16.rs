@@ -184,18 +184,18 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &::core::ffi::CStr = c"pgsql-bugs@lists.postgresql.org";
 pub const PACKAGE_NAME: &::core::ffi::CStr = c"PostgreSQL";
-pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 16.8";
+pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 16.9";
 pub const PACKAGE_TARNAME: &::core::ffi::CStr = c"postgresql";
 pub const PACKAGE_URL: &::core::ffi::CStr = c"https://www.postgresql.org/";
-pub const PACKAGE_VERSION: &::core::ffi::CStr = c"16.8";
+pub const PACKAGE_VERSION: &::core::ffi::CStr = c"16.9";
 pub const PG_KRB_SRVNAM: &::core::ffi::CStr = c"postgres";
 pub const PG_MAJORVERSION: &::core::ffi::CStr = c"16";
 pub const PG_MAJORVERSION_NUM: u32 = 16;
-pub const PG_MINORVERSION_NUM: u32 = 8;
+pub const PG_MINORVERSION_NUM: u32 = 9;
 pub const PG_USE_STDBOOL: u32 = 1;
-pub const PG_VERSION: &::core::ffi::CStr = c"16.8";
-pub const PG_VERSION_NUM: u32 = 160008;
-pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 16.8 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit" ;
+pub const PG_VERSION: &::core::ffi::CStr = c"16.9";
+pub const PG_VERSION_NUM: u32 = 160009;
+pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 16.9 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -255,7 +255,7 @@ pub const PG_BINARY_A: &::core::ffi::CStr = c"a";
 pub const PG_BINARY_R: &::core::ffi::CStr = c"r";
 pub const PG_BINARY_W: &::core::ffi::CStr = c"w";
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 16.8\n";
+pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 16.9\n";
 pub const EXE: &::core::ffi::CStr = c"";
 pub const DEVNULL: &::core::ffi::CStr = c"/dev/null";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -40397,6 +40397,11 @@ unsafe extern "C-unwind" {
         encoding: ::core::ffi::c_int,
         mbstr: *const ::core::ffi::c_char,
     ) -> ::core::ffi::c_int;
+    pub fn pg_encoding_mblen_or_incomplete(
+        encoding: ::core::ffi::c_int,
+        mbstr: *const ::core::ffi::c_char,
+        remaining: usize,
+    ) -> ::core::ffi::c_int;
     pub fn pg_encoding_mblen_bounded(
         encoding: ::core::ffi::c_int,
         mbstr: *const ::core::ffi::c_char,
@@ -43625,6 +43630,11 @@ unsafe extern "C-unwind" {
     pub fn ReorderBufferGetOldestXmin(rb: *mut ReorderBuffer) -> TransactionId;
     pub fn ReorderBufferGetCatalogChangesXacts(rb: *mut ReorderBuffer) -> *mut TransactionId;
     pub fn ReorderBufferSetRestartPoint(rb: *mut ReorderBuffer, ptr: XLogRecPtr);
+    pub fn ReorderBufferGetInvalidations(
+        rb: *mut ReorderBuffer,
+        xid: TransactionId,
+        msgs: *mut *mut SharedInvalidationMessage,
+    ) -> uint32;
     pub fn StartupReorderBuffer();
     pub fn _PG_output_plugin_init(cb: *mut OutputPluginCallbacks);
     pub fn OutputPluginPrepareWrite(ctx: *mut LogicalDecodingContext, last_write: bool);
