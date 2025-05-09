@@ -357,8 +357,9 @@ impl CommandExecute for Regress {
 
         if self.is_setup_sql_newer(&manifest_path) {
             println!(
-                "{} database {dbname} to be (re)created as `setup.sql` is newer than its expected output",
-                "     Forcing".bold().yellow()
+                "{} database {} to be (re)created as `setup.sql` is newer than its expected output",
+                "     Forcing".bold().yellow(),
+                dbname.cyan()
             );
         }
 
@@ -542,42 +543,78 @@ fn pg_regress(
 
 fn decorate_output(input: &str) -> String {
     let mut decorated = String::with_capacity(input.len());
-    for mut line in input.lines() {
-        let mut is_test_line = false;
+    let (mut total_passed, mut total_failed) = (0, 0);
+    for line in input.lines() {
+        let mut line = line.to_string();
+        let mut is_old_line = false;
+        let mut is_new_line = false;
+
         if line.starts_with("ok") {
-            line = line.trim_start_matches("ok");
-            decorated.push_str(&format!("{}", "PASS ".bold().bright_green()));
-            is_test_line = true;
+            // for pg_regress from pg16 forward, rewrite the "ok" into a colored PASS"
+            is_new_line = true;
         } else if line.starts_with("not ok") {
-            line = line.trim_start_matches("not ok");
-            decorated.push_str(&format!("{}", "FAIL ".bold().bright_red()));
-            is_test_line = true;
+            // for pg_regress from pg16 forward, rewrite the "no ok" into a colored FAIL"
+            line = line.replace("not ok", "not_ok"); // to make parsing easier down below
+            is_new_line = true;
+        } else if line.contains("... ok") {
+            is_old_line = true;
+        } else if line.contains("... FAILED") {
+            is_old_line = true;
         }
 
-        if is_test_line {
-            fn split_line(line: &str) -> Option<(&str, &str, &str, &str)> {
+        let parsed_test_line = if is_new_line {
+            fn split_line(line: &str) -> Option<(&str, bool, &str, &str)> {
                 let mut parts = line.split_whitespace();
 
-                let num = parts.next()?;
+                let passed = parts.next()? == "ok";
+                parts.next()?; // throw away the test number
                 parts.next()?; // throw away the dash (-)
                 let test_name = parts.next()?;
                 let execution_time = parts.next()?;
                 let execution_units = parts.next()?;
-                Some((num, test_name, execution_time, execution_units))
+                Some((test_name, passed, execution_time, execution_units))
+            }
+            split_line(&line)
+        } else if is_old_line {
+            fn split_line(line: &str) -> Option<(&str, bool, &str, &str)> {
+                let mut parts = line.split_whitespace();
+
+                parts.next()?; // throw away "test"
+                let test_name = parts.next()?;
+                parts.next()?; // throw away "..."
+                let passed = parts.next()? == "ok";
+                let execution_time = parts.next()?;
+                let execution_units = parts.next()?;
+                Some((test_name, passed, execution_time, execution_units))
+            }
+            split_line(&line)
+        } else {
+            // not a line we care about
+            continue;
+        };
+
+        if let Some((test_name, passed, execution_time, execution_units)) = parsed_test_line {
+            if passed {
+                total_passed += 1
+            } else {
+                total_failed += 1
             }
 
-            if let Some((num, test_name, execution_time, execution_units)) = split_line(line) {
-                decorated.push_str(&format!("#{num} {test_name} {execution_time}{execution_units}"))
-            } else {
-                decorated.push_str(line);
-            }
-        } else {
-            let line = line.replace("... FAILED", &"... FAILED".bold().bright_red().to_string());
-            let line = line.replace("... ok", &"... ok".bold().bright_green().to_string());
-            decorated.push_str(&line);
+            decorated.push_str(&format!(
+                "{} {test_name} {execution_time}{execution_units}\n",
+                if passed {
+                    "PASS".bold().bright_green().to_string()
+                } else {
+                    "FAIL".bold().bright_red().to_string()
+                }
+            ))
         }
-        decorated.push('\n');
     }
+
+    if total_passed + total_failed > 0 {
+        decorated.push_str(&format!("passed={total_passed}, failed={total_failed}\n"))
+    }
+
     decorated
 }
 
