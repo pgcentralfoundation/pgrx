@@ -203,14 +203,27 @@ impl Regress {
         let expected_path = manifest_path_to_expected_tests_output_path(manifest_path)
             .join(&format!("{test_name}{}.out", variant_suffix.unwrap_or_default()));
 
-        println!(
-            "{} test output to {}",
-            "     Copying".bold().green(),
-            expected_path.display().bold().cyan()
-        );
-        std::fs::copy(test_result_output, &expected_path)?;
+        if expected_path.exists() {
+            println!(
+                "{} test output to {}",
+                "   Replacing".bold().green(),
+                expected_path.display().bold().cyan()
+            );
+            std::fs::copy(test_result_output, &expected_path)?;
 
-        add_to_git(expected_path)
+            // don't "git add" the file if it already exists
+            Ok(())
+        } else {
+            println!(
+                "{} test output to {}",
+                "     Copying".bold().green(),
+                expected_path.display().bold().cyan()
+            );
+            std::fs::copy(test_result_output, &expected_path)?;
+
+            // make sure to add the file to git
+            add_to_git(expected_path)
+        }
     }
 
     fn run_all_tests(
