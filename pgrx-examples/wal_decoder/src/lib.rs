@@ -50,7 +50,7 @@ impl Action {
         Self {
             typ: "COMMIT".into(),
             // TODO: convert the commit timestamp into a human readable format ?
-            committed: Some(txn.commit_time),
+            committed: Some(unsafe { txn.xact_time.commit_time }),
             rel: None,
             old: None,
             new: None,
@@ -143,7 +143,7 @@ struct DecodingState {
 // A Tuple describes the values of a table row before or after a change
 struct Tuple {
     rel: pgrx::PgRelation,
-    data: PgBox<pg_sys::ReorderBufferTupleBuf>,
+    data: PgBox<pg_sys::HeapTupleData>,
 }
 
 // Loop over the Tuple attributes and serialize them
@@ -168,10 +168,9 @@ impl Serialize for Tuple {
             }
             .to_str()
             .unwrap();
-            let mut tuple = self.data.tuple;
             let datum = unsafe {
                 pg_sys::heap_getattr(
-                    &mut tuple,
+                    self.data.as_ptr(),
                     attribute.attnum.into(),
                     desc.as_ptr(),
                     &mut isnull,
