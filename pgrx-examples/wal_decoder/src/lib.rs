@@ -143,6 +143,9 @@ struct DecodingState {
 // A Tuple describes the values of a table row before or after a change
 struct Tuple {
     rel: pgrx::PgRelation,
+    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
+    data: PgBox<pg_sys::ReorderBufferTupleBuf>,
+    #[cfg(any(feature = "pg17", feature = "pg18"))]
     data: PgBox<pg_sys::HeapTupleData>,
 }
 
@@ -168,13 +171,14 @@ impl Serialize for Tuple {
             }
             .to_str()
             .unwrap();
+
+            #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
+            let tuple = unsafe { &raw mut (*self.data.as_ptr()).tuple };
+            #[cfg(any(feature = "pg17", feature = "pg18"))]
+            let tuple = self.data.as_ptr();
+
             let datum = unsafe {
-                pg_sys::heap_getattr(
-                    self.data.as_ptr(),
-                    attribute.attnum.into(),
-                    desc.as_ptr(),
-                    &mut isnull,
-                )
+                pg_sys::heap_getattr(tuple, attribute.attnum.into(), desc.as_ptr(), &mut isnull)
             };
             if isnull {
                 continue;
