@@ -23,7 +23,16 @@ using composite types.
 use pgrx::{opname, pg_operator, prelude::*};
 
 // All `pgrx` extensions will do this:
-::pgrx::pg_module_magic_ext!(c"composite_type", pgrx::pg_sys::PG_VERSION);
+#[cfg(any(
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17"
+))]
+pgrx::pg_module_magic!();
+#[cfg(any(feature = "pg18"))]
+pgrx::pg_module_magic_ext!(c"composite_type", pgrx::pg_sys::PG_VERSION);
 
 /* Composite types must be defined either before they are used.
 

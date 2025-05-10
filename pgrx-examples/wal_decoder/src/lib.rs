@@ -4,7 +4,16 @@ use serde::ser::{SerializeStruct, Serializer};
 use serde::Serialize;
 use std::alloc::{alloc, dealloc, Layout};
 
-::pgrx::pg_module_magic_ext!(c"wal_decoder", pgrx::pg_sys::PG_VERSION);
+#[cfg(any(
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17"
+))]
+pgrx::pg_module_magic!();
+#[cfg(any(feature = "pg18"))]
+pgrx::pg_module_magic_ext!(c"wal_decoder", pgrx::pg_sys::PG_VERSION);
 
 // An Action describe a change that occurred on a table
 #[derive(Serialize)]

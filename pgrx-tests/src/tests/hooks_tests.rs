@@ -35,6 +35,13 @@ mod tests {
                 prev_hook(error_data)
             }
 
+            #[cfg(any(
+                feature = "pg13",
+                feature = "pg14",
+                feature = "pg15",
+                feature = "pg16",
+                feature = "pg17"
+            ))]
             fn executor_start(
                 &mut self,
                 query_desc: PgBox<QueryDesc>,
@@ -45,6 +52,24 @@ mod tests {
                 prev_hook(query_desc, eflags)
             }
 
+            #[cfg(feature = "pg18")]
+            fn executor_start(
+                &mut self,
+                query_desc: PgBox<QueryDesc>,
+                eflags: i32,
+                prev_hook: fn(PgBox<QueryDesc>, i32) -> HookResult<bool>,
+            ) -> HookResult<bool> {
+                self.events += 1;
+                prev_hook(query_desc, eflags)
+            }
+
+            #[cfg(any(
+                feature = "pg13",
+                feature = "pg14",
+                feature = "pg15",
+                feature = "pg16",
+                feature = "pg17"
+            ))]
             fn executor_run(
                 &mut self,
                 query_desc: PgBox<QueryDesc>,
@@ -55,6 +80,18 @@ mod tests {
             ) -> HookResult<()> {
                 self.events += 1;
                 prev_hook(query_desc, direction, count, execute_once)
+            }
+
+            #[cfg(feature = "pg18")]
+            fn executor_run(
+                &mut self,
+                query_desc: PgBox<QueryDesc>,
+                direction: i32,
+                count: u64,
+                prev_hook: fn(PgBox<QueryDesc>, i32, u64) -> HookResult<()>,
+            ) -> HookResult<()> {
+                self.events += 1;
+                prev_hook(query_desc, direction, count)
             }
 
             fn executor_finish(

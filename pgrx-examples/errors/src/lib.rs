@@ -10,7 +10,16 @@
 use pgrx::prelude::*;
 use pgrx::{error, info, warning, PgRelation, FATAL, PANIC};
 
-::pgrx::pg_module_magic_ext!(c"errors", pgrx::pg_sys::PG_VERSION);
+#[cfg(any(
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17"
+))]
+pgrx::pg_module_magic!();
+#[cfg(any(feature = "pg18"))]
+pgrx::pg_module_magic_ext!(c"errors", pgrx::pg_sys::PG_VERSION);
 
 #[pg_extern]
 fn array_with_null_and_panic(input: Vec<Option<i32>>) -> i64 {

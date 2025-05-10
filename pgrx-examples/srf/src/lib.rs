@@ -9,7 +9,16 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use pgrx::prelude::*;
 
-::pgrx::pg_module_magic_ext!(c"srf", pgrx::pg_sys::PG_VERSION);
+#[cfg(any(
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17"
+))]
+pgrx::pg_module_magic!();
+#[cfg(any(feature = "pg18"))]
+pgrx::pg_module_magic_ext!(c"srf", pgrx::pg_sys::PG_VERSION);
 
 #[pg_extern]
 fn generate_series(start: i64, finish: i64, step: default!(i64, 1)) -> SetOfIterator<'static, i64> {
