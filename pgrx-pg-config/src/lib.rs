@@ -67,7 +67,6 @@ pub enum PgMinorVersion {
     Release(u16),
     Beta(u16),
     Rc(u16),
-    Devel,
 }
 
 impl Display for PgMinorVersion {
@@ -77,7 +76,6 @@ impl Display for PgMinorVersion {
             PgMinorVersion::Release(v) => write!(f, ".{v}"),
             PgMinorVersion::Beta(v) => write!(f, "beta{v}"),
             PgMinorVersion::Rc(v) => write!(f, "rc{v}"),
-            PgMinorVersion::Devel => write!(f, "devel"),
         }
     }
 }
@@ -85,7 +83,7 @@ impl Display for PgMinorVersion {
 impl PgMinorVersion {
     fn version(&self) -> Option<u16> {
         match self {
-            PgMinorVersion::Latest | PgMinorVersion::Devel => None,
+            PgMinorVersion::Latest => None,
             PgMinorVersion::Release(v) | PgMinorVersion::Beta(v) | PgMinorVersion::Rc(v) => {
                 Some(*v)
             }
@@ -237,7 +235,6 @@ impl PgConfig {
 
         let mut beta = false;
         let mut rc = false;
-        let mut devel = false;
 
         if version.len() == 1 {
             // it's hopefully a "beta" or "rc" release
@@ -249,9 +246,6 @@ impl PgConfig {
             } else if first.contains("rc") {
                 rc = true;
                 version = first.split("rc").collect();
-            } else if first.contains("devel") {
-                devel = true;
-                version = first.split("devel").collect();
             } else {
                 return Err(eyre!("invalid version string: {version_str}"));
             }
@@ -259,10 +253,6 @@ impl PgConfig {
 
         let major = u16::from_str(version[0])
             .map_err(|e| eyre!("invalid major version number `{}`: {:?}", version[0], e))?;
-        if devel {
-            return Ok((major, PgMinorVersion::Devel));
-        }
-
         let mut minor = version[1];
         let mut end_index = minor.len();
         for (i, c) in minor.chars().enumerate() {
@@ -717,7 +707,16 @@ pub fn SUPPORTED_VERSIONS() -> Vec<PgVersion> {
         PgVersion::new(15, PgMinorVersion::Latest, None),
         PgVersion::new(16, PgMinorVersion::Latest, None),
         PgVersion::new(17, PgMinorVersion::Latest, None),
-        PgVersion::new(18, PgMinorVersion::Devel, None),
+        PgVersion::new(
+            18,
+            PgMinorVersion::Beta(1),
+            Some(
+                Url::parse(
+                    "https://ftp.postgresql.org/pub/source/v18beta1/postgresql-18beta1.tar.bz2",
+                )
+                .expect("malformed pg18beta1 url"),
+            ),
+        ),
     ]
 }
 
@@ -912,11 +911,6 @@ fn parse_version() {
         PgConfig::parse_version_str("PostgresSQL 12.f").expect_err("Parsed invalid version string");
     let _ =
         PgConfig::parse_version_str("PostgresSQL .53").expect_err("Parsed invalid version string");
-
-    // Check devel version
-    let (major, minor) = PgConfig::parse_version_str("PostgreSQL 18devel").unwrap();
-    assert_eq!(major, 18, "Major version should match");
-    assert_eq!(minor, PgMinorVersion::Devel, "Minor version should match");
 }
 
 #[test]

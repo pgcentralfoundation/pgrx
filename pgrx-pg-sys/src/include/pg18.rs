@@ -160,18 +160,18 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &::core::ffi::CStr = c"pgsql-bugs@lists.postgresql.org";
 pub const PACKAGE_NAME: &::core::ffi::CStr = c"PostgreSQL";
-pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 18devel";
+pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 18beta1";
 pub const PACKAGE_TARNAME: &::core::ffi::CStr = c"postgresql";
 pub const PACKAGE_URL: &::core::ffi::CStr = c"https://www.postgresql.org/";
-pub const PACKAGE_VERSION: &::core::ffi::CStr = c"18devel";
+pub const PACKAGE_VERSION: &::core::ffi::CStr = c"18beta1";
 pub const PG_KRB_SRVNAM: &::core::ffi::CStr = c"postgres";
 pub const PG_MAJORVERSION: &::core::ffi::CStr = c"18";
 pub const PG_MAJORVERSION_NUM: u32 = 18;
 pub const PG_MINORVERSION_NUM: u32 = 0;
-pub const PG_VERSION: &::core::ffi::CStr = c"18devel";
+pub const PG_VERSION: &::core::ffi::CStr = c"18beta1";
 pub const PG_VERSION_NUM: u32 = 180000;
 pub const PG_VERSION_STR: &::core::ffi::CStr =
-    c"PostgreSQL 18devel on x86_64-pc-linux-gnu, compiled by gcc (GCC) 14.2.1 20250207, 64-bit";
+    c"PostgreSQL 18beta1 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 14.2.1 20250207, 64-bit";
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_LONG: u32 = 8;
 pub const SIZEOF_LONG_LONG: u32 = 8;
@@ -183,6 +183,7 @@ pub const USE_ASSERT_CHECKING: u32 = 1;
 pub const USE_AVX512_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
 pub const USE_AVX512_POPCNT_WITH_RUNTIME_CHECK: u32 = 1;
 pub const USE_ICU: u32 = 1;
+pub const USE_LIBURING: u32 = 1;
 pub const USE_SSE42_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
 pub const USE_SYSV_SHARED_MEMORY: u32 = 1;
 pub const USE_UNNAMED_POSIX_SEMAPHORES: u32 = 1;
@@ -250,7 +251,7 @@ pub const PG_BINARY_A: &::core::ffi::CStr = c"a";
 pub const PG_BINARY_R: &::core::ffi::CStr = c"r";
 pub const PG_BINARY_W: &::core::ffi::CStr = c"w";
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 18devel\n";
+pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 18beta1\n";
 pub const EXE: &::core::ffi::CStr = c"";
 pub const DEVNULL: &::core::ffi::CStr = c"/dev/null";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -39301,7 +39302,7 @@ unsafe extern "C-unwind" {
     pub fn pg_comp_crc32c_avx512(
         crc: pg_crc32c,
         data: *const ::core::ffi::c_void,
-        length: usize,
+        len: usize,
     ) -> pg_crc32c;
     pub fn XLogReaderAllocate(
         wal_segment_size: ::core::ffi::c_int,
@@ -43620,6 +43621,11 @@ unsafe extern "C-unwind" {
     pub fn pg_encoding_mblen(
         encoding: ::core::ffi::c_int,
         mbstr: *const ::core::ffi::c_char,
+    ) -> ::core::ffi::c_int;
+    pub fn pg_encoding_mblen_or_incomplete(
+        encoding: ::core::ffi::c_int,
+        mbstr: *const ::core::ffi::c_char,
+        remaining: usize,
     ) -> ::core::ffi::c_int;
     pub fn pg_encoding_mblen_bounded(
         encoding: ::core::ffi::c_int,
