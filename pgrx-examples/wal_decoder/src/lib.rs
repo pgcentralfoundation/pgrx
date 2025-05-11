@@ -47,10 +47,14 @@ impl Action {
 
     // This is a simple COMMIT Statement
     pub fn commit(txn: PgBox<pg_sys::ReorderBufferTXN>, change_count: i64) -> Self {
+        #[cfg(any(feature = "pg13", feature = "pg14"))]
+        let committed = txn.commit_time;
+        #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+        let committed = unsafe { txn.xact_time.commit_time };
         Self {
             typ: "COMMIT".into(),
             // TODO: convert the commit timestamp into a human readable format ?
-            committed: Some(unsafe { txn.xact_time.commit_time }),
+            committed: Some(committed),
             rel: None,
             old: None,
             new: None,
