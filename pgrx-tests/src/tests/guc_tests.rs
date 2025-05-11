@@ -21,9 +21,9 @@ mod tests {
     fn test_bool_guc() {
         static GUC: GucSetting<bool> = GucSetting::<bool>::new(true);
         GucRegistry::define_bool_guc(
-            "test.bool",
-            "test bool gucs",
-            "test bool gucs",
+            c"test.bool",
+            c"test bool gucs",
+            c"test bool gucs",
             &GUC,
             GucContext::Userset,
             GucFlags::default(),
@@ -41,9 +41,9 @@ mod tests {
     fn test_int_guc() {
         static GUC: GucSetting<i32> = GucSetting::<i32>::new(42);
         GucRegistry::define_int_guc(
-            "test.int",
-            "test int guc",
-            "test int guc",
+            c"test.int",
+            c"test int guc",
+            c"test int guc",
             &GUC,
             -1,
             42,
@@ -63,9 +63,9 @@ mod tests {
     fn test_mb_guc() {
         static GUC: GucSetting<i32> = GucSetting::<i32>::new(42);
         GucRegistry::define_int_guc(
-            "test.megabytes",
-            "test megabytes guc",
-            "test megabytes guc",
+            c"test.megabytes",
+            c"test megabytes guc",
+            c"test megabytes guc",
             &GUC,
             -1,
             42000,
@@ -82,9 +82,9 @@ mod tests {
     fn test_float_guc() {
         static GUC: GucSetting<f64> = GucSetting::<f64>::new(42.42);
         GucRegistry::define_float_guc(
-            "test.float",
-            "test float guc",
-            "test float guc",
+            c"test.float",
+            c"test float guc",
+            c"test float guc",
             &GUC,
             -1.0f64,
             43.0f64,
@@ -108,9 +108,9 @@ mod tests {
         static GUC: GucSetting<Option<CString>> =
             GucSetting::<Option<CString>>::new(Some(c"this is a test"));
         GucRegistry::define_string_guc(
-            "test.string",
-            "test string guc",
-            "test string guc",
+            c"test.string",
+            c"test string guc",
+            c"test string guc",
             &GUC,
             GucContext::Userset,
             GucFlags::default(),
@@ -129,9 +129,9 @@ mod tests {
     fn test_string_guc_null_default() {
         static GUC: GucSetting<Option<CString>> = GucSetting::<Option<CString>>::new(None);
         GucRegistry::define_string_guc(
-            "test.string",
-            "test string guc",
-            "test string guc",
+            c"test.string",
+            c"test string guc",
+            c"test string guc",
             &GUC,
             GucContext::Userset,
             GucFlags::default(),
@@ -152,12 +152,16 @@ mod tests {
             One,
             Two,
             Three,
+            #[name = c"five"]
+            Four,
+            #[hidden = true]
+            Six,
         }
         static GUC: GucSetting<TestEnum> = GucSetting::<TestEnum>::new(TestEnum::Two);
         GucRegistry::define_enum_guc(
-            "test.enum",
-            "test enum guc",
-            "test enum guc",
+            c"test.enum",
+            c"test enum guc",
+            c"test enum guc",
             &GUC,
             GucContext::Userset,
             GucFlags::default(),
@@ -169,6 +173,9 @@ mod tests {
 
         Spi::run("SET test.enum = 'three'").expect("SPI failed");
         assert_eq!(GUC.get(), TestEnum::Three);
+
+        Spi::run("SET test.enum = 'five'").expect("SPI failed");
+        assert_eq!(GUC.get(), TestEnum::Four);
     }
 
     #[pg_test]
@@ -179,17 +186,17 @@ mod tests {
         static GUC_NO_SHOW: GucSetting<bool> = GucSetting::<bool>::new(true);
         static GUC_NO_RESET_ALL: GucSetting<bool> = GucSetting::<bool>::new(true);
         GucRegistry::define_bool_guc(
-            "test.no_show",
-            "test no show gucs",
-            "test no show gucs",
+            c"test.no_show",
+            c"test no show gucs",
+            c"test no show gucs",
             &GUC_NO_SHOW,
             GucContext::Userset,
             no_show_flag,
         );
         GucRegistry::define_bool_guc(
-            "test.no_reset_all",
-            "test no reset gucs",
-            "test no reset gucs",
+            c"test.no_reset_all",
+            c"test no reset gucs",
+            c"test no reset gucs",
             &GUC_NO_RESET_ALL,
             GucContext::Userset,
             GucFlags::NO_RESET_ALL,

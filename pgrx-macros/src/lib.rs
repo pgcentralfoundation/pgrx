@@ -11,6 +11,7 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use std::collections::HashSet;
+use std::ffi::CString;
 
 use proc_macro2::Ident;
 use quote::{format_ident, quote, ToTokens};
@@ -1064,7 +1065,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 }
 
 /// Derives the `GucEnum` trait, so that normal Rust enums can be used as a GUC.
-#[proc_macro_derive(PostgresGucEnum, attributes(hidden))]
+#[proc_macro_derive(PostgresGucEnum, attributes(name, hidden))]
 pub fn postgres_guc_enum(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -1072,83 +1073,100 @@ pub fn postgres_guc_enum(input: TokenStream) -> TokenStream {
 }
 
 fn impl_guc_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
-    let mut stream = proc_macro2::TokenStream::new();
+    use std::str::FromStr;
+    use syn::parse::Parse;
 
-    // validate that we're only operating on an enum
-    let enum_data = match ast.data {
-        Data::Enum(e) => e,
-        _ => {
-            return Err(syn::Error::new(
-                ast.span(),
-                "#[derive(PostgresGucEnum)] can only be applied to enums",
-            ))
-        }
-    };
-    let enum_name = ast.ident;
-    let enum_len = enum_data.variants.len();
-
-    let mut from_match_arms = proc_macro2::TokenStream::new();
-    for (idx, e) in enum_data.variants.iter().enumerate() {
-        let label = &e.ident;
-        let idx = idx as i32;
-        from_match_arms.extend(quote! { #idx => #enum_name::#label, })
-    }
-    from_match_arms.extend(quote! { _ => panic!("Unrecognized ordinal ")});
-
-    let mut ordinal_match_arms = proc_macro2::TokenStream::new();
-    for (idx, e) in enum_data.variants.iter().enumerate() {
-        let label = &e.ident;
-        let idx = idx as i32;
-        ordinal_match_arms.extend(quote! { #enum_name::#label => #idx, });
+    enum GucEnumAttribute {
+        Name(CString),
+        Hidden(bool),
     }
 
-    let mut build_array_body = proc_macro2::TokenStream::new();
-    for (idx, e) in enum_data.variants.iter().enumerate() {
-        let label = e.ident.to_string();
-        let mut hidden = false;
-
-        for att in e.attrs.iter() {
-            let att = quote! {#att}.to_string();
-            if att == "# [hidden]" {
-                hidden = true;
-                break;
+    impl Parse for GucEnumAttribute {
+        fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+            let ident: Ident = input.parse()?;
+            let _: syn::token::Eq = input.parse()?;
+            match ident.to_string().as_str() {
+                "name" => input.parse::<syn::LitCStr>().map(|val| Self::Name(val.value())),
+                "hidden" => input.parse::<syn::LitBool>().map(|val| Self::Hidden(val.value())),
+                x => Err(syn::Error::new(input.span(), format!("unknown attribute {x}"))),
             }
         }
-
-        build_array_body.extend(quote! {
-            ::pgrx::pgbox::PgBox::<_, ::pgrx::pgbox::AllocatedByPostgres>::with(&mut slice[#idx], |v| {
-                v.name = ::pgrx::memcxt::PgMemoryContexts::TopMemoryContext.pstrdup(#label);
-                v.val = #idx as i32;
-                v.hidden = #hidden;
-            });
-        });
     }
 
-    stream.extend(quote! {
-        unsafe impl ::pgrx::guc::GucEnum<#enum_name> for #enum_name {
-            fn from_ordinal(ordinal: i32) -> #enum_name {
+    // validate that we're only operating on an enum
+    let Data::Enum(data) = ast.data.clone() else {
+        return Err(syn::Error::new(
+            ast.span(),
+            "#[derive(PostgresGucEnum)] can only be applied to enums",
+        ));
+    };
+    let ident = ast.ident.clone();
+    let mut config = Vec::new();
+    for (index, variant) in data.variants.iter().enumerate() {
+        let default_name = CString::from_str(&variant.ident.to_string())
+            .expect("the identifier contains a null character.");
+        let default_val = index as i32;
+        let default_hidden = false;
+        let mut name = None;
+        let mut hidden = None;
+        for attr in variant.attrs.iter() {
+            let tokens = attr.meta.require_name_value()?.to_token_stream();
+            let pair: GucEnumAttribute = syn::parse2(tokens)?;
+            match pair {
+                GucEnumAttribute::Name(value) => {
+                    if name.replace(value).is_some() {
+                        return Err(syn::Error::new(ast.span(), "too many #[name] attributes"));
+                    }
+                }
+                GucEnumAttribute::Hidden(value) => {
+                    if hidden.replace(value).is_some() {
+                        return Err(syn::Error::new(ast.span(), "too many #[hidden] attributes"));
+                    }
+                }
+            }
+        }
+        let ident = variant.ident.clone();
+        let name = name.unwrap_or(default_name);
+        let val = default_val;
+        let hidden = hidden.unwrap_or(default_hidden);
+        config.push((ident, name, val, hidden));
+    }
+    let config_idents = config.iter().map(|x| &x.0).collect::<Vec<_>>();
+    let config_names = config.iter().map(|x| &x.1).collect::<Vec<_>>();
+    let config_vals = config.iter().map(|x| &x.2).collect::<Vec<_>>();
+    let config_hiddens = config.iter().map(|x| &x.3).collect::<Vec<_>>();
+
+    Ok(quote! {
+        unsafe impl ::pgrx::guc::GucEnum for #ident {
+            fn from_ordinal(ordinal: i32) -> Self {
                 match ordinal {
-                    #from_match_arms
+                    #(#config_vals => Self::#config_idents,)*
+                    _ => panic!("Unrecognized ordinal"),
                 }
             }
 
             fn to_ordinal(&self) -> i32 {
-                match *self {
-                    #ordinal_match_arms
+                match self {
+                    #(Self::#config_idents => #config_vals,)*
                 }
             }
 
-            fn config_matrix() -> *const ::pgrx::pg_sys::config_enum_entry {
-                unsafe {
-                    let slice = ::pgrx::memcxt::PgMemoryContexts::TopMemoryContext.palloc0_slice::<::pgrx::pg_sys::config_enum_entry>(#enum_len + 1usize);
-                    #build_array_body
-                    slice.as_ptr()
-                }
-            }
+            const CONFIG_ENUM_ENTRY: *const ::pgrx::pg_sys::config_enum_entry = [
+                #(
+                    ::pgrx::pg_sys::config_enum_entry {
+                        name: #config_names.as_ptr(),
+                        val: #config_vals,
+                        hidden: #config_hiddens,
+                    },
+                )*
+                ::pgrx::pg_sys::config_enum_entry {
+                    name: core::ptr::null(),
+                    val: 0,
+                    hidden: false,
+                },
+            ].as_ptr();
         }
-    });
-
-    Ok(stream)
+    })
 }
 
 #[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
