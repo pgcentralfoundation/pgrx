@@ -956,22 +956,18 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
-            pub fn #funcname_recv #generics(input: ::pgrx::pg_sys::PgInput) -> ::pgrx::datum::PgVarlena<#name #generics> {
-                use ::pgrx::datum::varlena::cbor_encode;
-                use ::pgrx::datum::PgVarlena;
-
-                let value: #name #generics = unsafe { cbor_decode(input.0 as *mut _) };
-                PgVarlena::from(value)
+            pub fn #funcname_recv #generics(input: *mut ::pgrx::pg_sys::varlena) -> #name #generics {
+                use ::pgrx::datum::varlena::cbor_decode;
+            
+                unsafe { cbor_decode(input) }
             }
 
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
-            pub fn #funcname_send #generics(input: ::pgrx::datum::PgVarlena<#name #generics>) -> ::pgrx::pg_sys::PgOutput {
-                use ::pgrx::datum::varlena::cbor_decode;
-                use ::pgrx::pg_sys::PgOutput;
-
-                let ptr = unsafe { cbor_encode(&*input) }; // pass a reference to the inner type
-                unsafe { PgOutput::from_varlena(ptr) }
+            pub fn #funcname_send #generics(input: #name #generics) -> *const ::pgrx::pg_sys::varlena {
+                use ::pgrx::datum::varlena::cbor_encode;
+            
+                unsafe { cbor_encode(&*input) }
             }
         });
     } else if args.contains(&PostgresTypeAttribute::InOutFuncs) {
