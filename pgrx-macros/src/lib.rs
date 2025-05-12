@@ -956,20 +956,18 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
-            pub fn #funcname_recv #generics(input: *mut ::pgrx::pg_sys::varlena) -> ::pgrx::datum::PgVarlena<#name #generics> {
-                use ::pgrx::datum::varlena::cbor_decode;
-                use ::pgrx::datum::PgVarlena;
-            
-                let val: #name #generics = unsafe { cbor_decode(input) };
-                PgVarlena::from(val)
+            pub fn #funcname_recv #generics(internal: ::pgrx::datum::Internal) -> #name #generics {
+                let ptr = internal.get().expect("internal input pointer is NULL");
+                let string_info = unsafe { StringInfo::from_pg(ptr as *mut pgrx::pg_sys::StringInfoData) };
+                let bytes = unsafe { std::slice::from_raw_parts(string_info.data as *const u8, string_info.len as usize) };
+
+                serde_cbor::from_slice(bytes).expect("failed to decode from CBOR")
             }
 
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
-            pub fn #funcname_send #generics(input: ::pgrx::datum::PgVarlena<#name #generics>) -> *const ::pgrx::pg_sys::varlena {
-                use ::pgrx::datum::varlena::cbor_encode;
-            
-                unsafe { cbor_encode(&*input) }
+            pub fn #funcname_send #generics(input: #name #generics) -> Vec<u8> {
+                serde_cbor::to_vec(&input).expect("failed to encode to CBOR")
             }
         });
     } else if args.contains(&PostgresTypeAttribute::InOutFuncs) {
