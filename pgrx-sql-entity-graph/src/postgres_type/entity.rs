@@ -242,7 +242,7 @@ impl ToSql for PostgresTypeEntity {
             .externs
             .iter()
             .find(|(k, _v)| k.full_path == receive_fn_path)
-            .ok_or_else(|| eyre::eyre!("Did not find `receive_fn: {}`.", receive_fn_path))?;
+            .ok_or_else(|| eyre::eyre!("Did not find `receive_fn: {}`, but found {out_fn_path}.", receive_fn_path))?;
 
         let (receive_fn_graph_index, receive_fn_entity) = context
             .graph
