@@ -806,6 +806,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     let has_lifetimes = generics.lifetimes().next();
     let funcname_in = Ident::new(&format!("{name}_in").to_lowercase(), name.span());
     let funcname_out = Ident::new(&format!("{name}_out").to_lowercase(), name.span());
+    let funcname_recv = Ident::new(&format!("{name}_recv").to_lowercase(), name.span());
+    let funcname_send = Ident::new(&format!("{name}_send").to_lowercase(), name.span());
     let mut args = parse_postgres_type_args(&ast.attrs);
     let mut stream = proc_macro2::TokenStream::new();
 
@@ -950,6 +952,26 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                 let mut bytes = json_to_vec(&input).unwrap();
                 bytes.push(0); // terminate
                 ::pgrx::ffi::CString::from_vec_with_nul(bytes).unwrap()
+            }
+
+            #[doc(hidden)]
+            #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
+            pub fn #funcname_recv #generics(input: ::pgrx::pg_sys::PgInput) -> ::pgrx::datum::PgVarlena<#name #generics> {
+                use ::pgrx::datum::varlena::cbor_encode;
+                use ::pgrx::datum::PgVarlena;
+
+                let value: #name #generics = unsafe { cbor_decode(input.0 as *mut _) };
+                PgVarlena::from(value)
+            }
+
+            #[doc(hidden)]
+            #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
+            pub fn #funcname_send #generics(input: ::pgrx::datum::PgVarlena<#name #generics>) -> ::pgrx::pg_sys::PgOutput {
+                use ::pgrx::datum::varlena::cbor_decode;
+                use ::pgrx::pg_sys::PgOutput;
+
+                let ptr = unsafe { cbor_encode(&*input) }; // pass a reference to the inner type
+                unsafe { PgOutput::from_varlena(ptr) }
             }
         });
     } else if args.contains(&PostgresTypeAttribute::InOutFuncs) {
