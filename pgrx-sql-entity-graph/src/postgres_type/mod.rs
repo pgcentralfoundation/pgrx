@@ -55,8 +55,8 @@ pub struct PostgresTypeDerive {
     generics: Generics,
     in_fn: Ident,
     out_fn: Ident,
-    receive_fn: Option<Ident>,
-    send_fn: Option<Ident>,
+    receive_fn: Ident,
+    send_fn: Ident,
     to_sql_config: ToSqlConfig,
     alignment: Alignment,
 }
@@ -67,8 +67,8 @@ impl PostgresTypeDerive {
         generics: Generics,
         in_fn: Ident,
         out_fn: Ident,
-        receive_fn: Option<Ident>,
-        send_fn: Option<Ident>,
+        receive_fn: Ident,
+        send_fn: Ident,
         to_sql_config: ToSqlConfig,
         alignment: Alignment,
     ) -> Result<CodeEnrichment<Self>, syn::Error> {
@@ -111,8 +111,8 @@ impl PostgresTypeDerive {
             derive_input.generics,
             funcname_in,
             funcname_out,
-            Some(funcname_receive),
-            Some(funcname_send),
+            funcname_receive,
+            funcname_send,
             to_sql_config,
             alignment,
         )
@@ -215,9 +215,9 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
                         let _ = path_items.pop(); // Drop the one we don't want.
                         path_items.join("::")
                     },
-                    receive_fn: #receive_fn.as_ref().map(|recv_fn| stringify!(recv_fn)),
+                    receive_fn: #receive_fn.as_ref().map(|recv_fn| stringify!(#receive_fn)),
                     receive_fn_module_path: #receive_fn.as_ref().map(|recv_fn| {
-                        let recv_fn = stringify!(recv_fn);
+                        let recv_fn = stringify!(#receive_fn);
                         let mut path_items: Vec<_> = recv_fn.split("::").collect();
                         let _ = path_items.pop(); // Drop the one we don't want.
                         path_items.join("::")
@@ -246,8 +246,8 @@ impl Parse for CodeEnrichment<PostgresTypeDerive> {
         let to_sql_config = ToSqlConfig::from_attributes(attrs.as_slice())?.unwrap_or_default();
         let in_fn = Ident::new(&format!("{}_in", ident).to_lowercase(), ident.span());
         let out_fn = Ident::new(&format!("{}_out", ident).to_lowercase(), ident.span());
-        let receive_fn = Some(Ident::new(&format!("{}_recv", ident).to_lowercase(), ident.span()));
-        let send_fn = Some(Ident::new(&format!("{}_send", ident).to_lowercase(), ident.span()));
+        let receive_fn = Ident::new(&format!("{}_recv", ident).to_lowercase(), ident.span());
+        let send_fn = Ident::new(&format!("{}_send", ident).to_lowercase(), ident.span());
         let alignment = Alignment::from_attributes(attrs.as_slice())?;
         PostgresTypeDerive::new(ident, generics, in_fn, out_fn, receive_fn, send_fn, to_sql_config, alignment)
     }
