@@ -229,7 +229,7 @@ impl ToSql for PostgresTypeEntity {
         let receive_fn_module_path = if !receive_fn_module_path.is_empty() {
             receive_fn_module_path.clone()
         } else {
-            receive_fn_module_path.to_string() // Presume a local
+            module_path.to_string() // Presume a local
         };
 
         let receive_fn_path = format!(
@@ -266,7 +266,7 @@ impl ToSql for PostgresTypeEntity {
         let send_fn_module_path = if !send_fn_module_path.is_empty() {
             send_fn_module_path.clone()
         } else {
-            send_fn_module_path.to_string() // Presume a local
+            module_path.to_string() // Presume a local
         };
 
         let send_fn_path = format!(
