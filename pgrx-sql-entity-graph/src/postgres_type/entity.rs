@@ -257,12 +257,6 @@ impl ToSql for PostgresTypeEntity {
 
         let receive_fn_sql = receive_fn_entity.to_sql(context)?;
 
-        let receive_fn_clause = format!(
-            ",\n\tRECEIVE = {}{}",
-            context.schema_prefix_for(&receive_fn_graph_index),
-            receive_fn
-        );
-
         let send_fn_module_path = if !send_fn_module_path.is_empty() {
             send_fn_module_path.clone()
         } else {
@@ -293,9 +287,6 @@ impl ToSql for PostgresTypeEntity {
             .ok_or_else(|| eyre!("Could not find send_fn graph entity."))?;
 
         let send_fn_sql = send_fn_entity.to_sql(context)?;
-
-        let send_fn_clause =
-            format!(",\n\tSEND = {}{}", context.schema_prefix_for(&send_fn_graph_index), send_fn);
 
         let shell_type = format!(
             "\n\
@@ -331,13 +322,17 @@ impl ToSql for PostgresTypeEntity {
                 CREATE TYPE {schema}{name} (\n\
                     \tINTERNALLENGTH = variable,\n\
                     \tINPUT = {schema_prefix_in_fn}{in_fn}, /* {in_fn_path} */\n\
-                    \tOUTPUT = {schema_prefix_out_fn}{out_fn}, /* {out_fn_path} */{receive_fn_clause}{send_fn_clause}\n\
+                    \tOUTPUT = {schema_prefix_out_fn}{out_fn}, /* {out_fn_path} */
+                    \tRECEIVE = {schema_prefix_receive_fn}{receive_fn}, /* {receive_fn_path} */\n\
+                    \tSEND = {schema_prefix_send_fn}{send_fn}, /* {send_fn_path} */\n\
                     \tSTORAGE = extended{alignment}\n\
                 );\
             ",
             schema = context.schema_prefix_for(&self_index),
             schema_prefix_in_fn = context.schema_prefix_for(&in_fn_graph_index),
             schema_prefix_out_fn = context.schema_prefix_for(&out_fn_graph_index),
+            schema_prefix_receive_fn = context.schema_prefix_for(&receive_fn_graph_index),
+            schema_prefix_send_fn = context.schema_prefix_for(&send_fn_graph_index),
         };
 
         let result = shell_type
