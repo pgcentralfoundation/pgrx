@@ -217,6 +217,9 @@ impl ToSql for PostgresTypeEntity {
             .ok_or_else(|| eyre!("Could not find out_fn graph entity."))?;
         let out_fn_sql = out_fn_entity.to_sql(context)?;
 
+        println!("in_fn_sql: {in_fn_sql}");
+        println!("out_fn_sql: {out_fn_sql}");
+
         let shell_type = format!(
             "\n\
                 -- {file}:{line}\n\
