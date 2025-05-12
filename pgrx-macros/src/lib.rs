@@ -957,9 +957,9 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
             pub fn #funcname_recv #generics(internal: ::pgrx::datum::Internal) -> Option<#name #generics> {
-                internal.get().map(|bytes: &Vec<u8>| {
+                unsafe{internal.get().map(|bytes: &Vec<u8>| {
                     serde_cbor::from_slice(&bytes).ok()
-                }).flatten()
+                }).flatten()}
             }
             
             #[doc(hidden)]
