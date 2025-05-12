@@ -957,9 +957,14 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
             pub fn #funcname_recv #generics(internal: ::pgrx::datum::Internal) -> #name #generics {
-                unsafe{internal.get().map(|bytes: &Vec<u8>| {
-                    serde_cbor::from_slice(&bytes).unwrap()
-                }).unwrap()}
+                let string_info = unsafe {
+                    let data = internal.get_mut::<::pgrx::pg_sys::StringInfoData>();
+                    ::pgrx::StringInfo::from_pg(data.expect("internal input pointer is NULL"))
+                }
+                .expect("failed to create StringInfo from internal");
+
+                let bytes = string_info.as_bytes();
+                serde_cbor::from_slice(bytes).expect("failed to decode from CBOR")
             }
             
             #[doc(hidden)]

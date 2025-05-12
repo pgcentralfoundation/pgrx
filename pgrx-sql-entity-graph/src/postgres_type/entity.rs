@@ -238,13 +238,13 @@ impl ToSql for PostgresTypeEntity {
         );
 
         // Find the receive function in the context
-        let (_, _) = context
+        let (_, _index) = context
             .externs
             .iter()
             .find(|(k, _v)| k.full_path == receive_fn_path)
-            .ok_or_else(|| eyre::eyre!("Did not find `receive_fn: {}`.", receive_fn_path))?;
+            .ok_or_else(|| eyre::eyre!("Did not find `receive_fn`: {receive_fn_path}."))?;
 
-        let (receive_fn_graph_index, _) = context
+        let (receive_fn_graph_index, receive_fn_entity) = context
             .graph
             .neighbors_undirected(self_index)
             .find_map(|neighbor| match &context.graph[neighbor] {
@@ -254,6 +254,7 @@ impl ToSql for PostgresTypeEntity {
                 _ => None,
             })
             .ok_or_else(|| eyre!("Could not find receive_fn graph entity."))?;
+        let receive_fn_sql = receive_fn_entity.to_sql(context)?;
 
         let send_fn_module_path = if !send_fn_module_path.is_empty() {
             send_fn_module_path.clone()
@@ -267,13 +268,13 @@ impl ToSql for PostgresTypeEntity {
         );
 
         // Find the send function in the context
-        let (_, _) = context
+        let (_, _index) = context
             .externs
             .iter()
             .find(|(k, _v)| k.full_path == send_fn_path)
             .ok_or_else(|| eyre::eyre!("Did not find `send_fn: {}`.", send_fn_path))?;
 
-        let (send_fn_graph_index, _) = context
+        let (send_fn_graph_index, send_fn_entity) = context
             .graph
             .neighbors_undirected(self_index)
             .find_map(|neighbor| match &context.graph[neighbor] {
@@ -283,6 +284,7 @@ impl ToSql for PostgresTypeEntity {
                 _ => None,
             })
             .ok_or_else(|| eyre!("Could not find send_fn graph entity."))?;
+        let send_fn_sql = send_fn_entity.to_sql(context)?;
 
         let shell_type = format!(
             "\n\
@@ -336,6 +338,10 @@ impl ToSql for PostgresTypeEntity {
             + &in_fn_sql
             + "\n"
             + &out_fn_sql
+            + "\n"
+            + &receive_fn_sql
+            + "\n"
+            + &send_fn_sql
             + "\n"
             + &materialized_type;
 
