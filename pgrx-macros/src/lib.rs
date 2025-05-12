@@ -958,7 +958,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
             pub fn #funcname_recv #generics(internal: ::pgrx::datum::Internal) -> #name #generics {
                 let ptr = internal.get().expect("internal input pointer is NULL");
-                let string_info = unsafe { StringInfo::from_pg(ptr as *mut pgrx::pg_sys::StringInfoData) };
+                let string_info = unsafe { ::pgrx::StringInfo::from_pg(ptr as *mut ::pgrx::pg_sys::StringInfoData) };
                 let bytes = unsafe { std::slice::from_raw_parts(string_info.data as *const u8, string_info.len as usize) };
 
                 serde_cbor::from_slice(bytes).expect("failed to decode from CBOR")
