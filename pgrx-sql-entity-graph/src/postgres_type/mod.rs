@@ -55,6 +55,8 @@ pub struct PostgresTypeDerive {
     generics: Generics,
     in_fn: Ident,
     out_fn: Ident,
+    receive_fn: Option<Ident>,
+    send_fn: Option<Ident>,
     to_sql_config: ToSqlConfig,
     alignment: Alignment,
 }
@@ -65,13 +67,15 @@ impl PostgresTypeDerive {
         generics: Generics,
         in_fn: Ident,
         out_fn: Ident,
+        receive_fn: Option<Ident>,
+        send_fn: Option<Ident>,
         to_sql_config: ToSqlConfig,
         alignment: Alignment,
     ) -> Result<CodeEnrichment<Self>, syn::Error> {
         if !to_sql_config.overrides_default() {
             crate::ident_is_acceptable_to_postgres(&name)?;
         }
-        Ok(CodeEnrichment(Self { generics, name, in_fn, out_fn, to_sql_config, alignment }))
+        Ok(CodeEnrichment(Self { generics, name, in_fn, out_fn, receive_fn, send_fn, to_sql_config, alignment }))
     }
 
     pub fn from_derive_input(
@@ -93,12 +97,22 @@ impl PostgresTypeDerive {
             &format!("{}_out", derive_input.ident).to_lowercase(),
             derive_input.ident.span(),
         );
+        let funcname_receive = Ident::new(
+            &format!("{}_recv", derive_input.ident).to_lowercase(),
+            derive_input.ident.span(),
+        );
+        let funcname_send = Ident::new(
+            &format!("{}_send", derive_input.ident).to_lowercase(),
+            derive_input.ident.span(),
+        );
         let alignment = Alignment::from_attributes(derive_input.attrs.as_slice())?;
         Self::new(
             derive_input.ident,
             derive_input.generics,
             funcname_in,
             funcname_out,
+            Some(funcname_receive),
+            Some(funcname_send),
             to_sql_config,
             alignment,
         )
@@ -129,6 +143,8 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
 
         let in_fn = &self.in_fn;
         let out_fn = &self.out_fn;
+        let receive_fn = &self.receive_fn;
+        let send_fn = &self.send_fn;
 
         let sql_graph_entity_fn_name = format_ident!("__pgrx_internals_type_{}", self.name);
 
@@ -199,6 +215,20 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
                         let _ = path_items.pop(); // Drop the one we don't want.
                         path_items.join("::")
                     },
+                    receive_fn: #receive_fn.as_ref().map(|recv_fn| stringify!(recv_fn)),
+                    receive_fn_module_path: #receive_fn.as_ref().map(|recv_fn| {
+                        let recv_fn = stringify!(recv_fn);
+                        let mut path_items: Vec<_> = recv_fn.split("::").collect();
+                        let _ = path_items.pop(); // Drop the one we don't want.
+                        path_items.join("::")
+                    }),
+                    send_fn: #send_fn.as_ref().map(|send_fn| stringify!(#send_fn)),
+                    send_fn_module_path: #send_fn.as_ref().map(|send_fn| {
+                        let send_fn = stringify!(#send_fn);
+                        let mut path_items: Vec<_> = send_fn.split("::").collect();
+                        let _ = path_items.pop(); // Drop the one we don't want.
+                        path_items.join("::")
+                    }),
                     to_sql_config: #to_sql_config,
                     alignment: #alignment,
                 };
@@ -216,7 +246,9 @@ impl Parse for CodeEnrichment<PostgresTypeDerive> {
         let to_sql_config = ToSqlConfig::from_attributes(attrs.as_slice())?.unwrap_or_default();
         let in_fn = Ident::new(&format!("{}_in", ident).to_lowercase(), ident.span());
         let out_fn = Ident::new(&format!("{}_out", ident).to_lowercase(), ident.span());
+        let receive_fn = Some(Ident::new(&format!("{}_recv", ident).to_lowercase(), ident.span()));
+        let send_fn = Some(Ident::new(&format!("{}_send", ident).to_lowercase(), ident.span()));
         let alignment = Alignment::from_attributes(attrs.as_slice())?;
-        PostgresTypeDerive::new(ident, generics, in_fn, out_fn, to_sql_config, alignment)
+        PostgresTypeDerive::new(ident, generics, in_fn, out_fn, receive_fn, send_fn, to_sql_config, alignment)
     }
 }
