@@ -215,15 +215,15 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
                         let _ = path_items.pop(); // Drop the one we don't want.
                         path_items.join("::")
                     },
-                    receive_fn: #receive_fn.as_ref().map(|recv_fn| stringify!(#receive_fn)),
-                    receive_fn_module_path: #receive_fn.as_ref().map(|recv_fn| {
+                    receive_fn: Some(stringify!(#receive_fn)),
+                    receive_fn_module_path: Some({
                         let recv_fn = stringify!(#receive_fn);
                         let mut path_items: Vec<_> = recv_fn.split("::").collect();
                         let _ = path_items.pop(); // Drop the one we don't want.
                         path_items.join("::")
                     }),
-                    send_fn: #send_fn.as_ref().map(|send_fn| stringify!(#send_fn)),
-                    send_fn_module_path: #send_fn.as_ref().map(|send_fn| {
+                    send_fn: Some(stringify!(#send_fn)),
+                    send_fn_module_path: Some({
                         let send_fn = stringify!(#send_fn);
                         let mut path_items: Vec<_> = send_fn.split("::").collect();
                         let _ = path_items.pop(); // Drop the one we don't want.
