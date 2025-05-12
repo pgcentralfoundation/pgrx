@@ -956,15 +956,17 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
-            pub fn #funcname_recv #generics(input: *mut ::pgrx::pg_sys::varlena) -> #name #generics {
+            pub fn #funcname_recv #generics(input: *mut ::pgrx::pg_sys::varlena) -> ::pgrx::datum::PgVarlena<#name #generics> {
                 use ::pgrx::datum::varlena::cbor_decode;
+                use ::pgrx::datum::PgVarlena;
             
-                unsafe { cbor_decode(input) }
+                let val: #name #generics = unsafe { cbor_decode(input) };
+                PgVarlena::from(val)
             }
 
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
-            pub fn #funcname_send #generics(input: #name #generics) -> *const ::pgrx::pg_sys::varlena {
+            pub fn #funcname_send #generics(input: ::pgrx::datum::PgVarlena<#name #generics>) -> *const ::pgrx::pg_sys::varlena {
                 use ::pgrx::datum::varlena::cbor_encode;
             
                 unsafe { cbor_encode(&*input) }
