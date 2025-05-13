@@ -991,6 +991,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
             pub fn #funcname_recv #generics(internal: ::pgrx::datum::Internal) -> #name #generics {
+                use std::io::Cursor;
                 use byteorder::{ReadBytesExt, BigEndian};
                 let string_info = unsafe {
                     let data = internal.get_mut::<::pgrx::pg_sys::StringInfoData>();
