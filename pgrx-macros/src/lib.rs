@@ -822,6 +822,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         panic!("DieselPGRX can only be derived for structs, not enums");
     };
 
+    let number_of_attributes: i32 = attribute_names.len() as i32;
+
     let mut writers: Vec<Ident> = Vec::new();
     let mut readers: Vec<Ident> = Vec::new();
 
@@ -1003,6 +1005,13 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
                 let mut cursor = Cursor::new(bytes);
 
+                // Composite types start with field count
+                let number_of_attributes = cursor
+                    .read_i32::<BigEndian>()
+                    .expect("failed to read number of attributes");
+
+                assert_eq!(number_of_attributes, #number_of_attributes);
+
                 #(
                     let #attribute_names = cursor.#readers::<BigEndian>().unwrap();
                 )*
@@ -1018,6 +1027,11 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                 use std::io::Write;
                 use byteorder::{WriteBytesExt, BigEndian};
                 let mut buffer = Vec::new();
+
+                // Composite types start with field count
+                buffer
+                    .write_i32::<BigEndian>(#number_of_attributes)
+                    .expect("failed to write number of attributes");
 
                 #(
                     buffer.#writers::<BigEndian>(input.#attribute_names).unwrap();
