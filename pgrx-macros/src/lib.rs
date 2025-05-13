@@ -815,6 +815,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     } else {
         panic!("DieselPGRX can only be derived for structs, not enums");
     };
+    let string_attribute_names: Vec<String> = attribute_names.iter().map(|i| i.to_string()).collect();
 
     let attribute_types: Vec<Type> = if let syn::Data::Struct(data) = &ast.data {
         data.fields.iter().map(|field| field.ty.clone()).collect()
@@ -1013,7 +1014,10 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                 assert_eq!(number_of_attributes, #number_of_attributes);
 
                 #(
-                    let #attribute_names = cursor.#readers::<BigEndian>().unwrap();
+                    let #attribute_names = cursor.#readers::<BigEndian>().expect(
+                        "failed to read {} from internal input",
+                        #string_attribute_names
+                    );
                 )*
 
                 #name {
@@ -1034,7 +1038,10 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                     .expect("failed to write number of attributes");
 
                 #(
-                    buffer.#writers::<BigEndian>(input.#attribute_names).unwrap();
+                    buffer.#writers::<BigEndian>(input.#attribute_names).expect(
+                        "failed to write {} to internal output",
+                        #string_attribute_names
+                    );
                 )*
 
                 buffer
