@@ -1015,8 +1015,10 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
                 #(
                     let #attribute_names = cursor.#readers::<BigEndian>().expect(
-                        "failed to read {} from internal input",
-                        #string_attribute_names
+                        &format!(
+                            "failed to read {} from internal input",
+                            #string_attribute_names
+                        )
                     );
                 )*
 
@@ -1039,8 +1041,10 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
                 #(
                     buffer.#writers::<BigEndian>(input.#attribute_names).expect(
-                        "failed to write {} to internal output",
-                        #string_attribute_names
+                        &format!(
+                            "failed to write {} to internal output",
+                            #string_attribute_names
+                        )
                     );
                 )*
 
