@@ -15,7 +15,7 @@ use std::collections::HashSet;
 use proc_macro2::Ident;
 use quote::{format_ident, quote, ToTokens};
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl};
+use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl, Type};
 
 use operators::{deriving_postgres_eq, deriving_postgres_hash, deriving_postgres_ord};
 use pgrx_sql_entity_graph as sql_gen;
@@ -808,6 +808,40 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     let funcname_out = Ident::new(&format!("{name}_out").to_lowercase(), name.span());
     let funcname_recv = Ident::new(&format!("{name}_recv").to_lowercase(), name.span());
     let funcname_send = Ident::new(&format!("{name}_send").to_lowercase(), name.span());
+
+    // We retrieve the list of attributes from the struct.
+    let attribute_names: Vec<Ident> = if let syn::Data::Struct(data) = &ast.data {
+        data.fields.iter().map(|field| field.ident.clone().unwrap()).collect()
+    } else {
+        panic!("DieselPGRX can only be derived for structs, not enums");
+    };
+
+    let attribute_types: Vec<Type> = if let syn::Data::Struct(data) = &ast.data {
+        data.fields.iter().map(|field| field.ty.clone()).collect()
+    } else {
+        panic!("DieselPGRX can only be derived for structs, not enums");
+    };
+
+    let mut writers: Vec<Ident> = Vec::new();
+    let mut readers: Vec<Ident> = Vec::new();
+
+    attribute_types.iter().for_each(|ty| {
+        match ty {
+            syn::Type::Path(type_path) => {
+                let segment = &type_path.path.segments.last().unwrap().ident;
+                let segment_name = segment.to_string();
+                match segment_name.as_str() {
+                    "i8" | "u8" | "i16" | "u16" | "i32" | "u32" | "i64" | "u64" => {
+                        writers.push(Ident::new(&format!("write_{segment_name}"), segment.span()));
+                        readers.push(Ident::new(&format!("read_{segment_name}"), segment.span()));
+                    }
+                    _ => panic!("Unsupported type: {}", segment),
+                }
+            },
+            _ => panic!("Unsupported type format"),
+        }
+    });
+
     let mut args = parse_postgres_type_args(&ast.attrs);
     let mut stream = proc_macro2::TokenStream::new();
 
@@ -956,7 +990,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
-            pub fn #funcname_recv #generics(internal: ::pgrx::datum::Internal) -> Option<#name #generics> {
+            pub fn #funcname_recv #generics(internal: ::pgrx::datum::Internal) -> #name #generics {
+                use byteorder::{ReadBytesExt, BigEndian};
                 let string_info = unsafe {
                     let data = internal.get_mut::<::pgrx::pg_sys::StringInfoData>();
                     ::pgrx::StringInfo::from_pg(data.expect("internal input pointer is NULL"))
@@ -964,13 +999,30 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                 .expect("failed to create StringInfo from internal");
 
                 let bytes = string_info.as_bytes();
-                serde_cbor::from_slice(bytes).ok()
+
+                let mut cursor = Cursor::new(bytes);
+
+                #(
+                    let #attribute_names = cursor.#readers::<BigEndian>().unwrap();
+                )*
+
+                #name {
+                    #(#attribute_names),*
+                }
             }
             
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
             pub fn #funcname_send #generics(input: #name #generics) -> Vec<u8> {
-                serde_cbor::to_vec(&input).expect("failed to encode to CBOR")
+                use std::io::Write;
+                use byteorder::{WriteBytesExt, BigEndian};
+                let mut buffer = Vec::new();
+
+                #(
+                    buffer.#writers::<BigEndian>(input.#attribute_names).unwrap();
+                )*
+
+                buffer
             }
         });
     } else if args.contains(&PostgresTypeAttribute::InOutFuncs) {
