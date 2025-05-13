@@ -358,7 +358,7 @@ pub fn rust_str_to_text_p(s: &str) -> PgBox<pg_sys::varlena> {
     unsafe { PgBox::from_pg(bytea.as_ptr() as *mut pg_sys::varlena) }
 }
 
-/// Convert a Rust `&[u8]]` into a Postgres `bytea *` (which is really a varchar)
+/// Convert a Rust `&[u8]` into a Postgres `bytea *` (which is really a varchar)
 ///
 /// This allocates the returned Postgres `bytea *` in `CurrentMemoryContext`.
 #[inline]
