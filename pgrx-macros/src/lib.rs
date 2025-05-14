@@ -976,14 +976,14 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     if args.contains(&PostgresTypeAttribute::Default) {
         stream.extend(quote! {
             #[doc(hidden)]
-            #[::pgrx::pgrx_macros::pg_extern(immutable,parallel_safe)]
+            #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
             pub fn #funcname_in #generics(input: Option<&#lifetime ::core::ffi::CStr>) -> Option<#name #generics> {
                 use ::pgrx::inoutfuncs::json_from_slice;
                 input.map(|cstr| json_from_slice(cstr.to_bytes()).ok()).flatten()
             }
 
             #[doc(hidden)]
-            #[::pgrx::pgrx_macros::pg_extern (immutable,parallel_safe)]
+            #[::pgrx::pgrx_macros::pg_extern (immutable, parallel_safe)]
             pub fn #funcname_out #generics(input: #name #generics) -> ::pgrx::ffi::CString {
                 use ::pgrx::inoutfuncs::json_to_vec;
                 let mut bytes = json_to_vec(&input).unwrap();
@@ -992,26 +992,30 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             }
 
             #[doc(hidden)]
-            #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
-            pub fn #funcname_recv #generics(internal: ::pgrx::datum::Internal) -> #name #generics {
+            #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
+            pub fn #funcname_recv #generics(
+                internal: ::pgrx::datum::Internal,
+                oid: Oid,
+                typmod: i32
+            ) -> #name #generics {
                 use std::io::Cursor;
                 use byteorder::{ReadBytesExt, BigEndian};
-                let string_info = unsafe {
-                    let data = internal.get_mut::<::pgrx::pg_sys::StringInfoData>();
-                    ::pgrx::StringInfo::from_pg(data.expect("internal input pointer is NULL"))
-                }
-                .expect("failed to create StringInfo from internal");
+
+                let _ = (oid, typmod);
+                let Some(string_info) = unsafe {
+                    let Some(data) = internal.get_mut::<::pgrx::pg_sys::StringInfoData>() else {
+                        pgrx::error!("internal input pointer is NULL");
+                        unreachable!()
+                    };
+                    ::pgrx::StringInfo::from_pg(data)
+                } else {
+                    pgrx::error!("failed to create StringInfo from internal");
+                    unreachable!()
+                };
 
                 let bytes = string_info.as_bytes();
 
                 let mut cursor = Cursor::new(bytes);
-
-                // Composite types start with field count
-                let number_of_attributes = cursor
-                    .read_i32::<BigEndian>()
-                    .expect("failed to read number of attributes");
-
-                assert_eq!(number_of_attributes, #number_of_attributes);
 
                 #(
                     let #attribute_names = cursor.#readers::<BigEndian>().expect(
@@ -1028,16 +1032,11 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             }
             
             #[doc(hidden)]
-            #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
+            #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
             pub fn #funcname_send #generics(input: #name #generics) -> Vec<u8> {
                 use std::io::Write;
                 use byteorder::{WriteBytesExt, BigEndian};
                 let mut buffer = Vec::new();
-
-                // Composite types start with field count
-                buffer
-                    .write_i32::<BigEndian>(#number_of_attributes)
-                    .expect("failed to write number of attributes");
 
                 #(
                     buffer.#writers::<BigEndian>(input.#attribute_names).expect(
