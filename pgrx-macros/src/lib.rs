@@ -1016,6 +1016,10 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
                 let mut cursor = Cursor::new(bytes);
 
+                // Maybe we should skip the first 4 bytes which are
+                // the varlena header?
+                cursor.set_position(4);
+
                 #(
                     let #attribute_names = cursor.#readers::<BigEndian>().expect(
                         &format!(
