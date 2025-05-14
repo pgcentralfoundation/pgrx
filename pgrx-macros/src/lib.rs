@@ -1002,15 +1002,16 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                 use byteorder::{ReadBytesExt, BigEndian};
 
                 let _ = (oid, typmod);
-                let Some(string_info) = unsafe {
+                let string_info = unsafe {
                     let Some(data) = internal.get_mut::<::pgrx::pg_sys::StringInfoData>() else {
                         pgrx::error!("internal input pointer is NULL");
                         unreachable!()
                     };
-                    ::pgrx::StringInfo::from_pg(data)
-                } else {
-                    pgrx::error!("failed to create StringInfo from internal");
-                    unreachable!()
+                    let Some(string_info) = ::pgrx::StringInfo::from_pg(data) else {
+                        pgrx::error!("failed to create StringInfo from internal");
+                        unreachable!()
+                    };
+                    string_info
                 };
 
                 let bytes = string_info.as_bytes();
