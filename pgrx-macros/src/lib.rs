@@ -995,7 +995,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
             pub fn #funcname_recv #generics(
                 internal: ::pgrx::datum::Internal,
-                oid: Oid,
+                oid: ::pgrx::pg_sys::Oid,
                 typmod: i32
             ) -> #name #generics {
                 use std::io::Cursor;
@@ -1005,11 +1005,9 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                 let string_info = unsafe {
                     let Some(data) = internal.get_mut::<::pgrx::pg_sys::StringInfoData>() else {
                         pgrx::error!("internal input pointer is NULL");
-                        unreachable!()
                     };
                     let Some(string_info) = ::pgrx::StringInfo::from_pg(data) else {
                         pgrx::error!("failed to create StringInfo from internal");
-                        unreachable!()
                     };
                     string_info
                 };
