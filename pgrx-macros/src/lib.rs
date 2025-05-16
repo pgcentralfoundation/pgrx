@@ -1013,7 +1013,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         ) -> #name #generics {
             let buf = unsafe { internal.get_mut::<::pgrx::pg_sys::StringInfoData>().unwrap() };
 
-            let mut serialized = StringInfo::new();
+            let mut serialized = ::pgrx::StringInfo::new();
 
             serialized.push_bytes(&[0u8; ::pgrx::pg_sys::VARHDRSZ]); // reserve space for the header
             serialized.push_bytes(buf.data);
