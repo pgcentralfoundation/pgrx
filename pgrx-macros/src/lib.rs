@@ -1015,7 +1015,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
             let mut serialized = StringInfo::new();
 
-            serialized.push_bytes(&[0u8; pg_sys::VARHDRSZ]); // reserve space for the header
+            serialized.push_bytes(&[0u8; ::pgrx::pg_sys::VARHDRSZ]); // reserve space for the header
             serialized.push_bytes(buf.data);
 
             let size = serialized.len();
