@@ -401,9 +401,7 @@ pub unsafe fn cbor_decode<'de, T>(input: *mut pg_sys::varlena) -> T
 where
     T: Deserialize<'de>,
 {
-    let dereferenced_varlena = *input;
-    let slice = unsafe{dereferenced_varlena.vl_dat.as_slice()};
-    todo!("received input: {:?}, {:?}", dereferenced_varlena, slice);
+    todo!("received input: {:?}, {:?}", *input);
     let varlena = pg_sys::pg_detoast_datum_packed(input as *mut pg_sys::varlena);
     let len = varsize_any_exhdr(varlena);
     let data = vardata_any(varlena);
