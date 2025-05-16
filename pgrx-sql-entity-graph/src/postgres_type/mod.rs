@@ -171,24 +171,24 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
             .receive_fn
             .as_ref()
             .map(|f| {
-                quote! {
+                quote! {{
                     let in_fn = stringify!(#f);
                     let mut path_items: Vec<_> = in_fn.split("::").collect();
                     let _ = path_items.pop(); // Drop the one we don't want.
                     path_items.join("::")
-                }
+                }}
             })
             .unwrap_or_else(|| quote! { None });
         let send_fn_module_path = self
             .send_fn
             .as_ref()
             .map(|f| {
-                quote! {
+                quote! {{
                     let out_fn = stringify!(#f);
                     let mut path_items: Vec<_> = out_fn.split("::").collect();
                     let _ = path_items.pop(); // Drop the one we don't want.
                     path_items.join("::")
-                }
+                }}
             })
             .unwrap_or_else(|| quote! { None });
 
