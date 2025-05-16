@@ -1018,17 +1018,16 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         #[doc(hidden)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
         pub fn #funcname_send #generics(input: #name #generics) -> Vec<u8> {
-            // use ::pgrx::datum::{FromDatum, IntoDatum};
-            // let Some(datum): Option<::pgrx::pg_sys::Datum> = input.into_datum() else {
-            //     ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
-            // };
-            // unsafe {
-            //     let Some(serialized): Option<Vec<u8>> = FromDatum::from_datum(datum, false) else {
-            //         ::pgrx::error!("Failed to CBOR-serialize Datum to type `{}`.", stringify!(#name));
-            //     };
-            //     serialized
-            // }
-            todo!("implement `send` function for `{}`", stringify!(#name))
+            use ::pgrx::datum::{FromDatum, IntoDatum};
+            let Some(datum): Option<::pgrx::pg_sys::Datum> = input.into_datum() else {
+                ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
+            };
+            unsafe {
+                let Some(serialized): Option<Vec<u8>> = FromDatum::from_datum(datum, false) else {
+                    ::pgrx::error!("Failed to CBOR-serialize Datum to type `{}`.", stringify!(#name));
+                };
+                serialized
+            }
         }
     });
 
