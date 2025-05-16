@@ -1009,11 +1009,11 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         #[doc(hidden)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
         pub fn #funcname_recv #generics(
-            internal: Option<&#lifetime ::pgrx::datum::Internal>,
-        ) -> Option<#name #generics> {
-            let buf = unsafe { internal?.get_mut::<pgrx::pg_sys::StringInfoData>()? };
+            internal: ::pgrx::datum::Internal,
+        ) -> #name #generics {
+            let buf = unsafe { internal.get_mut::<pgrx::pg_sys::StringInfoData>().unwrap() };
             let slice = unsafe { ::core::slice::from_raw_parts(buf.data as *const u8, buf.len as usize) };
-            ::pgrx::serde_cbor::from_slice(slice).ok()
+            ::pgrx::serde_cbor::from_slice(slice).expect("Failed to deserialize CBOR data")
         }
         #[doc(hidden)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
