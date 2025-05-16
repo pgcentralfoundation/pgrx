@@ -1019,8 +1019,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                 let Some(object) = FromDatum::from_datum(datum, false) else {
                     ::pgrx::error!("Failed to CBOR-deserialize Datum to type `{}`.", stringify!(#name));
                 };
+                object
             }
-            todo!("implement `recv` function for `{}`", stringify!(#name))
         }
         #[doc(hidden)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
