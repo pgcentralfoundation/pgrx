@@ -789,6 +789,7 @@ Optionally accepts the following attributes:
     attributes(
         inoutfuncs,
         pgvarlena_inoutfuncs,
+        pg_binary_protocol,
         bikeshed_postgres_type_manually_impl_from_into_datum,
         requires,
         pgrx
