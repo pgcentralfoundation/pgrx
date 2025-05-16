@@ -1011,11 +1011,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         pub fn #funcname_recv #generics(
             internal: ::pgrx::datum::Internal,
         ) -> #name #generics {
-            let buf = unsafe { internal.get_mut::<pgrx::pg_sys::StringInfoData>().unwrap() };
-
-            // We cast 
-            let data: &[u8] = unsafe { ::core::slice::from_raw_parts(buf.data as *mut u8, buf.len as usize) };
-            ::pgrx::datum::cbor_decode(buf.data as *mut pg_sys::varlena)
+            let buf = unsafe { internal.get_mut::<::pgrx::pg_sys::StringInfoData>().unwrap() };
+            ::pgrx::datum::cbor_decode(buf.data as *mut ::pgrx::pg_sys::varlena)
         }
         #[doc(hidden)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
