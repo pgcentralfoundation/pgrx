@@ -1011,30 +1011,32 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         pub fn #funcname_recv #generics(
             internal: ::pgrx::datum::Internal,
         ) -> #name #generics {
-            use ::pgrx::datum::{FromDatum, IntoDatum};
-            let Some(datum): Option<::pgrx::pg_sys::Datum> = internal.into_datum() else {
-                ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
-            };
-            unsafe {
-                let Some(object) = #name::from_datum(datum, false) else {
-                    ::pgrx::error!("Failed to CBOR-deserialize Datum to type `{}`.", stringify!(#name));
-                };
-                object
-            }
+            // use ::pgrx::datum::{FromDatum, IntoDatum};
+            // let Some(datum): Option<::pgrx::pg_sys::Datum> = internal.into_datum() else {
+            //     ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
+            // };
+            // unsafe {
+            //     let Some(object) = FromDatum::from_datum(datum, false) else {
+            //         ::pgrx::error!("Failed to CBOR-deserialize Datum to type `{}`.", stringify!(#name));
+            //     };
+            //     object
+            // }
+            todo!("implement `recv` function for `{}`", stringify!(#name))
         }
         #[doc(hidden)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
         pub fn #funcname_send #generics(input: #name #generics) -> Vec<u8> {
-            use ::pgrx::datum::{FromDatum, IntoDatum};
-            let Some(datum): Option<::pgrx::pg_sys::Datum> = input.into_datum() else {
-                ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
-            };
-            unsafe {
-                let Some(serialized): Option<Vec<u8>> = FromDatum::from_datum(datum, false) else {
-                    ::pgrx::error!("Failed to CBOR-serialize Datum to type `{}`.", stringify!(#name));
-                };
-                serialized
-            }
+            // use ::pgrx::datum::{FromDatum, IntoDatum};
+            // let Some(datum): Option<::pgrx::pg_sys::Datum> = input.into_datum() else {
+            //     ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
+            // };
+            // unsafe {
+            //     let Some(serialized): Option<Vec<u8>> = FromDatum::from_datum(datum, false) else {
+            //         ::pgrx::error!("Failed to CBOR-serialize Datum to type `{}`.", stringify!(#name));
+            //     };
+            //     serialized
+            // }
+            todo!("implement `send` function for `{}`", stringify!(#name))
         }
     });
 
