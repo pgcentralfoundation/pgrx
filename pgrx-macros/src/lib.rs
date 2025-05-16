@@ -1027,7 +1027,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             use ::pgrx::datum::{FromDatum, IntoDatum};
             let Some(datum): Option<::pgrx::pg_sys::Datum> = input.into_datum() else {
                 ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
-            }
+            };
             let Some(serialized): Option<Vec<u8>> = unsafe{ #name::from_datum(datum, false) else {
                 ::pgrx::error!("Failed to CBOR-serialize Datum to type `{}`.", stringify!(#name));
             } };
