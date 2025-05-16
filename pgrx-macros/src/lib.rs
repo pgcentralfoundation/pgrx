@@ -1016,7 +1016,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             let slice_i8: &[i8] = unsafe { ::core::slice::from_raw_parts(buf.data, buf.len as usize) };
             // We transmute the data from &[i8] to &[u8]:
             let slice_u8: &[u8] = unsafe { ::core::mem::transmute(slice_i8) };
-            ::pgrx::serde_cbor::from_slice(slice_u8).expect("failed to decode CBOR")
+            let object: #name #generics  = ::pgrx::serde_cbor::from_slice(slice_u8).expect("failed to decode CBOR");
+            todo!("Retrieved object: {:?}", object);
         }
         #[doc(hidden)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
