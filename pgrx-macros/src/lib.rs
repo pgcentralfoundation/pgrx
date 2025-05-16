@@ -15,7 +15,7 @@ use std::collections::HashSet;
 use proc_macro2::Ident;
 use quote::{format_ident, quote, ToTokens};
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl, Type};
+use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl};
 
 use operators::{deriving_postgres_eq, deriving_postgres_hash, deriving_postgres_ord};
 use pgrx_sql_entity_graph as sql_gen;
@@ -975,7 +975,6 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
                 object
             }
-            
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
             pub fn #funcname_send #generics(input: #name #generics) -> ::pgrx::datum::Internal {

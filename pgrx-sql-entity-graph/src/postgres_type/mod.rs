@@ -75,7 +75,16 @@ impl PostgresTypeDerive {
         if !to_sql_config.overrides_default() {
             crate::ident_is_acceptable_to_postgres(&name)?;
         }
-        Ok(CodeEnrichment(Self { generics, name, in_fn, out_fn, receive_fn, send_fn, to_sql_config, alignment }))
+        Ok(CodeEnrichment(Self {
+            generics,
+            name,
+            in_fn,
+            out_fn,
+            receive_fn,
+            send_fn,
+            to_sql_config,
+            alignment,
+        }))
     }
 
     pub fn from_derive_input(
@@ -249,6 +258,15 @@ impl Parse for CodeEnrichment<PostgresTypeDerive> {
         let receive_fn = Ident::new(&format!("{}_recv", ident).to_lowercase(), ident.span());
         let send_fn = Ident::new(&format!("{}_send", ident).to_lowercase(), ident.span());
         let alignment = Alignment::from_attributes(attrs.as_slice())?;
-        PostgresTypeDerive::new(ident, generics, in_fn, out_fn, receive_fn, send_fn, to_sql_config, alignment)
+        PostgresTypeDerive::new(
+            ident,
+            generics,
+            in_fn,
+            out_fn,
+            receive_fn,
+            send_fn,
+            to_sql_config,
+            alignment,
+        )
     }
 }
