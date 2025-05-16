@@ -698,7 +698,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     stream.extend(quote! {
         impl ::pgrx::datum::FromDatum for #enum_ident {
             #[inline]
-            unsafe fn from_polymorphic_datum(datum: ::pgrx::pg_sys::Datum, is_null: bool, typeoid: ::pgrx::pg_sys::Oid) -> Option<#enum_ident> {
+            unsafe fn from_polymorphic_datum(datum: ::pgrx::pg_sys::Datum, is_null: bool, _typeoid: ::pgrx::pg_sys::Oid) -> Option<#enum_ident> {
                 if is_null {
                     None
                 } else {
@@ -808,42 +808,6 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     let funcname_out = Ident::new(&format!("{name}_out").to_lowercase(), name.span());
     let funcname_recv = Ident::new(&format!("{name}_recv").to_lowercase(), name.span());
     let funcname_send = Ident::new(&format!("{name}_send").to_lowercase(), name.span());
-
-    // We retrieve the list of attributes from the struct.
-    let attribute_names: Vec<Ident> = if let syn::Data::Struct(data) = &ast.data {
-        data.fields.iter().map(|field| field.ident.clone().unwrap()).collect()
-    } else {
-        panic!("DieselPGRX can only be derived for structs, not enums");
-    };
-    let string_attribute_names: Vec<String> = attribute_names.iter().map(|i| i.to_string()).collect();
-
-    let attribute_types: Vec<Type> = if let syn::Data::Struct(data) = &ast.data {
-        data.fields.iter().map(|field| field.ty.clone()).collect()
-    } else {
-        panic!("DieselPGRX can only be derived for structs, not enums");
-    };
-
-    let number_of_attributes: i32 = attribute_names.len() as i32;
-
-    let mut writers: Vec<Ident> = Vec::new();
-    let mut readers: Vec<Ident> = Vec::new();
-
-    attribute_types.iter().for_each(|ty| {
-        match ty {
-            syn::Type::Path(type_path) => {
-                let segment = &type_path.path.segments.last().unwrap().ident;
-                let segment_name = segment.to_string();
-                match segment_name.as_str() {
-                    "i8" | "u8" | "i16" | "u16" | "i32" | "u32" | "i64" | "u64" => {
-                        writers.push(Ident::new(&format!("write_{segment_name}"), segment.span()));
-                        readers.push(Ident::new(&format!("read_{segment_name}"), segment.span()));
-                    }
-                    _ => panic!("Unsupported type: {}", segment),
-                }
-            },
-            _ => panic!("Unsupported type format"),
-        }
-    });
 
     let mut args = parse_postgres_type_args(&ast.attrs);
     let mut stream = proc_macro2::TokenStream::new();
@@ -995,62 +959,28 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
             pub fn #funcname_recv #generics(
                 internal: ::pgrx::datum::Internal,
-                oid: ::pgrx::pg_sys::Oid,
-                typmod: i32
             ) -> #name #generics {
-                use std::io::Cursor;
-                use byteorder::{ReadBytesExt, BigEndian};
-
-                let _ = (oid, typmod);
-                let string_info = unsafe {
-                    let Some(data) = internal.get_mut::<::pgrx::pg_sys::StringInfoData>() else {
-                        pgrx::error!("internal input pointer is NULL");
-                    };
-                    let Some(string_info) = ::pgrx::StringInfo::from_pg(data) else {
-                        pgrx::error!("failed to create StringInfo from internal");
-                    };
-                    string_info
+                use ::pgrx::datum::{FromDatum, IntoDatum};
+                let Some(datum): Option<::pgrx::pg_sys::Datum> = internal.into_datum() else {
+                    ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
+                };
+                // In order to satisfy the `from_polymorphic_datum` method signature,
+                // we create a dummy Oid which is afterwards ignored in the `from_polymorphic_datum` method.
+                // This is safe because the Oid is not used in any way for the implementation
+                // of the current function.
+                let dummy_oid = ::pgrx::pg_sys::Oid::from(0);
+                let Some(object) = #name::from_polymorphic_datum(datum, false, dummy_oid) else {
+                    ::pgrx::error!("Failed to CBOR-deserialize Datum to type `{}`.", stringify!(#name));
                 };
 
-                let bytes = string_info.as_bytes();
-
-                let mut cursor = Cursor::new(bytes);
-
-                // Maybe we should skip the first 4 bytes which are
-                // the varlena header?
-                cursor.set_position(4);
-
-                #(
-                    let #attribute_names = cursor.#readers::<BigEndian>().expect(
-                        &format!(
-                            "failed to read {} from internal input",
-                            #string_attribute_names
-                        )
-                    );
-                )*
-
-                #name {
-                    #(#attribute_names),*
-                }
+                object
             }
             
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
-            pub fn #funcname_send #generics(input: #name #generics) -> Vec<u8> {
-                use std::io::Write;
-                use byteorder::{WriteBytesExt, BigEndian};
-                let mut buffer = Vec::new();
-
-                #(
-                    buffer.#writers::<BigEndian>(input.#attribute_names).expect(
-                        &format!(
-                            "failed to write {} to internal output",
-                            #string_attribute_names
-                        )
-                    );
-                )*
-
-                buffer
+            pub fn #funcname_send #generics(input: #name #generics) -> ::pgrx::datum::Internal {
+                use ::pgrx::datum::IntoDatum;
+                ::pgrx::datum::::from(input.into_datum())
             }
         });
     } else if args.contains(&PostgresTypeAttribute::InOutFuncs) {
