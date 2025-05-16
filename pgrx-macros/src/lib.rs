@@ -1011,7 +1011,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         pub fn #funcname_recv #generics(
             internal: Option<&#lifetime ::pgrx::datum::Internal>,
         ) -> Option<#name #generics> {
-            let buf = unsafe { internal.get_mut::<pgrx::pg_sys::StringInfoData>()? };
+            let buf = unsafe { internal?.get_mut::<pgrx::pg_sys::StringInfoData>()? };
             let slice = unsafe { ::core::slice::from_raw_parts(buf.data as *const u8, buf.len as usize) };
             ::pgrx::serde_cbor::from_slice(slice).ok()
         }
