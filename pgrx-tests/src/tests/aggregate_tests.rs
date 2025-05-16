@@ -12,6 +12,7 @@ use pgrx::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize)]
+#[pg_binary_protocol]
 pub struct DemoSum {
     count: i32,
 }
@@ -64,6 +65,7 @@ impl Aggregate for DemoSum {
 }
 
 #[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize)]
+#[pg_binary_protocol]
 pub struct DemoPercentileDisc;
 
 #[pg_aggregate]
@@ -105,11 +107,13 @@ mod demo_schema {
     use serde::{Deserialize, Serialize};
 
     #[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
+    #[pg_binary_protocol]
     pub struct DemoState {
         pub sum: i32,
     }
 }
 #[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize)]
+#[pg_binary_protocol]
 pub struct DemoCustomState;
 
 // demonstrate we can properly support an STYPE with a pg_schema

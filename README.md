@@ -53,6 +53,7 @@
 - **Easy Custom Types**
    + `#[derive(PostgresType)]` to use a Rust struct as a Postgres type
       - By default, represented as a CBOR-encoded object in-memory/on-disk, and JSON as human-readable
+      - Supports `#[pg_binary_protocol]` to generate binary protocol send/recv functions
       - Provide custom in-memory/on-disk/human-readable representations
    + `#[derive(PostgresEnum)]` to use a Rust enum as a Postgres enum
    + Composite types supported with the `pgrx::composite_type!("Sample")` macro

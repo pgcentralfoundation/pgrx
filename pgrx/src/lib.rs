@@ -132,8 +132,6 @@ pub use pg_sys::{
     info, log, notice, warning, FATAL, PANIC,
 };
 
-pub use serde_cbor;
-
 #[doc(hidden)]
 pub use pgrx_sql_entity_graph;
 

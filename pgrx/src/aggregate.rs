@@ -29,6 +29,7 @@ use serde::{Serialize, Deserialize};
 // pg_module_magic!(); // Uncomment this outside of docs!
 
 #[derive(Copy, Clone, Default, PostgresType, Serialize, Deserialize)]
+#[pg_binary_protocol]
 pub struct DemoSum {
     count: i32,
 }
@@ -221,6 +222,7 @@ Sometimes it's useful to have aggregates share state, or use some other type for
 # use serde::{Serialize, Deserialize};
 #
 #[derive(Copy, Clone, Default, PostgresType, Serialize, Deserialize)]
+#[pg_binary_protocol]
 pub struct DemoSumState {
     count: i32,
 }

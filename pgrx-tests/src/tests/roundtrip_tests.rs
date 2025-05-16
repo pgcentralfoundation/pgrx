@@ -4,6 +4,7 @@ use rand::distr::{Alphanumeric, StandardUniform};
 use rand::Rng;
 
 #[derive(pgrx::PostgresType, Clone, PartialEq, Eq, Debug, serde::Serialize, serde::Deserialize)]
+#[pg_binary_protocol]
 pub struct RandomData {
     i: u64,
     s: String,

@@ -1003,52 +1003,57 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         });
     }
 
-    // At this time, the `PostgresTypeAttribute` does not impact the way we generate
-    // the `recv` and `send` functions.
-    stream.extend(quote! {
-        #[doc(hidden)]
-        #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
-        pub fn #funcname_recv #generics(
-            internal: ::pgrx::datum::Internal,
-        ) -> #name #generics {
-            let buf = unsafe { internal.get_mut::<::pgrx::pg_sys::StringInfoData>().unwrap() };
+    if args.contains(&PostgresTypeAttribute::pg_binary_protocol) {
+        // At this time, the `PostgresTypeAttribute` does not impact the way we generate
+        // the `recv` and `send` functions.
+        stream.extend(quote! {
+            #[doc(hidden)]
+            #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
+            pub fn #funcname_recv #generics(
+                internal: ::pgrx::datum::Internal,
+            ) -> #name #generics {
+                let buf = unsafe { internal.get_mut::<::pgrx::pg_sys::StringInfoData>().unwrap() };
 
-            let mut serialized = ::pgrx::StringInfo::new();
+                let mut serialized = ::pgrx::StringInfo::new();
 
-            serialized.push_bytes(&[0u8; ::pgrx::pg_sys::VARHDRSZ]); // reserve space for the header
-            serialized.push_bytes(unsafe {
-                core::slice::from_raw_parts(
-                    buf.data as *const u8,
-                    buf.len as usize
-                )
-            });
+                serialized.push_bytes(&[0u8; ::pgrx::pg_sys::VARHDRSZ]); // reserve space for the header
+                serialized.push_bytes(unsafe {
+                    core::slice::from_raw_parts(
+                        buf.data as *const u8,
+                        buf.len as usize
+                    )
+                });
 
-            let size = serialized.len();
-            let varlena = serialized.into_char_ptr();
+                let size = serialized.len();
+                let varlena = serialized.into_char_ptr();
 
-            unsafe{
-                ::pgrx::set_varsize_4b(varlena as *mut ::pgrx::pg_sys::varlena, size as i32);
-                buf.cursor = buf.len;
-                ::pgrx::datum::cbor_decode(varlena as *mut ::pgrx::pg_sys::varlena)
+                unsafe{
+                    ::pgrx::set_varsize_4b(varlena as *mut ::pgrx::pg_sys::varlena, size as i32);
+                    buf.cursor = buf.len;
+                    ::pgrx::datum::cbor_decode(varlena as *mut ::pgrx::pg_sys::varlena)
+                }
             }
-        }
-        #[doc(hidden)]
-        #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
-        pub fn #funcname_send #generics(input: #name #generics) -> Vec<u8> {
-            use ::pgrx::datum::{FromDatum, IntoDatum};
-            let Some(datum): Option<::pgrx::pg_sys::Datum> = input.into_datum() else {
-                ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
-            };
-            unsafe {
-                let Some(serialized): Option<Vec<u8>> = FromDatum::from_datum(datum, false) else {
-                    ::pgrx::error!("Failed to CBOR-serialize Datum to type `{}`.", stringify!(#name));
+            #[doc(hidden)]
+            #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
+            pub fn #funcname_send #generics(input: #name #generics) -> Vec<u8> {
+                use ::pgrx::datum::{FromDatum, IntoDatum};
+                let Some(datum): Option<::pgrx::pg_sys::Datum> = input.into_datum() else {
+                    ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
                 };
-                serialized
+                unsafe {
+                    let Some(serialized): Option<Vec<u8>> = FromDatum::from_datum(datum, false) else {
+                        ::pgrx::error!("Failed to CBOR-serialize Datum to type `{}`.", stringify!(#name));
+                    };
+                    serialized
+                }
             }
-        }
-    });
+        });
+    }
 
-    let sql_graph_entity_item = sql_gen::PostgresTypeDerive::from_derive_input(ast)?;
+    let sql_graph_entity_item = sql_gen::PostgresTypeDerive::from_derive_input(
+        ast,
+        args.contains(&PostgresTypeAttribute::InOutFuncs),
+    )?;
     sql_graph_entity_item.to_tokens(&mut stream);
 
     Ok(stream)
@@ -1145,6 +1150,7 @@ fn impl_guc_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
 #[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
 enum PostgresTypeAttribute {
     InOutFuncs,
+    pg_binary_protocol,
     PgVarlenaInOutFuncs,
     Default,
     ManualFromIntoDatum,
@@ -1159,6 +1165,9 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
         match path.as_str() {
             "inoutfuncs" => {
                 categorized_attributes.insert(PostgresTypeAttribute::InOutFuncs);
+            }
+            "pg_binary_protocol" => {
+                categorized_attributes.insert(PostgresTypeAttribute::pg_binary_protocol);
             }
             "pgvarlena_inoutfuncs" => {
                 categorized_attributes.insert(PostgresTypeAttribute::PgVarlenaInOutFuncs);

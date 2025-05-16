@@ -255,10 +255,15 @@ impl ToSql for SqlGraphEntity {
                             && item.full_path.ends_with(in_fn);
                         let is_out_fn = item.full_path.starts_with(out_fn_module_path)
                             && item.full_path.ends_with(out_fn);
-                        let is_receive_fn = item.full_path.starts_with(receive_fn_module_path)
-                            && item.full_path.ends_with(receive_fn);
-                        let is_send_fn = item.full_path.starts_with(send_fn_module_path)
-                            && item.full_path.ends_with(send_fn);
+                        let is_receive_fn =
+                            receive_fn_module_path.as_ref().is_some_and(|receive_fn_module_path| {
+                                item.full_path.starts_with(receive_fn_module_path)
+                            }) && receive_fn
+                                .is_some_and(|receive_fn| item.full_path.ends_with(receive_fn));
+                        let is_send_fn =
+                            send_fn_module_path.as_ref().is_some_and(|send_fn_module_path| {
+                                item.full_path.starts_with(send_fn_module_path)
+                            }) && send_fn.is_some_and(|send_fn| item.full_path.ends_with(send_fn));
                         is_in_fn || is_out_fn || is_receive_fn || is_send_fn
                     })
                 {
