@@ -1013,9 +1013,13 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         ) -> #name #generics {
             let buf = unsafe { internal.get_mut::<::pgrx::pg_sys::StringInfoData>().unwrap() };
 
+            let len_including_header = buf.len + ::pgrx::pg_sys::VARHDRSZ as ::core::ffi::c_int;
+            let shifted_len_including_header = len_including_header << 2;
+            let header: [u8; 4] = shifted_len_including_header.to_le_bytes();
+
             unsafe{
                 let mut varlena = ::pgrx::pg_sys::varlena {
-                    vl_len_: ((buf.len as u32 + ::pgrx::pg_sys::VARHDRSZ as u32) << 2).to_le_bytes(),
+                    vl_len_: core::mem::transmute(header),
                     vl_dat: core::mem::transmute(buf.data),
                 };
                 buf.cursor = buf.len;
