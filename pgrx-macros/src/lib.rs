@@ -1013,17 +1013,10 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         ) -> #name #generics {
             use ::pgrx::datum::{FromDatum, IntoDatum};
             let buf = unsafe { internal.get_mut::<pgrx::pg_sys::StringInfoData>().unwrap() };
-            let data: &[i8] = unsafe { ::core::slice::from_raw_parts(buf.data, buf.len as usize) };
-            todo!("Debugging buffer: {:?}", data);
-            // let Some(datum): Option<::pgrx::pg_sys::Datum> = internal.into_datum() else {
-            //     ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
-            // };
-            // unsafe {
-            //     let Some(object) = FromDatum::from_datum(datum, false) else {
-            //         ::pgrx::error!("Failed to CBOR-deserialize Datum to type `{}`.", stringify!(#name));
-            //     };
-            //     object
-            // }
+            let slice_i8: &[i8] = unsafe { ::core::slice::from_raw_parts(buf.data, buf.len as usize) };
+            // We transmute the data from &[i8] to &[u8]:
+            let slice_u8: &[u8] = unsafe { ::core::mem::transmute(slice_i8) };
+            serde_cbor::from_slice(slice_u8).expect("failed to decode CBOR")
         }
         #[doc(hidden)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
