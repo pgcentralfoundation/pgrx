@@ -1015,11 +1015,12 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             let Some(datum): Option<::pgrx::pg_sys::Datum> = internal.into_datum() else {
                 ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
             };
-            let Some(object) = unsafe{ #name::from_datum(datum, false) else {
-                ::pgrx::error!("Failed to CBOR-deserialize Datum to type `{}`.", stringify!(#name));
-            } };
-
-            object
+            unsafe {
+                let Some(object) = #name::from_datum(datum, false) else {
+                    ::pgrx::error!("Failed to CBOR-deserialize Datum to type `{}`.", stringify!(#name));
+                };
+                object
+            }
         }
         #[doc(hidden)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
@@ -1028,10 +1029,12 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             let Some(datum): Option<::pgrx::pg_sys::Datum> = input.into_datum() else {
                 ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
             };
-            let Some(serialized): Option<Vec<u8>> = unsafe{ #name::from_datum(datum, false) else {
-                ::pgrx::error!("Failed to CBOR-serialize Datum to type `{}`.", stringify!(#name));
-            } };
-            serialized
+            unsafe {
+                let Some(serialized): Option<Vec<u8>> = #name::from_datum(datum, false) else {
+                    ::pgrx::error!("Failed to CBOR-serialize Datum to type `{}`.", stringify!(#name));
+                };
+                serialized
+            }
         }
     });
 
