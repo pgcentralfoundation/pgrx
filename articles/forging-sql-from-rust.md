@@ -98,7 +98,6 @@ These `sql` files must be generated from data within the Rust code. The SQL gene
   ```rust
   #[derive(PostgresType, Serialize, Deserialize, Debug, Eq, PartialEq)]
   #[pg_binary_protocol]
-  #[]
   pub struct Animals {
       names: Vec<String>,
       age_lookup: HashMap<i32, String>,
