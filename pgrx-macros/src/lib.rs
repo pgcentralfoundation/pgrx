@@ -1014,15 +1014,15 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             use ::pgrx::datum::{FromDatum, IntoDatum};
             let buf = unsafe { internal.get_mut::<pgrx::pg_sys::StringInfoData>().unwrap() };
             todo!("Debugging buffer: {:?}", buf);
-            let Some(datum): Option<::pgrx::pg_sys::Datum> = internal.into_datum() else {
-                ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
-            };
-            unsafe {
-                let Some(object) = FromDatum::from_datum(datum, false) else {
-                    ::pgrx::error!("Failed to CBOR-deserialize Datum to type `{}`.", stringify!(#name));
-                };
-                object
-            }
+            // let Some(datum): Option<::pgrx::pg_sys::Datum> = internal.into_datum() else {
+            //     ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
+            // };
+            // unsafe {
+            //     let Some(object) = FromDatum::from_datum(datum, false) else {
+            //         ::pgrx::error!("Failed to CBOR-deserialize Datum to type `{}`.", stringify!(#name));
+            //     };
+            //     object
+            // }
         }
         #[doc(hidden)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
