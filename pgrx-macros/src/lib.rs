@@ -1012,8 +1012,15 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             internal: ::pgrx::datum::Internal,
         ) -> #name #generics {
             let buf = unsafe { internal.get_mut::<::pgrx::pg_sys::StringInfoData>().unwrap() };
-            buf.cursor = buf.len;
-            unsafe{::pgrx::datum::cbor_decode(buf.data as *mut ::pgrx::pg_sys::varlena)}
+
+            unsafe{
+                let varlena = ::pgrx::pg_sys::varlena {
+                    vl_len_: ((buf.len + ::pgrx::pg_sys::VARHDRSZ as ::core::ffi::c_int) << 2).to_le_bytes(),
+                    vl_dat: core::mem::transmute(buf.data),
+                };
+                buf.cursor = buf.len;
+                ::pgrx::datum::cbor_decode(varlena.as_mut_ptr())
+            }
         }
         #[doc(hidden)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
