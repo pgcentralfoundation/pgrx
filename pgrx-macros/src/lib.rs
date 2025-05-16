@@ -1015,12 +1015,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
             // We cast 
             let data: &[u8] = unsafe { ::core::slice::from_raw_parts(buf.data as *mut u8, buf.len as usize) };
-            todo!("The received data is: {:?}, with buffer: {:?}", data, buf);
-
-            // // We can cast the buffer into a varlena:
-            // unsafe {
-            //     ::pgrx::datum::cbor_decode(std::mem::transmute(buf.data))
-            // }
+            ::pgrx::datum::cbor_decode(buf.data as *mut pg_sys::varlena)
         }
         #[doc(hidden)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
