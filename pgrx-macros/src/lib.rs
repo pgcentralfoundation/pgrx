@@ -1009,15 +1009,11 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         #[doc(hidden)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
         pub fn #funcname_recv #generics(
-            internal: ::pgrx::datum::Internal,
-        ) -> #name #generics {
-            use ::pgrx::datum::{FromDatum, IntoDatum};
-            let buf = unsafe { internal.get_mut::<pgrx::pg_sys::StringInfoData>().unwrap() };
-            let slice_i8: &[i8] = unsafe { ::core::slice::from_raw_parts(buf.data, buf.len as usize) };
-            // We transmute the data from &[i8] to &[u8]:
-            let slice_u8: &[u8] = unsafe { ::core::mem::transmute(slice_i8) };
-            let object: #name #generics  = ::pgrx::serde_cbor::from_slice(slice_u8).expect("failed to decode CBOR");
-            todo!("Retrieved object: {:?}", object);
+            internal: Option<&#lifetime ::pgrx::datum::Internal>,
+        ) -> Option<#name #generics> {
+            let buf = unsafe { internal.get_mut::<pgrx::pg_sys::StringInfoData>()? };
+            let slice = unsafe { ::core::slice::from_raw_parts(buf.data as *const u8, buf.len as usize) };
+            ::pgrx::serde_cbor::from_slice(slice).ok()
         }
         #[doc(hidden)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
