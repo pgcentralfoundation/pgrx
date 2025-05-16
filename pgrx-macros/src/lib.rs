@@ -1003,7 +1003,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         });
     }
 
-    if args.contains(&PostgresTypeAttribute::pg_binary_protocol) {
+    if args.contains(&PostgresTypeAttribute::PgBinaryProtocol) {
         // At this time, the `PostgresTypeAttribute` does not impact the way we generate
         // the `recv` and `send` functions.
         stream.extend(quote! {
@@ -1052,7 +1052,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
     let sql_graph_entity_item = sql_gen::PostgresTypeDerive::from_derive_input(
         ast,
-        args.contains(&PostgresTypeAttribute::InOutFuncs),
+        args.contains(&PostgresTypeAttribute::PgBinaryProtocol),
     )?;
     sql_graph_entity_item.to_tokens(&mut stream);
 
@@ -1150,7 +1150,7 @@ fn impl_guc_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
 #[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
 enum PostgresTypeAttribute {
     InOutFuncs,
-    pg_binary_protocol,
+    PgBinaryProtocol,
     PgVarlenaInOutFuncs,
     Default,
     ManualFromIntoDatum,
@@ -1167,7 +1167,7 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
                 categorized_attributes.insert(PostgresTypeAttribute::InOutFuncs);
             }
             "pg_binary_protocol" => {
-                categorized_attributes.insert(PostgresTypeAttribute::pg_binary_protocol);
+                categorized_attributes.insert(PostgresTypeAttribute::PgBinaryProtocol);
             }
             "pgvarlena_inoutfuncs" => {
                 categorized_attributes.insert(PostgresTypeAttribute::PgVarlenaInOutFuncs);
