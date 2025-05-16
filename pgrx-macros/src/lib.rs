@@ -1013,7 +1013,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         ) -> #name #generics {
             use ::pgrx::datum::{FromDatum, IntoDatum};
             let buf = unsafe { internal.get_mut::<pgrx::pg_sys::StringInfoData>().unwrap() };
-            todo!("Debugging buffer: {:?}", buf);
+            let data: &[u8] = unsafe { ::core::slice::from_raw_parts(buf.data, buf.len) };
+            todo!("Debugging buffer: {:?}", data);
             // let Some(datum): Option<::pgrx::pg_sys::Datum> = internal.into_datum() else {
             //     ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
             // };
