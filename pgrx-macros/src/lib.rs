@@ -830,7 +830,9 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         }
     }
 
-    if args.is_empty() {
+    if !args.contains(&PostgresTypeAttribute::InOutFuncs)
+        && !args.contains(&PostgresTypeAttribute::PgVarlenaInOutFuncs)
+    {
         // assume the user wants us to implement the InOutFuncs
         args.insert(PostgresTypeAttribute::Default);
     }
