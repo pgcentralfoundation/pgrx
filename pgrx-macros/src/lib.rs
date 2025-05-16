@@ -1030,7 +1030,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                 ::pgrx::error!("Datum of type `{}` is unexpectedly NULL.", stringify!(#name));
             };
             unsafe {
-                let Some(serialized): Option<Vec<u8>> = #name::from_datum(datum, false) else {
+                let Some(serialized): Option<Vec<u8>> = FromDatum::from_datum(datum, false) else {
                     ::pgrx::error!("Failed to CBOR-serialize Datum to type `{}`.", stringify!(#name));
                 };
                 serialized
