@@ -225,8 +225,6 @@ impl ToSql for PostgresTypeEntity {
             .ok_or_else(|| eyre!("Could not find out_fn graph entity."))?;
         let out_fn_sql = out_fn_entity.to_sql(context)?;
 
-        // Handle binary protocol functions if they exist
-
         let receive_fn_graph_index_and_receive_fn_sql = receive_fn_module_path
             .as_ref()
             .zip(*receive_fn)
@@ -263,8 +261,6 @@ impl ToSql for PostgresTypeEntity {
                 Ok::<_, eyre::Report>((receive_fn_graph_index, receive_fn_sql, receive_fn_path))
             })
             .transpose()?;
-
-        // Handle send function for the binary protocol if it exists
 
         let send_fn_graph_index_and_send_fn_sql = send_fn_module_path
             .as_ref()
