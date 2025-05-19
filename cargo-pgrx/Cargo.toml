@@ -55,7 +55,7 @@ env_proxy = "0.4.1"
 serde.workspace = true
 serde-xml-rs = "0.6.0"
 tar = "0.4.44"
-ureq = { version = "3.0.10", default-features = false, features = ["gzip"] }
+ureq = { version = "3.0.10", default-features = false, features = ["gzip", "platform-verifier", "rustls"] }
 url.workspace = true
 which = "7.0.3"
 zip-extract = "0.2.2"
@@ -74,10 +74,11 @@ features = [
 
 [features]
 default = ["rustls"]
-native-tls = ["ureq/native-tls"]
+native-tls = ["ureq/native-tls", "ureq/platform-verifier"]
 rustls = [
     "ureq/rustls",
-    "ureq/native-tls" # induces rustls to use the OS-level root of trust
+    "ureq/native-tls", # induces rustls to use the OS-level root of trust
+    "ureq/platform-verifier" # use platform certificate store for validation
 ]
 
 [lints.clippy]
