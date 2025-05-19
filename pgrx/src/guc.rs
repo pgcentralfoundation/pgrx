@@ -14,10 +14,6 @@ pub use pgrx_macros::PostgresGucEnum;
 use std::cell::Cell;
 use std::ffi::c_void;
 
-#[cfg(target_arch = "arm")]
-pub type PlatformAgnosticI8 = u8;
-#[cfg(not(target_arch = "arm"))]
-pub type PlatformAgnosticI8 = i8;
 
 /// Defines at what level this GUC can be set
 pub enum GucContext {
@@ -226,7 +222,7 @@ impl GucRegistry {
         flags: GucFlags,
         check_hook: Option<unsafe extern "C-unwind" fn(*mut bool, *mut *mut c_void, u32) -> bool>,
         assign_hook: Option<unsafe extern "C-unwind" fn(bool, *mut c_void)>,
-        show_hook: Option<unsafe extern "C-unwind" fn() -> *const PlatformAgnosticI8>,
+        show_hook: Option<unsafe extern "C-unwind" fn() -> *const libc::c_char>,
     ) {
         unsafe {
             pg_sys::DefineCustomBoolVariable(
@@ -255,7 +251,7 @@ impl GucRegistry {
         flags: GucFlags,
         check_hook: Option<unsafe extern "C-unwind" fn(*mut i32, *mut *mut c_void, u32) -> bool>,
         assign_hook: Option<unsafe extern "C-unwind" fn(i32, *mut c_void)>,
-        show_hook: Option<unsafe extern "C-unwind" fn() -> *const PlatformAgnosticI8>,
+        show_hook: Option<unsafe extern "C-unwind" fn() -> *const libc::c_char>,
     ) {
         unsafe {
             pg_sys::DefineCustomIntVariable(
@@ -285,8 +281,8 @@ impl GucRegistry {
         check_hook: Option<
             unsafe extern "C-unwind" fn(*mut *mut PlatformAgnosticI8, *mut *mut c_void, u32) -> bool,
         >,
-        assign_hook: Option<unsafe extern "C-unwind" fn(*const PlatformAgnosticI8, *mut c_void)>,
-        show_hook: Option<unsafe extern "C-unwind" fn() -> *const PlatformAgnosticI8>,
+        assign_hook: Option<unsafe extern "C-unwind" fn(*const libc::c_char, *mut c_void)>,
+        show_hook: Option<unsafe extern "C-unwind" fn() -> *const libc::c_char>,
     ) {
         unsafe {
             let boot_val = setting.boot_val.map_or(std::ptr::null(), |s| s.as_ptr());
@@ -317,7 +313,7 @@ impl GucRegistry {
         flags: GucFlags,
         check_hook: Option<unsafe extern "C-unwind" fn(*mut f64, *mut *mut c_void, u32) -> bool>,
         assign_hook: Option<unsafe extern "C-unwind" fn(f64, *mut c_void)>,
-        show_hook: Option<unsafe extern "C-unwind" fn() -> *const PlatformAgnosticI8>,
+        show_hook: Option<unsafe extern "C-unwind" fn() -> *const libc::c_char>,
     ) {
         unsafe {
             pg_sys::DefineCustomRealVariable(
@@ -346,7 +342,7 @@ impl GucRegistry {
         flags: GucFlags,
         check_hook: Option<unsafe extern "C-unwind" fn(*mut i32, *mut *mut c_void, u32) -> bool>,
         assign_hook: Option<unsafe extern "C-unwind" fn(i32, *mut c_void)>,
-        show_hook: Option<unsafe extern "C-unwind" fn() -> *const PlatformAgnosticI8>,
+        show_hook: Option<unsafe extern "C-unwind" fn() -> *const libc::c_char>,
     ) where
         T: GucEnum<T> + Copy,
     {
