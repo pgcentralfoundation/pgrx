@@ -10,9 +10,9 @@
 //! Provides a safe interface into Postgres' Configuration System (GUC)
 use crate::{pg_sys, PgMemoryContexts};
 use core::ffi::CStr;
-use std::ffi::c_void;
 pub use pgrx_macros::PostgresGucEnum;
 use std::cell::Cell;
+use std::ffi::c_void;
 
 /// Defines at what level this GUC can be set
 pub enum GucContext {
@@ -219,7 +219,9 @@ impl GucRegistry {
         setting: &GucSetting<bool>,
         context: GucContext,
         flags: GucFlags,
-        assign_hook:  Option<unsafe extern "C-unwind" fn(bool, *mut c_void)>,
+        check_hook: Option<unsafe extern "C-unwind" fn(*mut bool, *mut *mut c_void, u32) -> bool>,
+        assign_hook: Option<unsafe extern "C-unwind" fn(bool, *mut c_void)>,
+        show_hook: Option<unsafe extern "C-unwind" fn() -> *const i8>,
     ) {
         unsafe {
             pg_sys::DefineCustomBoolVariable(
@@ -230,9 +232,9 @@ impl GucRegistry {
                 setting.get(),
                 context as isize as _,
                 flags.bits(),
-                None,
+                check_hook,
                 assign_hook,
-                None,
+                show_hook,
             );
         }
     }
@@ -246,7 +248,9 @@ impl GucRegistry {
         max_value: i32,
         context: GucContext,
         flags: GucFlags,
+        check_hook: Option<unsafe extern "C-unwind" fn(*mut i32, *mut *mut c_void, u32) -> bool>,
         assign_hook: Option<unsafe extern "C-unwind" fn(i32, *mut c_void)>,
+        show_hook: Option<unsafe extern "C-unwind" fn() -> *const i8>,
     ) {
         unsafe {
             pg_sys::DefineCustomIntVariable(
@@ -259,9 +263,9 @@ impl GucRegistry {
                 max_value,
                 context as isize as _,
                 flags.bits(),
-                None,
+                check_hook,
                 assign_hook,
-                None,
+                show_hook,
             )
         }
     }
@@ -273,7 +277,11 @@ impl GucRegistry {
         setting: &GucSetting<Option<&'static CStr>>,
         context: GucContext,
         flags: GucFlags,
+        check_hook: Option<
+            unsafe extern "C-unwind" fn(*mut *mut i8, *mut *mut c_void, u32) -> bool,
+        >,
         assign_hook: Option<unsafe extern "C-unwind" fn(*const i8, *mut c_void)>,
+        show_hook: Option<unsafe extern "C-unwind" fn() -> *const i8>,
     ) {
         unsafe {
             let boot_val = setting.boot_val.map_or(std::ptr::null(), |s| s.as_ptr());
@@ -286,9 +294,9 @@ impl GucRegistry {
                 boot_val,
                 context as isize as _,
                 flags.bits(),
-                None,
+                check_hook,
                 assign_hook,
-                None,
+                show_hook,
             );
         }
     }
@@ -302,7 +310,9 @@ impl GucRegistry {
         max_value: f64,
         context: GucContext,
         flags: GucFlags,
+        check_hook: Option<unsafe extern "C-unwind" fn(*mut f64, *mut *mut c_void, u32) -> bool>,
         assign_hook: Option<unsafe extern "C-unwind" fn(f64, *mut c_void)>,
+        show_hook: Option<unsafe extern "C-unwind" fn() -> *const i8>,
     ) {
         unsafe {
             pg_sys::DefineCustomRealVariable(
@@ -315,9 +325,9 @@ impl GucRegistry {
                 max_value,
                 context as isize as _,
                 flags.bits(),
-                None,
+                check_hook,
                 assign_hook,
-                None,
+                show_hook,
             );
         }
     }
@@ -329,7 +339,9 @@ impl GucRegistry {
         setting: &GucSetting<T>,
         context: GucContext,
         flags: GucFlags,
+        check_hook: Option<unsafe extern "C-unwind" fn(*mut i32, *mut *mut c_void, u32) -> bool>,
         assign_hook: Option<unsafe extern "C-unwind" fn(i32, *mut c_void)>,
+        show_hook: Option<unsafe extern "C-unwind" fn() -> *const i8>,
     ) where
         T: GucEnum<T> + Copy,
     {
@@ -345,9 +357,9 @@ impl GucRegistry {
                 setting.get().config_matrix(),
                 context as isize as _,
                 flags.bits(),
-                None,
+                check_hook,
                 assign_hook,
-                None,
+                show_hook,
             );
         }
     }
