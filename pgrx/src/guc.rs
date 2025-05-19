@@ -10,6 +10,7 @@
 //! Provides a safe interface into Postgres' Configuration System (GUC)
 use crate::{pg_sys, PgMemoryContexts};
 use core::ffi::CStr;
+use std::ffi::c_void;
 pub use pgrx_macros::PostgresGucEnum;
 use std::cell::Cell;
 
