@@ -219,7 +219,7 @@ impl GucRegistry {
         setting: &GucSetting<bool>,
         context: GucContext,
         flags: GucFlags,
-        assign_hook: Option<extern "C" fn(bool, *mut c_void) -> bool>,
+        assign_hook: Option<unsafe extern "C" fn(bool, *mut c_void) -> bool>,
     ) {
         unsafe {
             pg_sys::DefineCustomBoolVariable(
@@ -246,7 +246,7 @@ impl GucRegistry {
         max_value: i32,
         context: GucContext,
         flags: GucFlags,
-        assign_hook: Option<extern "C" fn(i32, *mut c_void) -> bool>,
+        assign_hook: Option<unsafe extern "C" fn(i32, *mut c_void) -> bool>,
     ) {
         unsafe {
             pg_sys::DefineCustomIntVariable(
@@ -273,7 +273,7 @@ impl GucRegistry {
         setting: &GucSetting<Option<&'static CStr>>,
         context: GucContext,
         flags: GucFlags,
-        assign_hook: Option<extern "C" fn(Option<&'static CStr>, *mut c_void) -> bool>,
+        assign_hook: Option<unsafe extern "C" fn(Option<&'static CStr>, *mut c_void) -> bool>,
     ) {
         unsafe {
             let boot_val = setting.boot_val.map_or(std::ptr::null(), |s| s.as_ptr());
@@ -302,6 +302,7 @@ impl GucRegistry {
         max_value: f64,
         context: GucContext,
         flags: GucFlags,
+        assign_hook: Option<unsafe extern "C" fn(f64, *mut c_void) -> bool>,
     ) {
         unsafe {
             pg_sys::DefineCustomRealVariable(
@@ -315,7 +316,7 @@ impl GucRegistry {
                 context as isize as _,
                 flags.bits(),
                 None,
-                None,
+                assign_hook,
                 None,
             );
         }
@@ -328,7 +329,7 @@ impl GucRegistry {
         setting: &GucSetting<T>,
         context: GucContext,
         flags: GucFlags,
-        assign_hook: Option<extern "C" fn(T, *mut c_void) -> bool>,
+        assign_hook: Option<unsafe extern "C" fn(T, *mut c_void) -> bool>,
     ) where
         T: GucEnum<T> + Copy,
     {
