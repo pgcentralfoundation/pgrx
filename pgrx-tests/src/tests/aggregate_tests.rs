@@ -118,11 +118,11 @@ impl Aggregate<DemoSubName> for DemoOps {
     }
 }
 
-#[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize)]
+#[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize, AggregateName)]
 pub struct DemoPercentileDisc;
 
 #[pg_aggregate]
-impl Aggregate for DemoPercentileDisc {
+impl Aggregate<DemoPercentileDisc> for DemoPercentileDisc {
     type Args = name!(input, i32);
     type State = Internal;
     type Finalize = i32;
@@ -202,10 +202,11 @@ impl Aggregate<DemoCustomState> for DemoCustomState {
     }
 }
 
+#[derive(AggregateName)]
 struct FirstJson;
 
 #[pg_aggregate]
-impl Aggregate for FirstJson {
+impl Aggregate<FirstJson> for FirstJson {
     type State = pgrx::Json;
     type Args = pgrx::name!(value, pgrx::Json);
 
@@ -219,10 +220,11 @@ impl Aggregate for FirstJson {
     }
 }
 
+#[derive(AggregateName)]
 struct FirstJsonB;
 
 #[pg_aggregate]
-impl Aggregate for FirstJsonB {
+impl Aggregate<FirstJsonB> for FirstJsonB {
     type State = pgrx::JsonB;
     type Args = pgrx::name!(value, pgrx::JsonB);
 
@@ -236,10 +238,11 @@ impl Aggregate for FirstJsonB {
     }
 }
 
+#[derive(AggregateName)]
 struct FirstAnyArray;
 
 #[pg_aggregate]
-impl Aggregate for FirstAnyArray {
+impl Aggregate<FirstAnyArray> for FirstAnyArray {
     type State = pgrx::AnyArray;
     type Args = pgrx::name!(value, pgrx::AnyArray);
 
@@ -253,10 +256,11 @@ impl Aggregate for FirstAnyArray {
     }
 }
 
+#[derive(AggregateName)]
 struct FirstAnyElement;
 
 #[pg_aggregate]
-impl Aggregate for FirstAnyElement {
+impl Aggregate<FirstAnyElement> for FirstAnyElement {
     type State = pgrx::AnyElement;
     type Args = pgrx::name!(value, pgrx::AnyElement);
 

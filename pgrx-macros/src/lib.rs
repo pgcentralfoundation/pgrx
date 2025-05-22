@@ -1248,7 +1248,7 @@ fn impl_aggregate_name(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream
     let name_str = custom_name_value.unwrap_or(name.to_string());
 
     let expanded = quote! {
-        impl ToAggregateName for #name {
+        impl ::pgrx::aggregate::ToAggregateName for #name {
             const NAME: &'static str = #name_str;
         }
     };
