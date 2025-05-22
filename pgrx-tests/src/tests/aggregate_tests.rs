@@ -12,18 +12,24 @@ use pgrx::{datum::Internal, ToAggregateName};
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize)]
-pub struct DemoSum {
+pub struct DemoOps {
     count: i32,
 }
 
 struct DemoSumName;
 
+struct DemoSubName;
+
 impl ToAggregateName for DemoSumName {
     const NAME: &'static str = "demo_sum";
 }
 
+impl ToAggregateName for DemoSubName {
+    const NAME: &'static str = "demo_sub";
+}
+
 #[pg_aggregate]
-impl Aggregate<DemoSumName> for DemoSum {
+impl Aggregate<DemoSumName> for DemoOps {
     const PARALLEL: Option<ParallelOption> = Some(pgrx::aggregate::ParallelOption::Unsafe);
     const INITIAL_CONDITION: Option<&'static str> = Some(r#"0"#);
     const MOVING_INITIAL_CONDITION: Option<&'static str> = Some(r#"0"#);
@@ -46,7 +52,7 @@ impl Aggregate<DemoSumName> for DemoSum {
         arg: Self::Args,
         fcinfo: pg_sys::FunctionCallInfo,
     ) -> Self::MovingState {
-        Self::state(current, arg, fcinfo)
+        <Self as Aggregate<DemoSumName>>::state(current, arg, fcinfo)
     }
 
     fn moving_state_inverse(
@@ -64,6 +70,52 @@ impl Aggregate<DemoSumName> for DemoSum {
         _fcinfo: pg_sys::FunctionCallInfo,
     ) -> Self::State {
         first += second;
+        first
+    }
+}
+
+#[pg_aggregate]
+impl Aggregate<DemoSubName> for DemoOps {
+    const PARALLEL: Option<ParallelOption> = Some(pgrx::aggregate::ParallelOption::Unsafe);
+    const INITIAL_CONDITION: Option<&'static str> = Some(r#"0"#);
+    const MOVING_INITIAL_CONDITION: Option<&'static str> = Some(r#"0"#);
+
+    type Args = i32;
+    type State = i32;
+    type MovingState = i32;
+
+    fn state(
+        mut current: Self::State,
+        arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::State {
+        current -= arg;
+        current
+    }
+
+    fn moving_state(
+        current: Self::State,
+        arg: Self::Args,
+        fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::MovingState {
+        <Self as Aggregate<DemoSubName>>::state(current, arg, fcinfo)
+    }
+
+    fn moving_state_inverse(
+        mut current: Self::State,
+        arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::MovingState {
+        current += arg;
+        current
+    }
+
+    fn combine(
+        mut first: Self::State,
+        second: Self::State,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::State {
+        first -= second;
         first
     }
 }
@@ -244,6 +296,25 @@ mod tests {
         ",
         );
         assert_eq!(retval, Ok(Some(vec![1, 21, 320, 4300])));
+    }
+
+    #[pg_test]
+    fn aggregate_demo_sub() {
+        let retval =
+            Spi::get_one::<i32>("SELECT demo_sub(value) FROM UNNEST(ARRAY [1, 1, 2]) as value;");
+        assert_eq!(retval, Ok(Some(-4)));
+
+        // Moving-aggregate mode
+        let retval = Spi::get_one::<Vec<i32>>(
+            "
+            SELECT array_agg(calculated) FROM (
+                SELECT demo_sub(value) OVER (
+                    ROWS BETWEEN 1 PRECEDING AND CURRENT ROW
+                ) as calculated FROM UNNEST(ARRAY [1, 20, 300, 4000]) as value
+            ) as results;
+        ",
+        );
+        assert_eq!(retval, Ok(Some(vec![-1, -21, -320, -4300])));
     }
 
     #[pg_test]

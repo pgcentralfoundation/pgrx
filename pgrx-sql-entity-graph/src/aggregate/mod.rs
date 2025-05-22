@@ -85,6 +85,7 @@ pub struct PgAggregate {
     item_impl: ItemImpl,
     name: Expr,
     target_ident: Ident,
+    snake_case_target_ident: Ident,
     pg_externs: Vec<ItemFn>,
     // Note these should not be considered *writable*, they're snapshots from construction.
     type_args: AggregateTypeList,
@@ -143,20 +144,51 @@ impl PgAggregate {
         let target_path = get_target_path(&item_impl)?;
         let target_ident = get_target_ident(&target_path)?;
 
-        let snake_case_target_ident =
-            Ident::new(&target_ident.to_string().to_case(Case::Snake), target_ident.span());
-        crate::ident_is_acceptable_to_postgres(&snake_case_target_ident)?;
-
         let mut pg_externs = Vec::default();
         // We want to avoid having multiple borrows, so we take a snapshot to scan from,
         // and mutate the actual one.
         let item_impl_snapshot = item_impl.clone();
 
+        let generic_type_result = extract_generic_from_trait(&item_impl);
+
+        let generic_type_name_snake_case = match &generic_type_result {
+            Some(generic_type) => {
+                if let Type::Path(type_path) = generic_type {
+                    if let Some(ident) = type_path.path.segments.last().map(|s| &s.ident) {
+                        // If it's not the unit type `()`, get its snake_case name
+                        if ident != "unit" && ident != "()" {
+                            // Check for both `unit` and `()` as stringified forms
+                            Some(ident.to_string().to_case(Case::Snake))
+                        } else {
+                            None // It's the unit type, don't append "unit"
+                        }
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            }
+            None => None,
+        };
+
+        let snake_case_target_ident_base = target_ident.to_string().to_case(Case::Snake);
+        let snake_case_target_ident_full = if let Some(generic_name) = generic_type_name_snake_case
+        {
+            format!("{}_{}", snake_case_target_ident_base, generic_name)
+        } else {
+            snake_case_target_ident_base
+        };
+
+        let snake_case_target_ident =
+            Ident::new(&snake_case_target_ident_full, target_ident.span());
+        crate::ident_is_acceptable_to_postgres(&snake_case_target_ident)?;
+
         let self_ty = &item_impl.self_ty;
         let name;
         let as_aggregate: syn::Expr;
         let mut generated_to_aggregate_name_impl = None;
-        match extract_generic_from_trait(&item_impl).cloned() {
+        match generic_type_result.cloned() {
             Some(generic_type) => {
                 name = parse_quote! {
                     <#generic_type as ::pgrx::aggregate::ToAggregateName>::NAME
@@ -574,6 +606,7 @@ impl PgAggregate {
             target_ident,
             pg_externs,
             name,
+            snake_case_target_ident,
             type_args: type_args_value,
             type_ordered_set_args: type_ordered_set_args_value,
             type_moving_state: type_moving_state_value,
@@ -635,10 +668,8 @@ impl PgAggregate {
 impl ToEntityGraphTokens for PgAggregate {
     fn to_entity_graph_tokens(&self) -> TokenStream2 {
         let target_ident = &self.target_ident;
-        let snake_case_target_ident =
-            Ident::new(&target_ident.to_string().to_case(Case::Snake), target_ident.span());
         let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgrx_internals_aggregate_{}", snake_case_target_ident),
+            &format!("__pgrx_internals_aggregate_{}", self.snake_case_target_ident),
             target_ident.span(),
         );
 
@@ -971,7 +1002,7 @@ mod tests {
         assert_eq!(agg.0.pg_externs.len(), 1);
         // That extern should be named specifically:
         let extern_fn = &agg.0.pg_externs[0];
-        assert_eq!(extern_fn.sig.ident.to_string(), "demo_agg_state");
+        assert_eq!(extern_fn.sig.ident.to_string(), "demo_agg_demo_name_state");
         // It should be possible to generate entity tokens.
         let _ = agg.to_token_stream();
         Ok(())
@@ -1035,7 +1066,7 @@ mod tests {
         assert_eq!(agg.0.pg_externs.len(), 8);
         // That extern should be named specifically:
         let extern_fn = &agg.0.pg_externs[0];
-        assert_eq!(extern_fn.sig.ident.to_string(), "demo_agg_state");
+        assert_eq!(extern_fn.sig.ident.to_string(), "demo_agg_demo_name_state");
         // It should be possible to generate entity tokens.
         let _ = agg.to_token_stream();
         Ok(())
