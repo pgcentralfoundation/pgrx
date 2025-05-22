@@ -7,8 +7,8 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use pgrx::datum::Internal;
 use pgrx::prelude::*;
+use pgrx::{datum::Internal, ToAggregateName};
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize)]
@@ -16,9 +16,14 @@ pub struct DemoSum {
     count: i32,
 }
 
-#[pg_aggregate]
-impl Aggregate for DemoSum {
+struct DemoSumName;
+
+impl ToAggregateName for DemoSumName {
     const NAME: &'static str = "demo_sum";
+}
+
+#[pg_aggregate]
+impl Aggregate<DemoSumName> for DemoSum {
     const PARALLEL: Option<ParallelOption> = Some(pgrx::aggregate::ParallelOption::Unsafe);
     const INITIAL_CONDITION: Option<&'static str> = Some(r#"0"#);
     const MOVING_INITIAL_CONDITION: Option<&'static str> = Some(r#"0"#);
@@ -112,10 +117,14 @@ mod demo_schema {
 #[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize)]
 pub struct DemoCustomState;
 
+impl ToAggregateName for DemoCustomState {
+    const NAME: &'static str = "demo_sum_state";
+}
+
 // demonstrate we can properly support an STYPE with a pg_schema
 #[pg_aggregate]
-impl Aggregate for DemoCustomState {
-    const NAME: &'static str = "demo_sum_state";
+impl Aggregate<DemoCustomState> for DemoCustomState {
+    //const NAME: &'static str = "demo_sum_state";
     type Args = i32;
     type State = Option<demo_schema::DemoState>;
     type Finalize = i32;

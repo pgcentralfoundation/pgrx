@@ -22,6 +22,8 @@ mod options;
 
 pub use aggregate_type::{AggregateType, AggregateTypeList};
 pub use options::{FinalizeModify, ParallelOption};
+use quote::ToTokens;
+use syn::PathArguments;
 
 use crate::enrich::CodeEnrichment;
 use crate::enrich::ToEntityGraphTokens;
@@ -106,6 +108,32 @@ pub struct PgAggregate {
     fn_moving_finalize: Option<Ident>,
     hypothetical: bool,
     to_sql_config: ToSqlConfig,
+    generated_to_aggregate_name_impl: Option<proc_macro2::TokenStream>,
+}
+
+fn extract_generic_from_trait(item_impl: &ItemImpl) -> Option<&Type> {
+    let (_, path, _) = item_impl.trait_.as_ref()?;
+
+    let last_segment = path.segments.last()?;
+
+    if last_segment.ident != "Aggregate" {
+        return None;
+    }
+
+    let args = match &last_segment.arguments {
+        PathArguments::AngleBracketed(args) => args,
+        _ => {
+            return None;
+        }
+    };
+
+    let generic_arg = args.args.first()?;
+
+    if let syn::GenericArgument::Type(ty) = generic_arg {
+        Some(ty)
+    } else {
+        None
+    }
 }
 
 impl PgAggregate {
@@ -124,46 +152,35 @@ impl PgAggregate {
         // and mutate the actual one.
         let item_impl_snapshot = item_impl.clone();
 
-        if let Some((_, ref path, _)) = item_impl.trait_ {
-            // TODO: Consider checking the path if there is more than one segment to make sure it's pgrx.
-            if let Some(last) = path.segments.last() {
-                if last.ident != "Aggregate" {
-                    return Err(syn::Error::new(
-                        last.ident.span(),
-                        "`#[pg_aggregate]` only works with the `Aggregate` trait.",
-                    ));
-                }
+        let self_ty = &item_impl.self_ty;
+        let name;
+        let as_aggregate: syn::Expr;
+        let mut generated_to_aggregate_name_impl = None;
+        match extract_generic_from_trait(&item_impl).cloned() {
+            Some(generic_type) => {
+                name = parse_quote! {
+                    <#generic_type as ::pgrx::aggregate::ToAggregateName>::NAME
+                };
+                as_aggregate = parse_quote! {
+                    ::pgrx::aggregate::Aggregate::<#generic_type>
+                };
+            }
+            None => {
+                let type_name_str = self_ty.to_token_stream().to_string();
+                generated_to_aggregate_name_impl = Some(quote! {
+                    impl ::pgrx::aggregate::ToAggregateName for #self_ty {
+                        const NAME: &'static str = #type_name_str;
+                    }
+                });
+
+                name = parse_quote! {
+                    <#self_ty as ::pgrx::aggregate::ToAggregateName>::NAME
+                };
+                as_aggregate = parse_quote! {
+                    ::pgrx::aggregate::Aggregate
+                };
             }
         }
-
-        let name = match get_impl_const_by_name(&item_impl_snapshot, "NAME") {
-            Some(item_const) => match &item_const.expr {
-                syn::Expr::Lit(ref expr) => {
-                    if let syn::Lit::Str(_) = &expr.lit {
-                        item_const.expr.clone()
-                    } else {
-                        return Err(syn::Error::new(
-                            expr.span(),
-                            "`NAME` must be a `&'static str` for Aggregate implementations.",
-                        ));
-                    }
-                }
-                e => {
-                    return Err(syn::Error::new(
-                        e.span(),
-                        "`NAME` must be a `&'static str` for Aggregate implementations.",
-                    ));
-                }
-            },
-            None => {
-                item_impl.items.push(parse_quote! {
-                    const NAME: &'static str = stringify!(Self);
-                });
-                parse_quote! {
-                    stringify!(#target_ident)
-                }
-            }
-        };
 
         // `State` is an optional value, we default to `Self`.
         let type_state = get_impl_type_by_name(&item_impl_snapshot, "State");
@@ -301,9 +318,9 @@ impl PgAggregate {
                 #pg_extern_attr
                 fn #fn_name(this: #type_state_without_self, #(#args_with_names),*, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> #type_state_without_self {
                     unsafe {
-                        <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                        <#target_path as #as_aggregate>::in_memory_context(
                             fcinfo,
-                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::state(this, (#(#arg_names),*), fcinfo)
+                            move |_context| <#target_path as #as_aggregate>::state(this, (#(#arg_names),*), fcinfo)
                         )
                     }
                 }
@@ -326,9 +343,9 @@ impl PgAggregate {
                 #pg_extern_attr
                 fn #fn_name(this: #type_state_without_self, v: #type_state_without_self, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> #type_state_without_self {
                     unsafe {
-                        <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                        <#target_path as #as_aggregate>::in_memory_context(
                             fcinfo,
-                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::combine(this, v, fcinfo)
+                            move |_context| <#target_path as #as_aggregate>::combine(this, v, fcinfo)
                         )
                     }
                 }
@@ -357,9 +374,9 @@ impl PgAggregate {
                     #pg_extern_attr
                     fn #fn_name(this: #type_state_without_self, #(#direct_args_with_names),*, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> #type_finalize {
                         unsafe {
-                            <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                            <#target_path as #as_aggregate>::in_memory_context(
                                 fcinfo,
-                                move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::finalize(this, (#(#direct_arg_names),*), fcinfo)
+                                move |_context| <#target_path as #as_aggregate>::finalize(this, (#(#direct_arg_names),*), fcinfo)
                             )
                         }
                     }
@@ -370,9 +387,9 @@ impl PgAggregate {
                     #pg_extern_attr
                     fn #fn_name(this: #type_state_without_self, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> #type_finalize {
                         unsafe {
-                            <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                            <#target_path as #as_aggregate>::in_memory_context(
                                 fcinfo,
-                                move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::finalize(this, (), fcinfo)
+                                move |_context| <#target_path as #as_aggregate>::finalize(this, (), fcinfo)
                             )
                         }
                     }
@@ -398,9 +415,9 @@ impl PgAggregate {
                 #pg_extern_attr
                 fn #fn_name(this: #type_state_without_self, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> Vec<u8> {
                     unsafe {
-                        <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                        <#target_path as #as_aggregate>::in_memory_context(
                             fcinfo,
-                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::serial(this, fcinfo)
+                            move |_context| <#target_path as #as_aggregate>::serial(this, fcinfo)
                         )
                     }
                 }
@@ -427,9 +444,9 @@ impl PgAggregate {
                 #pg_extern_attr
                 fn #fn_name(this: #type_state_without_self, buf: Vec<u8>, internal: ::pgrx::pgbox::PgBox<#type_state_without_self>, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pgbox::PgBox<#type_state_without_self> {
                     unsafe {
-                        <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                        <#target_path as #as_aggregate>::in_memory_context(
                             fcinfo,
-                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::deserial(this, buf, internal, fcinfo)
+                            move |_context| <#target_path as #as_aggregate>::deserial(this, buf, internal, fcinfo)
                         )
                     }
                 }
@@ -461,9 +478,9 @@ impl PgAggregate {
                     fcinfo: ::pgrx::pg_sys::FunctionCallInfo,
                 ) -> #type_moving_state {
                     unsafe {
-                        <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                        <#target_path as #as_aggregate>::in_memory_context(
                             fcinfo,
-                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::moving_state(mstate, (#(#arg_names),*), fcinfo)
+                            move |_context| <#target_path as #as_aggregate>::moving_state(mstate, (#(#arg_names),*), fcinfo)
                         )
                     }
                 }
@@ -472,10 +489,10 @@ impl PgAggregate {
         } else {
             item_impl.items.push(parse_quote! {
                 fn moving_state(
-                    _mstate: <#target_path as ::pgrx::aggregate::Aggregate>::MovingState,
+                    _mstate: <#target_path as #as_aggregate>::MovingState,
                     _v: Self::Args,
                     _fcinfo: ::pgrx::pg_sys::FunctionCallInfo,
-                ) -> <#target_path as ::pgrx::aggregate::Aggregate>::MovingState {
+                ) -> <#target_path as #as_aggregate>::MovingState {
                     unimplemented!("Call to moving_state on an aggregate which does not support it.")
                 }
             });
@@ -499,9 +516,9 @@ impl PgAggregate {
                     fcinfo: ::pgrx::pg_sys::FunctionCallInfo,
                 ) -> #type_moving_state {
                     unsafe {
-                        <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                        <#target_path as #as_aggregate>::in_memory_context(
                             fcinfo,
-                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::moving_state_inverse(mstate, (#(#arg_names),*), fcinfo)
+                            move |_context| <#target_path as #as_aggregate>::moving_state_inverse(mstate, (#(#arg_names),*), fcinfo)
                         )
                     }
                 }
@@ -535,9 +552,9 @@ impl PgAggregate {
                 #pg_extern_attr
                 fn #fn_name(mstate: #type_moving_state, #(#direct_args_with_names),* #maybe_comma fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> #type_finalize {
                     unsafe {
-                        <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                        <#target_path as #as_aggregate>::in_memory_context(
                             fcinfo,
-                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::moving_finalize(mstate, (#(#direct_arg_names),*), fcinfo)
+                            move |_context| <#target_path as #as_aggregate>::moving_finalize(mstate, (#(#direct_arg_names),*), fcinfo)
                         )
                     }
                 }
@@ -610,6 +627,7 @@ impl PgAggregate {
                 false
             },
             to_sql_config,
+            generated_to_aggregate_name_impl,
         }))
     }
 }
@@ -694,9 +712,18 @@ impl ToRustCodeTokens for PgAggregate {
     fn to_rust_code_tokens(&self) -> TokenStream2 {
         let impl_item = &self.item_impl;
         let pg_externs = self.pg_externs.iter();
-        quote! {
-            #impl_item
-            #(#pg_externs)*
+
+        if let Some(to_aggregate_name_impl_tokens) = &self.generated_to_aggregate_name_impl {
+            quote! {
+                #impl_item
+                #to_aggregate_name_impl_tokens
+                #(#pg_externs)*
+            }
+        } else {
+            quote! {
+                #impl_item
+                #(#pg_externs)*
+            }
         }
     }
 }
@@ -927,10 +954,9 @@ mod tests {
     fn agg_required_only() -> Result<()> {
         let tokens: ItemImpl = parse_quote! {
             #[pg_aggregate]
-            impl Aggregate for DemoAgg {
+            impl Aggregate<DemoName> for DemoAgg {
                 type State = PgVarlena<Self>;
                 type Args = i32;
-                const NAME: &'static str = "DEMO";
 
                 fn state(mut current: Self::State, arg: Self::Args) -> Self::State {
                     todo!()
@@ -955,13 +981,11 @@ mod tests {
     fn agg_all_options() -> Result<()> {
         let tokens: ItemImpl = parse_quote! {
             #[pg_aggregate]
-            impl Aggregate for DemoAgg {
+            impl Aggregate<DemoName> for DemoAgg {
                 type State = PgVarlena<Self>;
                 type Args = i32;
                 type OrderBy = i32;
                 type MovingState = i32;
-
-                const NAME: &'static str = "DEMO";
 
                 const PARALLEL: Option<ParallelOption> = Some(ParallelOption::Safe);
                 const FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);

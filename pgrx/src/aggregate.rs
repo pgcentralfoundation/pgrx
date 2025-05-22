@@ -276,6 +276,15 @@ use crate::pgbox::PgBox;
 
 pub use pgrx_sql_entity_graph::{FinalizeModify, ParallelOption};
 
+pub trait ToAggregateName {
+    /// The name of the aggregate. (eg. What you'd pass to `SELECT agg(col) FROM tab`.)
+    const NAME: &'static str;
+}
+
+impl ToAggregateName for () {
+    const NAME: &'static str = "unknown";
+}
+
 /// Aggregate implementation trait.
 ///
 /// When decorated with [`#[pgrx_macros::pg_aggregate]`](pgrx_macros::pg_aggregate), enables the
@@ -284,7 +293,7 @@ pub use pgrx_sql_entity_graph::{FinalizeModify, ParallelOption};
 ///
 /// The [`#[pgrx_macros::pg_aggregate]`](pgrx_macros::pg_aggregate) will automatically fill fields
 /// marked optional with stubs.
-pub trait Aggregate
+pub trait Aggregate<T: ToAggregateName = ()>
 where
     Self: Sized,
 {
@@ -333,9 +342,6 @@ where
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
     type MovingState;
-
-    /// The name of the aggregate. (eg. What you'd pass to `SELECT agg(col) FROM tab`.)
-    const NAME: &'static str;
 
     /// Set to true if this is an ordered set aggregate.
     ///

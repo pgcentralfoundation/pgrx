@@ -139,7 +139,6 @@ mod pgrx_modqual_tests {
     impl ::pgrx::Aggregate for PgrxModuleQualificationTest {
         type State = ::pgrx::datum::PgVarlena<Self>;
         type Args = ::pgrx::name!(value, Option<i32>);
-        const NAME: &'static str = "PgrxModuleQualificationTestAgg";
 
         const INITIAL_CONDITION: Option<&'static str> = Some(r#"{"v": 0}"#);
 

@@ -14,7 +14,7 @@ pub struct Foo;
 
 #[pg_aggregate]
 impl Aggregate for Foo {
-    const NAME: &'static str = "foo";
+    //const NAME: &'static str = "foo";
     const ORDERED_SET: bool = true;
 
     type OrderedSetArgs = (name!(a, f64), name!(b, f64));
