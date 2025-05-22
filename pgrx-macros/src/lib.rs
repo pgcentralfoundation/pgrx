@@ -1211,6 +1211,51 @@ pub fn derive_postgres_hash(input: TokenStream) -> TokenStream {
     deriving_postgres_hash(ast).unwrap_or_else(syn::Error::into_compile_error).into()
 }
 
+/// Derives the `ToAggregateName` trait.
+#[proc_macro_derive(AggregateName, attributes(aggregate_name))]
+pub fn derive_aggregate_name(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as syn::DeriveInput);
+
+    impl_aggregate_name(ast).unwrap_or_else(|e| e.into_compile_error()).into()
+}
+
+fn impl_aggregate_name(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
+    let name = &ast.ident;
+
+    let mut custom_name_value: Option<String> = None;
+
+    for attr in &ast.attrs {
+        if attr.path().is_ident("aggregate_name") {
+            let meta = &attr.meta;
+            match meta {
+                syn::Meta::NameValue(syn::MetaNameValue {
+                    value: syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(s), .. }),
+                    ..
+                }) => {
+                    custom_name_value = Some(s.value());
+                    break;
+                }
+                _ => {
+                    return Err(syn::Error::new_spanned(
+                            attr,
+                            "#[aggregate_name] must be in the form `#[aggregate_name = \"string_literal\"]`",
+                        ));
+                }
+            }
+        }
+    }
+
+    let name_str = custom_name_value.unwrap_or(name.to_string());
+
+    let expanded = quote! {
+        impl ToAggregateName for #name {
+            const NAME: &'static str = #name_str;
+        }
+    };
+
+    Ok(expanded)
+}
+
 /**
 Declare a `pgrx::Aggregate` implementation on a type as able to used by Postgres as an aggregate.
 

@@ -18,14 +18,12 @@ pub struct DemoOps {
 
 struct DemoSumName;
 
+#[derive(AggregateName)]
+#[aggregate_name = "demo_sub"]
 struct DemoSubName;
 
 impl ToAggregateName for DemoSumName {
     const NAME: &'static str = "demo_sum";
-}
-
-impl ToAggregateName for DemoSubName {
-    const NAME: &'static str = "demo_sub";
 }
 
 #[pg_aggregate]
