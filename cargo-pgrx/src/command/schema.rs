@@ -477,6 +477,7 @@ fn compute_codegen(
         out
     };
     Ok(quote::quote! {
+        #[doc(hidden)]
         pub fn main() {
             #inputs
             #build
