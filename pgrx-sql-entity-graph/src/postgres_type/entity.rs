@@ -221,7 +221,7 @@ impl ToSql for PostgresTypeEntity {
             "\n\
                 -- {file}:{line}\n\
                 -- {full_path}\n\
-                CREATE TYPE {schema}{name};\
+                CREATE TYPE {schema}\"{name}\";\
             ",
             schema = context.schema_prefix_for(&self_index),
         );
@@ -248,7 +248,7 @@ impl ToSql for PostgresTypeEntity {
             "\n\
                 -- {file}:{line}\n\
                 -- {full_path}\n\
-                CREATE TYPE {schema}{name} (\n\
+                CREATE TYPE {schema}\"{name}\" (\n\
                     \tINTERNALLENGTH = variable,\n\
                     \tINPUT = {schema_prefix_in_fn}{in_fn}, /* {in_fn_path} */\n\
                     \tOUTPUT = {schema_prefix_out_fn}{out_fn}, /* {out_fn_path} */\n\

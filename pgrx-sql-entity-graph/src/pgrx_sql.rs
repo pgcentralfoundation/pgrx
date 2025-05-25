@@ -398,7 +398,7 @@ impl PgrxSql {
     }
 
     pub fn schema_prefix_for(&self, target: &NodeIndex) -> String {
-        self.schema_alias_of(target).map(|v| (v + ".").to_string()).unwrap_or_default()
+        self.schema_alias_of(target).map(|v| format!("\"{v}\".")).unwrap_or_default()
     }
 
     pub fn to_sql(&self) -> eyre::Result<String> {

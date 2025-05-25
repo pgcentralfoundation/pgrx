@@ -861,7 +861,7 @@ impl ToSql for InventoryPostgresEnum {
             "\n\
                     -- {file}:{line}\n\
                     -- {full_path}\n\
-                    CREATE TYPE {schema}{name} AS ENUM (\n\
+                    CREATE TYPE {schema}\"{name}\" AS ENUM (\n\
                         {variants}\
                     );\
                 ",
