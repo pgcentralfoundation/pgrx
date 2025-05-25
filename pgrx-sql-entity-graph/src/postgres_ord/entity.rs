@@ -88,13 +88,13 @@ impl ToSql for PostgresOrdEntity {
             -- {file}:{line}\n\
             -- {full_path}\n\
             CREATE OPERATOR FAMILY {name}_btree_ops USING btree;\n\
-            CREATE OPERATOR CLASS {name}_btree_ops DEFAULT FOR TYPE {name} USING btree FAMILY {name}_btree_ops AS\n\
+            CREATE OPERATOR CLASS {name}_btree_ops DEFAULT FOR TYPE \"{name}\" USING btree FAMILY {name}_btree_ops AS\n\
                     \tOPERATOR 1 <,\n\
                     \tOPERATOR 2 <=,\n\
                     \tOPERATOR 3 =,\n\
                     \tOPERATOR 4 >=,\n\
                     \tOPERATOR 5 >,\n\
-                    \tFUNCTION 1 {cmp_fn_name}({name}, {name});\
+                    \tFUNCTION 1 {cmp_fn_name}(\"{name}\", \"{name}\");\
             ",
             cmp_fn_name = self.cmp_fn_name(),
         );

@@ -67,8 +67,8 @@ impl ToSql for PostgresHashEntity {
                             -- {file}:{line}\n\
                             -- {full_path}\n\
                             CREATE OPERATOR FAMILY {name}_hash_ops USING hash;\n\
-                            CREATE OPERATOR CLASS {name}_hash_ops DEFAULT FOR TYPE {name} USING hash FAMILY {name}_hash_ops AS\n\
-                                \tOPERATOR    1   =  ({name}, {name}),\n\
+                            CREATE OPERATOR CLASS {name}_hash_ops DEFAULT FOR TYPE \"{name}\" USING hash FAMILY {name}_hash_ops AS\n\
+                                \tOPERATOR    1   =  (\"{name}\", \"{name}\"),\n\
                                 \tFUNCTION    1   {fn_name}({name});\
                             ",
                           name = self.name,
