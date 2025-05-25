@@ -186,7 +186,7 @@ impl ToSql for PgExternEntity {
                     Err(err) => return Err(err).wrap_err("Error mapping return SQL")
                 };
                 format!(
-                    "RETURNS {schema_prefix}{sql_type} /* {full_path} */",
+                    "RETURNS {schema_prefix}\"{sql_type}\" /* {full_path} */",
                     schema_prefix = context.schema_prefix_for(&graph_index),
                     full_path = ty.full_path
                 )
