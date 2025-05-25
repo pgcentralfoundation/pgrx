@@ -124,7 +124,7 @@ impl ToSql for PgExternEntity {
                 match metadata_argument.argument_sql {
                     Ok(SqlMapping::As(ref argument_sql)) => {
                         let buf = format!("\
-                                            \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
+                                            \t\"{pattern}\" {variadic}{schema_prefix}\"{sql_type}\"{default}{maybe_comma}/* {type_name} */\
                                         ",
                                             pattern = arg.pattern,
                                             schema_prefix = context.schema_prefix_for(&graph_index),
@@ -148,7 +148,7 @@ impl ToSql for PgExternEntity {
                                 )
                             })?;
                         let buf = format!("\
-                            \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
+                            \t\"{pattern}\" {variadic}{schema_prefix}\"{sql_type}\"{default}{maybe_comma}/* {type_name} */\
                         ",
                             pattern = arg.pattern,
                             schema_prefix = context.schema_prefix_for(&graph_index),
@@ -205,7 +205,7 @@ impl ToSql for PgExternEntity {
                         Err(err) => return Err(err).wrap_err("Error mapping return SQL"),
                     };
                 format!(
-                    "RETURNS SETOF {schema_prefix}{sql_type} /* {full_path} */",
+                    "RETURNS SETOF {schema_prefix}\"{sql_type}\" /* {full_path} */",
                     schema_prefix = context.schema_prefix_for(&graph_index),
                     full_path = ty.full_path
                 )
@@ -240,7 +240,7 @@ impl ToSql for PgExternEntity {
 
                     let needs_comma = idx < (table_items.len() - 1);
                     let item = format!(
-                        "\n\t{col_name} {schema_prefix}{ty_resolved}{needs_comma} /* {ty_name} */",
+                        "\n\t{col_name} {schema_prefix}\"{ty_resolved}\"{needs_comma} /* {ty_name} */",
                         col_name = col_name.expect(
                             "An iterator of tuples should have `named!()` macro declarations."
                         ),
@@ -431,8 +431,8 @@ impl ToSql for PgExternEntity {
                                                     -- {module_path}::{name}\n\
                                                     CREATE OPERATOR {schema}{opname} (\n\
                                                         \tPROCEDURE={schema}\"{name}\",\n\
-                                                        \tLEFTARG={schema_prefix_left}{left_arg_sql}, /* {left_name} */\n\
-                                                        \tRIGHTARG={schema_prefix_right}{right_arg_sql}{maybe_comma} /* {right_name} */\n\
+                                                        \tLEFTARG={schema_prefix_left}\"{left_arg_sql}\", /* {left_name} */\n\
+                                                        \tRIGHTARG={schema_prefix_right}\"{right_arg_sql}\"{maybe_comma} /* {right_name} */\n\
                                                         {optionals}\
                                                     );\
                                                     ",
@@ -542,9 +542,9 @@ impl ToSql for PgExternEntity {
                                                     -- {file}:{line}\n\
                                                     -- {module_path}::{name}\n\
                                                     CREATE CAST (\n\
-                                                        \t{schema_prefix_source}{source_arg_sql} /* {source_name} */\n\
+                                                        \t{schema_prefix_source}\"{source_arg_sql}\" /* {source_name} */\n\
                                                         \tAS\n\
-                                                        \t{schema_prefix_target}{target_arg_sql} /* {target_name} */\n\
+                                                        \t{schema_prefix_target}\"{target_arg_sql}\" /* {target_name} */\n\
                                                     )\n\
                                                     WITH FUNCTION {function_name}{optional};\
                                                     ",

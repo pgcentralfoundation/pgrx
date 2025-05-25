@@ -319,7 +319,7 @@ impl ToSql for PgAggregateEntity {
                     })?;
                 let needs_comma = idx < (self.args.len() - 1);
                 let buf = format!("\
-                       \t{name}{variadic}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
+                       \t{name}{variadic}{schema_prefix}\"{sql_type}\"{maybe_comma}/* {full_path} */\
                    ",
                        schema_prefix = context.schema_prefix_for(&graph_index),
                        // First try to match on [`TypeId`] since it's most reliable.
@@ -366,7 +366,7 @@ impl ToSql for PgAggregateEntity {
                 let needs_comma = idx < (direct_args.len() - 1);
                 let buf = format!(
                     "\
-                    \t{maybe_name}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
+                    \t{maybe_name}{schema_prefix}\"{sql_type}\"{maybe_comma}/* {full_path} */\
                    ",
                     schema_prefix = context.schema_prefix_for(&graph_index),
                     // First try to match on [`TypeId`] since it's most reliable.
