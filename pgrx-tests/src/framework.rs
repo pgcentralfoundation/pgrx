@@ -150,8 +150,11 @@ pub fn run_test(
                     return Ok(());
                 }
 
-                let pg_location = dberror.file().unwrap_or("<unknown>").to_string();
+                let mut pg_location = dberror.file().unwrap_or("<unknown>").to_string();
                 let rust_location = dberror.where_().unwrap_or("<unknown>").to_string();
+                if let Some(lineno) = dberror.line() {
+                    pg_location += &format!(":{lineno}");
+                }
 
                 (pg_location, rust_location, received_error_message.to_string())
             } else {
