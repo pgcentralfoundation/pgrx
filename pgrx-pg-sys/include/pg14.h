@@ -134,6 +134,7 @@
 #include "parser/parse_coerce.h"
 #include "parser/parser.h"
 #include "parser/parsetree.h"
+#include "parser/scanner.h"
 #include "parser/scansup.h"
 #include "partitioning/partbounds.h"
 #include "partitioning/partdefs.h"
