@@ -17,16 +17,7 @@ use serde::{Deserialize, Serialize};
 
 use alloc::string::String;
 
-#[cfg(any(
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15",
-    feature = "pg16",
-    feature = "pg17"
-))]
-pgrx::pg_module_magic!();
-#[cfg(any(feature = "pg18"))]
-pgrx::pg_module_magic_ext!(c"nostd", pgrx::pg_sys::PG_VERSION);
+pgrx::pg_module_magic!(c"nostd", pgrx::pg_sys::PG_VERSION);
 
 /// standard Rust equality/comparison derives
 #[derive(Eq, PartialEq, Ord, Hash, PartialOrd)]

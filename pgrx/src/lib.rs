@@ -175,7 +175,7 @@ const _: () = {
 /// <div class="example-wrap" style="display:inline-block">
 /// <pre class="ignore" style="white-space:normal;font:inherit;">
 ///
-/// **Note**: Every [`pgrx`][crate] extension **must** have this macro called at top level (usually `src/lib.rs`) to be valid.
+/// **Note**: Every [`pgrx`][crate] extension **must** have this macro called at top level (usually `src/lib.rs`) to be valid. You can use `pg_module_magic!()` or `pg_module_magic!(name, version)`
 ///
 /// </pre></div>
 ///
@@ -193,16 +193,6 @@ macro_rules! pg_module_magic {
             // noop
         }
     };
-}
-
-/// A macro for marking a library compatible with [`pgrx`][crate].
-/// Similar to [`pg_module_magic!()`](pg_module_magic), but for Postgres 18+, which has a different
-/// API to add extension name and postgres version.
-///
-/// name and version are passed as C strings.
-#[cfg(feature = "pg18")]
-#[macro_export]
-macro_rules! pg_module_magic_ext {
     ($name:expr, $version:expr) => {
         $crate::pg_magic_func!($name, $version);
 
@@ -263,27 +253,28 @@ macro_rules! pg_magic_func {
                 feature = "pg17"
             ))]
             {
-                static MY_MAGIC: ::pgrx::pg_sys::Pg_magic_struct = ::pgrx::pg_sys::Pg_magic_struct {
-                    len: ::core::mem::size_of::<::pgrx::pg_sys::Pg_magic_struct>() as i32,
-                    version: ::pgrx::pg_sys::PG_VERSION_NUM as i32 / 100,
-                    funcmaxargs: ::pgrx::pg_sys::FUNC_MAX_ARGS as i32,
-                    indexmaxkeys: ::pgrx::pg_sys::INDEX_MAX_KEYS as i32,
-                    namedatalen: ::pgrx::pg_sys::NAMEDATALEN as i32,
-                    float8byval: cfg!(target_pointer_width = "64") as i32,
-                    #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-                    abi_extra: {
-                        // we'll use what the bindings tell us, but if it ain't "PostgreSQL" then we'll
-                        // raise a compilation error unless the `unsafe-postgres` feature is set
-                        let magic = ::pgrx::pg_sys::FMGR_ABI_EXTRA.to_bytes_with_nul();
-                        let mut abi = [0 as ::pgrx::ffi::c_char; 32];
-                        let mut i = 0;
-                        while i < magic.len() {
-                            abi[i] = magic[i] as ::pgrx::ffi::c_char;
-                            i += 1;
-                        }
-                        abi
-                    },
-                };
+                static MY_MAGIC: ::pgrx::pg_sys::Pg_magic_struct =
+                    ::pgrx::pg_sys::Pg_magic_struct {
+                        len: ::core::mem::size_of::<::pgrx::pg_sys::Pg_magic_struct>() as i32,
+                        version: ::pgrx::pg_sys::PG_VERSION_NUM as i32 / 100,
+                        funcmaxargs: ::pgrx::pg_sys::FUNC_MAX_ARGS as i32,
+                        indexmaxkeys: ::pgrx::pg_sys::INDEX_MAX_KEYS as i32,
+                        namedatalen: ::pgrx::pg_sys::NAMEDATALEN as i32,
+                        float8byval: cfg!(target_pointer_width = "64") as i32,
+                        #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+                        abi_extra: {
+                            // we'll use what the bindings tell us, but if it ain't "PostgreSQL" then we'll
+                            // raise a compilation error unless the `unsafe-postgres` feature is set
+                            let magic = ::pgrx::pg_sys::FMGR_ABI_EXTRA.to_bytes_with_nul();
+                            let mut abi = [0 as ::pgrx::ffi::c_char; 32];
+                            let mut i = 0;
+                            while i < magic.len() {
+                                abi[i] = magic[i] as ::pgrx::ffi::c_char;
+                                i += 1;
+                            }
+                            abi
+                        },
+                    };
 
                 // since Postgres calls this first, register our panic handler now
                 // so we don't unwind into C / Postgres
@@ -333,52 +324,85 @@ macro_rules! pg_magic_func {
     };
 
     ($name:expr, $version:expr) => {
-        #[cfg(any(
-            feature = "pg13",
-            feature = "pg14",
-            feature = "pg15",
-            feature = "pg16",
-            feature = "pg17"
-        ))]
-        compile_error!("pg_magic_func!() does not accept name and version arguments in this version of pgrx. Use pg_module_magic!() instead.");
-
         #[no_mangle]
         #[allow(non_snake_case, unexpected_cfgs)]
         #[doc(hidden)]
         pub extern "C-unwind" fn Pg_magic_func() -> &'static ::pgrx::pg_sys::Pg_magic_struct {
-            struct PgMagicstruct(::pgrx::pg_sys::Pg_magic_struct);
-            unsafe impl Sync for PgMagicstruct {}
-            static MY_MAGIC: PgMagicstruct = PgMagicstruct(::pgrx::pg_sys::Pg_magic_struct {
-                len: ::core::mem::size_of::<::pgrx::pg_sys::Pg_magic_struct>() as i32,
-                abi_fields: ::pgrx::pg_sys::Pg_abi_values {
-                    version: ::pgrx::pg_sys::PG_VERSION_NUM as i32 / 100,
-                    funcmaxargs: ::pgrx::pg_sys::FUNC_MAX_ARGS as i32,
-                    indexmaxkeys: ::pgrx::pg_sys::INDEX_MAX_KEYS as i32,
-                    namedatalen: ::pgrx::pg_sys::NAMEDATALEN as i32,
-                    float8byval: cfg!(target_pointer_width = "64") as i32,
-                    abi_extra: {
-                        // we'll use what the bindings tell us, but if it ain't "PostgreSQL" then we'll
-                        // raise a compilation error unless the `unsafe-postgres` feature is set
-                        let magic = ::pgrx::pg_sys::FMGR_ABI_EXTRA.to_bytes_with_nul();
-                        let mut abi = [0 as ::pgrx::ffi::c_char; 32];
-                        let mut i = 0;
-                        while i < magic.len() {
-                            abi[i] = magic[i] as ::pgrx::ffi::c_char;
-                            i += 1;
-                        }
-                        abi
+            #[cfg(any(
+                feature = "pg13",
+                feature = "pg14",
+                feature = "pg15",
+                feature = "pg16",
+                feature = "pg17"
+            ))]
+            {
+                static MY_MAGIC: ::pgrx::pg_sys::Pg_magic_struct =
+                    ::pgrx::pg_sys::Pg_magic_struct {
+                        len: ::core::mem::size_of::<::pgrx::pg_sys::Pg_magic_struct>() as i32,
+                        version: ::pgrx::pg_sys::PG_VERSION_NUM as i32 / 100,
+                        funcmaxargs: ::pgrx::pg_sys::FUNC_MAX_ARGS as i32,
+                        indexmaxkeys: ::pgrx::pg_sys::INDEX_MAX_KEYS as i32,
+                        namedatalen: ::pgrx::pg_sys::NAMEDATALEN as i32,
+                        float8byval: cfg!(target_pointer_width = "64") as i32,
+                        #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+                        abi_extra: {
+                            // we'll use what the bindings tell us, but if it ain't "PostgreSQL" then we'll
+                            // raise a compilation error unless the `unsafe-postgres` feature is set
+                            let magic = ::pgrx::pg_sys::FMGR_ABI_EXTRA.to_bytes_with_nul();
+                            let mut abi = [0 as ::pgrx::ffi::c_char; 32];
+                            let mut i = 0;
+                            while i < magic.len() {
+                                abi[i] = magic[i] as ::pgrx::ffi::c_char;
+                                i += 1;
+                            }
+                            abi
+                        },
+                    };
+
+                // since Postgres calls this first, register our panic handler now
+                // so we don't unwind into C / Postgres
+                ::pgrx::pg_sys::panic::register_pg_guard_panic_hook();
+
+                // return the magic
+                &MY_MAGIC
+            }
+
+            #[cfg(feature = "pg18")]
+            {
+                struct PgMagicstruct(::pgrx::pg_sys::Pg_magic_struct);
+                unsafe impl Sync for PgMagicstruct {}
+                static MY_MAGIC: PgMagicstruct = PgMagicstruct(::pgrx::pg_sys::Pg_magic_struct {
+                    len: ::core::mem::size_of::<::pgrx::pg_sys::Pg_magic_struct>() as i32,
+                    abi_fields: ::pgrx::pg_sys::Pg_abi_values {
+                        version: ::pgrx::pg_sys::PG_VERSION_NUM as i32 / 100,
+                        funcmaxargs: ::pgrx::pg_sys::FUNC_MAX_ARGS as i32,
+                        indexmaxkeys: ::pgrx::pg_sys::INDEX_MAX_KEYS as i32,
+                        namedatalen: ::pgrx::pg_sys::NAMEDATALEN as i32,
+                        float8byval: cfg!(target_pointer_width = "64") as i32,
+                        abi_extra: {
+                            // we'll use what the bindings tell us, but if it ain't "PostgreSQL" then we'll
+                            // raise a compilation error unless the `unsafe-postgres` feature is set
+                            let magic = ::pgrx::pg_sys::FMGR_ABI_EXTRA.to_bytes_with_nul();
+                            let mut abi = [0 as ::pgrx::ffi::c_char; 32];
+                            let mut i = 0;
+                            while i < magic.len() {
+                                abi[i] = magic[i] as ::pgrx::ffi::c_char;
+                                i += 1;
+                            }
+                            abi
+                        },
                     },
-                },
-                name: $name.as_ptr(),
-                version: $version.as_ptr(),
-            });
+                    name: $name.as_ptr(),
+                    version: $version.as_ptr(),
+                });
 
-            // since Postgres calls this first, register our panic handler now
-            // so we don't unwind into C / Postgres
-            ::pgrx::pg_sys::panic::register_pg_guard_panic_hook();
+                // since Postgres calls this first, register our panic handler now
+                // so we don't unwind into C / Postgres
+                ::pgrx::pg_sys::panic::register_pg_guard_panic_hook();
 
-            // return the magic
-            &MY_MAGIC.0
+                // return the magic
+                &MY_MAGIC.0
+            }
         }
     };
 }

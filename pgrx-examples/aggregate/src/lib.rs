@@ -14,16 +14,7 @@ use pgrx::StringInfo;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
-#[cfg(any(
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15",
-    feature = "pg16",
-    feature = "pg17"
-))]
-pgrx::pg_module_magic!();
-#[cfg(any(feature = "pg18"))]
-pgrx::pg_module_magic_ext!(c"aggregate", pgrx::pg_sys::PG_VERSION);
+pgrx::pg_module_magic!(c"aggregate", pgrx::pg_sys::PG_VERSION);
 
 #[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
 #[pgvarlena_inoutfuncs]

@@ -15,16 +15,7 @@ use pgrx::{pg_shmem_init, warning};
 use serde::*;
 use std::sync::atomic::Ordering;
 
-#[cfg(any(
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15",
-    feature = "pg16",
-    feature = "pg17"
-))]
-pgrx::pg_module_magic!();
-#[cfg(any(feature = "pg18"))]
-pgrx::pg_module_magic_ext!(c"shmem", pgrx::pg_sys::PG_VERSION);
+pgrx::pg_module_magic!(c"shmem", pgrx::pg_sys::PG_VERSION);
 
 // types behind a `LwLock` must derive/implement `Copy` and `Clone`
 #[derive(Copy, Clone)]

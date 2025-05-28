@@ -13,16 +13,7 @@ use serde::{Deserialize, Serialize};
 mod derived;
 mod pgvarlena;
 
-#[cfg(any(
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15",
-    feature = "pg16",
-    feature = "pg17"
-))]
-pgrx::pg_module_magic!();
-#[cfg(any(feature = "pg18"))]
-pgrx::pg_module_magic_ext!(c"operators", pgrx::pg_sys::PG_VERSION);
+pgrx::pg_module_magic!(c"operators", pgrx::pg_sys::PG_VERSION);
 
 #[derive(PostgresType, Serialize, Deserialize, Eq, PartialEq)]
 pub struct MyType {

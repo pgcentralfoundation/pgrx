@@ -10,16 +10,7 @@
 use pgrx::prelude::*;
 use rand::Rng;
 
-#[cfg(any(
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15",
-    feature = "pg16",
-    feature = "pg17"
-))]
-pgrx::pg_module_magic!();
-#[cfg(any(feature = "pg18"))]
-pgrx::pg_module_magic_ext!(c"datetime", pgrx::pg_sys::PG_VERSION);
+pgrx::pg_module_magic!(c"datetime", pgrx::pg_sys::PG_VERSION);
 
 #[pg_extern(name = "to_iso_string", immutable, parallel_safe)]
 fn to_iso_string(tsz: TimestampWithTimeZone) -> String {

@@ -14,16 +14,7 @@ use std::io::{Read, Write};
 use std::panic::catch_unwind;
 use std::process::Command;
 
-#[cfg(any(
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15",
-    feature = "pg16",
-    feature = "pg17"
-))]
-pgrx::pg_module_magic!();
-#[cfg(any(feature = "pg18"))]
-pgrx::pg_module_magic_ext!(c"bad_ideas", pgrx::pg_sys::PG_VERSION);
+pgrx::pg_module_magic!(c"bad_ideas", pgrx::pg_sys::PG_VERSION);
 
 #[pg_extern]
 fn panic(s: &str) -> bool {

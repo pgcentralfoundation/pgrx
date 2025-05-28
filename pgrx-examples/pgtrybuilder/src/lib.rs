@@ -10,16 +10,7 @@
 use pgrx::pg_sys::panic::CaughtError;
 use pgrx::prelude::*;
 
-#[cfg(any(
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15",
-    feature = "pg16",
-    feature = "pg17"
-))]
-pgrx::pg_module_magic!();
-#[cfg(any(feature = "pg18"))]
-pgrx::pg_module_magic_ext!(c"pgtrybuilder", pgrx::pg_sys::PG_VERSION);
+pgrx::pg_module_magic!(c"pgtrybuilder", pgrx::pg_sys::PG_VERSION);
 
 #[pg_extern]
 fn is_valid_number(i: i32) -> i32 {

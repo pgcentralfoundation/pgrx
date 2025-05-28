@@ -9,16 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use pgrx::prelude::*;
 
-#[cfg(any(
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15",
-    feature = "pg16",
-    feature = "pg17"
-))]
-pgrx::pg_module_magic!();
-#[cfg(any(feature = "pg18"))]
-pgrx::pg_module_magic_ext!(c"spi_srf", pgrx::pg_sys::PG_VERSION);
+pgrx::pg_module_magic!(c"spi_srf", pgrx::pg_sys::PG_VERSION);
 
 extension_sql!(
     r#"

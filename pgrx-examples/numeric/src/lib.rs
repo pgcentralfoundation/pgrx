@@ -10,16 +10,7 @@
 #![allow(clippy::assign_op_pattern)]
 use pgrx::prelude::*;
 
-#[cfg(any(
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15",
-    feature = "pg16",
-    feature = "pg17"
-))]
-pgrx::pg_module_magic!();
-#[cfg(any(feature = "pg18"))]
-pgrx::pg_module_magic_ext!(c"numeric", pgrx::pg_sys::PG_VERSION);
+pgrx::pg_module_magic!(c"numeric", pgrx::pg_sys::PG_VERSION);
 
 #[pg_extern]
 fn add_numeric(a: Numeric<1000, 33>, b: Numeric<1000, 33>) -> Numeric<1000, 33> {

@@ -16,16 +16,7 @@ mod hstore_clone;
 mod ordered;
 mod rust_enum;
 
-#[cfg(any(
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15",
-    feature = "pg16",
-    feature = "pg17"
-))]
-pgrx::pg_module_magic!();
-#[cfg(any(feature = "pg18"))]
-pgrx::pg_module_magic_ext!(c"custom_types", pgrx::pg_sys::PG_VERSION);
+pgrx::pg_module_magic!(c"custom_types", pgrx::pg_sys::PG_VERSION);
 
 #[cfg(test)]
 pub mod pg_test {
