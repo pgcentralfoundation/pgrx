@@ -14,7 +14,6 @@ pub use pgrx_macros::PostgresGucEnum;
 use std::cell::Cell;
 use std::ffi::c_void;
 
-
 /// Defines at what level this GUC can be set
 pub enum GucContext {
     /// cannot be set by the user at all, but only through
@@ -213,7 +212,124 @@ where
 /// A struct that has associated functions to register new GUCs
 pub struct GucRegistry {}
 impl GucRegistry {
+    // GUC Registration functions that do not expose hooks
     pub fn define_bool_guc(
+        name: &str,
+        short_description: &str,
+        long_description: &str,
+        setting: &GucSetting<bool>,
+        context: GucContext,
+        flags: GucFlags,
+    ) {
+        GucRegistry::define_bool_guc_with_hooks(
+            name,
+            short_description,
+            long_description,
+            setting,
+            context,
+            flags,
+            None,
+            None,
+            None,
+        );
+    }
+
+    pub fn define_int_guc(
+        name: &str,
+        short_description: &str,
+        long_description: &str,
+        setting: &GucSetting<i32>,
+        min_value: i32,
+        max_value: i32,
+        context: GucContext,
+        flags: GucFlags,
+    ) {
+        GucRegistry::define_int_guc_with_hooks(
+            name,
+            short_description,
+            long_description,
+            setting,
+            min_value,
+            max_value,
+            context,
+            flags,
+            None,
+            None,
+            None,
+        );
+    }
+
+    pub fn define_string_guc(
+        name: &str,
+        short_description: &str,
+        long_description: &str,
+        setting: &GucSetting<Option<&'static CStr>>,
+        context: GucContext,
+        flags: GucFlags,
+    ) {
+        GucRegistry::define_string_guc_with_hooks(
+            name,
+            short_description,
+            long_description,
+            setting,
+            context,
+            flags,
+            None,
+            None,
+            None,
+        );
+    }
+
+    pub fn define_float_guc(
+        name: &str,
+        short_description: &str,
+        long_description: &str,
+        setting: &GucSetting<f64>,
+        min_value: f64,
+        max_value: f64,
+        context: GucContext,
+        flags: GucFlags,
+    ) {
+        GucRegistry::define_float_guc_with_hooks(
+            name,
+            short_description,
+            long_description,
+            setting,
+            min_value,
+            max_value,
+            context,
+            flags,
+            None,
+            None,
+            None,
+        );
+    }
+
+    pub fn define_enum_guc<T>(
+        name: &str,
+        short_description: &str,
+        long_description: &str,
+        setting: &GucSetting<T>,
+        context: GucContext,
+        flags: GucFlags,
+    ) where
+        T: GucEnum<T> + Copy,
+    {
+        GucRegistry::define_enum_guc_with_hooks(
+            name,
+            short_description,
+            long_description,
+            setting,
+            context,
+            flags,
+            None,
+            None,
+            None,
+        );
+    }
+
+    // GUC Registration functions that expose hooks
+    pub fn define_bool_guc_with_hooks(
         name: &str,
         short_description: &str,
         long_description: &str,
@@ -240,7 +356,7 @@ impl GucRegistry {
         }
     }
 
-    pub fn define_int_guc(
+    pub fn define_int_guc_with_hooks(
         name: &str,
         short_description: &str,
         long_description: &str,
@@ -271,7 +387,7 @@ impl GucRegistry {
         }
     }
 
-    pub fn define_string_guc(
+    pub fn define_string_guc_with_hooks(
         name: &str,
         short_description: &str,
         long_description: &str,
@@ -302,7 +418,7 @@ impl GucRegistry {
         }
     }
 
-    pub fn define_float_guc(
+    pub fn define_float_guc_with_hooks(
         name: &str,
         short_description: &str,
         long_description: &str,
@@ -333,7 +449,7 @@ impl GucRegistry {
         }
     }
 
-    pub fn define_enum_guc<T>(
+    pub fn define_enum_guc_with_hooks<T>(
         name: &str,
         short_description: &str,
         long_description: &str,

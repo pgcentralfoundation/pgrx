@@ -27,9 +27,6 @@ mod tests {
             &GUC,
             GucContext::Userset,
             GucFlags::default(),
-            None,
-            None,
-            None,
         );
         assert_eq!(GUC.get(), true);
 
@@ -52,9 +49,6 @@ mod tests {
             42,
             GucContext::Userset,
             GucFlags::default(),
-            None,
-            None,
-            None,
         );
         assert_eq!(GUC.get(), 42);
 
@@ -77,9 +71,6 @@ mod tests {
             42000,
             GucContext::Userset,
             GucFlags::UNIT_MB,
-            None,
-            None,
-            None,
         );
         assert_eq!(GUC.get(), 42);
 
@@ -99,9 +90,6 @@ mod tests {
             43.0f64,
             GucContext::Userset,
             GucFlags::default(),
-            None,
-            None,
-            None,
         );
         assert_eq!(GUC.get(), 42.42);
 
@@ -126,9 +114,6 @@ mod tests {
             &GUC,
             GucContext::Userset,
             GucFlags::default(),
-            None,
-            None,
-            None,
         );
         assert!(GUC.get().is_some());
         assert_eq!(GUC.get().unwrap().to_str().unwrap(), "this is a test");
@@ -151,9 +136,6 @@ mod tests {
             &GUC,
             GucContext::Userset,
             GucFlags::default(),
-            None,
-            None,
-            None,
         );
         assert!(GUC.get().is_none());
 
@@ -180,9 +162,6 @@ mod tests {
             &GUC,
             GucContext::Userset,
             GucFlags::default(),
-            None,
-            None,
-            None,
         );
         assert_eq!(GUC.get(), TestEnum::Two);
 
@@ -207,9 +186,6 @@ mod tests {
             &GUC_NO_SHOW,
             GucContext::Userset,
             no_show_flag,
-            None,
-            None,
-            None,
         );
         GucRegistry::define_bool_guc(
             "test.no_reset_all",
@@ -218,9 +194,6 @@ mod tests {
             &GUC_NO_RESET_ALL,
             GucContext::Userset,
             GucFlags::NO_RESET_ALL,
-            None,
-            None,
-            None,
         );
 
         // change both, then check that:
