@@ -279,7 +279,7 @@ impl GucRegistry {
         context: GucContext,
         flags: GucFlags,
         check_hook: Option<
-            unsafe extern "C-unwind" fn(*mut *mut PlatformAgnosticI8, *mut *mut c_void, u32) -> bool,
+            unsafe extern "C-unwind" fn(*mut *mut libc::c_char, *mut *mut c_void, u32) -> bool,
         >,
         assign_hook: Option<unsafe extern "C-unwind" fn(*const libc::c_char, *mut c_void)>,
         show_hook: Option<unsafe extern "C-unwind" fn() -> *const libc::c_char>,
