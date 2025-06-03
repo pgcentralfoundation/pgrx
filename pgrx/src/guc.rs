@@ -330,15 +330,14 @@ impl GucRegistry {
         }
     }
 
-    pub fn define_enum_guc<T>(
+    pub fn define_enum_guc<T: GucEnum>(
         name: &'static CStr,
         short_description: &'static CStr,
         long_description: &'static CStr,
         setting: &'static GucSetting<T>,
         context: GucContext,
         flags: GucFlags,
-    ) 
-    {
+    ) {
         setting.value.set(setting.boot_val.to_ordinal());
         unsafe {
             pg_sys::DefineCustomEnumVariable(
@@ -526,7 +525,7 @@ impl GucRegistry {
         check_hook: pg_sys::GucEnumCheckHook,
         assign_hook: pg_sys::GucEnumAssignHook,
         show_hook: pg_sys::GucShowHook,
-        )    {
+    ) {
         setting.value.set(setting.boot_val.to_ordinal());
         unsafe {
             pg_sys::DefineCustomEnumVariable(
