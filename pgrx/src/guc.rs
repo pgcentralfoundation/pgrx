@@ -328,7 +328,13 @@ impl GucRegistry {
         );
     }
 
-    // GUC Registration functions that expose hooks
+    /// Define a boolean GUC with custom hooks.
+    /// 
+    /// # Hooks
+    /// 
+    /// * `check_hook` - Validates new values. Return false to reject.
+    /// * `assign_hook` - Called after value is set. Use for side effects.
+    /// * `show_hook` - Returns custom display string for SHOW commands.
     pub fn define_bool_guc_with_hooks(
         name: &str,
         short_description: &str,
@@ -336,9 +342,9 @@ impl GucRegistry {
         setting: &GucSetting<bool>,
         context: GucContext,
         flags: GucFlags,
-        check_hook: Option<unsafe extern "C-unwind" fn(*mut bool, *mut *mut c_void, u32) -> bool>,
-        assign_hook: Option<unsafe extern "C-unwind" fn(bool, *mut c_void)>,
-        show_hook: Option<unsafe extern "C-unwind" fn() -> *const libc::c_char>,
+        check_hook: pg_sys::GucBoolCheckHook,
+        assign_hook: pg_sys::GucBoolAssignHook,
+        show_hook: pgsys::GucShowHook,
     ) {
         unsafe {
             pg_sys::DefineCustomBoolVariable(
@@ -365,9 +371,9 @@ impl GucRegistry {
         max_value: i32,
         context: GucContext,
         flags: GucFlags,
-        check_hook: Option<unsafe extern "C-unwind" fn(*mut i32, *mut *mut c_void, u32) -> bool>,
-        assign_hook: Option<unsafe extern "C-unwind" fn(i32, *mut c_void)>,
-        show_hook: Option<unsafe extern "C-unwind" fn() -> *const libc::c_char>,
+        check_hook: pg_sys::GucIntCheckHook,
+        assign_hook: pg_sys::GucIntAssignHook,
+        show_hook: pgsys::GucShowHook,
     ) {
         unsafe {
             pg_sys::DefineCustomIntVariable(
@@ -394,11 +400,9 @@ impl GucRegistry {
         setting: &GucSetting<Option<&'static CStr>>,
         context: GucContext,
         flags: GucFlags,
-        check_hook: Option<
-            unsafe extern "C-unwind" fn(*mut *mut libc::c_char, *mut *mut c_void, u32) -> bool,
-        >,
-        assign_hook: Option<unsafe extern "C-unwind" fn(*const libc::c_char, *mut c_void)>,
-        show_hook: Option<unsafe extern "C-unwind" fn() -> *const libc::c_char>,
+        check_hook: pg_sys::GucStringCheckHook,
+        assign_hook: pg_sys::GucStringAssignHook,
+        show_hook: pgsys::GucShowHook,
     ) {
         unsafe {
             let boot_val = setting.boot_val.map_or(std::ptr::null(), |s| s.as_ptr());
@@ -427,9 +431,9 @@ impl GucRegistry {
         max_value: f64,
         context: GucContext,
         flags: GucFlags,
-        check_hook: Option<unsafe extern "C-unwind" fn(*mut f64, *mut *mut c_void, u32) -> bool>,
-        assign_hook: Option<unsafe extern "C-unwind" fn(f64, *mut c_void)>,
-        show_hook: Option<unsafe extern "C-unwind" fn() -> *const libc::c_char>,
+        check_hook: pg_sys::GucRealCheckHook,
+        assign_hook: pg_sys::GucRealAssignHook,
+        show_hook: pgsys::GucShowHook,
     ) {
         unsafe {
             pg_sys::DefineCustomRealVariable(
@@ -456,9 +460,9 @@ impl GucRegistry {
         setting: &GucSetting<T>,
         context: GucContext,
         flags: GucFlags,
-        check_hook: Option<unsafe extern "C-unwind" fn(*mut i32, *mut *mut c_void, u32) -> bool>,
-        assign_hook: Option<unsafe extern "C-unwind" fn(i32, *mut c_void)>,
-        show_hook: Option<unsafe extern "C-unwind" fn() -> *const libc::c_char>,
+        check_hook: pg_sys::GucEnumCheckHook,
+        assign_hook: pg_sys::GucEnumAssignkHook,
+        show_hook: pgsys::GucShowHook,
     ) where
         T: GucEnum<T> + Copy,
     {
