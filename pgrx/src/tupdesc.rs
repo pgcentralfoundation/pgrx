@@ -299,6 +299,19 @@ fn tupdesc_get_attr(
     &atts[attno]
 }
 
+/// `attno` is 0-based
+#[cfg(feature = "pg18")]
+#[inline]
+fn tupdesc_get_attr(
+    tupdesc: &PgBox<pg_sys::TupleDescData>,
+    attno: usize,
+) -> &pg_sys::FormData_pg_attribute {
+    let att_pointer =
+        unsafe { tupdesc.compact_attrs.as_ptr().add(tupdesc.natts.try_into().unwrap()).cast() };
+    let atts = unsafe { std::slice::from_raw_parts(att_pointer, tupdesc.natts as usize) };
+    &atts[attno]
+}
+
 pub struct TupleDescIterator<'a> {
     tupdesc: &'a PgTupleDesc<'a>,
     curr: usize,

@@ -10,7 +10,7 @@
 use pgrx::prelude::*;
 use serde::{Deserialize, Serialize};
 
-::pgrx::pg_module_magic!();
+pgrx::pg_module_magic!(c"custom_sql", pgrx::pg_sys::PG_VERSION);
 
 #[pg_schema]
 mod home {

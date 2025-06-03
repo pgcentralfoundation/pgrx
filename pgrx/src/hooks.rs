@@ -26,7 +26,13 @@ use std::ops::Deref;
 // that option will always be set to None at runtime.
 pub struct JumbleState {}
 
-#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
+#[cfg(any(
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17",
+    feature = "pg18"
+))]
 pub use pg_sys::JumbleState;
 
 pub struct HookResult<T> {
@@ -58,6 +64,13 @@ pub trait PgHooks {
     }
 
     /// Hook for plugins to get control in ExecutorStart()
+    #[cfg(any(
+        feature = "pg13",
+        feature = "pg14",
+        feature = "pg15",
+        feature = "pg16",
+        feature = "pg17"
+    ))]
     fn executor_start(
         &mut self,
         query_desc: PgBox<pg_sys::QueryDesc>,
@@ -67,7 +80,25 @@ pub trait PgHooks {
         prev_hook(query_desc, eflags)
     }
 
+    /// Hook for plugins to get control in ExecutorStart()
+    #[cfg(feature = "pg18")]
+    fn executor_start(
+        &mut self,
+        query_desc: PgBox<pg_sys::QueryDesc>,
+        eflags: i32,
+        prev_hook: fn(query_desc: PgBox<pg_sys::QueryDesc>, eflags: i32) -> HookResult<bool>,
+    ) -> HookResult<bool> {
+        prev_hook(query_desc, eflags)
+    }
+
     /// Hook for plugins to get control in ExecutorRun()
+    #[cfg(any(
+        feature = "pg13",
+        feature = "pg14",
+        feature = "pg15",
+        feature = "pg16",
+        feature = "pg17"
+    ))]
     fn executor_run(
         &mut self,
         query_desc: PgBox<pg_sys::QueryDesc>,
@@ -82,6 +113,22 @@ pub trait PgHooks {
         ) -> HookResult<()>,
     ) -> HookResult<()> {
         prev_hook(query_desc, direction, count, execute_once)
+    }
+
+    /// Hook for plugins to get control in ExecutorRun()
+    #[cfg(feature = "pg18")]
+    fn executor_run(
+        &mut self,
+        query_desc: PgBox<pg_sys::QueryDesc>,
+        direction: pg_sys::ScanDirection::Type,
+        count: u64,
+        prev_hook: fn(
+            query_desc: PgBox<pg_sys::QueryDesc>,
+            direction: pg_sys::ScanDirection::Type,
+            count: u64,
+        ) -> HookResult<()>,
+    ) -> HookResult<()> {
+        prev_hook(query_desc, direction, count)
     }
 
     /// Hook for plugins to get control in ExecutorFinish()
@@ -214,7 +261,7 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
         .replace(pgrx_executor_check_perms)
         .or(Some(pgrx_standard_executor_check_perms_wrapper));
 
-    #[cfg(any(feature = "pg16", feature = "pg17"))]
+    #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
     let prev_executor_check_perms_hook = pg_sys::ExecutorCheckPerms_hook
         .replace(pgrx_executor_check_perms)
         .or(Some(pgrx_standard_executor_check_perms_wrapper));
@@ -259,6 +306,13 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
     pg_sys::RegisterXactCallback(Some(xact_callback), std::ptr::null_mut());
 }
 
+#[cfg(any(
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17"
+))]
 #[pg_guard]
 unsafe extern "C-unwind" fn pgrx_executor_start(query_desc: *mut pg_sys::QueryDesc, eflags: i32) {
     fn prev(query_desc: PgBox<pg_sys::QueryDesc>, eflags: i32) -> HookResult<()> {
@@ -274,6 +328,33 @@ unsafe extern "C-unwind" fn pgrx_executor_start(query_desc: *mut pg_sys::QueryDe
     hook.executor_start(PgBox::from_pg(query_desc), eflags, prev);
 }
 
+#[cfg(feature = "pg18")]
+#[pg_guard]
+unsafe extern "C-unwind" fn pgrx_executor_start(
+    query_desc: *mut pg_sys::QueryDesc,
+    eflags: i32,
+) -> bool {
+    fn prev(query_desc: PgBox<pg_sys::QueryDesc>, eflags: i32) -> HookResult<bool> {
+        let res = unsafe {
+            (HOOKS.as_mut().unwrap().prev_executor_start_hook.as_ref().unwrap())(
+                query_desc.into_pg(),
+                eflags,
+            )
+        };
+        HookResult::new(res)
+    }
+    let hook = &mut HOOKS.as_mut().unwrap().current_hook;
+    hook.executor_start(PgBox::from_pg(query_desc), eflags, prev);
+    true
+}
+
+#[cfg(any(
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17"
+))]
 #[pg_guard]
 unsafe extern "C-unwind" fn pgrx_executor_run(
     query_desc: *mut pg_sys::QueryDesc,
@@ -299,6 +380,31 @@ unsafe extern "C-unwind" fn pgrx_executor_run(
     }
     let hook = &mut HOOKS.as_mut().unwrap().current_hook;
     hook.executor_run(PgBox::from_pg(query_desc), direction, count, execute_once, prev);
+}
+
+#[cfg(feature = "pg18")]
+#[pg_guard]
+unsafe extern "C-unwind" fn pgrx_executor_run(
+    query_desc: *mut pg_sys::QueryDesc,
+    direction: pg_sys::ScanDirection::Type,
+    count: u64,
+) {
+    fn prev(
+        query_desc: PgBox<pg_sys::QueryDesc>,
+        direction: pg_sys::ScanDirection::Type,
+        count: u64,
+    ) -> HookResult<()> {
+        unsafe {
+            (HOOKS.as_mut().unwrap().prev_executor_run_hook.as_ref().unwrap())(
+                query_desc.into_pg(),
+                direction,
+                count,
+            )
+        }
+        HookResult::new(())
+    }
+    let hook = &mut HOOKS.as_mut().unwrap().current_hook;
+    hook.executor_run(PgBox::from_pg(query_desc), direction, count, prev);
 }
 
 #[pg_guard]
@@ -349,7 +455,7 @@ unsafe extern "C-unwind" fn pgrx_executor_check_perms(
     hook.executor_check_perms(PgList::from_pg(range_table), None, ereport_on_violation, prev).inner
 }
 
-#[cfg(any(feature = "pg16", feature = "pg17"))]
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
 #[pg_guard]
 unsafe extern "C-unwind" fn pgrx_executor_check_perms(
     range_table: *mut pg_sys::List,
@@ -427,7 +533,13 @@ unsafe extern "C-unwind" fn pgrx_process_utility(
     )
     .inner
 }
-#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
+#[cfg(any(
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17",
+    feature = "pg18"
+))]
 #[pg_guard]
 unsafe extern "C-unwind" fn pgrx_process_utility(
     pstmt: *mut pg_sys::PlannedStmt,
@@ -544,7 +656,13 @@ unsafe extern "C-unwind" fn pgrx_post_parse_analyze(
     hook.post_parse_analyze(PgBox::from_pg(parse_state), PgBox::from_pg(query), None, prev).inner
 }
 
-#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
+#[cfg(any(
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17",
+    feature = "pg18"
+))]
 #[pg_guard]
 unsafe extern "C-unwind" fn pgrx_post_parse_analyze(
     parse_state: *mut pg_sys::ParseState,
@@ -591,6 +709,13 @@ unsafe extern "C-unwind" fn pgrx_emit_log(error_data: *mut pg_sys::ErrorData) {
     hook.emit_log(PgBox::from_pg(error_data), prev).inner
 }
 
+#[cfg(any(
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17"
+))]
 #[pg_guard]
 unsafe extern "C-unwind" fn pgrx_standard_executor_start_wrapper(
     query_desc: *mut pg_sys::QueryDesc,
@@ -599,6 +724,22 @@ unsafe extern "C-unwind" fn pgrx_standard_executor_start_wrapper(
     pg_sys::standard_ExecutorStart(query_desc, eflags)
 }
 
+#[cfg(feature = "pg18")]
+#[pg_guard]
+unsafe extern "C-unwind" fn pgrx_standard_executor_start_wrapper(
+    query_desc: *mut pg_sys::QueryDesc,
+    eflags: i32,
+) -> bool {
+    pg_sys::standard_ExecutorStart(query_desc, eflags)
+}
+
+#[cfg(any(
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17"
+))]
 #[pg_guard]
 unsafe extern "C-unwind" fn pgrx_standard_executor_run_wrapper(
     query_desc: *mut pg_sys::QueryDesc,
@@ -607,6 +748,16 @@ unsafe extern "C-unwind" fn pgrx_standard_executor_run_wrapper(
     execute_once: bool,
 ) {
     pg_sys::standard_ExecutorRun(query_desc, direction, count, execute_once)
+}
+
+#[cfg(feature = "pg18")]
+#[pg_guard]
+unsafe extern "C-unwind" fn pgrx_standard_executor_run_wrapper(
+    query_desc: *mut pg_sys::QueryDesc,
+    direction: pg_sys::ScanDirection::Type,
+    count: u64,
+) {
+    pg_sys::standard_ExecutorRun(query_desc, direction, count)
 }
 
 #[pg_guard]
@@ -630,7 +781,7 @@ unsafe extern "C-unwind" fn pgrx_standard_executor_check_perms_wrapper(
     true
 }
 
-#[cfg(any(feature = "pg16", feature = "pg17"))]
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
 #[pg_guard]
 unsafe extern "C-unwind" fn pgrx_standard_executor_check_perms_wrapper(
     _range_table: *mut pg_sys::List,
@@ -662,7 +813,13 @@ unsafe extern "C-unwind" fn pgrx_standard_process_utility_wrapper(
     )
 }
 
-#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
+#[cfg(any(
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17",
+    feature = "pg18"
+))]
 #[pg_guard]
 unsafe extern "C-unwind" fn pgrx_standard_process_utility_wrapper(
     pstmt: *mut pg_sys::PlannedStmt,

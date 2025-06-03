@@ -10,7 +10,7 @@
 use pgrx::prelude::*;
 use rand::Rng;
 
-::pgrx::pg_module_magic!();
+pgrx::pg_module_magic!(c"datetime", pgrx::pg_sys::PG_VERSION);
 
 #[pg_extern(name = "to_iso_string", immutable, parallel_safe)]
 fn to_iso_string(tsz: TimestampWithTimeZone) -> String {

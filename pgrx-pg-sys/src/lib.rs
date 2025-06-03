@@ -9,9 +9,9 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #[cfg(
     // no features at all will cause problems
-    not(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17")),
+    not(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))
 )]
-std::compile_error!("exactly one feature must be provided (pg13, pg14, pg15, pg16, pg17)");
+std::compile_error!("exactly one feature must be provided (pg13, pg14, pg15, pg16, pg17, pg18)");
 
 mod cshim;
 mod cstr;
@@ -27,6 +27,9 @@ pub use cstr::AsPgCStr;
 pub use include::*;
 pub use node::PgNode;
 pub use port::*;
+
+// For postgres 18+, some functions will reexport when enabling `cshim` feature
+#[allow(ambiguous_glob_reexports)]
 pub use submodules::*;
 
 mod seal {

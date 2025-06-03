@@ -70,9 +70,9 @@ unsafe impl Enlist for pg_sys::Oid {
     }
 }
 
-#[cfg(any(feature = "pg16", feature = "pg17"))]
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
 impl Sealed for pg_sys::TransactionId {}
-#[cfg(any(feature = "pg16", feature = "pg17"))]
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
 unsafe impl Enlist for pg_sys::TransactionId {
     const LIST_TAG: pg_sys::NodeTag = pg_sys::NodeTag::T_XidList;
 

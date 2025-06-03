@@ -14,7 +14,7 @@ use std::io::{Read, Write};
 use std::panic::catch_unwind;
 use std::process::Command;
 
-::pgrx::pg_module_magic!();
+pgrx::pg_module_magic!(c"bad_ideas", pgrx::pg_sys::PG_VERSION);
 
 #[pg_extern]
 fn panic(s: &str) -> bool {

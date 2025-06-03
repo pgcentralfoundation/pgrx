@@ -97,6 +97,7 @@ These `sql` files must be generated from data within the Rust code. The SQL gene
 - Create 'Shell types', in & out functions, and 'Base types' for each `#[derive(PostgresType)]` marked type.
   ```rust
   #[derive(PostgresType, Serialize, Deserialize, Debug, Eq, PartialEq)]
+  #[pg_binary_protocol]
   pub struct Animals {
       names: Vec<String>,
       age_lookup: HashMap<i32, String>,
@@ -140,6 +141,7 @@ These `sql` files must be generated from data within the Rust code. The SQL gene
       Eq, PartialEq, Ord, Hash, PartialOrd,
       PostgresType, Serialize, Deserialize
   )]
+  #[pg_binary_protocol]
   pub struct Thing(String);
   ```
   ```sql

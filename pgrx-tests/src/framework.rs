@@ -584,9 +584,11 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
         #[inline]
         fn accept_envar(var: &str) -> bool {
             // taken from https://doc.rust-lang.org/cargo/reference/environment-variables.html
+            // and https://releases.llvm.org/12.0.1/tools/clang/docs/SourceBasedCodeCoverage.html
             var.starts_with("CARGO")
                 || var.starts_with("RUST")
                 || var.starts_with("DEP_")
+                || var.starts_with("LLVM_")
                 || ["OUT_DIR", "TARGET", "HOST", "NUM_JOBS", "OPT_LEVEL", "DEBUG", "PROFILE"]
                     .contains(&var)
         }
