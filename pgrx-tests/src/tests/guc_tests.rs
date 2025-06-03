@@ -241,7 +241,7 @@ mod tests {
         unsafe extern "C-unwind" fn check_hook(
             newval: *mut bool,
             _extra: *mut *mut std::ffi::c_void,
-            _source: u32,
+            _source: pg_sys::GucSource::Type,
         ) -> bool {
             if *newval {
                 *SIDE_EFFECT.write().unwrap() += 1;
