@@ -12,8 +12,7 @@ use crate::pg_sys;
 use core::ffi::CStr;
 pub use pgrx_macros::PostgresGucEnum;
 use std::cell::Cell;
-use std::ffi::c_void;
-use std::ffi::CString;
+use std::ffi::{c_void, CString};
 
 /// Defines at what level this GUC can be set
 pub enum GucContext {
@@ -235,17 +234,20 @@ impl GucRegistry {
         context: GucContext,
         flags: GucFlags,
     ) {
-        GucRegistry::define_bool_guc_with_hooks(
-            name,
-            short_description,
-            long_description,
-            setting,
-            context,
-            flags,
-            None,
-            None,
-            None,
-        );
+        unsafe {
+            pg_sys::DefineCustomBoolVariable(
+                name.as_ptr(),
+                short_description.as_ptr(),
+                long_description.as_ptr(),
+                setting.value.as_ptr(),
+                setting.value.get(),
+                context as isize as _,
+                flags.bits(),
+                None,
+                None,
+                None,
+            );
+        }
     }
 
     pub fn define_int_guc(
@@ -258,19 +260,22 @@ impl GucRegistry {
         context: GucContext,
         flags: GucFlags,
     ) {
-        GucRegistry::define_int_guc_with_hooks(
-            name,
-            short_description,
-            long_description,
-            setting,
-            min_value,
-            max_value,
-            context,
-            flags,
-            None,
-            None,
-            None,
-        );
+        unsafe {
+            pg_sys::DefineCustomIntVariable(
+                name.as_ptr(),
+                short_description.as_ptr(),
+                long_description.as_ptr(),
+                setting.value.as_ptr(),
+                setting.value.get(),
+                min_value,
+                max_value,
+                context as isize as _,
+                flags.bits(),
+                None,
+                None,
+                None,
+            )
+        }
     }
 
     pub fn define_string_guc(
@@ -281,17 +286,20 @@ impl GucRegistry {
         context: GucContext,
         flags: GucFlags,
     ) {
-        GucRegistry::define_string_guc_with_hooks(
-            name,
-            short_description,
-            long_description,
-            setting,
-            context,
-            flags,
-            None,
-            None,
-            None,
-        );
+        unsafe {
+            pg_sys::DefineCustomStringVariable(
+                name.as_ptr(),
+                short_description.as_ptr(),
+                long_description.as_ptr(),
+                setting.value.as_ptr(),
+                setting.value.get(),
+                context as isize as _,
+                flags.bits(),
+                None,
+                None,
+                None,
+            );
+        }
     }
 
     pub fn define_float_guc(
@@ -304,19 +312,22 @@ impl GucRegistry {
         context: GucContext,
         flags: GucFlags,
     ) {
-        GucRegistry::define_float_guc_with_hooks(
-            name,
-            short_description,
-            long_description,
-            setting,
-            min_value,
-            max_value,
-            context,
-            flags,
-            None,
-            None,
-            None,
-        );
+        unsafe {
+            pg_sys::DefineCustomRealVariable(
+                name.as_ptr(),
+                short_description.as_ptr(),
+                long_description.as_ptr(),
+                setting.value.as_ptr(),
+                setting.value.get(),
+                min_value,
+                max_value,
+                context as isize as _,
+                flags.bits(),
+                None,
+                None,
+                None,
+            );
+        }
     }
 
     pub fn define_enum_guc<T>(
@@ -329,17 +340,22 @@ impl GucRegistry {
     ) where
         T: GucEnum<T> + Copy,
     {
-        GucRegistry::define_enum_guc_with_hooks(
-            name,
-            short_description,
-            long_description,
-            setting,
-            context,
-            flags,
-            None,
-            None,
-            None,
-        );
+        setting.value.set(setting.boot_val.to_ordinal());
+        unsafe {
+            pg_sys::DefineCustomEnumVariable(
+                name.as_ptr(),
+                short_description.as_ptr(),
+                long_description.as_ptr(),
+                setting.value.as_ptr(),
+                setting.value.get(),
+                T::CONFIG_ENUM_ENTRY,
+                context as isize as _,
+                flags.bits(),
+                None,
+                None,
+                None,
+            );
+        }
     }
 
     /// Define a boolean GUC with custom hooks.
@@ -349,7 +365,14 @@ impl GucRegistry {
     /// * `check_hook` - Validates new values. Return false to reject.
     /// * `assign_hook` - Called after value is set. Use for side effects.
     /// * `show_hook` - Returns custom display string for SHOW commands.
-    pub fn define_bool_guc_with_hooks(
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because hook functions must be properly guarded against Rust panics.
+    /// Any hook function that might panic must be marked with `#[pg_guard]` to ensure proper
+    /// conversion of Rust panics into PostgreSQL errors.
+    ///
+    pub unsafe fn define_bool_guc_with_hooks(
         name: &'static CStr,
         short_description: &'static CStr,
         long_description: &'static CStr,
@@ -376,7 +399,14 @@ impl GucRegistry {
         }
     }
 
-    pub fn define_int_guc_with_hooks(
+    /// Define an integer GUC with custom hooks.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because hook functions must be properly guarded against Rust panics.
+    /// Any hook function that might panic must be marked with `#[pg_guard]` to ensure proper
+    /// conversion of Rust panics into PostgreSQL errors.
+    pub unsafe fn define_int_guc_with_hooks(
         name: &'static CStr,
         short_description: &'static CStr,
         long_description: &'static CStr,
@@ -407,7 +437,14 @@ impl GucRegistry {
         }
     }
 
-    pub fn define_string_guc_with_hooks(
+    /// Define a string GUC with custom hooks.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because hook functions must be properly guarded against Rust panics.
+    /// Any hook function that might panic must be marked with `#[pg_guard]` to ensure proper
+    /// conversion of Rust panics into PostgreSQL errors.
+    pub unsafe fn define_string_guc_with_hooks(
         name: &'static CStr,
         short_description: &'static CStr,
         long_description: &'static CStr,
@@ -434,6 +471,14 @@ impl GucRegistry {
         }
     }
 
+    /// Define a float GUC with custom hooks.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because hook functions must be properly guarded against Rust panics.
+    /// Any hook function that might panic must be marked with `#[pg_guard]` to ensure proper
+    /// conversion of Rust panics into PostgreSQL errors.
+    ///
     pub fn define_float_guc_with_hooks(
         name: &'static CStr,
         short_description: &'static CStr,
@@ -465,7 +510,14 @@ impl GucRegistry {
         }
     }
 
-    pub fn define_enum_guc_with_hooks<T: GucEnum>(
+    /// Define an enum GUC with custom hooks.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because hook functions must be properly guarded against Rust panics.
+    /// Any hook function that might panic must be marked with `#[pg_guard]` to ensure proper
+    /// conversion of Rust panics into PostgreSQL errors.
+    pub unsafe fn define_enum_guc_with_hooks<T: GucEnum>(
         name: &'static CStr,
         short_description: &'static CStr,
         long_description: &'static CStr,
