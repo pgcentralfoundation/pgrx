@@ -12,7 +12,7 @@ use crate::pg_sys;
 use core::ffi::CStr;
 pub use pgrx_macros::PostgresGucEnum;
 use std::cell::Cell;
-use std::ffi::{c_void, CString};
+use std::ffi::CString;
 
 /// Defines at what level this GUC can be set
 pub enum GucContext {
