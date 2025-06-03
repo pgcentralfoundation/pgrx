@@ -337,8 +337,7 @@ impl GucRegistry {
         setting: &'static GucSetting<T>,
         context: GucContext,
         flags: GucFlags,
-    ) where
-        T: GucEnum<T> + Copy,
+    ) 
     {
         setting.value.set(setting.boot_val.to_ordinal());
         unsafe {
@@ -381,7 +380,7 @@ impl GucRegistry {
         flags: GucFlags,
         check_hook: pg_sys::GucBoolCheckHook,
         assign_hook: pg_sys::GucBoolAssignHook,
-        show_hook: pgsys::GucShowHook,
+        show_hook: pg_sys::GucShowHook,
     ) {
         unsafe {
             pg_sys::DefineCustomBoolVariable(
@@ -417,7 +416,7 @@ impl GucRegistry {
         flags: GucFlags,
         check_hook: pg_sys::GucIntCheckHook,
         assign_hook: pg_sys::GucIntAssignHook,
-        show_hook: pgsys::GucShowHook,
+        show_hook: pg_sys::GucShowHook,
     ) {
         unsafe {
             pg_sys::DefineCustomIntVariable(
@@ -453,7 +452,7 @@ impl GucRegistry {
         flags: GucFlags,
         check_hook: pg_sys::GucStringCheckHook,
         assign_hook: pg_sys::GucStringAssignHook,
-        show_hook: pgsys::GucShowHook,
+        show_hook: pg_sys::GucShowHook,
     ) {
         unsafe {
             pg_sys::DefineCustomStringVariable(
@@ -490,7 +489,7 @@ impl GucRegistry {
         flags: GucFlags,
         check_hook: pg_sys::GucRealCheckHook,
         assign_hook: pg_sys::GucRealAssignHook,
-        show_hook: pgsys::GucShowHook,
+        show_hook: pg_sys::GucShowHook,
     ) {
         unsafe {
             pg_sys::DefineCustomRealVariable(
@@ -525,11 +524,9 @@ impl GucRegistry {
         context: GucContext,
         flags: GucFlags,
         check_hook: pg_sys::GucEnumCheckHook,
-        assign_hook: pg_sys::GucEnumAssignkHook,
-        show_hook: pgsys::GucShowHook,
-    ) where
-        T: GucEnum<T> + Copy,
-    {
+        assign_hook: pg_sys::GucEnumAssignHook,
+        show_hook: pg_sys::GucShowHook,
+        )    {
         setting.value.set(setting.boot_val.to_ordinal());
         unsafe {
             pg_sys::DefineCustomEnumVariable(
