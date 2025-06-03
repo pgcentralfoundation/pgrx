@@ -249,10 +249,10 @@ impl GucRegistry {
     }
 
     pub fn define_int_guc(
-        name: &str,
-        short_description: &str,
-        long_description: &str,
-        setting: &GucSetting<i32>,
+        name: &'static CStr,
+        short_description: &'static CStr,
+        long_description: &'static CStr,
+        setting: &'static GucSetting<i32>,
         min_value: i32,
         max_value: i32,
         context: GucContext,
@@ -274,10 +274,10 @@ impl GucRegistry {
     }
 
     pub fn define_string_guc(
-        name: &str,
-        short_description: &str,
-        long_description: &str,
-        setting: &GucSetting<Option<&'static CStr>>,
+        name: &'static CStr,
+        short_description: &'static CStr,
+        long_description: &'static CStr,
+        setting: &'static GucSetting<Option<CString>>,
         context: GucContext,
         flags: GucFlags,
     ) {
@@ -295,10 +295,10 @@ impl GucRegistry {
     }
 
     pub fn define_float_guc(
-        name: &str,
-        short_description: &str,
-        long_description: &str,
-        setting: &GucSetting<f64>,
+        name: &'static CStr,
+        short_description: &'static CStr,
+        long_description: &'static CStr,
+        setting: &'static GucSetting<f64>,
         min_value: f64,
         max_value: f64,
         context: GucContext,
@@ -320,10 +320,10 @@ impl GucRegistry {
     }
 
     pub fn define_enum_guc<T>(
-        name: &str,
-        short_description: &str,
-        long_description: &str,
-        setting: &GucSetting<T>,
+        name: &'static CStr,
+        short_description: &'static CStr,
+        long_description: &'static CStr,
+        setting: &'static GucSetting<T>,
         context: GucContext,
         flags: GucFlags,
     ) where
@@ -350,10 +350,10 @@ impl GucRegistry {
     /// * `assign_hook` - Called after value is set. Use for side effects.
     /// * `show_hook` - Returns custom display string for SHOW commands.
     pub fn define_bool_guc_with_hooks(
-        name: &str,
-        short_description: &str,
-        long_description: &str,
-        setting: &GucSetting<bool>,
+        name: &'static CStr,
+        short_description: &'static CStr,
+        long_description: &'static CStr,
+        setting: &'static GucSetting<bool>,
         context: GucContext,
         flags: GucFlags,
         check_hook: pg_sys::GucBoolCheckHook,
@@ -478,7 +478,6 @@ impl GucRegistry {
     ) where
         T: GucEnum<T> + Copy,
     {
-    ) {
         setting.value.set(setting.boot_val.to_ordinal());
         unsafe {
             pg_sys::DefineCustomEnumVariable(
