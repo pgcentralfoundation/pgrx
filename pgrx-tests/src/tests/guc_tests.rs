@@ -234,10 +234,11 @@ mod tests {
     }
 
     #[pg_test]
+    #[should_panic(expected = "invalid value for parameter \"test.hooks\": 0")]
     fn test_guc_check_hook() {
         static SIDE_EFFECT: std::sync::RwLock<i32> = std::sync::RwLock::new(0);
 
-        // Define hooks
+        #[pg_guard]
         unsafe extern "C-unwind" fn check_hook(
             newval: *mut bool,
             _extra: *mut *mut std::ffi::c_void,
@@ -266,10 +267,10 @@ mod tests {
         }
 
         // Test check hook - should reject false and not initialize the GUC
-        let result = std::panic::catch_unwind(|| {
-            Spi::run("SET test.hooks TO false").unwrap();
-        });
-        assert!(result.is_err(), "Expected panic when setting test.hooks to false");
+        assert!(
+            Spi::run("SET test.hooks TO false").is_err(),
+            "Expected panic when setting test.hooks to false"
+        );
         assert_eq!(*SIDE_EFFECT.read().unwrap(), 1);
 
         // Test check hook - should accept true and increment SIDE_EFFECT
@@ -279,9 +280,71 @@ mod tests {
     }
 
     #[pg_test]
+    #[should_panic(expected = "should panic!")]
+    fn test_check_hook_fail_guarded() {
+        #[pg_guard]
+        unsafe extern "C-unwind" fn check_hook(
+            newval: *mut bool,
+            _extra: *mut *mut std::ffi::c_void,
+            _source: pg_sys::GucSource::Type,
+        ) -> bool {
+            if *newval {
+                panic!("should panic!");
+            }
+            *newval
+        }
+
+        static GUARDED_GUC: GucSetting<bool> = GucSetting::<bool>::new(true);
+        unsafe {
+            GucRegistry::define_bool_guc_with_hooks(
+                c"test.guarded_hooks",
+                c"test guarded hooks guc",
+                c"test guarded hooks guc",
+                &GUARDED_GUC,
+                GucContext::Userset,
+                GucFlags::default(),
+                Some(check_hook),
+                None,
+                None,
+            );
+        }
+    }
+
+    #[pg_test]
+    #[should_panic(expected = "connection closed")] // -> indicates unguarded function caused postgres to crash
+    fn test_check_hook_fail_unguarded() {
+        unsafe extern "C-unwind" fn check_hook(
+            newval: *mut bool,
+            _extra: *mut *mut std::ffi::c_void,
+            _source: pg_sys::GucSource::Type,
+        ) -> bool {
+            if *newval {
+                panic!("should panic!");
+            }
+            *newval
+        }
+
+        static GUARDED_GUC: GucSetting<bool> = GucSetting::<bool>::new(true);
+        unsafe {
+            GucRegistry::define_bool_guc_with_hooks(
+                c"test.guarded_hooks",
+                c"test guarded hooks guc",
+                c"test guarded hooks guc",
+                &GUARDED_GUC,
+                GucContext::Userset,
+                GucFlags::default(),
+                Some(check_hook),
+                None,
+                None,
+            );
+        }
+    }
+
+    #[pg_test]
     fn test_assign_hook() {
         static SIDE_EFFECT: std::sync::RwLock<i32> = std::sync::RwLock::new(0);
 
+        #[pg_guard]
         unsafe extern "C-unwind" fn assign_hook(newval: bool, _extra: *mut ::core::ffi::c_void) {
             if newval {
                 *SIDE_EFFECT.write().unwrap() += 1;
@@ -315,6 +378,7 @@ mod tests {
 
     #[pg_test]
     fn test_show_hook() {
+        #[pg_guard]
         unsafe extern "C-unwind" fn show_hook() -> *const c_char {
             CString::new("CUSTOM_SHOW_HOOK").unwrap().into_raw() as *const c_char
         }
