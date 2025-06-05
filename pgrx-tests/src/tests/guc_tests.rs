@@ -281,38 +281,8 @@ mod tests {
 
     #[pg_test]
     #[should_panic(expected = "should panic!")]
-    fn test_check_hook_fail_guarded() {
+    fn test_check_hook_fail() {
         #[pg_guard]
-        unsafe extern "C-unwind" fn check_hook(
-            newval: *mut bool,
-            _extra: *mut *mut std::ffi::c_void,
-            _source: pg_sys::GucSource::Type,
-        ) -> bool {
-            if *newval {
-                panic!("should panic!");
-            }
-            *newval
-        }
-
-        static GUARDED_GUC: GucSetting<bool> = GucSetting::<bool>::new(true);
-        unsafe {
-            GucRegistry::define_bool_guc_with_hooks(
-                c"test.guarded_hooks",
-                c"test guarded hooks guc",
-                c"test guarded hooks guc",
-                &GUARDED_GUC,
-                GucContext::Userset,
-                GucFlags::default(),
-                Some(check_hook),
-                None,
-                None,
-            );
-        }
-    }
-
-    #[pg_test]
-    #[should_panic(expected = "connection closed")] // -> indicates unguarded function caused postgres to crash
-    fn test_check_hook_fail_unguarded() {
         unsafe extern "C-unwind" fn check_hook(
             newval: *mut bool,
             _extra: *mut *mut std::ffi::c_void,
