@@ -30,6 +30,7 @@ mod pg_catalog {
     }
 
     #[derive(PostgresType, Serialize, Deserialize)]
+    #[pg_binary_protocol]
     struct TestCastType;
 
     #[pg_cast(implicit, immutable)]

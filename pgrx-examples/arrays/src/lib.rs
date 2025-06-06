@@ -10,7 +10,7 @@
 use pgrx::prelude::*;
 use serde::*;
 
-::pgrx::pg_module_magic!();
+pgrx::pg_module_magic!(c"arrays", pgrx::pg_sys::PG_VERSION);
 
 #[pg_extern]
 fn sq_euclid_pgrx(a: Array<f32>, b: Array<f32>) -> f32 {

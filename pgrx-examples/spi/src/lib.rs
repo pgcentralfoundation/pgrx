@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use pgrx::prelude::*;
 
-::pgrx::pg_module_magic!();
+pgrx::pg_module_magic!(c"spi", pgrx::pg_sys::PG_VERSION);
 
 extension_sql!(
     r#"
@@ -43,6 +43,8 @@ fn spi_return_query() -> Result<
     let query = "SELECT oid, relname::text || '-pg16' FROM pg_class";
     #[cfg(feature = "pg17")]
     let query = "SELECT oid, relname::text || '-pg17' FROM pg_class";
+    #[cfg(feature = "pg18")]
+    let query = "SELECT oid, relname::text || '-pg18' FROM pg_class";
 
     Spi::connect(|client| {
         client

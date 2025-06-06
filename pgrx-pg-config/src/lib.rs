@@ -707,6 +707,16 @@ pub fn SUPPORTED_VERSIONS() -> Vec<PgVersion> {
         PgVersion::new(15, PgMinorVersion::Latest, None),
         PgVersion::new(16, PgMinorVersion::Latest, None),
         PgVersion::new(17, PgMinorVersion::Latest, None),
+        PgVersion::new(
+            18,
+            PgMinorVersion::Beta(1),
+            Some(
+                Url::parse(
+                    "https://ftp.postgresql.org/pub/source/v18beta1/postgresql-18beta1.tar.bz2",
+                )
+                .expect("malformed pg18beta1 url"),
+            ),
+        ),
     ]
 }
 

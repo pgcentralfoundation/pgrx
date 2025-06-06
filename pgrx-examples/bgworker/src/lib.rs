@@ -26,7 +26,7 @@ use std::time::Duration;
     this background worker
 */
 
-::pgrx::pg_module_magic!();
+pgrx::pg_module_magic!(c"bgworker", pgrx::pg_sys::PG_VERSION);
 
 #[pg_guard]
 pub extern "C-unwind" fn _PG_init() {

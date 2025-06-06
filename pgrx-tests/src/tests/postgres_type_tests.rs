@@ -14,6 +14,7 @@ use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
 #[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
+#[pg_binary_protocol]
 #[pgvarlena_inoutfuncs]
 pub struct VarlenaType {
     a: f32,
@@ -39,6 +40,7 @@ impl PgVarlenaInOutFuncs for VarlenaType {
 }
 
 #[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
+#[pg_binary_protocol]
 #[pgvarlena_inoutfuncs]
 pub enum VarlenaEnumType {
     A,
@@ -71,6 +73,7 @@ impl PgVarlenaInOutFuncs for VarlenaEnumType {
 }
 
 #[derive(Serialize, Deserialize, PostgresType)]
+#[pg_binary_protocol]
 #[inoutfuncs]
 pub struct CustomTextFormatSerializedType {
     a: f32,
@@ -105,6 +108,7 @@ fn fn_takes_option(input: Option<CustomTextFormatSerializedType>) -> String {
 }
 
 #[derive(Serialize, Deserialize, PostgresType)]
+#[pg_binary_protocol]
 #[inoutfuncs]
 pub enum CustomTextFormatSerializedEnumType {
     A,
@@ -140,6 +144,7 @@ fn fn_takes_option_enum(input: Option<CustomTextFormatSerializedEnumType>) -> St
 }
 
 #[derive(Serialize, Deserialize, PostgresType)]
+#[pg_binary_protocol]
 pub struct JsonType {
     a: f32,
     b: f32,
@@ -147,6 +152,7 @@ pub struct JsonType {
 }
 
 #[derive(Serialize, Deserialize, PostgresType)]
+#[pg_binary_protocol]
 #[serde(tag = "type")]
 pub enum JsonEnumType {
     E1 { a: f32 },

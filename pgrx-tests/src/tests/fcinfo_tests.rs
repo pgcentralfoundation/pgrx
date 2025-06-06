@@ -137,6 +137,7 @@ fn fcinfo_not_named_no_arg(fcinfo: pg_sys::FunctionCallInfo) -> i32 {
 }
 
 #[derive(PostgresType, Serialize, Deserialize, Debug, PartialEq)]
+#[pg_binary_protocol]
 #[inoutfuncs]
 pub struct NullStrict {}
 
@@ -153,6 +154,7 @@ impl InOutFuncs for NullStrict {
 }
 
 #[derive(PostgresType, Serialize, Deserialize, Debug, PartialEq)]
+#[pg_binary_protocol]
 #[inoutfuncs]
 pub struct NullError {}
 

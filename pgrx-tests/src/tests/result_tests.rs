@@ -19,6 +19,7 @@ use serde::*;
 //
 
 #[derive(Debug, Serialize, Deserialize, PostgresType)]
+#[pg_binary_protocol]
 pub struct ResultTestsA;
 
 #[pg_extern]

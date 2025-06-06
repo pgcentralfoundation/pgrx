@@ -42,6 +42,14 @@ pub(crate) mod pg17 {
 #[cfg(all(feature = "pg17", docsrs))]
 pub(crate) mod pg17;
 
+#[cfg(all(feature = "pg18", not(docsrs)))]
+pub(crate) mod pg18 {
+    #![allow(clippy::all)]
+    include!(concat!(env!("OUT_DIR"), "/pg18.rs"));
+}
+#[cfg(all(feature = "pg18", docsrs))]
+pub(crate) mod pg18;
+
 // export each module publicly
 #[cfg(feature = "pg13")]
 pub use pg13::*;
@@ -53,6 +61,8 @@ pub use pg15::*;
 pub use pg16::*;
 #[cfg(feature = "pg17")]
 pub use pg17::*;
+#[cfg(feature = "pg18")]
+pub use pg18::*;
 
 // feature gate each pg-specific oid module
 #[cfg(all(feature = "pg13", not(docsrs)))]
@@ -88,6 +98,12 @@ mod pg17_oids {
 }
 #[cfg(all(feature = "pg17", docsrs))]
 mod pg17_oids;
+#[cfg(all(feature = "pg18", not(docsrs)))]
+mod pg18_oids {
+    include!(concat!(env!("OUT_DIR"), "/pg18_oids.rs"));
+}
+#[cfg(all(feature = "pg18", docsrs))]
+mod pg18_oids;
 
 // export that module publicly
 #[cfg(feature = "pg13")]
@@ -100,6 +116,8 @@ pub use pg15_oids::*;
 pub use pg16_oids::*;
 #[cfg(feature = "pg17")]
 pub use pg17_oids::*;
+#[cfg(feature = "pg18")]
+pub use pg18_oids::*;
 
 mod internal {
     //!
@@ -285,6 +303,42 @@ mod internal {
             );
         }
     }
+
+    #[cfg(feature = "pg18")]
+    pub(crate) mod pg18 {
+        pub use crate::pg18::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
+
+        pub const QTW_EXAMINE_RTES: u32 = crate::pg18::QTW_EXAMINE_RTES_BEFORE;
+
+        /// # Safety
+        ///
+        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therefore, is
+        /// inherently unsafe
+        pub unsafe fn IndexBuildHeapScan<T>(
+            heap_relation: crate::Relation,
+            index_relation: crate::Relation,
+            index_info: *mut crate::IndexInfo,
+            build_callback: crate::IndexBuildCallback,
+            build_callback_state: *mut T,
+        ) {
+            let heap_relation_ref = heap_relation.as_ref().unwrap();
+            let table_am = heap_relation_ref.rd_tableam.as_ref().unwrap();
+
+            table_am.index_build_range_scan.unwrap()(
+                heap_relation,
+                index_relation,
+                index_info,
+                true,
+                false,
+                true,
+                0,
+                crate::InvalidBlockNumber,
+                build_callback,
+                build_callback_state as *mut std::os::raw::c_void,
+                std::ptr::null_mut(),
+            );
+        }
+    }
 }
 
 // and things that are version-specific
@@ -302,3 +356,6 @@ pub use internal::pg16::*;
 
 #[cfg(feature = "pg17")]
 pub use internal::pg17::*;
+
+#[cfg(feature = "pg18")]
+pub use internal::pg18::*;

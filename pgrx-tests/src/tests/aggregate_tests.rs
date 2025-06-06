@@ -12,6 +12,7 @@ use pgrx::{datum::Internal, ToAggregateName};
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize)]
+#[pg_binary_protocol]
 pub struct DemoOps {
     count: i32,
 }
@@ -119,6 +120,7 @@ impl Aggregate<DemoSubName> for DemoOps {
 }
 
 #[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize, AggregateName)]
+#[pg_binary_protocol]
 pub struct DemoPercentileDisc;
 
 #[pg_aggregate]
@@ -160,11 +162,13 @@ mod demo_schema {
     use serde::{Deserialize, Serialize};
 
     #[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
+    #[pg_binary_protocol]
     pub struct DemoState {
         pub sum: i32,
     }
 }
 #[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize)]
+#[pg_binary_protocol]
 pub struct DemoCustomState;
 
 impl ToAggregateName for DemoCustomState {
