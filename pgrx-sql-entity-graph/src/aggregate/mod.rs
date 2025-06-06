@@ -150,10 +150,10 @@ fn extract_generic_from_trait(item_impl: &ItemImpl) -> Result<&Type, syn::Error>
     if let syn::GenericArgument::Type(ty) = generic_arg {
         Ok(ty)
     } else {
-        return Err(syn::Error::new_spanned(
+        Err(syn::Error::new_spanned(
             generic_arg,
             "Expected a type as the generic argument for `Aggregate` (e.g., `Aggregate<MyType>`).",
-        ));
+        ))
     }
 }
 
