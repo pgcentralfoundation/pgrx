@@ -99,17 +99,17 @@ without considerable ongoing technical and financial contributions.
 
 Running PGRX on a Mac requires some additional setup.
 
-The Mac C compiler (clang) and related tools are bundled with [XCode](https://developer.apple.com/xcode/). 
+The Mac C compiler (clang) and related tools are bundled with [XCode](https://developer.apple.com/xcode/).
 XCode can be installed from the Mac App Store.
 
-For additional C libraries, it's easiest to use [Homebrew](https://brew.sh/). In particular, 
+For additional C libraries, it's easiest to use [Homebrew](https://brew.sh/). In particular,
 you will probably need these if you don't have them already:
 
 ```zsh
 brew install git icu4c pkg-config
 ```
-The config script that Postgres 17 uses in its build process does not automatically detect 
-the Homebrew install directory. (Earlier versions of Postgres do not have this problem.) 
+The config script that Postgres 17 uses in its build process does not automatically detect
+the Homebrew install directory. (Earlier versions of Postgres do not have this problem.)
 You may see this error:
 
 ```configure: error: ICU library not found```
@@ -131,6 +131,8 @@ Postgres installs get rebuilt.
 Running PGRX on Windows requires MSVC prerequisites.
 
 On Windows, please follow https://rust-lang.github.io/rustup/installation/windows-msvc.html to set up it.
+
+Set the `Beta: Use Unicode UTF-8 for worldwide language support` option to get readable errors in the console.
 
 ## Getting Started
 
@@ -163,7 +165,7 @@ cd my_extension
 This will create a new directory for the extension crate.
 
 ```
-$ tree 
+$ tree
 .
 ├── Cargo.toml
 ├── my_extension.control
@@ -324,9 +326,9 @@ but rather extend additional support for other kinds of Rust code. These are not
 ### "unsafe-postgres": Allow compilation for Postgres forks that have a different ABI
 
 As of Postgres 15, forks are allowed to specify they use a different ABI than canonical Postgres.
-Since pgrx makes countless assumptions about Postgres' internal ABI it is not possible for it to 
+Since pgrx makes countless assumptions about Postgres' internal ABI it is not possible for it to
 guarantee that a compiled pgrx extension will probably execute within such a Postgres fork.  You,
-dear compiler runner, can make this guarantee for yourself by specifying the `unsafe-postgres` 
+dear compiler runner, can make this guarantee for yourself by specifying the `unsafe-postgres`
 feature flag.  Otherwise, a pgrx extension will fail to compile with an error similar to:
 
 ```
@@ -372,7 +374,7 @@ This approach can also be used in extensions to ensure a matching version of `ca
 ## License
 
 ```
-Portions Copyright 2019-2021 ZomboDB, LLC.  
+Portions Copyright 2019-2021 ZomboDB, LLC.
 Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
 Portions Copyright 2023 PgCentral Foundation, Inc.
 

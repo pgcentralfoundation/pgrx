@@ -470,7 +470,7 @@ impl PgConfig {
             });
 
             match Command::new(&pg_config).arg(arg).output() {
-                Ok(output) => Ok(String::from_utf8(output.stdout).unwrap().trim().to_string()),
+                Ok(output) => Ok(String::from_utf8_lossy(&output.stdout).trim().to_string()),
                 Err(e) => match e.kind() {
                     ErrorKind::NotFound => Err(e).wrap_err_with(|| {
                         let pg_config_str = pg_config.display().to_string();
@@ -777,8 +777,8 @@ pub fn createdb(
         return Err(eyre!(
             "problem running createdb: {}\n\n{}{}",
             command_str,
-            String::from_utf8(output.stdout).unwrap(),
-            String::from_utf8(output.stderr).unwrap()
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
         ));
     }
 
@@ -837,8 +837,8 @@ pub fn dropdb(
         return Err(eyre!(
             "problem running dropdb: {}\n\n{}{}",
             command_str,
-            String::from_utf8(output.stdout).unwrap(),
-            String::from_utf8(output.stderr).unwrap()
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
         ));
     }
 
@@ -871,11 +871,11 @@ fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> eyre::Result<bool> {
             "problem checking if database '{}' exists: {}\n\n{}{}",
             dbname,
             command_str,
-            String::from_utf8(output.stdout).unwrap(),
-            String::from_utf8(output.stderr).unwrap()
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
         ))
     } else {
-        let count = i32::from_str(String::from_utf8(output.stdout).unwrap().trim())
+        let count = i32::from_str(String::from_utf8_lossy(&output.stdout).trim())
             .wrap_err("result is not a number")?;
         Ok(count > 0)
     }
