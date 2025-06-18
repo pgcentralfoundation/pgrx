@@ -132,8 +132,6 @@ Running PGRX on Windows requires MSVC prerequisites.
 
 On Windows, please follow https://rust-lang.github.io/rustup/installation/windows-msvc.html to set up it.
 
-Set the `Beta: Use Unicode UTF-8 for worldwide language support` option to get readable errors in the console.
-
 ## Getting Started
 
 Before anything else, install the [system dependencies](#system-requirements).
