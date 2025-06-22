@@ -126,3 +126,22 @@ pub(super) unsafe fn ARR_DATA_PTR(a: *mut pg_sys::ArrayType) -> *mut u8 {
 
     unsafe { a.cast::<u8>().add(ARR_DATA_OFFSET(a)) }
 }
+
+/// Returns a pointer to the lower bounds of the array.
+/// # Safety
+/// Does a field access, but doesn't deref out of bounds of ArrayType.  The caller asserts that
+/// `a` is a properly allocated [`pg_sys::ArrayType`]
+///
+/// [`pg_sys::ArrayType`] is typically allocated past its size, and its somewhere in that region
+/// that the returned pointer points, so don't attempt to `pfree` it.
+#[inline(always)]
+pub(super) unsafe fn ARR_LBOUND(a: *mut pg_sys::ArrayType) -> *mut i32 {
+    //  #define ARR_LBOUND(a) \
+    //        ((int *) (((char *) (a)) + sizeof(ArrayType) + \
+    //                  sizeof(int) * ARR_NDIM(a)))
+
+    a.cast::<u8>()
+        .add(std::mem::size_of::<pg_sys::ArrayType>())
+        .add(std::mem::size_of::<i32>() * ((*a).ndim as usize))
+        .cast::<i32>()
+}

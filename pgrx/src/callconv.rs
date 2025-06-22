@@ -20,9 +20,9 @@ use crate::datum::{Range, RangeSubType};
 use crate::heap_tuple::PgHeapTuple;
 use crate::layout::PassBy;
 use crate::nullable::Nullable;
-use crate::pg_sys;
 use crate::pgbox::*;
 use crate::rel::PgRelation;
+use crate::{pg_sys, Array};
 use crate::{PgBox, PgMemoryContexts};
 
 use core::marker::PhantomData;
@@ -592,6 +592,19 @@ unsafe impl<T> BoxRet for Vec<T>
 where
     T: IntoDatum,
 {
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        match self.into_datum() {
+            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
+            None => fcinfo.return_null(),
+        }
+    }
+}
+
+unsafe impl<'mcx, T: UnboxDatum> BoxRet for Array<'mcx, T>
+where
+    T: IntoDatum,
+{
+    #[inline]
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
         match self.into_datum() {
             Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },

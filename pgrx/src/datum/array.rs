@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::question_mark)]
 use super::{unbox, UnboxDatum};
-use crate::array::RawArray;
+use crate::array::{ArrayAllocError, RawArray};
 use crate::nullable::{
     BitSliceNulls, IntoNullableIterator, MaybeStrictNulls, NullLayout, Nullable, NullableContainer,
 };
@@ -424,6 +424,31 @@ impl Array<'_, f64> {
     pub fn as_slice(&self) -> Result<&[f64], ArraySliceError> {
         as_slice(self)
     }
+
+    /// Returns a mutable slice of `f64`s which comprise this [`Array`].
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
+    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    #[inline]
+    pub fn as_mut_slice(&mut self) -> Result<&mut [f64], ArraySliceError> {
+        as_mut_slice(self)
+    }
+}
+
+impl<'mcx> Array<'mcx, f64> {
+    #[inline]
+    pub fn new_with_len(len: usize) -> Result<Array<'mcx, f64>, ArrayAllocError> {
+        new_array_with_len(len)
+    }
+
+    #[inline(always)]
+    pub fn new_from_slice(slice: &'_ [f64]) -> Result<Array<'mcx, f64>, ArrayAllocError> {
+        let mut array = Self::new_with_len(slice.len())?;
+        array.as_mut_slice().unwrap().copy_from_slice(slice);
+        Ok(array)
+    }
 }
 
 impl Array<'_, f32> {
@@ -436,6 +461,31 @@ impl Array<'_, f32> {
     #[inline]
     pub fn as_slice(&self) -> Result<&[f32], ArraySliceError> {
         as_slice(self)
+    }
+
+    /// Returns a mutable slice of `f32`s which comprise this [`Array`].
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
+    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    #[inline]
+    pub fn as_mut_slice(&mut self) -> Result<&mut [f32], ArraySliceError> {
+        as_mut_slice(self)
+    }
+}
+
+impl<'mcx> Array<'mcx, f32> {
+    #[inline]
+    pub fn new_with_len(len: usize) -> Result<Array<'mcx, f32>, ArrayAllocError> {
+        new_array_with_len(len)
+    }
+
+    #[inline(always)]
+    pub fn new_from_slice(slice: &'_ [f32]) -> Result<Array<'mcx, f32>, ArrayAllocError> {
+        let mut array = Self::new_with_len(slice.len())?;
+        array.as_mut_slice().unwrap().copy_from_slice(slice);
+        Ok(array)
     }
 }
 
@@ -451,6 +501,31 @@ impl Array<'_, i64> {
     pub fn as_slice(&self) -> Result<&[i64], ArraySliceError> {
         as_slice(self)
     }
+
+    /// Returns a mutable slice of `i64`s which comprise this [`Array`].
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
+    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    #[inline]
+    pub fn as_mut_slice(&mut self) -> Result<&mut [i64], ArraySliceError> {
+        as_mut_slice(self)
+    }
+}
+
+impl<'mcx> Array<'mcx, i64> {
+    #[inline]
+    pub fn new_with_len(len: usize) -> Result<Array<'mcx, i64>, ArrayAllocError> {
+        new_array_with_len(len)
+    }
+
+    #[inline(always)]
+    pub fn new_from_slice(slice: &'_ [i64]) -> Result<Array<'mcx, i64>, ArrayAllocError> {
+        let mut array = Self::new_with_len(slice.len())?;
+        array.as_mut_slice().unwrap().copy_from_slice(slice);
+        Ok(array)
+    }
 }
 
 impl Array<'_, i32> {
@@ -463,6 +538,31 @@ impl Array<'_, i32> {
     #[inline]
     pub fn as_slice(&self) -> Result<&[i32], ArraySliceError> {
         as_slice(self)
+    }
+
+    /// Returns a mutable slice of `i32`s which comprise this [`Array`].
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
+    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    #[inline]
+    pub fn as_mut_slice(&mut self) -> Result<&mut [i32], ArraySliceError> {
+        as_mut_slice(self)
+    }
+}
+
+impl<'mcx> Array<'mcx, i32> {
+    #[inline]
+    pub fn new_with_len(len: usize) -> Result<Array<'mcx, i32>, ArrayAllocError> {
+        new_array_with_len(len)
+    }
+
+    #[inline(always)]
+    pub fn new_from_slice(slice: &'_ [i32]) -> Result<Array<'mcx, i32>, ArrayAllocError> {
+        let mut array = Self::new_with_len(slice.len())?;
+        array.as_mut_slice().unwrap().copy_from_slice(slice);
+        Ok(array)
     }
 }
 
@@ -477,6 +577,31 @@ impl Array<'_, i16> {
     pub fn as_slice(&self) -> Result<&[i16], ArraySliceError> {
         as_slice(self)
     }
+
+    /// Returns a mutable slice of `i16`s which comprise this [`Array`].
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
+    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    #[inline]
+    pub fn as_mut_slice(&mut self) -> Result<&mut [i16], ArraySliceError> {
+        as_mut_slice(self)
+    }
+}
+
+impl<'mcx> Array<'mcx, i16> {
+    #[inline]
+    pub fn new_with_len(len: usize) -> Result<Array<'mcx, i16>, ArrayAllocError> {
+        new_array_with_len(len)
+    }
+
+    #[inline(always)]
+    pub fn new_from_slice(slice: &'_ [i16]) -> Result<Array<'mcx, i16>, ArrayAllocError> {
+        let mut array = Self::new_with_len(slice.len())?;
+        array.as_mut_slice().unwrap().copy_from_slice(slice);
+        Ok(array)
+    }
 }
 
 impl Array<'_, i8> {
@@ -490,6 +615,31 @@ impl Array<'_, i8> {
     pub fn as_slice(&self) -> Result<&[i8], ArraySliceError> {
         as_slice(self)
     }
+
+    /// Returns a mutable slice of `i8`s which comprise this [`Array`].
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
+    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    #[inline]
+    pub fn as_mut_slice(&mut self) -> Result<&mut [i8], ArraySliceError> {
+        as_mut_slice(self)
+    }
+}
+
+impl<'mcx> Array<'mcx, i8> {
+    #[inline]
+    pub fn new_with_len(len: usize) -> Result<Array<'mcx, i8>, ArrayAllocError> {
+        new_array_with_len(len)
+    }
+
+    #[inline(always)]
+    pub fn new_from_slice(slice: &'_ [i8]) -> Result<Array<'mcx, i8>, ArrayAllocError> {
+        let mut array = Self::new_with_len(slice.len())?;
+        array.as_mut_slice().unwrap().copy_from_slice(slice);
+        Ok(array)
+    }
 }
 
 #[inline(always)]
@@ -501,6 +651,52 @@ fn as_slice<'a, T: Sized>(array: &'a Array<'_, T>) -> Result<&'a [T], ArraySlice
     let slice =
         unsafe { std::slice::from_raw_parts(array.raw.data_ptr() as *const _, array.len()) };
     Ok(slice)
+}
+
+#[inline(always)]
+fn as_mut_slice<'a, T: Sized>(array: &'a mut Array<'_, T>) -> Result<&'a mut [T], ArraySliceError> {
+    if array.contains_nulls() {
+        return Err(ArraySliceError::ContainsNulls);
+    }
+
+    let slice =
+        unsafe { std::slice::from_raw_parts_mut(array.raw.data_ptr() as *mut _, array.len()) };
+    Ok(slice)
+}
+
+/// Creates an Array<`a, T> with zero-elements
+/// Slightly faster than new_array_with_len(0)
+pub fn new_empty_array<'a, T: Sized>() -> Result<Array<'a, T>, ArrayAllocError>
+where
+    T: IntoDatum,
+    T: UnboxDatum,
+{
+    unsafe {
+        let raw_array = RawArray::new_empty_array_type::<T>()?;
+        let datum: pgrx_pg_sys::Datum = pg_sys::Datum::from(raw_array.into_ptr().as_ptr());
+        Array::<'a, T>::from_polymorphic_datum(datum, false, pg_sys::get_array_type(T::type_oid()))
+            .ok_or(ArrayAllocError::MemoryAllocationFailed)
+    }
+}
+
+/// Creates an Array<T> of a fixed len, with 0 for all elements
+/// Uses a single PG allocation rather than
+#[inline(always)]
+pub fn new_array_with_len<'a, T: Sized>(len: usize) -> Result<Array<'a, T>, ArrayAllocError>
+where
+    T: IntoDatum,
+    T: UnboxDatum,
+{
+    if len == 0 {
+        return new_empty_array();
+    }
+
+    let raw_array = RawArray::new_array_type_with_len::<T>(len)?;
+    let datum: pgrx_pg_sys::Datum = pg_sys::Datum::from(raw_array.into_ptr().as_ptr());
+    unsafe {
+        Array::<'a, T>::from_polymorphic_datum(datum, false, pg_sys::get_array_type(T::type_oid()))
+            .ok_or(ArrayAllocError::MemoryAllocationFailed)
+    }
 }
 
 mod casper {
@@ -946,7 +1142,7 @@ impl<T: IntoDatum> IntoDatum for Array<'_, T> {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let array_type = self.into_array_type();
-        let datum = pg_sys::Datum::from(array_type);
+        let datum: pgrx_pg_sys::Datum = pg_sys::Datum::from(array_type);
         Some(datum)
     }
 

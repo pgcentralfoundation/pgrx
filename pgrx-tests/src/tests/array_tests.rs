@@ -183,6 +183,11 @@ fn validate_cstring_array<'a>(
     Ok(true)
 }
 
+#[pg_extern]
+fn int_array_roundtrip(arr: Array<i32>) -> Array<i32> {
+    arr
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
@@ -503,6 +508,87 @@ mod tests {
         assert_eq!(a.get(3), Some(None));
         assert_eq!(a.get(4), Some(Some(String::from("the fifth element"))));
         assert_eq!(a.get(5), None);
+
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_int_array_roundtrip_test() -> Result<(), Box<dyn std::error::Error>> {
+        let a = Spi::get_one::<Vec<i32>>("SELECT int_array_roundtrip(ARRAY[1, 2, 3, 4, 5])")?;
+
+        assert_eq!(a, Some(vec![1, 2, 3, 4, 5]));
+
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_array_new_from_slice() -> Result<(), Box<dyn std::error::Error>> {
+        let a = Spi::get_one::<Array<i8>>("SELECT ARRAY[1, 2, 3, 4, 5]::\"char\"[]")?
+            .expect("spi result was NULL");
+        let b = Array::<i8>::new_from_slice(&[1, 2, 3, 4, 5]).expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, b.as_slice()?);
+
+        let a = Spi::get_one::<Array<i16>>("SELECT ARRAY[1, 2, 3, 4, 5]::smallint[]")?
+            .expect("spi result was NULL");
+        let b = Array::<i16>::new_from_slice(&[1, 2, 3, 4, 5]).expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, b.as_slice()?);
+
+        let a = Spi::get_one::<Array<i32>>("SELECT ARRAY[1, 2, 3, 4, 5]::integer[]")?
+            .expect("spi result was NULL");
+        let b = Array::<i32>::new_from_slice(&[1, 2, 3, 4, 5]).expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, b.as_slice()?);
+
+        let a = Spi::get_one::<Array<i64>>("SELECT ARRAY[1, 2, 3, 4, 5]::bigint[]")?
+            .expect("spi result was NULL");
+        let b = Array::<i64>::new_from_slice(&[1, 2, 3, 4, 5]).expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, b.as_slice()?);
+
+        let a = Spi::get_one::<Array<f32>>("SELECT ARRAY[1.0, 2.0, 3.0, 4.0, 5.0]::float4[]")?
+            .expect("spi result was NULL");
+        let b = Array::<f32>::new_from_slice(&[1.0, 2.0, 3.0, 4.0, 5.0])
+            .expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, b.as_slice()?);
+
+        let a = Spi::get_one::<Array<f64>>("SELECT ARRAY[1.0, 2.0, 3.0, 4.0, 5.0]::float8[]")?
+            .expect("spi result was NULL");
+        let b = Array::<f64>::new_from_slice(&[1.0, 2.0, 3.0, 4.0, 5.0])
+            .expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, b.as_slice()?);
+
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_new_array_with_len() -> Result<(), Box<dyn std::error::Error>> {
+        let a = Array::<i8>::new_with_len(5).expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[0, 0, 0, 0, 0]);
+
+        let a = Array::<i16>::new_with_len(5).expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[0, 0, 0, 0, 0]);
+
+        let a = Array::<i32>::new_with_len(5).expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[0, 0, 0, 0, 0]);
+
+        let a = Array::<i64>::new_with_len(5).expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[0, 0, 0, 0, 0]);
+
+        let a = Array::<f32>::new_with_len(5).expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[0.0, 0.0, 0.0, 0.0, 0.0]);
+
+        let a = Array::<f64>::new_with_len(5).expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[0.0, 0.0, 0.0, 0.0, 0.0]);
 
         Ok(())
     }

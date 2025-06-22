@@ -8,13 +8,14 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::precedence)]
-use crate::datum::Array;
+use crate::datum::{Array, IntoDatum, UnboxDatum};
 use crate::toast::{Toast, Toasty};
-use crate::{layout, pg_sys, varlena};
+use crate::{layout, pg_sys, set_varsize_4b, varlena, PgMemoryContexts};
 use bitvec::ptr::{self as bitptr, BitPtr, BitPtrError, Mut};
 use bitvec::slice::BitSlice;
 use core::ptr::{self, NonNull};
 use core::slice;
+use pgrx_pg_sys::ArrayType;
 
 mod port;
 
@@ -373,10 +374,65 @@ impl RawArray {
         let ptr = self.ptr.as_ptr().cast::<u8>();
         ptr.wrapping_add(unsafe { varlena::varsize_any(ptr.cast()) })
     }
+
+    /// Slightly faster than new_array_type_with_len(0)
+    pub fn new_empty_array_type<T>() -> Result<RawArray, ArrayAllocError>
+    where
+        T: IntoDatum,
+        T: UnboxDatum,
+        T: Sized,
+    {
+        unsafe {
+            let array_type = pg_sys::construct_empty_array(T::type_oid());
+            let array_type =
+                NonNull::new(array_type).ok_or(ArrayAllocError::MemoryAllocationFailed)?;
+            Ok(RawArray::from_ptr(array_type))
+        }
+    }
+
+    /// Rustified version of new_intArrayType(int num) from https://github.com/postgres/postgres/blob/master/contrib/intarray/_int_tool.c#L219
+    pub fn new_array_type_with_len<T>(len: usize) -> Result<RawArray, ArrayAllocError>
+    where
+        T: IntoDatum,
+        T: UnboxDatum,
+        T: Sized,
+    {
+        if len == 0 {
+            return Self::new_empty_array_type::<T>();
+        }
+        let elem_size = std::mem::size_of::<T>();
+        let nbytes: usize = port::ARR_OVERHEAD_NONULLS(1) + elem_size * len;
+
+        unsafe {
+            let array_type = PgMemoryContexts::For(pg_sys::CurrentMemoryContext).palloc0(nbytes)
+                as *mut ArrayType;
+            if array_type.is_null() {
+                return Err(ArrayAllocError::MemoryAllocationFailed);
+            }
+            set_varsize_4b(array_type as *mut pg_sys::varlena, nbytes as i32);
+            (*array_type).ndim = 1;
+            (*array_type).dataoffset = 0; /* marker for no null bitmap */
+            (*array_type).elemtype = T::type_oid();
+
+            let ndims = port::ARR_DIMS(array_type);
+            *ndims = len as i32; // equivalent of ARR_DIMS(r)[0] = num;
+            let arr_lbound = port::ARR_LBOUND(array_type);
+            *arr_lbound = 1;
+
+            let array_type = NonNull::new_unchecked(array_type);
+            Ok(RawArray::from_ptr(array_type))
+        }
+    }
 }
 
 impl Toasty for RawArray {
     unsafe fn drop_toast(&mut self) {
         unsafe { pg_sys::pfree(self.ptr.as_ptr().cast()) }
     }
+}
+
+#[derive(thiserror::Error, Debug, Copy, Clone, Eq, PartialEq)]
+pub enum ArrayAllocError {
+    #[error("Failed to allocate memory for Array")]
+    MemoryAllocationFailed,
 }
