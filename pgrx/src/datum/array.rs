@@ -664,7 +664,7 @@ fn as_mut_slice<'a, T: Sized>(array: &'a mut Array<'_, T>) -> Result<&'a mut [T]
     Ok(slice)
 }
 
-/// Creates an Array<`a, T> with zero-elements
+/// Creates an `Array<'a, T>` with zero-elements
 /// Slightly faster than new_array_with_len(0)
 pub fn new_empty_array<'a, T: Sized>() -> Result<Array<'a, T>, ArrayAllocError>
 where
@@ -679,7 +679,7 @@ where
     }
 }
 
-/// Creates an Array<T> of a fixed len, with 0 for all elements
+/// Creates an `Array<T>` of a fixed len, with 0 for all elements
 /// Uses a single PG allocation rather than
 #[inline(always)]
 pub fn new_array_with_len<'a, T: Sized>(len: usize) -> Result<Array<'a, T>, ArrayAllocError>
