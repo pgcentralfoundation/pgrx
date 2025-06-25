@@ -74,7 +74,9 @@ mod tests {
         }
 
         #[pg_trigger]
-        fn signature_aliased_both(_trigger: AliasedBorrowedPgTrigger) -> AliasedTriggerResult<'_> {
+        fn signature_aliased_both(
+            _trigger: AliasedBorrowedPgTrigger<'_>,
+        ) -> AliasedTriggerResult<'_> {
             unimplemented!("Only testing signature compiles")
         }
     }

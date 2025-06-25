@@ -594,7 +594,7 @@ fn compute_sql(package_name: &str, manifest: &Manifest) -> eyre::Result<()> {
     Ok(())
 }
 
-fn parse_object(data: &[u8]) -> object::Result<object::File> {
+fn parse_object(data: &[u8]) -> object::Result<object::File<'_>> {
     let kind = object::FileKind::parse(data)?;
 
     match kind {

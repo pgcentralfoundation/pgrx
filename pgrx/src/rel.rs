@@ -235,7 +235,7 @@ impl PgRelation {
     /// // assert that the tuple descriptor has 12 attributes
     /// assert_eq!(tupdesc.len(), 12);
     /// ```
-    pub fn tuple_desc(&self) -> PgTupleDesc {
+    pub fn tuple_desc(&self) -> PgTupleDesc<'_> {
         PgTupleDesc::from_relation(self)
     }
 
