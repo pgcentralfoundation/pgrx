@@ -4,7 +4,7 @@ use serde::ser::{SerializeStruct, Serializer};
 use serde::Serialize;
 use std::alloc::{alloc, dealloc, Layout};
 
-pgrx::pg_module_magic!(c"wal_decoder", pgrx::pg_sys::PG_VERSION);
+pgrx::pg_module_magic!(name, version);
 
 // An Action describe a change that occurred on a table
 #[derive(Serialize)]

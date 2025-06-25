@@ -14,7 +14,7 @@ use pgrx::StringInfo;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
-pgrx::pg_module_magic!(c"aggregate", pgrx::pg_sys::PG_VERSION);
+pgrx::pg_module_magic!(name, version);
 
 #[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
 #[pgvarlena_inoutfuncs]

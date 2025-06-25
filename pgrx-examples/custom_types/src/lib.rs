@@ -16,7 +16,7 @@ mod hstore_clone;
 mod ordered;
 mod rust_enum;
 
-pgrx::pg_module_magic!(c"custom_types", pgrx::pg_sys::PG_VERSION);
+pgrx::pg_module_magic!(name, version);
 
 #[cfg(test)]
 pub mod pg_test {

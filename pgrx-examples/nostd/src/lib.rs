@@ -17,7 +17,7 @@ use serde::{Deserialize, Serialize};
 
 use alloc::string::String;
 
-pgrx::pg_module_magic!(c"nostd", pgrx::pg_sys::PG_VERSION);
+pgrx::pg_module_magic!(name, version);
 
 /// standard Rust equality/comparison derives
 #[derive(Eq, PartialEq, Ord, Hash, PartialOrd)]

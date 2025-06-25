@@ -1,6 +1,6 @@
 use pgrx::prelude::*;
 
-::pgrx::pg_module_magic!(c"{name}", pgrx::pg_sys::PG_VERSION);
+::pgrx::pg_module_magic!(name, version);
 
 #[pg_extern]
 fn hello_{name}() -> &'static str {{
