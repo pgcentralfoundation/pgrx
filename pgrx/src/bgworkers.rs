@@ -663,8 +663,6 @@ impl BackgroundWorkerBuilder {
 /// the builder is useful for building this structure.
 impl<'a> From<&'a BackgroundWorkerBuilder> for pg_sys::BackgroundWorker {
     fn from(builder: &'a BackgroundWorkerBuilder) -> Self {
-        
-
         pg_sys::BackgroundWorker {
             bgw_name: RpgffiChar::from(&builder.bgw_name[..]).0,
             bgw_type: RpgffiChar::from(&builder.bgw_type[..]).0,

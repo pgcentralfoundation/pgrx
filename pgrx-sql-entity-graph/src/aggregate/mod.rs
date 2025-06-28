@@ -379,10 +379,8 @@ impl PgAggregate {
 
         let fn_finalize = get_impl_func_by_name(&item_impl_snapshot, "finalize");
         let fn_finalize_name = if let Some(found) = fn_finalize {
-            let fn_name = Ident::new(
-                &format!("{snake_case_target_ident}_finalize"),
-                found.sig.ident.span(),
-            );
+            let fn_name =
+                Ident::new(&format!("{snake_case_target_ident}_finalize"), found.sig.ident.span());
             let pg_extern_attr = pg_extern_attr(found);
 
             if !direct_args_with_names.is_empty() {
@@ -451,10 +449,8 @@ impl PgAggregate {
 
         let fn_deserial = get_impl_func_by_name(&item_impl_snapshot, "deserial");
         let fn_deserial_name = if let Some(found) = fn_deserial {
-            let fn_name = Ident::new(
-                &format!("{snake_case_target_ident}_deserial"),
-                found.sig.ident.span(),
-            );
+            let fn_name =
+                Ident::new(&format!("{snake_case_target_ident}_deserial"), found.sig.ident.span());
             let pg_extern_attr = pg_extern_attr(found);
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]

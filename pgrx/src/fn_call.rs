@@ -220,8 +220,7 @@ pub fn fn_call_with_collation<R: FromDatum + IntoDatum>(
         // Right now we only know how to support arguments with the IN mode.  Perhaps in the
         // future we can support IN_OUT and TABLE return types
         return Err(FnCallError::UnsupportedArgumentModes);
-    } else if retoid == pg_sys::INTERNALOID
-        || pg_proc.proargtypes().contains(&pg_sys::INTERNALOID)
+    } else if retoid == pg_sys::INTERNALOID || pg_proc.proargtypes().contains(&pg_sys::INTERNALOID)
     {
         // No idea what to do with the INTERNAL type.  Generally it's just a raw pointer but pgrx
         // has no way to express that with `IntoDatum`.  And passing around raw pointers seem
