@@ -7,18 +7,28 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use pgrx::datum::Internal;
 use pgrx::prelude::*;
+use pgrx::{datum::Internal, ToAggregateName};
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize)]
-pub struct DemoSum {
+#[pg_binary_protocol]
+pub struct DemoOps {
     count: i32,
 }
 
-#[pg_aggregate]
-impl Aggregate for DemoSum {
+struct DemoSumName;
+
+#[derive(AggregateName)]
+#[aggregate_name = "demo_sub"]
+struct DemoSubName;
+
+impl ToAggregateName for DemoSumName {
     const NAME: &'static str = "demo_sum";
+}
+
+#[pg_aggregate]
+impl Aggregate<DemoSumName> for DemoOps {
     const PARALLEL: Option<ParallelOption> = Some(pgrx::aggregate::ParallelOption::Unsafe);
     const INITIAL_CONDITION: Option<&'static str> = Some(r#"0"#);
     const MOVING_INITIAL_CONDITION: Option<&'static str> = Some(r#"0"#);
@@ -41,7 +51,7 @@ impl Aggregate for DemoSum {
         arg: Self::Args,
         fcinfo: pg_sys::FunctionCallInfo,
     ) -> Self::MovingState {
-        Self::state(current, arg, fcinfo)
+        <Self as Aggregate<DemoSumName>>::state(current, arg, fcinfo)
     }
 
     fn moving_state_inverse(
@@ -63,11 +73,58 @@ impl Aggregate for DemoSum {
     }
 }
 
-#[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize)]
+#[pg_aggregate]
+impl Aggregate<DemoSubName> for DemoOps {
+    const PARALLEL: Option<ParallelOption> = Some(pgrx::aggregate::ParallelOption::Unsafe);
+    const INITIAL_CONDITION: Option<&'static str> = Some(r#"0"#);
+    const MOVING_INITIAL_CONDITION: Option<&'static str> = Some(r#"0"#);
+
+    type Args = i32;
+    type State = i32;
+    type MovingState = i32;
+
+    fn state(
+        mut current: Self::State,
+        arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::State {
+        current -= arg;
+        current
+    }
+
+    fn moving_state(
+        current: Self::State,
+        arg: Self::Args,
+        fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::MovingState {
+        <Self as Aggregate<DemoSubName>>::state(current, arg, fcinfo)
+    }
+
+    fn moving_state_inverse(
+        mut current: Self::State,
+        arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::MovingState {
+        current += arg;
+        current
+    }
+
+    fn combine(
+        mut first: Self::State,
+        second: Self::State,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::State {
+        first -= second;
+        first
+    }
+}
+
+#[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize, AggregateName)]
+#[pg_binary_protocol]
 pub struct DemoPercentileDisc;
 
 #[pg_aggregate]
-impl Aggregate for DemoPercentileDisc {
+impl Aggregate<DemoPercentileDisc> for DemoPercentileDisc {
     type Args = name!(input, i32);
     type State = Internal;
     type Finalize = i32;
@@ -105,17 +162,23 @@ mod demo_schema {
     use serde::{Deserialize, Serialize};
 
     #[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
+    #[pg_binary_protocol]
     pub struct DemoState {
         pub sum: i32,
     }
 }
 #[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize)]
+#[pg_binary_protocol]
 pub struct DemoCustomState;
+
+impl ToAggregateName for DemoCustomState {
+    const NAME: &'static str = "demo_sum_state";
+}
 
 // demonstrate we can properly support an STYPE with a pg_schema
 #[pg_aggregate]
-impl Aggregate for DemoCustomState {
-    const NAME: &'static str = "demo_sum_state";
+impl Aggregate<DemoCustomState> for DemoCustomState {
+    //const NAME: &'static str = "demo_sum_state";
     type Args = i32;
     type State = Option<demo_schema::DemoState>;
     type Finalize = i32;
@@ -143,10 +206,11 @@ impl Aggregate for DemoCustomState {
     }
 }
 
+#[derive(AggregateName)]
 struct FirstJson;
 
 #[pg_aggregate]
-impl Aggregate for FirstJson {
+impl Aggregate<FirstJson> for FirstJson {
     type State = pgrx::Json;
     type Args = pgrx::name!(value, pgrx::Json);
 
@@ -160,10 +224,11 @@ impl Aggregate for FirstJson {
     }
 }
 
+#[derive(AggregateName)]
 struct FirstJsonB;
 
 #[pg_aggregate]
-impl Aggregate for FirstJsonB {
+impl Aggregate<FirstJsonB> for FirstJsonB {
     type State = pgrx::JsonB;
     type Args = pgrx::name!(value, pgrx::JsonB);
 
@@ -177,10 +242,11 @@ impl Aggregate for FirstJsonB {
     }
 }
 
+#[derive(AggregateName)]
 struct FirstAnyArray;
 
 #[pg_aggregate]
-impl Aggregate for FirstAnyArray {
+impl Aggregate<FirstAnyArray> for FirstAnyArray {
     type State = pgrx::AnyArray;
     type Args = pgrx::name!(value, pgrx::AnyArray);
 
@@ -194,10 +260,11 @@ impl Aggregate for FirstAnyArray {
     }
 }
 
+#[derive(AggregateName)]
 struct FirstAnyElement;
 
 #[pg_aggregate]
-impl Aggregate for FirstAnyElement {
+impl Aggregate<FirstAnyElement> for FirstAnyElement {
     type State = pgrx::AnyElement;
     type Args = pgrx::name!(value, pgrx::AnyElement);
 
@@ -235,6 +302,25 @@ mod tests {
         ",
         );
         assert_eq!(retval, Ok(Some(vec![1, 21, 320, 4300])));
+    }
+
+    #[pg_test]
+    fn aggregate_demo_sub() {
+        let retval =
+            Spi::get_one::<i32>("SELECT demo_sub(value) FROM UNNEST(ARRAY [1, 1, 2]) as value;");
+        assert_eq!(retval, Ok(Some(-4)));
+
+        // Moving-aggregate mode
+        let retval = Spi::get_one::<Vec<i32>>(
+            "
+            SELECT array_agg(calculated) FROM (
+                SELECT demo_sub(value) OVER (
+                    ROWS BETWEEN 1 PRECEDING AND CURRENT ROW
+                ) as calculated FROM UNNEST(ARRAY [1, 20, 300, 4000]) as value
+            ) as results;
+        ",
+        );
+        assert_eq!(retval, Ok(Some(vec![-1, -21, -320, -4300])));
     }
 
     #[pg_test]

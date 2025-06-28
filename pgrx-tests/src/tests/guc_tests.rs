@@ -12,7 +12,8 @@
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
-    use std::ffi::CStr;
+    use std::ffi::c_char;
+    use std::ffi::CString;
 
     use pgrx::guc::*;
     use pgrx::prelude::*;
@@ -21,9 +22,9 @@ mod tests {
     fn test_bool_guc() {
         static GUC: GucSetting<bool> = GucSetting::<bool>::new(true);
         GucRegistry::define_bool_guc(
-            "test.bool",
-            "test bool gucs",
-            "test bool gucs",
+            c"test.bool",
+            c"test bool gucs",
+            c"test bool gucs",
             &GUC,
             GucContext::Userset,
             GucFlags::default(),
@@ -41,9 +42,9 @@ mod tests {
     fn test_int_guc() {
         static GUC: GucSetting<i32> = GucSetting::<i32>::new(42);
         GucRegistry::define_int_guc(
-            "test.int",
-            "test int guc",
-            "test int guc",
+            c"test.int",
+            c"test int guc",
+            c"test int guc",
             &GUC,
             -1,
             42,
@@ -63,9 +64,9 @@ mod tests {
     fn test_mb_guc() {
         static GUC: GucSetting<i32> = GucSetting::<i32>::new(42);
         GucRegistry::define_int_guc(
-            "test.megabytes",
-            "test megabytes guc",
-            "test megabytes guc",
+            c"test.megabytes",
+            c"test megabytes guc",
+            c"test megabytes guc",
             &GUC,
             -1,
             42000,
@@ -82,9 +83,9 @@ mod tests {
     fn test_float_guc() {
         static GUC: GucSetting<f64> = GucSetting::<f64>::new(42.42);
         GucRegistry::define_float_guc(
-            "test.float",
-            "test float guc",
-            "test float guc",
+            c"test.float",
+            c"test float guc",
+            c"test float guc",
             &GUC,
             -1.0f64,
             43.0f64,
@@ -105,12 +106,12 @@ mod tests {
 
     #[pg_test]
     fn test_string_guc() {
-        static GUC: GucSetting<Option<&'static CStr>> =
-            GucSetting::<Option<&'static CStr>>::new(Some(c"this is a test"));
+        static GUC: GucSetting<Option<CString>> =
+            GucSetting::<Option<CString>>::new(Some(c"this is a test"));
         GucRegistry::define_string_guc(
-            "test.string",
-            "test string guc",
-            "test string guc",
+            c"test.string",
+            c"test string guc",
+            c"test string guc",
             &GUC,
             GucContext::Userset,
             GucFlags::default(),
@@ -127,12 +128,11 @@ mod tests {
 
     #[pg_test]
     fn test_string_guc_null_default() {
-        static GUC: GucSetting<Option<&'static CStr>> =
-            GucSetting::<Option<&'static CStr>>::new(None);
+        static GUC: GucSetting<Option<CString>> = GucSetting::<Option<CString>>::new(None);
         GucRegistry::define_string_guc(
-            "test.string",
-            "test string guc",
-            "test string guc",
+            c"test.string",
+            c"test string guc",
+            c"test string guc",
             &GUC,
             GucContext::Userset,
             GucFlags::default(),
@@ -153,12 +153,16 @@ mod tests {
             One,
             Two,
             Three,
+            #[name = c"five"]
+            Four,
+            #[hidden = true]
+            Six,
         }
         static GUC: GucSetting<TestEnum> = GucSetting::<TestEnum>::new(TestEnum::Two);
         GucRegistry::define_enum_guc(
-            "test.enum",
-            "test enum guc",
-            "test enum guc",
+            c"test.enum",
+            c"test enum guc",
+            c"test enum guc",
             &GUC,
             GucContext::Userset,
             GucFlags::default(),
@@ -170,6 +174,9 @@ mod tests {
 
         Spi::run("SET test.enum = 'three'").expect("SPI failed");
         assert_eq!(GUC.get(), TestEnum::Three);
+
+        Spi::run("SET test.enum = 'five'").expect("SPI failed");
+        assert_eq!(GUC.get(), TestEnum::Four);
     }
 
     #[pg_test]
@@ -180,17 +187,17 @@ mod tests {
         static GUC_NO_SHOW: GucSetting<bool> = GucSetting::<bool>::new(true);
         static GUC_NO_RESET_ALL: GucSetting<bool> = GucSetting::<bool>::new(true);
         GucRegistry::define_bool_guc(
-            "test.no_show",
-            "test no show gucs",
-            "test no show gucs",
+            c"test.no_show",
+            c"test no show gucs",
+            c"test no show gucs",
             &GUC_NO_SHOW,
             GucContext::Userset,
             no_show_flag,
         );
         GucRegistry::define_bool_guc(
-            "test.no_reset_all",
-            "test no reset gucs",
-            "test no reset gucs",
+            c"test.no_reset_all",
+            c"test no reset gucs",
+            c"test no reset gucs",
             &GUC_NO_RESET_ALL,
             GucContext::Userset,
             GucFlags::NO_RESET_ALL,
@@ -223,6 +230,150 @@ mod tests {
                 "'no_reset_all' should remain unchanged after 'RESET ALL'"
             );
             assert_eq!(GUC_NO_SHOW.get(), true, "'no_show' should reset after 'RESET ALL'");
+        });
+    }
+
+    #[pg_test]
+    #[should_panic(expected = "invalid value for parameter \"test.hooks\": 0")]
+    fn test_guc_check_hook() {
+        static SIDE_EFFECT: std::sync::RwLock<i32> = std::sync::RwLock::new(0);
+
+        #[pg_guard]
+        unsafe extern "C-unwind" fn check_hook(
+            newval: *mut bool,
+            _extra: *mut *mut std::ffi::c_void,
+            _source: pg_sys::GucSource::Type,
+        ) -> bool {
+            if *newval {
+                *SIDE_EFFECT.write().unwrap() += 1;
+            }
+            *newval
+        }
+
+        // Create and register GUC with hooks. As default is true, SIDE_EFFECT will be 1.
+        static GUC: GucSetting<bool> = GucSetting::<bool>::new(true);
+        unsafe {
+            GucRegistry::define_bool_guc_with_hooks(
+                c"test.hooks",
+                c"test hooks guc",
+                c"test hooks guc",
+                &GUC,
+                GucContext::Userset,
+                GucFlags::default(),
+                Some(check_hook),
+                None,
+                None,
+            );
+        }
+
+        // Test check hook - should reject false and not initialize the GUC
+        assert!(
+            Spi::run("SET test.hooks TO false").is_err(),
+            "Expected panic when setting test.hooks to false"
+        );
+        assert_eq!(*SIDE_EFFECT.read().unwrap(), 1);
+
+        // Test check hook - should accept true and increment SIDE_EFFECT
+        assert!(Spi::run("SET test.hooks TO true").is_ok());
+        assert_eq!(GUC.get(), true);
+        assert_eq!(*SIDE_EFFECT.read().unwrap(), 2);
+    }
+
+    #[pg_test]
+    #[should_panic(expected = "should panic!")]
+    fn test_check_hook_fail() {
+        #[pg_guard]
+        unsafe extern "C-unwind" fn check_hook(
+            newval: *mut bool,
+            _extra: *mut *mut std::ffi::c_void,
+            _source: pg_sys::GucSource::Type,
+        ) -> bool {
+            if *newval {
+                panic!("should panic!");
+            }
+            *newval
+        }
+
+        static GUARDED_GUC: GucSetting<bool> = GucSetting::<bool>::new(true);
+        unsafe {
+            GucRegistry::define_bool_guc_with_hooks(
+                c"test.guarded_hooks",
+                c"test guarded hooks guc",
+                c"test guarded hooks guc",
+                &GUARDED_GUC,
+                GucContext::Userset,
+                GucFlags::default(),
+                Some(check_hook),
+                None,
+                None,
+            );
+        }
+    }
+
+    #[pg_test]
+    fn test_assign_hook() {
+        static SIDE_EFFECT: std::sync::RwLock<i32> = std::sync::RwLock::new(0);
+
+        #[pg_guard]
+        unsafe extern "C-unwind" fn assign_hook(newval: bool, _extra: *mut ::core::ffi::c_void) {
+            if newval {
+                *SIDE_EFFECT.write().unwrap() += 1;
+            }
+        }
+
+        // Create and register GUC with hooks. As default is false, SIDE_EFFECT will be 0.
+        static GUC: GucSetting<bool> = GucSetting::<bool>::new(false);
+        unsafe {
+            GucRegistry::define_bool_guc_with_hooks(
+                c"test.hooks",
+                c"test hooks guc",
+                c"test hooks guc",
+                &GUC,
+                GucContext::Userset,
+                GucFlags::default(),
+                None,
+                Some(assign_hook),
+                None,
+            );
+        }
+
+        // SIDE_EFFECT should not be updated
+        Spi::run("SET test.hooks TO false").unwrap();
+        assert_eq!(*SIDE_EFFECT.read().unwrap(), 0);
+
+        // SIDE_EFFECT should be updated
+        Spi::run("SET test.hooks TO true").unwrap();
+        assert_eq!(*SIDE_EFFECT.read().unwrap(), 1);
+    }
+
+    #[pg_test]
+    fn test_show_hook() {
+        #[pg_guard]
+        unsafe extern "C-unwind" fn show_hook() -> *const c_char {
+            CString::new("CUSTOM_SHOW_HOOK").unwrap().into_raw() as *const c_char
+        }
+
+        // Register GUC
+        static GUC: GucSetting<bool> = GucSetting::<bool>::new(false);
+        unsafe {
+            GucRegistry::define_bool_guc_with_hooks(
+                c"test.hooks",
+                c"test hooks guc",
+                c"test hooks guc",
+                &GUC,
+                GucContext::Userset,
+                GucFlags::default(),
+                None,
+                None,
+                Some(show_hook),
+            );
+        }
+
+        // Test show hook
+        Spi::connect_mut(|client| {
+            let r = client.update("SHOW test.hooks", None, &[]).expect("SPI failed");
+            let value: &str = r.first().get_one::<&str>().unwrap().unwrap();
+            assert_eq!(value, "CUSTOM_SHOW_HOOK");
         });
     }
 }

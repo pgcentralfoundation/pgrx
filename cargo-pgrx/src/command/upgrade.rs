@@ -224,14 +224,14 @@ impl Upgrade {
                 if let Some((key, dep)) = dep_table.get_key_value_mut(dep_name) {
                     self.update_dep(path, key, dep)?;
                     // Workaround since update_toml() doesn't preserve comments
-                    dep_table.key_decor_mut(dep_name).map(|dec| {
+                    if let Some(dec) = dep_table.key_decor_mut(dep_name) {
                         if let Some(prefix) = decor.as_ref().and_then(|val| val.prefix().cloned()) {
                             dec.set_prefix(prefix)
                         }
                         if let Some(suffix) = decor.as_ref().and_then(|val| val.suffix().cloned()) {
                             dec.set_suffix(suffix)
                         }
-                    });
+                    }
                 } else {
                     debug!(
                         "Manifest does not contain a dependency entry for \

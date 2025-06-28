@@ -26,7 +26,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 
 static ACTIVE_THREAD: AtomicUsize = AtomicUsize::new(0);
 #[track_caller]
-pub(crate) fn check_active_thread() {
+pub fn check_active_thread() {
     let current_thread = nonzero_thread_id();
     // Relaxed is sufficient as we're only interested in the effects on a single
     // atomic variable, and don't need synchronization beyond that.

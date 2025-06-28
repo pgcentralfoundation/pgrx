@@ -252,7 +252,7 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
     ///
     /// ## Errors
     /// - [PgHeapTupleError::IncorrectAttributeCount] if the number of items in the iterator
-    /// does not match the number of attributes in the [PgTupleDesc].
+    ///   does not match the number of attributes in the [PgTupleDesc].
     ///
     /// # Safety
     ///
@@ -320,7 +320,7 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
     ///
     /// - return [TryFromDatumError::NoSuchAttributeName] if the attribute does not exist
     /// - return [TryFromDatumError::IncompatibleTypes] if the Rust type of the `value` is not
-    /// compatible with the attribute's Postgres type
+    ///   compatible with the attribute's Postgres type
     pub fn set_by_name<T: IntoDatum>(
         &mut self,
         attname: &str,
@@ -339,7 +339,7 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
     /// ## Errors
     /// - return [TryFromDatumError::NoSuchAttributeNumber] if the attribute does not exist
     /// - return [TryFromDatumError::IncompatibleTypes] if the Rust type of the `value` is not
-    /// compatible with the attribute's Postgres type
+    ///   compatible with the attribute's Postgres type
     pub fn set_by_index<T: IntoDatum>(
         &mut self,
         attno: NonZeroUsize,
@@ -527,7 +527,7 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
     /// ## Errors
     /// - return [`TryFromDatumError::NoSuchAttributeName`] if the attribute does not exist
     /// - return [`TryFromDatumError::IncompatibleTypes`] if the Rust type of the `value` is not
-    /// compatible with the attribute's Postgres type
+    ///   compatible with the attribute's Postgres type
     pub fn get_by_name<'tup, T>(&'tup self, attname: &str) -> Result<Option<T>, TryFromDatumError>
     where
         T: FromDatum + IntoDatum + UnboxDatum<As<'tup> = T> + 'tup,
@@ -551,7 +551,7 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
     /// ## Errors
     /// - return [`TryFromDatumError::NoSuchAttributeNumber`] if the attribute does not exist
     /// - return [`TryFromDatumError::IncompatibleTypes`] if the Rust type of the `value` is not
-    /// compatible with the attribute's Postgres type
+    ///   compatible with the attribute's Postgres type
     pub fn get_by_index<'tup, T>(
         &'tup self,
         attno: NonZeroUsize,

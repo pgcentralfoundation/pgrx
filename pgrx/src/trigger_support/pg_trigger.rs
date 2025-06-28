@@ -199,6 +199,9 @@ impl<'a> PgTrigger<'a> {
     pub fn extra_args(&self) -> Result<Vec<String>, PgTriggerError> {
         let tgargs = self.trigger.tgargs;
         let tgnargs = self.trigger.tgnargs;
+        if tgnargs == 0 {
+            return Ok(Vec::new());
+        }
         // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
         // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user agreed to
         // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by

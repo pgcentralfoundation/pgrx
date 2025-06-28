@@ -416,12 +416,10 @@ fn copy_sql_files(
 pub(crate) fn find_library_file(
     manifest: &Manifest,
     manifest_path: &Path,
-    build_command_messages: &Vec<CargoMessage>,
+    build_command_messages: &[CargoMessage],
 ) -> eyre::Result<PathBuf> {
     use std::env::consts::DLL_EXTENSION;
 
-    // cargo sometimes decides to change whether targets are kebab-case or snake_case in metadata,
-    // so normalize away the difference
     let manifest_path = std::path::absolute(manifest_path)?;
     let lib_filename = manifest.lib_filename()?;
 
@@ -430,13 +428,16 @@ pub(crate) fn find_library_file(
     // you might think this is being silly but they do periodically change outputs. these changes
     // often seem to be unintentional, but they're real, so...
     let library_file = build_command_messages
-        .into_iter()
+        .iter()
         .filter_map(|msg| match msg {
             CargoMessage::CompilerArtifact(artifact) => Some(artifact),
             _ => None,
         })
         // normalize being flattened and low to the ground
-        .find(|artifact| manifest_path == artifact.manifest_path)
+        .find(|artifact| {
+            artifact.manifest_path == manifest_path
+                && artifact.target.crate_types.iter().any(|s| s == "cdylib")
+        })
         .and_then(|artifact| {
             artifact
                 .filenames

@@ -142,7 +142,7 @@ impl<'a> PgTupleDesc<'a> {
     }
 
     /// wrap the `pg_sys::TupleDesc` contained by the specified `PgRelation`
-    pub fn from_relation(parent: &PgRelation) -> PgTupleDesc {
+    pub fn from_relation(parent: &PgRelation) -> PgTupleDesc<'_> {
         PgTupleDesc {
             // SAFETY:  `parent` is a Rust reference, and as such its rd_att attribute will be property initialized
             tupdesc: Some(unsafe { PgBox::from_pg(parent.rd_att) }),
@@ -232,7 +232,7 @@ impl<'a> PgTupleDesc<'a> {
     }
 
     /// Iterate over our attributes
-    pub fn iter(&self) -> TupleDescIterator {
+    pub fn iter(&self) -> TupleDescIterator<'_> {
         TupleDescIterator { tupdesc: self, curr: 0 }
     }
 
@@ -296,6 +296,19 @@ fn tupdesc_get_attr(
     attno: usize,
 ) -> &pg_sys::FormData_pg_attribute {
     let atts = unsafe { tupdesc.attrs.as_slice(tupdesc.natts as usize) };
+    &atts[attno]
+}
+
+/// `attno` is 0-based
+#[cfg(feature = "pg18")]
+#[inline]
+fn tupdesc_get_attr(
+    tupdesc: &PgBox<pg_sys::TupleDescData>,
+    attno: usize,
+) -> &pg_sys::FormData_pg_attribute {
+    let att_pointer =
+        unsafe { tupdesc.compact_attrs.as_ptr().add(tupdesc.natts.try_into().unwrap()).cast() };
+    let atts = unsafe { std::slice::from_raw_parts(att_pointer, tupdesc.natts as usize) };
     &atts[attno]
 }
 

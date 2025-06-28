@@ -30,7 +30,7 @@ mod pgrx_modqual_tests {
 
     use pgrx_macros::{
         opname, pg_aggregate, pg_extern, pg_guard, pg_operator, pg_schema, pg_trigger, pgrx,
-        PostgresEq, PostgresHash, PostgresOrd, PostgresType,
+        AggregateName, PostgresEq, PostgresHash, PostgresOrd, PostgresType,
     };
 
     ::pgrx::extension_sql!("SELECT 1;", name = "pgrx_module_qualification_test");
@@ -54,6 +54,10 @@ mod pgrx_modqual_tests {
     pub struct PgrxModuleQualificationTest {
         v: i32,
     }
+
+    #[derive(AggregateName)]
+    #[aggregate_name = "PgrxModuleQualificationTestAgg"]
+    struct PgrxMQTName;
 
     #[pg_extern]
     fn foo() {}
@@ -136,10 +140,9 @@ mod pgrx_modqual_tests {
     }
 
     #[pg_aggregate]
-    impl ::pgrx::Aggregate for PgrxModuleQualificationTest {
+    impl ::pgrx::Aggregate<PgrxMQTName> for PgrxModuleQualificationTest {
         type State = ::pgrx::datum::PgVarlena<Self>;
         type Args = ::pgrx::name!(value, Option<i32>);
-        const NAME: &'static str = "PgrxModuleQualificationTestAgg";
 
         const INITIAL_CONDITION: Option<&'static str> = Some(r#"{"v": 0}"#);
 

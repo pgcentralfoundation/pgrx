@@ -22,7 +22,7 @@ use std::path::PathBuf;
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Connect {
-    /// Do you want to run against pg13, pg14, pg15, pg16, or pg17?
+    /// Do you want to run against pg13, pg14, pg15, pg16, pg17, or pg18?
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
     /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
@@ -89,7 +89,7 @@ impl CommandExecute for Connect {
 ))]
 pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str, pgcli: bool) -> eyre::Result<()> {
     // restart postgres
-    start_postgres(pg_config)?;
+    start_postgres(pg_config, &Default::default())?;
 
     // create the named database
     if !createdb(pg_config, dbname, false, true, None)? {

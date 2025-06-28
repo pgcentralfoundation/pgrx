@@ -397,7 +397,7 @@ fn lookup_fn(fname: &str, args: &[&dyn FnCallArg]) -> Result<pg_sys::Oid> {
                     pg_sys::pfree((*s).val.str_.cast());
                 }
 
-                #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+                #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
                 {
                     let s = s.cast::<pg_sys::String>();
                     pg_sys::pfree((*s).sval.cast());
@@ -410,7 +410,7 @@ fn lookup_fn(fname: &str, args: &[&dyn FnCallArg]) -> Result<pg_sys::Oid> {
 
 /// Parses an arbitrary string as if it is a SQL identifier.  If it's not, [`FnCallError::InvalidIdentifier`]
 /// is returned
-fn parse_sql_ident(ident: &str) -> Result<Array<&str>> {
+fn parse_sql_ident(ident: &str) -> Result<Array<'_, &str>> {
     unsafe {
         direct_function_call::<Array<&str>>(
             pg_sys::parse_ident,

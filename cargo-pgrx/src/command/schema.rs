@@ -34,7 +34,7 @@ pub(crate) struct Schema {
     /// Build in test mode (for `cargo pgrx test`)
     #[clap(long)]
     test: bool,
-    /// Do you want to run against pg13, pg14, pg15, pg16, or pg17?
+    /// Do you want to run against pg13, pg14, pg15, pg16, pg17, or pg18?
     pg_version: Option<String>,
     /// Compile for release mode (default is debug)
     #[clap(long, short)]
@@ -343,7 +343,7 @@ fn first_build(
     }
 
     command.arg("--package");
-    command.arg(format!("{package_name}"));
+    command.arg(package_name);
 
     if let Some(user_manifest_path) = user_manifest_path.as_ref() {
         command.arg("--manifest-path");
@@ -478,6 +478,7 @@ fn compute_codegen(
         out
     };
     Ok(quote::quote! {
+        #[doc(hidden)]
         pub fn main() {
             #inputs
             #build
@@ -509,7 +510,7 @@ fn second_build(
     command.arg(pgrx_embed_name(manifest)?);
 
     command.arg("--package");
-    command.arg(format!("{package_name}"));
+    command.arg(package_name);
 
     if let Some(user_manifest_path) = user_manifest_path.as_ref() {
         command.arg("--manifest-path");

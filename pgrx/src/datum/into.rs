@@ -378,7 +378,7 @@ impl<'a> IntoDatum for &'a [u8] {
             // and the `dest` was freshly allocated, thus non-overlapping
             std::ptr::copy_nonoverlapping(
                 self.as_ptr(),
-                addr_of_mut!((*varattrib_4b).va_data).cast::<u8>(),
+                addr_of_mut!((&mut *varattrib_4b).va_data).cast::<u8>(),
                 self.len(),
             );
 

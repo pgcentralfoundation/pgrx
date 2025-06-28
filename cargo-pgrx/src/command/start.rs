@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 //LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
 //LICENSE
 //LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
@@ -21,7 +22,7 @@ use std::process::Stdio;
 #[derive(clap::Args, Debug, Clone)]
 #[clap(author)]
 pub(crate) struct Start {
-    /// The Postgres version to stop (pg13, pg14, pg15, pg16, pg17, or all)
+    /// The Postgres version to stop (pg13, pg14, pg15, pg16, pg17, pg18, or all)
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
@@ -32,12 +33,19 @@ pub(crate) struct Start {
     /// Path to Cargo.toml
     #[clap(long, value_parser)]
     manifest_path: Option<PathBuf>,
+
+    #[clap(long)]
+    postgresql_conf: Vec<String>,
 }
 
 impl CommandExecute for Start {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        fn perform(me: Start, pgrx: &Pgrx) -> eyre::Result<()> {
+        fn perform(
+            me: Start,
+            pgrx: &Pgrx,
+            postgresql_conf: &HashMap<String, String>,
+        ) -> eyre::Result<()> {
             let (package_manifest, _) = get_package_manifest(
                 &clap_cargo::Features::default(),
                 me.package.as_ref(),
@@ -47,7 +55,7 @@ impl CommandExecute for Start {
             let (pg_config, _) =
                 pg_config_and_version(pgrx, &package_manifest, me.pg_version, None, false)?;
 
-            start_postgres(&pg_config)
+            start_postgres(&pg_config, postgresql_conf)
         }
         let (package_manifest, _) = get_package_manifest(
             &clap_cargo::Features::default(),
@@ -55,22 +63,44 @@ impl CommandExecute for Start {
             self.manifest_path.clone(),
         )?;
 
+        let postgresql_conf = collect_postgresql_conf_settings(&self.postgresql_conf)?;
         let pgrx = Pgrx::from_config()?;
         if self.pg_version == Some("all".into()) {
             for v in crate::manifest::all_pg_in_both_tomls(&package_manifest, &pgrx) {
                 let mut versioned_start = self.clone();
                 versioned_start.pg_version = Some(v?.label()?);
-                perform(versioned_start, &pgrx)?;
+                perform(versioned_start, &pgrx, &postgresql_conf)?;
             }
             Ok(())
         } else {
-            perform(self, &pgrx)
+            perform(self, &pgrx, &postgresql_conf)
         }
     }
 }
 
+pub(crate) fn collect_postgresql_conf_settings(
+    settings: &Vec<String>,
+) -> eyre::Result<HashMap<String, String>> {
+    settings
+        .iter()
+        .map(|setting| {
+            if let Some((key, value)) = setting.split_once('=') {
+                Ok((key.to_string(), value.to_string()))
+            } else {
+                Err(eyre::eyre!(
+                    "`--postgresql_conf` setting of `{}` is not in the correct format",
+                    setting
+                ))
+            }
+        })
+        .collect()
+}
+
 #[tracing::instrument(level = "error", skip_all, fields(pg_version = %pg_config.version()?))]
-pub(crate) fn start_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
+pub(crate) fn start_postgres(
+    pg_config: &PgConfig,
+    runtime_conf: &HashMap<String, String>,
+) -> eyre::Result<()> {
     let datadir = pg_config.data_dir()?;
     let logfile = pg_config.log_file()?;
     let bindir = pg_config.bin_dir()?;
@@ -92,16 +122,31 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
         port.to_string().bold().cyan()
     );
     let pg_ctl = pg_config.pg_ctl_path()?;
+
+    let mut dash_o_args = vec![
+        "-i".into(), // listen for tcp connections
+        "-p".into(), // on this port
+        port.to_string(),
+        "-c".into(), // and allow unix socket connections
+        format!("unix_socket_directories={}", Pgrx::home()?.display()),
+    ];
+
+    // user-provided settings to set/override what's in their existing `postgresql.conf`
+    for (key, value) in runtime_conf {
+        dash_o_args.push(format!("-c {key}={value}"));
+    }
+
     let mut command = std::process::Command::new(pg_ctl);
     command
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .arg("start")
-        .arg(format!("-o -i -p {} -c unix_socket_directories={}", port, Pgrx::home()?.display()))
+        .arg(format!("-o {}", dash_o_args.join(" ")))
         .arg("-D")
         .arg(&datadir)
         .arg("-l")
         .arg(&logfile);
+
     #[cfg(target_os = "windows")]
     {
         // on windows, created pipes are leaked, so that the command hangs

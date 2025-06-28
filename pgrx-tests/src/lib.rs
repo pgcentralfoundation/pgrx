@@ -19,7 +19,7 @@ pub use framework::*;
 pub mod proptest;
 
 #[cfg(any(test, feature = "pg_test"))]
-pgrx::pg_module_magic!();
+pgrx::pg_module_magic!(name, version);
 
 #[cfg(test)]
 pub mod pg_test {

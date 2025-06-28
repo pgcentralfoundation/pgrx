@@ -337,7 +337,7 @@ Compile/install extension to a pgrx-managed Postgres instance and start psql
 Usage: cargo pgrx run [OPTIONS] [PG_VERSION] [DBNAME]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, or pg17? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, or pg18? [env: PG_VERSION=]
   [DBNAME]      The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
 
 Options:
@@ -388,7 +388,7 @@ Connect, via psql, to a Postgres instance
 Usage: cargo pgrx connect [OPTIONS] [PG_VERSION] [DBNAME]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, or pg17? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, or pg18? [env: PG_VERSION=]
   [DBNAME]      The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name [env: DBNAME=]
 
 Options:
@@ -451,7 +451,7 @@ Options:
   -V, --version                        Print version
 ```
 
-## Testing Your Extension
+## Testing with Unit Tests
 
 ```console
 $ cargo pgrx test
@@ -506,7 +506,7 @@ Run the test suite for this crate
 Usage: cargo pgrx test [OPTIONS] [PG_VERSION] [TESTNAME]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, or all? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, or all? [env: PG_VERSION=]
   [TESTNAME]    If specified, only run tests containing this string in their names
 
 Options:
@@ -524,6 +524,241 @@ Options:
   -h, --help                           Print help
   -V, --version                        Print version
 ```
+
+## Testing with Regression Tests
+
+pgrx supports a regression test system very similar to the one prescribed by Postgres' `pg_regress` tool.  In fact, pgrx uses `pg_regress` to run the regression tests.
+
+`cargo pgrx regress` is used to run the regression tests.  It has a number of options similar to `cargo pgrx test`:
+
+```console
+$ cargo pgrx regress --help
+Run the regression test suite for this crate
+
+Usage: cargo pgrx regress [OPTIONS] [PG_VERSION] [TEST_FILTER]
+
+Arguments:
+  [PG_VERSION]   Do you want to run against pg13, pg14, pg15, pg16, pg17? [env: PG_VERSION=]
+  [TEST_FILTER]  If specified, only run tests containing this string in their names
+
+Options:
+      --dbname <DBNAME>                    If specified, use this database name instead of the auto-generated version of `$extname_regress`
+      --resetdb                            Recreate the test database, even if it already exists
+  -v, --verbose...                         Enable info logs, -vv for debug, -vvv for trace
+  -p, --package <PACKAGE>                  Package to build (see `cargo help pkgid`)
+      --manifest-path <MANIFEST_PATH>      Path to Cargo.toml
+  -r, --release                            compile for release mode (default is debug)
+      --profile <PROFILE>                  Specific profile to use (conflicts with `--release`)
+  -n, --no-schema                          Don't regenerate the schema
+      --runas <USER>                       Use `sudo` to initialize and run the Postgres test instance as this system user
+      --pgdata <DIR>                       Initialize the test database cluster here, instead of the default location.  If used with `--runas`, then it must be writable by the user
+      --all-features                       Activate all available features
+      --no-default-features                Do not activate the `default` feature
+  -F, --features <FEATURES>                Space-separated list of features to activate
+      --postgresql-conf <POSTGRESQL_CONF>  Custom `postgresql.conf` settings in the form of `key=value`, ie `log_min_messages=debug1`
+  -a, --auto                               Automatically accept output for new tests *and* overwrite output for existing-but-failed tests
+  -h, --help                               Print help
+  -V, --version                            Print version
+```
+
+Regression tests are split into `*.sql` files and `*.out` files.  The files themselves are organized into separate directories rooted at `./tests/pg_regress`.
+
+For example, using our [range example](../pgrx-examples/range/), the directory structure looks like this:
+
+```console
+$ tree       
+.
+├── Cargo.lock
+├── Cargo.toml
+├── README.md
+├── tests
+│   └── pg_regress
+│       ├── sql                    # these are the individual regression test scripts
+│       │   ├── make_range.sql
+│       │   ├── setup.sql
+│       │   └── store_ranges.sql
+│       └── expected               # these are the corresponding test output files
+│           ├── make_range.out
+│           ├── setup.out
+│           └── store_ranges.out
+├── range.control
+└── src
+    ├── bin
+    │   └── pgrx_embed.rs
+    └── lib.rs
+```
+
+`setup.sql` is a special test in that it's run first, by itself, whenever the test database is first created, or reset using the `--resetdb` argument.
+
+When creating a new test, first make the `.sql` file in `./pg_regress/sql/` and then run `cargo pgrx regress`.  pgrx will detect that the file is new and interactively prompt you to add its output, automatically adding it to git (if the directory is managed by git).
+
+For example,
+
+```console
+$ echo "SELECT 1;" > ./pg_regress/sql/example.sql
+$ cargo pgrx regress                             
+       Using DefaultFeature("pg13") and `pg_config` from  ~/.pgrx/13.20/pgrx-install/bin/pg_config
+    Stopping Postgres v13
+    Building extension with features pg13
+     Running command " ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo" "build" "--lib" "--features" "pg13" "--no-default-features" "--message-format=json-render-diagnostics"
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+  Installing extension
+     Copying control file to  ~/.pgrx/13.20/pgrx-install/share/postgresql/extension/range.control
+     Copying shared library to  ~/.pgrx/13.20/pgrx-install/lib/postgresql/range.so
+  Discovered 9 SQL entities: 0 schemas (0 unique), 9 functions, 0 types, 0 enums, 0 sqls, 0 ords, 0 hashes, 0 aggregates, 0 triggers
+  Rebuilding pgrx_embed, in debug mode, for SQL generation with features pg13
+   Compiling range v0.0.0 ( ~/_work/pgrx/tests/pgrx-examples/range)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.70s
+     Writing SQL entities to  ~/.pgrx/13.20/pgrx-install/share/postgresql/extension/range--0.1.0.sql
+    Finished installing range
+    Starting Postgres v13 on port 28813
+    Re-using existing database range_regress
+       Found 1 new tests, running each individually to create output
+     Running command cd " ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" && env -u PGDATABASE -u PGHOST -u PGPORT -u PGUSER " ~/.pgrx/13.20/pgrx-install/lib/postgresql/pgxs/src/test/regress/pg_regress" "--host" "localhost" "--port" "28813" "--use-existing" "--dbname=range_regress" "--inputdir= ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" "--outputdir= ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" "example" "--launcher=/tmp/pgrx-pg_regress-runner-2940893.sh"
+-----------
+SELECT 1;
+ ?column? 
+----------
+        1
+(1 row)
+
+
+test `example` generated the above output:
+Accept [Y, n]? 
+```
+
+Typing `Y` (or just pressing return) will copy the test output to the proper location, `./pg_regress/expected/example.sql` and then run the entire test suite:
+
+```console
+...
+test `example` generated the above output:
+Accept [Y, n]? y
+     Copying test output to  ~/_work/pgrx/tests/pgrx-examples/range/tests/pg_regress/expected/example.out
+     Running command cd " ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" && env -u PGDATABASE -u PGHOST -u PGPORT -u PGUSER " ~/.pgrx/13.20/pgrx-install/lib/postgresql/pgxs/src/test/regress/pg_regress" "--host" "localhost" "--port" "28813" "--use-existing" "--dbname=range_regress" "--inputdir= ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" "--outputdir= ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" "example" "make_range" "store_ranges" "--launcher=/tmp/pgrx-pg_regress-runner-2940893.sh"
+(using postmaster on localhost, port 28813)
+============== running regression test queries        ==============
+test example                      ... ok            6 ms
+test make_range                   ... ok           18 ms
+test store_ranges                 ... ok           20 ms
+
+=====================
+ All 3 tests passed. 
+=====================
+```
+
+Alternatively, you can run `cargo pgrx regress --auto` (or `-a`) to **automatically** accept the output generated by a new test.
+
+`--auto` will **also** copy the output of **failed** tests to the `./tests/pg_regress/expected/` directory, overwriting the existing expected test output.  This is an automated version of blindly accepting different test output as the new, expected output.
+
+### Things to Know
+
+- `setup.sql` is only executed when tests are run for the first time, or the `--resetdb` argument is used
+- The point of `setup.sql` is to perform some heavy-weight database object creation/data-loading _only_ when the test regression database is created.
+- tests are executed in alphabetical order
+- pgrx creates a database named `$extname_regress` unless `--dbname` is used
+- Postgres' documentation for `pg_regress` [begins here](https://www.postgresql.org/docs/current/regress.html).  While pgrx does not support every knob and dial, its organization is largely compatible (PRs welcome to enhance features)
+- to regenerate the expected test output, delete the `./pg_regress/expected/TEST_NAME.out` file and run `cargo pgrx regress`.  You'll be prompted to accept the new output and it'll automatically be run through `git add`
+- `pg_regress` uses `psql` to run each test and literally diffs the output against the expected output file.  pgrx does two things to help eliminate noise in the test output.  The first is it sets `client_min_messages=warning` when starting the Postgres instance and it also passes `-v VERBOSITY=terse` through to `psql`.   
+
+### Diffing `psql` Output?
+
+Yes, Postgres' `pg_regress` tool plays each `test_name.sql` file through `psql`, captures the full output, and diffs that output against the test's corresponding `test_name.out` file.  It's a good idea for your tests to avoid variability in their output.
+
+Avoiding variability can mean some simple things like
+
+- ensuring the results of SELECT statements that return multiple rows are always sorted in a predictable/repeatable manner
+- avoiding outputting "random" values such as the result of the `random()` function, `txid_current()`, and others
+    
+    
+### Be Kind to Yourself
+
+While always good advice, in the context of individual regression tests, this means that a test should not leave anything behind or should be able to tolerate leftover database objects from previous runs.  
+
+Each test should be written to "DROP IF EXISTS ... ; CREATE ..." or instead "DROP ..." every database object at the end of the test.
+
+You can ignore this advice if you **always** run the regression tests with `--resetdb` as you'll have a clean database each time
+
+An example of an unkind test might be:
+
+```console
+$ echo "CREATE TABLE foo();" > ./tests/pg_regress/sql/bad.sql
+$ cargo pgrx regress    
+       Using DefaultFeature("pg13") and `pg_config` from  ~/.pgrx/13.20/pgrx-install/bin/pg_config
+    Stopping Postgres v13
+    Building extension with features pg13
+     Running command " ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo" "build" "--lib" "--features" "pg13" "--no-default-features" "--message-format=json-render-diagnostics"
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+  Installing extension
+     Copying control file to  ~/.pgrx/13.20/pgrx-install/share/postgresql/extension/range.control
+     Copying shared library to  ~/.pgrx/13.20/pgrx-install/lib/postgresql/range.so
+  Discovered 9 SQL entities: 0 schemas (0 unique), 9 functions, 0 types, 0 enums, 0 sqls, 0 ords, 0 hashes, 0 aggregates, 0 triggers
+  Rebuilding pgrx_embed, in debug mode, for SQL generation with features pg13
+   Compiling range v0.0.0 ( ~/_work/pgrx/tests/pgrx-examples/range)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.71s
+     Writing SQL entities to  ~/.pgrx/13.20/pgrx-install/share/postgresql/extension/range--0.1.0.sql
+    Finished installing range
+    Starting Postgres v13 on port 28813
+    Re-using existing database range_regress
+       Found 1 new tests, running each individually to create output
+     Running command cd " ~/_work/pgrx/tests/pgrx-examples/range/tests/pg_regress" && env -u PGDATABASE -u PGHOST -u PGPORT -u PGUSER " ~/.pgrx/13.20/pgrx-install/lib/postgresql/pgxs/src/test/regress/pg_regress" "--host" "localhost" "--port" "28813" "--use-existing" "--dbname=range_regress" "--inputdir= ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" "--outputdir= ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" "bad" "--launcher=/tmp/pgrx-pg_regress-runner-2947999.sh"
+-----------
+CREATE TABLE foo();
+
+test `bad` generated the above output:
+Accept [Y, n]? 
+```
+
+That looks like the perfect output, so we accept it:
+
+```console
+...
+test `bad` generated the above output:
+Accept [Y, n]? Y
+     Copying test output to  ~/_work/pgrx/tests/pgrx-examples/range/tests/pg_regress/expected/bad.out
+     Running command cd " ~/_work/pgrx/tests/pgrx-examples/range/tests/pg_regress" && env -u PGDATABASE -u PGHOST -u PGPORT -u PGUSER " ~/.pgrx/13.20/pgrx-install/lib/postgresql/pgxs/src/test/regress/pg_regress" "--host" "localhost" "--port" "28813" "--use-existing" "--dbname=range_regress" "--inputdir= ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" "--outputdir= ~/_work/pgrx/tests/pgrx-examples/range/pg_regress" "bad" "make_range" "store_ranges" "--launcher=/tmp/pgrx-pg_regress-runner-2947999.sh"
+(using postmaster on localhost, port 28813)
+============== running regression test queries        ==============
+test bad                          ... FAILED        5 ms
+test make_range                   ... ok           18 ms
+test store_ranges                 ... ok           19 ms
+
+======================
+ 1 of 3 tests failed. 
+======================
+
+The differences that caused some tests to fail can be viewed in the
+file " ~/_work/pgrx/tests/pgrx-examples/range/tests/pg_regress/regression.diffs".  A copy of the test summary that you see
+above is saved in the file " ~/_work/pgrx/tests/pgrx-examples/range/tests/pg_regress/regression.out".
+```
+
+And you see the `bad` test immediately failed!  To see how it failed, look at the `./pg_regress/regression.diffs` file:
+
+```console
+$ diff -U3  ~/_work/pgrx/tests/pgrx-examples/range/tests/pg_regress/expected/bad.out  ~/_work/pgrx/tests/pgrx-examples/range/tests/pg_regress/results/bad.out
+---  ~/_work/pgrx/tests/pgrx-examples/range/tests/pg_regress/expected/bad.out	2025-05-07 12:15:10.759010127 -0400
++++  ~/_work/pgrx/tests/pgrx-examples/range/tests/pg_regress/results/bad.out	2025-05-07 12:15:10.775009912 -0400
+@@ -1 +1,2 @@
+ CREATE TABLE foo();
++ERROR:  relation "foo" already exists
+```
+
+What you wanted in the .sql file is either
+
+```sql
+DROP TABLE IF EXISTS foo;  
+CREATE TABLE foo();
+``` 
+
+or 
+
+```sql
+CREATE TABLE foo(); 
+-- ... 
+DROP TABLE foo;
+```
+
+Either be resilient in the face of existing objects or cleanup when the test is finished.
+
 
 ## Building an Installation Package
 
@@ -593,7 +828,7 @@ Generate extension schema files
 Usage: cargo pgrx schema [OPTIONS] [PG_VERSION]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, or pg17?
+  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, or pg18?
 
 Options:
   -p, --package <PACKAGE>              Package to build (see `cargo help pkgid`)
@@ -699,7 +934,7 @@ AS 'MODULE_PATHNAME', 'hello_extension_wrapper';
 ```
 
 `MODULE_PATHNAME` is replaced by Postgres with the configured value in the `.control` file. For pgrx-based extensions,
-this is  usually set to `$libdir/<extension-name>`.
+this is  usually set to `<extension-name>`.
 
 When using versioned shared-object support, the same SQL would look as follows:
 
@@ -707,7 +942,7 @@ When using versioned shared-object support, the same SQL would look as follows:
 CREATE OR REPLACE FUNCTION "hello_extension"() RETURNS text /* &str */
 STRICT
 LANGUAGE c /* Rust */
-AS '$libdir/extension-0.0.0', 'hello_extension_wrapper';
+AS 'extension-0.0.0', 'hello_extension_wrapper';
 ```
 
 Note that the versioned shared library is hard-coded in the function definition. This corresponds to the
@@ -722,7 +957,7 @@ produce the following SQL for the above function:
 CREATE OR REPLACE FUNCTION "hello_extension"() RETURNS text /* &str */
 STRICT
 LANGUAGE c /* Rust */
-AS '$libdir/extension-0.1.0', 'hello_extension_wrapper';
+AS 'extension-0.1.0', 'hello_extension_wrapper';
 ```
 
 This SQL must be used in the upgrade script from `0.0.0` to `0.1.0` in order to point the `hello_extension` function to

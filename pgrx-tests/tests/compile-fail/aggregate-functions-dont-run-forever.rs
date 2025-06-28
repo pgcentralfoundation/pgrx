@@ -5,10 +5,11 @@ use std::collections::HashSet;
 
 const DOG_COMPOSITE_TYPE: &str = "Dog";
 
+#[derive(pgrx::AggregateName)]
 struct SumScritches {}
 
 #[pg_aggregate]
-impl Aggregate for SumScritches {
+impl Aggregate<SumScritches> for SumScritches {
     type State = i32;
     const INITIAL_CONDITION: Option<&'static str> = Some("0");
     type Args = pgrx::name!(value, pgrx::composite_type!('static, "Dog"));
@@ -42,10 +43,11 @@ CREATE AGGREGATE scritch_collector ("value" integer) (
 )
 ```
 */
+#[derive(pgrx::AggregateName)]
 struct ScritchCollector;
 
 #[pg_aggregate]
-impl Aggregate for ScritchCollector {
+impl Aggregate<ScritchCollector> for ScritchCollector {
     type State = Option<pgrx::composite_type!('static, "Dog")>;
     type Args = i32;
 
@@ -64,11 +66,11 @@ impl Aggregate for ScritchCollector {
     }
 }
 
-#[derive(Copy, Clone, Default, Debug)]
+#[derive(Copy, Clone, Default, Debug, pgrx::AggregateName)]
 pub struct DemoUnique;
 
 #[pg_aggregate]
-impl Aggregate for DemoUnique {
+impl Aggregate<DemoUnique> for DemoUnique {
     type Args = &'static str;
     type State = Internal;
     type Finalize = i32;
@@ -110,8 +112,12 @@ impl Aggregate for DemoUnique {
 #[derive(Copy, Clone, Default, Debug)]
 pub struct AggregateWithOrderedSetArgs;
 
+#[derive(pgrx::AggregateName)]
+#[aggregate_name = "AggregateWithOrderedSetArgs"]
+struct AggWOS;
+
 #[pg_aggregate]
-impl Aggregate for AggregateWithOrderedSetArgs {
+impl Aggregate<AggWOS> for AggregateWithOrderedSetArgs {
     type Args = name!(input, pgrx::composite_type!('static, "Dog"));
     type State = pgrx::composite_type!('static, "Dog");
     type Finalize = pgrx::composite_type!('static, "Dog");
@@ -138,8 +144,12 @@ impl Aggregate for AggregateWithOrderedSetArgs {
 #[derive(Copy, Clone, Default, Debug)]
 pub struct AggregateWithMovingState;
 
+#[derive(pgrx::AggregateName)]
+#[aggregate_name = "AggregateWithMovingState"]
+struct AggWMS;
+
 #[pg_aggregate]
-impl Aggregate for AggregateWithMovingState {
+impl Aggregate<AggWMS> for AggregateWithMovingState {
     type Args = pgrx::composite_type!('static, "Dog");
     type State = pgrx::composite_type!('static, "Dog");
     type MovingState = pgrx::composite_type!('static, "Dog");

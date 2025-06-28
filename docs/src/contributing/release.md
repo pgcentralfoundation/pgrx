@@ -1,5 +1,5 @@
 ```shell
-./prepare-release.sh NEW_VERSION_NUMBER
+PGRX_HOME=/tmp/pgrx-release ./prepare-release.sh NEW_VERSION_NUMBER
 ```
 
 - go make a PR to `develop` on GitHub

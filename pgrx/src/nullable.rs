@@ -121,7 +121,7 @@ impl<T> Nullable<T> {
     where
         &'a A: Into<Cow<'a, str>>,
     {
-        self.into_option().expect(msg.into().as_ref())
+        self.into_option().unwrap_or_else(|| panic!("{}", msg.into().as_ref()))
     }
     /// Convert to a result, returning `err` if this enum is `Null`.
     #[inline]
@@ -372,7 +372,7 @@ pub struct MaybeStrictNulls<Inner: NullLayout<usize>> {
     pub inner: Option<Inner>,
 }
 
-impl<'mcx, Inner> MaybeStrictNulls<Inner>
+impl<Inner> MaybeStrictNulls<Inner>
 where
     Inner: NullLayout<usize>,
 {
@@ -382,10 +382,7 @@ where
     }
     #[inline]
     pub fn is_strict(&self) -> bool {
-        match self.inner {
-            Some(_) => false,
-            None => true,
-        }
+        self.inner.is_none()
     }
     #[inline]
     pub fn get_inner(&self) -> Option<&Inner> {

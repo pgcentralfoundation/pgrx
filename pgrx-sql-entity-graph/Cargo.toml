@@ -10,7 +10,7 @@
  
 [package]
 name = "pgrx-sql-entity-graph"
-version = "0.13.1"
+version = "0.14.3"
 authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
 license = "MIT"
 description = "Sql Entity Graph for `pgrx`"
@@ -32,8 +32,8 @@ quote.workspace = true
 syn.workspace = true
 thiserror.workspace = true
 
-convert_case = "0.7.1"
-petgraph = "0.7.1"
+convert_case = "0.8.0"
+petgraph = "0.8.1"
 unescape = "0.1.0" # for escaped-character-handling
 
 # colorized sql output

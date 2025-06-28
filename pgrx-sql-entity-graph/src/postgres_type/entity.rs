@@ -105,6 +105,10 @@ pub struct PostgresTypeEntity {
     pub in_fn_module_path: String,
     pub out_fn: &'static str,
     pub out_fn_module_path: String,
+    pub receive_fn: Option<&'static str>,
+    pub receive_fn_module_path: Option<String>,
+    pub send_fn: Option<&'static str>,
+    pub send_fn_module_path: Option<String>,
     pub to_sql_config: ToSqlConfigEntity,
     pub alignment: Option<usize>,
 }
@@ -152,6 +156,10 @@ impl ToSql for PostgresTypeEntity {
             out_fn,
             out_fn_module_path,
             in_fn,
+            receive_fn,
+            receive_fn_module_path,
+            send_fn,
+            send_fn_module_path,
             alignment,
             ..
         }) = item_node
@@ -217,6 +225,80 @@ impl ToSql for PostgresTypeEntity {
             .ok_or_else(|| eyre!("Could not find out_fn graph entity."))?;
         let out_fn_sql = out_fn_entity.to_sql(context)?;
 
+        let receive_fn_graph_index_and_receive_fn_sql = receive_fn_module_path
+            .as_ref()
+            .zip(*receive_fn)
+            .map(|(receive_fn_module_path, receive_fn)| {
+                let receive_fn_module_path = if !receive_fn_module_path.is_empty() {
+                    receive_fn_module_path.clone()
+                } else {
+                    module_path.to_string() // Presume a local
+                };
+                let receive_fn_path = format!(
+                    "{receive_fn_module_path}{maybe_colons}{receive_fn}",
+                    maybe_colons = if !receive_fn_module_path.is_empty() { "::" } else { "" }
+                );
+
+                // Find the receive function in the context
+                let (_, _index) = context
+                    .externs
+                    .iter()
+                    .find(|(k, _v)| k.full_path == receive_fn_path)
+                    .ok_or_else(|| eyre::eyre!("Did not find `receive_fn`: {receive_fn_path}."))?;
+
+                let (receive_fn_graph_index, receive_fn_entity) = context
+                    .graph
+                    .neighbors_undirected(self_index)
+                    .find_map(|neighbor| match &context.graph[neighbor] {
+                        SqlGraphEntity::Function(func) if func.full_path == receive_fn_path => {
+                            Some((neighbor, func))
+                        }
+                        _ => None,
+                    })
+                    .ok_or_else(|| eyre!("Could not find receive_fn graph entity."))?;
+                let receive_fn_sql = receive_fn_entity.to_sql(context)?;
+
+                Ok::<_, eyre::Report>((receive_fn_graph_index, receive_fn_sql, receive_fn_path))
+            })
+            .transpose()?;
+
+        let send_fn_graph_index_and_send_fn_sql = send_fn_module_path
+            .as_ref()
+            .zip(*send_fn)
+            .map(|(send_fn_module_path, send_fn)| {
+                let send_fn_module_path = if !send_fn_module_path.is_empty() {
+                    send_fn_module_path.clone()
+                } else {
+                    module_path.to_string() // Presume a local
+                };
+                let send_fn_path = format!(
+                    "{send_fn_module_path}{maybe_colons}{send_fn}",
+                    maybe_colons = if !send_fn_module_path.is_empty() { "::" } else { "" }
+                );
+
+                // Find the send function in the context
+                let (_, _index) = context
+                    .externs
+                    .iter()
+                    .find(|(k, _v)| k.full_path == send_fn_path)
+                    .ok_or_else(|| eyre::eyre!("Did not find `send_fn: {}`.", send_fn_path))?;
+
+                let (send_fn_graph_index, send_fn_entity) = context
+                    .graph
+                    .neighbors_undirected(self_index)
+                    .find_map(|neighbor| match &context.graph[neighbor] {
+                        SqlGraphEntity::Function(func) if func.full_path == send_fn_path => {
+                            Some((neighbor, func))
+                        }
+                        _ => None,
+                    })
+                    .ok_or_else(|| eyre!("Could not find send_fn graph entity."))?;
+                let send_fn_sql = send_fn_entity.to_sql(context)?;
+
+                Ok::<_, eyre::Report>((send_fn_graph_index, send_fn_sql, send_fn_path))
+            })
+            .transpose()?;
+
         let shell_type = format!(
             "\n\
                 -- {file}:{line}\n\
@@ -244,6 +326,29 @@ impl ToSql for PostgresTypeEntity {
             })
             .unwrap_or_default();
 
+        let (receive_send_attributes, receive_send_sql) = receive_fn_graph_index_and_receive_fn_sql
+            .zip(send_fn_graph_index_and_send_fn_sql)
+            .map(|((receive_fn_graph_index, receive_fn_sql, receive_fn_path), (send_fn_graph_index, send_fn_sql, send_fn_path))| {
+                let receive_fn = receive_fn.unwrap();
+                let send_fn = send_fn.unwrap();
+                (
+                    format! {
+                        "\
+                        \tRECEIVE = {schema_prefix_receive_fn}{receive_fn}, /* {receive_fn_path} */\n\
+                        \tSEND = {schema_prefix_send_fn}{send_fn}, /* {send_fn_path} */\n\
+                        ",
+                        schema_prefix_receive_fn = context.schema_prefix_for(&receive_fn_graph_index),
+                        schema_prefix_send_fn = context.schema_prefix_for(&send_fn_graph_index),
+                    },
+                    format! {
+                        "\n\
+                        {receive_fn_sql}\n\
+                        {send_fn_sql}\n\
+                        "
+                    }
+                )
+            }).unwrap_or_default();
+
         let materialized_type = format! {
             "\n\
                 -- {file}:{line}\n\
@@ -252,14 +357,24 @@ impl ToSql for PostgresTypeEntity {
                     \tINTERNALLENGTH = variable,\n\
                     \tINPUT = {schema_prefix_in_fn}{in_fn}, /* {in_fn_path} */\n\
                     \tOUTPUT = {schema_prefix_out_fn}{out_fn}, /* {out_fn_path} */\n\
+                    {receive_send_attributes}\
                     \tSTORAGE = extended{alignment}\n\
                 );\
             ",
             schema = context.schema_prefix_for(&self_index),
             schema_prefix_in_fn = context.schema_prefix_for(&in_fn_graph_index),
-            schema_prefix_out_fn = context.schema_prefix_for(&out_fn_graph_index),
+            schema_prefix_out_fn = context.schema_prefix_for(&out_fn_graph_index)
         };
 
-        Ok(shell_type + "\n" + &in_fn_sql + "\n" + &out_fn_sql + "\n" + &materialized_type)
+        let result = shell_type
+            + "\n"
+            + &in_fn_sql
+            + "\n"
+            + &out_fn_sql
+            + &receive_send_sql
+            + "\n"
+            + &materialized_type;
+
+        Ok(result)
     }
 }

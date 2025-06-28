@@ -10,11 +10,11 @@
 // If this code doesn't generate a syntax error in the generated SQL then PR #1134 is working as expected
 use pgrx::{prelude::*, Internal};
 
+#[derive(AggregateName)]
 pub struct Foo;
 
 #[pg_aggregate]
-impl Aggregate for Foo {
-    const NAME: &'static str = "foo";
+impl Aggregate<Foo> for Foo {
     const ORDERED_SET: bool = true;
 
     type OrderedSetArgs = (name!(a, f64), name!(b, f64));

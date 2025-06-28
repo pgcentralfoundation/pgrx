@@ -43,6 +43,7 @@ enum CargoPgrxSubCommands {
     Get(super::get::Get),
     Cross(super::cross::Cross),
     Upgrade(super::upgrade::Upgrade),
+    Regress(super::regress::Regress),
 }
 
 impl CommandExecute for CargoPgrxSubCommands {
@@ -65,6 +66,7 @@ impl CommandExecute for CargoPgrxSubCommands {
             Get(c) => c.execute(),
             Cross(c) => c.execute(),
             Upgrade(c) => c.execute(),
+            Regress(c) => c.execute(),
         }
     }
 }

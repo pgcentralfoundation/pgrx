@@ -198,14 +198,28 @@ pub trait HasExtractableParts: Clone + IntoDatum + seal::DateTimeType {
                 Self::EXTRACT_FUNCTION,
                 &[field_datum, self.clone().into_datum()],
             );
-            #[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
+            #[cfg(any(
+                feature = "pg14",
+                feature = "pg15",
+                feature = "pg16",
+                feature = "pg17",
+                feature = "pg18"
+            ))]
             let field_value: Option<AnyNumeric> = direct_function_call(
                 Self::EXTRACT_FUNCTION,
                 &[field_datum, self.clone().into_datum()],
             );
             // don't leak the TEXT datum we made
             pg_sys::pfree(field_datum.unwrap().cast_mut_ptr());
-            field_value.map(|v| v.try_into().unwrap())
+
+            #[cfg(feature = "pg13")]
+            {
+                field_value.map(|v| AnyNumeric::from_str(&format!("{v}")).unwrap())
+            }
+            #[cfg(not(feature = "pg13"))]
+            {
+                field_value
+            }
         }
     }
 }
@@ -249,7 +263,8 @@ pub trait ToIsoString: IntoDatum + Sized + Display + seal::DateTimeType {
         feature = "pg14",
         feature = "pg15",
         feature = "pg16",
-        feature = "pg17"
+        feature = "pg17",
+        feature = "pg18"
     ))]
     fn to_iso_string_with_timezone<Tz: AsRef<str>>(
         self,
@@ -412,7 +427,13 @@ mod pg13 {
     }
 }
 
-#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
+#[cfg(any(
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17",
+    feature = "pg18"
+))]
 const DATE_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_date;
 impl_wrappers!(
@@ -428,7 +449,13 @@ impl_wrappers!(
 #[cfg(feature = "pg13")]
 const TIME_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::time_part;
-#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
+#[cfg(any(
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17",
+    feature = "pg18"
+))]
 const TIME_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_time;
 
@@ -445,7 +472,13 @@ impl_wrappers!(
 #[cfg(feature = "pg13")]
 const TIMETZ_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::timetz_part;
-#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
+#[cfg(any(
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17",
+    feature = "pg18"
+))]
 const TIMETZ_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_timetz;
 
@@ -462,7 +495,13 @@ impl_wrappers!(
 #[cfg(feature = "pg13")]
 const TIMESTAMP_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::timestamp_part;
-#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
+#[cfg(any(
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17",
+    feature = "pg18"
+))]
 const TIMESTAMP_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_timestamp;
 
@@ -479,7 +518,13 @@ impl_wrappers!(
 #[cfg(feature = "pg13")]
 const TIMESTAMPTZ_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::timestamptz_part;
-#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
+#[cfg(any(
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17",
+    feature = "pg18"
+))]
 const TIMESTAMPTZ_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_timestamptz;
 
@@ -496,7 +541,13 @@ impl_wrappers!(
 #[cfg(feature = "pg13")]
 const INTERVAL_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::interval_part;
-#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17"))]
+#[cfg(any(
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16",
+    feature = "pg17",
+    feature = "pg18"
+))]
 const INTERVAL_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_interval;
 
@@ -517,10 +568,8 @@ impl_wrappers!(
 /// if the `zone` is "CEST", which is GMT+2, then the result is `7200`.
 ///
 /// ## Errors
-///
 /// Returns a [`DateTimeConversionError`] if the specified timezone is unknown to Postgres
-
-#[cfg(any(feature = "pg16", feature = "pg17"))]
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
 pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, DateTimeConversionError> {
     let zone = zone.as_ref();
     PgTryBuilder::new(|| {

@@ -78,7 +78,7 @@ impl CommandExecute for Info {
     }
 }
 
-fn version(ver: &str) -> Cow<str> {
+fn version(ver: &str) -> Cow<'_, str> {
     if ver.starts_with("pg") {
         Cow::Borrowed(ver)
     } else {
