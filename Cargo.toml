@@ -9,7 +9,7 @@
 #LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 [workspace]
-resolver = "2"
+resolver = "3"
 members = [
     "cargo-pgrx",
     "pgrx",
@@ -51,6 +51,13 @@ exclude = [
     "pgrx-examples/versioned_so",
 ]
 
+[workspace.package]
+authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/pgcentralfoundation/pgrx/"
+homepage = "https://github.com/pgcentralfoundation/pgrx/"
+version = "0.15.0"
 
 [workspace.metadata.local-install]
 cargo-pgrx = { path = "cargo-pgrx" }

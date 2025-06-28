@@ -10,15 +10,15 @@
 
 [package]
 name = "pgrx-tests"
-version = "0.15.0"
-authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
-license = "MIT"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
 description = "Test framework for 'pgrx'-based Postgres extensions"
-homepage = "https://github.com/pgcentralfoundation/pgrx/"
-repository = "https://github.com/pgcentralfoundation/pgrx/"
+homepage.workspace = true
+repository.workspace = true
 documentation = "https://docs.rs/pgrx-tests"
 readme = "README.md"
-edition = "2021"
+edition.workspace = true
 include = ["src/**/*", "README.md", "!**/tests/**/*"]
 
 [lib]

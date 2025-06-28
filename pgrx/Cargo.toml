@@ -10,17 +10,17 @@
 
 [package]
 name = "pgrx"
-version = "0.15.0"
-authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
-license = "MIT"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
 description = "pgrx:  A Rust framework for creating Postgres extensions"
-homepage = "https://github.com/pgcentralfoundation/pgrx/"
-repository = "https://github.com/pgcentralfoundation/pgrx/"
+homepage.workspace = true
+repository.workspace = true
 documentation = "https://docs.rs/pgrx"
 categories = ["database"]
 keywords = ["database", "postgres", "postgresql", "extension"]
 readme = "../README.md"
-edition = "2021"
+edition.workspace = true
 include = ["src/**/*"]
 
 [lib]
