@@ -161,7 +161,6 @@ pub fn main() -> eyre::Result<()> {
     }
 
     let compile_cshim = env_tracked("CARGO_FEATURE_CSHIM").as_deref() == Some("1");
-
     let is_for_release =
         env_tracked("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").as_deref() == Some("1");
 
@@ -897,6 +896,9 @@ fn add_blocklists(bind: bindgen::Builder) -> bindgen::Builder {
         .blocklist_function("raw_expression_tree_walker")
         .blocklist_function("type_is_array")
         .blocklist_function("varsize_any")
+        // we define these ourselves b/c Postgres is schizophrenic about them across versions
+        .blocklist_function("PageValidateSpecialPointer")
+        .blocklist_function("PageIsValid")
         // it's defined twice on Windows, so use PGERROR instead
         .blocklist_item("ERROR")
         // it causes strange linker errors for PostgreSQL 14 on Windows
