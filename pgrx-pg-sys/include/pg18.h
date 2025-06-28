@@ -185,6 +185,7 @@
 #include "utils/memutils.h"
 #include "utils/numeric.h"
 #include "utils/palloc.h"
+#include "utils/ps_status.h"
 #include "utils/regproc.h"
 #include "utils/rel.h"
 #include "utils/relcache.h"
