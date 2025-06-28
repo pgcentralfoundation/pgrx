@@ -75,6 +75,7 @@
 #include "commands/defrem.h"
 #include "commands/event_trigger.h"
 #include "commands/explain.h"
+#include "commands/explain_format.h"
 #include "commands/extension.h"
 #include "commands/prepare.h"
 #include "commands/proclang.h"

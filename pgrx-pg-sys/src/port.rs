@@ -479,6 +479,15 @@ pub unsafe fn raw_expression_tree_walker(
     crate::raw_expression_tree_walker_impl(node, walker, context)
 }
 
+#[cfg(feature = "pg18")]
+pub unsafe fn expression_tree_mutator(
+    node: *mut crate::Node,
+    mutator: crate::tree_mutator_callback,
+    context: *mut ::core::ffi::c_void,
+) -> *mut crate::Node {
+    crate::expression_tree_mutator_impl(node, mutator, context)
+}
+
 #[inline(always)]
 pub unsafe fn MemoryContextSwitchTo(context: crate::MemoryContext) -> crate::MemoryContext {
     let old = crate::CurrentMemoryContext;
@@ -611,6 +620,22 @@ pub unsafe fn PageGetSpecialSize(page: pg_sys::Page) -> u16 {
 #[inline(always)]
 #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
 pub unsafe fn PageGetSpecialPointer(page: pg_sys::Page) -> *mut ::core::ffi::c_char {
+    /*
+    #define PageGetSpecialPointer(page) \
+    ( \
+        PageValidateSpecialPointer(page), \
+        ((page) + ((PageHeader) (page))->pd_special) \
+    )
+    */
+    let page_header = page as *mut pg_sys::PageHeaderData;
+    page.add((*page_header).pd_special as usize) as *mut ::core::ffi::c_char
+}
+
+#[allow(non_snake_case)]
+#[inline(always)]
+#[cfg(feature = "pg18")]
+pub unsafe fn PageGetSpecialPointer(page: pg_sys::Page) -> *mut ::core::ffi::c_char {
+    crate::PageValidateSpecialPointer(page);
     // #define PageGetSpecialPointer(page) \
     // ((char *) ((char *) (page) + ((PageHeader) (page))->pd_special))
     let page_header = page as *mut pg_sys::PageHeaderData;
