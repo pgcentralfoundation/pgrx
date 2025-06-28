@@ -79,7 +79,7 @@ impl CommandExecute for Start {
 }
 
 pub(crate) fn collect_postgresql_conf_settings(
-    settings: &Vec<String>,
+    settings: &[String],
 ) -> eyre::Result<HashMap<String, String>> {
     settings
         .iter()

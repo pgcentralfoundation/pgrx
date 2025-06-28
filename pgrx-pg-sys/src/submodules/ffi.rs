@@ -154,6 +154,7 @@ pub unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(f: F) -> T {
     unsafe { pg_guard_ffi_boundary_impl(f) }
 }
 
+#[allow(clippy::missing_transmute_annotations)]
 #[inline(always)]
 #[track_caller]
 unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
@@ -207,24 +208,37 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
             // copy out the fields we need to support pgrx' error handling
             let level = errdata.elevel.into();
             let sqlerrcode = errdata.sqlerrcode.into();
-            let message = errdata
-                .message
-                .is_null()
-                .then(|| String::from("<null error message>"))
-                .unwrap_or_else(|| CStr::from_ptr(errdata.message).to_string_lossy().to_string());
-            let detail = errdata.detail.is_null().then_some(None).unwrap_or_else(|| {
-                Some(CStr::from_ptr(errdata.detail).to_string_lossy().to_string())
-            });
-            let hint = errdata.hint.is_null().then_some(None).unwrap_or_else(|| {
-                Some(CStr::from_ptr(errdata.hint).to_string_lossy().to_string())
-            });
-            let funcname = errdata.funcname.is_null().then_some(None).unwrap_or_else(|| {
-                Some(CStr::from_ptr(errdata.funcname).to_string_lossy().to_string())
-            });
-            let file =
-                errdata.filename.is_null().then(|| String::from("<null filename>")).unwrap_or_else(
-                    || CStr::from_ptr(errdata.filename).to_string_lossy().to_string(),
-                );
+            let message = if errdata.message.is_null() {
+                String::from("<null error message>")
+            } else {
+                CStr::from_ptr(errdata.message).to_string_lossy().to_string()
+            };
+            let detail = if errdata.detail.is_null() {
+                None
+            } else {
+                {
+                    Some(CStr::from_ptr(errdata.detail).to_string_lossy().to_string())
+                }
+            };
+            let hint = if errdata.hint.is_null() {
+                None
+            } else {
+                {
+                    Some(CStr::from_ptr(errdata.hint).to_string_lossy().to_string())
+                }
+            };
+            let funcname = if errdata.funcname.is_null() {
+                None
+            } else {
+                {
+                    Some(CStr::from_ptr(errdata.funcname).to_string_lossy().to_string())
+                }
+            };
+            let file = if errdata.filename.is_null() {
+                String::from("<null filename>")
+            } else {
+                CStr::from_ptr(errdata.filename).to_string_lossy().to_string()
+            };
             let line = errdata.lineno as _;
 
             // clean up after ourselves by freeing the result of [CopyErrorData] and restoring

@@ -85,7 +85,7 @@ impl Package {
                 &pg_config,
                 &package_manifest_path,
                 &profile,
-                self.target.as_ref().map(|x| x.as_str()),
+                self.target.as_deref(),
             )?
         };
 
@@ -98,7 +98,7 @@ impl Package {
             &profile,
             self.test,
             &self.features,
-            self.target.as_ref().map(|x| x.as_str()),
+            self.target.as_deref(),
         )?;
 
         Ok((out_dir, output_files))

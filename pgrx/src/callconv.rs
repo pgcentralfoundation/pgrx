@@ -134,7 +134,7 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::PgBox<T> {
         let index = arg.index();
         unsafe {
             Self::from_datum(arg.2.value, arg.is_null())
-                .unwrap_or_else(|| panic!("argument {} must not be null", index))
+                .unwrap_or_else(|| panic!("argument {index} must not be null"))
         }
     }
 }
@@ -144,7 +144,7 @@ unsafe impl<'fcx> ArgAbi<'fcx> for PgHeapTuple<'fcx, AllocatedByRust> {
         let index = arg.index();
         unsafe {
             FromDatum::from_datum(arg.2.value, arg.is_null())
-                .unwrap_or_else(|| panic!("argument {} must not be null", index))
+                .unwrap_or_else(|| panic!("argument {index} must not be null"))
         }
     }
 }
@@ -189,7 +189,7 @@ where
         let index = arg.index();
         unsafe {
             arg.unbox_arg_using_from_datum()
-                .unwrap_or_else(|| panic!("argument {} must not be null", index))
+                .unwrap_or_else(|| panic!("argument {index} must not be null"))
         }
     }
 }
@@ -520,7 +520,7 @@ unsafe impl BoxRet for f64 {
     }
 }
 
-unsafe impl<'a> BoxRet for &'a [u8] {
+unsafe impl BoxRet for &[u8] {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
         match self.into_datum() {
             Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
@@ -529,7 +529,7 @@ unsafe impl<'a> BoxRet for &'a [u8] {
     }
 }
 
-unsafe impl<'a> BoxRet for &'a str {
+unsafe impl BoxRet for &str {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
         match self.into_datum() {
             Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
@@ -538,7 +538,7 @@ unsafe impl<'a> BoxRet for &'a str {
     }
 }
 
-unsafe impl<'a> BoxRet for &'a CStr {
+unsafe impl BoxRet for &CStr {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
         match self.into_datum() {
             Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },

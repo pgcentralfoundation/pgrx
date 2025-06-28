@@ -77,6 +77,7 @@ impl<'a> PgTrigger<'a> {
     /// Returns the new database row for INSERT/UPDATE operations in row-level triggers.
     ///
     /// Returns `None` in statement-level triggers and DELETE operations.
+    #[allow(clippy::new_ret_no_self)]
     // Derived from `pgrx_pg_sys::TriggerData.tg_newtuple` and `pgrx_pg_sys::TriggerData.tg_newslot.tts_tupleDescriptor`
     pub fn new(&self) -> Option<PgHeapTuple<'_, AllocatedByPostgres>> {
         // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,

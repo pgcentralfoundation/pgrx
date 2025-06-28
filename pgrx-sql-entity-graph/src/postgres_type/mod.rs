@@ -283,12 +283,12 @@ impl Parse for CodeEnrichment<PostgresTypeDerive> {
         let pg_binary_protocol = attrs.iter().any(|a| a.path().is_ident("pg_binary_protocol"));
 
         let to_sql_config = ToSqlConfig::from_attributes(attrs.as_slice())?.unwrap_or_default();
-        let in_fn = Ident::new(&format!("{}_in", ident).to_lowercase(), ident.span());
-        let out_fn = Ident::new(&format!("{}_out", ident).to_lowercase(), ident.span());
+        let in_fn = Ident::new(&format!("{ident}_in").to_lowercase(), ident.span());
+        let out_fn = Ident::new(&format!("{ident}_out").to_lowercase(), ident.span());
         let receive_fn = (pg_binary_protocol)
-            .then(|| Ident::new(&format!("{}_recv", ident).to_lowercase(), ident.span()));
+            .then(|| Ident::new(&format!("{ident}_recv").to_lowercase(), ident.span()));
         let send_fn = (pg_binary_protocol)
-            .then(|| Ident::new(&format!("{}_send", ident).to_lowercase(), ident.span()));
+            .then(|| Ident::new(&format!("{ident}_send").to_lowercase(), ident.span()));
         let alignment = Alignment::from_attributes(attrs.as_slice())?;
         PostgresTypeDerive::new(
             ident,

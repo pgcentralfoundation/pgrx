@@ -92,23 +92,23 @@ pub(crate) fn find_control_file(
         .parent()
         .ok_or_else(|| eyre!("could not get parent of `{}`", manifest_path.as_ref().display()))?;
 
-    for f in std::fs::read_dir(parent).wrap_err_with(|| {
+    for f in (std::fs::read_dir(parent).wrap_err_with(|| {
         eyre!("cannot open current directory `{}` for reading", parent.display())
-    })? {
-        if let Ok(f) = f {
-            let f_path = f.path();
-            if f_path.extension() == Some("control".as_ref()) {
-                let file_stem = f_path
-                    .file_stem()
-                    .ok_or_else(|| eyre!("could not get file stem of `{}`", f_path.display()))?;
-                let file_stem = file_stem
-                    .to_str()
-                    .ok_or_else(|| {
-                        eyre!("could not get file stem as String from `{}`", f_path.display())
-                    })?
-                    .to_string();
-                return Ok((f_path, file_stem));
-            }
+    })?)
+    .flatten()
+    {
+        let f_path = f.path();
+        if f_path.extension() == Some("control".as_ref()) {
+            let file_stem = f_path
+                .file_stem()
+                .ok_or_else(|| eyre!("could not get file stem of `{}`", f_path.display()))?;
+            let file_stem = file_stem
+                .to_str()
+                .ok_or_else(|| {
+                    eyre!("could not get file stem as String from `{}`", f_path.display())
+                })?
+                .to_string();
+            return Ok((f_path, file_stem));
         }
     }
 

@@ -89,7 +89,7 @@ impl Internal {
     /// We cannot guarantee that the contained datum points to memory that is really `T`.  This is
     /// your responsibility.
     #[inline(always)]
-    pub unsafe fn get_mut<T>(&self) -> Option<&mut T> {
+    pub unsafe fn get_mut<T>(&mut self) -> Option<&mut T> {
         self.0.and_then(|datum| (datum.cast_mut_ptr::<T>()).as_mut())
     }
 

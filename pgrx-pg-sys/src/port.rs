@@ -556,7 +556,7 @@ pub unsafe fn PageGetContents(page: pg_sys::Page) -> *mut ::core::ffi::c_char {
     // ((char *) (page) + MAXALIGN(SizeOfPageHeaderData))
     const SizeOfPageHeaderData: pg_sys::Size =
         core::mem::offset_of!(pg_sys::PageHeaderData, pd_linp);
-    page.add(pg_sys::MAXALIGN(SizeOfPageHeaderData) as usize) as *mut ::core::ffi::c_char
+    page.add(pg_sys::MAXALIGN(SizeOfPageHeaderData)) as *mut ::core::ffi::c_char
 }
 
 #[allow(non_snake_case)]

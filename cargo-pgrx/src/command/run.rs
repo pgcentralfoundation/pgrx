@@ -114,7 +114,7 @@ impl Run {
             &profile,
             &self.features,
             self.install_only,
-            self.target.as_ref().map(|x| x.as_str()),
+            self.target.as_deref(),
             postgresql_conf,
         )?;
 

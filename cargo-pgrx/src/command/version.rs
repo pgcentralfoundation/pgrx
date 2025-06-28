@@ -12,7 +12,7 @@ use pgrx_pg_config::{PgConfig, Pgrx, SUPPORTED_VERSIONS};
 pub(crate) fn pgrx_default() -> eyre::Result<Pgrx> {
     let mut pgrx = Pgrx::default();
 
-    rss::PostgreSQLVersionRss::new(&SUPPORTED_VERSIONS())?
+    rss::PostgreSQLVersionRss::try_new(&SUPPORTED_VERSIONS())?
         .into_iter()
         .for_each(|version| pgrx.push(PgConfig::from(version)));
 
@@ -43,7 +43,7 @@ mod rss {
     pub(super) struct PostgreSQLVersionRss;
 
     impl PostgreSQLVersionRss {
-        pub(super) fn new(supported_versions: &[PgVersion]) -> eyre::Result<Vec<PgVersion>> {
+        pub(super) fn try_new(supported_versions: &[PgVersion]) -> eyre::Result<Vec<PgVersion>> {
             static VERSIONS_RSS_URL: &str = "https://www.postgresql.org/versions.rss";
 
             let http_client = build_agent_for_url(VERSIONS_RSS_URL)?;

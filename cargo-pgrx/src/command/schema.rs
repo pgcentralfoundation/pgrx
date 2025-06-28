@@ -103,7 +103,7 @@ impl CommandExecute for Schema {
             &profile,
             self.test,
             &self.features,
-            self.target.as_ref().map(|x| x.as_str()),
+            self.target.as_deref(),
             self.out.as_ref(),
             self.dot,
             log_level,

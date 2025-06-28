@@ -390,7 +390,7 @@ where
     }
 }
 
-impl<'mcx, Inner> NullLayout<usize> for MaybeStrictNulls<Inner>
+impl<Inner> NullLayout<usize> for MaybeStrictNulls<Inner>
 where
     Inner: NullLayout<usize>,
 {

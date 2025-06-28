@@ -171,7 +171,7 @@ impl<'src> DatumWithOid<'src> {
     ///
     /// [`Oid`]: pg_sys::Oid
     pub unsafe fn new<T: IntoDatum>(value: T, oid: pg_sys::Oid) -> Self {
-        Self::new_from_datum(value.into_datum().map(|d| Datum(d, PhantomData::default())), oid)
+        Self::new_from_datum(value.into_datum().map(|d| Datum(d, PhantomData)), oid)
     }
 
     /// Construct a `DatumWithOid` given an optional [`Datum`] and [`Oid`].
@@ -196,7 +196,7 @@ impl<'src> DatumWithOid<'src> {
 
     /// Returns an [`Option<Datum>`].
     pub fn datum(&self) -> Option<Datum<'src>> {
-        self.datum.as_ref().map(|d| Datum(d.0, PhantomData::default()))
+        self.datum.as_ref().map(|d| Datum(d.0, PhantomData))
     }
 
     /// Returns an [`Oid`].

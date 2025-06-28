@@ -1217,7 +1217,7 @@ fn rust_fmt(path: &Path) -> eyre::Result<()> {
             );
 
             for line in rustfmt_output.lines() {
-                println!("cargo:warning={}", line);
+                println!("cargo:warning={line}");
             }
 
             // we won't fail the build because rustfmt failed

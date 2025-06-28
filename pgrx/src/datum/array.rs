@@ -569,7 +569,9 @@ mod casper {
                 8 => pg_sys::Datum::from(byval_read::<u64>(ptr)),
                 _ => unreachable!("`N` must be 1, 2, 4, or 8 (got {N})"),
             };
-            Some(T::unbox(core::mem::transmute(datum)))
+            Some(T::unbox(core::mem::transmute::<pgrx_pg_sys::Datum, crate::datum::Datum<'_>>(
+                datum,
+            )))
         }
 
         #[inline(always)]
@@ -591,7 +593,9 @@ mod casper {
             ptr: *const u8,
         ) -> Option<T::As<'arr>> {
             let datum = pg_sys::Datum::from(ptr);
-            Some(T::unbox(core::mem::transmute(datum)))
+            Some(T::unbox(core::mem::transmute::<pgrx_pg_sys::Datum, crate::datum::Datum<'_>>(
+                datum,
+            )))
         }
 
         #[inline]
@@ -615,7 +619,9 @@ mod casper {
             ptr: *const u8,
         ) -> Option<T::As<'arr>> {
             let datum = pg_sys::Datum::from(ptr);
-            Some(T::unbox(core::mem::transmute(datum)))
+            Some(T::unbox(core::mem::transmute::<pgrx_pg_sys::Datum, crate::datum::Datum<'_>>(
+                datum,
+            )))
         }
 
         #[inline]
@@ -640,7 +646,9 @@ mod casper {
             ptr: *const u8,
         ) -> Option<T::As<'arr>> {
             let datum = pg_sys::Datum::from(ptr);
-            Some(T::unbox(core::mem::transmute(datum)))
+            Some(T::unbox(core::mem::transmute::<pgrx_pg_sys::Datum, crate::datum::Datum<'_>>(
+                datum,
+            )))
         }
 
         #[inline]
@@ -1076,7 +1084,7 @@ where
     T: IntoDatum + Copy + 'a,
 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        array_datum_from_iter(self.into_iter().copied())
+        array_datum_from_iter(self.iter().copied())
     }
 
     fn type_oid() -> pg_sys::Oid {

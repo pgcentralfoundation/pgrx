@@ -219,7 +219,7 @@ unsafe fn fetchatt(A: *const crate::FormData_pg_attribute, T: *mut std::os::raw:
 ///
 /// Caller is responsible for ensuring `A` is a valid [`FormData_pg_attribute`] pointer
 #[inline(always)]
-#[cfg(any(feature = "pg18"))]
+#[cfg(feature = "pg18")]
 unsafe fn fetchatt(A: *const crate::CompactAttribute, T: *mut std::os::raw::c_char) -> Datum {
     // #define fetchatt(A,T) fetch_att(T, (A)->attbyval, (A)->attlen)
 

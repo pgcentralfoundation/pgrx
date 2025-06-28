@@ -29,7 +29,7 @@ pub unsafe trait PGRXSharedMemory {}
 /// Custom types need to also implement the `PGRXSharedMemory` trait.
 ///
 /// > Extensions that use shared memory **must** be loaded via `postgresql.conf`'s
-/// `shared_preload_libraries` configuration setting.  
+/// > `shared_preload_libraries` configuration setting.  
 ///
 /// # Example
 ///

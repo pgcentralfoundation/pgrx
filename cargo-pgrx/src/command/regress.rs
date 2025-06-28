@@ -167,8 +167,7 @@ impl Regress {
         };
 
         // remove the "setup" file from the list
-        let setup_entry =
-            files.iter().position(|entry| is_setup(entry)).map(|idx| files.remove(idx));
+        let setup_entry = files.iter().position(is_setup).map(|idx| files.remove(idx));
 
         // not all filesystems list directories sorted and we want some kind of guaranteed evaluation order
         files.sort_unstable_by_key(|entry| entry.file_name());
@@ -229,7 +228,7 @@ impl Regress {
         }
 
         let expected_path = manifest_path_to_expected_tests_output_path(manifest_path)
-            .join(&format!("{test_name}{}.out", variant_suffix.unwrap_or_default()));
+            .join(format!("{test_name}{}.out", variant_suffix.unwrap_or_default()));
 
         if expected_path.exists() {
             println!(
@@ -265,7 +264,7 @@ impl Regress {
         include_setup: bool,
         auto: bool,
     ) -> eyre::Result<()> {
-        let output_names = output_files.iter().map(|e| make_test_name(*e)).collect::<HashSet<_>>();
+        let output_names = output_files.iter().map(|e| make_test_name(e)).collect::<HashSet<_>>();
 
         // look for new tests (tests without a corresponding output file)
         let new_tests = test_files
@@ -284,10 +283,10 @@ impl Regress {
             );
             for new_test in new_tests {
                 if let Some(test_result_output) = create_regress_output(
-                    &pg_config,
+                    pg_config,
                     &manifest_path,
                     &pgregress_path,
-                    &dbname,
+                    dbname,
                     new_test,
                 )? {
                     self.accept_new_test(&manifest_path, test_result_output, auto)?;
@@ -439,7 +438,7 @@ fn create_regress_output(
     dbname: &str,
     test_file: &DirEntry,
 ) -> eyre::Result<Option<PathBuf>> {
-    let test_name = make_test_name(&test_file);
+    let test_name = make_test_name(test_file);
     let input_dir = test_file.path();
     let input_dir = input_dir
         .parent()
@@ -454,7 +453,7 @@ fn create_regress_output(
         // doesn't exist, since we are creating the test output.  So if that's the case, if we have
         // a `.out` file for it in the results/ directory, then we're successful
         let out_file =
-            manifest_path_to_results_output_path(&manifest_path).join(&format!("{test_name}.out"));
+            manifest_path_to_results_output_path(&manifest_path).join(format!("{test_name}.out"));
         if out_file.exists() {
             return Ok(Some(out_file));
         } else {
@@ -493,9 +492,9 @@ fn pg_regress(
         .arg("--port")
         .arg(pg_config.port()?.to_string())
         .arg("--use-existing")
-        .arg(&format!("--dbname={dbname}"))
-        .arg(&format!("--inputdir={}", input_dir.as_ref().display()))
-        .arg(&format!("--outputdir={}", input_dir.as_ref().display()))
+        .arg(format!("--dbname={dbname}"))
+        .arg(format!("--inputdir={}", input_dir.as_ref().display()))
+        .arg(format!("--outputdir={}", input_dir.as_ref().display()))
         .args(tests);
 
     #[cfg(not(target_os = "windows"))]
@@ -506,8 +505,7 @@ fn pg_regress(
             // in order to avoid verbose log output being enshrined in expected test output
             const LAUNCHER_SCRIPT: &[u8] = b"#! /bin/bash\n$* -v VERBOSITY=terse";
 
-            let path = PathBuf::from(temp_dir())
-                .join(&format!("pgrx-pg_regress-runner-{}.sh", std::process::id()));
+            let path = temp_dir().join(format!("pgrx-pg_regress-runner-{}.sh", std::process::id()));
             let mut tmpfile = File::create(&path)?;
             tmpfile.write_all(LAUNCHER_SCRIPT)?;
             let mut perms = path.metadata()?.permissions();
@@ -516,7 +514,7 @@ fn pg_regress(
             Ok(path)
         }
         let launcher_script = make_launcher_script()?;
-        command.arg(&format!("--launcher={}", launcher_script.display()));
+        command.arg(format!("--launcher={}", launcher_script.display()));
         launcher_script
     };
 
@@ -559,9 +557,7 @@ fn decorate_output(input: &str) -> String {
             // for pg_regress from pg16 forward, rewrite the "no ok" into a colored FAIL"
             line = line.replace("not ok", "not_ok"); // to make parsing easier down below
             is_new_line = true;
-        } else if line.contains("... ok") {
-            is_old_line = true;
-        } else if line.contains("... FAILED") {
+        } else if line.contains("... ok") || line.contains("... FAILED") {
             is_old_line = true;
         }
 
@@ -657,10 +653,9 @@ fn manifest_path_to_results_output_path(manifest_path: impl AsRef<Path>) -> Path
 
 fn add_to_git(path: impl AsRef<Path>) -> eyre::Result<()> {
     if let Ok(git) = which::which("git") {
-        if is_git_repo(&git) {
-            if !Command::new(git).arg("add").arg(path.as_ref()).status()?.success() {
-                panic!("unable to add {} to git", path.as_ref().display());
-            }
+        if is_git_repo(&git) && !Command::new(git).arg("add").arg(path.as_ref()).status()?.success()
+        {
+            panic!("unable to add {} to git", path.as_ref().display());
         }
     }
     Ok(())

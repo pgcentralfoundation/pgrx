@@ -1388,7 +1388,7 @@ fn make_extern_connection(
             Ok(())
         }
         None => Err(eyre!("Did not find connection `{full_path}` in {:#?}", {
-            let mut paths = externs.iter().map(|(v, _)| v.full_path).collect::<Vec<_>>();
+            let mut paths = externs.keys().map(|v| v.full_path).collect::<Vec<_>>();
             paths.sort();
             paths
         })),

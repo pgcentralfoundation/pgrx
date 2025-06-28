@@ -54,8 +54,8 @@ impl<T> PgLwLock<T> {
     pub fn share(&self) -> PgLwLockShareGuard<'_, T> {
         unsafe {
             let shared = self.inner.get().read().as_ref().expect("PgLwLock was not initialized");
-            pg_sys::LWLockAcquire((*shared).lock_ptr, pg_sys::LWLockMode::LW_SHARED);
-            PgLwLockShareGuard { data: &*(*shared).data.get(), lock: (*shared).lock_ptr }
+            pg_sys::LWLockAcquire(shared.lock_ptr, pg_sys::LWLockMode::LW_SHARED);
+            PgLwLockShareGuard { data: &*shared.data.get(), lock: shared.lock_ptr }
         }
     }
 
@@ -63,8 +63,8 @@ impl<T> PgLwLock<T> {
     pub fn exclusive(&self) -> PgLwLockExclusiveGuard<'_, T> {
         unsafe {
             let shared = self.inner.get().read().as_ref().expect("PgLwLock was not initialized");
-            pg_sys::LWLockAcquire((*shared).lock_ptr, pg_sys::LWLockMode::LW_EXCLUSIVE);
-            PgLwLockExclusiveGuard { data: &mut *(*shared).data.get(), lock: (*shared).lock_ptr }
+            pg_sys::LWLockAcquire(shared.lock_ptr, pg_sys::LWLockMode::LW_EXCLUSIVE);
+            PgLwLockExclusiveGuard { data: &mut *shared.data.get(), lock: shared.lock_ptr }
         }
     }
 

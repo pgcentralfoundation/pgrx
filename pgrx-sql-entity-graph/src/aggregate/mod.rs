@@ -191,7 +191,7 @@ impl PgAggregate {
         let generic_type_name = get_generic_type_name(&generic_type)?;
 
         let snake_case_target_ident =
-            format!("{}_{}", target_ident, generic_type_name).to_case(Case::Snake);
+            format!("{target_ident}_{generic_type_name}").to_case(Case::Snake);
         let snake_case_target_ident = Ident::new(&snake_case_target_ident, target_ident.span());
         crate::ident_is_acceptable_to_postgres(&snake_case_target_ident)?;
 
@@ -327,7 +327,7 @@ impl PgAggregate {
 
         let fn_state_name = if let Some(found) = fn_state {
             let fn_name =
-                Ident::new(&format!("{}_state", snake_case_target_ident), found.sig.ident.span());
+                Ident::new(&format!("{snake_case_target_ident}_state"), found.sig.ident.span());
             let pg_extern_attr = pg_extern_attr(found);
 
             pg_externs.push(parse_quote! {
@@ -353,7 +353,7 @@ impl PgAggregate {
         let fn_combine = get_impl_func_by_name(&item_impl_snapshot, "combine");
         let fn_combine_name = if let Some(found) = fn_combine {
             let fn_name =
-                Ident::new(&format!("{}_combine", snake_case_target_ident), found.sig.ident.span());
+                Ident::new(&format!("{snake_case_target_ident}_combine"), found.sig.ident.span());
             let pg_extern_attr = pg_extern_attr(found);
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
@@ -380,7 +380,7 @@ impl PgAggregate {
         let fn_finalize = get_impl_func_by_name(&item_impl_snapshot, "finalize");
         let fn_finalize_name = if let Some(found) = fn_finalize {
             let fn_name = Ident::new(
-                &format!("{}_finalize", snake_case_target_ident),
+                &format!("{snake_case_target_ident}_finalize"),
                 found.sig.ident.span(),
             );
             let pg_extern_attr = pg_extern_attr(found);
@@ -425,7 +425,7 @@ impl PgAggregate {
         let fn_serial = get_impl_func_by_name(&item_impl_snapshot, "serial");
         let fn_serial_name = if let Some(found) = fn_serial {
             let fn_name =
-                Ident::new(&format!("{}_serial", snake_case_target_ident), found.sig.ident.span());
+                Ident::new(&format!("{snake_case_target_ident}_serial"), found.sig.ident.span());
             let pg_extern_attr = pg_extern_attr(found);
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
@@ -452,7 +452,7 @@ impl PgAggregate {
         let fn_deserial = get_impl_func_by_name(&item_impl_snapshot, "deserial");
         let fn_deserial_name = if let Some(found) = fn_deserial {
             let fn_name = Ident::new(
-                &format!("{}_deserial", snake_case_target_ident),
+                &format!("{snake_case_target_ident}_deserial"),
                 found.sig.ident.span(),
             );
             let pg_extern_attr = pg_extern_attr(found);
@@ -481,7 +481,7 @@ impl PgAggregate {
         let fn_moving_state = get_impl_func_by_name(&item_impl_snapshot, "moving_state");
         let fn_moving_state_name = if let Some(found) = fn_moving_state {
             let fn_name = Ident::new(
-                &format!("{}_moving_state", snake_case_target_ident),
+                &format!("{snake_case_target_ident}_moving_state"),
                 found.sig.ident.span(),
             );
             let pg_extern_attr = pg_extern_attr(found);
@@ -520,7 +520,7 @@ impl PgAggregate {
             get_impl_func_by_name(&item_impl_snapshot, "moving_state_inverse");
         let fn_moving_state_inverse_name = if let Some(found) = fn_moving_state_inverse {
             let fn_name = Ident::new(
-                &format!("{}_moving_state_inverse", snake_case_target_ident),
+                &format!("{snake_case_target_ident}_moving_state_inverse"),
                 found.sig.ident.span(),
             );
             let pg_extern_attr = pg_extern_attr(found);
@@ -557,7 +557,7 @@ impl PgAggregate {
         let fn_moving_finalize = get_impl_func_by_name(&item_impl_snapshot, "moving_finalize");
         let fn_moving_finalize_name = if let Some(found) = fn_moving_finalize {
             let fn_name = Ident::new(
-                &format!("{}_moving_finalize", snake_case_target_ident),
+                &format!("{snake_case_target_ident}_moving_finalize"),
                 found.sig.ident.span(),
             );
             let pg_extern_attr = pg_extern_attr(found);

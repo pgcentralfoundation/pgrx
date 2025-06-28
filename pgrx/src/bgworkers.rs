@@ -311,6 +311,11 @@ unsafe extern "C-unwind" fn worker_spi_sigchld(_signal_args: i32) {
     pg_sys::SetLatch(pg_sys::MyLatch);
 }
 
+/// Indicates that a [`DynamicBackgroundWorker`] could not be loaded.
+/// There's no reason why.
+#[derive(Debug, Clone, Copy)]
+pub struct DynamicBackgroundWorkerLoadError;
+
 /// Dynamic background worker handle
 pub struct DynamicBackgroundWorker {
     handle: *mut pg_sys::BackgroundWorkerHandle,
@@ -638,7 +643,7 @@ impl BackgroundWorkerBuilder {
 
     /// Once properly configured, call `load_dynamic()` to get the BackgroundWorker registered and started dynamically.
     /// Start up might fail, e.g. if max_worker_processes is exceeded. In that case an Err is returned.
-    pub fn load_dynamic(self) -> Result<DynamicBackgroundWorker, ()> {
+    pub fn load_dynamic(self) -> Result<DynamicBackgroundWorker, DynamicBackgroundWorkerLoadError> {
         let mut bgw: pg_sys::BackgroundWorker = (&self).into();
         let mut handle: *mut pg_sys::BackgroundWorkerHandle = null_mut();
 
@@ -646,7 +651,7 @@ impl BackgroundWorkerBuilder {
         let success = unsafe { pg_sys::RegisterDynamicBackgroundWorker(&mut bgw, &mut handle) };
 
         if !success {
-            Err(())
+            Err(DynamicBackgroundWorkerLoadError)
         } else {
             Ok(DynamicBackgroundWorker { handle, notify_pid: bgw.bgw_notify_pid })
         }
@@ -658,15 +663,9 @@ impl BackgroundWorkerBuilder {
 /// the builder is useful for building this structure.
 impl<'a> From<&'a BackgroundWorkerBuilder> for pg_sys::BackgroundWorker {
     fn from(builder: &'a BackgroundWorkerBuilder) -> Self {
-        #[cfg(any(
-            feature = "pg13",
-            feature = "pg14",
-            feature = "pg15",
-            feature = "pg16",
-            feature = "pg17",
-            feature = "pg18"
-        ))]
-        let bgw = pg_sys::BackgroundWorker {
+        
+
+        pg_sys::BackgroundWorker {
             bgw_name: RpgffiChar::from(&builder.bgw_name[..]).0,
             bgw_type: RpgffiChar::from(&builder.bgw_type[..]).0,
             bgw_flags: builder.bgw_flags.bits(),
@@ -690,9 +689,7 @@ impl<'a> From<&'a BackgroundWorkerBuilder> for pg_sys::BackgroundWorker {
             bgw_main_arg: builder.bgw_main_arg,
             bgw_extra: RpgffiChar128::from(&builder.bgw_extra[..]).0,
             bgw_notify_pid: builder.bgw_notify_pid,
-        };
-
-        bgw
+        }
     }
 }
 
@@ -724,7 +721,7 @@ type RpgffiChar = RpgffiChar96;
 #[allow(dead_code)]
 struct RpgffiChar64([c_char; 64]);
 
-impl<'a> From<&'a str> for RpgffiChar64 {
+impl From<&str> for RpgffiChar64 {
     fn from(string: &str) -> Self {
         let mut r = [0; 64];
         for (dest, src) in r.iter_mut().zip(string.as_bytes()) {
@@ -736,7 +733,7 @@ impl<'a> From<&'a str> for RpgffiChar64 {
 
 struct RpgffiChar96([c_char; 96]);
 
-impl<'a> From<&'a str> for RpgffiChar96 {
+impl From<&str> for RpgffiChar96 {
     fn from(string: &str) -> Self {
         let mut r = [0; 96];
         for (dest, src) in r.iter_mut().zip(string.as_bytes()) {
@@ -748,7 +745,7 @@ impl<'a> From<&'a str> for RpgffiChar96 {
 
 struct RpgffiChar128([c_char; 128]);
 
-impl<'a> From<&'a str> for RpgffiChar128 {
+impl From<&str> for RpgffiChar128 {
     fn from(string: &str) -> Self {
         let mut r = [0; 128];
         for (dest, src) in r.iter_mut().zip(string.as_bytes()) {
@@ -761,7 +758,7 @@ impl<'a> From<&'a str> for RpgffiChar128 {
 #[allow(dead_code)]
 struct RpgffiChar1024([c_char; 1024]);
 
-impl<'a> From<&'a str> for RpgffiChar1024 {
+impl From<&str> for RpgffiChar1024 {
     fn from(string: &str) -> Self {
         let mut r = [0; 1024];
         for (dest, src) in r.iter_mut().zip(string.as_bytes()) {

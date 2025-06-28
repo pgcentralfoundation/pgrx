@@ -36,8 +36,9 @@ extern "C-unwind" fn extern_func_impl_1() -> bool {
 // and [no_mangle]
 #[pg_guard]
 #[no_mangle]
-#[allow(unused_lifetimes)]
+#[allow(unused_lifetimes, clippy::extra_unused_lifetimes)]
 extern "C-unwind" fn extern_func_impl_2<'a>() -> bool {
+    let _ = PhantomData::<&'a ()>;
     true
 }
 

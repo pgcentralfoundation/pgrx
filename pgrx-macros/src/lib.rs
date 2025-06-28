@@ -1015,7 +1015,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
             pub fn #funcname_recv #generics(
-                internal: ::pgrx::datum::Internal,
+                mut internal: ::pgrx::datum::Internal,
             ) -> #name #generics {
                 let buf = unsafe { internal.get_mut::<::pgrx::pg_sys::StringInfoData>().unwrap() };
 

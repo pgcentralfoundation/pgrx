@@ -19,7 +19,7 @@ use crate::prelude::*;
 use crate::{void_mut_ptr, PgList};
 use std::ops::Deref;
 
-#[cfg(any(feature = "pg13"))]
+#[cfg(feature = "pg13")]
 // JumbleState is not defined prior to postgres v14.
 // This zero-sized type is here to provide an inner type for
 // the option in post_parse_analyze_hook, but prior to v14
@@ -237,6 +237,7 @@ pub trait PgHooks {
 }
 
 struct Hooks {
+    #[allow(clippy::redundant_allocation)]
     current_hook: Box<&'static mut (dyn PgHooks)>,
     prev_emit_log_hook: pg_sys::emit_log_hook_type,
     prev_executor_start_hook: pg_sys::ExecutorStart_hook_type,

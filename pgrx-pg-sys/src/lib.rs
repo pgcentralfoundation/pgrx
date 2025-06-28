@@ -7,6 +7,8 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+#![allow(clippy::missing_safety_doc)] // sorry, Jubilee
+
 #[cfg(
     // no features at all will cause problems
     not(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))

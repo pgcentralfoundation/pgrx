@@ -320,8 +320,7 @@ impl ToSql for PostgresTypeEntity {
                 };
                 format!(
                     ",\n\
-                    \tALIGNMENT = {}",
-                    alignment
+                    \tALIGNMENT = {alignment}"
                 )
             })
             .unwrap_or_default();

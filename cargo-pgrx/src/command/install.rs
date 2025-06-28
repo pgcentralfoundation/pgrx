@@ -108,7 +108,7 @@ impl CommandExecute for Install {
             self.test,
             None,
             &self.features,
-            self.target.as_ref().map(|x| x.as_str()),
+            self.target.as_deref(),
         )?;
         Ok(())
     }
@@ -134,10 +134,10 @@ pub(crate) fn install_extension(
 ) -> eyre::Result<Vec<PathBuf>> {
     let mut output_tracking = Vec::new();
 
-    let manifest = Manifest::from_path(&package_manifest_path)?;
-    let (control_file, extname) = find_control_file(&package_manifest_path)?;
+    let manifest = Manifest::from_path(package_manifest_path)?;
+    let (control_file, extname) = find_control_file(package_manifest_path)?;
 
-    let versioned_so = get_property(&package_manifest_path, "module_pathname")?.is_none();
+    let versioned_so = get_property(package_manifest_path, "module_pathname")?.is_none();
 
     let build_command_output =
         build_extension(user_manifest_path.as_ref(), user_package, profile, features, target)?;
@@ -148,7 +148,7 @@ pub(crate) fn install_extension(
         build_command_stream.collect::<Result<Vec<_>, std::io::Error>>()?;
 
     println!("{} extension", "  Installing".bold().green());
-    let shlibpath = find_library_file(&manifest, &package_manifest_path, &build_command_messages)?;
+    let shlibpath = find_library_file(&manifest, package_manifest_path, &build_command_messages)?;
 
     let extdir = if let Some(base_directory) = base_directory.as_ref() {
         base_directory.join(make_relative_extdir(pg_config.extension_dir()?))
@@ -172,7 +172,7 @@ pub(crate) fn install_extension(
             dest,
             "control file",
             true,
-            &package_manifest_path,
+            package_manifest_path,
             &mut output_tracking,
             pg_config,
         )?;
@@ -180,7 +180,7 @@ pub(crate) fn install_extension(
 
     {
         let so_name = if versioned_so {
-            let extver = get_version(&package_manifest_path)?;
+            let extver = get_version(package_manifest_path)?;
             // note: versioned so-name format must agree with pgrx-utils
             format!("{extname}-{extver}")
         } else {
@@ -215,7 +215,7 @@ pub(crate) fn install_extension(
             dest,
             "shared library",
             false,
-            &package_manifest_path,
+            package_manifest_path,
             &mut output_tracking,
             pg_config,
         )?;
@@ -224,7 +224,7 @@ pub(crate) fn install_extension(
     copy_sql_files(
         user_manifest_path,
         user_package,
-        &package_manifest_path,
+        package_manifest_path,
         pg_config,
         profile,
         is_test,
