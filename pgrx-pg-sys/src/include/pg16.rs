@@ -1321,6 +1321,10 @@ pub const PERFORM_DELETION_QUIETLY: u32 = 4;
 pub const PERFORM_DELETION_SKIP_ORIGINAL: u32 = 8;
 pub const PERFORM_DELETION_SKIP_EXTENSIONS: u32 = 16;
 pub const PERFORM_DELETION_CONCURRENT_LOCK: u32 = 32;
+pub const MAX_CATALOG_MULTI_INSERT_BYTES: u32 = 65535;
+pub const CHKATYPE_ANYARRAY: u32 = 1;
+pub const CHKATYPE_ANYRECORD: u32 = 2;
+pub const CHKATYPE_IS_PARTKEY: u32 = 4;
 pub const DEFAULT_INDEX_TYPE: &::core::ffi::CStr = c"btree";
 pub const REINDEXOPT_VERBOSE: u32 = 1;
 pub const REINDEXOPT_REPORT_PROGRESS: u32 = 2;
@@ -1343,7 +1347,6 @@ pub const REINDEX_REL_SUPPRESS_INDEX_USE: u32 = 2;
 pub const REINDEX_REL_CHECK_CONSTRAINTS: u32 = 4;
 pub const REINDEX_REL_FORCE_INDEXES_UNLOGGED: u32 = 8;
 pub const REINDEX_REL_FORCE_INDEXES_PERMANENT: u32 = 16;
-pub const MAX_CATALOG_MULTI_INSERT_BYTES: u32 = 65535;
 pub const AccessMethodRelationId: Oid = Oid(2601);
 pub const AmNameIndexId: u32 = 2651;
 pub const AmOidIndexId: u32 = 2652;
@@ -5822,6 +5825,7 @@ pub const JB_FOBJECT: u32 = 536870912;
 pub const JB_FARRAY: u32 = 1073741824;
 pub const ATTSTATSSLOT_VALUES: u32 = 1;
 pub const ATTSTATSSLOT_NUMBERS: u32 = 2;
+pub const DEFAULT_UPDATE_PROCESS_TITLE: u32 = 1;
 pub const FORMAT_PROC_INVALID_AS_NULL: u32 = 1;
 pub const FORMAT_PROC_FORCE_QUALIFY: u32 = 2;
 pub const FORMAT_OPERATOR_INVALID_AS_NULL: u32 = 1;
@@ -21562,6 +21566,221 @@ pub mod ObjectClass {
     pub const OCLASS_SUBSCRIPTION: Type = 39;
     pub const OCLASS_TRANSFORM: Type = 40;
 }
+pub type CatalogIndexState = *mut ResultRelInfo;
+pub mod ParseExprKind {
+    pub type Type = ::core::ffi::c_uint;
+    pub const EXPR_KIND_NONE: Type = 0;
+    pub const EXPR_KIND_OTHER: Type = 1;
+    pub const EXPR_KIND_JOIN_ON: Type = 2;
+    pub const EXPR_KIND_JOIN_USING: Type = 3;
+    pub const EXPR_KIND_FROM_SUBSELECT: Type = 4;
+    pub const EXPR_KIND_FROM_FUNCTION: Type = 5;
+    pub const EXPR_KIND_WHERE: Type = 6;
+    pub const EXPR_KIND_HAVING: Type = 7;
+    pub const EXPR_KIND_FILTER: Type = 8;
+    pub const EXPR_KIND_WINDOW_PARTITION: Type = 9;
+    pub const EXPR_KIND_WINDOW_ORDER: Type = 10;
+    pub const EXPR_KIND_WINDOW_FRAME_RANGE: Type = 11;
+    pub const EXPR_KIND_WINDOW_FRAME_ROWS: Type = 12;
+    pub const EXPR_KIND_WINDOW_FRAME_GROUPS: Type = 13;
+    pub const EXPR_KIND_SELECT_TARGET: Type = 14;
+    pub const EXPR_KIND_INSERT_TARGET: Type = 15;
+    pub const EXPR_KIND_UPDATE_SOURCE: Type = 16;
+    pub const EXPR_KIND_UPDATE_TARGET: Type = 17;
+    pub const EXPR_KIND_MERGE_WHEN: Type = 18;
+    pub const EXPR_KIND_GROUP_BY: Type = 19;
+    pub const EXPR_KIND_ORDER_BY: Type = 20;
+    pub const EXPR_KIND_DISTINCT_ON: Type = 21;
+    pub const EXPR_KIND_LIMIT: Type = 22;
+    pub const EXPR_KIND_OFFSET: Type = 23;
+    pub const EXPR_KIND_RETURNING: Type = 24;
+    pub const EXPR_KIND_VALUES: Type = 25;
+    pub const EXPR_KIND_VALUES_SINGLE: Type = 26;
+    pub const EXPR_KIND_CHECK_CONSTRAINT: Type = 27;
+    pub const EXPR_KIND_DOMAIN_CHECK: Type = 28;
+    pub const EXPR_KIND_COLUMN_DEFAULT: Type = 29;
+    pub const EXPR_KIND_FUNCTION_DEFAULT: Type = 30;
+    pub const EXPR_KIND_INDEX_EXPRESSION: Type = 31;
+    pub const EXPR_KIND_INDEX_PREDICATE: Type = 32;
+    pub const EXPR_KIND_STATS_EXPRESSION: Type = 33;
+    pub const EXPR_KIND_ALTER_COL_TRANSFORM: Type = 34;
+    pub const EXPR_KIND_EXECUTE_PARAMETER: Type = 35;
+    pub const EXPR_KIND_TRIGGER_WHEN: Type = 36;
+    pub const EXPR_KIND_POLICY: Type = 37;
+    pub const EXPR_KIND_PARTITION_BOUND: Type = 38;
+    pub const EXPR_KIND_PARTITION_EXPRESSION: Type = 39;
+    pub const EXPR_KIND_CALL_ARGUMENT: Type = 40;
+    pub const EXPR_KIND_COPY_WHERE: Type = 41;
+    pub const EXPR_KIND_GENERATED_COLUMN: Type = 42;
+    pub const EXPR_KIND_CYCLE_MARK: Type = 43;
+}
+pub type PreParseColumnRefHook = ::core::option::Option<
+    unsafe extern "C-unwind" fn(pstate: *mut ParseState, cref: *mut ColumnRef) -> *mut Node,
+>;
+pub type PostParseColumnRefHook = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        pstate: *mut ParseState,
+        cref: *mut ColumnRef,
+        var: *mut Node,
+    ) -> *mut Node,
+>;
+pub type ParseParamRefHook = ::core::option::Option<
+    unsafe extern "C-unwind" fn(pstate: *mut ParseState, pref: *mut ParamRef) -> *mut Node,
+>;
+pub type CoerceParamHook = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        pstate: *mut ParseState,
+        param: *mut Param,
+        targetTypeId: Oid,
+        targetTypeMod: int32,
+        location: ::core::ffi::c_int,
+    ) -> *mut Node,
+>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParseState {
+    pub parentParseState: *mut ParseState,
+    pub p_sourcetext: *const ::core::ffi::c_char,
+    pub p_rtable: *mut List,
+    pub p_rteperminfos: *mut List,
+    pub p_joinexprs: *mut List,
+    pub p_nullingrels: *mut List,
+    pub p_joinlist: *mut List,
+    pub p_namespace: *mut List,
+    pub p_lateral_active: bool,
+    pub p_ctenamespace: *mut List,
+    pub p_future_ctes: *mut List,
+    pub p_parent_cte: *mut CommonTableExpr,
+    pub p_target_relation: Relation,
+    pub p_target_nsitem: *mut ParseNamespaceItem,
+    pub p_is_insert: bool,
+    pub p_windowdefs: *mut List,
+    pub p_expr_kind: ParseExprKind::Type,
+    pub p_next_resno: ::core::ffi::c_int,
+    pub p_multiassign_exprs: *mut List,
+    pub p_locking_clause: *mut List,
+    pub p_locked_from_parent: bool,
+    pub p_resolve_unknowns: bool,
+    pub p_queryEnv: *mut QueryEnvironment,
+    pub p_hasAggs: bool,
+    pub p_hasWindowFuncs: bool,
+    pub p_hasTargetSRFs: bool,
+    pub p_hasSubLinks: bool,
+    pub p_hasModifyingCTE: bool,
+    pub p_last_srf: *mut Node,
+    pub p_pre_columnref_hook: PreParseColumnRefHook,
+    pub p_post_columnref_hook: PostParseColumnRefHook,
+    pub p_paramref_hook: ParseParamRefHook,
+    pub p_coerce_param_hook: CoerceParamHook,
+    pub p_ref_hook_state: *mut ::core::ffi::c_void,
+}
+impl Default for ParseState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParseNamespaceItem {
+    pub p_names: *mut Alias,
+    pub p_rte: *mut RangeTblEntry,
+    pub p_rtindex: ::core::ffi::c_int,
+    pub p_perminfo: *mut RTEPermissionInfo,
+    pub p_nscolumns: *mut ParseNamespaceColumn,
+    pub p_rel_visible: bool,
+    pub p_cols_visible: bool,
+    pub p_lateral_only: bool,
+    pub p_lateral_ok: bool,
+}
+impl Default for ParseNamespaceItem {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParseNamespaceColumn {
+    pub p_varno: Index,
+    pub p_varattno: AttrNumber,
+    pub p_vartype: Oid,
+    pub p_vartypmod: int32,
+    pub p_varcollid: Oid,
+    pub p_varnosyn: Index,
+    pub p_varattnosyn: AttrNumber,
+    pub p_dontexpand: bool,
+}
+impl Default for ParseNamespaceColumn {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParseCallbackState {
+    pub pstate: *mut ParseState,
+    pub location: ::core::ffi::c_int,
+    pub errcallback: ErrorContextCallback,
+}
+impl Default for ParseCallbackState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RawColumnDefault {
+    pub attnum: AttrNumber,
+    pub raw_default: *mut Node,
+    pub missingMode: bool,
+    pub generated: ::core::ffi::c_char,
+}
+impl Default for RawColumnDefault {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CookedConstraint {
+    pub contype: ConstrType::Type,
+    pub conoid: Oid,
+    pub name: *mut ::core::ffi::c_char,
+    pub attnum: AttrNumber,
+    pub expr: *mut Node,
+    pub skip_validation: bool,
+    pub is_local: bool,
+    pub inhcount: ::core::ffi::c_int,
+    pub is_no_inherit: bool,
+}
+impl Default for CookedConstraint {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 pub mod IndexStateFlagsAction {
     pub type Type = ::core::ffi::c_uint;
     pub const INDEX_CREATE_SET_READY: Type = 0;
@@ -21601,7 +21820,6 @@ impl Default for ValidateIndexState {
         }
     }
 }
-pub type CatalogIndexState = *mut ResultRelInfo;
 #[repr(C)]
 #[derive(Debug)]
 pub struct _FuncCandidateList {
@@ -22046,181 +22264,6 @@ impl Default for FormData_pg_proc {
     }
 }
 pub type Form_pg_proc = *mut FormData_pg_proc;
-pub mod ParseExprKind {
-    pub type Type = ::core::ffi::c_uint;
-    pub const EXPR_KIND_NONE: Type = 0;
-    pub const EXPR_KIND_OTHER: Type = 1;
-    pub const EXPR_KIND_JOIN_ON: Type = 2;
-    pub const EXPR_KIND_JOIN_USING: Type = 3;
-    pub const EXPR_KIND_FROM_SUBSELECT: Type = 4;
-    pub const EXPR_KIND_FROM_FUNCTION: Type = 5;
-    pub const EXPR_KIND_WHERE: Type = 6;
-    pub const EXPR_KIND_HAVING: Type = 7;
-    pub const EXPR_KIND_FILTER: Type = 8;
-    pub const EXPR_KIND_WINDOW_PARTITION: Type = 9;
-    pub const EXPR_KIND_WINDOW_ORDER: Type = 10;
-    pub const EXPR_KIND_WINDOW_FRAME_RANGE: Type = 11;
-    pub const EXPR_KIND_WINDOW_FRAME_ROWS: Type = 12;
-    pub const EXPR_KIND_WINDOW_FRAME_GROUPS: Type = 13;
-    pub const EXPR_KIND_SELECT_TARGET: Type = 14;
-    pub const EXPR_KIND_INSERT_TARGET: Type = 15;
-    pub const EXPR_KIND_UPDATE_SOURCE: Type = 16;
-    pub const EXPR_KIND_UPDATE_TARGET: Type = 17;
-    pub const EXPR_KIND_MERGE_WHEN: Type = 18;
-    pub const EXPR_KIND_GROUP_BY: Type = 19;
-    pub const EXPR_KIND_ORDER_BY: Type = 20;
-    pub const EXPR_KIND_DISTINCT_ON: Type = 21;
-    pub const EXPR_KIND_LIMIT: Type = 22;
-    pub const EXPR_KIND_OFFSET: Type = 23;
-    pub const EXPR_KIND_RETURNING: Type = 24;
-    pub const EXPR_KIND_VALUES: Type = 25;
-    pub const EXPR_KIND_VALUES_SINGLE: Type = 26;
-    pub const EXPR_KIND_CHECK_CONSTRAINT: Type = 27;
-    pub const EXPR_KIND_DOMAIN_CHECK: Type = 28;
-    pub const EXPR_KIND_COLUMN_DEFAULT: Type = 29;
-    pub const EXPR_KIND_FUNCTION_DEFAULT: Type = 30;
-    pub const EXPR_KIND_INDEX_EXPRESSION: Type = 31;
-    pub const EXPR_KIND_INDEX_PREDICATE: Type = 32;
-    pub const EXPR_KIND_STATS_EXPRESSION: Type = 33;
-    pub const EXPR_KIND_ALTER_COL_TRANSFORM: Type = 34;
-    pub const EXPR_KIND_EXECUTE_PARAMETER: Type = 35;
-    pub const EXPR_KIND_TRIGGER_WHEN: Type = 36;
-    pub const EXPR_KIND_POLICY: Type = 37;
-    pub const EXPR_KIND_PARTITION_BOUND: Type = 38;
-    pub const EXPR_KIND_PARTITION_EXPRESSION: Type = 39;
-    pub const EXPR_KIND_CALL_ARGUMENT: Type = 40;
-    pub const EXPR_KIND_COPY_WHERE: Type = 41;
-    pub const EXPR_KIND_GENERATED_COLUMN: Type = 42;
-    pub const EXPR_KIND_CYCLE_MARK: Type = 43;
-}
-pub type PreParseColumnRefHook = ::core::option::Option<
-    unsafe extern "C-unwind" fn(pstate: *mut ParseState, cref: *mut ColumnRef) -> *mut Node,
->;
-pub type PostParseColumnRefHook = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        pstate: *mut ParseState,
-        cref: *mut ColumnRef,
-        var: *mut Node,
-    ) -> *mut Node,
->;
-pub type ParseParamRefHook = ::core::option::Option<
-    unsafe extern "C-unwind" fn(pstate: *mut ParseState, pref: *mut ParamRef) -> *mut Node,
->;
-pub type CoerceParamHook = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        pstate: *mut ParseState,
-        param: *mut Param,
-        targetTypeId: Oid,
-        targetTypeMod: int32,
-        location: ::core::ffi::c_int,
-    ) -> *mut Node,
->;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParseState {
-    pub parentParseState: *mut ParseState,
-    pub p_sourcetext: *const ::core::ffi::c_char,
-    pub p_rtable: *mut List,
-    pub p_rteperminfos: *mut List,
-    pub p_joinexprs: *mut List,
-    pub p_nullingrels: *mut List,
-    pub p_joinlist: *mut List,
-    pub p_namespace: *mut List,
-    pub p_lateral_active: bool,
-    pub p_ctenamespace: *mut List,
-    pub p_future_ctes: *mut List,
-    pub p_parent_cte: *mut CommonTableExpr,
-    pub p_target_relation: Relation,
-    pub p_target_nsitem: *mut ParseNamespaceItem,
-    pub p_is_insert: bool,
-    pub p_windowdefs: *mut List,
-    pub p_expr_kind: ParseExprKind::Type,
-    pub p_next_resno: ::core::ffi::c_int,
-    pub p_multiassign_exprs: *mut List,
-    pub p_locking_clause: *mut List,
-    pub p_locked_from_parent: bool,
-    pub p_resolve_unknowns: bool,
-    pub p_queryEnv: *mut QueryEnvironment,
-    pub p_hasAggs: bool,
-    pub p_hasWindowFuncs: bool,
-    pub p_hasTargetSRFs: bool,
-    pub p_hasSubLinks: bool,
-    pub p_hasModifyingCTE: bool,
-    pub p_last_srf: *mut Node,
-    pub p_pre_columnref_hook: PreParseColumnRefHook,
-    pub p_post_columnref_hook: PostParseColumnRefHook,
-    pub p_paramref_hook: ParseParamRefHook,
-    pub p_coerce_param_hook: CoerceParamHook,
-    pub p_ref_hook_state: *mut ::core::ffi::c_void,
-}
-impl Default for ParseState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParseNamespaceItem {
-    pub p_names: *mut Alias,
-    pub p_rte: *mut RangeTblEntry,
-    pub p_rtindex: ::core::ffi::c_int,
-    pub p_perminfo: *mut RTEPermissionInfo,
-    pub p_nscolumns: *mut ParseNamespaceColumn,
-    pub p_rel_visible: bool,
-    pub p_cols_visible: bool,
-    pub p_lateral_only: bool,
-    pub p_lateral_ok: bool,
-}
-impl Default for ParseNamespaceItem {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParseNamespaceColumn {
-    pub p_varno: Index,
-    pub p_varattno: AttrNumber,
-    pub p_vartype: Oid,
-    pub p_vartypmod: int32,
-    pub p_varcollid: Oid,
-    pub p_varnosyn: Index,
-    pub p_varattnosyn: AttrNumber,
-    pub p_dontexpand: bool,
-}
-impl Default for ParseNamespaceColumn {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParseCallbackState {
-    pub pstate: *mut ParseState,
-    pub location: ::core::ffi::c_int,
-    pub errcallback: ErrorContextCallback,
-}
-impl Default for ParseCallbackState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct AclItem {
@@ -37606,6 +37649,166 @@ unsafe extern "C-unwind" {
     pub fn dropDatabaseDependencies(databaseId: Oid);
     pub fn shdepDropOwned(roleids: *mut List, behavior: DropBehavior::Type);
     pub fn shdepReassignOwned(roleids: *mut List, newrole: Oid);
+    pub fn CatalogOpenIndexes(heapRel: Relation) -> CatalogIndexState;
+    pub fn CatalogCloseIndexes(indstate: CatalogIndexState);
+    pub fn CatalogTupleInsert(heapRel: Relation, tup: HeapTuple);
+    pub fn CatalogTupleInsertWithInfo(
+        heapRel: Relation,
+        tup: HeapTuple,
+        indstate: CatalogIndexState,
+    );
+    pub fn CatalogTuplesMultiInsertWithInfo(
+        heapRel: Relation,
+        slot: *mut *mut TupleTableSlot,
+        ntuples: ::core::ffi::c_int,
+        indstate: CatalogIndexState,
+    );
+    pub fn CatalogTupleUpdate(heapRel: Relation, otid: ItemPointer, tup: HeapTuple);
+    pub fn CatalogTupleUpdateWithInfo(
+        heapRel: Relation,
+        otid: ItemPointer,
+        tup: HeapTuple,
+        indstate: CatalogIndexState,
+    );
+    pub fn CatalogTupleDelete(heapRel: Relation, tid: ItemPointer);
+    pub fn make_parsestate(parentParseState: *mut ParseState) -> *mut ParseState;
+    pub fn free_parsestate(pstate: *mut ParseState);
+    pub fn parser_errposition(
+        pstate: *mut ParseState,
+        location: ::core::ffi::c_int,
+    ) -> ::core::ffi::c_int;
+    pub fn setup_parser_errposition_callback(
+        pcbstate: *mut ParseCallbackState,
+        pstate: *mut ParseState,
+        location: ::core::ffi::c_int,
+    );
+    pub fn cancel_parser_errposition_callback(pcbstate: *mut ParseCallbackState);
+    pub fn transformContainerType(containerType: *mut Oid, containerTypmod: *mut int32);
+    pub fn transformContainerSubscripts(
+        pstate: *mut ParseState,
+        containerBase: *mut Node,
+        containerType: Oid,
+        containerTypMod: int32,
+        indirection: *mut List,
+        isAssignment: bool,
+    ) -> *mut SubscriptingRef;
+    pub fn make_const(pstate: *mut ParseState, aconst: *mut A_Const) -> *mut Const;
+    pub fn heap_create(
+        relname: *const ::core::ffi::c_char,
+        relnamespace: Oid,
+        reltablespace: Oid,
+        relid: Oid,
+        relfilenumber: RelFileNumber,
+        accessmtd: Oid,
+        tupDesc: TupleDesc,
+        relkind: ::core::ffi::c_char,
+        relpersistence: ::core::ffi::c_char,
+        shared_relation: bool,
+        mapped_relation: bool,
+        allow_system_table_mods: bool,
+        relfrozenxid: *mut TransactionId,
+        relminmxid: *mut MultiXactId,
+        create_storage: bool,
+    ) -> Relation;
+    pub fn heap_create_with_catalog(
+        relname: *const ::core::ffi::c_char,
+        relnamespace: Oid,
+        reltablespace: Oid,
+        relid: Oid,
+        reltypeid: Oid,
+        reloftypeid: Oid,
+        ownerid: Oid,
+        accessmtd: Oid,
+        tupdesc: TupleDesc,
+        cooked_constraints: *mut List,
+        relkind: ::core::ffi::c_char,
+        relpersistence: ::core::ffi::c_char,
+        shared_relation: bool,
+        mapped_relation: bool,
+        oncommit: OnCommitAction::Type,
+        reloptions: Datum,
+        use_user_acl: bool,
+        allow_system_table_mods: bool,
+        is_internal: bool,
+        relrewrite: Oid,
+        typaddress: *mut ObjectAddress,
+    ) -> Oid;
+    pub fn heap_drop_with_catalog(relid: Oid);
+    pub fn heap_truncate(relids: *mut List);
+    pub fn heap_truncate_one_rel(rel: Relation);
+    pub fn heap_truncate_check_FKs(relations: *mut List, tempTables: bool);
+    pub fn heap_truncate_find_FKs(relationIds: *mut List) -> *mut List;
+    pub fn InsertPgAttributeTuples(
+        pg_attribute_rel: Relation,
+        tupdesc: TupleDesc,
+        new_rel_oid: Oid,
+        attoptions: *mut Datum,
+        indstate: CatalogIndexState,
+    );
+    pub fn InsertPgClassTuple(
+        pg_class_desc: Relation,
+        new_rel_desc: Relation,
+        new_rel_oid: Oid,
+        relacl: Datum,
+        reloptions: Datum,
+    );
+    pub fn AddRelationNewConstraints(
+        rel: Relation,
+        newColDefaults: *mut List,
+        newConstraints: *mut List,
+        allow_merge: bool,
+        is_local: bool,
+        is_internal: bool,
+        queryString: *const ::core::ffi::c_char,
+    ) -> *mut List;
+    pub fn RelationClearMissing(rel: Relation);
+    pub fn StoreAttrMissingVal(rel: Relation, attnum: AttrNumber, missingval: Datum);
+    pub fn SetAttrMissing(
+        relid: Oid,
+        attname: *mut ::core::ffi::c_char,
+        value: *mut ::core::ffi::c_char,
+    );
+    pub fn cookDefault(
+        pstate: *mut ParseState,
+        raw_default: *mut Node,
+        atttypid: Oid,
+        atttypmod: int32,
+        attname: *const ::core::ffi::c_char,
+        attgenerated: ::core::ffi::c_char,
+    ) -> *mut Node;
+    pub fn DeleteRelationTuple(relid: Oid);
+    pub fn DeleteAttributeTuples(relid: Oid);
+    pub fn DeleteSystemAttributeTuples(relid: Oid);
+    pub fn RemoveAttributeById(relid: Oid, attnum: AttrNumber);
+    pub fn CopyStatistics(fromrelid: Oid, torelid: Oid);
+    pub fn RemoveStatistics(relid: Oid, attnum: AttrNumber);
+    pub fn SystemAttributeDefinition(attno: AttrNumber) -> *const FormData_pg_attribute;
+    pub fn SystemAttributeByName(
+        attname: *const ::core::ffi::c_char,
+    ) -> *const FormData_pg_attribute;
+    pub fn CheckAttributeNamesTypes(
+        tupdesc: TupleDesc,
+        relkind: ::core::ffi::c_char,
+        flags: ::core::ffi::c_int,
+    );
+    pub fn CheckAttributeType(
+        attname: *const ::core::ffi::c_char,
+        atttypid: Oid,
+        attcollation: Oid,
+        containing_rowtypes: *mut List,
+        flags: ::core::ffi::c_int,
+    );
+    pub fn StorePartitionKey(
+        rel: Relation,
+        strategy: ::core::ffi::c_char,
+        partnatts: int16,
+        partattrs: *mut AttrNumber,
+        partexprs: *mut List,
+        partopclass: *mut Oid,
+        partcollation: *mut Oid,
+    );
+    pub fn RemovePartitionKeyByRelId(relid: Oid);
+    pub fn StorePartitionBound(rel: Relation, parent: Relation, bound: *mut PartitionBoundSpec);
     pub fn index_check_primary_key(
         heapRel: Relation,
         indexInfo: *mut IndexInfo,
@@ -37705,28 +37908,6 @@ unsafe extern "C-unwind" {
     pub fn SerializeReindexState(maxsize: Size, start_address: *mut ::core::ffi::c_char);
     pub fn RestoreReindexState(reindexstate: *mut ::core::ffi::c_void);
     pub fn IndexSetParentIndex(partitionIdx: Relation, parentOid: Oid);
-    pub fn CatalogOpenIndexes(heapRel: Relation) -> CatalogIndexState;
-    pub fn CatalogCloseIndexes(indstate: CatalogIndexState);
-    pub fn CatalogTupleInsert(heapRel: Relation, tup: HeapTuple);
-    pub fn CatalogTupleInsertWithInfo(
-        heapRel: Relation,
-        tup: HeapTuple,
-        indstate: CatalogIndexState,
-    );
-    pub fn CatalogTuplesMultiInsertWithInfo(
-        heapRel: Relation,
-        slot: *mut *mut TupleTableSlot,
-        ntuples: ::core::ffi::c_int,
-        indstate: CatalogIndexState,
-    );
-    pub fn CatalogTupleUpdate(heapRel: Relation, otid: ItemPointer, tup: HeapTuple);
-    pub fn CatalogTupleUpdateWithInfo(
-        heapRel: Relation,
-        otid: ItemPointer,
-        tup: HeapTuple,
-        indstate: CatalogIndexState,
-    );
-    pub fn CatalogTupleDelete(heapRel: Relation, tid: ItemPointer);
     pub fn RangeVarGetRelidExtended(
         relation: *const RangeVar,
         lockmode: LOCKMODE,
@@ -37965,28 +38146,6 @@ unsafe extern "C-unwind" {
     ) -> ObjectAddress;
     pub fn function_parse_error_transpose(prosrc: *const ::core::ffi::c_char) -> bool;
     pub fn oid_array_to_list(datum: Datum) -> *mut List;
-    pub fn make_parsestate(parentParseState: *mut ParseState) -> *mut ParseState;
-    pub fn free_parsestate(pstate: *mut ParseState);
-    pub fn parser_errposition(
-        pstate: *mut ParseState,
-        location: ::core::ffi::c_int,
-    ) -> ::core::ffi::c_int;
-    pub fn setup_parser_errposition_callback(
-        pcbstate: *mut ParseCallbackState,
-        pstate: *mut ParseState,
-        location: ::core::ffi::c_int,
-    );
-    pub fn cancel_parser_errposition_callback(pcbstate: *mut ParseCallbackState);
-    pub fn transformContainerType(containerType: *mut Oid, containerTypmod: *mut int32);
-    pub fn transformContainerSubscripts(
-        pstate: *mut ParseState,
-        containerBase: *mut Node,
-        containerType: Oid,
-        containerTypMod: int32,
-        indirection: *mut List,
-        isAssignment: bool,
-    ) -> *mut SubscriptingRef;
-    pub fn make_const(pstate: *mut ParseState, aconst: *mut A_Const) -> *mut Const;
     pub fn acldefault(objtype: ObjectType::Type, ownerId: Oid) -> *mut Acl;
     pub fn get_user_default_acl(objtype: ObjectType::Type, ownerId: Oid, nsp_oid: Oid) -> *mut Acl;
     pub fn recordDependencyOnNewAcl(
@@ -43444,6 +43603,12 @@ unsafe extern "C-unwind" {
     pub fn plpgsql_scanner_init(str_: *const ::core::ffi::c_char);
     pub fn plpgsql_scanner_finish();
     pub fn plpgsql_yyparse() -> ::core::ffi::c_int;
+    pub static mut ConfigReloadPending: sig_atomic_t;
+    pub static mut ShutdownRequestPending: sig_atomic_t;
+    pub fn HandleMainLoopInterrupts();
+    pub fn SignalHandlerForConfigReload(postgres_signal_arg: ::core::ffi::c_int);
+    pub fn SignalHandlerForCrashExit(postgres_signal_arg: ::core::ffi::c_int);
+    pub fn SignalHandlerForShutdownRequest(postgres_signal_arg: ::core::ffi::c_int);
     pub static mut EnableSSL: bool;
     pub static mut SuperuserReservedConnections: ::core::ffi::c_int;
     pub static mut ReservedConnections: ::core::ffi::c_int;
@@ -48174,6 +48339,16 @@ unsafe extern "C-unwind" {
     pub fn get_publication_name(pubid: Oid, missing_ok: bool) -> *mut ::core::ffi::c_char;
     pub fn get_subscription_oid(subname: *const ::core::ffi::c_char, missing_ok: bool) -> Oid;
     pub fn get_subscription_name(subid: Oid, missing_ok: bool) -> *mut ::core::ffi::c_char;
+    pub static mut update_process_title: bool;
+    pub fn save_ps_display_args(
+        argc: ::core::ffi::c_int,
+        argv: *mut *mut ::core::ffi::c_char,
+    ) -> *mut *mut ::core::ffi::c_char;
+    pub fn init_ps_display(fixed_part: *const ::core::ffi::c_char);
+    pub fn set_ps_display_suffix(suffix: *const ::core::ffi::c_char);
+    pub fn set_ps_display_remove_suffix();
+    pub fn set_ps_display_with_len(activity: *const ::core::ffi::c_char, len: usize);
+    pub fn get_ps_display(displen: *mut ::core::ffi::c_int) -> *const ::core::ffi::c_char;
     pub fn format_procedure_extended(procedure_oid: Oid, flags: bits16)
         -> *mut ::core::ffi::c_char;
     pub fn format_operator_extended(operator_oid: Oid, flags: bits16) -> *mut ::core::ffi::c_char;
