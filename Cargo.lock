@@ -2128,6 +2128,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "pgrx-version-updater"
+version = "0.1.1"
+dependencies = [
+ "cargo_toml",
+ "clap",
+ "owo-colors 4.2.0",
+ "rustc-hash",
+ "toml",
+ "toml_edit",
+ "walkdir",
+]
+
+[[package]]
 name = "phf"
 version = "0.11.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -19,6 +19,7 @@ members = [
     "pgrx-sql-entity-graph",
     "pgrx-tests",
     "pgrx-bindgen",
+    "tools/version-updater",
 ]
 exclude = [
     # "pgrx-examples/*",
