@@ -538,7 +538,7 @@ fn pg_regress(
                 None => (),
             }
 
-            println!("{}", line);
+            println!("{line}");
         }
         (passed_cnt, failed_cnt)
     });
