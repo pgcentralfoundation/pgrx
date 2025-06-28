@@ -131,7 +131,7 @@ fn get_arr_ndim(arr: Array<i32>) -> libc::c_int {
 // Because Array::iter currently iterates the Array as Datums, this is guaranteed to be "bug-free" regarding size.
 #[pg_extern]
 fn arr_mapped_vec(arr: Array<i32>) -> Vec<i32> {
-    arr.iter().filter_map(|x| x).collect()
+    arr.iter().flatten().collect()
 }
 
 /// Naive conversion.
@@ -378,7 +378,7 @@ mod tests {
     #[pg_test]
     fn test_cstring_array() -> Result<(), pgrx::spi::Error> {
         let strings = Spi::get_one::<bool>("SELECT validate_cstring_array(ARRAY['one', 'two', NULL, 'four', 'five', NULL, 'seven', NULL, NULL]::cstring[])")?.expect("datum was NULL");
-        assert_eq!(strings, true);
+        assert!(strings);
         Ok(())
     }
 

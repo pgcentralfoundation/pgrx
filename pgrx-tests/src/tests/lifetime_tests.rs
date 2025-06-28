@@ -21,7 +21,7 @@ pub struct CustomType<'s> {
 fn type_with_lifetime<'s>(_value: Option<CustomType<'s>>) {}
 
 #[pg_extern]
-fn type_ref_with_lifetime<'a>(_value: &'a str) {}
+fn type_ref_with_lifetime(_value: &str) {}
 
 #[pg_extern]
 fn returns_lifetime() -> Option<CustomType<'static>> {
@@ -47,5 +47,5 @@ fn returns_tuple_with_lifetime<'a>(
 
 #[pg_extern]
 fn returns_iterator_with_lifetime<'a>(value: &'a str) -> SetOfIterator<'a, &'a str> {
-    SetOfIterator::new(value.split_whitespace().into_iter())
+    SetOfIterator::new(value.split_whitespace())
 }

@@ -12,7 +12,7 @@
 use pgrx::prelude::*;
 use serde::*;
 
-fn foo<'a>(_s: Vec<Option<&'a str>>) {
+fn foo(_s: Vec<Option<&str>>) {
     unimplemented!()
 }
 

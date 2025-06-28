@@ -128,8 +128,8 @@ mod tests {
 
     #[pg_test]
     fn test_spi_run_with_args() {
-        let i = 1 as i32;
-        let j = 2 as i64;
+        let i = 1_i32;
+        let j = 2_i64;
 
         assert!(Spi::run_with_args("SELECT $1 + $2 = 3", &[i.into(), j.into(),],).is_ok());
     }
@@ -143,8 +143,8 @@ mod tests {
 
     #[pg_test]
     fn test_spi_explain_with_args() -> Result<(), pgrx::spi::Error> {
-        let i = 1 as i32;
-        let j = 2 as i64;
+        let i = 1_i32;
+        let j = 2_i64;
 
         let result = Spi::explain_with_args("SELECT $1 + $2 = 3", &[i.into(), j.into()])?;
 
@@ -434,7 +434,7 @@ mod tests {
         Spi::connect(|client| {
             let stmt = client.prepare("CREATE TABLE a ()", &[])?;
             // This is supposed to run in read-only
-            stmt.execute(&client, Some(1), &[])?;
+            stmt.execute(client, Some(1), &[])?;
             Ok(())
         })
     }
@@ -444,7 +444,7 @@ mod tests {
         Spi::connect(|client| {
             let stmt = client.prepare_mut("CREATE TABLE a ()", &[])?;
             // This is supposed to run in read-write
-            stmt.execute(&client, Some(1), &[])?;
+            stmt.execute(client, Some(1), &[])?;
             Ok(())
         })
     }

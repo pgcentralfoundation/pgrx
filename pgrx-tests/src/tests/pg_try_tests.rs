@@ -84,12 +84,12 @@ mod tests {
 
     #[pg_test(error = "panic in walker")]
     fn test_pg_try_execute_with_crash() {
-        PgTryBuilder::new(|| super::crash()).execute();
+        PgTryBuilder::new(super::crash).execute();
     }
 
     #[pg_test]
     fn test_pg_try_execute_with_crash_ignore() {
-        PgTryBuilder::new(|| super::crash())
+        PgTryBuilder::new(super::crash)
             .catch_when(PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, |_| ())
             .catch_others(|e| panic!("{e:?}"))
             .execute();
@@ -97,7 +97,7 @@ mod tests {
 
     #[pg_test(error = "panic in walker")]
     fn test_pg_try_execute_with_crash_rethrow() {
-        PgTryBuilder::new(|| super::crash())
+        PgTryBuilder::new(super::crash)
             .catch_when(PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, |e| e.rethrow())
             .execute();
     }
@@ -144,7 +144,7 @@ mod tests {
         let mut finally = false;
         let result = PgTryBuilder::new(|| 42).finally(|| finally = true).execute();
         assert_eq!(42, result);
-        assert_eq!(true, finally);
+        assert!(finally);
     }
 
     #[pg_test]
@@ -155,7 +155,7 @@ mod tests {
             .finally(|| finally = true)
             .execute();
         assert_eq!(99, result);
-        assert_eq!(true, finally);
+        assert!(finally);
     }
 
     #[pg_test]
@@ -168,7 +168,7 @@ mod tests {
                 .execute()
         });
         // finally block does run, even if a catch block throws
-        assert_eq!(true, finally.load(Ordering::SeqCst));
+        assert!(finally.load(Ordering::SeqCst));
         assert!(result.is_err());
     }
 
@@ -192,8 +192,8 @@ mod tests {
             .execute();
         }
 
-        assert_eq!(true, inner.load(Ordering::SeqCst));
-        assert_eq!(true, outer.load(Ordering::SeqCst));
+        assert!(inner.load(Ordering::SeqCst));
+        assert!(outer.load(Ordering::SeqCst));
     }
 
     #[pg_test]
@@ -219,8 +219,8 @@ mod tests {
             })
             .ok();
         }
-        assert_eq!(true, inner.load(Ordering::SeqCst));
-        assert_eq!(true, outer.load(Ordering::SeqCst));
+        assert!(inner.load(Ordering::SeqCst));
+        assert!(outer.load(Ordering::SeqCst));
     }
 
     #[pg_test]
@@ -247,8 +247,8 @@ mod tests {
             })
             .ok();
         }
-        assert_eq!(true, inner.load(Ordering::SeqCst));
-        assert_eq!(true, outer.load(Ordering::SeqCst));
+        assert!(inner.load(Ordering::SeqCst));
+        assert!(outer.load(Ordering::SeqCst));
     }
 
     #[pg_test]
@@ -275,8 +275,8 @@ mod tests {
             })
             .ok();
         }
-        assert_eq!(true, inner.load(Ordering::SeqCst));
-        assert_eq!(true, outer.load(Ordering::SeqCst));
+        assert!(inner.load(Ordering::SeqCst));
+        assert!(outer.load(Ordering::SeqCst));
     }
 
     #[pg_test]
@@ -305,10 +305,10 @@ mod tests {
             })
             .ok();
         }
-        assert_eq!(true, inner.load(Ordering::SeqCst));
-        assert_eq!(true, outer.load(Ordering::SeqCst));
+        assert!(inner.load(Ordering::SeqCst));
+        assert!(outer.load(Ordering::SeqCst));
 
         // really just testing that the finally block ran
-        assert_eq!(true, finally.load(Ordering::SeqCst));
+        assert!(finally.load(Ordering::SeqCst));
     }
 }

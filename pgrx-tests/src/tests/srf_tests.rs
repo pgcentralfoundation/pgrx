@@ -15,7 +15,7 @@ fn example_generate_series(
     end: i32,
     step: default!(i32, 1),
 ) -> SetOfIterator<'static, i32> {
-    SetOfIterator::new((start..=end).step_by(step as usize).into_iter())
+    SetOfIterator::new((start..=end).step_by(step as usize))
 }
 
 #[pg_extern]
@@ -42,7 +42,7 @@ fn return_empty_iterator(
 
 #[pg_extern]
 fn return_setof_iterator() -> SetOfIterator<'static, i32> {
-    SetOfIterator::new(vec![1, 2, 3].into_iter())
+    SetOfIterator::new(vec![1, 2, 3])
 }
 
 #[pg_extern]
@@ -293,7 +293,7 @@ mod tests {
                 ))
             })
             .collect::<Result<Vec<_>, _>>();
-        result.map(|v| TableIterator::new(v))
+        result.map(TableIterator::new)
     }
 
     #[pg_test(error = "column \"cause_an_error\" does not exist")]

@@ -407,7 +407,7 @@ fn maybe_make_pgdata<P: AsRef<Path>>(pgdata: P) -> eyre::Result<bool> {
 
         let mut mkdir = sudo_command(&runas);
         mkdir.arg("mkdir").arg("-p").arg(pgdata).stdout(Stdio::piped()).stderr(Stdio::piped());
-        let command_str = format!("{:?}", mkdir);
+        let command_str = format!("{mkdir:?}");
         println!("{} {}", "     Running".bold().green(), command_str);
         let child = mkdir.spawn()?;
         let output = child.wait_with_output()?;

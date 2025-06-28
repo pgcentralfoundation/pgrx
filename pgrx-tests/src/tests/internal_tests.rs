@@ -18,49 +18,49 @@ mod tests {
     #[pg_test]
     fn internal_insert() {
         let mut val = Internal::default();
-        assert_eq!(val.initialized(), false);
+        assert!(!val.initialized());
 
         let inner = unsafe { val.insert::<i32>(5) };
 
         assert_eq!(*inner, 5);
-        assert_eq!(val.initialized(), true);
+        assert!(val.initialized());
 
         let inner = unsafe { val.insert::<i32>(6) };
 
         assert_eq!(*inner, 6);
-        assert_eq!(val.initialized(), true);
+        assert!(val.initialized());
     }
 
     #[pg_test]
     fn internal_get_or_insert_default() {
         let mut val = Internal::default();
-        assert_eq!(val.initialized(), false);
+        assert!(!val.initialized());
 
         let inner = unsafe { val.get_or_insert_default::<i32>() };
 
         assert_eq!(*inner, 0);
-        assert_eq!(val.initialized(), true);
+        assert!(val.initialized());
     }
 
     #[pg_test]
     fn internal_get_or_insert() {
         let mut val = Internal::default();
-        assert_eq!(val.initialized(), false);
+        assert!(!val.initialized());
 
         let inner = unsafe { val.get_or_insert::<i32>(5) };
 
         assert_eq!(*inner, 5);
-        assert_eq!(val.initialized(), true);
+        assert!(val.initialized());
     }
 
     #[pg_test]
     fn internal_get_or_insert_with() {
         let mut val = Internal::default();
-        assert_eq!(val.initialized(), false);
+        assert!(!val.initialized());
 
         let inner = unsafe { val.get_or_insert_with(|| 5) };
 
         assert_eq!(*inner, 5);
-        assert_eq!(val.initialized(), true);
+        assert!(val.initialized());
     }
 }

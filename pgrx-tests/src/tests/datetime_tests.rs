@@ -31,7 +31,7 @@ fn accept_time_with_time_zone(t: TimeWithTimeZone) -> TimeWithTimeZone {
 
 #[pg_extern]
 fn convert_timetz_to_time(t: TimeWithTimeZone) -> Time {
-    t.to_utc().into()
+    t.to_utc()
 }
 
 #[pg_extern]

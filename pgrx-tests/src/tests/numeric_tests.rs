@@ -20,7 +20,7 @@ mod tests {
 
     #[pg_extern]
     fn return_an_i32_numeric() -> AnyNumeric {
-        AnyNumeric::try_from(32).unwrap()
+        AnyNumeric::from(32)
     }
 
     #[pg_extern]
@@ -30,7 +30,7 @@ mod tests {
 
     #[pg_extern]
     fn return_a_u64_numeric() -> AnyNumeric {
-        AnyNumeric::try_from(u64::MAX).unwrap()
+        AnyNumeric::from(u64::MAX)
     }
 
     #[pg_test]
@@ -77,33 +77,33 @@ mod tests {
     #[pg_test]
     #[rustfmt::skip]
     fn test_limits() {
-        assert_eq!(i8::try_from(AnyNumeric::try_from(i8::MIN).unwrap()).unwrap(), i8::MIN);
-        assert_eq!(i16::try_from(AnyNumeric::try_from(i16::MIN).unwrap()).unwrap(), i16::MIN);
-        assert_eq!(i32::try_from(AnyNumeric::try_from(i32::MIN).unwrap()).unwrap(), i32::MIN);
-        assert_eq!(i64::try_from(AnyNumeric::try_from(i64::MIN).unwrap()).unwrap(), i64::MIN);
-        assert_eq!(i128::try_from(AnyNumeric::try_from(i128::MIN).unwrap()).unwrap(), i128::MIN);
-        assert_eq!(isize::try_from(AnyNumeric::try_from(isize::MIN).unwrap()).unwrap(), isize::MIN);
+        assert_eq!(i8::try_from(AnyNumeric::from(i8::MIN)).unwrap(), i8::MIN);
+        assert_eq!(i16::try_from(AnyNumeric::from(i16::MIN)).unwrap(), i16::MIN);
+        assert_eq!(i32::try_from(AnyNumeric::from(i32::MIN)).unwrap(), i32::MIN);
+        assert_eq!(i64::try_from(AnyNumeric::from(i64::MIN)).unwrap(), i64::MIN);
+        assert_eq!(i128::try_from(AnyNumeric::from(i128::MIN)).unwrap(), i128::MIN);
+        assert_eq!(isize::try_from(AnyNumeric::from(isize::MIN)).unwrap(), isize::MIN);
 
-        assert_eq!(i8::try_from(AnyNumeric::try_from(i8::MAX).unwrap()).unwrap(), i8::MAX);
-        assert_eq!(i16::try_from(AnyNumeric::try_from(i16::MAX).unwrap()).unwrap(), i16::MAX);
-        assert_eq!(i32::try_from(AnyNumeric::try_from(i32::MAX).unwrap()).unwrap(), i32::MAX);
-        assert_eq!(i64::try_from(AnyNumeric::try_from(i64::MAX).unwrap()).unwrap(), i64::MAX);
-        assert_eq!(i128::try_from(AnyNumeric::try_from(i128::MAX).unwrap()).unwrap(), i128::MAX);
-        assert_eq!(isize::try_from(AnyNumeric::try_from(isize::MAX).unwrap()).unwrap(), isize::MAX);
+        assert_eq!(i8::try_from(AnyNumeric::from(i8::MAX)).unwrap(), i8::MAX);
+        assert_eq!(i16::try_from(AnyNumeric::from(i16::MAX)).unwrap(), i16::MAX);
+        assert_eq!(i32::try_from(AnyNumeric::from(i32::MAX)).unwrap(), i32::MAX);
+        assert_eq!(i64::try_from(AnyNumeric::from(i64::MAX)).unwrap(), i64::MAX);
+        assert_eq!(i128::try_from(AnyNumeric::from(i128::MAX)).unwrap(), i128::MAX);
+        assert_eq!(isize::try_from(AnyNumeric::from(isize::MAX)).unwrap(), isize::MAX);
 
-        assert_eq!(u8::try_from(AnyNumeric::try_from(u8::MIN).unwrap()).unwrap(), u8::MIN);
-        assert_eq!(u16::try_from(AnyNumeric::try_from(u16::MIN).unwrap()).unwrap(), u16::MIN);
-        assert_eq!(u32::try_from(AnyNumeric::try_from(u32::MIN).unwrap()).unwrap(), u32::MIN);
-        assert_eq!(u64::try_from(AnyNumeric::try_from(u64::MIN).unwrap()).unwrap(), u64::MIN);
-        assert_eq!(u128::try_from(AnyNumeric::try_from(u128::MIN).unwrap()).unwrap(), u128::MIN);
-        assert_eq!(usize::try_from(AnyNumeric::try_from(usize::MIN).unwrap()).unwrap(), usize::MIN);
+        assert_eq!(u8::try_from(AnyNumeric::from(u8::MIN)).unwrap(), u8::MIN);
+        assert_eq!(u16::try_from(AnyNumeric::from(u16::MIN)).unwrap(), u16::MIN);
+        assert_eq!(u32::try_from(AnyNumeric::from(u32::MIN)).unwrap(), u32::MIN);
+        assert_eq!(u64::try_from(AnyNumeric::from(u64::MIN)).unwrap(), u64::MIN);
+        assert_eq!(u128::try_from(AnyNumeric::from(u128::MIN)).unwrap(), u128::MIN);
+        assert_eq!(usize::try_from(AnyNumeric::from(usize::MIN)).unwrap(), usize::MIN);
 
-        assert_eq!(u8::try_from(AnyNumeric::try_from(u8::MAX).unwrap()).unwrap(), u8::MAX);
-        assert_eq!(u16::try_from(AnyNumeric::try_from(u16::MAX).unwrap()).unwrap(), u16::MAX);
-        assert_eq!(u32::try_from(AnyNumeric::try_from(u32::MAX).unwrap()).unwrap(), u32::MAX);
-        assert_eq!(u64::try_from(AnyNumeric::try_from(u64::MAX).unwrap()).unwrap(), u64::MAX);
-        assert_eq!(u128::try_from(AnyNumeric::try_from(u128::MAX).unwrap()).unwrap(), u128::MAX);
-        assert_eq!(usize::try_from(AnyNumeric::try_from(usize::MAX).unwrap()).unwrap(), usize::MAX);
+        assert_eq!(u8::try_from(AnyNumeric::from(u8::MAX)).unwrap(), u8::MAX);
+        assert_eq!(u16::try_from(AnyNumeric::from(u16::MAX)).unwrap(), u16::MAX);
+        assert_eq!(u32::try_from(AnyNumeric::from(u32::MAX)).unwrap(), u32::MAX);
+        assert_eq!(u64::try_from(AnyNumeric::from(u64::MAX)).unwrap(), u64::MAX);
+        assert_eq!(u128::try_from(AnyNumeric::from(u128::MAX)).unwrap(), u128::MAX);
+        assert_eq!(usize::try_from(AnyNumeric::from(usize::MAX)).unwrap(), usize::MAX);
 
         //
         // precision isn't quite the same and so can't compare min/max of floats
@@ -144,27 +144,27 @@ mod tests {
     #[pg_test]
     #[rustfmt::skip]
     fn test_bad_conversions() {
-        let a = AnyNumeric::try_from(u128::MAX).unwrap();
+        let a = AnyNumeric::from(u128::MAX);
         let b = u64::try_from(a);
         assert_eq!(b, Err(Error::OutOfRange(String::from("number too large to fit in target type"))));
 
-        let a = AnyNumeric::try_from(u128::MAX).unwrap();
+        let a = AnyNumeric::from(u128::MAX);
         let b = usize::try_from(a);
         assert_eq!(b, Err(Error::OutOfRange(String::from("number too large to fit in target type"))));
 
-        let a = AnyNumeric::try_from(u128::MAX).unwrap();
+        let a = AnyNumeric::from(u128::MAX);
         let b = u32::try_from(a);
         assert_eq!(b, Err(Error::OutOfRange(String::from("number too large to fit in target type"))));
 
-        let a = AnyNumeric::try_from(u128::MAX).unwrap();
+        let a = AnyNumeric::from(u128::MAX);
         let b = u16::try_from(a);
         assert_eq!(b, Err(Error::OutOfRange(String::from("number too large to fit in target type"))));
 
-        let a = AnyNumeric::try_from(u128::MAX).unwrap();
+        let a = AnyNumeric::from(u128::MAX);
         let b = u8::try_from(a);
         assert_eq!(b, Err(Error::OutOfRange(String::from("number too large to fit in target type"))));
 
-        let a = AnyNumeric::try_from(i128::MIN).unwrap();
+        let a = AnyNumeric::from(i128::MIN);
         let b = u8::try_from(a);
         assert_eq!(b, Err(Error::OutOfRange(String::from("invalid digit found in string"))));
         

@@ -352,8 +352,8 @@ mod tests {
         Vec<Option<AnyNumeric>>,
         vec![
             None,
-            Some(AnyNumeric::try_from(i128::MIN).unwrap()),
-            Some(AnyNumeric::try_from(u128::MAX).unwrap()),
+            Some(AnyNumeric::from(i128::MIN)),
+            Some(AnyNumeric::from(u128::MAX)),
             None,
             Some(AnyNumeric::from_str("31241234123412341234").unwrap()),
             None

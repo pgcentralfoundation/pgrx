@@ -1,3 +1,4 @@
+use std::marker::PhantomData;
 //LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
 //LICENSE
 //LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
@@ -19,6 +20,7 @@ fn extern_func() -> bool {
 // Uncommenting the line below will make it fail to compile
 // #[no_mangle]
 extern "C-unwind" fn extern_func_impl<T>() -> bool {
+    let _ = PhantomData::<T>;
     true
 }
 

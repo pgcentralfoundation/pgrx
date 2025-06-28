@@ -238,7 +238,7 @@ mod tests {
             // NB:  we need the Drop impl for Tracker to run here
         })
         .finally(|| {
-            assert_eq!(DID_DROP.load(Ordering::SeqCst), true);
+            assert!(DID_DROP.load(Ordering::SeqCst));
             panic!("it worked")
         })
         .execute();

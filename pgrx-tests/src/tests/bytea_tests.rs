@@ -39,7 +39,7 @@ mod tests {
 
     #[pg_extern]
     fn return_vec_bytes() -> Vec<u8> {
-        b"bytes".into_iter().cloned().collect()
+        b"bytes".iter().cloned().collect()
     }
 
     #[pg_test]
@@ -50,7 +50,7 @@ mod tests {
 
     #[pg_extern]
     fn return_vec_subvec(bytes: Vec<u8>) -> Vec<u8> {
-        (&bytes[1..=3]).into_iter().cloned().collect()
+        (&bytes[1..=3]).iter().cloned().collect()
     }
 
     #[pg_test]

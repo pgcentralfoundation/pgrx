@@ -29,14 +29,14 @@ mod tests {
     fn test_vec_bool() {
         let d = vec![Some(false).into_datum(), Some(true).into_datum()].into_datum().unwrap();
         let a = from_helper::<Vec<Option<pg_sys::Datum>>>(d).unwrap();
-        assert_eq!(a.first().unwrap().is_some(), true);
+        assert!(a.first().unwrap().is_some());
     }
 
     #[pg_test]
     fn test_vec_ints() {
         let d = vec![Some(0).into_datum(), Some(1).into_datum()].into_datum().unwrap();
         let a = from_helper::<Vec<Option<pg_sys::Datum>>>(d).unwrap();
-        assert_eq!(a.first().unwrap().is_some(), true);
+        assert!(a.first().unwrap().is_some());
     }
 
     #[pg_test]

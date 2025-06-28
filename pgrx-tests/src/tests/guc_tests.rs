@@ -29,13 +29,13 @@ mod tests {
             GucContext::Userset,
             GucFlags::default(),
         );
-        assert_eq!(GUC.get(), true);
+        assert!(GUC.get());
 
         Spi::run("SET test.bool TO false;").expect("SPI failed");
-        assert_eq!(GUC.get(), false);
+        assert!(!GUC.get());
 
         Spi::run("SET test.bool TO true;").expect("SPI failed");
-        assert_eq!(GUC.get(), true);
+        assert!(GUC.get());
     }
 
     #[pg_test]
@@ -208,7 +208,7 @@ mod tests {
         //  2. no_reset_all is not reset by RESET ALL, while no_show is
         Spi::run("SET test.no_show TO false;").expect("SPI failed");
         Spi::run("SET test.no_reset_all TO false;").expect("SPI failed");
-        assert_eq!(GUC_NO_RESET_ALL.get(), false);
+        assert!(!GUC_NO_RESET_ALL.get());
         Spi::connect_mut(|client| {
             let r = client.update("SHOW ALL", None, &[]).expect("SPI failed");
 
@@ -224,12 +224,11 @@ mod tests {
             assert!(no_reset_guc_in_show_all);
 
             Spi::run("RESET ALL").expect("SPI failed");
-            assert_eq!(
-                GUC_NO_RESET_ALL.get(),
-                false,
+            assert!(
+                !GUC_NO_RESET_ALL.get(),
                 "'no_reset_all' should remain unchanged after 'RESET ALL'"
             );
-            assert_eq!(GUC_NO_SHOW.get(), true, "'no_show' should reset after 'RESET ALL'");
+            assert!(GUC_NO_SHOW.get(), "'no_show' should reset after 'RESET ALL'");
         });
     }
 
@@ -275,7 +274,7 @@ mod tests {
 
         // Test check hook - should accept true and increment SIDE_EFFECT
         assert!(Spi::run("SET test.hooks TO true").is_ok());
-        assert_eq!(GUC.get(), true);
+        assert!(GUC.get());
         assert_eq!(*SIDE_EFFECT.read().unwrap(), 2);
     }
 

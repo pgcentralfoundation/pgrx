@@ -329,14 +329,12 @@ mod returning {
             // Gets resolved to:
             let maybe_dog: Option<PgHeapTuple<AllocatedByRust>> = maybe_dog;
 
-            let maybe_dog = if let Some(mut dog) = maybe_dog {
+            if let Some(mut dog) = maybe_dog {
                 dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap()).unwrap();
                 Some(dog)
             } else {
                 None
-            };
-
-            maybe_dog
+            }
         }
 
         #[pg_extern]
@@ -455,7 +453,7 @@ mod sql_generator_tests {
             name!(cat, ::pgrx::composite_type!('static, "Cat")),
         ),
     > {
-        TableIterator::new(Vec::new().into_iter())
+        TableIterator::new(Vec::new())
     }
 
     #[pg_extern]
@@ -563,7 +561,6 @@ mod sql_generator_tests {
             pgrx::PgTupleDesc::for_composite_type("Dog").expect("Couldn't find TestType");
 
         let tuples: Vec<PgHeapTuple<'_, AllocatedByRust>> = (0..10_000)
-            .into_iter()
             .map(move |i| {
                 let datums: Vec<Option<pg_sys::Datum>> =
                     vec!["good boy".into_datum(), i.into_datum()];
@@ -775,10 +772,7 @@ mod tests {
         const NON_EXISTING_ATTRIBUTE: &str = "DEFINITELY_NOT_EXISTING";
 
         match PgHeapTuple::new_composite_type(NON_EXISTING_ATTRIBUTE) {
-            Err(PgHeapTupleError::NoSuchType(not_found))
-                if not_found == NON_EXISTING_ATTRIBUTE.to_string() =>
-            {
-                ()
+            Err(PgHeapTupleError::NoSuchType(not_found)) if not_found == NON_EXISTING_ATTRIBUTE => {
             }
             Err(err) => panic!("{err}"),
             Ok(_) => panic!("Able to find what should be a not existing composite type"),
@@ -807,7 +801,7 @@ mod tests {
         Spi::run("CREATE TYPE DogWithAge AS (name text, age int);").expect("SPI failed");
         let mut heap_tuple = PgHeapTuple::new_composite_type("DogWithAge").unwrap();
 
-        const NON_EXISTING_ATTRIBUTE: NonZeroUsize = unsafe { NonZeroUsize::new_unchecked(9001) };
+        const NON_EXISTING_ATTRIBUTE: NonZeroUsize = NonZeroUsize::new(9001).unwrap();
         assert_eq!(
             heap_tuple.get_by_index::<String>(NON_EXISTING_ATTRIBUTE),
             Err(TryFromDatumError::NoSuchAttributeNumber(NON_EXISTING_ATTRIBUTE)),

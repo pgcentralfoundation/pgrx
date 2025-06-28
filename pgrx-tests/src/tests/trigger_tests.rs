@@ -149,7 +149,7 @@ mod tests {
 
         let field = "booper";
 
-        if new.get_by_name(field)? == Option::<&str>::None {
+        if (new.get_by_name::<&str>(field)?).is_none() {
             new.set_by_name(field, "Swooper")?;
         }
 

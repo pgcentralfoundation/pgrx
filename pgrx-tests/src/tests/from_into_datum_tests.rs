@@ -50,7 +50,7 @@ mod tests {
         let is_null: bool = true;
 
         unsafe {
-            if let Some(_) = String::from_datum(val, is_null) {
+            if String::from_datum(val, is_null).is_some() {
                 // <- this seg fault
                 panic!("converted a null Datum into a valid string")
             }

@@ -20,7 +20,7 @@ fn create_result() -> pgrx::composite_type!('static, "result") {
         entity_records.push(entity_record);
     }
     record.set_by_name("entities", entity_records).unwrap();
-    return record;
+    record
 }
 
 #[cfg(any(test, feature = "pg_test"))]
