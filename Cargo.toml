@@ -57,6 +57,8 @@ edition = "2021"
 license = "MIT"
 repository = "https://github.com/pgcentralfoundation/pgrx/"
 homepage = "https://github.com/pgcentralfoundation/pgrx/"
+# TODO: all crates should use this version rather than copy it
+#   See https://github.com/pgcentralfoundation/pgrx/pull/2100 comments
 version = "0.15.0"
 
 [workspace.metadata.local-install]
