@@ -1081,6 +1081,12 @@ fn impl_guc_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
         Hidden(bool),
     }
 
+    impl GucEnumAttribute {
+        fn is_guc_enum_attribute(attribute: &str) -> bool {
+            matches!(attribute, "name" | "hidden")
+        }
+    }
+
     impl Parse for GucEnumAttribute {
         fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
             let ident: Ident = input.parse()?;
@@ -1110,17 +1116,26 @@ fn impl_guc_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
         let mut name = None;
         let mut hidden = None;
         for attr in variant.attrs.iter() {
-            let tokens = attr.meta.require_name_value()?.to_token_stream();
-            let pair: GucEnumAttribute = syn::parse2(tokens)?;
-            match pair {
-                GucEnumAttribute::Name(value) => {
-                    if name.replace(value).is_some() {
-                        return Err(syn::Error::new(ast.span(), "too many #[name] attributes"));
-                    }
-                }
-                GucEnumAttribute::Hidden(value) => {
-                    if hidden.replace(value).is_some() {
-                        return Err(syn::Error::new(ast.span(), "too many #[hidden] attributes"));
+            if let Some(ident) = attr.path().get_ident() {
+                if GucEnumAttribute::is_guc_enum_attribute(&ident.to_string()) {
+                    let pair: GucEnumAttribute = syn::parse2(attr.meta.to_token_stream())?;
+                    match pair {
+                        GucEnumAttribute::Name(value) => {
+                            if name.replace(value).is_some() {
+                                return Err(syn::Error::new(
+                                    ast.span(),
+                                    "too many #[name] attributes",
+                                ));
+                            }
+                        }
+                        GucEnumAttribute::Hidden(value) => {
+                            if hidden.replace(value).is_some() {
+                                return Err(syn::Error::new(
+                                    ast.span(),
+                                    "too many #[hidden] attributes",
+                                ));
+                            }
+                        }
                     }
                 }
             }

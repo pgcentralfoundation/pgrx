@@ -615,7 +615,7 @@ fn pgrx_embed_name(manifest: &Manifest) -> eyre::Result<String> {
         .ok_or_else(|| eyre!("Failed to find a pgrx_embed binary."))
 }
 
-fn parse_object(data: &[u8]) -> object::Result<object::File> {
+fn parse_object(data: &[u8]) -> object::Result<object::File<'_>> {
     let kind = object::FileKind::parse(data)?;
 
     match kind {

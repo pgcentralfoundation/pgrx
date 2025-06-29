@@ -152,6 +152,7 @@ mod tests {
         enum TestEnum {
             One,
             Two,
+            #[doc = "three"]
             Three,
             #[name = c"five"]
             Four,
