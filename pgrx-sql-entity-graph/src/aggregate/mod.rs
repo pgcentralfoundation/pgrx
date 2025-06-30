@@ -680,7 +680,7 @@ impl ToEntityGraphTokens for PgAggregate {
         let to_sql_config = &self.to_sql_config;
 
         quote! {
-            #[no_mangle]
+            #[unsafe(no_mangle)]
             #[doc(hidden)]
             #[allow(unknown_lints, clippy::no_mangle_with_rust_abi)]
             pub extern "Rust" fn #sql_graph_entity_fn_name() -> ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity {
@@ -749,7 +749,7 @@ fn get_target_ident(path: &Path) -> Result<Ident, syn::Error> {
 
 fn get_target_path(item_impl: &ItemImpl) -> Result<Path, syn::Error> {
     let target_ident = match &*item_impl.self_ty {
-        syn::Type::Path(ref type_path) => {
+        syn::Type::Path(type_path) => {
             let last_segment = type_path.path.segments.last().ok_or_else(|| {
                 syn::Error::new(
                     type_path.span(),
@@ -902,7 +902,7 @@ fn get_const_litstr(item: &ImplItemConst) -> syn::Result<Option<String>> {
 }
 
 fn remap_self_to_target(ty: &mut syn::Type, target: &syn::Ident) {
-    if let Type::Path(ref mut ty_path) = ty {
+    if let Type::Path(ty_path) = ty {
         for segment in ty_path.path.segments.iter_mut() {
             if segment.ident == "Self" {
                 segment.ident = target.clone()

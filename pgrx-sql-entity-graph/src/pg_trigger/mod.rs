@@ -113,7 +113,7 @@ impl ToEntityGraphTokens for PgTrigger {
         let to_sql_config = &self.to_sql_config;
 
         quote! {
-            #[no_mangle]
+            #[unsafe(no_mangle)]
             #[doc(hidden)]
             #[allow(unknown_lints, clippy::no_mangle_with_rust_abi, nonstandard_style)]
             pub extern "Rust" fn #sql_graph_entity_fn_name() -> ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity {

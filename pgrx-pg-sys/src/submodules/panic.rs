@@ -395,7 +395,7 @@ where
         GuardAction::Return(r) => r,
         GuardAction::ReThrow => {
             #[cfg_attr(target_os = "windows", link(name = "postgres"))]
-            extern "C-unwind" {
+            unsafe extern "C-unwind" {
                 fn pg_re_throw() -> !;
             }
             unsafe {
@@ -510,7 +510,7 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
     //
 
     #[cfg_attr(target_os = "windows", link(name = "postgres"))]
-    extern "C-unwind" {
+    unsafe extern "C-unwind" {
         fn errcode(sqlerrcode: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
         fn errmsg(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
         fn errdetail(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
@@ -520,7 +520,7 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
 
     // we only allocate file, lineno and funcname if `errstart` returns true
     #[cfg_attr(target_os = "windows", link(name = "postgres"))]
-    extern "C-unwind" {
+    unsafe extern "C-unwind" {
         fn errstart(elevel: ::std::os::raw::c_int, domain: *const ::std::os::raw::c_char) -> bool;
         fn errfinish(
             filename: *const ::std::os::raw::c_char,

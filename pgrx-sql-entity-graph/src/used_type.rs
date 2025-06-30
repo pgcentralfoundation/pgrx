@@ -147,7 +147,7 @@ impl UsedType {
                                     syn::GenericArgument::Type(inner_ty) => {
                                         match inner_ty {
                                             // Result<$Type<T>>
-                                            syn::Type::Path(ref inner_type_path) => {
+                                            syn::Type::Path(inner_type_path) => {
                                                 let path = &inner_type_path.path;
                                                 let last_segment =
                                                     path.segments.last().ok_or(syn::Error::new(
@@ -210,7 +210,7 @@ impl UsedType {
                                     syn::GenericArgument::Type(inner_ty) => {
                                         match inner_ty {
                                             // Option<VariadicArray<T>>
-                                            syn::Type::Path(ref inner_type_path) => {
+                                            syn::Type::Path(inner_type_path) => {
                                                 let path = &inner_type_path.path;
                                                 let last_segment =
                                                     path.segments.last().ok_or(syn::Error::new(

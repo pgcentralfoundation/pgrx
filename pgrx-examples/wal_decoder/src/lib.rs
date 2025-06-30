@@ -196,7 +196,7 @@ impl Serialize for Tuple {
 
 // Initialize the output plugin
 #[allow(non_snake_case)]
-#[no_mangle]
+#[unsafe(no_mangle)]
 #[pg_guard]
 pub unsafe extern "C-unwind" fn _PG_output_plugin_init(cb_ptr: *mut pg_sys::OutputPluginCallbacks) {
     let mut callbacks = unsafe { PgBox::from_pg(cb_ptr) };

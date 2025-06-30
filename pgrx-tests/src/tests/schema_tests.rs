@@ -47,7 +47,7 @@ mod test_schema {
         entity: &SqlGraphEntity,
         _context: &PgrxSql,
     ) -> Result<String, Box<dyn std::error::Error + Send + Sync + 'static>> {
-        if let SqlGraphEntity::Function(ref func) = entity {
+        if let SqlGraphEntity::Function(func) = entity {
             Ok(format!(
                 "\
                 CREATE FUNCTION test_schema.\"func_generated_with_custom_name\"() RETURNS void\n\
@@ -65,7 +65,7 @@ mod test_schema {
         entity: &SqlGraphEntity,
         _context: &PgrxSql,
     ) -> Result<String, Box<dyn std::error::Error + Send + Sync + 'static>> {
-        if let SqlGraphEntity::Type(ref ty) = entity {
+        if let SqlGraphEntity::Type(ty) = entity {
             Ok(format!(
                 "\n\
                 CREATE TYPE test_schema.Custom{name};\

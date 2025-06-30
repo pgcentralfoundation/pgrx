@@ -259,9 +259,9 @@ impl Returning {
                 let used_ty = UsedType::new(syn::Type::Reference(ty_ref.clone()))?;
                 Ok(Returning::Type(used_ty))
             }
-            syn::Type::Macro(ref mut type_macro) => Self::parse_type_macro(type_macro),
-            syn::Type::Paren(ref mut type_paren) => match &mut *type_paren.elem {
-                syn::Type::Macro(ref mut type_macro) => Self::parse_type_macro(type_macro),
+            syn::Type::Macro(type_macro) => Self::parse_type_macro(type_macro),
+            syn::Type::Paren(type_paren) => match &mut *type_paren.elem {
+                syn::Type::Macro(type_macro) => Self::parse_type_macro(type_macro),
                 other => Err(syn::Error::new(
                     other.span(),
                     format!("Got unknown return type (type_paren): {type_paren:?}"),

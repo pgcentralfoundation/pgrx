@@ -44,4 +44,4 @@ mod seal {
 // (https://github.com/pgcentralfoundation/pgrx/issues/730).
 #[cfg(target_os = "linux")]
 #[link(name = "resolv")]
-extern "C" {}
+unsafe extern "C" {}

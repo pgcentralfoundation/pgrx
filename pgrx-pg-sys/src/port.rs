@@ -107,7 +107,7 @@ pub unsafe fn GetMemoryChunkContext(pointer: *mut std::os::raw::c_void) -> pg_sy
     #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
     {
         #[pgrx_macros::pg_guard]
-        extern "C-unwind" {
+        unsafe extern "C-unwind" {
             #[link_name = "GetMemoryChunkContext"]
             pub fn extern_fn(pointer: *mut std::os::raw::c_void) -> pg_sys::MemoryContext;
         }

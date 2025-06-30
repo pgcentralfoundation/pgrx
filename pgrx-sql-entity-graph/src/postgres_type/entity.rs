@@ -61,7 +61,7 @@ impl Alignment {
 
         let attr = attr.parse_args::<PgrxAttribute>()?;
         for arg in attr.args.iter() {
-            let PgrxArg::NameValue(ref nv) = arg;
+            let PgrxArg::NameValue(nv) = arg;
             if !nv.path.is_ident("alignment") {
                 continue;
             }

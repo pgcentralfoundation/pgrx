@@ -213,7 +213,7 @@ pub(crate) fn get_package_manifest(
 
 pub(crate) fn all_pg_in_both_tomls<'a>(
     manifest: &'a Manifest,
-    pgrx: &Pgrx,
+    pgrx: &'a Pgrx,
 ) -> impl Iterator<Item = eyre::Result<PgConfig>> + 'a {
     // Maybe eventually warn when the Cargo.toml has a version our config.toml doesn't,
     // as it makes sense to further constrain support from the version set pgrx supports,

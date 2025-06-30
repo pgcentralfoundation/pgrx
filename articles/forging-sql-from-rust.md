@@ -237,7 +237,7 @@ During the proc macro expansion process, we can append the [`proc_macro2::TokenS
 struct Floof { boof: usize }
 
 // We should extend the TokenStream with something like
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __pgrx_internals_type_Floof()
 -> pgrx::datum::inventory::SqlGraphEntity {
     todo!()
@@ -253,7 +253,7 @@ pub fn floof_from_boof(boof: usize) -> Floof {
 }
 
 // We should extend the TokenStream with something like
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __pgrx_internals_fn_floof_from_boof()
 -> pgrx::datum::inventory::SqlGraphEntity {
     todo!()
@@ -473,7 +473,7 @@ struct Floof { boof: usize }
 The above gets parsed and new tokens are quasi-quoted atop this template like this:
 
 ```rust
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn  #inventory_fn_name() -> pgrx::datum::inventory::SqlGraphEntity {
     let mut mappings = Default::default();
     <#name #ty_generics as pgrx::datum::WithTypeIds>::register_with_refs(
@@ -498,7 +498,7 @@ pub extern "C" fn  #inventory_fn_name() -> pgrx::datum::inventory::SqlGraphEntit
 The proc macro passes will make it into:
 
 ```rust
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn  __pgrx_internals_type_Floof() -> pgrx::datum::inventory::SqlGraphEntity {
     let mut mappings = Default::default();
     <Floof as pgrx::datum::WithTypeIds>::register_with_refs(
@@ -544,7 +544,7 @@ Types such as `Vec<T>` require a type to be `Sized`, `pgrx::datum::Array<T>` req
 ```rust
 // This doesn't work
 syn::parse_quote! {
-    #[no_mangle]
+    #[unsafe(no_mangle)]
     pub extern "C" fn  #inventory_fn_name() -> pgrx::datum::inventory::SqlGraphEntity {
         let mut mappings = Default::default();
         #hypothetical_if_some_type_impls_sized_block {

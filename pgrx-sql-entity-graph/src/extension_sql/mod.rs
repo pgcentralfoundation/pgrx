@@ -96,7 +96,7 @@ impl ToEntityGraphTokens for ExtensionSqlFile {
         let creates_iter = creates.iter();
         let sql_graph_entity_fn_name = format_ident!("__pgrx_internals_sql_{}", name.clone());
         quote! {
-            #[no_mangle]
+            #[unsafe(no_mangle)]
             #[doc(hidden)]
             #[allow(unknown_lints, clippy::no_mangle_with_rust_abi)]
             pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity {
@@ -193,7 +193,7 @@ impl ToEntityGraphTokens for ExtensionSql {
 
         let sql_graph_entity_fn_name = format_ident!("__pgrx_internals_sql_{}", name.value());
         quote! {
-            #[no_mangle]
+            #[unsafe(no_mangle)]
             #[doc(hidden)]
             #[allow(unknown_lints, clippy::no_mangle_with_rust_abi)]
             pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity {

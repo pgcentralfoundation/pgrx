@@ -17,7 +17,9 @@ pub(crate) fn cargo() -> std::process::Command {
 pub(crate) fn initialize() {
     match (std::env::var_os("CARGO_PGRX"), std::env::current_exe()) {
         (None, Ok(path)) => {
-            std::env::set_var("CARGO_PGRX", path);
+            unsafe {
+                std::env::set_var("CARGO_PGRX", path);
+            }
             // TODO: Should we set `CARGO_PGRX_{CARGO,RUSTC}` to `RUSTC`/`CARGO`
             // if unset, then prefer those? The issue with `RUSTC`/`CARGO` vars
             // is that they are unset if something invokes e.g. `cargo`

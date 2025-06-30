@@ -39,7 +39,7 @@ pub extern "C-unwind" fn _PG_init() {
 }
 
 #[pg_guard]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C-unwind" fn background_worker_main(arg: pg_sys::Datum) {
     let arg = unsafe { i32::from_polymorphic_datum(arg, false, pg_sys::INT4OID) };
 

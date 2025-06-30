@@ -923,11 +923,14 @@ fn from_empty_env() -> eyre::Result<()> {
     let pg_config = PgConfig::from_env();
     assert!(pg_config.is_err());
 
-    // but now we can
-    std::env::set_var("PGRX_PG_CONFIG_AS_ENV", "true");
-    std::env::set_var("PGRX_PG_CONFIG_VERSION", "PostgresSQL 15.1");
-    std::env::set_var("PGRX_PG_CONFIG_INCLUDEDIR-SERVER", "/path/to/server/headers");
-    std::env::set_var("PGRX_PG_CONFIG_CPPFLAGS", "some cpp flags");
+    // SAFETY: set_var in 2024th edition requires unsafe due to sync issues
+    unsafe {
+        // but now we can
+        std::env::set_var("PGRX_PG_CONFIG_AS_ENV", "true");
+        std::env::set_var("PGRX_PG_CONFIG_VERSION", "PostgresSQL 15.1");
+        std::env::set_var("PGRX_PG_CONFIG_INCLUDEDIR-SERVER", "/path/to/server/headers");
+        std::env::set_var("PGRX_PG_CONFIG_CPPFLAGS", "some cpp flags");
+    }
 
     let pg_config = PgConfig::from_env().unwrap();
     assert_eq!(pg_config.major_version()?, 15, "Major version should match");

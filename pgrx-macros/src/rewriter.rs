@@ -31,8 +31,11 @@ macro_rules! format_ident {
 pub fn extern_block(block: ItemForeignMod) -> proc_macro2::TokenStream {
     let mut stream = proc_macro2::TokenStream::new();
 
+    let unsafety = &block.unsafety;
+    let abi = &block.abi;
+    let abi = quote! { #unsafety #abi };
     for item in block.items.into_iter() {
-        stream.extend(foreign_item(item, &block.abi));
+        stream.extend(foreign_item(item, &abi));
     }
 
     stream
@@ -58,7 +61,7 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
             GenericParam::Const(_) => true,
         })
     {
-        panic!("#[pg_guard] for function with generic parameters must not be combined with #[no_mangle]");
+        panic!("#[pg_guard] for function with generic parameters must not be combined with #[unsafe(no_mangle)]");
     }
 
     // but for the inner function (the one we're wrapping) we don't need any kind of
@@ -82,7 +85,7 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
     } else if input_func_name == "_PG_init" || input_func_name == "_PG_fini" {
         quote! {
             #[allow(non_snake_case)]
-            #[no_mangle]
+            #[unsafe(no_mangle)]
         }
     } else {
         quote! {}
@@ -121,7 +124,10 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
     })
 }
 
-fn foreign_item(item: ForeignItem, abi: &syn::Abi) -> syn::Result<proc_macro2::TokenStream> {
+fn foreign_item(
+    item: ForeignItem,
+    abi: &proc_macro2::TokenStream,
+) -> syn::Result<proc_macro2::TokenStream> {
     match item {
         ForeignItem::Fn(func) => {
             if func.sig.variadic.is_some() {
@@ -135,7 +141,10 @@ fn foreign_item(item: ForeignItem, abi: &syn::Abi) -> syn::Result<proc_macro2::T
     }
 }
 
-fn foreign_item_fn(func: &ForeignItemFn, abi: &syn::Abi) -> syn::Result<proc_macro2::TokenStream> {
+fn foreign_item_fn(
+    func: &ForeignItemFn,
+    abi: &proc_macro2::TokenStream,
+) -> syn::Result<proc_macro2::TokenStream> {
     let func_name = func.sig.ident.clone();
     let arg_list = rename_arg_list(&func.sig)?;
     let arg_list_with_types = rename_arg_list_with_types(&func.sig)?;
@@ -170,7 +179,7 @@ fn foreign_item_fn(func: &ForeignItemFn, abi: &syn::Abi) -> syn::Result<proc_mac
 
 fn foreign_item_static(
     variable: &ForeignItemStatic,
-    abi: &syn::Abi,
+    abi: &proc_macro2::TokenStream,
 ) -> syn::Result<proc_macro2::TokenStream> {
     let link = quote! { #[cfg_attr(target_os = "windows", link(name = "postgres"))] };
     Ok(quote! {

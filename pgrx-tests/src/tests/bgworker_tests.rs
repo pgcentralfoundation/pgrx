@@ -10,7 +10,7 @@
 use pgrx::prelude::*;
 
 #[pg_guard]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C-unwind" fn bgworker(arg: pg_sys::Datum) {
     use pgrx::bgworkers::*;
     use std::time::Duration;
@@ -41,7 +41,7 @@ pub extern "C-unwind" fn bgworker(arg: pg_sys::Datum) {
 }
 
 #[pg_guard]
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// Here we test that `BackgroundWorker::transaction` can return data from the closure
 pub extern "C-unwind" fn bgworker_return_value(arg: pg_sys::Datum) {
     use pgrx::bgworkers::*;
@@ -75,7 +75,7 @@ pub extern "C-unwind" fn bgworker_return_value(arg: pg_sys::Datum) {
 }
 
 #[pg_guard]
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// Simple background worker that waits to be terminated; used to test behaviour in case of worker slots exhaustion
 pub extern "C-unwind" fn bgworker_sleep() {
     use pgrx::bgworkers::*;

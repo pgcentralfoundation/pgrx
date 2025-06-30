@@ -103,7 +103,7 @@ impl ToEntityGraphTokens for PostgresOrd {
         let sql_graph_entity_fn_name = format_ident!("__pgrx_internals_ord_{}", self.name);
         let to_sql_config = &self.to_sql_config;
         quote! {
-            #[no_mangle]
+            #[unsafe(no_mangle)]
             #[doc(hidden)]
             #[allow(nonstandard_style, unknown_lints, clippy::no_mangle_with_rust_abi)]
             pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity {
