@@ -77,12 +77,7 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
     let func_name = func.sig.ident.clone();
     let func_name = format_ident!("{}", func_name);
 
-    let prolog = if input_func_name == "__pgrx_private_shmem_hook"
-        || input_func_name == "__pgrx_private_shmem_request_hook"
-    {
-        // we do not want "no_mangle" on these functions
-        quote! {}
-    } else if input_func_name == "_PG_init" || input_func_name == "_PG_fini" {
+    let prolog = if input_func_name == "_PG_init" || input_func_name == "_PG_fini" {
         quote! {
             #[allow(non_snake_case)]
             #[unsafe(no_mangle)]

@@ -29,15 +29,41 @@ pub struct Pgtest {
 
 unsafe impl PGRXSharedMemory for Pgtest {}
 
-static DEQUE: PgLwLock<heapless::Deque<Pgtest, 400>> = PgLwLock::new(c"shmem_deque");
-static VEC: PgLwLock<heapless::Vec<Pgtest, 400>> = PgLwLock::new(c"shmem_vec");
-static HASH: PgLwLock<heapless::FnvIndexMap<i32, i32, 4>> = PgLwLock::new(c"shmem_hash");
-static STRUCT: PgLwLock<Pgtest> = PgLwLock::new(c"shmem_struct");
-static PRIMITIVE: PgLwLock<i32> = PgLwLock::new(c"shmem_primtive");
-static ATOMIC: PgAtomic<std::sync::atomic::AtomicBool> = PgAtomic::new(c"shmem_atomic");
+#[derive(Default)]
+#[repr(transparent)]
+pub struct AssertPGRXSharedMemory<T>(T);
+
+impl<T> std::ops::Deref for AssertPGRXSharedMemory<T> {
+    type Target = T;
+
+    fn deref(&self) -> &T {
+        &self.0
+    }
+}
+
+impl<T> std::ops::DerefMut for AssertPGRXSharedMemory<T> {
+    fn deref_mut(&mut self) -> &mut T {
+        &mut self.0
+    }
+}
+
+unsafe impl<T> PGRXSharedMemory for AssertPGRXSharedMemory<T> {}
+
+static DEQUE: PgLwLock<AssertPGRXSharedMemory<heapless::Deque<Pgtest, 400>>> =
+    unsafe { PgLwLock::new(c"shmem_deque") };
+static VEC: PgLwLock<AssertPGRXSharedMemory<heapless::Vec<Pgtest, 400>>> =
+    unsafe { PgLwLock::new(c"shmem_vec") };
+static HASH: PgLwLock<AssertPGRXSharedMemory<heapless::FnvIndexMap<i32, i32, 4>>> =
+    unsafe { PgLwLock::new(c"shmem_hash") };
+static STRUCT: PgLwLock<Pgtest> = unsafe { PgLwLock::new(c"shmem_struct") };
+static PRIMITIVE: PgLwLock<i32> = unsafe { PgLwLock::new(c"shmem_primtive") };
+static ATOMIC: PgAtomic<std::sync::atomic::AtomicBool> = unsafe { PgAtomic::new(c"shmem_atomic") };
 
 #[pg_guard]
 pub extern "C-unwind" fn _PG_init() {
+    if unsafe { pgrx::pg_sys::IsUnderPostmaster } {
+        pgrx::error!("this extension must be loaded via shared_preload_libraries.");
+    }
     pg_shmem_init!(DEQUE);
     pg_shmem_init!(VEC);
     pg_shmem_init!(HASH);
@@ -156,4 +182,13 @@ fn atomic_get() -> bool {
 #[pg_extern]
 fn atomic_set(value: bool) -> bool {
     ATOMIC.get().swap(value, Ordering::Relaxed)
+}
+
+#[cfg(test)]
+pub mod pg_test {
+    pub fn setup(_options: Vec<&str>) {}
+
+    pub fn postgresql_conf_options() -> Vec<&'static str> {
+        vec!["shared_preload_libraries='shmem'"]
+    }
 }
