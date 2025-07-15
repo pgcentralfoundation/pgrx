@@ -15,7 +15,9 @@ use crate::CommandExecute;
 use eyre::eyre;
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{PgConfig, Pgrx};
+use std::io::Write;
 use std::path::PathBuf;
+use std::process::Command;
 use std::process::Stdio;
 
 /// Start a pgrx-managed Postgres instance
@@ -36,6 +38,8 @@ pub(crate) struct Start {
 
     #[clap(long)]
     postgresql_conf: Vec<String>,
+    #[clap(long)]
+    valgrind: bool,
 }
 
 impl CommandExecute for Start {
@@ -55,7 +59,7 @@ impl CommandExecute for Start {
             let (pg_config, _) =
                 pg_config_and_version(pgrx, &package_manifest, me.pg_version, None, false)?;
 
-            start_postgres(&pg_config, postgresql_conf)
+            start_postgres(&pg_config, postgresql_conf, me.valgrind)
         }
         let (package_manifest, _) = get_package_manifest(
             &clap_cargo::Features::default(),
@@ -100,6 +104,7 @@ pub(crate) fn collect_postgresql_conf_settings(
 pub(crate) fn start_postgres(
     pg_config: &PgConfig,
     runtime_conf: &HashMap<String, String>,
+    use_valgrind: bool,
 ) -> eyre::Result<()> {
     let datadir = pg_config.data_dir()?;
     let logfile = pg_config.log_file()?;
@@ -123,7 +128,38 @@ pub(crate) fn start_postgres(
     );
     let pg_ctl = pg_config.pg_ctl_path()?;
 
-    let mut dash_o_args = vec![
+    let postmaster_path = if use_valgrind {
+        #[allow(unused_mut)]
+        let mut builder = tempfile::Builder::new();
+        #[cfg(target_family = "unix")]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let permission = std::fs::Permissions::from_mode(0o700);
+            builder.permissions(permission);
+        }
+        let mut file = builder.tempfile()?;
+        file.write_all(b"#!/usr/bin/sh\n")?;
+        let mut command = Command::new("exec");
+        command.arg("valgrind");
+        command.arg("--leak-check=no");
+        command.arg("--gen-suppressions=all");
+        command.arg("--time-stamp=yes");
+        command.arg("--error-markers=VALGRINDERROR-BEGIN,VALGRINDERROR-END");
+        command.arg("--trace-children=yes");
+        if let Ok(path) = valgrind_suppressions_path(&pg_config) {
+            if let Ok(true) = std::fs::exists(&path) {
+                command.arg(format!("--suppressions={}", path.display()));
+            }
+        }
+        command.arg(pg_config.postmaster_path()?.display().to_string());
+        file.write_all(format!("{command:?}").as_bytes())?;
+        file.write_all(b" \"$@\"\n")?;
+        Some(file.into_temp_path())
+    } else {
+        None
+    };
+
+    let mut postmaster_args = vec![
         "-i".into(), // listen for tcp connections
         "-p".into(), // on this port
         port.to_string(),
@@ -133,20 +169,24 @@ pub(crate) fn start_postgres(
 
     // user-provided settings to set/override what's in their existing `postgresql.conf`
     for (key, value) in runtime_conf {
-        dash_o_args.push(format!("-c {key}={value}"));
+        postmaster_args.push("-c".to_string());
+        postmaster_args.push(format!("{key}={value}"));
     }
 
-    let mut command = std::process::Command::new(pg_ctl);
+    let mut command = Command::new(pg_ctl);
     command
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .arg("start")
-        .arg(format!("-o {}", dash_o_args.join(" ")))
+        .arg("-o")
+        .arg(postmaster_args.join(" "))
         .arg("-D")
         .arg(&datadir)
         .arg("-l")
         .arg(&logfile);
-
+    if let Some(postmaster_path) = postmaster_path.as_ref() {
+        command.arg("-p").arg(postmaster_path);
+    }
     #[cfg(target_os = "windows")]
     {
         // on windows, created pipes are leaked, so that the command hangs
@@ -166,4 +206,11 @@ pub(crate) fn start_postgres(
     }
 
     Ok(())
+}
+
+fn valgrind_suppressions_path(pg_config: &PgConfig) -> Result<PathBuf, eyre::Report> {
+    let mut home = Pgrx::home()?;
+    home.push(pg_config.version()?);
+    home.push("src/tools/valgrind.supp");
+    Ok(home)
 }

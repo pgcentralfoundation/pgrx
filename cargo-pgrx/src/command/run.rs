@@ -54,6 +54,8 @@ pub(crate) struct Run {
     /// Install without running
     #[clap(long)]
     install_only: bool,
+    #[clap(long)]
+    valgrind: bool,
 }
 
 impl From<&Regress> for Run {
@@ -70,6 +72,7 @@ impl From<&Regress> for Run {
             verbose: regress.verbose,
             pgcli: false,
             install_only: false,
+            valgrind: false,
         }
     }
 }
@@ -114,6 +117,7 @@ impl Run {
             &profile,
             &self.features,
             self.install_only,
+            self.valgrind,
             self.target.as_deref(),
             postgresql_conf,
         )?;
@@ -147,6 +151,7 @@ pub(crate) fn run(
     profile: &CargoProfile,
     features: &clap_cargo::Features,
     install_only: bool,
+    use_valgrind: bool,
     target: Option<&str>,
     postgresql_conf: &HashMap<String, String>,
 ) -> eyre::Result<()> {
@@ -171,7 +176,7 @@ pub(crate) fn run(
     }
 
     // restart postgres
-    start_postgres(pg_config, postgresql_conf)?;
+    start_postgres(pg_config, postgresql_conf, use_valgrind)?;
 
     // create the named database
     if create_database && !createdb(pg_config, dbname, false, true, None)? {

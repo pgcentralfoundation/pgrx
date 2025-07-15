@@ -549,7 +549,8 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
         }
         let mut file = builder.tempfile()?;
         file.write_all(b"#!/usr/bin/sh\n")?;
-        let mut command = Command::new("valgrind");
+        let mut command = Command::new("exec");
+        command.arg("valgrind");
         command.arg("--leak-check=no");
         command.arg("--gen-suppressions=all");
         command.arg("--time-stamp=yes");
@@ -620,10 +621,7 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
         .arg("-l")
         .arg(pipe.path());
     if let Some(postmaster_path) = postmaster_path.as_ref() {
-        command
-            .arg("-W") // pg_ctl cannot detect if postmaster starts
-            .arg("-p")
-            .arg(postmaster_path);
+        command.arg("-p").arg(postmaster_path);
     }
     #[cfg(target_os = "windows")]
     {
