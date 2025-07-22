@@ -76,6 +76,12 @@ pub(crate) struct Regress {
 impl Regress {
     #[rustfmt::skip]
     fn is_setup_sql_newer(&self, manifest_path: impl AsRef<Path>) -> bool {
+
+        // if we have reset the db, then re-run the setup
+        if self.resetdb {
+            return true;
+        }
+
         let sql = manifest_path_to_sql_tests_path(&manifest_path);
         if !sql.exists() { return false; }
         let expected = manifest_path_to_expected_tests_output_path(&manifest_path);
