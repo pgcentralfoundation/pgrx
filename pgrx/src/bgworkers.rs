@@ -205,6 +205,29 @@ impl BackgroundWorker {
         };
     }
 
+    /// Intended to be called once to indicate the database and user to use to
+    /// connect to via SPI
+    pub fn connect_worker_to_spi_by_oid(dboid: Option<pg_sys::Oid>, useroid: Option<pg_sys::Oid>) {
+        unsafe {
+            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+        }
+
+        let dboid = dboid.unwrap_or(pg_sys::InvalidOid);
+        let useroid = useroid.unwrap_or(pg_sys::InvalidOid);
+
+        unsafe {
+            #[cfg(any(
+                feature = "pg13",
+                feature = "pg14",
+                feature = "pg15",
+                feature = "pg16",
+                feature = "pg17",
+                feature = "pg18"
+            ))]
+            pg_sys::BackgroundWorkerInitializeConnectionByOid(dboid, useroid, 0);
+        };
+    }
+
     /// Indicate the set of signal handlers we want to receive.
     ///
     /// You likely always want to do this:
