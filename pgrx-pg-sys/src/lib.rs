@@ -45,3 +45,12 @@ mod seal {
 #[cfg(target_os = "linux")]
 #[link(name = "resolv")]
 unsafe extern "C" {}
+
+// Link to the builtin crypto libraries on Windows.
+// This is necessary only when Postgres is built --with-openssl, but what Windows distribution isn't?
+//
+// See: https://github.com/postgres/postgres/blob/REL_17_0/meson.build#L1321
+#[cfg(target_os = "windows")]
+#[link(name = "ssl")]
+#[link(name = "crypto")]
+unsafe extern "C" {}
