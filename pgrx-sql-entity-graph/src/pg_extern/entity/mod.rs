@@ -482,20 +482,6 @@ impl ToSql for PgExternEntity {
                 }
                 Err(err) => return Err(err.into()),
             };
-            if self.metadata.arguments.len() != 1 {
-                return Err(eyre!(
-                    "PG cast function ({}) must have exactly one argument, got {}",
-                    self.name,
-                    self.metadata.arguments.len()
-                ));
-            }
-            if self.fn_args.len() != 1 {
-                return Err(eyre!(
-                    "PG cast function ({}) must have exactly one argument, got {}",
-                    self.name,
-                    self.fn_args.len()
-                ));
-            }
             let source_arg = self
                 .metadata
                 .arguments

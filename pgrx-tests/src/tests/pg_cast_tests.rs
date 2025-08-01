@@ -38,6 +38,18 @@ mod pg_catalog {
         // look, it's just a test, okay?
         true
     }
+
+    // there is a 3-arg version of CAST functions that pass through the user-provided "type modifier"
+    // and if it's an explicit cast or not.  This function itself is enough to test that we can generate
+    // the proper code for the function
+    #[pg_cast]
+    fn testcasttype_to_testcasttype(
+        i: TestCastType,
+        _typmod: i32,
+        _is_explicit: bool,
+    ) -> TestCastType {
+        i
+    }
 }
 
 #[cfg(any(test, feature = "pg_test"))]
