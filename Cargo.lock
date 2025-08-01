@@ -372,7 +372,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-pgrx"
-version = "0.15.0"
+version = "0.16.0"
 dependencies = [
  "bzip2",
  "cargo-edit",
@@ -1976,7 +1976,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx"
-version = "0.15.0"
+version = "0.16.0"
 dependencies = [
  "bitflags 2.9.0",
  "bitvec",
@@ -1996,7 +1996,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-bindgen"
-version = "0.15.0"
+version = "0.16.0"
 dependencies = [
  "bindgen",
  "cc",
@@ -2013,7 +2013,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-macros"
-version = "0.15.0"
+version = "0.16.0"
 dependencies = [
  "pgrx-sql-entity-graph",
  "proc-macro2",
@@ -2024,7 +2024,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-pg-config"
-version = "0.15.0"
+version = "0.16.0"
 dependencies = [
  "cargo_toml",
  "codepage",
@@ -2043,7 +2043,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-pg-sys"
-version = "0.15.0"
+version = "0.16.0"
 dependencies = [
  "cee-scape",
  "libc",
@@ -2056,7 +2056,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-sql-entity-graph"
-version = "0.15.0"
+version = "0.16.0"
 dependencies = [
  "convert_case",
  "eyre",
@@ -2072,7 +2072,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-tests"
-version = "0.15.0"
+version = "0.16.0"
 dependencies = [
  "clap-cargo 0.14.1",
  "eyre",

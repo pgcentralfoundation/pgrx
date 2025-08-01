@@ -165,17 +165,17 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &::core::ffi::CStr = c"pgsql-bugs@lists.postgresql.org";
 pub const PACKAGE_NAME: &::core::ffi::CStr = c"PostgreSQL";
-pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 18beta1";
+pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 18beta2";
 pub const PACKAGE_TARNAME: &::core::ffi::CStr = c"postgresql";
 pub const PACKAGE_URL: &::core::ffi::CStr = c"https://www.postgresql.org/";
-pub const PACKAGE_VERSION: &::core::ffi::CStr = c"18beta1";
+pub const PACKAGE_VERSION: &::core::ffi::CStr = c"18beta2";
 pub const PG_KRB_SRVNAM: &::core::ffi::CStr = c"postgres";
 pub const PG_MAJORVERSION: &::core::ffi::CStr = c"18";
 pub const PG_MAJORVERSION_NUM: u32 = 18;
 pub const PG_MINORVERSION_NUM: u32 = 0;
-pub const PG_VERSION: &::core::ffi::CStr = c"18beta1";
+pub const PG_VERSION: &::core::ffi::CStr = c"18beta2";
 pub const PG_VERSION_NUM: u32 = 180000;
-pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 18beta1 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit" ;
+pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 18beta2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_LONG: u32 = 8;
 pub const SIZEOF_LONG_LONG: u32 = 8;
@@ -254,7 +254,7 @@ pub const PG_BINARY_A: &::core::ffi::CStr = c"a";
 pub const PG_BINARY_R: &::core::ffi::CStr = c"r";
 pub const PG_BINARY_W: &::core::ffi::CStr = c"w";
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 18beta1\n";
+pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 18beta2\n";
 pub const EXE: &::core::ffi::CStr = c"";
 pub const DEVNULL: &::core::ffi::CStr = c"/dev/null";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -718,7 +718,7 @@ pub const RTPrefixStrategyNumber: u32 = 28;
 pub const RTOldBelowStrategyNumber: u32 = 29;
 pub const RTOldAboveStrategyNumber: u32 = 30;
 pub const RTMaxStrategyNumber: u32 = 30;
-pub const CATALOG_VERSION_NO: u32 = 202504091;
+pub const CATALOG_VERSION_NO: u32 = 202506291;
 pub const PG_TBLSPC_DIR: &::core::ffi::CStr = c"pg_tblspc";
 pub const PG_TBLSPC_DIR_SLASH: &::core::ffi::CStr = c"pg_tblspc/";
 pub const OIDCHARS: u32 = 10;
@@ -763,87 +763,6 @@ pub const HASH_SHARED_MEM: u32 = 2048;
 pub const HASH_ATTACH: u32 = 4096;
 pub const HASH_FIXED_SIZE: u32 = 8192;
 pub const NO_MAX_DSIZE: i32 = -1;
-pub const ACL_INSERT: u32 = 1;
-pub const ACL_SELECT: u32 = 2;
-pub const ACL_UPDATE: u32 = 4;
-pub const ACL_DELETE: u32 = 8;
-pub const ACL_TRUNCATE: u32 = 16;
-pub const ACL_REFERENCES: u32 = 32;
-pub const ACL_TRIGGER: u32 = 64;
-pub const ACL_EXECUTE: u32 = 128;
-pub const ACL_USAGE: u32 = 256;
-pub const ACL_CREATE: u32 = 512;
-pub const ACL_CREATE_TEMP: u32 = 1024;
-pub const ACL_CONNECT: u32 = 2048;
-pub const ACL_SET: u32 = 4096;
-pub const ACL_ALTER_SYSTEM: u32 = 8192;
-pub const ACL_MAINTAIN: u32 = 16384;
-pub const N_ACL_RIGHTS: u32 = 15;
-pub const ACL_NO_RIGHTS: u32 = 0;
-pub const ACL_SELECT_FOR_UPDATE: u32 = 4;
-pub const FRAMEOPTION_NONDEFAULT: u32 = 1;
-pub const FRAMEOPTION_RANGE: u32 = 2;
-pub const FRAMEOPTION_ROWS: u32 = 4;
-pub const FRAMEOPTION_GROUPS: u32 = 8;
-pub const FRAMEOPTION_BETWEEN: u32 = 16;
-pub const FRAMEOPTION_START_UNBOUNDED_PRECEDING: u32 = 32;
-pub const FRAMEOPTION_END_UNBOUNDED_PRECEDING: u32 = 64;
-pub const FRAMEOPTION_START_UNBOUNDED_FOLLOWING: u32 = 128;
-pub const FRAMEOPTION_END_UNBOUNDED_FOLLOWING: u32 = 256;
-pub const FRAMEOPTION_START_CURRENT_ROW: u32 = 512;
-pub const FRAMEOPTION_END_CURRENT_ROW: u32 = 1024;
-pub const FRAMEOPTION_START_OFFSET_PRECEDING: u32 = 2048;
-pub const FRAMEOPTION_END_OFFSET_PRECEDING: u32 = 4096;
-pub const FRAMEOPTION_START_OFFSET_FOLLOWING: u32 = 8192;
-pub const FRAMEOPTION_END_OFFSET_FOLLOWING: u32 = 16384;
-pub const FRAMEOPTION_EXCLUDE_CURRENT_ROW: u32 = 32768;
-pub const FRAMEOPTION_EXCLUDE_GROUP: u32 = 65536;
-pub const FRAMEOPTION_EXCLUDE_TIES: u32 = 131072;
-pub const FRAMEOPTION_START_OFFSET: u32 = 10240;
-pub const FRAMEOPTION_END_OFFSET: u32 = 20480;
-pub const FRAMEOPTION_EXCLUSION: u32 = 229376;
-pub const FRAMEOPTION_DEFAULTS: u32 = 1058;
-pub const FKCONSTR_ACTION_NOACTION: u8 = 97u8;
-pub const FKCONSTR_ACTION_RESTRICT: u8 = 114u8;
-pub const FKCONSTR_ACTION_CASCADE: u8 = 99u8;
-pub const FKCONSTR_ACTION_SETNULL: u8 = 110u8;
-pub const FKCONSTR_ACTION_SETDEFAULT: u8 = 100u8;
-pub const FKCONSTR_MATCH_FULL: u8 = 102u8;
-pub const FKCONSTR_MATCH_PARTIAL: u8 = 112u8;
-pub const FKCONSTR_MATCH_SIMPLE: u8 = 115u8;
-pub const OPCLASS_ITEM_OPERATOR: u32 = 1;
-pub const OPCLASS_ITEM_FUNCTION: u32 = 2;
-pub const OPCLASS_ITEM_STORAGETYPE: u32 = 3;
-pub const CURSOR_OPT_BINARY: u32 = 1;
-pub const CURSOR_OPT_SCROLL: u32 = 2;
-pub const CURSOR_OPT_NO_SCROLL: u32 = 4;
-pub const CURSOR_OPT_INSENSITIVE: u32 = 8;
-pub const CURSOR_OPT_ASENSITIVE: u32 = 16;
-pub const CURSOR_OPT_HOLD: u32 = 32;
-pub const CURSOR_OPT_FAST_PLAN: u32 = 256;
-pub const CURSOR_OPT_GENERIC_PLAN: u32 = 512;
-pub const CURSOR_OPT_CUSTOM_PLAN: u32 = 1024;
-pub const CURSOR_OPT_PARALLEL_OK: u32 = 2048;
-pub const COMPLETION_TAG_BUFSIZE: u32 = 64;
-pub const RELEASE_PRIO_BUFFER_IOS: u32 = 100;
-pub const RELEASE_PRIO_BUFFER_PINS: u32 = 200;
-pub const RELEASE_PRIO_RELCACHE_REFS: u32 = 300;
-pub const RELEASE_PRIO_DSMS: u32 = 400;
-pub const RELEASE_PRIO_JIT_CONTEXTS: u32 = 500;
-pub const RELEASE_PRIO_CRYPTOHASH_CONTEXTS: u32 = 600;
-pub const RELEASE_PRIO_HMAC_CONTEXTS: u32 = 700;
-pub const RELEASE_PRIO_CATCACHE_REFS: u32 = 100;
-pub const RELEASE_PRIO_CATCACHE_LIST_REFS: u32 = 200;
-pub const RELEASE_PRIO_PLANCACHE_REFS: u32 = 300;
-pub const RELEASE_PRIO_TUPDESC_REFS: u32 = 400;
-pub const RELEASE_PRIO_SNAPSHOT_REFS: u32 = 500;
-pub const RELEASE_PRIO_FILES: u32 = 600;
-pub const RELEASE_PRIO_WAITEVENTSETS: u32 = 700;
-pub const RELEASE_PRIO_FIRST: u32 = 1;
-pub const RELEASE_PRIO_LAST: u32 = 4294967295;
-pub const CACHEDPLANSOURCE_MAGIC: u32 = 195726186;
-pub const CACHEDPLAN_MAGIC: u32 = 953717834;
-pub const CACHEDEXPR_MAGIC: u32 = 838275847;
 pub const IO_DIRECT_DATA: u32 = 1;
 pub const IO_DIRECT_WAL: u32 = 2;
 pub const IO_DIRECT_WAL_INIT: u32 = 4;
@@ -953,180 +872,70 @@ pub const FIELDNO_AGGSTATE_CURAGGCONTEXT: u32 = 14;
 pub const FIELDNO_AGGSTATE_CURPERTRANS: u32 = 16;
 pub const FIELDNO_AGGSTATE_CURRENT_SET: u32 = 20;
 pub const FIELDNO_AGGSTATE_ALL_PERGROUPS: u32 = 54;
-pub const NUM_INDIVIDUAL_LWLOCKS: u32 = 54;
-pub const LWLOCK_PADDED_SIZE: u32 = 128;
-pub const NUM_BUFFER_PARTITIONS: u32 = 128;
-pub const LOG2_NUM_LOCK_PARTITIONS: u32 = 4;
-pub const NUM_LOCK_PARTITIONS: u32 = 16;
-pub const LOG2_NUM_PREDICATELOCK_PARTITIONS: u32 = 4;
-pub const NUM_PREDICATELOCK_PARTITIONS: u32 = 16;
-pub const BUFFER_MAPPING_LWLOCK_OFFSET: u32 = 54;
-pub const LOCK_MANAGER_LWLOCK_OFFSET: u32 = 182;
-pub const PREDICATELOCK_MANAGER_LWLOCK_OFFSET: u32 = 198;
-pub const NUM_FIXED_LWLOCKS: u32 = 214;
-pub const SHMEM_INDEX_KEYSIZE: u32 = 48;
-pub const SHMEM_INDEX_SIZE: u32 = 64;
-pub const MAX_TIMESTAMP_PRECISION: u32 = 6;
-pub const MAX_INTERVAL_PRECISION: u32 = 6;
-pub const TS_PREC_INV: f64 = 1000000.0;
-pub const DAYS_PER_YEAR: f64 = 365.25;
-pub const MONTHS_PER_YEAR: u32 = 12;
-pub const DAYS_PER_MONTH: u32 = 30;
-pub const DAYS_PER_WEEK: u32 = 7;
-pub const HOURS_PER_DAY: u32 = 24;
-pub const SECS_PER_YEAR: u32 = 31557600;
-pub const SECS_PER_DAY: u32 = 86400;
-pub const SECS_PER_HOUR: u32 = 3600;
-pub const SECS_PER_MINUTE: u32 = 60;
-pub const MINS_PER_HOUR: u32 = 60;
-pub const MAX_TZDISP_HOUR: u32 = 15;
-pub const TZDISP_LIMIT: u32 = 57600;
-pub const JULIAN_MINYEAR: i32 = -4713;
-pub const JULIAN_MINMONTH: u32 = 11;
-pub const JULIAN_MINDAY: u32 = 24;
-pub const JULIAN_MAXYEAR: u32 = 5874898;
-pub const JULIAN_MAXMONTH: u32 = 6;
-pub const JULIAN_MAXDAY: u32 = 3;
-pub const UNIX_EPOCH_JDATE: u32 = 2440588;
-pub const POSTGRES_EPOCH_JDATE: u32 = 2451545;
-pub const DATETIME_MIN_JULIAN: u32 = 0;
-pub const DATE_END_JULIAN: u32 = 2147483494;
-pub const TIMESTAMP_END_JULIAN: u32 = 109203528;
-pub const TZ_STRLEN_MAX: u32 = 255;
-pub const INTERVAL_FULL_RANGE: u32 = 32767;
-pub const INTERVAL_RANGE_MASK: u32 = 32767;
-pub const INTERVAL_FULL_PRECISION: u32 = 65535;
-pub const INTERVAL_PRECISION_MASK: u32 = 65535;
-pub const InvalidLocalTransactionId: u32 = 0;
-pub const MAX_LOCKMODES: u32 = 10;
-pub const DEFAULT_LOCKMETHOD: u32 = 1;
-pub const USER_LOCKMETHOD: u32 = 2;
-pub const CHECKPOINT_IS_SHUTDOWN: u32 = 1;
-pub const CHECKPOINT_END_OF_RECOVERY: u32 = 2;
-pub const CHECKPOINT_IMMEDIATE: u32 = 4;
-pub const CHECKPOINT_FORCE: u32 = 8;
-pub const CHECKPOINT_FLUSH_ALL: u32 = 16;
-pub const CHECKPOINT_WAIT: u32 = 32;
-pub const CHECKPOINT_REQUESTED: u32 = 64;
-pub const CHECKPOINT_CAUSE_XLOG: u32 = 128;
-pub const CHECKPOINT_CAUSE_TIME: u32 = 256;
-pub const XLOG_INCLUDE_ORIGIN: u32 = 1;
-pub const XLOG_MARK_UNIMPORTANT: u32 = 2;
-pub const RECOVERY_SIGNAL_FILE: &::core::ffi::CStr = c"recovery.signal";
-pub const STANDBY_SIGNAL_FILE: &::core::ffi::CStr = c"standby.signal";
-pub const BACKUP_LABEL_FILE: &::core::ffi::CStr = c"backup_label";
-pub const BACKUP_LABEL_OLD: &::core::ffi::CStr = c"backup_label.old";
-pub const TABLESPACE_MAP: &::core::ffi::CStr = c"tablespace_map";
-pub const TABLESPACE_MAP_OLD: &::core::ffi::CStr = c"tablespace_map.old";
-pub const PROMOTE_SIGNAL_FILE: &::core::ffi::CStr = c"promote";
-pub const RelationRelationId: Oid = Oid(1259);
-pub const RelationRelation_Rowtype_Id: u32 = 83;
-pub const ClassOidIndexId: u32 = 2662;
-pub const ClassNameNspIndexId: u32 = 2663;
-pub const ClassTblspcRelfilenodeIndexId: u32 = 3455;
-pub const Anum_pg_class_oid: u32 = 1;
-pub const Anum_pg_class_relname: u32 = 2;
-pub const Anum_pg_class_relnamespace: u32 = 3;
-pub const Anum_pg_class_reltype: u32 = 4;
-pub const Anum_pg_class_reloftype: u32 = 5;
-pub const Anum_pg_class_relowner: u32 = 6;
-pub const Anum_pg_class_relam: u32 = 7;
-pub const Anum_pg_class_relfilenode: u32 = 8;
-pub const Anum_pg_class_reltablespace: u32 = 9;
-pub const Anum_pg_class_relpages: u32 = 10;
-pub const Anum_pg_class_reltuples: u32 = 11;
-pub const Anum_pg_class_relallvisible: u32 = 12;
-pub const Anum_pg_class_relallfrozen: u32 = 13;
-pub const Anum_pg_class_reltoastrelid: u32 = 14;
-pub const Anum_pg_class_relhasindex: u32 = 15;
-pub const Anum_pg_class_relisshared: u32 = 16;
-pub const Anum_pg_class_relpersistence: u32 = 17;
-pub const Anum_pg_class_relkind: u32 = 18;
-pub const Anum_pg_class_relnatts: u32 = 19;
-pub const Anum_pg_class_relchecks: u32 = 20;
-pub const Anum_pg_class_relhasrules: u32 = 21;
-pub const Anum_pg_class_relhastriggers: u32 = 22;
-pub const Anum_pg_class_relhassubclass: u32 = 23;
-pub const Anum_pg_class_relrowsecurity: u32 = 24;
-pub const Anum_pg_class_relforcerowsecurity: u32 = 25;
-pub const Anum_pg_class_relispopulated: u32 = 26;
-pub const Anum_pg_class_relreplident: u32 = 27;
-pub const Anum_pg_class_relispartition: u32 = 28;
-pub const Anum_pg_class_relrewrite: u32 = 29;
-pub const Anum_pg_class_relfrozenxid: u32 = 30;
-pub const Anum_pg_class_relminmxid: u32 = 31;
-pub const Anum_pg_class_relacl: u32 = 32;
-pub const Anum_pg_class_reloptions: u32 = 33;
-pub const Anum_pg_class_relpartbound: u32 = 34;
-pub const Natts_pg_class: u32 = 34;
-pub const RELKIND_RELATION: u8 = 114u8;
-pub const RELKIND_INDEX: u8 = 105u8;
-pub const RELKIND_SEQUENCE: u8 = 83u8;
-pub const RELKIND_TOASTVALUE: u8 = 116u8;
-pub const RELKIND_VIEW: u8 = 118u8;
-pub const RELKIND_MATVIEW: u8 = 109u8;
-pub const RELKIND_COMPOSITE_TYPE: u8 = 99u8;
-pub const RELKIND_FOREIGN_TABLE: u8 = 102u8;
-pub const RELKIND_PARTITIONED_TABLE: u8 = 112u8;
-pub const RELKIND_PARTITIONED_INDEX: u8 = 73u8;
-pub const RELPERSISTENCE_PERMANENT: u8 = 112u8;
-pub const RELPERSISTENCE_UNLOGGED: u8 = 117u8;
-pub const RELPERSISTENCE_TEMP: u8 = 116u8;
-pub const REPLICA_IDENTITY_DEFAULT: u8 = 100u8;
-pub const REPLICA_IDENTITY_NOTHING: u8 = 110u8;
-pub const REPLICA_IDENTITY_FULL: u8 = 102u8;
-pub const REPLICA_IDENTITY_INDEX: u8 = 105u8;
-pub const IndexRelationId: Oid = Oid(2610);
-pub const PgIndexToastTable: u32 = 8149;
-pub const PgIndexToastIndex: u32 = 8150;
-pub const IndexIndrelidIndexId: u32 = 2678;
-pub const IndexRelidIndexId: u32 = 2679;
-pub const Anum_pg_index_indexrelid: u32 = 1;
-pub const Anum_pg_index_indrelid: u32 = 2;
-pub const Anum_pg_index_indnatts: u32 = 3;
-pub const Anum_pg_index_indnkeyatts: u32 = 4;
-pub const Anum_pg_index_indisunique: u32 = 5;
-pub const Anum_pg_index_indnullsnotdistinct: u32 = 6;
-pub const Anum_pg_index_indisprimary: u32 = 7;
-pub const Anum_pg_index_indisexclusion: u32 = 8;
-pub const Anum_pg_index_indimmediate: u32 = 9;
-pub const Anum_pg_index_indisclustered: u32 = 10;
-pub const Anum_pg_index_indisvalid: u32 = 11;
-pub const Anum_pg_index_indcheckxmin: u32 = 12;
-pub const Anum_pg_index_indisready: u32 = 13;
-pub const Anum_pg_index_indislive: u32 = 14;
-pub const Anum_pg_index_indisreplident: u32 = 15;
-pub const Anum_pg_index_indkey: u32 = 16;
-pub const Anum_pg_index_indcollation: u32 = 17;
-pub const Anum_pg_index_indclass: u32 = 18;
-pub const Anum_pg_index_indoption: u32 = 19;
-pub const Anum_pg_index_indexprs: u32 = 20;
-pub const Anum_pg_index_indpred: u32 = 21;
-pub const Natts_pg_index: u32 = 21;
-pub const INDOPTION_DESC: u32 = 1;
-pub const INDOPTION_NULLS_FIRST: u32 = 2;
-pub const PublicationRelationId: Oid = Oid(6104);
-pub const PublicationObjectIndexId: u32 = 6110;
-pub const PublicationNameIndexId: u32 = 6111;
-pub const Anum_pg_publication_oid: u32 = 1;
-pub const Anum_pg_publication_pubname: u32 = 2;
-pub const Anum_pg_publication_pubowner: u32 = 3;
-pub const Anum_pg_publication_puballtables: u32 = 4;
-pub const Anum_pg_publication_pubinsert: u32 = 5;
-pub const Anum_pg_publication_pubupdate: u32 = 6;
-pub const Anum_pg_publication_pubdelete: u32 = 7;
-pub const Anum_pg_publication_pubtruncate: u32 = 8;
-pub const Anum_pg_publication_pubviaroot: u32 = 9;
-pub const Anum_pg_publication_pubgencols: u32 = 10;
-pub const Natts_pg_publication: u32 = 10;
-pub const PGAIO_RESULT_ID_BITS: u32 = 6;
-pub const PGAIO_RESULT_STATUS_BITS: u32 = 3;
-pub const PGAIO_RESULT_ERROR_BITS: u32 = 23;
-pub const HEAP_MIN_FILLFACTOR: u32 = 10;
-pub const HEAP_DEFAULT_FILLFACTOR: u32 = 100;
+pub const COMPLETION_TAG_BUFSIZE: u32 = 64;
+pub const ACL_INSERT: u32 = 1;
+pub const ACL_SELECT: u32 = 2;
+pub const ACL_UPDATE: u32 = 4;
+pub const ACL_DELETE: u32 = 8;
+pub const ACL_TRUNCATE: u32 = 16;
+pub const ACL_REFERENCES: u32 = 32;
+pub const ACL_TRIGGER: u32 = 64;
+pub const ACL_EXECUTE: u32 = 128;
+pub const ACL_USAGE: u32 = 256;
+pub const ACL_CREATE: u32 = 512;
+pub const ACL_CREATE_TEMP: u32 = 1024;
+pub const ACL_CONNECT: u32 = 2048;
+pub const ACL_SET: u32 = 4096;
+pub const ACL_ALTER_SYSTEM: u32 = 8192;
+pub const ACL_MAINTAIN: u32 = 16384;
+pub const N_ACL_RIGHTS: u32 = 15;
+pub const ACL_NO_RIGHTS: u32 = 0;
+pub const ACL_SELECT_FOR_UPDATE: u32 = 4;
+pub const FRAMEOPTION_NONDEFAULT: u32 = 1;
+pub const FRAMEOPTION_RANGE: u32 = 2;
+pub const FRAMEOPTION_ROWS: u32 = 4;
+pub const FRAMEOPTION_GROUPS: u32 = 8;
+pub const FRAMEOPTION_BETWEEN: u32 = 16;
+pub const FRAMEOPTION_START_UNBOUNDED_PRECEDING: u32 = 32;
+pub const FRAMEOPTION_END_UNBOUNDED_PRECEDING: u32 = 64;
+pub const FRAMEOPTION_START_UNBOUNDED_FOLLOWING: u32 = 128;
+pub const FRAMEOPTION_END_UNBOUNDED_FOLLOWING: u32 = 256;
+pub const FRAMEOPTION_START_CURRENT_ROW: u32 = 512;
+pub const FRAMEOPTION_END_CURRENT_ROW: u32 = 1024;
+pub const FRAMEOPTION_START_OFFSET_PRECEDING: u32 = 2048;
+pub const FRAMEOPTION_END_OFFSET_PRECEDING: u32 = 4096;
+pub const FRAMEOPTION_START_OFFSET_FOLLOWING: u32 = 8192;
+pub const FRAMEOPTION_END_OFFSET_FOLLOWING: u32 = 16384;
+pub const FRAMEOPTION_EXCLUDE_CURRENT_ROW: u32 = 32768;
+pub const FRAMEOPTION_EXCLUDE_GROUP: u32 = 65536;
+pub const FRAMEOPTION_EXCLUDE_TIES: u32 = 131072;
+pub const FRAMEOPTION_START_OFFSET: u32 = 10240;
+pub const FRAMEOPTION_END_OFFSET: u32 = 20480;
+pub const FRAMEOPTION_EXCLUSION: u32 = 229376;
+pub const FRAMEOPTION_DEFAULTS: u32 = 1058;
+pub const FKCONSTR_ACTION_NOACTION: u8 = 97u8;
+pub const FKCONSTR_ACTION_RESTRICT: u8 = 114u8;
+pub const FKCONSTR_ACTION_CASCADE: u8 = 99u8;
+pub const FKCONSTR_ACTION_SETNULL: u8 = 110u8;
+pub const FKCONSTR_ACTION_SETDEFAULT: u8 = 100u8;
+pub const FKCONSTR_MATCH_FULL: u8 = 102u8;
+pub const FKCONSTR_MATCH_PARTIAL: u8 = 112u8;
+pub const FKCONSTR_MATCH_SIMPLE: u8 = 115u8;
+pub const OPCLASS_ITEM_OPERATOR: u32 = 1;
+pub const OPCLASS_ITEM_FUNCTION: u32 = 2;
+pub const OPCLASS_ITEM_STORAGETYPE: u32 = 3;
+pub const CURSOR_OPT_BINARY: u32 = 1;
+pub const CURSOR_OPT_SCROLL: u32 = 2;
+pub const CURSOR_OPT_NO_SCROLL: u32 = 4;
+pub const CURSOR_OPT_INSENSITIVE: u32 = 8;
+pub const CURSOR_OPT_ASENSITIVE: u32 = 16;
+pub const CURSOR_OPT_HOLD: u32 = 32;
+pub const CURSOR_OPT_FAST_PLAN: u32 = 256;
+pub const CURSOR_OPT_GENERIC_PLAN: u32 = 512;
+pub const CURSOR_OPT_CUSTOM_PLAN: u32 = 1024;
+pub const CURSOR_OPT_PARALLEL_OK: u32 = 2048;
 pub const MaxAllocHugeSize: u32 = 0;
 pub const InvalidAllocSize: i32 = -1;
-pub const MEMORY_CONTEXT_IDENT_SHMEM_SIZE: u32 = 64;
 pub const ALLOCSET_DEFAULT_MINSIZE: u32 = 0;
 pub const ALLOCSET_DEFAULT_INITSIZE: u32 = 8192;
 pub const ALLOCSET_DEFAULT_MAXSIZE: u32 = 8388608;
@@ -1183,6 +992,33 @@ pub const SIG_BLOCK: u32 = 0;
 pub const SIG_UNBLOCK: u32 = 1;
 pub const SIG_SETMASK: u32 = 2;
 pub const SIGSTKSZ: u32 = 8192;
+pub const MAX_TIMESTAMP_PRECISION: u32 = 6;
+pub const MAX_INTERVAL_PRECISION: u32 = 6;
+pub const TS_PREC_INV: f64 = 1000000.0;
+pub const DAYS_PER_YEAR: f64 = 365.25;
+pub const MONTHS_PER_YEAR: u32 = 12;
+pub const DAYS_PER_MONTH: u32 = 30;
+pub const DAYS_PER_WEEK: u32 = 7;
+pub const HOURS_PER_DAY: u32 = 24;
+pub const SECS_PER_YEAR: u32 = 31557600;
+pub const SECS_PER_DAY: u32 = 86400;
+pub const SECS_PER_HOUR: u32 = 3600;
+pub const SECS_PER_MINUTE: u32 = 60;
+pub const MINS_PER_HOUR: u32 = 60;
+pub const MAX_TZDISP_HOUR: u32 = 15;
+pub const TZDISP_LIMIT: u32 = 57600;
+pub const JULIAN_MINYEAR: i32 = -4713;
+pub const JULIAN_MINMONTH: u32 = 11;
+pub const JULIAN_MINDAY: u32 = 24;
+pub const JULIAN_MAXYEAR: u32 = 5874898;
+pub const JULIAN_MAXMONTH: u32 = 6;
+pub const JULIAN_MAXDAY: u32 = 3;
+pub const UNIX_EPOCH_JDATE: u32 = 2440588;
+pub const POSTGRES_EPOCH_JDATE: u32 = 2451545;
+pub const DATETIME_MIN_JULIAN: u32 = 0;
+pub const DATE_END_JULIAN: u32 = 2147483494;
+pub const TIMESTAMP_END_JULIAN: u32 = 109203528;
+pub const TZ_STRLEN_MAX: u32 = 255;
 pub const InvalidPid: i32 = -1;
 pub const USE_POSTGRES_DATES: u32 = 0;
 pub const USE_ISO_DATES: u32 = 1;
@@ -1209,6 +1045,10 @@ pub const INIT_PG_OVERRIDE_ROLE_LOGIN: u32 = 4;
 pub const MIN_XFN_CHARS: u32 = 16;
 pub const MAX_XFN_CHARS: u32 = 40;
 pub const VALID_XFN_CHARS: &::core::ffi::CStr = c"0123456789ABCDEF.history.backup.partial";
+pub const INTERVAL_FULL_RANGE: u32 = 32767;
+pub const INTERVAL_RANGE_MASK: u32 = 32767;
+pub const INTERVAL_FULL_PRECISION: u32 = 65535;
+pub const INTERVAL_PRECISION_MASK: u32 = 65535;
 pub const PGSTAT_NUM_PROGRESS_PARAM: u32 = 20;
 pub const PqMsg_Bind: u8 = 66u8;
 pub const PqMsg_Close: u8 = 67u8;
@@ -1302,6 +1142,24 @@ pub const PGSTAT_STAT_PERMANENT_FILENAME: &::core::ffi::CStr = c"pg_stat/pgstat.
 pub const PGSTAT_STAT_PERMANENT_TMPFILE: &::core::ffi::CStr = c"pg_stat/pgstat.tmp";
 pub const PG_STAT_TMP_DIR: &::core::ffi::CStr = c"pg_stat_tmp";
 pub const PGSTAT_FILE_FORMAT_ID: u32 = 27638967;
+pub const CHECKPOINT_IS_SHUTDOWN: u32 = 1;
+pub const CHECKPOINT_END_OF_RECOVERY: u32 = 2;
+pub const CHECKPOINT_IMMEDIATE: u32 = 4;
+pub const CHECKPOINT_FORCE: u32 = 8;
+pub const CHECKPOINT_FLUSH_ALL: u32 = 16;
+pub const CHECKPOINT_WAIT: u32 = 32;
+pub const CHECKPOINT_REQUESTED: u32 = 64;
+pub const CHECKPOINT_CAUSE_XLOG: u32 = 128;
+pub const CHECKPOINT_CAUSE_TIME: u32 = 256;
+pub const XLOG_INCLUDE_ORIGIN: u32 = 1;
+pub const XLOG_MARK_UNIMPORTANT: u32 = 2;
+pub const RECOVERY_SIGNAL_FILE: &::core::ffi::CStr = c"recovery.signal";
+pub const STANDBY_SIGNAL_FILE: &::core::ffi::CStr = c"standby.signal";
+pub const BACKUP_LABEL_FILE: &::core::ffi::CStr = c"backup_label";
+pub const BACKUP_LABEL_OLD: &::core::ffi::CStr = c"backup_label.old";
+pub const TABLESPACE_MAP: &::core::ffi::CStr = c"tablespace_map";
+pub const TABLESPACE_MAP_OLD: &::core::ffi::CStr = c"tablespace_map.old";
+pub const PROMOTE_SIGNAL_FILE: &::core::ffi::CStr = c"promote";
 pub const RM_MAX_ID: u32 = 255;
 pub const RM_MIN_CUSTOM_ID: u32 = 128;
 pub const RM_MAX_CUSTOM_ID: u32 = 255;
@@ -1337,8 +1195,115 @@ pub const REGBUF_WILL_INIT: u32 = 6;
 pub const REGBUF_STANDARD: u32 = 8;
 pub const REGBUF_KEEP_DATA: u32 = 16;
 pub const REGBUF_NO_CHANGE: u32 = 32;
+pub const RelationRelationId: Oid = Oid(1259);
+pub const RelationRelation_Rowtype_Id: u32 = 83;
+pub const ClassOidIndexId: u32 = 2662;
+pub const ClassNameNspIndexId: u32 = 2663;
+pub const ClassTblspcRelfilenodeIndexId: u32 = 3455;
+pub const Anum_pg_class_oid: u32 = 1;
+pub const Anum_pg_class_relname: u32 = 2;
+pub const Anum_pg_class_relnamespace: u32 = 3;
+pub const Anum_pg_class_reltype: u32 = 4;
+pub const Anum_pg_class_reloftype: u32 = 5;
+pub const Anum_pg_class_relowner: u32 = 6;
+pub const Anum_pg_class_relam: u32 = 7;
+pub const Anum_pg_class_relfilenode: u32 = 8;
+pub const Anum_pg_class_reltablespace: u32 = 9;
+pub const Anum_pg_class_relpages: u32 = 10;
+pub const Anum_pg_class_reltuples: u32 = 11;
+pub const Anum_pg_class_relallvisible: u32 = 12;
+pub const Anum_pg_class_relallfrozen: u32 = 13;
+pub const Anum_pg_class_reltoastrelid: u32 = 14;
+pub const Anum_pg_class_relhasindex: u32 = 15;
+pub const Anum_pg_class_relisshared: u32 = 16;
+pub const Anum_pg_class_relpersistence: u32 = 17;
+pub const Anum_pg_class_relkind: u32 = 18;
+pub const Anum_pg_class_relnatts: u32 = 19;
+pub const Anum_pg_class_relchecks: u32 = 20;
+pub const Anum_pg_class_relhasrules: u32 = 21;
+pub const Anum_pg_class_relhastriggers: u32 = 22;
+pub const Anum_pg_class_relhassubclass: u32 = 23;
+pub const Anum_pg_class_relrowsecurity: u32 = 24;
+pub const Anum_pg_class_relforcerowsecurity: u32 = 25;
+pub const Anum_pg_class_relispopulated: u32 = 26;
+pub const Anum_pg_class_relreplident: u32 = 27;
+pub const Anum_pg_class_relispartition: u32 = 28;
+pub const Anum_pg_class_relrewrite: u32 = 29;
+pub const Anum_pg_class_relfrozenxid: u32 = 30;
+pub const Anum_pg_class_relminmxid: u32 = 31;
+pub const Anum_pg_class_relacl: u32 = 32;
+pub const Anum_pg_class_reloptions: u32 = 33;
+pub const Anum_pg_class_relpartbound: u32 = 34;
+pub const Natts_pg_class: u32 = 34;
+pub const RELKIND_RELATION: u8 = 114u8;
+pub const RELKIND_INDEX: u8 = 105u8;
+pub const RELKIND_SEQUENCE: u8 = 83u8;
+pub const RELKIND_TOASTVALUE: u8 = 116u8;
+pub const RELKIND_VIEW: u8 = 118u8;
+pub const RELKIND_MATVIEW: u8 = 109u8;
+pub const RELKIND_COMPOSITE_TYPE: u8 = 99u8;
+pub const RELKIND_FOREIGN_TABLE: u8 = 102u8;
+pub const RELKIND_PARTITIONED_TABLE: u8 = 112u8;
+pub const RELKIND_PARTITIONED_INDEX: u8 = 73u8;
+pub const RELPERSISTENCE_PERMANENT: u8 = 112u8;
+pub const RELPERSISTENCE_UNLOGGED: u8 = 117u8;
+pub const RELPERSISTENCE_TEMP: u8 = 116u8;
+pub const REPLICA_IDENTITY_DEFAULT: u8 = 100u8;
+pub const REPLICA_IDENTITY_NOTHING: u8 = 110u8;
+pub const REPLICA_IDENTITY_FULL: u8 = 102u8;
+pub const REPLICA_IDENTITY_INDEX: u8 = 105u8;
+pub const IndexRelationId: Oid = Oid(2610);
+pub const PgIndexToastTable: u32 = 6351;
+pub const PgIndexToastIndex: u32 = 6352;
+pub const IndexIndrelidIndexId: u32 = 2678;
+pub const IndexRelidIndexId: u32 = 2679;
+pub const Anum_pg_index_indexrelid: u32 = 1;
+pub const Anum_pg_index_indrelid: u32 = 2;
+pub const Anum_pg_index_indnatts: u32 = 3;
+pub const Anum_pg_index_indnkeyatts: u32 = 4;
+pub const Anum_pg_index_indisunique: u32 = 5;
+pub const Anum_pg_index_indnullsnotdistinct: u32 = 6;
+pub const Anum_pg_index_indisprimary: u32 = 7;
+pub const Anum_pg_index_indisexclusion: u32 = 8;
+pub const Anum_pg_index_indimmediate: u32 = 9;
+pub const Anum_pg_index_indisclustered: u32 = 10;
+pub const Anum_pg_index_indisvalid: u32 = 11;
+pub const Anum_pg_index_indcheckxmin: u32 = 12;
+pub const Anum_pg_index_indisready: u32 = 13;
+pub const Anum_pg_index_indislive: u32 = 14;
+pub const Anum_pg_index_indisreplident: u32 = 15;
+pub const Anum_pg_index_indkey: u32 = 16;
+pub const Anum_pg_index_indcollation: u32 = 17;
+pub const Anum_pg_index_indclass: u32 = 18;
+pub const Anum_pg_index_indoption: u32 = 19;
+pub const Anum_pg_index_indexprs: u32 = 20;
+pub const Anum_pg_index_indpred: u32 = 21;
+pub const Natts_pg_index: u32 = 21;
+pub const INDOPTION_DESC: u32 = 1;
+pub const INDOPTION_NULLS_FIRST: u32 = 2;
+pub const PublicationRelationId: Oid = Oid(6104);
+pub const PublicationObjectIndexId: u32 = 6110;
+pub const PublicationNameIndexId: u32 = 6111;
+pub const Anum_pg_publication_oid: u32 = 1;
+pub const Anum_pg_publication_pubname: u32 = 2;
+pub const Anum_pg_publication_pubowner: u32 = 3;
+pub const Anum_pg_publication_puballtables: u32 = 4;
+pub const Anum_pg_publication_pubinsert: u32 = 5;
+pub const Anum_pg_publication_pubupdate: u32 = 6;
+pub const Anum_pg_publication_pubdelete: u32 = 7;
+pub const Anum_pg_publication_pubtruncate: u32 = 8;
+pub const Anum_pg_publication_pubviaroot: u32 = 9;
+pub const Anum_pg_publication_pubgencols: u32 = 10;
+pub const Natts_pg_publication: u32 = 10;
+pub const PGAIO_RESULT_ID_BITS: u32 = 6;
+pub const PGAIO_RESULT_STATUS_BITS: u32 = 3;
+pub const PGAIO_RESULT_ERROR_BITS: u32 = 23;
+pub const HEAP_MIN_FILLFACTOR: u32 = 10;
+pub const HEAP_DEFAULT_FILLFACTOR: u32 = 100;
 pub const MAX_GENERIC_XLOG_PAGES: u32 = 4;
 pub const GENERIC_XLOG_FULL_IMAGE: u32 = 1;
+pub const SHMEM_INDEX_KEYSIZE: u32 = 48;
+pub const SHMEM_INDEX_SIZE: u32 = 64;
 pub const GIN_COMPARE_PROC: u32 = 1;
 pub const GIN_EXTRACTVALUE_PROC: u32 = 2;
 pub const GIN_EXTRACTQUERY_PROC: u32 = 3;
@@ -1370,7 +1335,7 @@ pub const GIST_DISTANCE_PROC: u32 = 8;
 pub const GIST_FETCH_PROC: u32 = 9;
 pub const GIST_OPTIONS_PROC: u32 = 10;
 pub const GIST_SORTSUPPORT_PROC: u32 = 11;
-pub const GIST_STRATNUM_PROC: u32 = 12;
+pub const GIST_TRANSLATE_CMPTYPE_PROC: u32 = 12;
 pub const GISTNProcs: u32 = 12;
 pub const F_LEAF: u32 = 1;
 pub const F_DELETED: u32 = 2;
@@ -1469,6 +1434,22 @@ pub const XACT_XINFO_HAS_DROPPED_STATS: u32 = 256;
 pub const XACT_COMPLETION_APPLY_FEEDBACK: u32 = 536870912;
 pub const XACT_COMPLETION_UPDATE_RELCACHE_FILE: u32 = 1073741824;
 pub const XACT_COMPLETION_FORCE_SYNC_COMMIT: u32 = 2147483648;
+pub const RELEASE_PRIO_BUFFER_IOS: u32 = 100;
+pub const RELEASE_PRIO_BUFFER_PINS: u32 = 200;
+pub const RELEASE_PRIO_RELCACHE_REFS: u32 = 300;
+pub const RELEASE_PRIO_DSMS: u32 = 400;
+pub const RELEASE_PRIO_JIT_CONTEXTS: u32 = 500;
+pub const RELEASE_PRIO_CRYPTOHASH_CONTEXTS: u32 = 600;
+pub const RELEASE_PRIO_HMAC_CONTEXTS: u32 = 700;
+pub const RELEASE_PRIO_CATCACHE_REFS: u32 = 100;
+pub const RELEASE_PRIO_CATCACHE_LIST_REFS: u32 = 200;
+pub const RELEASE_PRIO_PLANCACHE_REFS: u32 = 300;
+pub const RELEASE_PRIO_TUPDESC_REFS: u32 = 400;
+pub const RELEASE_PRIO_SNAPSHOT_REFS: u32 = 500;
+pub const RELEASE_PRIO_FILES: u32 = 600;
+pub const RELEASE_PRIO_WAITEVENTSETS: u32 = 700;
+pub const RELEASE_PRIO_FIRST: u32 = 1;
+pub const RELEASE_PRIO_LAST: u32 = 4294967295;
 pub const READ_BUFFERS_ZERO_ON_ERROR: u32 = 1;
 pub const READ_BUFFERS_ISSUE_ADVICE: u32 = 2;
 pub const READ_BUFFERS_IGNORE_CHECKSUM_FAILURES: u32 = 4;
@@ -1502,6 +1483,21 @@ pub const XLOG_MULTIXACT_ZERO_OFF_PAGE: u32 = 0;
 pub const XLOG_MULTIXACT_ZERO_MEM_PAGE: u32 = 16;
 pub const XLOG_MULTIXACT_CREATE_ID: u32 = 32;
 pub const XLOG_MULTIXACT_TRUNCATE_ID: u32 = 48;
+pub const NUM_INDIVIDUAL_LWLOCKS: u32 = 54;
+pub const LWLOCK_PADDED_SIZE: u32 = 128;
+pub const NUM_BUFFER_PARTITIONS: u32 = 128;
+pub const LOG2_NUM_LOCK_PARTITIONS: u32 = 4;
+pub const NUM_LOCK_PARTITIONS: u32 = 16;
+pub const LOG2_NUM_PREDICATELOCK_PARTITIONS: u32 = 4;
+pub const NUM_PREDICATELOCK_PARTITIONS: u32 = 16;
+pub const BUFFER_MAPPING_LWLOCK_OFFSET: u32 = 54;
+pub const LOCK_MANAGER_LWLOCK_OFFSET: u32 = 182;
+pub const PREDICATELOCK_MANAGER_LWLOCK_OFFSET: u32 = 198;
+pub const NUM_FIXED_LWLOCKS: u32 = 214;
+pub const InvalidLocalTransactionId: u32 = 0;
+pub const MAX_LOCKMODES: u32 = 10;
+pub const DEFAULT_LOCKMETHOD: u32 = 1;
+pub const USER_LOCKMETHOD: u32 = 2;
 pub const BITS_PER_HEAPBLOCK: u32 = 2;
 pub const VISIBILITYMAP_ALL_VISIBLE: u32 = 1;
 pub const VISIBILITYMAP_ALL_FROZEN: u32 = 2;
@@ -1647,7 +1643,7 @@ pub const ROLE_PG_CHECKPOINT: u32 = 4544;
 pub const ROLE_PG_MAINTAIN: u32 = 6337;
 pub const ROLE_PG_USE_RESERVED_CONNECTIONS: u32 = 4550;
 pub const ROLE_PG_CREATE_SUBSCRIPTION: u32 = 6304;
-pub const ROLE_PG_SIGNAL_AUTOVACUUM_WORKER: u32 = 8916;
+pub const ROLE_PG_SIGNAL_AUTOVACUUM_WORKER: u32 = 6392;
 pub const CollationRelationId: Oid = Oid(3456);
 pub const CollationNameEncNspIndexId: u32 = 3164;
 pub const CollationOidIndexId: u32 = 3085;
@@ -2093,6 +2089,9 @@ pub const AT_REWRITE_ALTER_PERSISTENCE: u32 = 1;
 pub const AT_REWRITE_DEFAULT_VAL: u32 = 2;
 pub const AT_REWRITE_COLUMN_REWRITE: u32 = 4;
 pub const AT_REWRITE_ACCESS_METHOD: u32 = 8;
+pub const CACHEDPLANSOURCE_MAGIC: u32 = 195726186;
+pub const CACHEDPLAN_MAGIC: u32 = 953717834;
+pub const CACHEDEXPR_MAGIC: u32 = 838275847;
 pub const PROGRESS_VACUUM_PHASE: u32 = 0;
 pub const PROGRESS_VACUUM_TOTAL_HEAP_BLKS: u32 = 1;
 pub const PROGRESS_VACUUM_HEAP_BLKS_SCANNED: u32 = 2;
@@ -2521,6 +2520,7 @@ pub const RBTXN_HAS_STREAMABLE_CHANGE: u32 = 256;
 pub const RBTXN_SENT_PREPARE: u32 = 512;
 pub const RBTXN_IS_COMMITTED: u32 = 1024;
 pub const RBTXN_IS_ABORTED: u32 = 2048;
+pub const RBTXN_DISTR_INVAL_OVERFLOWED: u32 = 4096;
 pub const RBTXN_PREPARE_STATUS_MASK: u32 = 704;
 pub const LOGICALREP_PROTO_MIN_VERSION_NUM: u32 = 1;
 pub const LOGICALREP_PROTO_VERSION_NUM: u32 = 1;
@@ -4098,7 +4098,6 @@ pub const F_POWER_NUMERIC_NUMERIC: u32 = 2169;
 pub const F_WIDTH_BUCKET_NUMERIC_NUMERIC_NUMERIC_INT4: u32 = 2170;
 pub const F_PG_CANCEL_BACKEND: u32 = 2171;
 pub const F_PG_BACKUP_START: u32 = 2172;
-pub const F_PG_GET_PROCESS_MEMORY_CONTEXTS: u32 = 2173;
 pub const F_BPCHAR_PATTERN_LT: u32 = 2174;
 pub const F_BPCHAR_PATTERN_LE: u32 = 2175;
 pub const F_ARRAY_LENGTH: u32 = 2176;
@@ -6001,6 +6000,7 @@ pub const F_PG_STAT_GET_DB_CONFLICT_LOGICALSLOT: u32 = 6309;
 pub const F_PG_STAT_GET_LASTSCAN: u32 = 6310;
 pub const F_SYSTEM_USER: u32 = 6311;
 pub const F_BINARY_UPGRADE_LOGICAL_SLOT_HAS_CAUGHT_UP: u32 = 6312;
+pub const F_PG_STAT_GET_BACKEND_WAL: u32 = 6313;
 pub const F_PG_STAT_GET_CHECKPOINTER_STAT_RESET_TIME: u32 = 6314;
 pub const F_PG_BASETYPE: u32 = 6315;
 pub const F_PG_COLUMN_TOAST_CHUNK_ID: u32 = 6316;
@@ -6033,87 +6033,86 @@ pub const F_UUID_EXTRACT_VERSION: u32 = 6343;
 pub const F_PG_SYNC_REPLICATION_SLOTS: u32 = 6344;
 pub const F_RANGE_CONTAINS_ELEM_SUPPORT: u32 = 6345;
 pub const F_ELEM_CONTAINED_BY_RANGE_SUPPORT: u32 = 6346;
-pub const F_PG_STAT_GET_BACKEND_WAL: u32 = 8037;
-pub const F_GIST_STRATNUM_COMMON: u32 = 8047;
-pub const F_HAS_LARGEOBJECT_PRIVILEGE_NAME_OID_TEXT: u32 = 8048;
-pub const F_HAS_LARGEOBJECT_PRIVILEGE_OID_TEXT: u32 = 8049;
-pub const F_HAS_LARGEOBJECT_PRIVILEGE_OID_OID_TEXT: u32 = 8050;
-pub const F_PG_GET_LOADED_MODULES: u32 = 8303;
-pub const F_GENERATE_SERIES_TIMESTAMP_SUPPORT: u32 = 8402;
-pub const F_PG_STAT_GET_DB_PARALLEL_WORKERS_TO_LAUNCH: u32 = 8403;
-pub const F_PG_STAT_GET_DB_PARALLEL_WORKERS_LAUNCHED: u32 = 8404;
-pub const F_GENERATE_SERIES_NUMERIC_SUPPORT: u32 = 8405;
-pub const F_PG_STAT_GET_TOTAL_VACUUM_TIME: u32 = 8406;
-pub const F_PG_STAT_GET_TOTAL_AUTOVACUUM_TIME: u32 = 8407;
-pub const F_PG_STAT_GET_TOTAL_ANALYZE_TIME: u32 = 8408;
-pub const F_PG_STAT_GET_TOTAL_AUTOANALYZE_TIME: u32 = 8409;
-pub const F_PG_RESTORE_RELATION_STATS: u32 = 8459;
-pub const F_PG_RESTORE_ATTRIBUTE_STATS: u32 = 8461;
-pub const F_CRC32: u32 = 8571;
-pub const F_CRC32C: u32 = 8572;
-pub const F_PG_STAT_GET_CHECKPOINTER_SLRU_WRITTEN: u32 = 8573;
-pub const F_BYTEA_INT2: u32 = 8577;
-pub const F_BYTEA_INT4: u32 = 8578;
-pub const F_BYTEA_INT8: u32 = 8579;
-pub const F_INT2_BYTEA: u32 = 8580;
-pub const F_INT4_BYTEA: u32 = 8581;
-pub const F_INT8_BYTEA: u32 = 8582;
-pub const F_MAX_RECORD: u32 = 8595;
-pub const F_MIN_RECORD: u32 = 8596;
-pub const F_RECORD_LARGER: u32 = 8597;
-pub const F_RECORD_SMALLER: u32 = 8598;
-pub const F_PG_STAT_GET_CHECKPOINTER_NUM_PERFORMED: u32 = 8599;
-pub const F_ARRAY_APPEND_SUPPORT: u32 = 8680;
-pub const F_ARRAY_PREPEND_SUPPORT: u32 = 8681;
-pub const F_ARRAY_SUBSCRIPT_HANDLER_SUPPORT: u32 = 8682;
-pub const F_ARRAY_REVERSE: u32 = 8686;
-pub const F_REVERSE_BYTEA: u32 = 8694;
-pub const F_GAMMA: u32 = 8702;
-pub const F_LGAMMA: u32 = 8703;
-pub const F_PG_GET_ACL: u32 = 8730;
-pub const F_PG_STAT_GET_BACKEND_IO: u32 = 8806;
-pub const F_PG_STAT_RESET_BACKEND_STATS: u32 = 8807;
-pub const F_ARRAY_SORT_ANYARRAY: u32 = 8810;
-pub const F_ARRAY_SORT_ANYARRAY_BOOL: u32 = 8811;
-pub const F_ARRAY_SORT_ANYARRAY_BOOL_BOOL: u32 = 8812;
-pub const F_RANGE_SORTSUPPORT: u32 = 8849;
-pub const F_BYTEA_LARGER: u32 = 8920;
-pub const F_BYTEA_SMALLER: u32 = 8921;
-pub const F_MAX_BYTEA: u32 = 8922;
-pub const F_MIN_BYTEA: u32 = 8923;
-pub const F_PG_CLEAR_RELATION_STATS: u32 = 9160;
-pub const F_PG_CLEAR_ATTRIBUTE_STATS: u32 = 9162;
-pub const F_PG_GET_AIOS: u32 = 9200;
-pub const F_PG_LS_SUMMARIESDIR: u32 = 9220;
-pub const F_PG_TIMEZONE_ABBREVS_ZONE: u32 = 9221;
-pub const F_BTINT2SKIPSUPPORT: u32 = 9290;
-pub const F_BTINT4SKIPSUPPORT: u32 = 9291;
-pub const F_BTINT8SKIPSUPPORT: u32 = 9292;
-pub const F_BTOIDSKIPSUPPORT: u32 = 9293;
-pub const F_BTCHARSKIPSUPPORT: u32 = 9294;
-pub const F_DATE_SKIPSUPPORT: u32 = 9295;
-pub const F_BTBOOLSKIPSUPPORT: u32 = 9296;
-pub const F_TIMESTAMP_SKIPSUPPORT: u32 = 9297;
-pub const F_UUID_SKIPSUPPORT: u32 = 9298;
-pub const F_CASEFOLD: u32 = 9569;
-pub const F_HASHBYTEA: u32 = 9708;
-pub const F_HASHBYTEAEXTENDED: u32 = 9709;
-pub const F_HASHDATE: u32 = 9710;
-pub const F_HASHDATEEXTENDED: u32 = 9711;
-pub const F_HASHBOOL: u32 = 9712;
-pub const F_HASHBOOLEXTENDED: u32 = 9713;
-pub const F_HASHXID: u32 = 9714;
-pub const F_HASHXIDEXTENDED: u32 = 9715;
-pub const F_HASHXID8: u32 = 9716;
-pub const F_HASHXID8EXTENDED: u32 = 9717;
-pub const F_HASHCID: u32 = 9718;
-pub const F_HASHCIDEXTENDED: u32 = 9719;
-pub const F_TIMESTAMPTZ_HASH: u32 = 9720;
-pub const F_TIMESTAMPTZ_HASH_EXTENDED: u32 = 9721;
-pub const F_PG_GET_SEQUENCE_DATA: u32 = 9876;
-pub const F_UUIDV4: u32 = 9895;
-pub const F_UUIDV7_: u32 = 9896;
-pub const F_UUIDV7_INTERVAL: u32 = 9897;
+pub const F_GIST_TRANSLATE_CMPTYPE_COMMON: u32 = 6347;
+pub const F_HAS_LARGEOBJECT_PRIVILEGE_NAME_OID_TEXT: u32 = 6348;
+pub const F_HAS_LARGEOBJECT_PRIVILEGE_OID_TEXT: u32 = 6349;
+pub const F_HAS_LARGEOBJECT_PRIVILEGE_OID_OID_TEXT: u32 = 6350;
+pub const F_PG_GET_LOADED_MODULES: u32 = 6353;
+pub const F_GENERATE_SERIES_TIMESTAMP_SUPPORT: u32 = 6354;
+pub const F_PG_STAT_GET_DB_PARALLEL_WORKERS_TO_LAUNCH: u32 = 6355;
+pub const F_PG_STAT_GET_DB_PARALLEL_WORKERS_LAUNCHED: u32 = 6356;
+pub const F_GENERATE_SERIES_NUMERIC_SUPPORT: u32 = 6357;
+pub const F_PG_STAT_GET_TOTAL_VACUUM_TIME: u32 = 6358;
+pub const F_PG_STAT_GET_TOTAL_AUTOVACUUM_TIME: u32 = 6359;
+pub const F_PG_STAT_GET_TOTAL_ANALYZE_TIME: u32 = 6360;
+pub const F_PG_STAT_GET_TOTAL_AUTOANALYZE_TIME: u32 = 6361;
+pub const F_PG_RESTORE_RELATION_STATS: u32 = 6362;
+pub const F_PG_RESTORE_ATTRIBUTE_STATS: u32 = 6363;
+pub const F_CRC32: u32 = 6364;
+pub const F_CRC32C: u32 = 6365;
+pub const F_PG_STAT_GET_CHECKPOINTER_SLRU_WRITTEN: u32 = 6366;
+pub const F_BYTEA_INT2: u32 = 6367;
+pub const F_BYTEA_INT4: u32 = 6368;
+pub const F_BYTEA_INT8: u32 = 6369;
+pub const F_INT2_BYTEA: u32 = 6370;
+pub const F_INT4_BYTEA: u32 = 6371;
+pub const F_INT8_BYTEA: u32 = 6372;
+pub const F_MAX_RECORD: u32 = 6373;
+pub const F_MIN_RECORD: u32 = 6374;
+pub const F_RECORD_LARGER: u32 = 6375;
+pub const F_RECORD_SMALLER: u32 = 6376;
+pub const F_PG_STAT_GET_CHECKPOINTER_NUM_PERFORMED: u32 = 6377;
+pub const F_ARRAY_APPEND_SUPPORT: u32 = 6378;
+pub const F_ARRAY_PREPEND_SUPPORT: u32 = 6379;
+pub const F_ARRAY_SUBSCRIPT_HANDLER_SUPPORT: u32 = 6380;
+pub const F_ARRAY_REVERSE: u32 = 6381;
+pub const F_REVERSE_BYTEA: u32 = 6382;
+pub const F_GAMMA: u32 = 6383;
+pub const F_LGAMMA: u32 = 6384;
+pub const F_PG_GET_ACL: u32 = 6385;
+pub const F_PG_STAT_GET_BACKEND_IO: u32 = 6386;
+pub const F_PG_STAT_RESET_BACKEND_STATS: u32 = 6387;
+pub const F_ARRAY_SORT_ANYARRAY: u32 = 6388;
+pub const F_ARRAY_SORT_ANYARRAY_BOOL: u32 = 6389;
+pub const F_ARRAY_SORT_ANYARRAY_BOOL_BOOL: u32 = 6390;
+pub const F_RANGE_SORTSUPPORT: u32 = 6391;
+pub const F_BYTEA_LARGER: u32 = 6393;
+pub const F_BYTEA_SMALLER: u32 = 6394;
+pub const F_MAX_BYTEA: u32 = 6395;
+pub const F_MIN_BYTEA: u32 = 6396;
+pub const F_PG_CLEAR_RELATION_STATS: u32 = 6397;
+pub const F_PG_CLEAR_ATTRIBUTE_STATS: u32 = 6398;
+pub const F_PG_GET_AIOS: u32 = 6399;
+pub const F_PG_LS_SUMMARIESDIR: u32 = 6400;
+pub const F_PG_TIMEZONE_ABBREVS_ZONE: u32 = 6401;
+pub const F_BTINT2SKIPSUPPORT: u32 = 6402;
+pub const F_BTINT4SKIPSUPPORT: u32 = 6403;
+pub const F_BTINT8SKIPSUPPORT: u32 = 6404;
+pub const F_BTOIDSKIPSUPPORT: u32 = 6405;
+pub const F_BTCHARSKIPSUPPORT: u32 = 6406;
+pub const F_DATE_SKIPSUPPORT: u32 = 6407;
+pub const F_BTBOOLSKIPSUPPORT: u32 = 6408;
+pub const F_TIMESTAMP_SKIPSUPPORT: u32 = 6409;
+pub const F_UUID_SKIPSUPPORT: u32 = 6410;
+pub const F_CASEFOLD: u32 = 6412;
+pub const F_HASHBYTEA: u32 = 6413;
+pub const F_HASHBYTEAEXTENDED: u32 = 6414;
+pub const F_HASHDATE: u32 = 6415;
+pub const F_HASHDATEEXTENDED: u32 = 6416;
+pub const F_HASHBOOL: u32 = 6417;
+pub const F_HASHBOOLEXTENDED: u32 = 6418;
+pub const F_HASHXID: u32 = 6419;
+pub const F_HASHXIDEXTENDED: u32 = 6420;
+pub const F_HASHXID8: u32 = 6421;
+pub const F_HASHXID8EXTENDED: u32 = 6422;
+pub const F_HASHCID: u32 = 6423;
+pub const F_HASHCIDEXTENDED: u32 = 6424;
+pub const F_TIMESTAMPTZ_HASH: u32 = 6425;
+pub const F_TIMESTAMPTZ_HASH_EXTENDED: u32 = 6426;
+pub const F_PG_GET_SEQUENCE_DATA: u32 = 6427;
+pub const F_UUIDV4: u32 = 6428;
+pub const F_UUIDV7_: u32 = 6429;
+pub const F_UUIDV7_INTERVAL: u32 = 6430;
 pub const NUMERIC_MAX_PRECISION: u32 = 1000;
 pub const NUMERIC_MIN_SCALE: i32 = -1000;
 pub const NUMERIC_MAX_SCALE: u32 = 1000;
@@ -9305,6 +9304,8 @@ pub struct ArrayExpr {
     pub element_typeid: Oid,
     pub elements: *mut List,
     pub multidims: bool,
+    pub list_start: ParseLoc,
+    pub list_end: ParseLoc,
     pub location: ParseLoc,
 }
 impl Default for ArrayExpr {
@@ -10035,8 +10036,8 @@ impl Default for OnConflictExpr {
 pub struct PlannedStmt {
     pub type_: NodeTag,
     pub commandType: CmdType::Type,
-    pub queryId: uint64,
-    pub planId: uint64,
+    pub queryId: int64,
+    pub planId: int64,
     pub hasReturning: bool,
     pub hasModifyingCTE: bool,
     pub canSetTag: bool,
@@ -10050,7 +10051,6 @@ pub struct PlannedStmt {
     pub unprunableRelids: *mut Bitmapset,
     pub permInfos: *mut List,
     pub resultRelations: *mut List,
-    pub firstResultRels: *mut List,
     pub appendRelations: *mut List,
     pub subplans: *mut List,
     pub rewindPlanIDs: *mut Bitmapset,
@@ -11407,6 +11407,3303 @@ pub struct QueryEnvironment {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct Trigger {
+    pub tgoid: Oid,
+    pub tgname: *mut ::core::ffi::c_char,
+    pub tgfoid: Oid,
+    pub tgtype: int16,
+    pub tgenabled: ::core::ffi::c_char,
+    pub tgisinternal: bool,
+    pub tgisclone: bool,
+    pub tgconstrrelid: Oid,
+    pub tgconstrindid: Oid,
+    pub tgconstraint: Oid,
+    pub tgdeferrable: bool,
+    pub tginitdeferred: bool,
+    pub tgnargs: int16,
+    pub tgnattr: int16,
+    pub tgattr: *mut int16,
+    pub tgargs: *mut *mut ::core::ffi::c_char,
+    pub tgqual: *mut ::core::ffi::c_char,
+    pub tgoldtable: *mut ::core::ffi::c_char,
+    pub tgnewtable: *mut ::core::ffi::c_char,
+}
+impl Default for Trigger {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TriggerDesc {
+    pub triggers: *mut Trigger,
+    pub numtriggers: ::core::ffi::c_int,
+    pub trig_insert_before_row: bool,
+    pub trig_insert_after_row: bool,
+    pub trig_insert_instead_row: bool,
+    pub trig_insert_before_statement: bool,
+    pub trig_insert_after_statement: bool,
+    pub trig_update_before_row: bool,
+    pub trig_update_after_row: bool,
+    pub trig_update_instead_row: bool,
+    pub trig_update_before_statement: bool,
+    pub trig_update_after_statement: bool,
+    pub trig_delete_before_row: bool,
+    pub trig_delete_after_row: bool,
+    pub trig_delete_instead_row: bool,
+    pub trig_delete_before_statement: bool,
+    pub trig_delete_after_statement: bool,
+    pub trig_truncate_before_statement: bool,
+    pub trig_truncate_after_statement: bool,
+    pub trig_insert_new_table: bool,
+    pub trig_update_old_table: bool,
+    pub trig_update_new_table: bool,
+    pub trig_delete_old_table: bool,
+}
+impl Default for TriggerDesc {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type socklen_t = __socklen_t;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct dirent {
+    pub d_ino: __ino_t,
+    pub d_off: __off_t,
+    pub d_reclen: ::core::ffi::c_ushort,
+    pub d_type: ::core::ffi::c_uchar,
+    pub d_name: [::core::ffi::c_char; 256usize],
+}
+impl Default for dirent {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct __dirstream {
+    _unused: [u8; 0],
+}
+pub type DIR = __dirstream;
+pub type File = ::core::ffi::c_int;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PgAioHandle {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct FileSet {
+    pub creator_pid: pid_t,
+    pub number: uint32,
+    pub ntablespaces: ::core::ffi::c_int,
+    pub tablespaces: [Oid; 8usize],
+}
+impl Default for FileSet {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SharedFileSet {
+    pub fs: FileSet,
+    pub mutex: slock_t,
+    pub refcnt: ::core::ffi::c_int,
+}
+impl Default for SharedFileSet {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SharedTuplestore {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SharedTuplestoreAccessor {
+    _unused: [u8; 0],
+}
+pub mod SnapshotType {
+    pub type Type = ::core::ffi::c_uint;
+    pub const SNAPSHOT_MVCC: Type = 0;
+    pub const SNAPSHOT_SELF: Type = 1;
+    pub const SNAPSHOT_ANY: Type = 2;
+    pub const SNAPSHOT_TOAST: Type = 3;
+    pub const SNAPSHOT_DIRTY: Type = 4;
+    pub const SNAPSHOT_HISTORIC_MVCC: Type = 5;
+    pub const SNAPSHOT_NON_VACUUMABLE: Type = 6;
+}
+pub type Snapshot = *mut SnapshotData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SnapshotData {
+    pub snapshot_type: SnapshotType::Type,
+    pub xmin: TransactionId,
+    pub xmax: TransactionId,
+    pub xip: *mut TransactionId,
+    pub xcnt: uint32,
+    pub subxip: *mut TransactionId,
+    pub subxcnt: int32,
+    pub suboverflowed: bool,
+    pub takenDuringRecovery: bool,
+    pub copied: bool,
+    pub curcid: CommandId,
+    pub speculativeToken: uint32,
+    pub vistest: *mut GlobalVisState,
+    pub active_count: uint32,
+    pub regd_count: uint32,
+    pub ph_node: pairingheap_node,
+    pub snapXactCompletionCount: uint64,
+}
+impl Default for SnapshotData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type Relation = *mut RelationData;
+pub type RelationPtr = *mut Relation;
+pub mod IndexAttrBitmapKind {
+    pub type Type = ::core::ffi::c_uint;
+    pub const INDEX_ATTR_BITMAP_KEY: Type = 0;
+    pub const INDEX_ATTR_BITMAP_PRIMARY_KEY: Type = 1;
+    pub const INDEX_ATTR_BITMAP_IDENTITY_KEY: Type = 2;
+    pub const INDEX_ATTR_BITMAP_HOT_BLOCKING: Type = 3;
+    pub const INDEX_ATTR_BITMAP_SUMMARIZED: Type = 4;
+}
+pub type SortSupport = *mut SortSupportData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SortSupportData {
+    pub ssup_cxt: MemoryContext,
+    pub ssup_collation: Oid,
+    pub ssup_reverse: bool,
+    pub ssup_nulls_first: bool,
+    pub ssup_attno: AttrNumber,
+    pub ssup_extra: *mut ::core::ffi::c_void,
+    pub comparator: ::core::option::Option<
+        unsafe extern "C-unwind" fn(x: Datum, y: Datum, ssup: SortSupport) -> ::core::ffi::c_int,
+    >,
+    pub abbreviate: bool,
+    pub abbrev_converter: ::core::option::Option<
+        unsafe extern "C-unwind" fn(original: Datum, ssup: SortSupport) -> Datum,
+    >,
+    pub abbrev_abort: ::core::option::Option<
+        unsafe extern "C-unwind" fn(memtupcount: ::core::ffi::c_int, ssup: SortSupport) -> bool,
+    >,
+    pub abbrev_full_comparator: ::core::option::Option<
+        unsafe extern "C-unwind" fn(x: Datum, y: Datum, ssup: SortSupport) -> ::core::ffi::c_int,
+    >,
+}
+impl Default for SortSupportData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ScanKeyData {
+    pub sk_flags: ::core::ffi::c_int,
+    pub sk_attno: AttrNumber,
+    pub sk_strategy: StrategyNumber,
+    pub sk_subtype: Oid,
+    pub sk_collation: Oid,
+    pub sk_func: FmgrInfo,
+    pub sk_argument: Datum,
+}
+impl Default for ScanKeyData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type ScanKey = *mut ScanKeyData;
+pub type LOCKMASK = ::core::ffi::c_int;
+pub type LOCKMODE = ::core::ffi::c_int;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct xl_standby_lock {
+    pub xid: TransactionId,
+    pub dbOid: Oid,
+    pub relOid: Oid,
+}
+impl Default for xl_standby_lock {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct IndexScanInstrumentation {
+    pub nsearches: uint64,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct SharedIndexScanInstrumentation {
+    pub num_workers: ::core::ffi::c_int,
+    pub winstrument: __IncompleteArrayField<IndexScanInstrumentation>,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct IndexBuildResult {
+    pub heap_tuples: f64,
+    pub index_tuples: f64,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct IndexVacuumInfo {
+    pub index: Relation,
+    pub heaprel: Relation,
+    pub analyze_only: bool,
+    pub report_progress: bool,
+    pub estimated_count: bool,
+    pub message_level: ::core::ffi::c_int,
+    pub num_heap_tuples: f64,
+    pub strategy: BufferAccessStrategy,
+}
+impl Default for IndexVacuumInfo {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct IndexBulkDeleteResult {
+    pub num_pages: BlockNumber,
+    pub estimated_count: bool,
+    pub num_index_tuples: f64,
+    pub tuples_removed: f64,
+    pub pages_newly_deleted: BlockNumber,
+    pub pages_deleted: BlockNumber,
+    pub pages_free: BlockNumber,
+}
+pub type IndexBulkDeleteCallback = ::core::option::Option<
+    unsafe extern "C-unwind" fn(itemptr: ItemPointer, state: *mut ::core::ffi::c_void) -> bool,
+>;
+pub type IndexScanDesc = *mut IndexScanDescData;
+pub type SysScanDesc = *mut SysScanDescData;
+pub type ParallelIndexScanDesc = *mut ParallelIndexScanDescData;
+pub mod IndexUniqueCheck {
+    pub type Type = ::core::ffi::c_uint;
+    pub const UNIQUE_CHECK_NO: Type = 0;
+    pub const UNIQUE_CHECK_YES: Type = 1;
+    pub const UNIQUE_CHECK_PARTIAL: Type = 2;
+    pub const UNIQUE_CHECK_EXISTING: Type = 3;
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct IndexOrderByDistance {
+    pub value: f64,
+    pub isnull: bool,
+}
+pub mod IndexAMProperty {
+    pub type Type = ::core::ffi::c_uint;
+    pub const AMPROP_UNKNOWN: Type = 0;
+    pub const AMPROP_ASC: Type = 1;
+    pub const AMPROP_DESC: Type = 2;
+    pub const AMPROP_NULLS_FIRST: Type = 3;
+    pub const AMPROP_NULLS_LAST: Type = 4;
+    pub const AMPROP_ORDERABLE: Type = 5;
+    pub const AMPROP_DISTANCE_ORDERABLE: Type = 6;
+    pub const AMPROP_RETURNABLE: Type = 7;
+    pub const AMPROP_SEARCH_ARRAY: Type = 8;
+    pub const AMPROP_SEARCH_NULLS: Type = 9;
+    pub const AMPROP_CLUSTERABLE: Type = 10;
+    pub const AMPROP_INDEX_SCAN: Type = 11;
+    pub const AMPROP_BITMAP_SCAN: Type = 12;
+    pub const AMPROP_BACKWARD_SCAN: Type = 13;
+    pub const AMPROP_CAN_ORDER: Type = 14;
+    pub const AMPROP_CAN_UNIQUE: Type = 15;
+    pub const AMPROP_CAN_MULTI_COL: Type = 16;
+    pub const AMPROP_CAN_EXCLUDE: Type = 17;
+    pub const AMPROP_CAN_INCLUDE: Type = 18;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct OpFamilyMember {
+    pub is_func: bool,
+    pub object: Oid,
+    pub number: ::core::ffi::c_int,
+    pub lefttype: Oid,
+    pub righttype: Oid,
+    pub sortfamily: Oid,
+    pub ref_is_hard: bool,
+    pub ref_is_family: bool,
+    pub refobjid: Oid,
+}
+impl Default for OpFamilyMember {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type amtranslate_strategy_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(strategy: StrategyNumber, opfamily: Oid) -> CompareType::Type,
+>;
+pub type amtranslate_cmptype_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(cmptype: CompareType::Type, opfamily: Oid) -> StrategyNumber,
+>;
+pub type ambuild_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        heapRelation: Relation,
+        indexRelation: Relation,
+        indexInfo: *mut IndexInfo,
+    ) -> *mut IndexBuildResult,
+>;
+pub type ambuildempty_function =
+    ::core::option::Option<unsafe extern "C-unwind" fn(indexRelation: Relation)>;
+pub type aminsert_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        indexRelation: Relation,
+        values: *mut Datum,
+        isnull: *mut bool,
+        heap_tid: ItemPointer,
+        heapRelation: Relation,
+        checkUnique: IndexUniqueCheck::Type,
+        indexUnchanged: bool,
+        indexInfo: *mut IndexInfo,
+    ) -> bool,
+>;
+pub type aminsertcleanup_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(indexRelation: Relation, indexInfo: *mut IndexInfo),
+>;
+pub type ambulkdelete_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        info: *mut IndexVacuumInfo,
+        stats: *mut IndexBulkDeleteResult,
+        callback: IndexBulkDeleteCallback,
+        callback_state: *mut ::core::ffi::c_void,
+    ) -> *mut IndexBulkDeleteResult,
+>;
+pub type amvacuumcleanup_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        info: *mut IndexVacuumInfo,
+        stats: *mut IndexBulkDeleteResult,
+    ) -> *mut IndexBulkDeleteResult,
+>;
+pub type amcanreturn_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(indexRelation: Relation, attno: ::core::ffi::c_int) -> bool,
+>;
+pub type amcostestimate_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        root: *mut PlannerInfo,
+        path: *mut IndexPath,
+        loop_count: f64,
+        indexStartupCost: *mut Cost,
+        indexTotalCost: *mut Cost,
+        indexSelectivity: *mut Selectivity,
+        indexCorrelation: *mut f64,
+        indexPages: *mut f64,
+    ),
+>;
+pub type amgettreeheight_function =
+    ::core::option::Option<unsafe extern "C-unwind" fn(rel: Relation) -> ::core::ffi::c_int>;
+pub type amoptions_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(reloptions: Datum, validate: bool) -> *mut bytea,
+>;
+pub type amproperty_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        index_oid: Oid,
+        attno: ::core::ffi::c_int,
+        prop: IndexAMProperty::Type,
+        propname: *const ::core::ffi::c_char,
+        res: *mut bool,
+        isnull: *mut bool,
+    ) -> bool,
+>;
+pub type ambuildphasename_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(phasenum: int64) -> *mut ::core::ffi::c_char,
+>;
+pub type amvalidate_function =
+    ::core::option::Option<unsafe extern "C-unwind" fn(opclassoid: Oid) -> bool>;
+pub type amadjustmembers_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        opfamilyoid: Oid,
+        opclassoid: Oid,
+        operators: *mut List,
+        functions: *mut List,
+    ),
+>;
+pub type ambeginscan_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        indexRelation: Relation,
+        nkeys: ::core::ffi::c_int,
+        norderbys: ::core::ffi::c_int,
+    ) -> IndexScanDesc,
+>;
+pub type amrescan_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        scan: IndexScanDesc,
+        keys: ScanKey,
+        nkeys: ::core::ffi::c_int,
+        orderbys: ScanKey,
+        norderbys: ::core::ffi::c_int,
+    ),
+>;
+pub type amgettuple_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(scan: IndexScanDesc, direction: ScanDirection::Type) -> bool,
+>;
+pub type amgetbitmap_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(scan: IndexScanDesc, tbm: *mut TIDBitmap) -> int64,
+>;
+pub type amendscan_function =
+    ::core::option::Option<unsafe extern "C-unwind" fn(scan: IndexScanDesc)>;
+pub type ammarkpos_function =
+    ::core::option::Option<unsafe extern "C-unwind" fn(scan: IndexScanDesc)>;
+pub type amrestrpos_function =
+    ::core::option::Option<unsafe extern "C-unwind" fn(scan: IndexScanDesc)>;
+pub type amestimateparallelscan_function = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        indexRelation: Relation,
+        nkeys: ::core::ffi::c_int,
+        norderbys: ::core::ffi::c_int,
+    ) -> Size,
+>;
+pub type aminitparallelscan_function =
+    ::core::option::Option<unsafe extern "C-unwind" fn(target: *mut ::core::ffi::c_void)>;
+pub type amparallelrescan_function =
+    ::core::option::Option<unsafe extern "C-unwind" fn(scan: IndexScanDesc)>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct IndexAmRoutine {
+    pub type_: NodeTag,
+    pub amstrategies: uint16,
+    pub amsupport: uint16,
+    pub amoptsprocnum: uint16,
+    pub amcanorder: bool,
+    pub amcanorderbyop: bool,
+    pub amcanhash: bool,
+    pub amconsistentequality: bool,
+    pub amconsistentordering: bool,
+    pub amcanbackward: bool,
+    pub amcanunique: bool,
+    pub amcanmulticol: bool,
+    pub amoptionalkey: bool,
+    pub amsearcharray: bool,
+    pub amsearchnulls: bool,
+    pub amstorage: bool,
+    pub amclusterable: bool,
+    pub ampredlocks: bool,
+    pub amcanparallel: bool,
+    pub amcanbuildparallel: bool,
+    pub amcaninclude: bool,
+    pub amusemaintenanceworkmem: bool,
+    pub amsummarizing: bool,
+    pub amparallelvacuumoptions: uint8,
+    pub amkeytype: Oid,
+    pub ambuild: ambuild_function,
+    pub ambuildempty: ambuildempty_function,
+    pub aminsert: aminsert_function,
+    pub aminsertcleanup: aminsertcleanup_function,
+    pub ambulkdelete: ambulkdelete_function,
+    pub amvacuumcleanup: amvacuumcleanup_function,
+    pub amcanreturn: amcanreturn_function,
+    pub amcostestimate: amcostestimate_function,
+    pub amgettreeheight: amgettreeheight_function,
+    pub amoptions: amoptions_function,
+    pub amproperty: amproperty_function,
+    pub ambuildphasename: ambuildphasename_function,
+    pub amvalidate: amvalidate_function,
+    pub amadjustmembers: amadjustmembers_function,
+    pub ambeginscan: ambeginscan_function,
+    pub amrescan: amrescan_function,
+    pub amgettuple: amgettuple_function,
+    pub amgetbitmap: amgetbitmap_function,
+    pub amendscan: amendscan_function,
+    pub ammarkpos: ammarkpos_function,
+    pub amrestrpos: amrestrpos_function,
+    pub amestimateparallelscan: amestimateparallelscan_function,
+    pub aminitparallelscan: aminitparallelscan_function,
+    pub amparallelrescan: amparallelrescan_function,
+    pub amtranslatestrategy: amtranslate_strategy_function,
+    pub amtranslatecmptype: amtranslate_cmptype_function,
+}
+impl Default for IndexAmRoutine {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DomainConstraintCache {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TypeCacheEnumData {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TypeCacheEntry {
+    pub type_id: Oid,
+    pub type_id_hash: uint32,
+    pub typlen: int16,
+    pub typbyval: bool,
+    pub typalign: ::core::ffi::c_char,
+    pub typstorage: ::core::ffi::c_char,
+    pub typtype: ::core::ffi::c_char,
+    pub typrelid: Oid,
+    pub typsubscript: Oid,
+    pub typelem: Oid,
+    pub typarray: Oid,
+    pub typcollation: Oid,
+    pub btree_opf: Oid,
+    pub btree_opintype: Oid,
+    pub hash_opf: Oid,
+    pub hash_opintype: Oid,
+    pub eq_opr: Oid,
+    pub lt_opr: Oid,
+    pub gt_opr: Oid,
+    pub cmp_proc: Oid,
+    pub hash_proc: Oid,
+    pub hash_extended_proc: Oid,
+    pub eq_opr_finfo: FmgrInfo,
+    pub cmp_proc_finfo: FmgrInfo,
+    pub hash_proc_finfo: FmgrInfo,
+    pub hash_extended_proc_finfo: FmgrInfo,
+    pub tupDesc: TupleDesc,
+    pub tupDesc_identifier: uint64,
+    pub rngelemtype: *mut TypeCacheEntry,
+    pub rng_opfamily: Oid,
+    pub rng_collation: Oid,
+    pub rng_cmp_proc_finfo: FmgrInfo,
+    pub rng_canonical_finfo: FmgrInfo,
+    pub rng_subdiff_finfo: FmgrInfo,
+    pub rngtype: *mut TypeCacheEntry,
+    pub domainBaseType: Oid,
+    pub domainBaseTypmod: int32,
+    pub domainData: *mut DomainConstraintCache,
+    pub flags: ::core::ffi::c_int,
+    pub enumData: *mut TypeCacheEnumData,
+    pub nextDomain: *mut TypeCacheEntry,
+}
+impl Default for TypeCacheEntry {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DomainConstraintRef {
+    pub constraints: *mut List,
+    pub refctx: MemoryContext,
+    pub tcache: *mut TypeCacheEntry,
+    pub need_exprstate: bool,
+    pub dcc: *mut DomainConstraintCache,
+    pub callback: MemoryContextCallback,
+}
+impl Default for DomainConstraintRef {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SharedRecordTypmodRegistry {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct BrinOpcInfo {
+    pub oi_nstored: uint16,
+    pub oi_regular_nulls: bool,
+    pub oi_opaque: *mut ::core::ffi::c_void,
+    pub oi_typcache: __IncompleteArrayField<*mut TypeCacheEntry>,
+}
+impl Default for BrinOpcInfo {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct BrinDesc {
+    pub bd_context: MemoryContext,
+    pub bd_index: Relation,
+    pub bd_tupdesc: TupleDesc,
+    pub bd_disktdesc: TupleDesc,
+    pub bd_totalstored: ::core::ffi::c_int,
+    pub bd_info: __IncompleteArrayField<*mut BrinOpcInfo>,
+}
+impl Default for BrinDesc {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type brin_serialize_callback_type = ::core::option::Option<
+    unsafe extern "C-unwind" fn(bdesc: *mut BrinDesc, src: Datum, dst: *mut Datum),
+>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct BrinValues {
+    pub bv_attno: AttrNumber,
+    pub bv_hasnulls: bool,
+    pub bv_allnulls: bool,
+    pub bv_values: *mut Datum,
+    pub bv_mem_value: Datum,
+    pub bv_context: MemoryContext,
+    pub bv_serialize: brin_serialize_callback_type,
+}
+impl Default for BrinValues {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct BrinMemTuple {
+    pub bt_placeholder: bool,
+    pub bt_empty_range: bool,
+    pub bt_blkno: BlockNumber,
+    pub bt_context: MemoryContext,
+    pub bt_values: *mut Datum,
+    pub bt_allnulls: *mut bool,
+    pub bt_hasnulls: *mut bool,
+    pub bt_columns: __IncompleteArrayField<BrinValues>,
+}
+impl Default for BrinMemTuple {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct BrinTuple {
+    pub bt_blkno: BlockNumber,
+    pub bt_info: uint8,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct GinPageOpaqueData {
+    pub rightlink: BlockNumber,
+    pub maxoff: OffsetNumber,
+    pub flags: uint16,
+}
+pub type GinPageOpaque = *mut GinPageOpaqueData;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct GinMetaPageData {
+    pub head: BlockNumber,
+    pub tail: BlockNumber,
+    pub tailFreeSize: uint32,
+    pub nPendingPages: BlockNumber,
+    pub nPendingHeapTuples: int64,
+    pub nTotalPages: BlockNumber,
+    pub nEntryPages: BlockNumber,
+    pub nDataPages: BlockNumber,
+    pub nEntries: int64,
+    pub ginVersion: int32,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PostingItem {
+    pub child_blkno: BlockIdData,
+    pub key: ItemPointerData,
+}
+pub type GinNullCategory = ::core::ffi::c_schar;
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct GinPostingList {
+    pub first: ItemPointerData,
+    pub nbytes: uint16,
+    pub bytes: __IncompleteArrayField<::core::ffi::c_uchar>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct GinTuple {
+    pub tuplen: ::core::ffi::c_int,
+    pub attrnum: OffsetNumber,
+    pub keylen: uint16,
+    pub typlen: int16,
+    pub typbyval: bool,
+    pub category: ::core::ffi::c_schar,
+    pub nitems: ::core::ffi::c_int,
+    pub data: __IncompleteArrayField<::core::ffi::c_char>,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct IndexTupleData {
+    pub t_tid: ItemPointerData,
+    pub t_info: ::core::ffi::c_ushort,
+}
+pub type IndexTuple = *mut IndexTupleData;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct IndexAttributeBitMapData {
+    pub bits: [bits8; 4usize],
+}
+pub type IndexAttributeBitMap = *mut IndexAttributeBitMapData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LogicalTapeSet {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LogicalTape {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct TapeShare {
+    pub firstblocknumber: int64,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Tuplesortstate {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Sharedsort {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SortCoordinateData {
+    pub isWorker: bool,
+    pub nParticipants: ::core::ffi::c_int,
+    pub sharedsort: *mut Sharedsort,
+}
+impl Default for SortCoordinateData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type SortCoordinate = *mut SortCoordinateData;
+pub mod TuplesortMethod {
+    pub type Type = ::core::ffi::c_uint;
+    pub const SORT_TYPE_STILL_IN_PROGRESS: Type = 0;
+    pub const SORT_TYPE_TOP_N_HEAPSORT: Type = 1;
+    pub const SORT_TYPE_QUICKSORT: Type = 2;
+    pub const SORT_TYPE_EXTERNAL_SORT: Type = 4;
+    pub const SORT_TYPE_EXTERNAL_MERGE: Type = 8;
+}
+pub mod TuplesortSpaceType {
+    pub type Type = ::core::ffi::c_uint;
+    pub const SORT_SPACE_TYPE_DISK: Type = 0;
+    pub const SORT_SPACE_TYPE_MEMORY: Type = 1;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TuplesortInstrumentation {
+    pub sortMethod: TuplesortMethod::Type,
+    pub spaceType: TuplesortSpaceType::Type,
+    pub spaceUsed: int64,
+}
+impl Default for TuplesortInstrumentation {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SortTuple {
+    pub tuple: *mut ::core::ffi::c_void,
+    pub datum1: Datum,
+    pub isnull1: bool,
+    pub srctape: ::core::ffi::c_int,
+}
+impl Default for SortTuple {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type SortTupleComparator = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        a: *const SortTuple,
+        b: *const SortTuple,
+        state: *mut Tuplesortstate,
+    ) -> ::core::ffi::c_int,
+>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TuplesortPublic {
+    pub comparetup: SortTupleComparator,
+    pub comparetup_tiebreak: SortTupleComparator,
+    pub removeabbrev: ::core::option::Option<
+        unsafe extern "C-unwind" fn(
+            state: *mut Tuplesortstate,
+            stups: *mut SortTuple,
+            count: ::core::ffi::c_int,
+        ),
+    >,
+    pub writetup: ::core::option::Option<
+        unsafe extern "C-unwind" fn(
+            state: *mut Tuplesortstate,
+            tape: *mut LogicalTape,
+            stup: *mut SortTuple,
+        ),
+    >,
+    pub readtup: ::core::option::Option<
+        unsafe extern "C-unwind" fn(
+            state: *mut Tuplesortstate,
+            stup: *mut SortTuple,
+            tape: *mut LogicalTape,
+            len: ::core::ffi::c_uint,
+        ),
+    >,
+    pub freestate: ::core::option::Option<unsafe extern "C-unwind" fn(state: *mut Tuplesortstate)>,
+    pub maincontext: MemoryContext,
+    pub sortcontext: MemoryContext,
+    pub tuplecontext: MemoryContext,
+    pub haveDatum1: bool,
+    pub nKeys: ::core::ffi::c_int,
+    pub sortKeys: SortSupport,
+    pub onlyKey: SortSupport,
+    pub sortopt: ::core::ffi::c_int,
+    pub tuples: bool,
+    pub arg: *mut ::core::ffi::c_void,
+}
+impl Default for TuplesortPublic {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Tuplestorestate {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParallelHashJoinState {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CopyMultiInsertBuffer {
+    _unused: [u8; 0],
+}
+pub type ExprStateEvalFunc = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        expression: *mut ExprState,
+        econtext: *mut ExprContext,
+        isNull: *mut bool,
+    ) -> Datum,
+>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ExprState {
+    pub type_: NodeTag,
+    pub flags: uint8,
+    pub resnull: bool,
+    pub resvalue: Datum,
+    pub resultslot: *mut TupleTableSlot,
+    pub steps: *mut ExprEvalStep,
+    pub evalfunc: ExprStateEvalFunc,
+    pub expr: *mut Expr,
+    pub evalfunc_private: *mut ::core::ffi::c_void,
+    pub steps_len: ::core::ffi::c_int,
+    pub steps_alloc: ::core::ffi::c_int,
+    pub parent: *mut PlanState,
+    pub ext_params: ParamListInfo,
+    pub innermost_caseval: *mut Datum,
+    pub innermost_casenull: *mut bool,
+    pub innermost_domainval: *mut Datum,
+    pub innermost_domainnull: *mut bool,
+    pub escontext: *mut ErrorSaveContext,
+}
+impl Default for ExprState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct IndexInfo {
+    pub type_: NodeTag,
+    pub ii_NumIndexAttrs: ::core::ffi::c_int,
+    pub ii_NumIndexKeyAttrs: ::core::ffi::c_int,
+    pub ii_IndexAttrNumbers: [AttrNumber; 32usize],
+    pub ii_Expressions: *mut List,
+    pub ii_ExpressionsState: *mut List,
+    pub ii_Predicate: *mut List,
+    pub ii_PredicateState: *mut ExprState,
+    pub ii_ExclusionOps: *mut Oid,
+    pub ii_ExclusionProcs: *mut Oid,
+    pub ii_ExclusionStrats: *mut uint16,
+    pub ii_UniqueOps: *mut Oid,
+    pub ii_UniqueProcs: *mut Oid,
+    pub ii_UniqueStrats: *mut uint16,
+    pub ii_Unique: bool,
+    pub ii_NullsNotDistinct: bool,
+    pub ii_ReadyForInserts: bool,
+    pub ii_CheckedUnchanged: bool,
+    pub ii_IndexUnchanged: bool,
+    pub ii_Concurrent: bool,
+    pub ii_BrokenHotChain: bool,
+    pub ii_Summarizing: bool,
+    pub ii_WithoutOverlaps: bool,
+    pub ii_ParallelWorkers: ::core::ffi::c_int,
+    pub ii_Am: Oid,
+    pub ii_AmCache: *mut ::core::ffi::c_void,
+    pub ii_Context: MemoryContext,
+}
+impl Default for IndexInfo {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type ExprContextCallbackFunction =
+    ::core::option::Option<unsafe extern "C-unwind" fn(arg: Datum)>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ExprContext_CB {
+    pub next: *mut ExprContext_CB,
+    pub function: ExprContextCallbackFunction,
+    pub arg: Datum,
+}
+impl Default for ExprContext_CB {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ExprContext {
+    pub type_: NodeTag,
+    pub ecxt_scantuple: *mut TupleTableSlot,
+    pub ecxt_innertuple: *mut TupleTableSlot,
+    pub ecxt_outertuple: *mut TupleTableSlot,
+    pub ecxt_per_query_memory: MemoryContext,
+    pub ecxt_per_tuple_memory: MemoryContext,
+    pub ecxt_param_exec_vals: *mut ParamExecData,
+    pub ecxt_param_list_info: ParamListInfo,
+    pub ecxt_aggvalues: *mut Datum,
+    pub ecxt_aggnulls: *mut bool,
+    pub caseValue_datum: Datum,
+    pub caseValue_isNull: bool,
+    pub domainValue_datum: Datum,
+    pub domainValue_isNull: bool,
+    pub ecxt_oldtuple: *mut TupleTableSlot,
+    pub ecxt_newtuple: *mut TupleTableSlot,
+    pub ecxt_estate: *mut EState,
+    pub ecxt_callbacks: *mut ExprContext_CB,
+}
+impl Default for ExprContext {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub mod ExprDoneCond {
+    pub type Type = ::core::ffi::c_uint;
+    pub const ExprSingleResult: Type = 0;
+    pub const ExprMultipleResult: Type = 1;
+    pub const ExprEndResult: Type = 2;
+}
+pub mod SetFunctionReturnMode {
+    pub type Type = ::core::ffi::c_uint;
+    pub const SFRM_ValuePerCall: Type = 1;
+    pub const SFRM_Materialize: Type = 2;
+    pub const SFRM_Materialize_Random: Type = 4;
+    pub const SFRM_Materialize_Preferred: Type = 8;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ReturnSetInfo {
+    pub type_: NodeTag,
+    pub econtext: *mut ExprContext,
+    pub expectedDesc: TupleDesc,
+    pub allowedModes: ::core::ffi::c_int,
+    pub returnMode: SetFunctionReturnMode::Type,
+    pub isDone: ExprDoneCond::Type,
+    pub setResult: *mut Tuplestorestate,
+    pub setDesc: TupleDesc,
+}
+impl Default for ReturnSetInfo {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ProjectionInfo {
+    pub type_: NodeTag,
+    pub pi_state: ExprState,
+    pub pi_exprContext: *mut ExprContext,
+}
+impl Default for ProjectionInfo {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct JunkFilter {
+    pub type_: NodeTag,
+    pub jf_targetList: *mut List,
+    pub jf_cleanTupType: TupleDesc,
+    pub jf_cleanMap: *mut AttrNumber,
+    pub jf_resultSlot: *mut TupleTableSlot,
+}
+impl Default for JunkFilter {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct OnConflictSetState {
+    pub type_: NodeTag,
+    pub oc_Existing: *mut TupleTableSlot,
+    pub oc_ProjSlot: *mut TupleTableSlot,
+    pub oc_ProjInfo: *mut ProjectionInfo,
+    pub oc_WhereClause: *mut ExprState,
+}
+impl Default for OnConflictSetState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MergeActionState {
+    pub type_: NodeTag,
+    pub mas_action: *mut MergeAction,
+    pub mas_proj: *mut ProjectionInfo,
+    pub mas_whenqual: *mut ExprState,
+}
+impl Default for MergeActionState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ResultRelInfo {
+    pub type_: NodeTag,
+    pub ri_RangeTableIndex: Index,
+    pub ri_RelationDesc: Relation,
+    pub ri_NumIndices: ::core::ffi::c_int,
+    pub ri_IndexRelationDescs: RelationPtr,
+    pub ri_IndexRelationInfo: *mut *mut IndexInfo,
+    pub ri_RowIdAttNo: AttrNumber,
+    pub ri_extraUpdatedCols: *mut Bitmapset,
+    pub ri_extraUpdatedCols_valid: bool,
+    pub ri_projectNew: *mut ProjectionInfo,
+    pub ri_newTupleSlot: *mut TupleTableSlot,
+    pub ri_oldTupleSlot: *mut TupleTableSlot,
+    pub ri_projectNewInfoValid: bool,
+    pub ri_needLockTagTuple: bool,
+    pub ri_TrigDesc: *mut TriggerDesc,
+    pub ri_TrigFunctions: *mut FmgrInfo,
+    pub ri_TrigWhenExprs: *mut *mut ExprState,
+    pub ri_TrigInstrument: *mut Instrumentation,
+    pub ri_ReturningSlot: *mut TupleTableSlot,
+    pub ri_TrigOldSlot: *mut TupleTableSlot,
+    pub ri_TrigNewSlot: *mut TupleTableSlot,
+    pub ri_AllNullSlot: *mut TupleTableSlot,
+    pub ri_FdwRoutine: *mut FdwRoutine,
+    pub ri_FdwState: *mut ::core::ffi::c_void,
+    pub ri_usesFdwDirectModify: bool,
+    pub ri_NumSlots: ::core::ffi::c_int,
+    pub ri_NumSlotsInitialized: ::core::ffi::c_int,
+    pub ri_BatchSize: ::core::ffi::c_int,
+    pub ri_Slots: *mut *mut TupleTableSlot,
+    pub ri_PlanSlots: *mut *mut TupleTableSlot,
+    pub ri_WithCheckOptions: *mut List,
+    pub ri_WithCheckOptionExprs: *mut List,
+    pub ri_CheckConstraintExprs: *mut *mut ExprState,
+    pub ri_GenVirtualNotNullConstraintExprs: *mut *mut ExprState,
+    pub ri_GeneratedExprsI: *mut *mut ExprState,
+    pub ri_GeneratedExprsU: *mut *mut ExprState,
+    pub ri_NumGeneratedNeededI: ::core::ffi::c_int,
+    pub ri_NumGeneratedNeededU: ::core::ffi::c_int,
+    pub ri_returningList: *mut List,
+    pub ri_projectReturning: *mut ProjectionInfo,
+    pub ri_onConflictArbiterIndexes: *mut List,
+    pub ri_onConflict: *mut OnConflictSetState,
+    pub ri_MergeActions: [*mut List; 3usize],
+    pub ri_MergeJoinCondition: *mut ExprState,
+    pub ri_PartitionCheckExpr: *mut ExprState,
+    pub ri_ChildToRootMap: *mut TupleConversionMap,
+    pub ri_ChildToRootMapValid: bool,
+    pub ri_RootToChildMap: *mut TupleConversionMap,
+    pub ri_RootToChildMapValid: bool,
+    pub ri_RootResultRelInfo: *mut ResultRelInfo,
+    pub ri_PartitionTupleSlot: *mut TupleTableSlot,
+    pub ri_CopyMultiInsertBuffer: *mut CopyMultiInsertBuffer,
+    pub ri_ancestorResultRels: *mut List,
+}
+impl Default for ResultRelInfo {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AsyncRequest {
+    pub requestor: *mut PlanState,
+    pub requestee: *mut PlanState,
+    pub request_index: ::core::ffi::c_int,
+    pub callback_pending: bool,
+    pub request_complete: bool,
+    pub result: *mut TupleTableSlot,
+}
+impl Default for AsyncRequest {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct EState {
+    pub type_: NodeTag,
+    pub es_direction: ScanDirection::Type,
+    pub es_snapshot: Snapshot,
+    pub es_crosscheck_snapshot: Snapshot,
+    pub es_range_table: *mut List,
+    pub es_range_table_size: Index,
+    pub es_relations: *mut Relation,
+    pub es_rowmarks: *mut *mut ExecRowMark,
+    pub es_rteperminfos: *mut List,
+    pub es_plannedstmt: *mut PlannedStmt,
+    pub es_part_prune_infos: *mut List,
+    pub es_part_prune_states: *mut List,
+    pub es_part_prune_results: *mut List,
+    pub es_unpruned_relids: *mut Bitmapset,
+    pub es_sourceText: *const ::core::ffi::c_char,
+    pub es_junkFilter: *mut JunkFilter,
+    pub es_output_cid: CommandId,
+    pub es_result_relations: *mut *mut ResultRelInfo,
+    pub es_opened_result_relations: *mut List,
+    pub es_partition_directory: PartitionDirectory,
+    pub es_tuple_routing_result_relations: *mut List,
+    pub es_trig_target_relations: *mut List,
+    pub es_param_list_info: ParamListInfo,
+    pub es_param_exec_vals: *mut ParamExecData,
+    pub es_queryEnv: *mut QueryEnvironment,
+    pub es_query_cxt: MemoryContext,
+    pub es_tupleTable: *mut List,
+    pub es_processed: uint64,
+    pub es_total_processed: uint64,
+    pub es_top_eflags: ::core::ffi::c_int,
+    pub es_instrument: ::core::ffi::c_int,
+    pub es_finished: bool,
+    pub es_exprcontexts: *mut List,
+    pub es_subplanstates: *mut List,
+    pub es_auxmodifytables: *mut List,
+    pub es_per_tuple_exprcontext: *mut ExprContext,
+    pub es_epq_active: *mut EPQState,
+    pub es_use_parallel_mode: bool,
+    pub es_parallel_workers_to_launch: ::core::ffi::c_int,
+    pub es_parallel_workers_launched: ::core::ffi::c_int,
+    pub es_query_dsa: *mut dsa_area,
+    pub es_jit_flags: ::core::ffi::c_int,
+    pub es_jit: *mut JitContext,
+    pub es_jit_worker_instr: *mut JitInstrumentation,
+    pub es_insert_pending_result_relations: *mut List,
+    pub es_insert_pending_modifytables: *mut List,
+}
+impl Default for EState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ExecRowMark {
+    pub relation: Relation,
+    pub relid: Oid,
+    pub rti: Index,
+    pub prti: Index,
+    pub rowmarkId: Index,
+    pub markType: RowMarkType::Type,
+    pub strength: LockClauseStrength::Type,
+    pub waitPolicy: LockWaitPolicy::Type,
+    pub ermActive: bool,
+    pub curCtid: ItemPointerData,
+    pub ermExtra: *mut ::core::ffi::c_void,
+}
+impl Default for ExecRowMark {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ExecAuxRowMark {
+    pub rowmark: *mut ExecRowMark,
+    pub ctidAttNo: AttrNumber,
+    pub toidAttNo: AttrNumber,
+    pub wholeAttNo: AttrNumber,
+}
+impl Default for ExecAuxRowMark {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type TupleHashEntry = *mut TupleHashEntryData;
+pub type TupleHashTable = *mut TupleHashTableData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TupleHashEntryData {
+    pub firstTuple: MinimalTuple,
+    pub status: uint32,
+    pub hash: uint32,
+}
+impl Default for TupleHashEntryData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct tuplehash_hash {
+    pub size: uint64,
+    pub members: uint32,
+    pub sizemask: uint32,
+    pub grow_threshold: uint32,
+    pub data: *mut TupleHashEntryData,
+    pub ctx: MemoryContext,
+    pub private_data: *mut ::core::ffi::c_void,
+}
+impl Default for tuplehash_hash {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub mod tuplehash_status {
+    pub type Type = ::core::ffi::c_uint;
+    pub const tuplehash_SH_EMPTY: Type = 0;
+    pub const tuplehash_SH_IN_USE: Type = 1;
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct tuplehash_iterator {
+    pub cur: uint32,
+    pub end: uint32,
+    pub done: bool,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TupleHashTableData {
+    pub hashtab: *mut tuplehash_hash,
+    pub numCols: ::core::ffi::c_int,
+    pub keyColIdx: *mut AttrNumber,
+    pub tab_hash_expr: *mut ExprState,
+    pub tab_eq_func: *mut ExprState,
+    pub tab_collations: *mut Oid,
+    pub tablecxt: MemoryContext,
+    pub tempcxt: MemoryContext,
+    pub additionalsize: Size,
+    pub tableslot: *mut TupleTableSlot,
+    pub inputslot: *mut TupleTableSlot,
+    pub in_hash_expr: *mut ExprState,
+    pub cur_eq_func: *mut ExprState,
+    pub exprcontext: *mut ExprContext,
+}
+impl Default for TupleHashTableData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type TupleHashIterator = tuplehash_iterator;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WindowFuncExprState {
+    pub type_: NodeTag,
+    pub wfunc: *mut WindowFunc,
+    pub args: *mut List,
+    pub aggfilter: *mut ExprState,
+    pub wfuncno: ::core::ffi::c_int,
+}
+impl Default for WindowFuncExprState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SetExprState {
+    pub type_: NodeTag,
+    pub expr: *mut Expr,
+    pub args: *mut List,
+    pub elidedFuncState: *mut ExprState,
+    pub func: FmgrInfo,
+    pub funcResultStore: *mut Tuplestorestate,
+    pub funcResultSlot: *mut TupleTableSlot,
+    pub funcResultDesc: TupleDesc,
+    pub funcReturnsTuple: bool,
+    pub funcReturnsSet: bool,
+    pub setArgsValid: bool,
+    pub shutdown_reg: bool,
+    pub fcinfo: FunctionCallInfo,
+}
+impl Default for SetExprState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SubPlanState {
+    pub type_: NodeTag,
+    pub subplan: *mut SubPlan,
+    pub planstate: *mut PlanState,
+    pub parent: *mut PlanState,
+    pub testexpr: *mut ExprState,
+    pub curTuple: HeapTuple,
+    pub curArray: Datum,
+    pub descRight: TupleDesc,
+    pub projLeft: *mut ProjectionInfo,
+    pub projRight: *mut ProjectionInfo,
+    pub hashtable: TupleHashTable,
+    pub hashnulls: TupleHashTable,
+    pub havehashrows: bool,
+    pub havenullrows: bool,
+    pub hashtablecxt: MemoryContext,
+    pub hashtempcxt: MemoryContext,
+    pub innerecontext: *mut ExprContext,
+    pub numCols: ::core::ffi::c_int,
+    pub keyColIdx: *mut AttrNumber,
+    pub tab_eq_funcoids: *mut Oid,
+    pub tab_collations: *mut Oid,
+    pub tab_hash_funcs: *mut FmgrInfo,
+    pub lhs_hash_expr: *mut ExprState,
+    pub cur_eq_funcs: *mut FmgrInfo,
+    pub cur_eq_comp: *mut ExprState,
+}
+impl Default for SubPlanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub mod DomainConstraintType {
+    pub type Type = ::core::ffi::c_uint;
+    pub const DOM_CONSTRAINT_NOTNULL: Type = 0;
+    pub const DOM_CONSTRAINT_CHECK: Type = 1;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DomainConstraintState {
+    pub type_: NodeTag,
+    pub constrainttype: DomainConstraintType::Type,
+    pub name: *mut ::core::ffi::c_char,
+    pub check_expr: *mut Expr,
+    pub check_exprstate: *mut ExprState,
+}
+impl Default for DomainConstraintState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct JsonExprState {
+    pub jsexpr: *mut JsonExpr,
+    pub formatted_expr: NullableDatum,
+    pub pathspec: NullableDatum,
+    pub args: *mut List,
+    pub error: NullableDatum,
+    pub empty: NullableDatum,
+    pub jump_empty: ::core::ffi::c_int,
+    pub jump_error: ::core::ffi::c_int,
+    pub jump_eval_coercion: ::core::ffi::c_int,
+    pub jump_end: ::core::ffi::c_int,
+    pub input_fcinfo: FunctionCallInfo,
+    pub escontext: ErrorSaveContext,
+}
+impl Default for JsonExprState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type ExecProcNodeMtd = ::core::option::Option<
+    unsafe extern "C-unwind" fn(pstate: *mut PlanState) -> *mut TupleTableSlot,
+>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PlanState {
+    pub type_: NodeTag,
+    pub plan: *mut Plan,
+    pub state: *mut EState,
+    pub ExecProcNode: ExecProcNodeMtd,
+    pub ExecProcNodeReal: ExecProcNodeMtd,
+    pub instrument: *mut Instrumentation,
+    pub worker_instrument: *mut WorkerInstrumentation,
+    pub worker_jit_instrument: *mut SharedJitInstrumentation,
+    pub qual: *mut ExprState,
+    pub lefttree: *mut PlanState,
+    pub righttree: *mut PlanState,
+    pub initPlan: *mut List,
+    pub subPlan: *mut List,
+    pub chgParam: *mut Bitmapset,
+    pub ps_ResultTupleDesc: TupleDesc,
+    pub ps_ResultTupleSlot: *mut TupleTableSlot,
+    pub ps_ExprContext: *mut ExprContext,
+    pub ps_ProjInfo: *mut ProjectionInfo,
+    pub async_capable: bool,
+    pub scandesc: TupleDesc,
+    pub scanops: *const TupleTableSlotOps,
+    pub outerops: *const TupleTableSlotOps,
+    pub innerops: *const TupleTableSlotOps,
+    pub resultops: *const TupleTableSlotOps,
+    pub scanopsfixed: bool,
+    pub outeropsfixed: bool,
+    pub inneropsfixed: bool,
+    pub resultopsfixed: bool,
+    pub scanopsset: bool,
+    pub outeropsset: bool,
+    pub inneropsset: bool,
+    pub resultopsset: bool,
+}
+impl Default for PlanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct EPQState {
+    pub parentestate: *mut EState,
+    pub epqParam: ::core::ffi::c_int,
+    pub resultRelations: *mut List,
+    pub tuple_table: *mut List,
+    pub relsubs_slot: *mut *mut TupleTableSlot,
+    pub plan: *mut Plan,
+    pub arowMarks: *mut List,
+    pub origslot: *mut TupleTableSlot,
+    pub recheckestate: *mut EState,
+    pub relsubs_rowmark: *mut *mut ExecAuxRowMark,
+    pub relsubs_done: *mut bool,
+    pub relsubs_blocked: *mut bool,
+    pub recheckplanstate: *mut PlanState,
+}
+impl Default for EPQState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ResultState {
+    pub ps: PlanState,
+    pub resconstantqual: *mut ExprState,
+    pub rs_done: bool,
+    pub rs_checkqual: bool,
+}
+impl Default for ResultState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ProjectSetState {
+    pub ps: PlanState,
+    pub elems: *mut *mut Node,
+    pub elemdone: *mut ExprDoneCond::Type,
+    pub nelems: ::core::ffi::c_int,
+    pub pending_srf_tuples: bool,
+    pub argcontext: MemoryContext,
+}
+impl Default for ProjectSetState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ModifyTableState {
+    pub ps: PlanState,
+    pub operation: CmdType::Type,
+    pub canSetTag: bool,
+    pub mt_done: bool,
+    pub mt_nrels: ::core::ffi::c_int,
+    pub resultRelInfo: *mut ResultRelInfo,
+    pub rootResultRelInfo: *mut ResultRelInfo,
+    pub mt_epqstate: EPQState,
+    pub fireBSTriggers: bool,
+    pub mt_resultOidAttno: ::core::ffi::c_int,
+    pub mt_lastResultOid: Oid,
+    pub mt_lastResultIndex: ::core::ffi::c_int,
+    pub mt_resultOidHash: *mut HTAB,
+    pub mt_root_tuple_slot: *mut TupleTableSlot,
+    pub mt_partition_tuple_routing: *mut PartitionTupleRouting,
+    pub mt_transition_capture: *mut TransitionCaptureState,
+    pub mt_oc_transition_capture: *mut TransitionCaptureState,
+    pub mt_merge_subcommands: ::core::ffi::c_int,
+    pub mt_merge_action: *mut MergeActionState,
+    pub mt_merge_pending_not_matched: *mut TupleTableSlot,
+    pub mt_merge_inserted: f64,
+    pub mt_merge_updated: f64,
+    pub mt_merge_deleted: f64,
+    pub mt_updateColnosLists: *mut List,
+    pub mt_mergeActionLists: *mut List,
+    pub mt_mergeJoinConditions: *mut List,
+}
+impl Default for ModifyTableState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParallelAppendState {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionPruneState {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AppendState {
+    pub ps: PlanState,
+    pub appendplans: *mut *mut PlanState,
+    pub as_nplans: ::core::ffi::c_int,
+    pub as_whichplan: ::core::ffi::c_int,
+    pub as_begun: bool,
+    pub as_asyncplans: *mut Bitmapset,
+    pub as_nasyncplans: ::core::ffi::c_int,
+    pub as_asyncrequests: *mut *mut AsyncRequest,
+    pub as_asyncresults: *mut *mut TupleTableSlot,
+    pub as_nasyncresults: ::core::ffi::c_int,
+    pub as_syncdone: bool,
+    pub as_nasyncremain: ::core::ffi::c_int,
+    pub as_needrequest: *mut Bitmapset,
+    pub as_eventset: *mut WaitEventSet,
+    pub as_first_partial_plan: ::core::ffi::c_int,
+    pub as_pstate: *mut ParallelAppendState,
+    pub pstate_len: Size,
+    pub as_prune_state: *mut PartitionPruneState,
+    pub as_valid_subplans_identified: bool,
+    pub as_valid_subplans: *mut Bitmapset,
+    pub as_valid_asyncplans: *mut Bitmapset,
+    pub choose_next_subplan:
+        ::core::option::Option<unsafe extern "C-unwind" fn(arg1: *mut AppendState) -> bool>,
+}
+impl Default for AppendState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MergeAppendState {
+    pub ps: PlanState,
+    pub mergeplans: *mut *mut PlanState,
+    pub ms_nplans: ::core::ffi::c_int,
+    pub ms_nkeys: ::core::ffi::c_int,
+    pub ms_sortkeys: SortSupport,
+    pub ms_slots: *mut *mut TupleTableSlot,
+    pub ms_heap: *mut binaryheap,
+    pub ms_initialized: bool,
+    pub ms_prune_state: *mut PartitionPruneState,
+    pub ms_valid_subplans: *mut Bitmapset,
+}
+impl Default for MergeAppendState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RecursiveUnionState {
+    pub ps: PlanState,
+    pub recursing: bool,
+    pub intermediate_empty: bool,
+    pub working_table: *mut Tuplestorestate,
+    pub intermediate_table: *mut Tuplestorestate,
+    pub eqfuncoids: *mut Oid,
+    pub hashfunctions: *mut FmgrInfo,
+    pub tempContext: MemoryContext,
+    pub hashtable: TupleHashTable,
+    pub tableContext: MemoryContext,
+}
+impl Default for RecursiveUnionState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct BitmapAndState {
+    pub ps: PlanState,
+    pub bitmapplans: *mut *mut PlanState,
+    pub nplans: ::core::ffi::c_int,
+}
+impl Default for BitmapAndState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct BitmapOrState {
+    pub ps: PlanState,
+    pub bitmapplans: *mut *mut PlanState,
+    pub nplans: ::core::ffi::c_int,
+}
+impl Default for BitmapOrState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ScanState {
+    pub ps: PlanState,
+    pub ss_currentRelation: Relation,
+    pub ss_currentScanDesc: *mut TableScanDescData,
+    pub ss_ScanTupleSlot: *mut TupleTableSlot,
+}
+impl Default for ScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SeqScanState {
+    pub ss: ScanState,
+    pub pscan_len: Size,
+}
+impl Default for SeqScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SampleScanState {
+    pub ss: ScanState,
+    pub args: *mut List,
+    pub repeatable: *mut ExprState,
+    pub tsmroutine: *mut TsmRoutine,
+    pub tsm_state: *mut ::core::ffi::c_void,
+    pub use_bulkread: bool,
+    pub use_pagemode: bool,
+    pub begun: bool,
+    pub seed: uint32,
+    pub donetuples: int64,
+    pub haveblock: bool,
+    pub done: bool,
+}
+impl Default for SampleScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct IndexRuntimeKeyInfo {
+    pub scan_key: *mut ScanKeyData,
+    pub key_expr: *mut ExprState,
+    pub key_toastable: bool,
+}
+impl Default for IndexRuntimeKeyInfo {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct IndexArrayKeyInfo {
+    pub scan_key: *mut ScanKeyData,
+    pub array_expr: *mut ExprState,
+    pub next_elem: ::core::ffi::c_int,
+    pub num_elems: ::core::ffi::c_int,
+    pub elem_values: *mut Datum,
+    pub elem_nulls: *mut bool,
+}
+impl Default for IndexArrayKeyInfo {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct IndexScanState {
+    pub ss: ScanState,
+    pub indexqualorig: *mut ExprState,
+    pub indexorderbyorig: *mut List,
+    pub iss_ScanKeys: *mut ScanKeyData,
+    pub iss_NumScanKeys: ::core::ffi::c_int,
+    pub iss_OrderByKeys: *mut ScanKeyData,
+    pub iss_NumOrderByKeys: ::core::ffi::c_int,
+    pub iss_RuntimeKeys: *mut IndexRuntimeKeyInfo,
+    pub iss_NumRuntimeKeys: ::core::ffi::c_int,
+    pub iss_RuntimeKeysReady: bool,
+    pub iss_RuntimeContext: *mut ExprContext,
+    pub iss_RelationDesc: Relation,
+    pub iss_ScanDesc: *mut IndexScanDescData,
+    pub iss_Instrument: IndexScanInstrumentation,
+    pub iss_SharedInfo: *mut SharedIndexScanInstrumentation,
+    pub iss_ReorderQueue: *mut pairingheap,
+    pub iss_ReachedEnd: bool,
+    pub iss_OrderByValues: *mut Datum,
+    pub iss_OrderByNulls: *mut bool,
+    pub iss_SortSupport: SortSupport,
+    pub iss_OrderByTypByVals: *mut bool,
+    pub iss_OrderByTypLens: *mut int16,
+    pub iss_PscanLen: Size,
+}
+impl Default for IndexScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct IndexOnlyScanState {
+    pub ss: ScanState,
+    pub recheckqual: *mut ExprState,
+    pub ioss_ScanKeys: *mut ScanKeyData,
+    pub ioss_NumScanKeys: ::core::ffi::c_int,
+    pub ioss_OrderByKeys: *mut ScanKeyData,
+    pub ioss_NumOrderByKeys: ::core::ffi::c_int,
+    pub ioss_RuntimeKeys: *mut IndexRuntimeKeyInfo,
+    pub ioss_NumRuntimeKeys: ::core::ffi::c_int,
+    pub ioss_RuntimeKeysReady: bool,
+    pub ioss_RuntimeContext: *mut ExprContext,
+    pub ioss_RelationDesc: Relation,
+    pub ioss_ScanDesc: *mut IndexScanDescData,
+    pub ioss_Instrument: IndexScanInstrumentation,
+    pub ioss_SharedInfo: *mut SharedIndexScanInstrumentation,
+    pub ioss_TableSlot: *mut TupleTableSlot,
+    pub ioss_VMBuffer: Buffer,
+    pub ioss_PscanLen: Size,
+    pub ioss_NameCStringAttNums: *mut AttrNumber,
+    pub ioss_NameCStringCount: ::core::ffi::c_int,
+}
+impl Default for IndexOnlyScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct BitmapIndexScanState {
+    pub ss: ScanState,
+    pub biss_result: *mut TIDBitmap,
+    pub biss_ScanKeys: *mut ScanKeyData,
+    pub biss_NumScanKeys: ::core::ffi::c_int,
+    pub biss_RuntimeKeys: *mut IndexRuntimeKeyInfo,
+    pub biss_NumRuntimeKeys: ::core::ffi::c_int,
+    pub biss_ArrayKeys: *mut IndexArrayKeyInfo,
+    pub biss_NumArrayKeys: ::core::ffi::c_int,
+    pub biss_RuntimeKeysReady: bool,
+    pub biss_RuntimeContext: *mut ExprContext,
+    pub biss_RelationDesc: Relation,
+    pub biss_ScanDesc: *mut IndexScanDescData,
+    pub biss_Instrument: IndexScanInstrumentation,
+    pub biss_SharedInfo: *mut SharedIndexScanInstrumentation,
+}
+impl Default for BitmapIndexScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct BitmapHeapScanInstrumentation {
+    pub exact_pages: uint64,
+    pub lossy_pages: uint64,
+}
+pub mod SharedBitmapState {
+    pub type Type = ::core::ffi::c_uint;
+    pub const BM_INITIAL: Type = 0;
+    pub const BM_INPROGRESS: Type = 1;
+    pub const BM_FINISHED: Type = 2;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParallelBitmapHeapState {
+    pub tbmiterator: dsa_pointer,
+    pub mutex: slock_t,
+    pub state: SharedBitmapState::Type,
+    pub cv: ConditionVariable,
+}
+impl Default for ParallelBitmapHeapState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct SharedBitmapHeapInstrumentation {
+    pub num_workers: ::core::ffi::c_int,
+    pub sinstrument: __IncompleteArrayField<BitmapHeapScanInstrumentation>,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct BitmapHeapScanState {
+    pub ss: ScanState,
+    pub bitmapqualorig: *mut ExprState,
+    pub tbm: *mut TIDBitmap,
+    pub stats: BitmapHeapScanInstrumentation,
+    pub initialized: bool,
+    pub pstate: *mut ParallelBitmapHeapState,
+    pub sinstrument: *mut SharedBitmapHeapInstrumentation,
+    pub recheck: bool,
+}
+impl Default for BitmapHeapScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TidScanState {
+    pub ss: ScanState,
+    pub tss_tidexprs: *mut List,
+    pub tss_isCurrentOf: bool,
+    pub tss_NumTids: ::core::ffi::c_int,
+    pub tss_TidPtr: ::core::ffi::c_int,
+    pub tss_TidList: *mut ItemPointerData,
+}
+impl Default for TidScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TidRangeScanState {
+    pub ss: ScanState,
+    pub trss_tidexprs: *mut List,
+    pub trss_mintid: ItemPointerData,
+    pub trss_maxtid: ItemPointerData,
+    pub trss_inScan: bool,
+}
+impl Default for TidRangeScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SubqueryScanState {
+    pub ss: ScanState,
+    pub subplan: *mut PlanState,
+}
+impl Default for SubqueryScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct FunctionScanPerFuncState {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct FunctionScanState {
+    pub ss: ScanState,
+    pub eflags: ::core::ffi::c_int,
+    pub ordinality: bool,
+    pub simple: bool,
+    pub ordinal: int64,
+    pub nfuncs: ::core::ffi::c_int,
+    pub funcstates: *mut FunctionScanPerFuncState,
+    pub argcontext: MemoryContext,
+}
+impl Default for FunctionScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ValuesScanState {
+    pub ss: ScanState,
+    pub rowcontext: *mut ExprContext,
+    pub exprlists: *mut *mut List,
+    pub exprstatelists: *mut *mut List,
+    pub array_len: ::core::ffi::c_int,
+    pub curr_idx: ::core::ffi::c_int,
+}
+impl Default for ValuesScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TableFuncScanState {
+    pub ss: ScanState,
+    pub docexpr: *mut ExprState,
+    pub rowexpr: *mut ExprState,
+    pub colexprs: *mut List,
+    pub coldefexprs: *mut List,
+    pub colvalexprs: *mut List,
+    pub passingvalexprs: *mut List,
+    pub ns_names: *mut List,
+    pub ns_uris: *mut List,
+    pub notnulls: *mut Bitmapset,
+    pub opaque: *mut ::core::ffi::c_void,
+    pub routine: *mut TableFuncRoutine,
+    pub in_functions: *mut FmgrInfo,
+    pub typioparams: *mut Oid,
+    pub ordinal: int64,
+    pub perTableCxt: MemoryContext,
+    pub tupstore: *mut Tuplestorestate,
+}
+impl Default for TableFuncScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CteScanState {
+    pub ss: ScanState,
+    pub eflags: ::core::ffi::c_int,
+    pub readptr: ::core::ffi::c_int,
+    pub cteplanstate: *mut PlanState,
+    pub leader: *mut CteScanState,
+    pub cte_table: *mut Tuplestorestate,
+    pub eof_cte: bool,
+}
+impl Default for CteScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct NamedTuplestoreScanState {
+    pub ss: ScanState,
+    pub readptr: ::core::ffi::c_int,
+    pub tupdesc: TupleDesc,
+    pub relation: *mut Tuplestorestate,
+}
+impl Default for NamedTuplestoreScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WorkTableScanState {
+    pub ss: ScanState,
+    pub rustate: *mut RecursiveUnionState,
+}
+impl Default for WorkTableScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ForeignScanState {
+    pub ss: ScanState,
+    pub fdw_recheck_quals: *mut ExprState,
+    pub pscan_len: Size,
+    pub resultRelInfo: *mut ResultRelInfo,
+    pub fdwroutine: *mut FdwRoutine,
+    pub fdw_state: *mut ::core::ffi::c_void,
+}
+impl Default for ForeignScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CustomScanState {
+    pub ss: ScanState,
+    pub flags: uint32,
+    pub custom_ps: *mut List,
+    pub pscan_len: Size,
+    pub methods: *const CustomExecMethods,
+    pub slotOps: *const TupleTableSlotOps,
+}
+impl Default for CustomScanState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct JoinState {
+    pub ps: PlanState,
+    pub jointype: JoinType::Type,
+    pub single_match: bool,
+    pub joinqual: *mut ExprState,
+}
+impl Default for JoinState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct NestLoopState {
+    pub js: JoinState,
+    pub nl_NeedNewOuter: bool,
+    pub nl_MatchedOuter: bool,
+    pub nl_NullInnerTupleSlot: *mut TupleTableSlot,
+}
+impl Default for NestLoopState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MergeJoinClauseData {
+    _unused: [u8; 0],
+}
+pub type MergeJoinClause = *mut MergeJoinClauseData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MergeJoinState {
+    pub js: JoinState,
+    pub mj_NumClauses: ::core::ffi::c_int,
+    pub mj_Clauses: MergeJoinClause,
+    pub mj_JoinState: ::core::ffi::c_int,
+    pub mj_SkipMarkRestore: bool,
+    pub mj_ExtraMarks: bool,
+    pub mj_ConstFalseJoin: bool,
+    pub mj_FillOuter: bool,
+    pub mj_FillInner: bool,
+    pub mj_MatchedOuter: bool,
+    pub mj_MatchedInner: bool,
+    pub mj_OuterTupleSlot: *mut TupleTableSlot,
+    pub mj_InnerTupleSlot: *mut TupleTableSlot,
+    pub mj_MarkedTupleSlot: *mut TupleTableSlot,
+    pub mj_NullOuterTupleSlot: *mut TupleTableSlot,
+    pub mj_NullInnerTupleSlot: *mut TupleTableSlot,
+    pub mj_OuterEContext: *mut ExprContext,
+    pub mj_InnerEContext: *mut ExprContext,
+}
+impl Default for MergeJoinState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct HashJoinTupleData {
+    _unused: [u8; 0],
+}
+pub type HashJoinTuple = *mut HashJoinTupleData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct HashJoinTableData {
+    _unused: [u8; 0],
+}
+pub type HashJoinTable = *mut HashJoinTableData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct HashJoinState {
+    pub js: JoinState,
+    pub hashclauses: *mut ExprState,
+    pub hj_OuterHash: *mut ExprState,
+    pub hj_HashTable: HashJoinTable,
+    pub hj_CurHashValue: uint32,
+    pub hj_CurBucketNo: ::core::ffi::c_int,
+    pub hj_CurSkewBucketNo: ::core::ffi::c_int,
+    pub hj_CurTuple: HashJoinTuple,
+    pub hj_OuterTupleSlot: *mut TupleTableSlot,
+    pub hj_HashTupleSlot: *mut TupleTableSlot,
+    pub hj_NullOuterTupleSlot: *mut TupleTableSlot,
+    pub hj_NullInnerTupleSlot: *mut TupleTableSlot,
+    pub hj_FirstOuterTupleSlot: *mut TupleTableSlot,
+    pub hj_JoinState: ::core::ffi::c_int,
+    pub hj_MatchedOuter: bool,
+    pub hj_OuterNotEmpty: bool,
+}
+impl Default for HashJoinState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MaterialState {
+    pub ss: ScanState,
+    pub eflags: ::core::ffi::c_int,
+    pub eof_underlying: bool,
+    pub tuplestorestate: *mut Tuplestorestate,
+}
+impl Default for MaterialState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MemoizeEntry {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MemoizeTuple {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MemoizeKey {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct MemoizeInstrumentation {
+    pub cache_hits: uint64,
+    pub cache_misses: uint64,
+    pub cache_evictions: uint64,
+    pub cache_overflows: uint64,
+    pub mem_peak: uint64,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct SharedMemoizeInfo {
+    pub num_workers: ::core::ffi::c_int,
+    pub sinstrument: __IncompleteArrayField<MemoizeInstrumentation>,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MemoizeState {
+    pub ss: ScanState,
+    pub mstatus: ::core::ffi::c_int,
+    pub nkeys: ::core::ffi::c_int,
+    pub hashtable: *mut memoize_hash,
+    pub hashkeydesc: TupleDesc,
+    pub tableslot: *mut TupleTableSlot,
+    pub probeslot: *mut TupleTableSlot,
+    pub cache_eq_expr: *mut ExprState,
+    pub param_exprs: *mut *mut ExprState,
+    pub hashfunctions: *mut FmgrInfo,
+    pub collations: *mut Oid,
+    pub mem_used: uint64,
+    pub mem_limit: uint64,
+    pub tableContext: MemoryContext,
+    pub lru_list: dlist_head,
+    pub last_tuple: *mut MemoizeTuple,
+    pub entry: *mut MemoizeEntry,
+    pub singlerow: bool,
+    pub binary_mode: bool,
+    pub stats: MemoizeInstrumentation,
+    pub shared_info: *mut SharedMemoizeInfo,
+    pub keyparamids: *mut Bitmapset,
+}
+impl Default for MemoizeState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PresortedKeyData {
+    pub flinfo: FmgrInfo,
+    pub fcinfo: FunctionCallInfo,
+    pub attno: OffsetNumber,
+}
+impl Default for PresortedKeyData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct SharedSortInfo {
+    pub num_workers: ::core::ffi::c_int,
+    pub sinstrument: __IncompleteArrayField<TuplesortInstrumentation>,
+}
+impl Default for SharedSortInfo {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SortState {
+    pub ss: ScanState,
+    pub randomAccess: bool,
+    pub bounded: bool,
+    pub bound: int64,
+    pub sort_Done: bool,
+    pub bounded_Done: bool,
+    pub bound_Done: int64,
+    pub tuplesortstate: *mut ::core::ffi::c_void,
+    pub am_worker: bool,
+    pub datumSort: bool,
+    pub shared_info: *mut SharedSortInfo,
+}
+impl Default for SortState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct IncrementalSortGroupInfo {
+    pub groupCount: int64,
+    pub maxDiskSpaceUsed: int64,
+    pub totalDiskSpaceUsed: int64,
+    pub maxMemorySpaceUsed: int64,
+    pub totalMemorySpaceUsed: int64,
+    pub sortMethods: bits32,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct IncrementalSortInfo {
+    pub fullsortGroupInfo: IncrementalSortGroupInfo,
+    pub prefixsortGroupInfo: IncrementalSortGroupInfo,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct SharedIncrementalSortInfo {
+    pub num_workers: ::core::ffi::c_int,
+    pub sinfo: __IncompleteArrayField<IncrementalSortInfo>,
+}
+pub mod IncrementalSortExecutionStatus {
+    pub type Type = ::core::ffi::c_uint;
+    pub const INCSORT_LOADFULLSORT: Type = 0;
+    pub const INCSORT_LOADPREFIXSORT: Type = 1;
+    pub const INCSORT_READFULLSORT: Type = 2;
+    pub const INCSORT_READPREFIXSORT: Type = 3;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct IncrementalSortState {
+    pub ss: ScanState,
+    pub bounded: bool,
+    pub bound: int64,
+    pub outerNodeDone: bool,
+    pub bound_Done: int64,
+    pub execution_status: IncrementalSortExecutionStatus::Type,
+    pub n_fullsort_remaining: int64,
+    pub fullsort_state: *mut Tuplesortstate,
+    pub prefixsort_state: *mut Tuplesortstate,
+    pub presorted_keys: *mut PresortedKeyData,
+    pub incsort_info: IncrementalSortInfo,
+    pub group_pivot: *mut TupleTableSlot,
+    pub transfer_tuple: *mut TupleTableSlot,
+    pub am_worker: bool,
+    pub shared_info: *mut SharedIncrementalSortInfo,
+}
+impl Default for IncrementalSortState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GroupState {
+    pub ss: ScanState,
+    pub eqfunction: *mut ExprState,
+    pub grp_done: bool,
+}
+impl Default for GroupState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct AggregateInstrumentation {
+    pub hash_mem_peak: Size,
+    pub hash_disk_used: uint64,
+    pub hash_batches_used: ::core::ffi::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct SharedAggInfo {
+    pub num_workers: ::core::ffi::c_int,
+    pub sinstrument: __IncompleteArrayField<AggregateInstrumentation>,
+}
+pub type AggStatePerAgg = *mut AggStatePerAggData;
+pub type AggStatePerTrans = *mut AggStatePerTransData;
+pub type AggStatePerGroup = *mut AggStatePerGroupData;
+pub type AggStatePerPhase = *mut AggStatePerPhaseData;
+pub type AggStatePerHash = *mut AggStatePerHashData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AggState {
+    pub ss: ScanState,
+    pub aggs: *mut List,
+    pub numaggs: ::core::ffi::c_int,
+    pub numtrans: ::core::ffi::c_int,
+    pub aggstrategy: AggStrategy::Type,
+    pub aggsplit: AggSplit::Type,
+    pub phase: AggStatePerPhase,
+    pub numphases: ::core::ffi::c_int,
+    pub current_phase: ::core::ffi::c_int,
+    pub peragg: AggStatePerAgg,
+    pub pertrans: AggStatePerTrans,
+    pub hashcontext: *mut ExprContext,
+    pub aggcontexts: *mut *mut ExprContext,
+    pub tmpcontext: *mut ExprContext,
+    pub curaggcontext: *mut ExprContext,
+    pub curperagg: AggStatePerAgg,
+    pub curpertrans: AggStatePerTrans,
+    pub input_done: bool,
+    pub agg_done: bool,
+    pub projected_set: ::core::ffi::c_int,
+    pub current_set: ::core::ffi::c_int,
+    pub grouped_cols: *mut Bitmapset,
+    pub all_grouped_cols: *mut List,
+    pub colnos_needed: *mut Bitmapset,
+    pub max_colno_needed: ::core::ffi::c_int,
+    pub all_cols_needed: bool,
+    pub maxsets: ::core::ffi::c_int,
+    pub phases: AggStatePerPhase,
+    pub sort_in: *mut Tuplesortstate,
+    pub sort_out: *mut Tuplesortstate,
+    pub sort_slot: *mut TupleTableSlot,
+    pub pergroups: *mut AggStatePerGroup,
+    pub grp_firstTuple: HeapTuple,
+    pub table_filled: bool,
+    pub num_hashes: ::core::ffi::c_int,
+    pub hash_metacxt: MemoryContext,
+    pub hash_tablecxt: MemoryContext,
+    pub hash_tapeset: *mut LogicalTapeSet,
+    pub hash_spills: *mut HashAggSpill,
+    pub hash_spill_rslot: *mut TupleTableSlot,
+    pub hash_spill_wslot: *mut TupleTableSlot,
+    pub hash_batches: *mut List,
+    pub hash_ever_spilled: bool,
+    pub hash_spill_mode: bool,
+    pub hash_mem_limit: Size,
+    pub hash_ngroups_limit: uint64,
+    pub hash_planned_partitions: ::core::ffi::c_int,
+    pub hashentrysize: f64,
+    pub hash_mem_peak: Size,
+    pub hash_ngroups_current: uint64,
+    pub hash_disk_used: uint64,
+    pub hash_batches_used: ::core::ffi::c_int,
+    pub perhash: AggStatePerHash,
+    pub hash_pergroup: *mut AggStatePerGroup,
+    pub all_pergroups: *mut AggStatePerGroup,
+    pub shared_info: *mut SharedAggInfo,
+}
+impl Default for AggState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WindowStatePerFuncData {
+    _unused: [u8; 0],
+}
+pub type WindowStatePerFunc = *mut WindowStatePerFuncData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WindowStatePerAggData {
+    _unused: [u8; 0],
+}
+pub type WindowStatePerAgg = *mut WindowStatePerAggData;
+pub mod WindowAggStatus {
+    pub type Type = ::core::ffi::c_uint;
+    pub const WINDOWAGG_DONE: Type = 0;
+    pub const WINDOWAGG_RUN: Type = 1;
+    pub const WINDOWAGG_PASSTHROUGH: Type = 2;
+    pub const WINDOWAGG_PASSTHROUGH_STRICT: Type = 3;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WindowAggState {
+    pub ss: ScanState,
+    pub funcs: *mut List,
+    pub numfuncs: ::core::ffi::c_int,
+    pub numaggs: ::core::ffi::c_int,
+    pub perfunc: WindowStatePerFunc,
+    pub peragg: WindowStatePerAgg,
+    pub partEqfunction: *mut ExprState,
+    pub ordEqfunction: *mut ExprState,
+    pub buffer: *mut Tuplestorestate,
+    pub current_ptr: ::core::ffi::c_int,
+    pub framehead_ptr: ::core::ffi::c_int,
+    pub frametail_ptr: ::core::ffi::c_int,
+    pub grouptail_ptr: ::core::ffi::c_int,
+    pub spooled_rows: int64,
+    pub currentpos: int64,
+    pub frameheadpos: int64,
+    pub frametailpos: int64,
+    pub agg_winobj: *mut WindowObjectData,
+    pub aggregatedbase: int64,
+    pub aggregatedupto: int64,
+    pub status: WindowAggStatus::Type,
+    pub frameOptions: ::core::ffi::c_int,
+    pub startOffset: *mut ExprState,
+    pub endOffset: *mut ExprState,
+    pub startOffsetValue: Datum,
+    pub endOffsetValue: Datum,
+    pub startInRangeFunc: FmgrInfo,
+    pub endInRangeFunc: FmgrInfo,
+    pub inRangeColl: Oid,
+    pub inRangeAsc: bool,
+    pub inRangeNullsFirst: bool,
+    pub use_pass_through: bool,
+    pub top_window: bool,
+    pub runcondition: *mut ExprState,
+    pub currentgroup: int64,
+    pub frameheadgroup: int64,
+    pub frametailgroup: int64,
+    pub groupheadpos: int64,
+    pub grouptailpos: int64,
+    pub partcontext: MemoryContext,
+    pub aggcontext: MemoryContext,
+    pub curaggcontext: MemoryContext,
+    pub tmpcontext: *mut ExprContext,
+    pub all_first: bool,
+    pub partition_spooled: bool,
+    pub next_partition: bool,
+    pub more_partitions: bool,
+    pub framehead_valid: bool,
+    pub frametail_valid: bool,
+    pub grouptail_valid: bool,
+    pub first_part_slot: *mut TupleTableSlot,
+    pub framehead_slot: *mut TupleTableSlot,
+    pub frametail_slot: *mut TupleTableSlot,
+    pub agg_row_slot: *mut TupleTableSlot,
+    pub temp_slot_1: *mut TupleTableSlot,
+    pub temp_slot_2: *mut TupleTableSlot,
+}
+impl Default for WindowAggState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct UniqueState {
+    pub ps: PlanState,
+    pub eqfunction: *mut ExprState,
+}
+impl Default for UniqueState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GatherState {
+    pub ps: PlanState,
+    pub initialized: bool,
+    pub need_to_scan_locally: bool,
+    pub tuples_needed: int64,
+    pub funnel_slot: *mut TupleTableSlot,
+    pub pei: *mut ParallelExecutorInfo,
+    pub nworkers_launched: ::core::ffi::c_int,
+    pub nreaders: ::core::ffi::c_int,
+    pub nextreader: ::core::ffi::c_int,
+    pub reader: *mut *mut TupleQueueReader,
+}
+impl Default for GatherState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GMReaderTupleBuffer {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GatherMergeState {
+    pub ps: PlanState,
+    pub initialized: bool,
+    pub gm_initialized: bool,
+    pub need_to_scan_locally: bool,
+    pub tuples_needed: int64,
+    pub tupDesc: TupleDesc,
+    pub gm_nkeys: ::core::ffi::c_int,
+    pub gm_sortkeys: SortSupport,
+    pub pei: *mut ParallelExecutorInfo,
+    pub nworkers_launched: ::core::ffi::c_int,
+    pub nreaders: ::core::ffi::c_int,
+    pub gm_slots: *mut *mut TupleTableSlot,
+    pub reader: *mut *mut TupleQueueReader,
+    pub gm_tuple_buffers: *mut GMReaderTupleBuffer,
+    pub gm_heap: *mut binaryheap,
+}
+impl Default for GatherMergeState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct HashInstrumentation {
+    pub nbuckets: ::core::ffi::c_int,
+    pub nbuckets_original: ::core::ffi::c_int,
+    pub nbatch: ::core::ffi::c_int,
+    pub nbatch_original: ::core::ffi::c_int,
+    pub space_peak: Size,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct SharedHashInfo {
+    pub num_workers: ::core::ffi::c_int,
+    pub hinstrument: __IncompleteArrayField<HashInstrumentation>,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct HashState {
+    pub ps: PlanState,
+    pub hashtable: HashJoinTable,
+    pub hash_expr: *mut ExprState,
+    pub skew_hashfunction: *mut FmgrInfo,
+    pub skew_collation: Oid,
+    pub shared_info: *mut SharedHashInfo,
+    pub hinstrument: *mut HashInstrumentation,
+    pub parallel_state: *mut ParallelHashJoinState,
+}
+impl Default for HashState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SetOpStatePerInput {
+    pub firstTupleSlot: *mut TupleTableSlot,
+    pub numTuples: int64,
+    pub nextTupleSlot: *mut TupleTableSlot,
+    pub needGroup: bool,
+}
+impl Default for SetOpStatePerInput {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SetOpState {
+    pub ps: PlanState,
+    pub setop_done: bool,
+    pub numOutput: int64,
+    pub numCols: ::core::ffi::c_int,
+    pub sortKeys: SortSupport,
+    pub leftInput: SetOpStatePerInput,
+    pub rightInput: SetOpStatePerInput,
+    pub need_init: bool,
+    pub eqfuncoids: *mut Oid,
+    pub hashfunctions: *mut FmgrInfo,
+    pub hashtable: TupleHashTable,
+    pub tableContext: MemoryContext,
+    pub table_filled: bool,
+    pub hashiter: TupleHashIterator,
+}
+impl Default for SetOpState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LockRowsState {
+    pub ps: PlanState,
+    pub lr_arowMarks: *mut List,
+    pub lr_epqstate: EPQState,
+}
+impl Default for LockRowsState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub mod LimitStateCond {
+    pub type Type = ::core::ffi::c_uint;
+    pub const LIMIT_INITIAL: Type = 0;
+    pub const LIMIT_RESCAN: Type = 1;
+    pub const LIMIT_EMPTY: Type = 2;
+    pub const LIMIT_INWINDOW: Type = 3;
+    pub const LIMIT_WINDOWEND_TIES: Type = 4;
+    pub const LIMIT_SUBPLANEOF: Type = 5;
+    pub const LIMIT_WINDOWEND: Type = 6;
+    pub const LIMIT_WINDOWSTART: Type = 7;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LimitState {
+    pub ps: PlanState,
+    pub limitOffset: *mut ExprState,
+    pub limitCount: *mut ExprState,
+    pub limitOption: LimitOption::Type,
+    pub offset: int64,
+    pub count: int64,
+    pub noCount: bool,
+    pub lstate: LimitStateCond::Type,
+    pub position: int64,
+    pub subSlot: *mut TupleTableSlot,
+    pub eqfunction: *mut ExprState,
+    pub last_slot: *mut TupleTableSlot,
+}
+impl Default for LimitState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub mod CommandTag {
+    pub type Type = ::core::ffi::c_uint;
+    pub const CMDTAG_UNKNOWN: Type = 0;
+    pub const CMDTAG_ALTER_ACCESS_METHOD: Type = 1;
+    pub const CMDTAG_ALTER_AGGREGATE: Type = 2;
+    pub const CMDTAG_ALTER_CAST: Type = 3;
+    pub const CMDTAG_ALTER_COLLATION: Type = 4;
+    pub const CMDTAG_ALTER_CONSTRAINT: Type = 5;
+    pub const CMDTAG_ALTER_CONVERSION: Type = 6;
+    pub const CMDTAG_ALTER_DATABASE: Type = 7;
+    pub const CMDTAG_ALTER_DEFAULT_PRIVILEGES: Type = 8;
+    pub const CMDTAG_ALTER_DOMAIN: Type = 9;
+    pub const CMDTAG_ALTER_EVENT_TRIGGER: Type = 10;
+    pub const CMDTAG_ALTER_EXTENSION: Type = 11;
+    pub const CMDTAG_ALTER_FOREIGN_DATA_WRAPPER: Type = 12;
+    pub const CMDTAG_ALTER_FOREIGN_TABLE: Type = 13;
+    pub const CMDTAG_ALTER_FUNCTION: Type = 14;
+    pub const CMDTAG_ALTER_INDEX: Type = 15;
+    pub const CMDTAG_ALTER_LANGUAGE: Type = 16;
+    pub const CMDTAG_ALTER_LARGE_OBJECT: Type = 17;
+    pub const CMDTAG_ALTER_MATERIALIZED_VIEW: Type = 18;
+    pub const CMDTAG_ALTER_OPERATOR: Type = 19;
+    pub const CMDTAG_ALTER_OPERATOR_CLASS: Type = 20;
+    pub const CMDTAG_ALTER_OPERATOR_FAMILY: Type = 21;
+    pub const CMDTAG_ALTER_POLICY: Type = 22;
+    pub const CMDTAG_ALTER_PROCEDURE: Type = 23;
+    pub const CMDTAG_ALTER_PUBLICATION: Type = 24;
+    pub const CMDTAG_ALTER_ROLE: Type = 25;
+    pub const CMDTAG_ALTER_ROUTINE: Type = 26;
+    pub const CMDTAG_ALTER_RULE: Type = 27;
+    pub const CMDTAG_ALTER_SCHEMA: Type = 28;
+    pub const CMDTAG_ALTER_SEQUENCE: Type = 29;
+    pub const CMDTAG_ALTER_SERVER: Type = 30;
+    pub const CMDTAG_ALTER_STATISTICS: Type = 31;
+    pub const CMDTAG_ALTER_SUBSCRIPTION: Type = 32;
+    pub const CMDTAG_ALTER_SYSTEM: Type = 33;
+    pub const CMDTAG_ALTER_TABLE: Type = 34;
+    pub const CMDTAG_ALTER_TABLESPACE: Type = 35;
+    pub const CMDTAG_ALTER_TEXT_SEARCH_CONFIGURATION: Type = 36;
+    pub const CMDTAG_ALTER_TEXT_SEARCH_DICTIONARY: Type = 37;
+    pub const CMDTAG_ALTER_TEXT_SEARCH_PARSER: Type = 38;
+    pub const CMDTAG_ALTER_TEXT_SEARCH_TEMPLATE: Type = 39;
+    pub const CMDTAG_ALTER_TRANSFORM: Type = 40;
+    pub const CMDTAG_ALTER_TRIGGER: Type = 41;
+    pub const CMDTAG_ALTER_TYPE: Type = 42;
+    pub const CMDTAG_ALTER_USER_MAPPING: Type = 43;
+    pub const CMDTAG_ALTER_VIEW: Type = 44;
+    pub const CMDTAG_ANALYZE: Type = 45;
+    pub const CMDTAG_BEGIN: Type = 46;
+    pub const CMDTAG_CALL: Type = 47;
+    pub const CMDTAG_CHECKPOINT: Type = 48;
+    pub const CMDTAG_CLOSE: Type = 49;
+    pub const CMDTAG_CLOSE_CURSOR: Type = 50;
+    pub const CMDTAG_CLOSE_CURSOR_ALL: Type = 51;
+    pub const CMDTAG_CLUSTER: Type = 52;
+    pub const CMDTAG_COMMENT: Type = 53;
+    pub const CMDTAG_COMMIT: Type = 54;
+    pub const CMDTAG_COMMIT_PREPARED: Type = 55;
+    pub const CMDTAG_COPY: Type = 56;
+    pub const CMDTAG_COPY_FROM: Type = 57;
+    pub const CMDTAG_CREATE_ACCESS_METHOD: Type = 58;
+    pub const CMDTAG_CREATE_AGGREGATE: Type = 59;
+    pub const CMDTAG_CREATE_CAST: Type = 60;
+    pub const CMDTAG_CREATE_COLLATION: Type = 61;
+    pub const CMDTAG_CREATE_CONSTRAINT: Type = 62;
+    pub const CMDTAG_CREATE_CONVERSION: Type = 63;
+    pub const CMDTAG_CREATE_DATABASE: Type = 64;
+    pub const CMDTAG_CREATE_DOMAIN: Type = 65;
+    pub const CMDTAG_CREATE_EVENT_TRIGGER: Type = 66;
+    pub const CMDTAG_CREATE_EXTENSION: Type = 67;
+    pub const CMDTAG_CREATE_FOREIGN_DATA_WRAPPER: Type = 68;
+    pub const CMDTAG_CREATE_FOREIGN_TABLE: Type = 69;
+    pub const CMDTAG_CREATE_FUNCTION: Type = 70;
+    pub const CMDTAG_CREATE_INDEX: Type = 71;
+    pub const CMDTAG_CREATE_LANGUAGE: Type = 72;
+    pub const CMDTAG_CREATE_MATERIALIZED_VIEW: Type = 73;
+    pub const CMDTAG_CREATE_OPERATOR: Type = 74;
+    pub const CMDTAG_CREATE_OPERATOR_CLASS: Type = 75;
+    pub const CMDTAG_CREATE_OPERATOR_FAMILY: Type = 76;
+    pub const CMDTAG_CREATE_POLICY: Type = 77;
+    pub const CMDTAG_CREATE_PROCEDURE: Type = 78;
+    pub const CMDTAG_CREATE_PUBLICATION: Type = 79;
+    pub const CMDTAG_CREATE_ROLE: Type = 80;
+    pub const CMDTAG_CREATE_ROUTINE: Type = 81;
+    pub const CMDTAG_CREATE_RULE: Type = 82;
+    pub const CMDTAG_CREATE_SCHEMA: Type = 83;
+    pub const CMDTAG_CREATE_SEQUENCE: Type = 84;
+    pub const CMDTAG_CREATE_SERVER: Type = 85;
+    pub const CMDTAG_CREATE_STATISTICS: Type = 86;
+    pub const CMDTAG_CREATE_SUBSCRIPTION: Type = 87;
+    pub const CMDTAG_CREATE_TABLE: Type = 88;
+    pub const CMDTAG_CREATE_TABLE_AS: Type = 89;
+    pub const CMDTAG_CREATE_TABLESPACE: Type = 90;
+    pub const CMDTAG_CREATE_TEXT_SEARCH_CONFIGURATION: Type = 91;
+    pub const CMDTAG_CREATE_TEXT_SEARCH_DICTIONARY: Type = 92;
+    pub const CMDTAG_CREATE_TEXT_SEARCH_PARSER: Type = 93;
+    pub const CMDTAG_CREATE_TEXT_SEARCH_TEMPLATE: Type = 94;
+    pub const CMDTAG_CREATE_TRANSFORM: Type = 95;
+    pub const CMDTAG_CREATE_TRIGGER: Type = 96;
+    pub const CMDTAG_CREATE_TYPE: Type = 97;
+    pub const CMDTAG_CREATE_USER_MAPPING: Type = 98;
+    pub const CMDTAG_CREATE_VIEW: Type = 99;
+    pub const CMDTAG_DEALLOCATE: Type = 100;
+    pub const CMDTAG_DEALLOCATE_ALL: Type = 101;
+    pub const CMDTAG_DECLARE_CURSOR: Type = 102;
+    pub const CMDTAG_DELETE: Type = 103;
+    pub const CMDTAG_DISCARD: Type = 104;
+    pub const CMDTAG_DISCARD_ALL: Type = 105;
+    pub const CMDTAG_DISCARD_PLANS: Type = 106;
+    pub const CMDTAG_DISCARD_SEQUENCES: Type = 107;
+    pub const CMDTAG_DISCARD_TEMP: Type = 108;
+    pub const CMDTAG_DO: Type = 109;
+    pub const CMDTAG_DROP_ACCESS_METHOD: Type = 110;
+    pub const CMDTAG_DROP_AGGREGATE: Type = 111;
+    pub const CMDTAG_DROP_CAST: Type = 112;
+    pub const CMDTAG_DROP_COLLATION: Type = 113;
+    pub const CMDTAG_DROP_CONSTRAINT: Type = 114;
+    pub const CMDTAG_DROP_CONVERSION: Type = 115;
+    pub const CMDTAG_DROP_DATABASE: Type = 116;
+    pub const CMDTAG_DROP_DOMAIN: Type = 117;
+    pub const CMDTAG_DROP_EVENT_TRIGGER: Type = 118;
+    pub const CMDTAG_DROP_EXTENSION: Type = 119;
+    pub const CMDTAG_DROP_FOREIGN_DATA_WRAPPER: Type = 120;
+    pub const CMDTAG_DROP_FOREIGN_TABLE: Type = 121;
+    pub const CMDTAG_DROP_FUNCTION: Type = 122;
+    pub const CMDTAG_DROP_INDEX: Type = 123;
+    pub const CMDTAG_DROP_LANGUAGE: Type = 124;
+    pub const CMDTAG_DROP_MATERIALIZED_VIEW: Type = 125;
+    pub const CMDTAG_DROP_OPERATOR: Type = 126;
+    pub const CMDTAG_DROP_OPERATOR_CLASS: Type = 127;
+    pub const CMDTAG_DROP_OPERATOR_FAMILY: Type = 128;
+    pub const CMDTAG_DROP_OWNED: Type = 129;
+    pub const CMDTAG_DROP_POLICY: Type = 130;
+    pub const CMDTAG_DROP_PROCEDURE: Type = 131;
+    pub const CMDTAG_DROP_PUBLICATION: Type = 132;
+    pub const CMDTAG_DROP_ROLE: Type = 133;
+    pub const CMDTAG_DROP_ROUTINE: Type = 134;
+    pub const CMDTAG_DROP_RULE: Type = 135;
+    pub const CMDTAG_DROP_SCHEMA: Type = 136;
+    pub const CMDTAG_DROP_SEQUENCE: Type = 137;
+    pub const CMDTAG_DROP_SERVER: Type = 138;
+    pub const CMDTAG_DROP_STATISTICS: Type = 139;
+    pub const CMDTAG_DROP_SUBSCRIPTION: Type = 140;
+    pub const CMDTAG_DROP_TABLE: Type = 141;
+    pub const CMDTAG_DROP_TABLESPACE: Type = 142;
+    pub const CMDTAG_DROP_TEXT_SEARCH_CONFIGURATION: Type = 143;
+    pub const CMDTAG_DROP_TEXT_SEARCH_DICTIONARY: Type = 144;
+    pub const CMDTAG_DROP_TEXT_SEARCH_PARSER: Type = 145;
+    pub const CMDTAG_DROP_TEXT_SEARCH_TEMPLATE: Type = 146;
+    pub const CMDTAG_DROP_TRANSFORM: Type = 147;
+    pub const CMDTAG_DROP_TRIGGER: Type = 148;
+    pub const CMDTAG_DROP_TYPE: Type = 149;
+    pub const CMDTAG_DROP_USER_MAPPING: Type = 150;
+    pub const CMDTAG_DROP_VIEW: Type = 151;
+    pub const CMDTAG_EXECUTE: Type = 152;
+    pub const CMDTAG_EXPLAIN: Type = 153;
+    pub const CMDTAG_FETCH: Type = 154;
+    pub const CMDTAG_GRANT: Type = 155;
+    pub const CMDTAG_GRANT_ROLE: Type = 156;
+    pub const CMDTAG_IMPORT_FOREIGN_SCHEMA: Type = 157;
+    pub const CMDTAG_INSERT: Type = 158;
+    pub const CMDTAG_LISTEN: Type = 159;
+    pub const CMDTAG_LOAD: Type = 160;
+    pub const CMDTAG_LOCK_TABLE: Type = 161;
+    pub const CMDTAG_LOGIN: Type = 162;
+    pub const CMDTAG_MERGE: Type = 163;
+    pub const CMDTAG_MOVE: Type = 164;
+    pub const CMDTAG_NOTIFY: Type = 165;
+    pub const CMDTAG_PREPARE: Type = 166;
+    pub const CMDTAG_PREPARE_TRANSACTION: Type = 167;
+    pub const CMDTAG_REASSIGN_OWNED: Type = 168;
+    pub const CMDTAG_REFRESH_MATERIALIZED_VIEW: Type = 169;
+    pub const CMDTAG_REINDEX: Type = 170;
+    pub const CMDTAG_RELEASE: Type = 171;
+    pub const CMDTAG_RESET: Type = 172;
+    pub const CMDTAG_REVOKE: Type = 173;
+    pub const CMDTAG_REVOKE_ROLE: Type = 174;
+    pub const CMDTAG_ROLLBACK: Type = 175;
+    pub const CMDTAG_ROLLBACK_PREPARED: Type = 176;
+    pub const CMDTAG_SAVEPOINT: Type = 177;
+    pub const CMDTAG_SECURITY_LABEL: Type = 178;
+    pub const CMDTAG_SELECT: Type = 179;
+    pub const CMDTAG_SELECT_FOR_KEY_SHARE: Type = 180;
+    pub const CMDTAG_SELECT_FOR_NO_KEY_UPDATE: Type = 181;
+    pub const CMDTAG_SELECT_FOR_SHARE: Type = 182;
+    pub const CMDTAG_SELECT_FOR_UPDATE: Type = 183;
+    pub const CMDTAG_SELECT_INTO: Type = 184;
+    pub const CMDTAG_SET: Type = 185;
+    pub const CMDTAG_SET_CONSTRAINTS: Type = 186;
+    pub const CMDTAG_SHOW: Type = 187;
+    pub const CMDTAG_START_TRANSACTION: Type = 188;
+    pub const CMDTAG_TRUNCATE_TABLE: Type = 189;
+    pub const CMDTAG_UNLISTEN: Type = 190;
+    pub const CMDTAG_UPDATE: Type = 191;
+    pub const CMDTAG_VACUUM: Type = 192;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct QueryCompletion {
+    pub commandTag: CommandTag::Type,
+    pub nprocessed: uint64,
+}
+impl Default for QueryCompletion {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub mod CommandDest {
+    pub type Type = ::core::ffi::c_uint;
+    pub const DestNone: Type = 0;
+    pub const DestDebug: Type = 1;
+    pub const DestRemote: Type = 2;
+    pub const DestRemoteExecute: Type = 3;
+    pub const DestRemoteSimple: Type = 4;
+    pub const DestSPI: Type = 5;
+    pub const DestTuplestore: Type = 6;
+    pub const DestIntoRel: Type = 7;
+    pub const DestCopyOut: Type = 8;
+    pub const DestSQLFunction: Type = 9;
+    pub const DestTransientRel: Type = 10;
+    pub const DestTupleQueue: Type = 11;
+    pub const DestExplainSerialize: Type = 12;
+}
+pub type DestReceiver = _DestReceiver;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _DestReceiver {
+    pub receiveSlot: ::core::option::Option<
+        unsafe extern "C-unwind" fn(slot: *mut TupleTableSlot, self_: *mut DestReceiver) -> bool,
+    >,
+    pub rStartup: ::core::option::Option<
+        unsafe extern "C-unwind" fn(
+            self_: *mut DestReceiver,
+            operation: ::core::ffi::c_int,
+            typeinfo: TupleDesc,
+        ),
+    >,
+    pub rShutdown: ::core::option::Option<unsafe extern "C-unwind" fn(self_: *mut DestReceiver)>,
+    pub rDestroy: ::core::option::Option<unsafe extern "C-unwind" fn(self_: *mut DestReceiver)>,
+    pub mydest: CommandDest::Type,
+}
+impl Default for _DestReceiver {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct QueryDesc {
+    pub operation: CmdType::Type,
+    pub plannedstmt: *mut PlannedStmt,
+    pub sourceText: *const ::core::ffi::c_char,
+    pub snapshot: Snapshot,
+    pub crosscheck_snapshot: Snapshot,
+    pub dest: *mut DestReceiver,
+    pub params: ParamListInfo,
+    pub queryEnv: *mut QueryEnvironment,
+    pub instrument_options: ::core::ffi::c_int,
+    pub tupDesc: TupleDesc,
+    pub estate: *mut EState,
+    pub planstate: *mut PlanState,
+    pub already_executed: bool,
+    pub totaltime: *mut Instrumentation,
+}
+impl Default for QueryDesc {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct Integer {
     pub type_: NodeTag,
     pub ival: ::core::ffi::c_int,
@@ -11515,7 +14812,7 @@ pub struct Query {
     pub type_: NodeTag,
     pub commandType: CmdType::Type,
     pub querySource: QuerySource::Type,
-    pub queryId: uint64,
+    pub queryId: int64,
     pub canSetTag: bool,
     pub utilityStmt: *mut Node,
     pub resultRelation: ::core::ffi::c_int,
@@ -11649,6 +14946,8 @@ pub struct A_Expr {
     pub name: *mut List,
     pub lexpr: *mut Node,
     pub rexpr: *mut Node,
+    pub rexpr_list_start: ParseLoc,
+    pub rexpr_list_end: ParseLoc,
     pub location: ParseLoc,
 }
 impl Default for A_Expr {
@@ -11832,6 +15131,8 @@ impl Default for A_Indirection {
 pub struct A_ArrayExpr {
     pub type_: NodeTag,
     pub elements: *mut List,
+    pub list_start: ParseLoc,
+    pub list_end: ParseLoc,
     pub location: ParseLoc,
 }
 impl Default for A_ArrayExpr {
@@ -13054,8 +16355,6 @@ pub struct InsertStmt {
     pub returningClause: *mut ReturningClause,
     pub withClause: *mut WithClause,
     pub override_: OverridingKind::Type,
-    pub stmt_location: ParseLoc,
-    pub stmt_len: ParseLoc,
 }
 impl Default for InsertStmt {
     fn default() -> Self {
@@ -13075,8 +16374,6 @@ pub struct DeleteStmt {
     pub whereClause: *mut Node,
     pub returningClause: *mut ReturningClause,
     pub withClause: *mut WithClause,
-    pub stmt_location: ParseLoc,
-    pub stmt_len: ParseLoc,
 }
 impl Default for DeleteStmt {
     fn default() -> Self {
@@ -13097,8 +16394,6 @@ pub struct UpdateStmt {
     pub fromClause: *mut List,
     pub returningClause: *mut ReturningClause,
     pub withClause: *mut WithClause,
-    pub stmt_location: ParseLoc,
-    pub stmt_len: ParseLoc,
 }
 impl Default for UpdateStmt {
     fn default() -> Self {
@@ -13119,8 +16414,6 @@ pub struct MergeStmt {
     pub mergeWhenClauses: *mut List,
     pub returningClause: *mut ReturningClause,
     pub withClause: *mut WithClause,
-    pub stmt_location: ParseLoc,
-    pub stmt_len: ParseLoc,
 }
 impl Default for MergeStmt {
     fn default() -> Self {
@@ -13162,8 +16455,6 @@ pub struct SelectStmt {
     pub all: bool,
     pub larg: *mut SelectStmt,
     pub rarg: *mut SelectStmt,
-    pub stmt_location: ParseLoc,
-    pub stmt_len: ParseLoc,
 }
 impl Default for SelectStmt {
     fn default() -> Self {
@@ -15699,3448 +18990,6 @@ impl Default for DropSubscriptionStmt {
         }
     }
 }
-pub mod CommandTag {
-    pub type Type = ::core::ffi::c_uint;
-    pub const CMDTAG_UNKNOWN: Type = 0;
-    pub const CMDTAG_ALTER_ACCESS_METHOD: Type = 1;
-    pub const CMDTAG_ALTER_AGGREGATE: Type = 2;
-    pub const CMDTAG_ALTER_CAST: Type = 3;
-    pub const CMDTAG_ALTER_COLLATION: Type = 4;
-    pub const CMDTAG_ALTER_CONSTRAINT: Type = 5;
-    pub const CMDTAG_ALTER_CONVERSION: Type = 6;
-    pub const CMDTAG_ALTER_DATABASE: Type = 7;
-    pub const CMDTAG_ALTER_DEFAULT_PRIVILEGES: Type = 8;
-    pub const CMDTAG_ALTER_DOMAIN: Type = 9;
-    pub const CMDTAG_ALTER_EVENT_TRIGGER: Type = 10;
-    pub const CMDTAG_ALTER_EXTENSION: Type = 11;
-    pub const CMDTAG_ALTER_FOREIGN_DATA_WRAPPER: Type = 12;
-    pub const CMDTAG_ALTER_FOREIGN_TABLE: Type = 13;
-    pub const CMDTAG_ALTER_FUNCTION: Type = 14;
-    pub const CMDTAG_ALTER_INDEX: Type = 15;
-    pub const CMDTAG_ALTER_LANGUAGE: Type = 16;
-    pub const CMDTAG_ALTER_LARGE_OBJECT: Type = 17;
-    pub const CMDTAG_ALTER_MATERIALIZED_VIEW: Type = 18;
-    pub const CMDTAG_ALTER_OPERATOR: Type = 19;
-    pub const CMDTAG_ALTER_OPERATOR_CLASS: Type = 20;
-    pub const CMDTAG_ALTER_OPERATOR_FAMILY: Type = 21;
-    pub const CMDTAG_ALTER_POLICY: Type = 22;
-    pub const CMDTAG_ALTER_PROCEDURE: Type = 23;
-    pub const CMDTAG_ALTER_PUBLICATION: Type = 24;
-    pub const CMDTAG_ALTER_ROLE: Type = 25;
-    pub const CMDTAG_ALTER_ROUTINE: Type = 26;
-    pub const CMDTAG_ALTER_RULE: Type = 27;
-    pub const CMDTAG_ALTER_SCHEMA: Type = 28;
-    pub const CMDTAG_ALTER_SEQUENCE: Type = 29;
-    pub const CMDTAG_ALTER_SERVER: Type = 30;
-    pub const CMDTAG_ALTER_STATISTICS: Type = 31;
-    pub const CMDTAG_ALTER_SUBSCRIPTION: Type = 32;
-    pub const CMDTAG_ALTER_SYSTEM: Type = 33;
-    pub const CMDTAG_ALTER_TABLE: Type = 34;
-    pub const CMDTAG_ALTER_TABLESPACE: Type = 35;
-    pub const CMDTAG_ALTER_TEXT_SEARCH_CONFIGURATION: Type = 36;
-    pub const CMDTAG_ALTER_TEXT_SEARCH_DICTIONARY: Type = 37;
-    pub const CMDTAG_ALTER_TEXT_SEARCH_PARSER: Type = 38;
-    pub const CMDTAG_ALTER_TEXT_SEARCH_TEMPLATE: Type = 39;
-    pub const CMDTAG_ALTER_TRANSFORM: Type = 40;
-    pub const CMDTAG_ALTER_TRIGGER: Type = 41;
-    pub const CMDTAG_ALTER_TYPE: Type = 42;
-    pub const CMDTAG_ALTER_USER_MAPPING: Type = 43;
-    pub const CMDTAG_ALTER_VIEW: Type = 44;
-    pub const CMDTAG_ANALYZE: Type = 45;
-    pub const CMDTAG_BEGIN: Type = 46;
-    pub const CMDTAG_CALL: Type = 47;
-    pub const CMDTAG_CHECKPOINT: Type = 48;
-    pub const CMDTAG_CLOSE: Type = 49;
-    pub const CMDTAG_CLOSE_CURSOR: Type = 50;
-    pub const CMDTAG_CLOSE_CURSOR_ALL: Type = 51;
-    pub const CMDTAG_CLUSTER: Type = 52;
-    pub const CMDTAG_COMMENT: Type = 53;
-    pub const CMDTAG_COMMIT: Type = 54;
-    pub const CMDTAG_COMMIT_PREPARED: Type = 55;
-    pub const CMDTAG_COPY: Type = 56;
-    pub const CMDTAG_COPY_FROM: Type = 57;
-    pub const CMDTAG_CREATE_ACCESS_METHOD: Type = 58;
-    pub const CMDTAG_CREATE_AGGREGATE: Type = 59;
-    pub const CMDTAG_CREATE_CAST: Type = 60;
-    pub const CMDTAG_CREATE_COLLATION: Type = 61;
-    pub const CMDTAG_CREATE_CONSTRAINT: Type = 62;
-    pub const CMDTAG_CREATE_CONVERSION: Type = 63;
-    pub const CMDTAG_CREATE_DATABASE: Type = 64;
-    pub const CMDTAG_CREATE_DOMAIN: Type = 65;
-    pub const CMDTAG_CREATE_EVENT_TRIGGER: Type = 66;
-    pub const CMDTAG_CREATE_EXTENSION: Type = 67;
-    pub const CMDTAG_CREATE_FOREIGN_DATA_WRAPPER: Type = 68;
-    pub const CMDTAG_CREATE_FOREIGN_TABLE: Type = 69;
-    pub const CMDTAG_CREATE_FUNCTION: Type = 70;
-    pub const CMDTAG_CREATE_INDEX: Type = 71;
-    pub const CMDTAG_CREATE_LANGUAGE: Type = 72;
-    pub const CMDTAG_CREATE_MATERIALIZED_VIEW: Type = 73;
-    pub const CMDTAG_CREATE_OPERATOR: Type = 74;
-    pub const CMDTAG_CREATE_OPERATOR_CLASS: Type = 75;
-    pub const CMDTAG_CREATE_OPERATOR_FAMILY: Type = 76;
-    pub const CMDTAG_CREATE_POLICY: Type = 77;
-    pub const CMDTAG_CREATE_PROCEDURE: Type = 78;
-    pub const CMDTAG_CREATE_PUBLICATION: Type = 79;
-    pub const CMDTAG_CREATE_ROLE: Type = 80;
-    pub const CMDTAG_CREATE_ROUTINE: Type = 81;
-    pub const CMDTAG_CREATE_RULE: Type = 82;
-    pub const CMDTAG_CREATE_SCHEMA: Type = 83;
-    pub const CMDTAG_CREATE_SEQUENCE: Type = 84;
-    pub const CMDTAG_CREATE_SERVER: Type = 85;
-    pub const CMDTAG_CREATE_STATISTICS: Type = 86;
-    pub const CMDTAG_CREATE_SUBSCRIPTION: Type = 87;
-    pub const CMDTAG_CREATE_TABLE: Type = 88;
-    pub const CMDTAG_CREATE_TABLE_AS: Type = 89;
-    pub const CMDTAG_CREATE_TABLESPACE: Type = 90;
-    pub const CMDTAG_CREATE_TEXT_SEARCH_CONFIGURATION: Type = 91;
-    pub const CMDTAG_CREATE_TEXT_SEARCH_DICTIONARY: Type = 92;
-    pub const CMDTAG_CREATE_TEXT_SEARCH_PARSER: Type = 93;
-    pub const CMDTAG_CREATE_TEXT_SEARCH_TEMPLATE: Type = 94;
-    pub const CMDTAG_CREATE_TRANSFORM: Type = 95;
-    pub const CMDTAG_CREATE_TRIGGER: Type = 96;
-    pub const CMDTAG_CREATE_TYPE: Type = 97;
-    pub const CMDTAG_CREATE_USER_MAPPING: Type = 98;
-    pub const CMDTAG_CREATE_VIEW: Type = 99;
-    pub const CMDTAG_DEALLOCATE: Type = 100;
-    pub const CMDTAG_DEALLOCATE_ALL: Type = 101;
-    pub const CMDTAG_DECLARE_CURSOR: Type = 102;
-    pub const CMDTAG_DELETE: Type = 103;
-    pub const CMDTAG_DISCARD: Type = 104;
-    pub const CMDTAG_DISCARD_ALL: Type = 105;
-    pub const CMDTAG_DISCARD_PLANS: Type = 106;
-    pub const CMDTAG_DISCARD_SEQUENCES: Type = 107;
-    pub const CMDTAG_DISCARD_TEMP: Type = 108;
-    pub const CMDTAG_DO: Type = 109;
-    pub const CMDTAG_DROP_ACCESS_METHOD: Type = 110;
-    pub const CMDTAG_DROP_AGGREGATE: Type = 111;
-    pub const CMDTAG_DROP_CAST: Type = 112;
-    pub const CMDTAG_DROP_COLLATION: Type = 113;
-    pub const CMDTAG_DROP_CONSTRAINT: Type = 114;
-    pub const CMDTAG_DROP_CONVERSION: Type = 115;
-    pub const CMDTAG_DROP_DATABASE: Type = 116;
-    pub const CMDTAG_DROP_DOMAIN: Type = 117;
-    pub const CMDTAG_DROP_EVENT_TRIGGER: Type = 118;
-    pub const CMDTAG_DROP_EXTENSION: Type = 119;
-    pub const CMDTAG_DROP_FOREIGN_DATA_WRAPPER: Type = 120;
-    pub const CMDTAG_DROP_FOREIGN_TABLE: Type = 121;
-    pub const CMDTAG_DROP_FUNCTION: Type = 122;
-    pub const CMDTAG_DROP_INDEX: Type = 123;
-    pub const CMDTAG_DROP_LANGUAGE: Type = 124;
-    pub const CMDTAG_DROP_MATERIALIZED_VIEW: Type = 125;
-    pub const CMDTAG_DROP_OPERATOR: Type = 126;
-    pub const CMDTAG_DROP_OPERATOR_CLASS: Type = 127;
-    pub const CMDTAG_DROP_OPERATOR_FAMILY: Type = 128;
-    pub const CMDTAG_DROP_OWNED: Type = 129;
-    pub const CMDTAG_DROP_POLICY: Type = 130;
-    pub const CMDTAG_DROP_PROCEDURE: Type = 131;
-    pub const CMDTAG_DROP_PUBLICATION: Type = 132;
-    pub const CMDTAG_DROP_ROLE: Type = 133;
-    pub const CMDTAG_DROP_ROUTINE: Type = 134;
-    pub const CMDTAG_DROP_RULE: Type = 135;
-    pub const CMDTAG_DROP_SCHEMA: Type = 136;
-    pub const CMDTAG_DROP_SEQUENCE: Type = 137;
-    pub const CMDTAG_DROP_SERVER: Type = 138;
-    pub const CMDTAG_DROP_STATISTICS: Type = 139;
-    pub const CMDTAG_DROP_SUBSCRIPTION: Type = 140;
-    pub const CMDTAG_DROP_TABLE: Type = 141;
-    pub const CMDTAG_DROP_TABLESPACE: Type = 142;
-    pub const CMDTAG_DROP_TEXT_SEARCH_CONFIGURATION: Type = 143;
-    pub const CMDTAG_DROP_TEXT_SEARCH_DICTIONARY: Type = 144;
-    pub const CMDTAG_DROP_TEXT_SEARCH_PARSER: Type = 145;
-    pub const CMDTAG_DROP_TEXT_SEARCH_TEMPLATE: Type = 146;
-    pub const CMDTAG_DROP_TRANSFORM: Type = 147;
-    pub const CMDTAG_DROP_TRIGGER: Type = 148;
-    pub const CMDTAG_DROP_TYPE: Type = 149;
-    pub const CMDTAG_DROP_USER_MAPPING: Type = 150;
-    pub const CMDTAG_DROP_VIEW: Type = 151;
-    pub const CMDTAG_EXECUTE: Type = 152;
-    pub const CMDTAG_EXPLAIN: Type = 153;
-    pub const CMDTAG_FETCH: Type = 154;
-    pub const CMDTAG_GRANT: Type = 155;
-    pub const CMDTAG_GRANT_ROLE: Type = 156;
-    pub const CMDTAG_IMPORT_FOREIGN_SCHEMA: Type = 157;
-    pub const CMDTAG_INSERT: Type = 158;
-    pub const CMDTAG_LISTEN: Type = 159;
-    pub const CMDTAG_LOAD: Type = 160;
-    pub const CMDTAG_LOCK_TABLE: Type = 161;
-    pub const CMDTAG_LOGIN: Type = 162;
-    pub const CMDTAG_MERGE: Type = 163;
-    pub const CMDTAG_MOVE: Type = 164;
-    pub const CMDTAG_NOTIFY: Type = 165;
-    pub const CMDTAG_PREPARE: Type = 166;
-    pub const CMDTAG_PREPARE_TRANSACTION: Type = 167;
-    pub const CMDTAG_REASSIGN_OWNED: Type = 168;
-    pub const CMDTAG_REFRESH_MATERIALIZED_VIEW: Type = 169;
-    pub const CMDTAG_REINDEX: Type = 170;
-    pub const CMDTAG_RELEASE: Type = 171;
-    pub const CMDTAG_RESET: Type = 172;
-    pub const CMDTAG_REVOKE: Type = 173;
-    pub const CMDTAG_REVOKE_ROLE: Type = 174;
-    pub const CMDTAG_ROLLBACK: Type = 175;
-    pub const CMDTAG_ROLLBACK_PREPARED: Type = 176;
-    pub const CMDTAG_SAVEPOINT: Type = 177;
-    pub const CMDTAG_SECURITY_LABEL: Type = 178;
-    pub const CMDTAG_SELECT: Type = 179;
-    pub const CMDTAG_SELECT_FOR_KEY_SHARE: Type = 180;
-    pub const CMDTAG_SELECT_FOR_NO_KEY_UPDATE: Type = 181;
-    pub const CMDTAG_SELECT_FOR_SHARE: Type = 182;
-    pub const CMDTAG_SELECT_FOR_UPDATE: Type = 183;
-    pub const CMDTAG_SELECT_INTO: Type = 184;
-    pub const CMDTAG_SET: Type = 185;
-    pub const CMDTAG_SET_CONSTRAINTS: Type = 186;
-    pub const CMDTAG_SHOW: Type = 187;
-    pub const CMDTAG_START_TRANSACTION: Type = 188;
-    pub const CMDTAG_TRUNCATE_TABLE: Type = 189;
-    pub const CMDTAG_UNLISTEN: Type = 190;
-    pub const CMDTAG_UPDATE: Type = 191;
-    pub const CMDTAG_VACUUM: Type = 192;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct QueryCompletion {
-    pub commandTag: CommandTag::Type,
-    pub nprocessed: uint64,
-}
-impl Default for QueryCompletion {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ResourceOwnerData {
-    _unused: [u8; 0],
-}
-pub type ResourceOwner = *mut ResourceOwnerData;
-pub mod ResourceReleasePhase {
-    pub type Type = ::core::ffi::c_uint;
-    pub const RESOURCE_RELEASE_BEFORE_LOCKS: Type = 1;
-    pub const RESOURCE_RELEASE_LOCKS: Type = 2;
-    pub const RESOURCE_RELEASE_AFTER_LOCKS: Type = 3;
-}
-pub type ResourceReleasePriority = uint32;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ResourceOwnerDesc {
-    pub name: *const ::core::ffi::c_char,
-    pub release_phase: ResourceReleasePhase::Type,
-    pub release_priority: ResourceReleasePriority,
-    pub ReleaseResource: ::core::option::Option<unsafe extern "C-unwind" fn(res: Datum)>,
-    pub DebugPrint:
-        ::core::option::Option<unsafe extern "C-unwind" fn(res: Datum) -> *mut ::core::ffi::c_char>,
-}
-impl Default for ResourceOwnerDesc {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type ResourceReleaseCallback = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        phase: ResourceReleasePhase::Type,
-        isCommit: bool,
-        isTopLevel: bool,
-        arg: *mut ::core::ffi::c_void,
-    ),
->;
-pub mod PlanCacheMode {
-    pub type Type = ::core::ffi::c_uint;
-    pub const PLAN_CACHE_MODE_AUTO: Type = 0;
-    pub const PLAN_CACHE_MODE_FORCE_GENERIC_PLAN: Type = 1;
-    pub const PLAN_CACHE_MODE_FORCE_CUSTOM_PLAN: Type = 2;
-}
-pub type PostRewriteHook = ::core::option::Option<
-    unsafe extern "C-unwind" fn(querytree_list: *mut List, arg: *mut ::core::ffi::c_void),
->;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CachedPlanSource {
-    pub magic: ::core::ffi::c_int,
-    pub raw_parse_tree: *mut RawStmt,
-    pub analyzed_parse_tree: *mut Query,
-    pub query_string: *const ::core::ffi::c_char,
-    pub commandTag: CommandTag::Type,
-    pub param_types: *mut Oid,
-    pub num_params: ::core::ffi::c_int,
-    pub parserSetup: ParserSetupHook,
-    pub parserSetupArg: *mut ::core::ffi::c_void,
-    pub postRewrite: PostRewriteHook,
-    pub postRewriteArg: *mut ::core::ffi::c_void,
-    pub cursor_options: ::core::ffi::c_int,
-    pub fixed_result: bool,
-    pub resultDesc: TupleDesc,
-    pub context: MemoryContext,
-    pub query_list: *mut List,
-    pub relationOids: *mut List,
-    pub invalItems: *mut List,
-    pub search_path: *mut SearchPathMatcher,
-    pub query_context: MemoryContext,
-    pub rewriteRoleId: Oid,
-    pub rewriteRowSecurity: bool,
-    pub dependsOnRLS: bool,
-    pub gplan: *mut CachedPlan,
-    pub is_oneshot: bool,
-    pub is_complete: bool,
-    pub is_saved: bool,
-    pub is_valid: bool,
-    pub generation: ::core::ffi::c_int,
-    pub node: dlist_node,
-    pub generic_cost: f64,
-    pub total_custom_cost: f64,
-    pub num_custom_plans: int64,
-    pub num_generic_plans: int64,
-}
-impl Default for CachedPlanSource {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CachedPlan {
-    pub magic: ::core::ffi::c_int,
-    pub stmt_list: *mut List,
-    pub is_oneshot: bool,
-    pub is_saved: bool,
-    pub is_reused: bool,
-    pub is_valid: bool,
-    pub planRoleId: Oid,
-    pub dependsOnRole: bool,
-    pub saved_xmin: TransactionId,
-    pub generation: ::core::ffi::c_int,
-    pub refcount: ::core::ffi::c_int,
-    pub context: MemoryContext,
-    pub stmt_context: MemoryContext,
-}
-impl Default for CachedPlan {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CachedExpression {
-    pub magic: ::core::ffi::c_int,
-    pub expr: *mut Node,
-    pub is_valid: bool,
-    pub relationOids: *mut List,
-    pub invalItems: *mut List,
-    pub context: MemoryContext,
-    pub node: dlist_node,
-}
-impl Default for CachedExpression {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct Trigger {
-    pub tgoid: Oid,
-    pub tgname: *mut ::core::ffi::c_char,
-    pub tgfoid: Oid,
-    pub tgtype: int16,
-    pub tgenabled: ::core::ffi::c_char,
-    pub tgisinternal: bool,
-    pub tgisclone: bool,
-    pub tgconstrrelid: Oid,
-    pub tgconstrindid: Oid,
-    pub tgconstraint: Oid,
-    pub tgdeferrable: bool,
-    pub tginitdeferred: bool,
-    pub tgnargs: int16,
-    pub tgnattr: int16,
-    pub tgattr: *mut int16,
-    pub tgargs: *mut *mut ::core::ffi::c_char,
-    pub tgqual: *mut ::core::ffi::c_char,
-    pub tgoldtable: *mut ::core::ffi::c_char,
-    pub tgnewtable: *mut ::core::ffi::c_char,
-}
-impl Default for Trigger {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TriggerDesc {
-    pub triggers: *mut Trigger,
-    pub numtriggers: ::core::ffi::c_int,
-    pub trig_insert_before_row: bool,
-    pub trig_insert_after_row: bool,
-    pub trig_insert_instead_row: bool,
-    pub trig_insert_before_statement: bool,
-    pub trig_insert_after_statement: bool,
-    pub trig_update_before_row: bool,
-    pub trig_update_after_row: bool,
-    pub trig_update_instead_row: bool,
-    pub trig_update_before_statement: bool,
-    pub trig_update_after_statement: bool,
-    pub trig_delete_before_row: bool,
-    pub trig_delete_after_row: bool,
-    pub trig_delete_instead_row: bool,
-    pub trig_delete_before_statement: bool,
-    pub trig_delete_after_statement: bool,
-    pub trig_truncate_before_statement: bool,
-    pub trig_truncate_after_statement: bool,
-    pub trig_insert_new_table: bool,
-    pub trig_update_old_table: bool,
-    pub trig_update_new_table: bool,
-    pub trig_delete_old_table: bool,
-}
-impl Default for TriggerDesc {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type socklen_t = __socklen_t;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct dirent {
-    pub d_ino: __ino_t,
-    pub d_off: __off_t,
-    pub d_reclen: ::core::ffi::c_ushort,
-    pub d_type: ::core::ffi::c_uchar,
-    pub d_name: [::core::ffi::c_char; 256usize],
-}
-impl Default for dirent {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct __dirstream {
-    _unused: [u8; 0],
-}
-pub type DIR = __dirstream;
-pub type File = ::core::ffi::c_int;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgAioHandle {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct FileSet {
-    pub creator_pid: pid_t,
-    pub number: uint32,
-    pub ntablespaces: ::core::ffi::c_int,
-    pub tablespaces: [Oid; 8usize],
-}
-impl Default for FileSet {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SharedFileSet {
-    pub fs: FileSet,
-    pub mutex: slock_t,
-    pub refcnt: ::core::ffi::c_int,
-}
-impl Default for SharedFileSet {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SharedTuplestore {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SharedTuplestoreAccessor {
-    _unused: [u8; 0],
-}
-pub mod SnapshotType {
-    pub type Type = ::core::ffi::c_uint;
-    pub const SNAPSHOT_MVCC: Type = 0;
-    pub const SNAPSHOT_SELF: Type = 1;
-    pub const SNAPSHOT_ANY: Type = 2;
-    pub const SNAPSHOT_TOAST: Type = 3;
-    pub const SNAPSHOT_DIRTY: Type = 4;
-    pub const SNAPSHOT_HISTORIC_MVCC: Type = 5;
-    pub const SNAPSHOT_NON_VACUUMABLE: Type = 6;
-}
-pub type Snapshot = *mut SnapshotData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SnapshotData {
-    pub snapshot_type: SnapshotType::Type,
-    pub xmin: TransactionId,
-    pub xmax: TransactionId,
-    pub xip: *mut TransactionId,
-    pub xcnt: uint32,
-    pub subxip: *mut TransactionId,
-    pub subxcnt: int32,
-    pub suboverflowed: bool,
-    pub takenDuringRecovery: bool,
-    pub copied: bool,
-    pub curcid: CommandId,
-    pub speculativeToken: uint32,
-    pub vistest: *mut GlobalVisState,
-    pub active_count: uint32,
-    pub regd_count: uint32,
-    pub ph_node: pairingheap_node,
-    pub snapXactCompletionCount: uint64,
-}
-impl Default for SnapshotData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type Relation = *mut RelationData;
-pub type RelationPtr = *mut Relation;
-pub mod IndexAttrBitmapKind {
-    pub type Type = ::core::ffi::c_uint;
-    pub const INDEX_ATTR_BITMAP_KEY: Type = 0;
-    pub const INDEX_ATTR_BITMAP_PRIMARY_KEY: Type = 1;
-    pub const INDEX_ATTR_BITMAP_IDENTITY_KEY: Type = 2;
-    pub const INDEX_ATTR_BITMAP_HOT_BLOCKING: Type = 3;
-    pub const INDEX_ATTR_BITMAP_SUMMARIZED: Type = 4;
-}
-pub type SortSupport = *mut SortSupportData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SortSupportData {
-    pub ssup_cxt: MemoryContext,
-    pub ssup_collation: Oid,
-    pub ssup_reverse: bool,
-    pub ssup_nulls_first: bool,
-    pub ssup_attno: AttrNumber,
-    pub ssup_extra: *mut ::core::ffi::c_void,
-    pub comparator: ::core::option::Option<
-        unsafe extern "C-unwind" fn(x: Datum, y: Datum, ssup: SortSupport) -> ::core::ffi::c_int,
-    >,
-    pub abbreviate: bool,
-    pub abbrev_converter: ::core::option::Option<
-        unsafe extern "C-unwind" fn(original: Datum, ssup: SortSupport) -> Datum,
-    >,
-    pub abbrev_abort: ::core::option::Option<
-        unsafe extern "C-unwind" fn(memtupcount: ::core::ffi::c_int, ssup: SortSupport) -> bool,
-    >,
-    pub abbrev_full_comparator: ::core::option::Option<
-        unsafe extern "C-unwind" fn(x: Datum, y: Datum, ssup: SortSupport) -> ::core::ffi::c_int,
-    >,
-}
-impl Default for SortSupportData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ScanKeyData {
-    pub sk_flags: ::core::ffi::c_int,
-    pub sk_attno: AttrNumber,
-    pub sk_strategy: StrategyNumber,
-    pub sk_subtype: Oid,
-    pub sk_collation: Oid,
-    pub sk_func: FmgrInfo,
-    pub sk_argument: Datum,
-}
-impl Default for ScanKeyData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type ScanKey = *mut ScanKeyData;
-pub type LOCKMASK = ::core::ffi::c_int;
-pub type LOCKMODE = ::core::ffi::c_int;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct xl_standby_lock {
-    pub xid: TransactionId,
-    pub dbOid: Oid,
-    pub relOid: Oid,
-}
-impl Default for xl_standby_lock {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct IndexScanInstrumentation {
-    pub nsearches: uint64,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct SharedIndexScanInstrumentation {
-    pub num_workers: ::core::ffi::c_int,
-    pub winstrument: __IncompleteArrayField<IndexScanInstrumentation>,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct IndexBuildResult {
-    pub heap_tuples: f64,
-    pub index_tuples: f64,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct IndexVacuumInfo {
-    pub index: Relation,
-    pub heaprel: Relation,
-    pub analyze_only: bool,
-    pub report_progress: bool,
-    pub estimated_count: bool,
-    pub message_level: ::core::ffi::c_int,
-    pub num_heap_tuples: f64,
-    pub strategy: BufferAccessStrategy,
-}
-impl Default for IndexVacuumInfo {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct IndexBulkDeleteResult {
-    pub num_pages: BlockNumber,
-    pub estimated_count: bool,
-    pub num_index_tuples: f64,
-    pub tuples_removed: f64,
-    pub pages_newly_deleted: BlockNumber,
-    pub pages_deleted: BlockNumber,
-    pub pages_free: BlockNumber,
-}
-pub type IndexBulkDeleteCallback = ::core::option::Option<
-    unsafe extern "C-unwind" fn(itemptr: ItemPointer, state: *mut ::core::ffi::c_void) -> bool,
->;
-pub type IndexScanDesc = *mut IndexScanDescData;
-pub type SysScanDesc = *mut SysScanDescData;
-pub type ParallelIndexScanDesc = *mut ParallelIndexScanDescData;
-pub mod IndexUniqueCheck {
-    pub type Type = ::core::ffi::c_uint;
-    pub const UNIQUE_CHECK_NO: Type = 0;
-    pub const UNIQUE_CHECK_YES: Type = 1;
-    pub const UNIQUE_CHECK_PARTIAL: Type = 2;
-    pub const UNIQUE_CHECK_EXISTING: Type = 3;
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct IndexOrderByDistance {
-    pub value: f64,
-    pub isnull: bool,
-}
-pub mod IndexAMProperty {
-    pub type Type = ::core::ffi::c_uint;
-    pub const AMPROP_UNKNOWN: Type = 0;
-    pub const AMPROP_ASC: Type = 1;
-    pub const AMPROP_DESC: Type = 2;
-    pub const AMPROP_NULLS_FIRST: Type = 3;
-    pub const AMPROP_NULLS_LAST: Type = 4;
-    pub const AMPROP_ORDERABLE: Type = 5;
-    pub const AMPROP_DISTANCE_ORDERABLE: Type = 6;
-    pub const AMPROP_RETURNABLE: Type = 7;
-    pub const AMPROP_SEARCH_ARRAY: Type = 8;
-    pub const AMPROP_SEARCH_NULLS: Type = 9;
-    pub const AMPROP_CLUSTERABLE: Type = 10;
-    pub const AMPROP_INDEX_SCAN: Type = 11;
-    pub const AMPROP_BITMAP_SCAN: Type = 12;
-    pub const AMPROP_BACKWARD_SCAN: Type = 13;
-    pub const AMPROP_CAN_ORDER: Type = 14;
-    pub const AMPROP_CAN_UNIQUE: Type = 15;
-    pub const AMPROP_CAN_MULTI_COL: Type = 16;
-    pub const AMPROP_CAN_EXCLUDE: Type = 17;
-    pub const AMPROP_CAN_INCLUDE: Type = 18;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct OpFamilyMember {
-    pub is_func: bool,
-    pub object: Oid,
-    pub number: ::core::ffi::c_int,
-    pub lefttype: Oid,
-    pub righttype: Oid,
-    pub sortfamily: Oid,
-    pub ref_is_hard: bool,
-    pub ref_is_family: bool,
-    pub refobjid: Oid,
-}
-impl Default for OpFamilyMember {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type amtranslate_strategy_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(strategy: StrategyNumber, opfamily: Oid) -> CompareType::Type,
->;
-pub type amtranslate_cmptype_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(cmptype: CompareType::Type, opfamily: Oid) -> StrategyNumber,
->;
-pub type ambuild_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        heapRelation: Relation,
-        indexRelation: Relation,
-        indexInfo: *mut IndexInfo,
-    ) -> *mut IndexBuildResult,
->;
-pub type ambuildempty_function =
-    ::core::option::Option<unsafe extern "C-unwind" fn(indexRelation: Relation)>;
-pub type aminsert_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        indexRelation: Relation,
-        values: *mut Datum,
-        isnull: *mut bool,
-        heap_tid: ItemPointer,
-        heapRelation: Relation,
-        checkUnique: IndexUniqueCheck::Type,
-        indexUnchanged: bool,
-        indexInfo: *mut IndexInfo,
-    ) -> bool,
->;
-pub type aminsertcleanup_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(indexRelation: Relation, indexInfo: *mut IndexInfo),
->;
-pub type ambulkdelete_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        info: *mut IndexVacuumInfo,
-        stats: *mut IndexBulkDeleteResult,
-        callback: IndexBulkDeleteCallback,
-        callback_state: *mut ::core::ffi::c_void,
-    ) -> *mut IndexBulkDeleteResult,
->;
-pub type amvacuumcleanup_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        info: *mut IndexVacuumInfo,
-        stats: *mut IndexBulkDeleteResult,
-    ) -> *mut IndexBulkDeleteResult,
->;
-pub type amcanreturn_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(indexRelation: Relation, attno: ::core::ffi::c_int) -> bool,
->;
-pub type amcostestimate_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        root: *mut PlannerInfo,
-        path: *mut IndexPath,
-        loop_count: f64,
-        indexStartupCost: *mut Cost,
-        indexTotalCost: *mut Cost,
-        indexSelectivity: *mut Selectivity,
-        indexCorrelation: *mut f64,
-        indexPages: *mut f64,
-    ),
->;
-pub type amgettreeheight_function =
-    ::core::option::Option<unsafe extern "C-unwind" fn(rel: Relation) -> ::core::ffi::c_int>;
-pub type amoptions_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(reloptions: Datum, validate: bool) -> *mut bytea,
->;
-pub type amproperty_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        index_oid: Oid,
-        attno: ::core::ffi::c_int,
-        prop: IndexAMProperty::Type,
-        propname: *const ::core::ffi::c_char,
-        res: *mut bool,
-        isnull: *mut bool,
-    ) -> bool,
->;
-pub type ambuildphasename_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(phasenum: int64) -> *mut ::core::ffi::c_char,
->;
-pub type amvalidate_function =
-    ::core::option::Option<unsafe extern "C-unwind" fn(opclassoid: Oid) -> bool>;
-pub type amadjustmembers_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        opfamilyoid: Oid,
-        opclassoid: Oid,
-        operators: *mut List,
-        functions: *mut List,
-    ),
->;
-pub type ambeginscan_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        indexRelation: Relation,
-        nkeys: ::core::ffi::c_int,
-        norderbys: ::core::ffi::c_int,
-    ) -> IndexScanDesc,
->;
-pub type amrescan_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        scan: IndexScanDesc,
-        keys: ScanKey,
-        nkeys: ::core::ffi::c_int,
-        orderbys: ScanKey,
-        norderbys: ::core::ffi::c_int,
-    ),
->;
-pub type amgettuple_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(scan: IndexScanDesc, direction: ScanDirection::Type) -> bool,
->;
-pub type amgetbitmap_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(scan: IndexScanDesc, tbm: *mut TIDBitmap) -> int64,
->;
-pub type amendscan_function =
-    ::core::option::Option<unsafe extern "C-unwind" fn(scan: IndexScanDesc)>;
-pub type ammarkpos_function =
-    ::core::option::Option<unsafe extern "C-unwind" fn(scan: IndexScanDesc)>;
-pub type amrestrpos_function =
-    ::core::option::Option<unsafe extern "C-unwind" fn(scan: IndexScanDesc)>;
-pub type amestimateparallelscan_function = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        indexRelation: Relation,
-        nkeys: ::core::ffi::c_int,
-        norderbys: ::core::ffi::c_int,
-    ) -> Size,
->;
-pub type aminitparallelscan_function =
-    ::core::option::Option<unsafe extern "C-unwind" fn(target: *mut ::core::ffi::c_void)>;
-pub type amparallelrescan_function =
-    ::core::option::Option<unsafe extern "C-unwind" fn(scan: IndexScanDesc)>;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct IndexAmRoutine {
-    pub type_: NodeTag,
-    pub amstrategies: uint16,
-    pub amsupport: uint16,
-    pub amoptsprocnum: uint16,
-    pub amcanorder: bool,
-    pub amcanorderbyop: bool,
-    pub amcanhash: bool,
-    pub amconsistentequality: bool,
-    pub amconsistentordering: bool,
-    pub amcanbackward: bool,
-    pub amcanunique: bool,
-    pub amcanmulticol: bool,
-    pub amoptionalkey: bool,
-    pub amsearcharray: bool,
-    pub amsearchnulls: bool,
-    pub amstorage: bool,
-    pub amclusterable: bool,
-    pub ampredlocks: bool,
-    pub amcanparallel: bool,
-    pub amcanbuildparallel: bool,
-    pub amcaninclude: bool,
-    pub amusemaintenanceworkmem: bool,
-    pub amsummarizing: bool,
-    pub amparallelvacuumoptions: uint8,
-    pub amkeytype: Oid,
-    pub ambuild: ambuild_function,
-    pub ambuildempty: ambuildempty_function,
-    pub aminsert: aminsert_function,
-    pub aminsertcleanup: aminsertcleanup_function,
-    pub ambulkdelete: ambulkdelete_function,
-    pub amvacuumcleanup: amvacuumcleanup_function,
-    pub amcanreturn: amcanreturn_function,
-    pub amcostestimate: amcostestimate_function,
-    pub amgettreeheight: amgettreeheight_function,
-    pub amoptions: amoptions_function,
-    pub amproperty: amproperty_function,
-    pub ambuildphasename: ambuildphasename_function,
-    pub amvalidate: amvalidate_function,
-    pub amadjustmembers: amadjustmembers_function,
-    pub ambeginscan: ambeginscan_function,
-    pub amrescan: amrescan_function,
-    pub amgettuple: amgettuple_function,
-    pub amgetbitmap: amgetbitmap_function,
-    pub amendscan: amendscan_function,
-    pub ammarkpos: ammarkpos_function,
-    pub amrestrpos: amrestrpos_function,
-    pub amestimateparallelscan: amestimateparallelscan_function,
-    pub aminitparallelscan: aminitparallelscan_function,
-    pub amparallelrescan: amparallelrescan_function,
-    pub amtranslatestrategy: amtranslate_strategy_function,
-    pub amtranslatecmptype: amtranslate_cmptype_function,
-}
-impl Default for IndexAmRoutine {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DomainConstraintCache {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TypeCacheEnumData {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TypeCacheEntry {
-    pub type_id: Oid,
-    pub type_id_hash: uint32,
-    pub typlen: int16,
-    pub typbyval: bool,
-    pub typalign: ::core::ffi::c_char,
-    pub typstorage: ::core::ffi::c_char,
-    pub typtype: ::core::ffi::c_char,
-    pub typrelid: Oid,
-    pub typsubscript: Oid,
-    pub typelem: Oid,
-    pub typarray: Oid,
-    pub typcollation: Oid,
-    pub btree_opf: Oid,
-    pub btree_opintype: Oid,
-    pub hash_opf: Oid,
-    pub hash_opintype: Oid,
-    pub eq_opr: Oid,
-    pub lt_opr: Oid,
-    pub gt_opr: Oid,
-    pub cmp_proc: Oid,
-    pub hash_proc: Oid,
-    pub hash_extended_proc: Oid,
-    pub eq_opr_finfo: FmgrInfo,
-    pub cmp_proc_finfo: FmgrInfo,
-    pub hash_proc_finfo: FmgrInfo,
-    pub hash_extended_proc_finfo: FmgrInfo,
-    pub tupDesc: TupleDesc,
-    pub tupDesc_identifier: uint64,
-    pub rngelemtype: *mut TypeCacheEntry,
-    pub rng_opfamily: Oid,
-    pub rng_collation: Oid,
-    pub rng_cmp_proc_finfo: FmgrInfo,
-    pub rng_canonical_finfo: FmgrInfo,
-    pub rng_subdiff_finfo: FmgrInfo,
-    pub rngtype: *mut TypeCacheEntry,
-    pub domainBaseType: Oid,
-    pub domainBaseTypmod: int32,
-    pub domainData: *mut DomainConstraintCache,
-    pub flags: ::core::ffi::c_int,
-    pub enumData: *mut TypeCacheEnumData,
-    pub nextDomain: *mut TypeCacheEntry,
-}
-impl Default for TypeCacheEntry {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DomainConstraintRef {
-    pub constraints: *mut List,
-    pub refctx: MemoryContext,
-    pub tcache: *mut TypeCacheEntry,
-    pub need_exprstate: bool,
-    pub dcc: *mut DomainConstraintCache,
-    pub callback: MemoryContextCallback,
-}
-impl Default for DomainConstraintRef {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SharedRecordTypmodRegistry {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct BrinOpcInfo {
-    pub oi_nstored: uint16,
-    pub oi_regular_nulls: bool,
-    pub oi_opaque: *mut ::core::ffi::c_void,
-    pub oi_typcache: __IncompleteArrayField<*mut TypeCacheEntry>,
-}
-impl Default for BrinOpcInfo {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct BrinDesc {
-    pub bd_context: MemoryContext,
-    pub bd_index: Relation,
-    pub bd_tupdesc: TupleDesc,
-    pub bd_disktdesc: TupleDesc,
-    pub bd_totalstored: ::core::ffi::c_int,
-    pub bd_info: __IncompleteArrayField<*mut BrinOpcInfo>,
-}
-impl Default for BrinDesc {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type brin_serialize_callback_type = ::core::option::Option<
-    unsafe extern "C-unwind" fn(bdesc: *mut BrinDesc, src: Datum, dst: *mut Datum),
->;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct BrinValues {
-    pub bv_attno: AttrNumber,
-    pub bv_hasnulls: bool,
-    pub bv_allnulls: bool,
-    pub bv_values: *mut Datum,
-    pub bv_mem_value: Datum,
-    pub bv_context: MemoryContext,
-    pub bv_serialize: brin_serialize_callback_type,
-}
-impl Default for BrinValues {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct BrinMemTuple {
-    pub bt_placeholder: bool,
-    pub bt_empty_range: bool,
-    pub bt_blkno: BlockNumber,
-    pub bt_context: MemoryContext,
-    pub bt_values: *mut Datum,
-    pub bt_allnulls: *mut bool,
-    pub bt_hasnulls: *mut bool,
-    pub bt_columns: __IncompleteArrayField<BrinValues>,
-}
-impl Default for BrinMemTuple {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct BrinTuple {
-    pub bt_blkno: BlockNumber,
-    pub bt_info: uint8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct GinPageOpaqueData {
-    pub rightlink: BlockNumber,
-    pub maxoff: OffsetNumber,
-    pub flags: uint16,
-}
-pub type GinPageOpaque = *mut GinPageOpaqueData;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct GinMetaPageData {
-    pub head: BlockNumber,
-    pub tail: BlockNumber,
-    pub tailFreeSize: uint32,
-    pub nPendingPages: BlockNumber,
-    pub nPendingHeapTuples: int64,
-    pub nTotalPages: BlockNumber,
-    pub nEntryPages: BlockNumber,
-    pub nDataPages: BlockNumber,
-    pub nEntries: int64,
-    pub ginVersion: int32,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PostingItem {
-    pub child_blkno: BlockIdData,
-    pub key: ItemPointerData,
-}
-pub type GinNullCategory = ::core::ffi::c_schar;
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct GinPostingList {
-    pub first: ItemPointerData,
-    pub nbytes: uint16,
-    pub bytes: __IncompleteArrayField<::core::ffi::c_uchar>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct GinTuple {
-    pub tuplen: ::core::ffi::c_int,
-    pub attrnum: OffsetNumber,
-    pub keylen: uint16,
-    pub typlen: int16,
-    pub typbyval: bool,
-    pub category: ::core::ffi::c_schar,
-    pub nitems: ::core::ffi::c_int,
-    pub data: __IncompleteArrayField<::core::ffi::c_char>,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct IndexTupleData {
-    pub t_tid: ItemPointerData,
-    pub t_info: ::core::ffi::c_ushort,
-}
-pub type IndexTuple = *mut IndexTupleData;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct IndexAttributeBitMapData {
-    pub bits: [bits8; 4usize],
-}
-pub type IndexAttributeBitMap = *mut IndexAttributeBitMapData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct LogicalTapeSet {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct LogicalTape {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct TapeShare {
-    pub firstblocknumber: int64,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct Tuplesortstate {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct Sharedsort {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SortCoordinateData {
-    pub isWorker: bool,
-    pub nParticipants: ::core::ffi::c_int,
-    pub sharedsort: *mut Sharedsort,
-}
-impl Default for SortCoordinateData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type SortCoordinate = *mut SortCoordinateData;
-pub mod TuplesortMethod {
-    pub type Type = ::core::ffi::c_uint;
-    pub const SORT_TYPE_STILL_IN_PROGRESS: Type = 0;
-    pub const SORT_TYPE_TOP_N_HEAPSORT: Type = 1;
-    pub const SORT_TYPE_QUICKSORT: Type = 2;
-    pub const SORT_TYPE_EXTERNAL_SORT: Type = 4;
-    pub const SORT_TYPE_EXTERNAL_MERGE: Type = 8;
-}
-pub mod TuplesortSpaceType {
-    pub type Type = ::core::ffi::c_uint;
-    pub const SORT_SPACE_TYPE_DISK: Type = 0;
-    pub const SORT_SPACE_TYPE_MEMORY: Type = 1;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TuplesortInstrumentation {
-    pub sortMethod: TuplesortMethod::Type,
-    pub spaceType: TuplesortSpaceType::Type,
-    pub spaceUsed: int64,
-}
-impl Default for TuplesortInstrumentation {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SortTuple {
-    pub tuple: *mut ::core::ffi::c_void,
-    pub datum1: Datum,
-    pub isnull1: bool,
-    pub srctape: ::core::ffi::c_int,
-}
-impl Default for SortTuple {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type SortTupleComparator = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        a: *const SortTuple,
-        b: *const SortTuple,
-        state: *mut Tuplesortstate,
-    ) -> ::core::ffi::c_int,
->;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TuplesortPublic {
-    pub comparetup: SortTupleComparator,
-    pub comparetup_tiebreak: SortTupleComparator,
-    pub removeabbrev: ::core::option::Option<
-        unsafe extern "C-unwind" fn(
-            state: *mut Tuplesortstate,
-            stups: *mut SortTuple,
-            count: ::core::ffi::c_int,
-        ),
-    >,
-    pub writetup: ::core::option::Option<
-        unsafe extern "C-unwind" fn(
-            state: *mut Tuplesortstate,
-            tape: *mut LogicalTape,
-            stup: *mut SortTuple,
-        ),
-    >,
-    pub readtup: ::core::option::Option<
-        unsafe extern "C-unwind" fn(
-            state: *mut Tuplesortstate,
-            stup: *mut SortTuple,
-            tape: *mut LogicalTape,
-            len: ::core::ffi::c_uint,
-        ),
-    >,
-    pub freestate: ::core::option::Option<unsafe extern "C-unwind" fn(state: *mut Tuplesortstate)>,
-    pub maincontext: MemoryContext,
-    pub sortcontext: MemoryContext,
-    pub tuplecontext: MemoryContext,
-    pub haveDatum1: bool,
-    pub nKeys: ::core::ffi::c_int,
-    pub sortKeys: SortSupport,
-    pub onlyKey: SortSupport,
-    pub sortopt: ::core::ffi::c_int,
-    pub tuples: bool,
-    pub arg: *mut ::core::ffi::c_void,
-}
-impl Default for TuplesortPublic {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct Tuplestorestate {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParallelHashJoinState {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CopyMultiInsertBuffer {
-    _unused: [u8; 0],
-}
-pub type ExprStateEvalFunc = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        expression: *mut ExprState,
-        econtext: *mut ExprContext,
-        isNull: *mut bool,
-    ) -> Datum,
->;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ExprState {
-    pub type_: NodeTag,
-    pub flags: uint8,
-    pub resnull: bool,
-    pub resvalue: Datum,
-    pub resultslot: *mut TupleTableSlot,
-    pub steps: *mut ExprEvalStep,
-    pub evalfunc: ExprStateEvalFunc,
-    pub expr: *mut Expr,
-    pub evalfunc_private: *mut ::core::ffi::c_void,
-    pub steps_len: ::core::ffi::c_int,
-    pub steps_alloc: ::core::ffi::c_int,
-    pub parent: *mut PlanState,
-    pub ext_params: ParamListInfo,
-    pub innermost_caseval: *mut Datum,
-    pub innermost_casenull: *mut bool,
-    pub innermost_domainval: *mut Datum,
-    pub innermost_domainnull: *mut bool,
-    pub escontext: *mut ErrorSaveContext,
-}
-impl Default for ExprState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct IndexInfo {
-    pub type_: NodeTag,
-    pub ii_NumIndexAttrs: ::core::ffi::c_int,
-    pub ii_NumIndexKeyAttrs: ::core::ffi::c_int,
-    pub ii_IndexAttrNumbers: [AttrNumber; 32usize],
-    pub ii_Expressions: *mut List,
-    pub ii_ExpressionsState: *mut List,
-    pub ii_Predicate: *mut List,
-    pub ii_PredicateState: *mut ExprState,
-    pub ii_ExclusionOps: *mut Oid,
-    pub ii_ExclusionProcs: *mut Oid,
-    pub ii_ExclusionStrats: *mut uint16,
-    pub ii_UniqueOps: *mut Oid,
-    pub ii_UniqueProcs: *mut Oid,
-    pub ii_UniqueStrats: *mut uint16,
-    pub ii_Unique: bool,
-    pub ii_NullsNotDistinct: bool,
-    pub ii_ReadyForInserts: bool,
-    pub ii_CheckedUnchanged: bool,
-    pub ii_IndexUnchanged: bool,
-    pub ii_Concurrent: bool,
-    pub ii_BrokenHotChain: bool,
-    pub ii_Summarizing: bool,
-    pub ii_WithoutOverlaps: bool,
-    pub ii_ParallelWorkers: ::core::ffi::c_int,
-    pub ii_Am: Oid,
-    pub ii_AmCache: *mut ::core::ffi::c_void,
-    pub ii_Context: MemoryContext,
-}
-impl Default for IndexInfo {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type ExprContextCallbackFunction =
-    ::core::option::Option<unsafe extern "C-unwind" fn(arg: Datum)>;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ExprContext_CB {
-    pub next: *mut ExprContext_CB,
-    pub function: ExprContextCallbackFunction,
-    pub arg: Datum,
-}
-impl Default for ExprContext_CB {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ExprContext {
-    pub type_: NodeTag,
-    pub ecxt_scantuple: *mut TupleTableSlot,
-    pub ecxt_innertuple: *mut TupleTableSlot,
-    pub ecxt_outertuple: *mut TupleTableSlot,
-    pub ecxt_per_query_memory: MemoryContext,
-    pub ecxt_per_tuple_memory: MemoryContext,
-    pub ecxt_param_exec_vals: *mut ParamExecData,
-    pub ecxt_param_list_info: ParamListInfo,
-    pub ecxt_aggvalues: *mut Datum,
-    pub ecxt_aggnulls: *mut bool,
-    pub caseValue_datum: Datum,
-    pub caseValue_isNull: bool,
-    pub domainValue_datum: Datum,
-    pub domainValue_isNull: bool,
-    pub ecxt_oldtuple: *mut TupleTableSlot,
-    pub ecxt_newtuple: *mut TupleTableSlot,
-    pub ecxt_estate: *mut EState,
-    pub ecxt_callbacks: *mut ExprContext_CB,
-}
-impl Default for ExprContext {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub mod ExprDoneCond {
-    pub type Type = ::core::ffi::c_uint;
-    pub const ExprSingleResult: Type = 0;
-    pub const ExprMultipleResult: Type = 1;
-    pub const ExprEndResult: Type = 2;
-}
-pub mod SetFunctionReturnMode {
-    pub type Type = ::core::ffi::c_uint;
-    pub const SFRM_ValuePerCall: Type = 1;
-    pub const SFRM_Materialize: Type = 2;
-    pub const SFRM_Materialize_Random: Type = 4;
-    pub const SFRM_Materialize_Preferred: Type = 8;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ReturnSetInfo {
-    pub type_: NodeTag,
-    pub econtext: *mut ExprContext,
-    pub expectedDesc: TupleDesc,
-    pub allowedModes: ::core::ffi::c_int,
-    pub returnMode: SetFunctionReturnMode::Type,
-    pub isDone: ExprDoneCond::Type,
-    pub setResult: *mut Tuplestorestate,
-    pub setDesc: TupleDesc,
-}
-impl Default for ReturnSetInfo {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ProjectionInfo {
-    pub type_: NodeTag,
-    pub pi_state: ExprState,
-    pub pi_exprContext: *mut ExprContext,
-}
-impl Default for ProjectionInfo {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct JunkFilter {
-    pub type_: NodeTag,
-    pub jf_targetList: *mut List,
-    pub jf_cleanTupType: TupleDesc,
-    pub jf_cleanMap: *mut AttrNumber,
-    pub jf_resultSlot: *mut TupleTableSlot,
-}
-impl Default for JunkFilter {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct OnConflictSetState {
-    pub type_: NodeTag,
-    pub oc_Existing: *mut TupleTableSlot,
-    pub oc_ProjSlot: *mut TupleTableSlot,
-    pub oc_ProjInfo: *mut ProjectionInfo,
-    pub oc_WhereClause: *mut ExprState,
-}
-impl Default for OnConflictSetState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MergeActionState {
-    pub type_: NodeTag,
-    pub mas_action: *mut MergeAction,
-    pub mas_proj: *mut ProjectionInfo,
-    pub mas_whenqual: *mut ExprState,
-}
-impl Default for MergeActionState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ResultRelInfo {
-    pub type_: NodeTag,
-    pub ri_RangeTableIndex: Index,
-    pub ri_RelationDesc: Relation,
-    pub ri_NumIndices: ::core::ffi::c_int,
-    pub ri_IndexRelationDescs: RelationPtr,
-    pub ri_IndexRelationInfo: *mut *mut IndexInfo,
-    pub ri_RowIdAttNo: AttrNumber,
-    pub ri_extraUpdatedCols: *mut Bitmapset,
-    pub ri_extraUpdatedCols_valid: bool,
-    pub ri_projectNew: *mut ProjectionInfo,
-    pub ri_newTupleSlot: *mut TupleTableSlot,
-    pub ri_oldTupleSlot: *mut TupleTableSlot,
-    pub ri_projectNewInfoValid: bool,
-    pub ri_needLockTagTuple: bool,
-    pub ri_TrigDesc: *mut TriggerDesc,
-    pub ri_TrigFunctions: *mut FmgrInfo,
-    pub ri_TrigWhenExprs: *mut *mut ExprState,
-    pub ri_TrigInstrument: *mut Instrumentation,
-    pub ri_ReturningSlot: *mut TupleTableSlot,
-    pub ri_TrigOldSlot: *mut TupleTableSlot,
-    pub ri_TrigNewSlot: *mut TupleTableSlot,
-    pub ri_AllNullSlot: *mut TupleTableSlot,
-    pub ri_FdwRoutine: *mut FdwRoutine,
-    pub ri_FdwState: *mut ::core::ffi::c_void,
-    pub ri_usesFdwDirectModify: bool,
-    pub ri_NumSlots: ::core::ffi::c_int,
-    pub ri_NumSlotsInitialized: ::core::ffi::c_int,
-    pub ri_BatchSize: ::core::ffi::c_int,
-    pub ri_Slots: *mut *mut TupleTableSlot,
-    pub ri_PlanSlots: *mut *mut TupleTableSlot,
-    pub ri_WithCheckOptions: *mut List,
-    pub ri_WithCheckOptionExprs: *mut List,
-    pub ri_CheckConstraintExprs: *mut *mut ExprState,
-    pub ri_GenVirtualNotNullConstraintExprs: *mut *mut ExprState,
-    pub ri_GeneratedExprsI: *mut *mut ExprState,
-    pub ri_GeneratedExprsU: *mut *mut ExprState,
-    pub ri_NumGeneratedNeededI: ::core::ffi::c_int,
-    pub ri_NumGeneratedNeededU: ::core::ffi::c_int,
-    pub ri_returningList: *mut List,
-    pub ri_projectReturning: *mut ProjectionInfo,
-    pub ri_onConflictArbiterIndexes: *mut List,
-    pub ri_onConflict: *mut OnConflictSetState,
-    pub ri_MergeActions: [*mut List; 3usize],
-    pub ri_MergeJoinCondition: *mut ExprState,
-    pub ri_PartitionCheckExpr: *mut ExprState,
-    pub ri_ChildToRootMap: *mut TupleConversionMap,
-    pub ri_ChildToRootMapValid: bool,
-    pub ri_RootToChildMap: *mut TupleConversionMap,
-    pub ri_RootToChildMapValid: bool,
-    pub ri_RootResultRelInfo: *mut ResultRelInfo,
-    pub ri_PartitionTupleSlot: *mut TupleTableSlot,
-    pub ri_CopyMultiInsertBuffer: *mut CopyMultiInsertBuffer,
-    pub ri_ancestorResultRels: *mut List,
-}
-impl Default for ResultRelInfo {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AsyncRequest {
-    pub requestor: *mut PlanState,
-    pub requestee: *mut PlanState,
-    pub request_index: ::core::ffi::c_int,
-    pub callback_pending: bool,
-    pub request_complete: bool,
-    pub result: *mut TupleTableSlot,
-}
-impl Default for AsyncRequest {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct EState {
-    pub type_: NodeTag,
-    pub es_direction: ScanDirection::Type,
-    pub es_snapshot: Snapshot,
-    pub es_crosscheck_snapshot: Snapshot,
-    pub es_range_table: *mut List,
-    pub es_range_table_size: Index,
-    pub es_relations: *mut Relation,
-    pub es_rowmarks: *mut *mut ExecRowMark,
-    pub es_rteperminfos: *mut List,
-    pub es_plannedstmt: *mut PlannedStmt,
-    pub es_cachedplan: *mut CachedPlan,
-    pub es_part_prune_infos: *mut List,
-    pub es_part_prune_states: *mut List,
-    pub es_part_prune_results: *mut List,
-    pub es_unpruned_relids: *mut Bitmapset,
-    pub es_sourceText: *const ::core::ffi::c_char,
-    pub es_junkFilter: *mut JunkFilter,
-    pub es_output_cid: CommandId,
-    pub es_result_relations: *mut *mut ResultRelInfo,
-    pub es_opened_result_relations: *mut List,
-    pub es_partition_directory: PartitionDirectory,
-    pub es_tuple_routing_result_relations: *mut List,
-    pub es_trig_target_relations: *mut List,
-    pub es_param_list_info: ParamListInfo,
-    pub es_param_exec_vals: *mut ParamExecData,
-    pub es_queryEnv: *mut QueryEnvironment,
-    pub es_query_cxt: MemoryContext,
-    pub es_tupleTable: *mut List,
-    pub es_processed: uint64,
-    pub es_total_processed: uint64,
-    pub es_top_eflags: ::core::ffi::c_int,
-    pub es_instrument: ::core::ffi::c_int,
-    pub es_finished: bool,
-    pub es_aborted: bool,
-    pub es_exprcontexts: *mut List,
-    pub es_subplanstates: *mut List,
-    pub es_auxmodifytables: *mut List,
-    pub es_per_tuple_exprcontext: *mut ExprContext,
-    pub es_epq_active: *mut EPQState,
-    pub es_use_parallel_mode: bool,
-    pub es_parallel_workers_to_launch: ::core::ffi::c_int,
-    pub es_parallel_workers_launched: ::core::ffi::c_int,
-    pub es_query_dsa: *mut dsa_area,
-    pub es_jit_flags: ::core::ffi::c_int,
-    pub es_jit: *mut JitContext,
-    pub es_jit_worker_instr: *mut JitInstrumentation,
-    pub es_insert_pending_result_relations: *mut List,
-    pub es_insert_pending_modifytables: *mut List,
-}
-impl Default for EState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ExecRowMark {
-    pub relation: Relation,
-    pub relid: Oid,
-    pub rti: Index,
-    pub prti: Index,
-    pub rowmarkId: Index,
-    pub markType: RowMarkType::Type,
-    pub strength: LockClauseStrength::Type,
-    pub waitPolicy: LockWaitPolicy::Type,
-    pub ermActive: bool,
-    pub curCtid: ItemPointerData,
-    pub ermExtra: *mut ::core::ffi::c_void,
-}
-impl Default for ExecRowMark {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ExecAuxRowMark {
-    pub rowmark: *mut ExecRowMark,
-    pub ctidAttNo: AttrNumber,
-    pub toidAttNo: AttrNumber,
-    pub wholeAttNo: AttrNumber,
-}
-impl Default for ExecAuxRowMark {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type TupleHashEntry = *mut TupleHashEntryData;
-pub type TupleHashTable = *mut TupleHashTableData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TupleHashEntryData {
-    pub firstTuple: MinimalTuple,
-    pub status: uint32,
-    pub hash: uint32,
-}
-impl Default for TupleHashEntryData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct tuplehash_hash {
-    pub size: uint64,
-    pub members: uint32,
-    pub sizemask: uint32,
-    pub grow_threshold: uint32,
-    pub data: *mut TupleHashEntryData,
-    pub ctx: MemoryContext,
-    pub private_data: *mut ::core::ffi::c_void,
-}
-impl Default for tuplehash_hash {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub mod tuplehash_status {
-    pub type Type = ::core::ffi::c_uint;
-    pub const tuplehash_SH_EMPTY: Type = 0;
-    pub const tuplehash_SH_IN_USE: Type = 1;
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct tuplehash_iterator {
-    pub cur: uint32,
-    pub end: uint32,
-    pub done: bool,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TupleHashTableData {
-    pub hashtab: *mut tuplehash_hash,
-    pub numCols: ::core::ffi::c_int,
-    pub keyColIdx: *mut AttrNumber,
-    pub tab_hash_expr: *mut ExprState,
-    pub tab_eq_func: *mut ExprState,
-    pub tab_collations: *mut Oid,
-    pub tablecxt: MemoryContext,
-    pub tempcxt: MemoryContext,
-    pub additionalsize: Size,
-    pub tableslot: *mut TupleTableSlot,
-    pub inputslot: *mut TupleTableSlot,
-    pub in_hash_expr: *mut ExprState,
-    pub cur_eq_func: *mut ExprState,
-    pub exprcontext: *mut ExprContext,
-}
-impl Default for TupleHashTableData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type TupleHashIterator = tuplehash_iterator;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct WindowFuncExprState {
-    pub type_: NodeTag,
-    pub wfunc: *mut WindowFunc,
-    pub args: *mut List,
-    pub aggfilter: *mut ExprState,
-    pub wfuncno: ::core::ffi::c_int,
-}
-impl Default for WindowFuncExprState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SetExprState {
-    pub type_: NodeTag,
-    pub expr: *mut Expr,
-    pub args: *mut List,
-    pub elidedFuncState: *mut ExprState,
-    pub func: FmgrInfo,
-    pub funcResultStore: *mut Tuplestorestate,
-    pub funcResultSlot: *mut TupleTableSlot,
-    pub funcResultDesc: TupleDesc,
-    pub funcReturnsTuple: bool,
-    pub funcReturnsSet: bool,
-    pub setArgsValid: bool,
-    pub shutdown_reg: bool,
-    pub fcinfo: FunctionCallInfo,
-}
-impl Default for SetExprState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SubPlanState {
-    pub type_: NodeTag,
-    pub subplan: *mut SubPlan,
-    pub planstate: *mut PlanState,
-    pub parent: *mut PlanState,
-    pub testexpr: *mut ExprState,
-    pub curTuple: HeapTuple,
-    pub curArray: Datum,
-    pub descRight: TupleDesc,
-    pub projLeft: *mut ProjectionInfo,
-    pub projRight: *mut ProjectionInfo,
-    pub hashtable: TupleHashTable,
-    pub hashnulls: TupleHashTable,
-    pub havehashrows: bool,
-    pub havenullrows: bool,
-    pub hashtablecxt: MemoryContext,
-    pub hashtempcxt: MemoryContext,
-    pub innerecontext: *mut ExprContext,
-    pub numCols: ::core::ffi::c_int,
-    pub keyColIdx: *mut AttrNumber,
-    pub tab_eq_funcoids: *mut Oid,
-    pub tab_collations: *mut Oid,
-    pub tab_hash_funcs: *mut FmgrInfo,
-    pub lhs_hash_expr: *mut ExprState,
-    pub cur_eq_funcs: *mut FmgrInfo,
-    pub cur_eq_comp: *mut ExprState,
-}
-impl Default for SubPlanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub mod DomainConstraintType {
-    pub type Type = ::core::ffi::c_uint;
-    pub const DOM_CONSTRAINT_NOTNULL: Type = 0;
-    pub const DOM_CONSTRAINT_CHECK: Type = 1;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DomainConstraintState {
-    pub type_: NodeTag,
-    pub constrainttype: DomainConstraintType::Type,
-    pub name: *mut ::core::ffi::c_char,
-    pub check_expr: *mut Expr,
-    pub check_exprstate: *mut ExprState,
-}
-impl Default for DomainConstraintState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct JsonExprState {
-    pub jsexpr: *mut JsonExpr,
-    pub formatted_expr: NullableDatum,
-    pub pathspec: NullableDatum,
-    pub args: *mut List,
-    pub error: NullableDatum,
-    pub empty: NullableDatum,
-    pub jump_empty: ::core::ffi::c_int,
-    pub jump_error: ::core::ffi::c_int,
-    pub jump_eval_coercion: ::core::ffi::c_int,
-    pub jump_end: ::core::ffi::c_int,
-    pub input_fcinfo: FunctionCallInfo,
-    pub escontext: ErrorSaveContext,
-}
-impl Default for JsonExprState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type ExecProcNodeMtd = ::core::option::Option<
-    unsafe extern "C-unwind" fn(pstate: *mut PlanState) -> *mut TupleTableSlot,
->;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PlanState {
-    pub type_: NodeTag,
-    pub plan: *mut Plan,
-    pub state: *mut EState,
-    pub ExecProcNode: ExecProcNodeMtd,
-    pub ExecProcNodeReal: ExecProcNodeMtd,
-    pub instrument: *mut Instrumentation,
-    pub worker_instrument: *mut WorkerInstrumentation,
-    pub worker_jit_instrument: *mut SharedJitInstrumentation,
-    pub qual: *mut ExprState,
-    pub lefttree: *mut PlanState,
-    pub righttree: *mut PlanState,
-    pub initPlan: *mut List,
-    pub subPlan: *mut List,
-    pub chgParam: *mut Bitmapset,
-    pub ps_ResultTupleDesc: TupleDesc,
-    pub ps_ResultTupleSlot: *mut TupleTableSlot,
-    pub ps_ExprContext: *mut ExprContext,
-    pub ps_ProjInfo: *mut ProjectionInfo,
-    pub async_capable: bool,
-    pub scandesc: TupleDesc,
-    pub scanops: *const TupleTableSlotOps,
-    pub outerops: *const TupleTableSlotOps,
-    pub innerops: *const TupleTableSlotOps,
-    pub resultops: *const TupleTableSlotOps,
-    pub scanopsfixed: bool,
-    pub outeropsfixed: bool,
-    pub inneropsfixed: bool,
-    pub resultopsfixed: bool,
-    pub scanopsset: bool,
-    pub outeropsset: bool,
-    pub inneropsset: bool,
-    pub resultopsset: bool,
-}
-impl Default for PlanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct EPQState {
-    pub parentestate: *mut EState,
-    pub epqParam: ::core::ffi::c_int,
-    pub resultRelations: *mut List,
-    pub tuple_table: *mut List,
-    pub relsubs_slot: *mut *mut TupleTableSlot,
-    pub plan: *mut Plan,
-    pub arowMarks: *mut List,
-    pub origslot: *mut TupleTableSlot,
-    pub recheckestate: *mut EState,
-    pub relsubs_rowmark: *mut *mut ExecAuxRowMark,
-    pub relsubs_done: *mut bool,
-    pub relsubs_blocked: *mut bool,
-    pub recheckplanstate: *mut PlanState,
-}
-impl Default for EPQState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ResultState {
-    pub ps: PlanState,
-    pub resconstantqual: *mut ExprState,
-    pub rs_done: bool,
-    pub rs_checkqual: bool,
-}
-impl Default for ResultState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ProjectSetState {
-    pub ps: PlanState,
-    pub elems: *mut *mut Node,
-    pub elemdone: *mut ExprDoneCond::Type,
-    pub nelems: ::core::ffi::c_int,
-    pub pending_srf_tuples: bool,
-    pub argcontext: MemoryContext,
-}
-impl Default for ProjectSetState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ModifyTableState {
-    pub ps: PlanState,
-    pub operation: CmdType::Type,
-    pub canSetTag: bool,
-    pub mt_done: bool,
-    pub mt_nrels: ::core::ffi::c_int,
-    pub resultRelInfo: *mut ResultRelInfo,
-    pub rootResultRelInfo: *mut ResultRelInfo,
-    pub mt_epqstate: EPQState,
-    pub fireBSTriggers: bool,
-    pub mt_resultOidAttno: ::core::ffi::c_int,
-    pub mt_lastResultOid: Oid,
-    pub mt_lastResultIndex: ::core::ffi::c_int,
-    pub mt_resultOidHash: *mut HTAB,
-    pub mt_root_tuple_slot: *mut TupleTableSlot,
-    pub mt_partition_tuple_routing: *mut PartitionTupleRouting,
-    pub mt_transition_capture: *mut TransitionCaptureState,
-    pub mt_oc_transition_capture: *mut TransitionCaptureState,
-    pub mt_merge_subcommands: ::core::ffi::c_int,
-    pub mt_merge_action: *mut MergeActionState,
-    pub mt_merge_pending_not_matched: *mut TupleTableSlot,
-    pub mt_merge_inserted: f64,
-    pub mt_merge_updated: f64,
-    pub mt_merge_deleted: f64,
-    pub mt_updateColnosLists: *mut List,
-    pub mt_mergeActionLists: *mut List,
-    pub mt_mergeJoinConditions: *mut List,
-}
-impl Default for ModifyTableState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParallelAppendState {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PartitionPruneState {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AppendState {
-    pub ps: PlanState,
-    pub appendplans: *mut *mut PlanState,
-    pub as_nplans: ::core::ffi::c_int,
-    pub as_whichplan: ::core::ffi::c_int,
-    pub as_begun: bool,
-    pub as_asyncplans: *mut Bitmapset,
-    pub as_nasyncplans: ::core::ffi::c_int,
-    pub as_asyncrequests: *mut *mut AsyncRequest,
-    pub as_asyncresults: *mut *mut TupleTableSlot,
-    pub as_nasyncresults: ::core::ffi::c_int,
-    pub as_syncdone: bool,
-    pub as_nasyncremain: ::core::ffi::c_int,
-    pub as_needrequest: *mut Bitmapset,
-    pub as_eventset: *mut WaitEventSet,
-    pub as_first_partial_plan: ::core::ffi::c_int,
-    pub as_pstate: *mut ParallelAppendState,
-    pub pstate_len: Size,
-    pub as_prune_state: *mut PartitionPruneState,
-    pub as_valid_subplans_identified: bool,
-    pub as_valid_subplans: *mut Bitmapset,
-    pub as_valid_asyncplans: *mut Bitmapset,
-    pub choose_next_subplan:
-        ::core::option::Option<unsafe extern "C-unwind" fn(arg1: *mut AppendState) -> bool>,
-}
-impl Default for AppendState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MergeAppendState {
-    pub ps: PlanState,
-    pub mergeplans: *mut *mut PlanState,
-    pub ms_nplans: ::core::ffi::c_int,
-    pub ms_nkeys: ::core::ffi::c_int,
-    pub ms_sortkeys: SortSupport,
-    pub ms_slots: *mut *mut TupleTableSlot,
-    pub ms_heap: *mut binaryheap,
-    pub ms_initialized: bool,
-    pub ms_prune_state: *mut PartitionPruneState,
-    pub ms_valid_subplans: *mut Bitmapset,
-}
-impl Default for MergeAppendState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RecursiveUnionState {
-    pub ps: PlanState,
-    pub recursing: bool,
-    pub intermediate_empty: bool,
-    pub working_table: *mut Tuplestorestate,
-    pub intermediate_table: *mut Tuplestorestate,
-    pub eqfuncoids: *mut Oid,
-    pub hashfunctions: *mut FmgrInfo,
-    pub tempContext: MemoryContext,
-    pub hashtable: TupleHashTable,
-    pub tableContext: MemoryContext,
-}
-impl Default for RecursiveUnionState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct BitmapAndState {
-    pub ps: PlanState,
-    pub bitmapplans: *mut *mut PlanState,
-    pub nplans: ::core::ffi::c_int,
-}
-impl Default for BitmapAndState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct BitmapOrState {
-    pub ps: PlanState,
-    pub bitmapplans: *mut *mut PlanState,
-    pub nplans: ::core::ffi::c_int,
-}
-impl Default for BitmapOrState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ScanState {
-    pub ps: PlanState,
-    pub ss_currentRelation: Relation,
-    pub ss_currentScanDesc: *mut TableScanDescData,
-    pub ss_ScanTupleSlot: *mut TupleTableSlot,
-}
-impl Default for ScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SeqScanState {
-    pub ss: ScanState,
-    pub pscan_len: Size,
-}
-impl Default for SeqScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SampleScanState {
-    pub ss: ScanState,
-    pub args: *mut List,
-    pub repeatable: *mut ExprState,
-    pub tsmroutine: *mut TsmRoutine,
-    pub tsm_state: *mut ::core::ffi::c_void,
-    pub use_bulkread: bool,
-    pub use_pagemode: bool,
-    pub begun: bool,
-    pub seed: uint32,
-    pub donetuples: int64,
-    pub haveblock: bool,
-    pub done: bool,
-}
-impl Default for SampleScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct IndexRuntimeKeyInfo {
-    pub scan_key: *mut ScanKeyData,
-    pub key_expr: *mut ExprState,
-    pub key_toastable: bool,
-}
-impl Default for IndexRuntimeKeyInfo {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct IndexArrayKeyInfo {
-    pub scan_key: *mut ScanKeyData,
-    pub array_expr: *mut ExprState,
-    pub next_elem: ::core::ffi::c_int,
-    pub num_elems: ::core::ffi::c_int,
-    pub elem_values: *mut Datum,
-    pub elem_nulls: *mut bool,
-}
-impl Default for IndexArrayKeyInfo {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct IndexScanState {
-    pub ss: ScanState,
-    pub indexqualorig: *mut ExprState,
-    pub indexorderbyorig: *mut List,
-    pub iss_ScanKeys: *mut ScanKeyData,
-    pub iss_NumScanKeys: ::core::ffi::c_int,
-    pub iss_OrderByKeys: *mut ScanKeyData,
-    pub iss_NumOrderByKeys: ::core::ffi::c_int,
-    pub iss_RuntimeKeys: *mut IndexRuntimeKeyInfo,
-    pub iss_NumRuntimeKeys: ::core::ffi::c_int,
-    pub iss_RuntimeKeysReady: bool,
-    pub iss_RuntimeContext: *mut ExprContext,
-    pub iss_RelationDesc: Relation,
-    pub iss_ScanDesc: *mut IndexScanDescData,
-    pub iss_Instrument: IndexScanInstrumentation,
-    pub iss_SharedInfo: *mut SharedIndexScanInstrumentation,
-    pub iss_ReorderQueue: *mut pairingheap,
-    pub iss_ReachedEnd: bool,
-    pub iss_OrderByValues: *mut Datum,
-    pub iss_OrderByNulls: *mut bool,
-    pub iss_SortSupport: SortSupport,
-    pub iss_OrderByTypByVals: *mut bool,
-    pub iss_OrderByTypLens: *mut int16,
-    pub iss_PscanLen: Size,
-}
-impl Default for IndexScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct IndexOnlyScanState {
-    pub ss: ScanState,
-    pub recheckqual: *mut ExprState,
-    pub ioss_ScanKeys: *mut ScanKeyData,
-    pub ioss_NumScanKeys: ::core::ffi::c_int,
-    pub ioss_OrderByKeys: *mut ScanKeyData,
-    pub ioss_NumOrderByKeys: ::core::ffi::c_int,
-    pub ioss_RuntimeKeys: *mut IndexRuntimeKeyInfo,
-    pub ioss_NumRuntimeKeys: ::core::ffi::c_int,
-    pub ioss_RuntimeKeysReady: bool,
-    pub ioss_RuntimeContext: *mut ExprContext,
-    pub ioss_RelationDesc: Relation,
-    pub ioss_ScanDesc: *mut IndexScanDescData,
-    pub ioss_Instrument: IndexScanInstrumentation,
-    pub ioss_SharedInfo: *mut SharedIndexScanInstrumentation,
-    pub ioss_TableSlot: *mut TupleTableSlot,
-    pub ioss_VMBuffer: Buffer,
-    pub ioss_PscanLen: Size,
-    pub ioss_NameCStringAttNums: *mut AttrNumber,
-    pub ioss_NameCStringCount: ::core::ffi::c_int,
-}
-impl Default for IndexOnlyScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct BitmapIndexScanState {
-    pub ss: ScanState,
-    pub biss_result: *mut TIDBitmap,
-    pub biss_ScanKeys: *mut ScanKeyData,
-    pub biss_NumScanKeys: ::core::ffi::c_int,
-    pub biss_RuntimeKeys: *mut IndexRuntimeKeyInfo,
-    pub biss_NumRuntimeKeys: ::core::ffi::c_int,
-    pub biss_ArrayKeys: *mut IndexArrayKeyInfo,
-    pub biss_NumArrayKeys: ::core::ffi::c_int,
-    pub biss_RuntimeKeysReady: bool,
-    pub biss_RuntimeContext: *mut ExprContext,
-    pub biss_RelationDesc: Relation,
-    pub biss_ScanDesc: *mut IndexScanDescData,
-    pub biss_Instrument: IndexScanInstrumentation,
-    pub biss_SharedInfo: *mut SharedIndexScanInstrumentation,
-}
-impl Default for BitmapIndexScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct BitmapHeapScanInstrumentation {
-    pub exact_pages: uint64,
-    pub lossy_pages: uint64,
-}
-pub mod SharedBitmapState {
-    pub type Type = ::core::ffi::c_uint;
-    pub const BM_INITIAL: Type = 0;
-    pub const BM_INPROGRESS: Type = 1;
-    pub const BM_FINISHED: Type = 2;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParallelBitmapHeapState {
-    pub tbmiterator: dsa_pointer,
-    pub mutex: slock_t,
-    pub state: SharedBitmapState::Type,
-    pub cv: ConditionVariable,
-}
-impl Default for ParallelBitmapHeapState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct SharedBitmapHeapInstrumentation {
-    pub num_workers: ::core::ffi::c_int,
-    pub sinstrument: __IncompleteArrayField<BitmapHeapScanInstrumentation>,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct BitmapHeapScanState {
-    pub ss: ScanState,
-    pub bitmapqualorig: *mut ExprState,
-    pub tbm: *mut TIDBitmap,
-    pub stats: BitmapHeapScanInstrumentation,
-    pub initialized: bool,
-    pub pstate: *mut ParallelBitmapHeapState,
-    pub sinstrument: *mut SharedBitmapHeapInstrumentation,
-    pub recheck: bool,
-}
-impl Default for BitmapHeapScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TidScanState {
-    pub ss: ScanState,
-    pub tss_tidexprs: *mut List,
-    pub tss_isCurrentOf: bool,
-    pub tss_NumTids: ::core::ffi::c_int,
-    pub tss_TidPtr: ::core::ffi::c_int,
-    pub tss_TidList: *mut ItemPointerData,
-}
-impl Default for TidScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TidRangeScanState {
-    pub ss: ScanState,
-    pub trss_tidexprs: *mut List,
-    pub trss_mintid: ItemPointerData,
-    pub trss_maxtid: ItemPointerData,
-    pub trss_inScan: bool,
-}
-impl Default for TidRangeScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SubqueryScanState {
-    pub ss: ScanState,
-    pub subplan: *mut PlanState,
-}
-impl Default for SubqueryScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct FunctionScanPerFuncState {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct FunctionScanState {
-    pub ss: ScanState,
-    pub eflags: ::core::ffi::c_int,
-    pub ordinality: bool,
-    pub simple: bool,
-    pub ordinal: int64,
-    pub nfuncs: ::core::ffi::c_int,
-    pub funcstates: *mut FunctionScanPerFuncState,
-    pub argcontext: MemoryContext,
-}
-impl Default for FunctionScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ValuesScanState {
-    pub ss: ScanState,
-    pub rowcontext: *mut ExprContext,
-    pub exprlists: *mut *mut List,
-    pub exprstatelists: *mut *mut List,
-    pub array_len: ::core::ffi::c_int,
-    pub curr_idx: ::core::ffi::c_int,
-}
-impl Default for ValuesScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TableFuncScanState {
-    pub ss: ScanState,
-    pub docexpr: *mut ExprState,
-    pub rowexpr: *mut ExprState,
-    pub colexprs: *mut List,
-    pub coldefexprs: *mut List,
-    pub colvalexprs: *mut List,
-    pub passingvalexprs: *mut List,
-    pub ns_names: *mut List,
-    pub ns_uris: *mut List,
-    pub notnulls: *mut Bitmapset,
-    pub opaque: *mut ::core::ffi::c_void,
-    pub routine: *mut TableFuncRoutine,
-    pub in_functions: *mut FmgrInfo,
-    pub typioparams: *mut Oid,
-    pub ordinal: int64,
-    pub perTableCxt: MemoryContext,
-    pub tupstore: *mut Tuplestorestate,
-}
-impl Default for TableFuncScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CteScanState {
-    pub ss: ScanState,
-    pub eflags: ::core::ffi::c_int,
-    pub readptr: ::core::ffi::c_int,
-    pub cteplanstate: *mut PlanState,
-    pub leader: *mut CteScanState,
-    pub cte_table: *mut Tuplestorestate,
-    pub eof_cte: bool,
-}
-impl Default for CteScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct NamedTuplestoreScanState {
-    pub ss: ScanState,
-    pub readptr: ::core::ffi::c_int,
-    pub tupdesc: TupleDesc,
-    pub relation: *mut Tuplestorestate,
-}
-impl Default for NamedTuplestoreScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct WorkTableScanState {
-    pub ss: ScanState,
-    pub rustate: *mut RecursiveUnionState,
-}
-impl Default for WorkTableScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ForeignScanState {
-    pub ss: ScanState,
-    pub fdw_recheck_quals: *mut ExprState,
-    pub pscan_len: Size,
-    pub resultRelInfo: *mut ResultRelInfo,
-    pub fdwroutine: *mut FdwRoutine,
-    pub fdw_state: *mut ::core::ffi::c_void,
-}
-impl Default for ForeignScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CustomScanState {
-    pub ss: ScanState,
-    pub flags: uint32,
-    pub custom_ps: *mut List,
-    pub pscan_len: Size,
-    pub methods: *const CustomExecMethods,
-    pub slotOps: *const TupleTableSlotOps,
-}
-impl Default for CustomScanState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct JoinState {
-    pub ps: PlanState,
-    pub jointype: JoinType::Type,
-    pub single_match: bool,
-    pub joinqual: *mut ExprState,
-}
-impl Default for JoinState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct NestLoopState {
-    pub js: JoinState,
-    pub nl_NeedNewOuter: bool,
-    pub nl_MatchedOuter: bool,
-    pub nl_NullInnerTupleSlot: *mut TupleTableSlot,
-}
-impl Default for NestLoopState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MergeJoinClauseData {
-    _unused: [u8; 0],
-}
-pub type MergeJoinClause = *mut MergeJoinClauseData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MergeJoinState {
-    pub js: JoinState,
-    pub mj_NumClauses: ::core::ffi::c_int,
-    pub mj_Clauses: MergeJoinClause,
-    pub mj_JoinState: ::core::ffi::c_int,
-    pub mj_SkipMarkRestore: bool,
-    pub mj_ExtraMarks: bool,
-    pub mj_ConstFalseJoin: bool,
-    pub mj_FillOuter: bool,
-    pub mj_FillInner: bool,
-    pub mj_MatchedOuter: bool,
-    pub mj_MatchedInner: bool,
-    pub mj_OuterTupleSlot: *mut TupleTableSlot,
-    pub mj_InnerTupleSlot: *mut TupleTableSlot,
-    pub mj_MarkedTupleSlot: *mut TupleTableSlot,
-    pub mj_NullOuterTupleSlot: *mut TupleTableSlot,
-    pub mj_NullInnerTupleSlot: *mut TupleTableSlot,
-    pub mj_OuterEContext: *mut ExprContext,
-    pub mj_InnerEContext: *mut ExprContext,
-}
-impl Default for MergeJoinState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct HashJoinTupleData {
-    _unused: [u8; 0],
-}
-pub type HashJoinTuple = *mut HashJoinTupleData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct HashJoinTableData {
-    _unused: [u8; 0],
-}
-pub type HashJoinTable = *mut HashJoinTableData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct HashJoinState {
-    pub js: JoinState,
-    pub hashclauses: *mut ExprState,
-    pub hj_OuterHash: *mut ExprState,
-    pub hj_HashTable: HashJoinTable,
-    pub hj_CurHashValue: uint32,
-    pub hj_CurBucketNo: ::core::ffi::c_int,
-    pub hj_CurSkewBucketNo: ::core::ffi::c_int,
-    pub hj_CurTuple: HashJoinTuple,
-    pub hj_OuterTupleSlot: *mut TupleTableSlot,
-    pub hj_HashTupleSlot: *mut TupleTableSlot,
-    pub hj_NullOuterTupleSlot: *mut TupleTableSlot,
-    pub hj_NullInnerTupleSlot: *mut TupleTableSlot,
-    pub hj_FirstOuterTupleSlot: *mut TupleTableSlot,
-    pub hj_JoinState: ::core::ffi::c_int,
-    pub hj_MatchedOuter: bool,
-    pub hj_OuterNotEmpty: bool,
-}
-impl Default for HashJoinState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MaterialState {
-    pub ss: ScanState,
-    pub eflags: ::core::ffi::c_int,
-    pub eof_underlying: bool,
-    pub tuplestorestate: *mut Tuplestorestate,
-}
-impl Default for MaterialState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MemoizeEntry {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MemoizeTuple {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MemoizeKey {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct MemoizeInstrumentation {
-    pub cache_hits: uint64,
-    pub cache_misses: uint64,
-    pub cache_evictions: uint64,
-    pub cache_overflows: uint64,
-    pub mem_peak: uint64,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct SharedMemoizeInfo {
-    pub num_workers: ::core::ffi::c_int,
-    pub sinstrument: __IncompleteArrayField<MemoizeInstrumentation>,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MemoizeState {
-    pub ss: ScanState,
-    pub mstatus: ::core::ffi::c_int,
-    pub nkeys: ::core::ffi::c_int,
-    pub hashtable: *mut memoize_hash,
-    pub hashkeydesc: TupleDesc,
-    pub tableslot: *mut TupleTableSlot,
-    pub probeslot: *mut TupleTableSlot,
-    pub cache_eq_expr: *mut ExprState,
-    pub param_exprs: *mut *mut ExprState,
-    pub hashfunctions: *mut FmgrInfo,
-    pub collations: *mut Oid,
-    pub mem_used: uint64,
-    pub mem_limit: uint64,
-    pub tableContext: MemoryContext,
-    pub lru_list: dlist_head,
-    pub last_tuple: *mut MemoizeTuple,
-    pub entry: *mut MemoizeEntry,
-    pub singlerow: bool,
-    pub binary_mode: bool,
-    pub stats: MemoizeInstrumentation,
-    pub shared_info: *mut SharedMemoizeInfo,
-    pub keyparamids: *mut Bitmapset,
-}
-impl Default for MemoizeState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PresortedKeyData {
-    pub flinfo: FmgrInfo,
-    pub fcinfo: FunctionCallInfo,
-    pub attno: OffsetNumber,
-}
-impl Default for PresortedKeyData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct SharedSortInfo {
-    pub num_workers: ::core::ffi::c_int,
-    pub sinstrument: __IncompleteArrayField<TuplesortInstrumentation>,
-}
-impl Default for SharedSortInfo {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SortState {
-    pub ss: ScanState,
-    pub randomAccess: bool,
-    pub bounded: bool,
-    pub bound: int64,
-    pub sort_Done: bool,
-    pub bounded_Done: bool,
-    pub bound_Done: int64,
-    pub tuplesortstate: *mut ::core::ffi::c_void,
-    pub am_worker: bool,
-    pub datumSort: bool,
-    pub shared_info: *mut SharedSortInfo,
-}
-impl Default for SortState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct IncrementalSortGroupInfo {
-    pub groupCount: int64,
-    pub maxDiskSpaceUsed: int64,
-    pub totalDiskSpaceUsed: int64,
-    pub maxMemorySpaceUsed: int64,
-    pub totalMemorySpaceUsed: int64,
-    pub sortMethods: bits32,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct IncrementalSortInfo {
-    pub fullsortGroupInfo: IncrementalSortGroupInfo,
-    pub prefixsortGroupInfo: IncrementalSortGroupInfo,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct SharedIncrementalSortInfo {
-    pub num_workers: ::core::ffi::c_int,
-    pub sinfo: __IncompleteArrayField<IncrementalSortInfo>,
-}
-pub mod IncrementalSortExecutionStatus {
-    pub type Type = ::core::ffi::c_uint;
-    pub const INCSORT_LOADFULLSORT: Type = 0;
-    pub const INCSORT_LOADPREFIXSORT: Type = 1;
-    pub const INCSORT_READFULLSORT: Type = 2;
-    pub const INCSORT_READPREFIXSORT: Type = 3;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct IncrementalSortState {
-    pub ss: ScanState,
-    pub bounded: bool,
-    pub bound: int64,
-    pub outerNodeDone: bool,
-    pub bound_Done: int64,
-    pub execution_status: IncrementalSortExecutionStatus::Type,
-    pub n_fullsort_remaining: int64,
-    pub fullsort_state: *mut Tuplesortstate,
-    pub prefixsort_state: *mut Tuplesortstate,
-    pub presorted_keys: *mut PresortedKeyData,
-    pub incsort_info: IncrementalSortInfo,
-    pub group_pivot: *mut TupleTableSlot,
-    pub transfer_tuple: *mut TupleTableSlot,
-    pub am_worker: bool,
-    pub shared_info: *mut SharedIncrementalSortInfo,
-}
-impl Default for IncrementalSortState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GroupState {
-    pub ss: ScanState,
-    pub eqfunction: *mut ExprState,
-    pub grp_done: bool,
-}
-impl Default for GroupState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct AggregateInstrumentation {
-    pub hash_mem_peak: Size,
-    pub hash_disk_used: uint64,
-    pub hash_batches_used: ::core::ffi::c_int,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct SharedAggInfo {
-    pub num_workers: ::core::ffi::c_int,
-    pub sinstrument: __IncompleteArrayField<AggregateInstrumentation>,
-}
-pub type AggStatePerAgg = *mut AggStatePerAggData;
-pub type AggStatePerTrans = *mut AggStatePerTransData;
-pub type AggStatePerGroup = *mut AggStatePerGroupData;
-pub type AggStatePerPhase = *mut AggStatePerPhaseData;
-pub type AggStatePerHash = *mut AggStatePerHashData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AggState {
-    pub ss: ScanState,
-    pub aggs: *mut List,
-    pub numaggs: ::core::ffi::c_int,
-    pub numtrans: ::core::ffi::c_int,
-    pub aggstrategy: AggStrategy::Type,
-    pub aggsplit: AggSplit::Type,
-    pub phase: AggStatePerPhase,
-    pub numphases: ::core::ffi::c_int,
-    pub current_phase: ::core::ffi::c_int,
-    pub peragg: AggStatePerAgg,
-    pub pertrans: AggStatePerTrans,
-    pub hashcontext: *mut ExprContext,
-    pub aggcontexts: *mut *mut ExprContext,
-    pub tmpcontext: *mut ExprContext,
-    pub curaggcontext: *mut ExprContext,
-    pub curperagg: AggStatePerAgg,
-    pub curpertrans: AggStatePerTrans,
-    pub input_done: bool,
-    pub agg_done: bool,
-    pub projected_set: ::core::ffi::c_int,
-    pub current_set: ::core::ffi::c_int,
-    pub grouped_cols: *mut Bitmapset,
-    pub all_grouped_cols: *mut List,
-    pub colnos_needed: *mut Bitmapset,
-    pub max_colno_needed: ::core::ffi::c_int,
-    pub all_cols_needed: bool,
-    pub maxsets: ::core::ffi::c_int,
-    pub phases: AggStatePerPhase,
-    pub sort_in: *mut Tuplesortstate,
-    pub sort_out: *mut Tuplesortstate,
-    pub sort_slot: *mut TupleTableSlot,
-    pub pergroups: *mut AggStatePerGroup,
-    pub grp_firstTuple: HeapTuple,
-    pub table_filled: bool,
-    pub num_hashes: ::core::ffi::c_int,
-    pub hash_metacxt: MemoryContext,
-    pub hash_tablecxt: MemoryContext,
-    pub hash_tapeset: *mut LogicalTapeSet,
-    pub hash_spills: *mut HashAggSpill,
-    pub hash_spill_rslot: *mut TupleTableSlot,
-    pub hash_spill_wslot: *mut TupleTableSlot,
-    pub hash_batches: *mut List,
-    pub hash_ever_spilled: bool,
-    pub hash_spill_mode: bool,
-    pub hash_mem_limit: Size,
-    pub hash_ngroups_limit: uint64,
-    pub hash_planned_partitions: ::core::ffi::c_int,
-    pub hashentrysize: f64,
-    pub hash_mem_peak: Size,
-    pub hash_ngroups_current: uint64,
-    pub hash_disk_used: uint64,
-    pub hash_batches_used: ::core::ffi::c_int,
-    pub perhash: AggStatePerHash,
-    pub hash_pergroup: *mut AggStatePerGroup,
-    pub all_pergroups: *mut AggStatePerGroup,
-    pub shared_info: *mut SharedAggInfo,
-}
-impl Default for AggState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct WindowStatePerFuncData {
-    _unused: [u8; 0],
-}
-pub type WindowStatePerFunc = *mut WindowStatePerFuncData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct WindowStatePerAggData {
-    _unused: [u8; 0],
-}
-pub type WindowStatePerAgg = *mut WindowStatePerAggData;
-pub mod WindowAggStatus {
-    pub type Type = ::core::ffi::c_uint;
-    pub const WINDOWAGG_DONE: Type = 0;
-    pub const WINDOWAGG_RUN: Type = 1;
-    pub const WINDOWAGG_PASSTHROUGH: Type = 2;
-    pub const WINDOWAGG_PASSTHROUGH_STRICT: Type = 3;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct WindowAggState {
-    pub ss: ScanState,
-    pub funcs: *mut List,
-    pub numfuncs: ::core::ffi::c_int,
-    pub numaggs: ::core::ffi::c_int,
-    pub perfunc: WindowStatePerFunc,
-    pub peragg: WindowStatePerAgg,
-    pub partEqfunction: *mut ExprState,
-    pub ordEqfunction: *mut ExprState,
-    pub buffer: *mut Tuplestorestate,
-    pub current_ptr: ::core::ffi::c_int,
-    pub framehead_ptr: ::core::ffi::c_int,
-    pub frametail_ptr: ::core::ffi::c_int,
-    pub grouptail_ptr: ::core::ffi::c_int,
-    pub spooled_rows: int64,
-    pub currentpos: int64,
-    pub frameheadpos: int64,
-    pub frametailpos: int64,
-    pub agg_winobj: *mut WindowObjectData,
-    pub aggregatedbase: int64,
-    pub aggregatedupto: int64,
-    pub status: WindowAggStatus::Type,
-    pub frameOptions: ::core::ffi::c_int,
-    pub startOffset: *mut ExprState,
-    pub endOffset: *mut ExprState,
-    pub startOffsetValue: Datum,
-    pub endOffsetValue: Datum,
-    pub startInRangeFunc: FmgrInfo,
-    pub endInRangeFunc: FmgrInfo,
-    pub inRangeColl: Oid,
-    pub inRangeAsc: bool,
-    pub inRangeNullsFirst: bool,
-    pub use_pass_through: bool,
-    pub top_window: bool,
-    pub runcondition: *mut ExprState,
-    pub currentgroup: int64,
-    pub frameheadgroup: int64,
-    pub frametailgroup: int64,
-    pub groupheadpos: int64,
-    pub grouptailpos: int64,
-    pub partcontext: MemoryContext,
-    pub aggcontext: MemoryContext,
-    pub curaggcontext: MemoryContext,
-    pub tmpcontext: *mut ExprContext,
-    pub all_first: bool,
-    pub partition_spooled: bool,
-    pub next_partition: bool,
-    pub more_partitions: bool,
-    pub framehead_valid: bool,
-    pub frametail_valid: bool,
-    pub grouptail_valid: bool,
-    pub first_part_slot: *mut TupleTableSlot,
-    pub framehead_slot: *mut TupleTableSlot,
-    pub frametail_slot: *mut TupleTableSlot,
-    pub agg_row_slot: *mut TupleTableSlot,
-    pub temp_slot_1: *mut TupleTableSlot,
-    pub temp_slot_2: *mut TupleTableSlot,
-}
-impl Default for WindowAggState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct UniqueState {
-    pub ps: PlanState,
-    pub eqfunction: *mut ExprState,
-}
-impl Default for UniqueState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GatherState {
-    pub ps: PlanState,
-    pub initialized: bool,
-    pub need_to_scan_locally: bool,
-    pub tuples_needed: int64,
-    pub funnel_slot: *mut TupleTableSlot,
-    pub pei: *mut ParallelExecutorInfo,
-    pub nworkers_launched: ::core::ffi::c_int,
-    pub nreaders: ::core::ffi::c_int,
-    pub nextreader: ::core::ffi::c_int,
-    pub reader: *mut *mut TupleQueueReader,
-}
-impl Default for GatherState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GMReaderTupleBuffer {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GatherMergeState {
-    pub ps: PlanState,
-    pub initialized: bool,
-    pub gm_initialized: bool,
-    pub need_to_scan_locally: bool,
-    pub tuples_needed: int64,
-    pub tupDesc: TupleDesc,
-    pub gm_nkeys: ::core::ffi::c_int,
-    pub gm_sortkeys: SortSupport,
-    pub pei: *mut ParallelExecutorInfo,
-    pub nworkers_launched: ::core::ffi::c_int,
-    pub nreaders: ::core::ffi::c_int,
-    pub gm_slots: *mut *mut TupleTableSlot,
-    pub reader: *mut *mut TupleQueueReader,
-    pub gm_tuple_buffers: *mut GMReaderTupleBuffer,
-    pub gm_heap: *mut binaryheap,
-}
-impl Default for GatherMergeState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct HashInstrumentation {
-    pub nbuckets: ::core::ffi::c_int,
-    pub nbuckets_original: ::core::ffi::c_int,
-    pub nbatch: ::core::ffi::c_int,
-    pub nbatch_original: ::core::ffi::c_int,
-    pub space_peak: Size,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct SharedHashInfo {
-    pub num_workers: ::core::ffi::c_int,
-    pub hinstrument: __IncompleteArrayField<HashInstrumentation>,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct HashState {
-    pub ps: PlanState,
-    pub hashtable: HashJoinTable,
-    pub hash_expr: *mut ExprState,
-    pub skew_hashfunction: *mut FmgrInfo,
-    pub skew_collation: Oid,
-    pub shared_info: *mut SharedHashInfo,
-    pub hinstrument: *mut HashInstrumentation,
-    pub parallel_state: *mut ParallelHashJoinState,
-}
-impl Default for HashState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SetOpStatePerInput {
-    pub firstTupleSlot: *mut TupleTableSlot,
-    pub numTuples: int64,
-    pub nextTupleSlot: *mut TupleTableSlot,
-    pub needGroup: bool,
-}
-impl Default for SetOpStatePerInput {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SetOpState {
-    pub ps: PlanState,
-    pub setop_done: bool,
-    pub numOutput: int64,
-    pub numCols: ::core::ffi::c_int,
-    pub sortKeys: SortSupport,
-    pub leftInput: SetOpStatePerInput,
-    pub rightInput: SetOpStatePerInput,
-    pub need_init: bool,
-    pub eqfuncoids: *mut Oid,
-    pub hashfunctions: *mut FmgrInfo,
-    pub hashtable: TupleHashTable,
-    pub tableContext: MemoryContext,
-    pub table_filled: bool,
-    pub hashiter: TupleHashIterator,
-}
-impl Default for SetOpState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct LockRowsState {
-    pub ps: PlanState,
-    pub lr_arowMarks: *mut List,
-    pub lr_epqstate: EPQState,
-}
-impl Default for LockRowsState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub mod LimitStateCond {
-    pub type Type = ::core::ffi::c_uint;
-    pub const LIMIT_INITIAL: Type = 0;
-    pub const LIMIT_RESCAN: Type = 1;
-    pub const LIMIT_EMPTY: Type = 2;
-    pub const LIMIT_INWINDOW: Type = 3;
-    pub const LIMIT_WINDOWEND_TIES: Type = 4;
-    pub const LIMIT_SUBPLANEOF: Type = 5;
-    pub const LIMIT_WINDOWEND: Type = 6;
-    pub const LIMIT_WINDOWSTART: Type = 7;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct LimitState {
-    pub ps: PlanState,
-    pub limitOffset: *mut ExprState,
-    pub limitCount: *mut ExprState,
-    pub limitOption: LimitOption::Type,
-    pub offset: int64,
-    pub count: int64,
-    pub noCount: bool,
-    pub lstate: LimitStateCond::Type,
-    pub position: int64,
-    pub subSlot: *mut TupleTableSlot,
-    pub eqfunction: *mut ExprState,
-    pub last_slot: *mut TupleTableSlot,
-}
-impl Default for LimitState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub mod CommandDest {
-    pub type Type = ::core::ffi::c_uint;
-    pub const DestNone: Type = 0;
-    pub const DestDebug: Type = 1;
-    pub const DestRemote: Type = 2;
-    pub const DestRemoteExecute: Type = 3;
-    pub const DestRemoteSimple: Type = 4;
-    pub const DestSPI: Type = 5;
-    pub const DestTuplestore: Type = 6;
-    pub const DestIntoRel: Type = 7;
-    pub const DestCopyOut: Type = 8;
-    pub const DestSQLFunction: Type = 9;
-    pub const DestTransientRel: Type = 10;
-    pub const DestTupleQueue: Type = 11;
-    pub const DestExplainSerialize: Type = 12;
-}
-pub type DestReceiver = _DestReceiver;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _DestReceiver {
-    pub receiveSlot: ::core::option::Option<
-        unsafe extern "C-unwind" fn(slot: *mut TupleTableSlot, self_: *mut DestReceiver) -> bool,
-    >,
-    pub rStartup: ::core::option::Option<
-        unsafe extern "C-unwind" fn(
-            self_: *mut DestReceiver,
-            operation: ::core::ffi::c_int,
-            typeinfo: TupleDesc,
-        ),
-    >,
-    pub rShutdown: ::core::option::Option<unsafe extern "C-unwind" fn(self_: *mut DestReceiver)>,
-    pub rDestroy: ::core::option::Option<unsafe extern "C-unwind" fn(self_: *mut DestReceiver)>,
-    pub mydest: CommandDest::Type,
-}
-impl Default for _DestReceiver {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct QueryDesc {
-    pub operation: CmdType::Type,
-    pub plannedstmt: *mut PlannedStmt,
-    pub cplan: *mut CachedPlan,
-    pub sourceText: *const ::core::ffi::c_char,
-    pub snapshot: Snapshot,
-    pub crosscheck_snapshot: Snapshot,
-    pub dest: *mut DestReceiver,
-    pub params: ParamListInfo,
-    pub queryEnv: *mut QueryEnvironment,
-    pub instrument_options: ::core::ffi::c_int,
-    pub tupDesc: TupleDesc,
-    pub estate: *mut EState,
-    pub planstate: *mut PlanState,
-    pub already_executed: bool,
-    pub totaltime: *mut Instrumentation,
-}
-impl Default for QueryDesc {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct MemoryContextCounters {
@@ -19222,26 +19071,40 @@ impl Default for MemoryContextData {
         }
     }
 }
-pub mod LWLockWaitState {
-    pub type Type = ::core::ffi::c_uint;
-    pub const LW_WS_NOT_WAITING: Type = 0;
-    pub const LW_WS_WAITING: Type = 1;
-    pub const LW_WS_PENDING_WAKEUP: Type = 2;
-}
+pub type ExecutorStart_hook_type = ::core::option::Option<
+    unsafe extern "C-unwind" fn(queryDesc: *mut QueryDesc, eflags: ::core::ffi::c_int),
+>;
+pub type ExecutorRun_hook_type = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        queryDesc: *mut QueryDesc,
+        direction: ScanDirection::Type,
+        count: uint64,
+    ),
+>;
+pub type ExecutorFinish_hook_type =
+    ::core::option::Option<unsafe extern "C-unwind" fn(queryDesc: *mut QueryDesc)>;
+pub type ExecutorEnd_hook_type =
+    ::core::option::Option<unsafe extern "C-unwind" fn(queryDesc: *mut QueryDesc)>;
+pub type ExecutorCheckPerms_hook_type = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        rangeTable: *mut List,
+        rtePermInfos: *mut List,
+        ereport_on_violation: bool,
+    ) -> bool,
+>;
+pub type ExecScanAccessMtd = ::core::option::Option<
+    unsafe extern "C-unwind" fn(node: *mut ScanState) -> *mut TupleTableSlot,
+>;
+pub type ExecScanRecheckMtd = ::core::option::Option<
+    unsafe extern "C-unwind" fn(node: *mut ScanState, slot: *mut TupleTableSlot) -> bool,
+>;
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct LWLock {
-    pub tranche: uint16,
-    pub state: pg_atomic_uint32,
-    pub waiters: proclist_head,
+#[derive(Debug, Copy, Clone)]
+pub struct TupOutputState {
+    pub slot: *mut TupleTableSlot,
+    pub dest: *mut DestReceiver,
 }
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union LWLockPadded {
-    pub lock: LWLock,
-    pub pad: [::core::ffi::c_char; 128usize],
-}
-impl Default for LWLockPadded {
+impl Default for TupOutputState {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -19252,11 +19115,13 @@ impl Default for LWLockPadded {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct NamedLWLockTranche {
-    pub trancheId: ::core::ffi::c_int,
-    pub trancheName: *mut ::core::ffi::c_char,
+pub struct AttInMetadata {
+    pub tupdesc: TupleDesc,
+    pub attinfuncs: *mut FmgrInfo,
+    pub attioparams: *mut Oid,
+    pub atttypmods: *mut int32,
 }
-impl Default for NamedLWLockTranche {
+impl Default for AttInMetadata {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -19265,69 +19130,17 @@ impl Default for NamedLWLockTranche {
         }
     }
 }
-pub mod LWLockMode {
-    pub type Type = ::core::ffi::c_uint;
-    pub const LW_EXCLUSIVE: Type = 0;
-    pub const LW_SHARED: Type = 1;
-    pub const LW_WAIT_UNTIL_FREE: Type = 2;
-}
-pub mod BuiltinTrancheIds {
-    pub type Type = ::core::ffi::c_uint;
-    pub const LWTRANCHE_XACT_BUFFER: Type = 54;
-    pub const LWTRANCHE_COMMITTS_BUFFER: Type = 55;
-    pub const LWTRANCHE_SUBTRANS_BUFFER: Type = 56;
-    pub const LWTRANCHE_MULTIXACTOFFSET_BUFFER: Type = 57;
-    pub const LWTRANCHE_MULTIXACTMEMBER_BUFFER: Type = 58;
-    pub const LWTRANCHE_NOTIFY_BUFFER: Type = 59;
-    pub const LWTRANCHE_SERIAL_BUFFER: Type = 60;
-    pub const LWTRANCHE_WAL_INSERT: Type = 61;
-    pub const LWTRANCHE_BUFFER_CONTENT: Type = 62;
-    pub const LWTRANCHE_REPLICATION_ORIGIN_STATE: Type = 63;
-    pub const LWTRANCHE_REPLICATION_SLOT_IO: Type = 64;
-    pub const LWTRANCHE_LOCK_FASTPATH: Type = 65;
-    pub const LWTRANCHE_BUFFER_MAPPING: Type = 66;
-    pub const LWTRANCHE_LOCK_MANAGER: Type = 67;
-    pub const LWTRANCHE_PREDICATE_LOCK_MANAGER: Type = 68;
-    pub const LWTRANCHE_PARALLEL_HASH_JOIN: Type = 69;
-    pub const LWTRANCHE_PARALLEL_BTREE_SCAN: Type = 70;
-    pub const LWTRANCHE_PARALLEL_QUERY_DSA: Type = 71;
-    pub const LWTRANCHE_PER_SESSION_DSA: Type = 72;
-    pub const LWTRANCHE_PER_SESSION_RECORD_TYPE: Type = 73;
-    pub const LWTRANCHE_PER_SESSION_RECORD_TYPMOD: Type = 74;
-    pub const LWTRANCHE_SHARED_TUPLESTORE: Type = 75;
-    pub const LWTRANCHE_SHARED_TIDBITMAP: Type = 76;
-    pub const LWTRANCHE_PARALLEL_APPEND: Type = 77;
-    pub const LWTRANCHE_PER_XACT_PREDICATE_LIST: Type = 78;
-    pub const LWTRANCHE_PGSTATS_DSA: Type = 79;
-    pub const LWTRANCHE_PGSTATS_HASH: Type = 80;
-    pub const LWTRANCHE_PGSTATS_DATA: Type = 81;
-    pub const LWTRANCHE_LAUNCHER_DSA: Type = 82;
-    pub const LWTRANCHE_LAUNCHER_HASH: Type = 83;
-    pub const LWTRANCHE_DSM_REGISTRY_DSA: Type = 84;
-    pub const LWTRANCHE_DSM_REGISTRY_HASH: Type = 85;
-    pub const LWTRANCHE_COMMITTS_SLRU: Type = 86;
-    pub const LWTRANCHE_MULTIXACTMEMBER_SLRU: Type = 87;
-    pub const LWTRANCHE_MULTIXACTOFFSET_SLRU: Type = 88;
-    pub const LWTRANCHE_NOTIFY_SLRU: Type = 89;
-    pub const LWTRANCHE_SERIAL_SLRU: Type = 90;
-    pub const LWTRANCHE_SUBTRANS_SLRU: Type = 91;
-    pub const LWTRANCHE_XACT_SLRU: Type = 92;
-    pub const LWTRANCHE_PARALLEL_VACUUM_DSA: Type = 93;
-    pub const LWTRANCHE_AIO_URING_COMPLETION: Type = 94;
-    pub const LWTRANCHE_MEMORY_CONTEXT_REPORTING_STATE: Type = 95;
-    pub const LWTRANCHE_MEMORY_CONTEXT_REPORTING_PROC: Type = 96;
-    pub const LWTRANCHE_FIRST_USER_DEFINED: Type = 97;
-}
-pub type LWLockId = *mut LWLock;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct ShmemIndexEnt {
-    pub key: [::core::ffi::c_char; 48usize],
-    pub location: *mut ::core::ffi::c_void,
-    pub size: Size,
-    pub allocated_size: Size,
+pub struct FuncCallContext {
+    pub call_cntr: uint64,
+    pub max_calls: uint64,
+    pub user_fctx: *mut ::core::ffi::c_void,
+    pub attinmeta: *mut AttInMetadata,
+    pub multi_call_memory_ctx: MemoryContext,
+    pub tuple_desc: TupleDesc,
 }
-impl Default for ShmemIndexEnt {
+impl Default for FuncCallContext {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -19335,6 +19148,22 @@ impl Default for ShmemIndexEnt {
             s.assume_init()
         }
     }
+}
+pub mod TypeFuncClass {
+    pub type Type = ::core::ffi::c_uint;
+    pub const TYPEFUNC_SCALAR: Type = 0;
+    pub const TYPEFUNC_COMPOSITE: Type = 1;
+    pub const TYPEFUNC_COMPOSITE_DOMAIN: Type = 2;
+    pub const TYPEFUNC_RECORD: Type = 3;
+    pub const TYPEFUNC_OTHER: Type = 4;
+}
+pub type sig_atomic_t = __sig_atomic_t;
+pub mod _bindgen_ty_16 {
+    pub type Type = ::core::ffi::c_uint;
+    pub const SIGEV_SIGNAL: Type = 0;
+    pub const SIGEV_NONE: Type = 1;
+    pub const SIGEV_THREAD: Type = 2;
+    pub const SIGEV_THREAD_ID: Type = 4;
 }
 pub type Timestamp = int64;
 pub type TimestampTz = int64;
@@ -19402,227 +19231,766 @@ pub struct pg_tzenum {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct VirtualTransactionId {
-    pub procNumber: ProcNumber,
-    pub localTransactionId: LocalTransactionId,
-}
-#[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct LockMethodData {
-    pub numLockModes: ::core::ffi::c_int,
-    pub conflictTab: *const LOCKMASK,
-    pub lockModeNames: *const *const ::core::ffi::c_char,
-    pub trace_flag: *const bool,
+pub struct Port {
+    _unused: [u8; 0],
 }
-impl Default for LockMethodData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type LockMethod = *const LockMethodData;
-pub type LOCKMETHODID = uint16;
-pub mod LockTagType {
+pub type pg_stack_base_t = *mut ::core::ffi::c_char;
+pub mod BackendType {
     pub type Type = ::core::ffi::c_uint;
-    pub const LOCKTAG_RELATION: Type = 0;
-    pub const LOCKTAG_RELATION_EXTEND: Type = 1;
-    pub const LOCKTAG_DATABASE_FROZEN_IDS: Type = 2;
-    pub const LOCKTAG_PAGE: Type = 3;
-    pub const LOCKTAG_TUPLE: Type = 4;
-    pub const LOCKTAG_TRANSACTION: Type = 5;
-    pub const LOCKTAG_VIRTUALTRANSACTION: Type = 6;
-    pub const LOCKTAG_SPECULATIVE_TOKEN: Type = 7;
-    pub const LOCKTAG_OBJECT: Type = 8;
-    pub const LOCKTAG_USERLOCK: Type = 9;
-    pub const LOCKTAG_ADVISORY: Type = 10;
-    pub const LOCKTAG_APPLY_TRANSACTION: Type = 11;
+    pub const B_INVALID: Type = 0;
+    pub const B_BACKEND: Type = 1;
+    pub const B_DEAD_END_BACKEND: Type = 2;
+    pub const B_AUTOVAC_LAUNCHER: Type = 3;
+    pub const B_AUTOVAC_WORKER: Type = 4;
+    pub const B_BG_WORKER: Type = 5;
+    pub const B_WAL_SENDER: Type = 6;
+    pub const B_SLOTSYNC_WORKER: Type = 7;
+    pub const B_STANDALONE_BACKEND: Type = 8;
+    pub const B_ARCHIVER: Type = 9;
+    pub const B_BG_WRITER: Type = 10;
+    pub const B_CHECKPOINTER: Type = 11;
+    pub const B_IO_WORKER: Type = 12;
+    pub const B_STARTUP: Type = 13;
+    pub const B_WAL_RECEIVER: Type = 14;
+    pub const B_WAL_SUMMARIZER: Type = 15;
+    pub const B_WAL_WRITER: Type = 16;
+    pub const B_LOGGER: Type = 17;
 }
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct LOCKTAG {
-    pub locktag_field1: uint32,
-    pub locktag_field2: uint32,
-    pub locktag_field3: uint32,
-    pub locktag_field4: uint16,
-    pub locktag_type: uint8,
-    pub locktag_lockmethodid: uint8,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct LOCK {
-    pub tag: LOCKTAG,
-    pub grantMask: LOCKMASK,
-    pub waitMask: LOCKMASK,
-    pub procLocks: dlist_head,
-    pub waitProcs: dclist_head,
-    pub requested: [::core::ffi::c_int; 10usize],
-    pub nRequested: ::core::ffi::c_int,
-    pub granted: [::core::ffi::c_int; 10usize],
-    pub nGranted: ::core::ffi::c_int,
-}
-impl Default for LOCK {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PROCLOCKTAG {
-    pub myLock: *mut LOCK,
-    pub myProc: *mut PGPROC,
-}
-impl Default for PROCLOCKTAG {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PROCLOCK {
-    pub tag: PROCLOCKTAG,
-    pub groupLeader: *mut PGPROC,
-    pub holdMask: LOCKMASK,
-    pub releaseMask: LOCKMASK,
-    pub lockLink: dlist_node,
-    pub procLink: dlist_node,
-}
-impl Default for PROCLOCK {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct LOCALLOCKTAG {
-    pub lock: LOCKTAG,
-    pub mode: LOCKMODE,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct LOCALLOCKOWNER {
-    pub owner: *mut ResourceOwnerData,
-    pub nLocks: int64,
-}
-impl Default for LOCALLOCKOWNER {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct LOCALLOCK {
-    pub tag: LOCALLOCKTAG,
-    pub hashcode: uint32,
-    pub lock: *mut LOCK,
-    pub proclock: *mut PROCLOCK,
-    pub nLocks: int64,
-    pub numLockOwners: ::core::ffi::c_int,
-    pub maxLockOwners: ::core::ffi::c_int,
-    pub lockOwners: *mut LOCALLOCKOWNER,
-    pub holdsStrongLockCount: bool,
-    pub lockCleared: bool,
-}
-impl Default for LOCALLOCK {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct LockInstanceData {
-    pub locktag: LOCKTAG,
-    pub holdMask: LOCKMASK,
-    pub waitLockMode: LOCKMODE,
-    pub vxid: VirtualTransactionId,
-    pub waitStart: TimestampTz,
-    pub pid: ::core::ffi::c_int,
-    pub leaderPid: ::core::ffi::c_int,
-    pub fastpath: bool,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct LockData {
-    pub nelements: ::core::ffi::c_int,
-    pub locks: *mut LockInstanceData,
-}
-impl Default for LockData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct BlockedProcData {
-    pub pid: ::core::ffi::c_int,
-    pub first_lock: ::core::ffi::c_int,
-    pub num_locks: ::core::ffi::c_int,
-    pub first_waiter: ::core::ffi::c_int,
-    pub num_waiters: ::core::ffi::c_int,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct BlockedProcsData {
-    pub procs: *mut BlockedProcData,
-    pub locks: *mut LockInstanceData,
-    pub waiter_pids: *mut ::core::ffi::c_int,
-    pub nprocs: ::core::ffi::c_int,
-    pub maxprocs: ::core::ffi::c_int,
-    pub nlocks: ::core::ffi::c_int,
-    pub maxlocks: ::core::ffi::c_int,
-    pub npids: ::core::ffi::c_int,
-    pub maxpids: ::core::ffi::c_int,
-}
-impl Default for BlockedProcsData {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub mod LockAcquireResult {
+pub mod ProcessingMode {
+    #[doc = "\t  pmod.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *\n\t\t\tPOSTGRES processing mode definitions.                            *"]
     pub type Type = ::core::ffi::c_uint;
-    pub const LOCKACQUIRE_NOT_AVAIL: Type = 0;
-    pub const LOCKACQUIRE_OK: Type = 1;
-    pub const LOCKACQUIRE_ALREADY_HELD: Type = 2;
-    pub const LOCKACQUIRE_ALREADY_CLEAR: Type = 3;
+    pub const BootstrapProcessing: Type = 0;
+    pub const InitProcessing: Type = 1;
+    pub const NormalProcessing: Type = 2;
 }
-pub mod DeadLockState {
+pub type shmem_request_hook_type = ::core::option::Option<unsafe extern "C-unwind" fn()>;
+pub mod ConflictType {
     pub type Type = ::core::ffi::c_uint;
-    pub const DS_NOT_YET_CHECKED: Type = 0;
-    pub const DS_NO_DEADLOCK: Type = 1;
-    pub const DS_SOFT_DEADLOCK: Type = 2;
-    pub const DS_HARD_DEADLOCK: Type = 3;
-    pub const DS_BLOCKED_BY_AUTOVACUUM: Type = 4;
+    pub const CT_INSERT_EXISTS: Type = 0;
+    pub const CT_UPDATE_ORIGIN_DIFFERS: Type = 1;
+    pub const CT_UPDATE_EXISTS: Type = 2;
+    pub const CT_UPDATE_MISSING: Type = 3;
+    pub const CT_DELETE_ORIGIN_DIFFERS: Type = 4;
+    pub const CT_DELETE_MISSING: Type = 5;
+    pub const CT_MULTIPLE_UNIQUE_CONFLICTS: Type = 6;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ConflictTupleInfo {
+    pub slot: *mut TupleTableSlot,
+    pub indexoid: Oid,
+    pub xmin: TransactionId,
+    pub origin: RepOriginId,
+    pub ts: TimestampTz,
+}
+impl Default for ConflictTupleInfo {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub mod ProgressCommandType {
+    pub type Type = ::core::ffi::c_uint;
+    pub const PROGRESS_COMMAND_INVALID: Type = 0;
+    pub const PROGRESS_COMMAND_VACUUM: Type = 1;
+    pub const PROGRESS_COMMAND_ANALYZE: Type = 2;
+    pub const PROGRESS_COMMAND_CLUSTER: Type = 3;
+    pub const PROGRESS_COMMAND_CREATE_INDEX: Type = 4;
+    pub const PROGRESS_COMMAND_BASEBACKUP: Type = 5;
+    pub const PROGRESS_COMMAND_COPY: Type = 6;
+}
+pub type sa_family_t = ::core::ffi::c_ushort;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct sockaddr_storage {
+    pub ss_family: sa_family_t,
+    pub __ss_padding: [::core::ffi::c_char; 118usize],
+    pub __ss_align: ::core::ffi::c_ulong,
+}
+impl Default for sockaddr_storage {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SockAddr {
+    pub addr: sockaddr_storage,
+    pub salen: socklen_t,
+}
+impl Default for SockAddr {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AddrInfo {
+    pub family: ::core::ffi::c_int,
+    pub addr: SockAddr,
+}
+impl Default for AddrInfo {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type ProtocolVersion = uint32;
+pub type MsgType = ProtocolVersion;
+pub type PacketLen = uint32;
+pub type AuthRequest = uint32;
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct CancelRequestPacket {
+    pub cancelRequestCode: MsgType,
+    pub backendPID: uint32,
+    pub cancelAuthCode: __IncompleteArrayField<uint8>,
+}
+pub mod BackendState {
+    pub type Type = ::core::ffi::c_uint;
+    pub const STATE_UNDEFINED: Type = 0;
+    pub const STATE_STARTING: Type = 1;
+    pub const STATE_IDLE: Type = 2;
+    pub const STATE_RUNNING: Type = 3;
+    pub const STATE_IDLEINTRANSACTION: Type = 4;
+    pub const STATE_FASTPATH: Type = 5;
+    pub const STATE_IDLEINTRANSACTION_ABORTED: Type = 6;
+    pub const STATE_DISABLED: Type = 7;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PgBackendSSLStatus {
+    pub ssl_bits: ::core::ffi::c_int,
+    pub ssl_version: [::core::ffi::c_char; 64usize],
+    pub ssl_cipher: [::core::ffi::c_char; 64usize],
+    pub ssl_client_dn: [::core::ffi::c_char; 64usize],
+    pub ssl_client_serial: [::core::ffi::c_char; 64usize],
+    pub ssl_issuer_dn: [::core::ffi::c_char; 64usize],
+}
+impl Default for PgBackendSSLStatus {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PgBackendGSSStatus {
+    pub gss_princ: [::core::ffi::c_char; 64usize],
+    pub gss_auth: bool,
+    pub gss_enc: bool,
+    pub gss_delegation: bool,
+}
+impl Default for PgBackendGSSStatus {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PgBackendStatus {
+    pub st_changecount: ::core::ffi::c_int,
+    pub st_procpid: ::core::ffi::c_int,
+    pub st_backendType: BackendType::Type,
+    pub st_proc_start_timestamp: TimestampTz,
+    pub st_xact_start_timestamp: TimestampTz,
+    pub st_activity_start_timestamp: TimestampTz,
+    pub st_state_start_timestamp: TimestampTz,
+    pub st_databaseid: Oid,
+    pub st_userid: Oid,
+    pub st_clientaddr: SockAddr,
+    pub st_clienthostname: *mut ::core::ffi::c_char,
+    pub st_ssl: bool,
+    pub st_sslstatus: *mut PgBackendSSLStatus,
+    pub st_gss: bool,
+    pub st_gssstatus: *mut PgBackendGSSStatus,
+    pub st_state: BackendState::Type,
+    pub st_appname: *mut ::core::ffi::c_char,
+    pub st_activity_raw: *mut ::core::ffi::c_char,
+    pub st_progress_command: ProgressCommandType::Type,
+    pub st_progress_command_target: Oid,
+    pub st_progress_param: [int64; 20usize],
+    pub st_query_id: int64,
+    pub st_plan_id: int64,
+}
+impl Default for PgBackendStatus {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LocalPgBackendStatus {
+    pub backendStatus: PgBackendStatus,
+    pub proc_number: ProcNumber,
+    pub backend_xid: TransactionId,
+    pub backend_xmin: TransactionId,
+    pub backend_subxact_count: ::core::ffi::c_int,
+    pub backend_subxact_overflowed: bool,
+}
+impl Default for LocalPgBackendStatus {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub mod WaitEventActivity {
+    pub type Type = ::core::ffi::c_uint;
+    pub const WAIT_EVENT_ARCHIVER_MAIN: Type = 83886080;
+    pub const WAIT_EVENT_AUTOVACUUM_MAIN: Type = 83886081;
+    pub const WAIT_EVENT_BGWRITER_HIBERNATE: Type = 83886082;
+    pub const WAIT_EVENT_BGWRITER_MAIN: Type = 83886083;
+    pub const WAIT_EVENT_CHECKPOINTER_MAIN: Type = 83886084;
+    pub const WAIT_EVENT_CHECKPOINTER_SHUTDOWN: Type = 83886085;
+    pub const WAIT_EVENT_IO_WORKER_MAIN: Type = 83886086;
+    pub const WAIT_EVENT_LOGICAL_APPLY_MAIN: Type = 83886087;
+    pub const WAIT_EVENT_LOGICAL_LAUNCHER_MAIN: Type = 83886088;
+    pub const WAIT_EVENT_LOGICAL_PARALLEL_APPLY_MAIN: Type = 83886089;
+    pub const WAIT_EVENT_RECOVERY_WAL_STREAM: Type = 83886090;
+    pub const WAIT_EVENT_REPLICATION_SLOTSYNC_MAIN: Type = 83886091;
+    pub const WAIT_EVENT_REPLICATION_SLOTSYNC_SHUTDOWN: Type = 83886092;
+    pub const WAIT_EVENT_SYSLOGGER_MAIN: Type = 83886093;
+    pub const WAIT_EVENT_WAL_RECEIVER_MAIN: Type = 83886094;
+    pub const WAIT_EVENT_WAL_SENDER_MAIN: Type = 83886095;
+    pub const WAIT_EVENT_WAL_SUMMARIZER_WAL: Type = 83886096;
+    pub const WAIT_EVENT_WAL_WRITER_MAIN: Type = 83886097;
+}
+pub mod WaitEventBufferPin {
+    pub type Type = ::core::ffi::c_uint;
+    pub const WAIT_EVENT_BUFFER_PIN: Type = 67108864;
+}
+pub mod WaitEventClient {
+    pub type Type = ::core::ffi::c_uint;
+    pub const WAIT_EVENT_CLIENT_READ: Type = 100663296;
+    pub const WAIT_EVENT_CLIENT_WRITE: Type = 100663297;
+    pub const WAIT_EVENT_GSS_OPEN_SERVER: Type = 100663298;
+    pub const WAIT_EVENT_LIBPQWALRECEIVER_CONNECT: Type = 100663299;
+    pub const WAIT_EVENT_LIBPQWALRECEIVER_RECEIVE: Type = 100663300;
+    pub const WAIT_EVENT_SSL_OPEN_SERVER: Type = 100663301;
+    pub const WAIT_EVENT_WAIT_FOR_STANDBY_CONFIRMATION: Type = 100663302;
+    pub const WAIT_EVENT_WAL_SENDER_WAIT_FOR_WAL: Type = 100663303;
+    pub const WAIT_EVENT_WAL_SENDER_WRITE_DATA: Type = 100663304;
+}
+pub mod WaitEventIO {
+    pub type Type = ::core::ffi::c_uint;
+    pub const WAIT_EVENT_AIO_IO_COMPLETION: Type = 167772160;
+    pub const WAIT_EVENT_AIO_IO_URING_EXECUTION: Type = 167772161;
+    pub const WAIT_EVENT_AIO_IO_URING_SUBMIT: Type = 167772162;
+    pub const WAIT_EVENT_BASEBACKUP_READ: Type = 167772163;
+    pub const WAIT_EVENT_BASEBACKUP_SYNC: Type = 167772164;
+    pub const WAIT_EVENT_BASEBACKUP_WRITE: Type = 167772165;
+    pub const WAIT_EVENT_BUFFILE_READ: Type = 167772166;
+    pub const WAIT_EVENT_BUFFILE_TRUNCATE: Type = 167772167;
+    pub const WAIT_EVENT_BUFFILE_WRITE: Type = 167772168;
+    pub const WAIT_EVENT_CONTROL_FILE_READ: Type = 167772169;
+    pub const WAIT_EVENT_CONTROL_FILE_SYNC: Type = 167772170;
+    pub const WAIT_EVENT_CONTROL_FILE_SYNC_UPDATE: Type = 167772171;
+    pub const WAIT_EVENT_CONTROL_FILE_WRITE: Type = 167772172;
+    pub const WAIT_EVENT_CONTROL_FILE_WRITE_UPDATE: Type = 167772173;
+    pub const WAIT_EVENT_COPY_FILE_COPY: Type = 167772174;
+    pub const WAIT_EVENT_COPY_FILE_READ: Type = 167772175;
+    pub const WAIT_EVENT_COPY_FILE_WRITE: Type = 167772176;
+    pub const WAIT_EVENT_DATA_FILE_EXTEND: Type = 167772177;
+    pub const WAIT_EVENT_DATA_FILE_FLUSH: Type = 167772178;
+    pub const WAIT_EVENT_DATA_FILE_IMMEDIATE_SYNC: Type = 167772179;
+    pub const WAIT_EVENT_DATA_FILE_PREFETCH: Type = 167772180;
+    pub const WAIT_EVENT_DATA_FILE_READ: Type = 167772181;
+    pub const WAIT_EVENT_DATA_FILE_SYNC: Type = 167772182;
+    pub const WAIT_EVENT_DATA_FILE_TRUNCATE: Type = 167772183;
+    pub const WAIT_EVENT_DATA_FILE_WRITE: Type = 167772184;
+    pub const WAIT_EVENT_DSM_ALLOCATE: Type = 167772185;
+    pub const WAIT_EVENT_DSM_FILL_ZERO_WRITE: Type = 167772186;
+    pub const WAIT_EVENT_LOCK_FILE_ADDTODATADIR_READ: Type = 167772187;
+    pub const WAIT_EVENT_LOCK_FILE_ADDTODATADIR_SYNC: Type = 167772188;
+    pub const WAIT_EVENT_LOCK_FILE_ADDTODATADIR_WRITE: Type = 167772189;
+    pub const WAIT_EVENT_LOCK_FILE_CREATE_READ: Type = 167772190;
+    pub const WAIT_EVENT_LOCK_FILE_CREATE_SYNC: Type = 167772191;
+    pub const WAIT_EVENT_LOCK_FILE_CREATE_WRITE: Type = 167772192;
+    pub const WAIT_EVENT_LOCK_FILE_RECHECKDATADIR_READ: Type = 167772193;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_CHECKPOINT_SYNC: Type = 167772194;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_MAPPING_SYNC: Type = 167772195;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_MAPPING_WRITE: Type = 167772196;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_SYNC: Type = 167772197;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_TRUNCATE: Type = 167772198;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_WRITE: Type = 167772199;
+    pub const WAIT_EVENT_RELATION_MAP_READ: Type = 167772200;
+    pub const WAIT_EVENT_RELATION_MAP_REPLACE: Type = 167772201;
+    pub const WAIT_EVENT_RELATION_MAP_WRITE: Type = 167772202;
+    pub const WAIT_EVENT_REORDER_BUFFER_READ: Type = 167772203;
+    pub const WAIT_EVENT_REORDER_BUFFER_WRITE: Type = 167772204;
+    pub const WAIT_EVENT_REORDER_LOGICAL_MAPPING_READ: Type = 167772205;
+    pub const WAIT_EVENT_REPLICATION_SLOT_READ: Type = 167772206;
+    pub const WAIT_EVENT_REPLICATION_SLOT_RESTORE_SYNC: Type = 167772207;
+    pub const WAIT_EVENT_REPLICATION_SLOT_SYNC: Type = 167772208;
+    pub const WAIT_EVENT_REPLICATION_SLOT_WRITE: Type = 167772209;
+    pub const WAIT_EVENT_SLRU_FLUSH_SYNC: Type = 167772210;
+    pub const WAIT_EVENT_SLRU_READ: Type = 167772211;
+    pub const WAIT_EVENT_SLRU_SYNC: Type = 167772212;
+    pub const WAIT_EVENT_SLRU_WRITE: Type = 167772213;
+    pub const WAIT_EVENT_SNAPBUILD_READ: Type = 167772214;
+    pub const WAIT_EVENT_SNAPBUILD_SYNC: Type = 167772215;
+    pub const WAIT_EVENT_SNAPBUILD_WRITE: Type = 167772216;
+    pub const WAIT_EVENT_TIMELINE_HISTORY_FILE_SYNC: Type = 167772217;
+    pub const WAIT_EVENT_TIMELINE_HISTORY_FILE_WRITE: Type = 167772218;
+    pub const WAIT_EVENT_TIMELINE_HISTORY_READ: Type = 167772219;
+    pub const WAIT_EVENT_TIMELINE_HISTORY_SYNC: Type = 167772220;
+    pub const WAIT_EVENT_TIMELINE_HISTORY_WRITE: Type = 167772221;
+    pub const WAIT_EVENT_TWOPHASE_FILE_READ: Type = 167772222;
+    pub const WAIT_EVENT_TWOPHASE_FILE_SYNC: Type = 167772223;
+    pub const WAIT_EVENT_TWOPHASE_FILE_WRITE: Type = 167772224;
+    pub const WAIT_EVENT_VERSION_FILE_SYNC: Type = 167772225;
+    pub const WAIT_EVENT_VERSION_FILE_WRITE: Type = 167772226;
+    pub const WAIT_EVENT_WALSENDER_TIMELINE_HISTORY_READ: Type = 167772227;
+    pub const WAIT_EVENT_WAL_BOOTSTRAP_SYNC: Type = 167772228;
+    pub const WAIT_EVENT_WAL_BOOTSTRAP_WRITE: Type = 167772229;
+    pub const WAIT_EVENT_WAL_COPY_READ: Type = 167772230;
+    pub const WAIT_EVENT_WAL_COPY_SYNC: Type = 167772231;
+    pub const WAIT_EVENT_WAL_COPY_WRITE: Type = 167772232;
+    pub const WAIT_EVENT_WAL_INIT_SYNC: Type = 167772233;
+    pub const WAIT_EVENT_WAL_INIT_WRITE: Type = 167772234;
+    pub const WAIT_EVENT_WAL_READ: Type = 167772235;
+    pub const WAIT_EVENT_WAL_SUMMARY_READ: Type = 167772236;
+    pub const WAIT_EVENT_WAL_SUMMARY_WRITE: Type = 167772237;
+    pub const WAIT_EVENT_WAL_SYNC: Type = 167772238;
+    pub const WAIT_EVENT_WAL_SYNC_METHOD_ASSIGN: Type = 167772239;
+    pub const WAIT_EVENT_WAL_WRITE: Type = 167772240;
+}
+pub mod WaitEventIPC {
+    pub type Type = ::core::ffi::c_uint;
+    pub const WAIT_EVENT_APPEND_READY: Type = 134217728;
+    pub const WAIT_EVENT_ARCHIVE_CLEANUP_COMMAND: Type = 134217729;
+    pub const WAIT_EVENT_ARCHIVE_COMMAND: Type = 134217730;
+    pub const WAIT_EVENT_BACKEND_TERMINATION: Type = 134217731;
+    pub const WAIT_EVENT_BACKUP_WAIT_WAL_ARCHIVE: Type = 134217732;
+    pub const WAIT_EVENT_BGWORKER_SHUTDOWN: Type = 134217733;
+    pub const WAIT_EVENT_BGWORKER_STARTUP: Type = 134217734;
+    pub const WAIT_EVENT_BTREE_PAGE: Type = 134217735;
+    pub const WAIT_EVENT_BUFFER_IO: Type = 134217736;
+    pub const WAIT_EVENT_CHECKPOINT_DELAY_COMPLETE: Type = 134217737;
+    pub const WAIT_EVENT_CHECKPOINT_DELAY_START: Type = 134217738;
+    pub const WAIT_EVENT_CHECKPOINT_DONE: Type = 134217739;
+    pub const WAIT_EVENT_CHECKPOINT_START: Type = 134217740;
+    pub const WAIT_EVENT_EXECUTE_GATHER: Type = 134217741;
+    pub const WAIT_EVENT_HASH_BATCH_ALLOCATE: Type = 134217742;
+    pub const WAIT_EVENT_HASH_BATCH_ELECT: Type = 134217743;
+    pub const WAIT_EVENT_HASH_BATCH_LOAD: Type = 134217744;
+    pub const WAIT_EVENT_HASH_BUILD_ALLOCATE: Type = 134217745;
+    pub const WAIT_EVENT_HASH_BUILD_ELECT: Type = 134217746;
+    pub const WAIT_EVENT_HASH_BUILD_HASH_INNER: Type = 134217747;
+    pub const WAIT_EVENT_HASH_BUILD_HASH_OUTER: Type = 134217748;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_DECIDE: Type = 134217749;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_ELECT: Type = 134217750;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_FINISH: Type = 134217751;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_REALLOCATE: Type = 134217752;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_REPARTITION: Type = 134217753;
+    pub const WAIT_EVENT_HASH_GROW_BUCKETS_ELECT: Type = 134217754;
+    pub const WAIT_EVENT_HASH_GROW_BUCKETS_REALLOCATE: Type = 134217755;
+    pub const WAIT_EVENT_HASH_GROW_BUCKETS_REINSERT: Type = 134217756;
+    pub const WAIT_EVENT_LOGICAL_APPLY_SEND_DATA: Type = 134217757;
+    pub const WAIT_EVENT_LOGICAL_PARALLEL_APPLY_STATE_CHANGE: Type = 134217758;
+    pub const WAIT_EVENT_LOGICAL_SYNC_DATA: Type = 134217759;
+    pub const WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE: Type = 134217760;
+    pub const WAIT_EVENT_MESSAGE_QUEUE_INTERNAL: Type = 134217761;
+    pub const WAIT_EVENT_MESSAGE_QUEUE_PUT_MESSAGE: Type = 134217762;
+    pub const WAIT_EVENT_MESSAGE_QUEUE_RECEIVE: Type = 134217763;
+    pub const WAIT_EVENT_MESSAGE_QUEUE_SEND: Type = 134217764;
+    pub const WAIT_EVENT_MULTIXACT_CREATION: Type = 134217765;
+    pub const WAIT_EVENT_PARALLEL_BITMAP_SCAN: Type = 134217766;
+    pub const WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN: Type = 134217767;
+    pub const WAIT_EVENT_PARALLEL_FINISH: Type = 134217768;
+    pub const WAIT_EVENT_PROCARRAY_GROUP_UPDATE: Type = 134217769;
+    pub const WAIT_EVENT_PROC_SIGNAL_BARRIER: Type = 134217770;
+    pub const WAIT_EVENT_PROMOTE: Type = 134217771;
+    pub const WAIT_EVENT_RECOVERY_CONFLICT_SNAPSHOT: Type = 134217772;
+    pub const WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE: Type = 134217773;
+    pub const WAIT_EVENT_RECOVERY_END_COMMAND: Type = 134217774;
+    pub const WAIT_EVENT_RECOVERY_PAUSE: Type = 134217775;
+    pub const WAIT_EVENT_REPLICATION_ORIGIN_DROP: Type = 134217776;
+    pub const WAIT_EVENT_REPLICATION_SLOT_DROP: Type = 134217777;
+    pub const WAIT_EVENT_RESTORE_COMMAND: Type = 134217778;
+    pub const WAIT_EVENT_SAFE_SNAPSHOT: Type = 134217779;
+    pub const WAIT_EVENT_SYNC_REP: Type = 134217780;
+    pub const WAIT_EVENT_WAL_BUFFER_INIT: Type = 134217781;
+    pub const WAIT_EVENT_WAL_RECEIVER_EXIT: Type = 134217782;
+    pub const WAIT_EVENT_WAL_RECEIVER_WAIT_START: Type = 134217783;
+    pub const WAIT_EVENT_WAL_SUMMARY_READY: Type = 134217784;
+    pub const WAIT_EVENT_XACT_GROUP_UPDATE: Type = 134217785;
+}
+pub mod WaitEventTimeout {
+    pub type Type = ::core::ffi::c_uint;
+    pub const WAIT_EVENT_BASE_BACKUP_THROTTLE: Type = 150994944;
+    pub const WAIT_EVENT_CHECKPOINT_WRITE_DELAY: Type = 150994945;
+    pub const WAIT_EVENT_PG_SLEEP: Type = 150994946;
+    pub const WAIT_EVENT_RECOVERY_APPLY_DELAY: Type = 150994947;
+    pub const WAIT_EVENT_RECOVERY_RETRIEVE_RETRY_INTERVAL: Type = 150994948;
+    pub const WAIT_EVENT_REGISTER_SYNC_REQUEST: Type = 150994949;
+    pub const WAIT_EVENT_SPIN_DELAY: Type = 150994950;
+    pub const WAIT_EVENT_VACUUM_DELAY: Type = 150994951;
+    pub const WAIT_EVENT_VACUUM_TRUNCATE: Type = 150994952;
+    pub const WAIT_EVENT_WAL_SUMMARIZER_ERROR: Type = 150994953;
+}
+pub mod TrackFunctionsLevel {
+    pub type Type = ::core::ffi::c_uint;
+    pub const TRACK_FUNC_OFF: Type = 0;
+    pub const TRACK_FUNC_PL: Type = 1;
+    pub const TRACK_FUNC_ALL: Type = 2;
+}
+pub mod PgStat_FetchConsistency {
+    pub type Type = ::core::ffi::c_uint;
+    pub const PGSTAT_FETCH_CONSISTENCY_NONE: Type = 0;
+    pub const PGSTAT_FETCH_CONSISTENCY_CACHE: Type = 1;
+    pub const PGSTAT_FETCH_CONSISTENCY_SNAPSHOT: Type = 2;
+}
+pub mod SessionEndType {
+    pub type Type = ::core::ffi::c_uint;
+    pub const DISCONNECT_NOT_YET: Type = 0;
+    pub const DISCONNECT_NORMAL: Type = 1;
+    pub const DISCONNECT_CLIENT_EOF: Type = 2;
+    pub const DISCONNECT_FATAL: Type = 3;
+    pub const DISCONNECT_KILLED: Type = 4;
+}
+pub type PgStat_Counter = int64;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_FunctionCounts {
+    pub numcalls: PgStat_Counter,
+    pub total_time: instr_time,
+    pub self_time: instr_time,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PgStat_FunctionCallUsage {
+    pub fs: *mut PgStat_FunctionCounts,
+    pub save_f_total_time: instr_time,
+    pub save_total: instr_time,
+    pub start: instr_time,
+}
+impl Default for PgStat_FunctionCallUsage {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_BackendSubEntry {
+    pub apply_error_count: PgStat_Counter,
+    pub sync_error_count: PgStat_Counter,
+    pub conflict_count: [PgStat_Counter; 7usize],
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_TableCounts {
+    pub numscans: PgStat_Counter,
+    pub tuples_returned: PgStat_Counter,
+    pub tuples_fetched: PgStat_Counter,
+    pub tuples_inserted: PgStat_Counter,
+    pub tuples_updated: PgStat_Counter,
+    pub tuples_deleted: PgStat_Counter,
+    pub tuples_hot_updated: PgStat_Counter,
+    pub tuples_newpage_updated: PgStat_Counter,
+    pub truncdropped: bool,
+    pub delta_live_tuples: PgStat_Counter,
+    pub delta_dead_tuples: PgStat_Counter,
+    pub changed_tuples: PgStat_Counter,
+    pub blocks_fetched: PgStat_Counter,
+    pub blocks_hit: PgStat_Counter,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PgStat_TableStatus {
+    pub id: Oid,
+    pub shared: bool,
+    pub trans: *mut PgStat_TableXactStatus,
+    pub counts: PgStat_TableCounts,
+    pub relation: Relation,
+}
+impl Default for PgStat_TableStatus {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PgStat_TableXactStatus {
+    pub tuples_inserted: PgStat_Counter,
+    pub tuples_updated: PgStat_Counter,
+    pub tuples_deleted: PgStat_Counter,
+    pub truncdropped: bool,
+    pub inserted_pre_truncdrop: PgStat_Counter,
+    pub updated_pre_truncdrop: PgStat_Counter,
+    pub deleted_pre_truncdrop: PgStat_Counter,
+    pub nest_level: ::core::ffi::c_int,
+    pub upper: *mut PgStat_TableXactStatus,
+    pub parent: *mut PgStat_TableStatus,
+    pub next: *mut PgStat_TableXactStatus,
+}
+impl Default for PgStat_TableXactStatus {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PgStat_ArchiverStats {
+    pub archived_count: PgStat_Counter,
+    pub last_archived_wal: [::core::ffi::c_char; 41usize],
+    pub last_archived_timestamp: TimestampTz,
+    pub failed_count: PgStat_Counter,
+    pub last_failed_wal: [::core::ffi::c_char; 41usize],
+    pub last_failed_timestamp: TimestampTz,
+    pub stat_reset_timestamp: TimestampTz,
+}
+impl Default for PgStat_ArchiverStats {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_BgWriterStats {
+    pub buf_written_clean: PgStat_Counter,
+    pub maxwritten_clean: PgStat_Counter,
+    pub buf_alloc: PgStat_Counter,
+    pub stat_reset_timestamp: TimestampTz,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_CheckpointerStats {
+    pub num_timed: PgStat_Counter,
+    pub num_requested: PgStat_Counter,
+    pub num_performed: PgStat_Counter,
+    pub restartpoints_timed: PgStat_Counter,
+    pub restartpoints_requested: PgStat_Counter,
+    pub restartpoints_performed: PgStat_Counter,
+    pub write_time: PgStat_Counter,
+    pub sync_time: PgStat_Counter,
+    pub buffers_written: PgStat_Counter,
+    pub slru_written: PgStat_Counter,
+    pub stat_reset_timestamp: TimestampTz,
+}
+pub mod IOObject {
+    pub type Type = ::core::ffi::c_uint;
+    pub const IOOBJECT_RELATION: Type = 0;
+    pub const IOOBJECT_TEMP_RELATION: Type = 1;
+    pub const IOOBJECT_WAL: Type = 2;
+}
+pub mod IOContext {
+    pub type Type = ::core::ffi::c_uint;
+    pub const IOCONTEXT_BULKREAD: Type = 0;
+    pub const IOCONTEXT_BULKWRITE: Type = 1;
+    pub const IOCONTEXT_INIT: Type = 2;
+    pub const IOCONTEXT_NORMAL: Type = 3;
+    pub const IOCONTEXT_VACUUM: Type = 4;
+}
+pub mod IOOp {
+    pub type Type = ::core::ffi::c_uint;
+    pub const IOOP_EVICT: Type = 0;
+    pub const IOOP_FSYNC: Type = 1;
+    pub const IOOP_HIT: Type = 2;
+    pub const IOOP_REUSE: Type = 3;
+    pub const IOOP_WRITEBACK: Type = 4;
+    pub const IOOP_EXTEND: Type = 5;
+    pub const IOOP_READ: Type = 6;
+    pub const IOOP_WRITE: Type = 7;
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_BktypeIO {
+    pub bytes: [[[uint64; 8usize]; 5usize]; 3usize],
+    pub counts: [[[PgStat_Counter; 8usize]; 5usize]; 3usize],
+    pub times: [[[PgStat_Counter; 8usize]; 5usize]; 3usize],
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_PendingIO {
+    pub bytes: [[[uint64; 8usize]; 5usize]; 3usize],
+    pub counts: [[[PgStat_Counter; 8usize]; 5usize]; 3usize],
+    pub pending_times: [[[instr_time; 8usize]; 5usize]; 3usize],
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_IO {
+    pub stat_reset_timestamp: TimestampTz,
+    pub stats: [PgStat_BktypeIO; 18usize],
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_StatDBEntry {
+    pub xact_commit: PgStat_Counter,
+    pub xact_rollback: PgStat_Counter,
+    pub blocks_fetched: PgStat_Counter,
+    pub blocks_hit: PgStat_Counter,
+    pub tuples_returned: PgStat_Counter,
+    pub tuples_fetched: PgStat_Counter,
+    pub tuples_inserted: PgStat_Counter,
+    pub tuples_updated: PgStat_Counter,
+    pub tuples_deleted: PgStat_Counter,
+    pub last_autovac_time: TimestampTz,
+    pub conflict_tablespace: PgStat_Counter,
+    pub conflict_lock: PgStat_Counter,
+    pub conflict_snapshot: PgStat_Counter,
+    pub conflict_logicalslot: PgStat_Counter,
+    pub conflict_bufferpin: PgStat_Counter,
+    pub conflict_startup_deadlock: PgStat_Counter,
+    pub temp_files: PgStat_Counter,
+    pub temp_bytes: PgStat_Counter,
+    pub deadlocks: PgStat_Counter,
+    pub checksum_failures: PgStat_Counter,
+    pub last_checksum_failure: TimestampTz,
+    pub blk_read_time: PgStat_Counter,
+    pub blk_write_time: PgStat_Counter,
+    pub sessions: PgStat_Counter,
+    pub session_time: PgStat_Counter,
+    pub active_time: PgStat_Counter,
+    pub idle_in_transaction_time: PgStat_Counter,
+    pub sessions_abandoned: PgStat_Counter,
+    pub sessions_fatal: PgStat_Counter,
+    pub sessions_killed: PgStat_Counter,
+    pub parallel_workers_to_launch: PgStat_Counter,
+    pub parallel_workers_launched: PgStat_Counter,
+    pub stat_reset_timestamp: TimestampTz,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_StatFuncEntry {
+    pub numcalls: PgStat_Counter,
+    pub total_time: PgStat_Counter,
+    pub self_time: PgStat_Counter,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_StatReplSlotEntry {
+    pub spill_txns: PgStat_Counter,
+    pub spill_count: PgStat_Counter,
+    pub spill_bytes: PgStat_Counter,
+    pub stream_txns: PgStat_Counter,
+    pub stream_count: PgStat_Counter,
+    pub stream_bytes: PgStat_Counter,
+    pub total_txns: PgStat_Counter,
+    pub total_bytes: PgStat_Counter,
+    pub stat_reset_timestamp: TimestampTz,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_SLRUStats {
+    pub blocks_zeroed: PgStat_Counter,
+    pub blocks_hit: PgStat_Counter,
+    pub blocks_read: PgStat_Counter,
+    pub blocks_written: PgStat_Counter,
+    pub blocks_exists: PgStat_Counter,
+    pub flush: PgStat_Counter,
+    pub truncate: PgStat_Counter,
+    pub stat_reset_timestamp: TimestampTz,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_StatSubEntry {
+    pub apply_error_count: PgStat_Counter,
+    pub sync_error_count: PgStat_Counter,
+    pub conflict_count: [PgStat_Counter; 7usize],
+    pub stat_reset_timestamp: TimestampTz,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_StatTabEntry {
+    pub numscans: PgStat_Counter,
+    pub lastscan: TimestampTz,
+    pub tuples_returned: PgStat_Counter,
+    pub tuples_fetched: PgStat_Counter,
+    pub tuples_inserted: PgStat_Counter,
+    pub tuples_updated: PgStat_Counter,
+    pub tuples_deleted: PgStat_Counter,
+    pub tuples_hot_updated: PgStat_Counter,
+    pub tuples_newpage_updated: PgStat_Counter,
+    pub live_tuples: PgStat_Counter,
+    pub dead_tuples: PgStat_Counter,
+    pub mod_since_analyze: PgStat_Counter,
+    pub ins_since_vacuum: PgStat_Counter,
+    pub blocks_fetched: PgStat_Counter,
+    pub blocks_hit: PgStat_Counter,
+    pub last_vacuum_time: TimestampTz,
+    pub vacuum_count: PgStat_Counter,
+    pub last_autovacuum_time: TimestampTz,
+    pub autovacuum_count: PgStat_Counter,
+    pub last_analyze_time: TimestampTz,
+    pub analyze_count: PgStat_Counter,
+    pub last_autoanalyze_time: TimestampTz,
+    pub autoanalyze_count: PgStat_Counter,
+    pub total_vacuum_time: PgStat_Counter,
+    pub total_autovacuum_time: PgStat_Counter,
+    pub total_analyze_time: PgStat_Counter,
+    pub total_autoanalyze_time: PgStat_Counter,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_WalCounters {
+    pub wal_records: PgStat_Counter,
+    pub wal_fpi: PgStat_Counter,
+    pub wal_bytes: uint64,
+    pub wal_buffers_full: PgStat_Counter,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_WalStats {
+    pub wal_counters: PgStat_WalCounters,
+    pub stat_reset_timestamp: TimestampTz,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_Backend {
+    pub stat_reset_timestamp: TimestampTz,
+    pub io_stats: PgStat_BktypeIO,
+    pub wal_counters: PgStat_WalCounters,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_BackendPending {
+    pub pending_io: PgStat_PendingIO,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -19710,6 +20078,279 @@ pub mod SessionBackupState {
     pub type Type = ::core::ffi::c_uint;
     pub const SESSION_BACKUP_NONE: Type = 0;
     pub const SESSION_BACKUP_RUNNING: Type = 1;
+}
+pub type RmgrId = uint8;
+pub mod RmgrIds {
+    pub type Type = ::core::ffi::c_uint;
+    pub const RM_XLOG_ID: Type = 0;
+    pub const RM_XACT_ID: Type = 1;
+    pub const RM_SMGR_ID: Type = 2;
+    pub const RM_CLOG_ID: Type = 3;
+    pub const RM_DBASE_ID: Type = 4;
+    pub const RM_TBLSPC_ID: Type = 5;
+    pub const RM_MULTIXACT_ID: Type = 6;
+    pub const RM_RELMAP_ID: Type = 7;
+    pub const RM_STANDBY_ID: Type = 8;
+    pub const RM_HEAP2_ID: Type = 9;
+    pub const RM_HEAP_ID: Type = 10;
+    pub const RM_BTREE_ID: Type = 11;
+    pub const RM_HASH_ID: Type = 12;
+    pub const RM_GIN_ID: Type = 13;
+    pub const RM_GIST_ID: Type = 14;
+    pub const RM_SEQ_ID: Type = 15;
+    pub const RM_SPGIST_ID: Type = 16;
+    pub const RM_BRIN_ID: Type = 17;
+    pub const RM_COMMIT_TS_ID: Type = 18;
+    pub const RM_REPLORIGIN_ID: Type = 19;
+    pub const RM_GENERIC_ID: Type = 20;
+    pub const RM_LOGICALMSG_ID: Type = 21;
+    pub const RM_NEXT_ID: Type = 22;
+}
+pub type pg_crc32c = uint32;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RelFileLocator {
+    pub spcOid: Oid,
+    pub dbOid: Oid,
+    pub relNumber: RelFileNumber,
+}
+impl Default for RelFileLocator {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RelFileLocatorBackend {
+    pub locator: RelFileLocator,
+    pub backend: ProcNumber,
+}
+impl Default for RelFileLocatorBackend {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct XLogRecord {
+    pub xl_tot_len: uint32,
+    pub xl_xid: TransactionId,
+    pub xl_prev: XLogRecPtr,
+    pub xl_info: uint8,
+    pub xl_rmid: RmgrId,
+    pub xl_crc: pg_crc32c,
+}
+impl Default for XLogRecord {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct XLogRecordBlockHeader {
+    pub id: uint8,
+    pub fork_flags: uint8,
+    pub data_length: uint16,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct XLogRecordBlockImageHeader {
+    pub length: uint16,
+    pub hole_offset: uint16,
+    pub bimg_info: uint8,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct XLogRecordBlockCompressHeader {
+    pub hole_length: uint16,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct XLogRecordDataHeaderShort {
+    pub id: uint8,
+    pub data_length: uint8,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct XLogRecordDataHeaderLong {
+    pub id: uint8,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct WALOpenSegment {
+    pub ws_file: ::core::ffi::c_int,
+    pub ws_segno: XLogSegNo,
+    pub ws_tli: TimeLineID,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WALSegmentContext {
+    pub ws_dir: [::core::ffi::c_char; 1024usize],
+    pub ws_segsize: ::core::ffi::c_int,
+}
+impl Default for WALSegmentContext {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type XLogPageReadCB = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        xlogreader: *mut XLogReaderState,
+        targetPagePtr: XLogRecPtr,
+        reqLen: ::core::ffi::c_int,
+        targetRecPtr: XLogRecPtr,
+        readBuf: *mut ::core::ffi::c_char,
+    ) -> ::core::ffi::c_int,
+>;
+pub type WALSegmentOpenCB = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        xlogreader: *mut XLogReaderState,
+        nextSegNo: XLogSegNo,
+        tli_p: *mut TimeLineID,
+    ),
+>;
+pub type WALSegmentCloseCB =
+    ::core::option::Option<unsafe extern "C-unwind" fn(xlogreader: *mut XLogReaderState)>;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct XLogReaderRoutine {
+    pub page_read: XLogPageReadCB,
+    pub segment_open: WALSegmentOpenCB,
+    pub segment_close: WALSegmentCloseCB,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DecodedBkpBlock {
+    pub in_use: bool,
+    pub rlocator: RelFileLocator,
+    pub forknum: ForkNumber::Type,
+    pub blkno: BlockNumber,
+    pub prefetch_buffer: Buffer,
+    pub flags: uint8,
+    pub has_image: bool,
+    pub apply_image: bool,
+    pub bkp_image: *mut ::core::ffi::c_char,
+    pub hole_offset: uint16,
+    pub hole_length: uint16,
+    pub bimg_len: uint16,
+    pub bimg_info: uint8,
+    pub has_data: bool,
+    pub data: *mut ::core::ffi::c_char,
+    pub data_len: uint16,
+    pub data_bufsz: uint16,
+}
+impl Default for DecodedBkpBlock {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct DecodedXLogRecord {
+    pub size: usize,
+    pub oversized: bool,
+    pub next: *mut DecodedXLogRecord,
+    pub lsn: XLogRecPtr,
+    pub next_lsn: XLogRecPtr,
+    pub header: XLogRecord,
+    pub record_origin: RepOriginId,
+    pub toplevel_xid: TransactionId,
+    pub main_data: *mut ::core::ffi::c_char,
+    pub main_data_len: uint32,
+    pub max_block_id: ::core::ffi::c_int,
+    pub blocks: __IncompleteArrayField<DecodedBkpBlock>,
+}
+impl Default for DecodedXLogRecord {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct XLogReaderState {
+    pub routine: XLogReaderRoutine,
+    pub system_identifier: uint64,
+    pub private_data: *mut ::core::ffi::c_void,
+    pub ReadRecPtr: XLogRecPtr,
+    pub EndRecPtr: XLogRecPtr,
+    pub abortedRecPtr: XLogRecPtr,
+    pub missingContrecPtr: XLogRecPtr,
+    pub overwrittenRecPtr: XLogRecPtr,
+    pub DecodeRecPtr: XLogRecPtr,
+    pub NextRecPtr: XLogRecPtr,
+    pub PrevRecPtr: XLogRecPtr,
+    pub record: *mut DecodedXLogRecord,
+    pub decode_buffer: *mut ::core::ffi::c_char,
+    pub decode_buffer_size: usize,
+    pub free_decode_buffer: bool,
+    pub decode_buffer_head: *mut ::core::ffi::c_char,
+    pub decode_buffer_tail: *mut ::core::ffi::c_char,
+    pub decode_queue_head: *mut DecodedXLogRecord,
+    pub decode_queue_tail: *mut DecodedXLogRecord,
+    pub readBuf: *mut ::core::ffi::c_char,
+    pub readLen: uint32,
+    pub segcxt: WALSegmentContext,
+    pub seg: WALOpenSegment,
+    pub segoff: uint32,
+    pub latestPagePtr: XLogRecPtr,
+    pub latestPageTLI: TimeLineID,
+    pub currRecPtr: XLogRecPtr,
+    pub currTLI: TimeLineID,
+    pub currTLIValidUntil: XLogRecPtr,
+    pub nextTLI: TimeLineID,
+    pub readRecordBuf: *mut ::core::ffi::c_char,
+    pub readRecordBufSize: uint32,
+    pub errormsg_buf: *mut ::core::ffi::c_char,
+    pub errormsg_deferred: bool,
+    pub nonblocking: bool,
+}
+impl Default for XLogReaderState {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub mod XLogPageReadResult {
+    pub type Type = ::core::ffi::c_int;
+    pub const XLREAD_SUCCESS: Type = 0;
+    pub const XLREAD_FAIL: Type = -1;
+    pub const XLREAD_WOULDBLOCK: Type = -2;
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct WALReadError {
+    pub wre_errno: ::core::ffi::c_int,
+    pub wre_off: ::core::ffi::c_int,
+    pub wre_req: ::core::ffi::c_int,
+    pub wre_read: ::core::ffi::c_int,
+    pub wre_seg: WALOpenSegment,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -19917,37 +20558,6 @@ pub struct RuleLock {
     pub rules: *mut *mut RewriteRule,
 }
 impl Default for RuleLock {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RelFileLocator {
-    pub spcOid: Oid,
-    pub dbOid: Oid,
-    pub relNumber: RelFileNumber,
-}
-impl Default for RelFileLocator {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RelFileLocatorBackend {
-    pub locator: RelFileLocator,
-    pub backend: ProcNumber,
-}
-impl Default for RelFileLocatorBackend {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -20509,1177 +21119,27 @@ impl Default for ViewOptions {
         }
     }
 }
-pub mod XLTW_Oper {
-    pub type Type = ::core::ffi::c_uint;
-    pub const XLTW_None: Type = 0;
-    pub const XLTW_Update: Type = 1;
-    pub const XLTW_Delete: Type = 2;
-    pub const XLTW_Lock: Type = 3;
-    pub const XLTW_LockUpdated: Type = 4;
-    pub const XLTW_InsertIndex: Type = 5;
-    pub const XLTW_InsertIndexUnique: Type = 6;
-    pub const XLTW_FetchUpdated: Type = 7;
-    pub const XLTW_RecheckExclusionConstr: Type = 8;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MemoryStatsEntry {
-    pub name: dsa_pointer,
-    pub ident: dsa_pointer,
-    pub path: dsa_pointer,
-    pub type_: NodeTag,
-    pub path_length: ::core::ffi::c_int,
-    pub levels: ::core::ffi::c_int,
-    pub totalspace: int64,
-    pub nblocks: int64,
-    pub freespace: int64,
-    pub freechunks: int64,
-    pub num_agg_stats: ::core::ffi::c_int,
-}
-impl Default for MemoryStatsEntry {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct MemoryStatsCtl {
-    pub memstats_dsa_handle: dsa_handle,
-    pub lw_lock: LWLock,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct MemoryStatsBackendState {
-    pub memcxt_cv: ConditionVariable,
-    pub lw_lock: LWLock,
-    pub proc_id: ::core::ffi::c_int,
-    pub total_stats: ::core::ffi::c_int,
-    pub summary: bool,
-    pub memstats_dsa_pointer: dsa_pointer,
-    pub stats_timestamp: TimestampTz,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MemoryStatsContextId {
-    pub context: MemoryContext,
-    pub context_id: ::core::ffi::c_int,
-}
-impl Default for MemoryStatsContextId {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type ExecutorStart_hook_type = ::core::option::Option<
-    unsafe extern "C-unwind" fn(queryDesc: *mut QueryDesc, eflags: ::core::ffi::c_int) -> bool,
->;
-pub type ExecutorRun_hook_type = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        queryDesc: *mut QueryDesc,
-        direction: ScanDirection::Type,
-        count: uint64,
-    ),
->;
-pub type ExecutorFinish_hook_type =
-    ::core::option::Option<unsafe extern "C-unwind" fn(queryDesc: *mut QueryDesc)>;
-pub type ExecutorEnd_hook_type =
-    ::core::option::Option<unsafe extern "C-unwind" fn(queryDesc: *mut QueryDesc)>;
-pub type ExecutorCheckPerms_hook_type = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        rangeTable: *mut List,
-        rtePermInfos: *mut List,
-        ereport_on_violation: bool,
-    ) -> bool,
->;
-pub type ExecScanAccessMtd = ::core::option::Option<
-    unsafe extern "C-unwind" fn(node: *mut ScanState) -> *mut TupleTableSlot,
->;
-pub type ExecScanRecheckMtd = ::core::option::Option<
-    unsafe extern "C-unwind" fn(node: *mut ScanState, slot: *mut TupleTableSlot) -> bool,
->;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TupOutputState {
-    pub slot: *mut TupleTableSlot,
-    pub dest: *mut DestReceiver,
-}
-impl Default for TupOutputState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AttInMetadata {
-    pub tupdesc: TupleDesc,
-    pub attinfuncs: *mut FmgrInfo,
-    pub attioparams: *mut Oid,
-    pub atttypmods: *mut int32,
-}
-impl Default for AttInMetadata {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct FuncCallContext {
-    pub call_cntr: uint64,
-    pub max_calls: uint64,
-    pub user_fctx: *mut ::core::ffi::c_void,
-    pub attinmeta: *mut AttInMetadata,
-    pub multi_call_memory_ctx: MemoryContext,
-    pub tuple_desc: TupleDesc,
-}
-impl Default for FuncCallContext {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub mod TypeFuncClass {
-    pub type Type = ::core::ffi::c_uint;
-    pub const TYPEFUNC_SCALAR: Type = 0;
-    pub const TYPEFUNC_COMPOSITE: Type = 1;
-    pub const TYPEFUNC_COMPOSITE_DOMAIN: Type = 2;
-    pub const TYPEFUNC_RECORD: Type = 3;
-    pub const TYPEFUNC_OTHER: Type = 4;
-}
-pub type sig_atomic_t = __sig_atomic_t;
-pub mod _bindgen_ty_16 {
-    pub type Type = ::core::ffi::c_uint;
-    pub const SIGEV_SIGNAL: Type = 0;
-    pub const SIGEV_NONE: Type = 1;
-    pub const SIGEV_THREAD: Type = 2;
-    pub const SIGEV_THREAD_ID: Type = 4;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct Port {
-    _unused: [u8; 0],
-}
-pub type pg_stack_base_t = *mut ::core::ffi::c_char;
-pub mod BackendType {
-    pub type Type = ::core::ffi::c_uint;
-    pub const B_INVALID: Type = 0;
-    pub const B_BACKEND: Type = 1;
-    pub const B_DEAD_END_BACKEND: Type = 2;
-    pub const B_AUTOVAC_LAUNCHER: Type = 3;
-    pub const B_AUTOVAC_WORKER: Type = 4;
-    pub const B_BG_WORKER: Type = 5;
-    pub const B_WAL_SENDER: Type = 6;
-    pub const B_SLOTSYNC_WORKER: Type = 7;
-    pub const B_STANDALONE_BACKEND: Type = 8;
-    pub const B_ARCHIVER: Type = 9;
-    pub const B_BG_WRITER: Type = 10;
-    pub const B_CHECKPOINTER: Type = 11;
-    pub const B_IO_WORKER: Type = 12;
-    pub const B_STARTUP: Type = 13;
-    pub const B_WAL_RECEIVER: Type = 14;
-    pub const B_WAL_SUMMARIZER: Type = 15;
-    pub const B_WAL_WRITER: Type = 16;
-    pub const B_LOGGER: Type = 17;
-}
-pub mod ProcessingMode {
-    #[doc = "\t  pmod.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *\n\t\t\tPOSTGRES processing mode definitions.                            *"]
-    pub type Type = ::core::ffi::c_uint;
-    pub const BootstrapProcessing: Type = 0;
-    pub const InitProcessing: Type = 1;
-    pub const NormalProcessing: Type = 2;
-}
-pub type shmem_request_hook_type = ::core::option::Option<unsafe extern "C-unwind" fn()>;
-pub mod ConflictType {
-    pub type Type = ::core::ffi::c_uint;
-    pub const CT_INSERT_EXISTS: Type = 0;
-    pub const CT_UPDATE_ORIGIN_DIFFERS: Type = 1;
-    pub const CT_UPDATE_EXISTS: Type = 2;
-    pub const CT_UPDATE_MISSING: Type = 3;
-    pub const CT_DELETE_ORIGIN_DIFFERS: Type = 4;
-    pub const CT_DELETE_MISSING: Type = 5;
-    pub const CT_MULTIPLE_UNIQUE_CONFLICTS: Type = 6;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ConflictTupleInfo {
-    pub slot: *mut TupleTableSlot,
-    pub indexoid: Oid,
-    pub xmin: TransactionId,
-    pub origin: RepOriginId,
-    pub ts: TimestampTz,
-}
-impl Default for ConflictTupleInfo {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub mod ProgressCommandType {
-    pub type Type = ::core::ffi::c_uint;
-    pub const PROGRESS_COMMAND_INVALID: Type = 0;
-    pub const PROGRESS_COMMAND_VACUUM: Type = 1;
-    pub const PROGRESS_COMMAND_ANALYZE: Type = 2;
-    pub const PROGRESS_COMMAND_CLUSTER: Type = 3;
-    pub const PROGRESS_COMMAND_CREATE_INDEX: Type = 4;
-    pub const PROGRESS_COMMAND_BASEBACKUP: Type = 5;
-    pub const PROGRESS_COMMAND_COPY: Type = 6;
-}
-pub type sa_family_t = ::core::ffi::c_ushort;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sockaddr_storage {
-    pub ss_family: sa_family_t,
-    pub __ss_padding: [::core::ffi::c_char; 118usize],
-    pub __ss_align: ::core::ffi::c_ulong,
-}
-impl Default for sockaddr_storage {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SockAddr {
-    pub addr: sockaddr_storage,
-    pub salen: socklen_t,
-}
-impl Default for SockAddr {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AddrInfo {
-    pub family: ::core::ffi::c_int,
-    pub addr: SockAddr,
-}
-impl Default for AddrInfo {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type ProtocolVersion = uint32;
-pub type MsgType = ProtocolVersion;
-pub type PacketLen = uint32;
-pub type AuthRequest = uint32;
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct CancelRequestPacket {
-    pub cancelRequestCode: MsgType,
-    pub backendPID: uint32,
-    pub cancelAuthCode: __IncompleteArrayField<::core::ffi::c_char>,
-}
-pub mod BackendState {
-    pub type Type = ::core::ffi::c_uint;
-    pub const STATE_UNDEFINED: Type = 0;
-    pub const STATE_STARTING: Type = 1;
-    pub const STATE_IDLE: Type = 2;
-    pub const STATE_RUNNING: Type = 3;
-    pub const STATE_IDLEINTRANSACTION: Type = 4;
-    pub const STATE_FASTPATH: Type = 5;
-    pub const STATE_IDLEINTRANSACTION_ABORTED: Type = 6;
-    pub const STATE_DISABLED: Type = 7;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgBackendSSLStatus {
-    pub ssl_bits: ::core::ffi::c_int,
-    pub ssl_version: [::core::ffi::c_char; 64usize],
-    pub ssl_cipher: [::core::ffi::c_char; 64usize],
-    pub ssl_client_dn: [::core::ffi::c_char; 64usize],
-    pub ssl_client_serial: [::core::ffi::c_char; 64usize],
-    pub ssl_issuer_dn: [::core::ffi::c_char; 64usize],
-}
-impl Default for PgBackendSSLStatus {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgBackendGSSStatus {
-    pub gss_princ: [::core::ffi::c_char; 64usize],
-    pub gss_auth: bool,
-    pub gss_enc: bool,
-    pub gss_delegation: bool,
-}
-impl Default for PgBackendGSSStatus {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgBackendStatus {
-    pub st_changecount: ::core::ffi::c_int,
-    pub st_procpid: ::core::ffi::c_int,
-    pub st_backendType: BackendType::Type,
-    pub st_proc_start_timestamp: TimestampTz,
-    pub st_xact_start_timestamp: TimestampTz,
-    pub st_activity_start_timestamp: TimestampTz,
-    pub st_state_start_timestamp: TimestampTz,
-    pub st_databaseid: Oid,
-    pub st_userid: Oid,
-    pub st_clientaddr: SockAddr,
-    pub st_clienthostname: *mut ::core::ffi::c_char,
-    pub st_ssl: bool,
-    pub st_sslstatus: *mut PgBackendSSLStatus,
-    pub st_gss: bool,
-    pub st_gssstatus: *mut PgBackendGSSStatus,
-    pub st_state: BackendState::Type,
-    pub st_appname: *mut ::core::ffi::c_char,
-    pub st_activity_raw: *mut ::core::ffi::c_char,
-    pub st_progress_command: ProgressCommandType::Type,
-    pub st_progress_command_target: Oid,
-    pub st_progress_param: [int64; 20usize],
-    pub st_query_id: uint64,
-    pub st_plan_id: uint64,
-}
-impl Default for PgBackendStatus {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct LocalPgBackendStatus {
-    pub backendStatus: PgBackendStatus,
-    pub proc_number: ProcNumber,
-    pub backend_xid: TransactionId,
-    pub backend_xmin: TransactionId,
-    pub backend_subxact_count: ::core::ffi::c_int,
-    pub backend_subxact_overflowed: bool,
-}
-impl Default for LocalPgBackendStatus {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub mod WaitEventActivity {
-    pub type Type = ::core::ffi::c_uint;
-    pub const WAIT_EVENT_ARCHIVER_MAIN: Type = 83886080;
-    pub const WAIT_EVENT_AUTOVACUUM_MAIN: Type = 83886081;
-    pub const WAIT_EVENT_BGWRITER_HIBERNATE: Type = 83886082;
-    pub const WAIT_EVENT_BGWRITER_MAIN: Type = 83886083;
-    pub const WAIT_EVENT_CHECKPOINTER_MAIN: Type = 83886084;
-    pub const WAIT_EVENT_CHECKPOINTER_SHUTDOWN: Type = 83886085;
-    pub const WAIT_EVENT_IO_WORKER_MAIN: Type = 83886086;
-    pub const WAIT_EVENT_LOGICAL_APPLY_MAIN: Type = 83886087;
-    pub const WAIT_EVENT_LOGICAL_LAUNCHER_MAIN: Type = 83886088;
-    pub const WAIT_EVENT_LOGICAL_PARALLEL_APPLY_MAIN: Type = 83886089;
-    pub const WAIT_EVENT_RECOVERY_WAL_STREAM: Type = 83886090;
-    pub const WAIT_EVENT_REPLICATION_SLOTSYNC_MAIN: Type = 83886091;
-    pub const WAIT_EVENT_REPLICATION_SLOTSYNC_SHUTDOWN: Type = 83886092;
-    pub const WAIT_EVENT_SYSLOGGER_MAIN: Type = 83886093;
-    pub const WAIT_EVENT_WAL_RECEIVER_MAIN: Type = 83886094;
-    pub const WAIT_EVENT_WAL_SENDER_MAIN: Type = 83886095;
-    pub const WAIT_EVENT_WAL_SUMMARIZER_WAL: Type = 83886096;
-    pub const WAIT_EVENT_WAL_WRITER_MAIN: Type = 83886097;
-}
-pub mod WaitEventBufferPin {
-    pub type Type = ::core::ffi::c_uint;
-    pub const WAIT_EVENT_BUFFER_PIN: Type = 67108864;
-}
-pub mod WaitEventClient {
-    pub type Type = ::core::ffi::c_uint;
-    pub const WAIT_EVENT_CLIENT_READ: Type = 100663296;
-    pub const WAIT_EVENT_CLIENT_WRITE: Type = 100663297;
-    pub const WAIT_EVENT_GSS_OPEN_SERVER: Type = 100663298;
-    pub const WAIT_EVENT_LIBPQWALRECEIVER_CONNECT: Type = 100663299;
-    pub const WAIT_EVENT_LIBPQWALRECEIVER_RECEIVE: Type = 100663300;
-    pub const WAIT_EVENT_SSL_OPEN_SERVER: Type = 100663301;
-    pub const WAIT_EVENT_WAIT_FOR_STANDBY_CONFIRMATION: Type = 100663302;
-    pub const WAIT_EVENT_WAL_SENDER_WAIT_FOR_WAL: Type = 100663303;
-    pub const WAIT_EVENT_WAL_SENDER_WRITE_DATA: Type = 100663304;
-}
-pub mod WaitEventIO {
-    pub type Type = ::core::ffi::c_uint;
-    pub const WAIT_EVENT_AIO_IO_COMPLETION: Type = 167772160;
-    pub const WAIT_EVENT_AIO_IO_URING_EXECUTION: Type = 167772161;
-    pub const WAIT_EVENT_AIO_IO_URING_SUBMIT: Type = 167772162;
-    pub const WAIT_EVENT_BASEBACKUP_READ: Type = 167772163;
-    pub const WAIT_EVENT_BASEBACKUP_SYNC: Type = 167772164;
-    pub const WAIT_EVENT_BASEBACKUP_WRITE: Type = 167772165;
-    pub const WAIT_EVENT_BUFFILE_READ: Type = 167772166;
-    pub const WAIT_EVENT_BUFFILE_TRUNCATE: Type = 167772167;
-    pub const WAIT_EVENT_BUFFILE_WRITE: Type = 167772168;
-    pub const WAIT_EVENT_CONTROL_FILE_READ: Type = 167772169;
-    pub const WAIT_EVENT_CONTROL_FILE_SYNC: Type = 167772170;
-    pub const WAIT_EVENT_CONTROL_FILE_SYNC_UPDATE: Type = 167772171;
-    pub const WAIT_EVENT_CONTROL_FILE_WRITE: Type = 167772172;
-    pub const WAIT_EVENT_CONTROL_FILE_WRITE_UPDATE: Type = 167772173;
-    pub const WAIT_EVENT_COPY_FILE_COPY: Type = 167772174;
-    pub const WAIT_EVENT_COPY_FILE_READ: Type = 167772175;
-    pub const WAIT_EVENT_COPY_FILE_WRITE: Type = 167772176;
-    pub const WAIT_EVENT_DATA_FILE_EXTEND: Type = 167772177;
-    pub const WAIT_EVENT_DATA_FILE_FLUSH: Type = 167772178;
-    pub const WAIT_EVENT_DATA_FILE_IMMEDIATE_SYNC: Type = 167772179;
-    pub const WAIT_EVENT_DATA_FILE_PREFETCH: Type = 167772180;
-    pub const WAIT_EVENT_DATA_FILE_READ: Type = 167772181;
-    pub const WAIT_EVENT_DATA_FILE_SYNC: Type = 167772182;
-    pub const WAIT_EVENT_DATA_FILE_TRUNCATE: Type = 167772183;
-    pub const WAIT_EVENT_DATA_FILE_WRITE: Type = 167772184;
-    pub const WAIT_EVENT_DSM_ALLOCATE: Type = 167772185;
-    pub const WAIT_EVENT_DSM_FILL_ZERO_WRITE: Type = 167772186;
-    pub const WAIT_EVENT_LOCK_FILE_ADDTODATADIR_READ: Type = 167772187;
-    pub const WAIT_EVENT_LOCK_FILE_ADDTODATADIR_SYNC: Type = 167772188;
-    pub const WAIT_EVENT_LOCK_FILE_ADDTODATADIR_WRITE: Type = 167772189;
-    pub const WAIT_EVENT_LOCK_FILE_CREATE_READ: Type = 167772190;
-    pub const WAIT_EVENT_LOCK_FILE_CREATE_SYNC: Type = 167772191;
-    pub const WAIT_EVENT_LOCK_FILE_CREATE_WRITE: Type = 167772192;
-    pub const WAIT_EVENT_LOCK_FILE_RECHECKDATADIR_READ: Type = 167772193;
-    pub const WAIT_EVENT_LOGICAL_REWRITE_CHECKPOINT_SYNC: Type = 167772194;
-    pub const WAIT_EVENT_LOGICAL_REWRITE_MAPPING_SYNC: Type = 167772195;
-    pub const WAIT_EVENT_LOGICAL_REWRITE_MAPPING_WRITE: Type = 167772196;
-    pub const WAIT_EVENT_LOGICAL_REWRITE_SYNC: Type = 167772197;
-    pub const WAIT_EVENT_LOGICAL_REWRITE_TRUNCATE: Type = 167772198;
-    pub const WAIT_EVENT_LOGICAL_REWRITE_WRITE: Type = 167772199;
-    pub const WAIT_EVENT_RELATION_MAP_READ: Type = 167772200;
-    pub const WAIT_EVENT_RELATION_MAP_REPLACE: Type = 167772201;
-    pub const WAIT_EVENT_RELATION_MAP_WRITE: Type = 167772202;
-    pub const WAIT_EVENT_REORDER_BUFFER_READ: Type = 167772203;
-    pub const WAIT_EVENT_REORDER_BUFFER_WRITE: Type = 167772204;
-    pub const WAIT_EVENT_REORDER_LOGICAL_MAPPING_READ: Type = 167772205;
-    pub const WAIT_EVENT_REPLICATION_SLOT_READ: Type = 167772206;
-    pub const WAIT_EVENT_REPLICATION_SLOT_RESTORE_SYNC: Type = 167772207;
-    pub const WAIT_EVENT_REPLICATION_SLOT_SYNC: Type = 167772208;
-    pub const WAIT_EVENT_REPLICATION_SLOT_WRITE: Type = 167772209;
-    pub const WAIT_EVENT_SLRU_FLUSH_SYNC: Type = 167772210;
-    pub const WAIT_EVENT_SLRU_READ: Type = 167772211;
-    pub const WAIT_EVENT_SLRU_SYNC: Type = 167772212;
-    pub const WAIT_EVENT_SLRU_WRITE: Type = 167772213;
-    pub const WAIT_EVENT_SNAPBUILD_READ: Type = 167772214;
-    pub const WAIT_EVENT_SNAPBUILD_SYNC: Type = 167772215;
-    pub const WAIT_EVENT_SNAPBUILD_WRITE: Type = 167772216;
-    pub const WAIT_EVENT_TIMELINE_HISTORY_FILE_SYNC: Type = 167772217;
-    pub const WAIT_EVENT_TIMELINE_HISTORY_FILE_WRITE: Type = 167772218;
-    pub const WAIT_EVENT_TIMELINE_HISTORY_READ: Type = 167772219;
-    pub const WAIT_EVENT_TIMELINE_HISTORY_SYNC: Type = 167772220;
-    pub const WAIT_EVENT_TIMELINE_HISTORY_WRITE: Type = 167772221;
-    pub const WAIT_EVENT_TWOPHASE_FILE_READ: Type = 167772222;
-    pub const WAIT_EVENT_TWOPHASE_FILE_SYNC: Type = 167772223;
-    pub const WAIT_EVENT_TWOPHASE_FILE_WRITE: Type = 167772224;
-    pub const WAIT_EVENT_VERSION_FILE_SYNC: Type = 167772225;
-    pub const WAIT_EVENT_VERSION_FILE_WRITE: Type = 167772226;
-    pub const WAIT_EVENT_WALSENDER_TIMELINE_HISTORY_READ: Type = 167772227;
-    pub const WAIT_EVENT_WAL_BOOTSTRAP_SYNC: Type = 167772228;
-    pub const WAIT_EVENT_WAL_BOOTSTRAP_WRITE: Type = 167772229;
-    pub const WAIT_EVENT_WAL_COPY_READ: Type = 167772230;
-    pub const WAIT_EVENT_WAL_COPY_SYNC: Type = 167772231;
-    pub const WAIT_EVENT_WAL_COPY_WRITE: Type = 167772232;
-    pub const WAIT_EVENT_WAL_INIT_SYNC: Type = 167772233;
-    pub const WAIT_EVENT_WAL_INIT_WRITE: Type = 167772234;
-    pub const WAIT_EVENT_WAL_READ: Type = 167772235;
-    pub const WAIT_EVENT_WAL_SUMMARY_READ: Type = 167772236;
-    pub const WAIT_EVENT_WAL_SUMMARY_WRITE: Type = 167772237;
-    pub const WAIT_EVENT_WAL_SYNC: Type = 167772238;
-    pub const WAIT_EVENT_WAL_SYNC_METHOD_ASSIGN: Type = 167772239;
-    pub const WAIT_EVENT_WAL_WRITE: Type = 167772240;
-}
-pub mod WaitEventIPC {
-    pub type Type = ::core::ffi::c_uint;
-    pub const WAIT_EVENT_APPEND_READY: Type = 134217728;
-    pub const WAIT_EVENT_ARCHIVE_CLEANUP_COMMAND: Type = 134217729;
-    pub const WAIT_EVENT_ARCHIVE_COMMAND: Type = 134217730;
-    pub const WAIT_EVENT_BACKEND_TERMINATION: Type = 134217731;
-    pub const WAIT_EVENT_BACKUP_WAIT_WAL_ARCHIVE: Type = 134217732;
-    pub const WAIT_EVENT_BGWORKER_SHUTDOWN: Type = 134217733;
-    pub const WAIT_EVENT_BGWORKER_STARTUP: Type = 134217734;
-    pub const WAIT_EVENT_BTREE_PAGE: Type = 134217735;
-    pub const WAIT_EVENT_BUFFER_IO: Type = 134217736;
-    pub const WAIT_EVENT_CHECKPOINT_DELAY_COMPLETE: Type = 134217737;
-    pub const WAIT_EVENT_CHECKPOINT_DELAY_START: Type = 134217738;
-    pub const WAIT_EVENT_CHECKPOINT_DONE: Type = 134217739;
-    pub const WAIT_EVENT_CHECKPOINT_START: Type = 134217740;
-    pub const WAIT_EVENT_EXECUTE_GATHER: Type = 134217741;
-    pub const WAIT_EVENT_HASH_BATCH_ALLOCATE: Type = 134217742;
-    pub const WAIT_EVENT_HASH_BATCH_ELECT: Type = 134217743;
-    pub const WAIT_EVENT_HASH_BATCH_LOAD: Type = 134217744;
-    pub const WAIT_EVENT_HASH_BUILD_ALLOCATE: Type = 134217745;
-    pub const WAIT_EVENT_HASH_BUILD_ELECT: Type = 134217746;
-    pub const WAIT_EVENT_HASH_BUILD_HASH_INNER: Type = 134217747;
-    pub const WAIT_EVENT_HASH_BUILD_HASH_OUTER: Type = 134217748;
-    pub const WAIT_EVENT_HASH_GROW_BATCHES_DECIDE: Type = 134217749;
-    pub const WAIT_EVENT_HASH_GROW_BATCHES_ELECT: Type = 134217750;
-    pub const WAIT_EVENT_HASH_GROW_BATCHES_FINISH: Type = 134217751;
-    pub const WAIT_EVENT_HASH_GROW_BATCHES_REALLOCATE: Type = 134217752;
-    pub const WAIT_EVENT_HASH_GROW_BATCHES_REPARTITION: Type = 134217753;
-    pub const WAIT_EVENT_HASH_GROW_BUCKETS_ELECT: Type = 134217754;
-    pub const WAIT_EVENT_HASH_GROW_BUCKETS_REALLOCATE: Type = 134217755;
-    pub const WAIT_EVENT_HASH_GROW_BUCKETS_REINSERT: Type = 134217756;
-    pub const WAIT_EVENT_LOGICAL_APPLY_SEND_DATA: Type = 134217757;
-    pub const WAIT_EVENT_LOGICAL_PARALLEL_APPLY_STATE_CHANGE: Type = 134217758;
-    pub const WAIT_EVENT_LOGICAL_SYNC_DATA: Type = 134217759;
-    pub const WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE: Type = 134217760;
-    pub const WAIT_EVENT_MEM_CXT_PUBLISH: Type = 134217761;
-    pub const WAIT_EVENT_MESSAGE_QUEUE_INTERNAL: Type = 134217762;
-    pub const WAIT_EVENT_MESSAGE_QUEUE_PUT_MESSAGE: Type = 134217763;
-    pub const WAIT_EVENT_MESSAGE_QUEUE_RECEIVE: Type = 134217764;
-    pub const WAIT_EVENT_MESSAGE_QUEUE_SEND: Type = 134217765;
-    pub const WAIT_EVENT_MULTIXACT_CREATION: Type = 134217766;
-    pub const WAIT_EVENT_PARALLEL_BITMAP_SCAN: Type = 134217767;
-    pub const WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN: Type = 134217768;
-    pub const WAIT_EVENT_PARALLEL_FINISH: Type = 134217769;
-    pub const WAIT_EVENT_PROCARRAY_GROUP_UPDATE: Type = 134217770;
-    pub const WAIT_EVENT_PROC_SIGNAL_BARRIER: Type = 134217771;
-    pub const WAIT_EVENT_PROMOTE: Type = 134217772;
-    pub const WAIT_EVENT_RECOVERY_CONFLICT_SNAPSHOT: Type = 134217773;
-    pub const WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE: Type = 134217774;
-    pub const WAIT_EVENT_RECOVERY_END_COMMAND: Type = 134217775;
-    pub const WAIT_EVENT_RECOVERY_PAUSE: Type = 134217776;
-    pub const WAIT_EVENT_REPLICATION_ORIGIN_DROP: Type = 134217777;
-    pub const WAIT_EVENT_REPLICATION_SLOT_DROP: Type = 134217778;
-    pub const WAIT_EVENT_RESTORE_COMMAND: Type = 134217779;
-    pub const WAIT_EVENT_SAFE_SNAPSHOT: Type = 134217780;
-    pub const WAIT_EVENT_SYNC_REP: Type = 134217781;
-    pub const WAIT_EVENT_WAL_BUFFER_INIT: Type = 134217782;
-    pub const WAIT_EVENT_WAL_RECEIVER_EXIT: Type = 134217783;
-    pub const WAIT_EVENT_WAL_RECEIVER_WAIT_START: Type = 134217784;
-    pub const WAIT_EVENT_WAL_SUMMARY_READY: Type = 134217785;
-    pub const WAIT_EVENT_XACT_GROUP_UPDATE: Type = 134217786;
-}
-pub mod WaitEventTimeout {
-    pub type Type = ::core::ffi::c_uint;
-    pub const WAIT_EVENT_BASE_BACKUP_THROTTLE: Type = 150994944;
-    pub const WAIT_EVENT_CHECKPOINT_WRITE_DELAY: Type = 150994945;
-    pub const WAIT_EVENT_PG_SLEEP: Type = 150994946;
-    pub const WAIT_EVENT_RECOVERY_APPLY_DELAY: Type = 150994947;
-    pub const WAIT_EVENT_RECOVERY_RETRIEVE_RETRY_INTERVAL: Type = 150994948;
-    pub const WAIT_EVENT_REGISTER_SYNC_REQUEST: Type = 150994949;
-    pub const WAIT_EVENT_SPIN_DELAY: Type = 150994950;
-    pub const WAIT_EVENT_VACUUM_DELAY: Type = 150994951;
-    pub const WAIT_EVENT_VACUUM_TRUNCATE: Type = 150994952;
-    pub const WAIT_EVENT_WAL_SUMMARIZER_ERROR: Type = 150994953;
-}
-pub mod TrackFunctionsLevel {
-    pub type Type = ::core::ffi::c_uint;
-    pub const TRACK_FUNC_OFF: Type = 0;
-    pub const TRACK_FUNC_PL: Type = 1;
-    pub const TRACK_FUNC_ALL: Type = 2;
-}
-pub mod PgStat_FetchConsistency {
-    pub type Type = ::core::ffi::c_uint;
-    pub const PGSTAT_FETCH_CONSISTENCY_NONE: Type = 0;
-    pub const PGSTAT_FETCH_CONSISTENCY_CACHE: Type = 1;
-    pub const PGSTAT_FETCH_CONSISTENCY_SNAPSHOT: Type = 2;
-}
-pub mod SessionEndType {
-    pub type Type = ::core::ffi::c_uint;
-    pub const DISCONNECT_NOT_YET: Type = 0;
-    pub const DISCONNECT_NORMAL: Type = 1;
-    pub const DISCONNECT_CLIENT_EOF: Type = 2;
-    pub const DISCONNECT_FATAL: Type = 3;
-    pub const DISCONNECT_KILLED: Type = 4;
-}
-pub type PgStat_Counter = int64;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_FunctionCounts {
-    pub numcalls: PgStat_Counter,
-    pub total_time: instr_time,
-    pub self_time: instr_time,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_FunctionCallUsage {
-    pub fs: *mut PgStat_FunctionCounts,
-    pub save_f_total_time: instr_time,
-    pub save_total: instr_time,
-    pub start: instr_time,
-}
-impl Default for PgStat_FunctionCallUsage {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_BackendSubEntry {
-    pub apply_error_count: PgStat_Counter,
-    pub sync_error_count: PgStat_Counter,
-    pub conflict_count: [PgStat_Counter; 7usize],
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_TableCounts {
-    pub numscans: PgStat_Counter,
-    pub tuples_returned: PgStat_Counter,
-    pub tuples_fetched: PgStat_Counter,
-    pub tuples_inserted: PgStat_Counter,
-    pub tuples_updated: PgStat_Counter,
-    pub tuples_deleted: PgStat_Counter,
-    pub tuples_hot_updated: PgStat_Counter,
-    pub tuples_newpage_updated: PgStat_Counter,
-    pub truncdropped: bool,
-    pub delta_live_tuples: PgStat_Counter,
-    pub delta_dead_tuples: PgStat_Counter,
-    pub changed_tuples: PgStat_Counter,
-    pub blocks_fetched: PgStat_Counter,
-    pub blocks_hit: PgStat_Counter,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_TableStatus {
-    pub id: Oid,
-    pub shared: bool,
-    pub trans: *mut PgStat_TableXactStatus,
-    pub counts: PgStat_TableCounts,
-    pub relation: Relation,
-}
-impl Default for PgStat_TableStatus {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_TableXactStatus {
-    pub tuples_inserted: PgStat_Counter,
-    pub tuples_updated: PgStat_Counter,
-    pub tuples_deleted: PgStat_Counter,
-    pub truncdropped: bool,
-    pub inserted_pre_truncdrop: PgStat_Counter,
-    pub updated_pre_truncdrop: PgStat_Counter,
-    pub deleted_pre_truncdrop: PgStat_Counter,
-    pub nest_level: ::core::ffi::c_int,
-    pub upper: *mut PgStat_TableXactStatus,
-    pub parent: *mut PgStat_TableStatus,
-    pub next: *mut PgStat_TableXactStatus,
-}
-impl Default for PgStat_TableXactStatus {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_ArchiverStats {
-    pub archived_count: PgStat_Counter,
-    pub last_archived_wal: [::core::ffi::c_char; 41usize],
-    pub last_archived_timestamp: TimestampTz,
-    pub failed_count: PgStat_Counter,
-    pub last_failed_wal: [::core::ffi::c_char; 41usize],
-    pub last_failed_timestamp: TimestampTz,
-    pub stat_reset_timestamp: TimestampTz,
-}
-impl Default for PgStat_ArchiverStats {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_BgWriterStats {
-    pub buf_written_clean: PgStat_Counter,
-    pub maxwritten_clean: PgStat_Counter,
-    pub buf_alloc: PgStat_Counter,
-    pub stat_reset_timestamp: TimestampTz,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_CheckpointerStats {
-    pub num_timed: PgStat_Counter,
-    pub num_requested: PgStat_Counter,
-    pub num_performed: PgStat_Counter,
-    pub restartpoints_timed: PgStat_Counter,
-    pub restartpoints_requested: PgStat_Counter,
-    pub restartpoints_performed: PgStat_Counter,
-    pub write_time: PgStat_Counter,
-    pub sync_time: PgStat_Counter,
-    pub buffers_written: PgStat_Counter,
-    pub slru_written: PgStat_Counter,
-    pub stat_reset_timestamp: TimestampTz,
-}
-pub mod IOObject {
-    pub type Type = ::core::ffi::c_uint;
-    pub const IOOBJECT_RELATION: Type = 0;
-    pub const IOOBJECT_TEMP_RELATION: Type = 1;
-    pub const IOOBJECT_WAL: Type = 2;
-}
-pub mod IOContext {
-    pub type Type = ::core::ffi::c_uint;
-    pub const IOCONTEXT_BULKREAD: Type = 0;
-    pub const IOCONTEXT_BULKWRITE: Type = 1;
-    pub const IOCONTEXT_INIT: Type = 2;
-    pub const IOCONTEXT_NORMAL: Type = 3;
-    pub const IOCONTEXT_VACUUM: Type = 4;
-}
-pub mod IOOp {
-    pub type Type = ::core::ffi::c_uint;
-    pub const IOOP_EVICT: Type = 0;
-    pub const IOOP_FSYNC: Type = 1;
-    pub const IOOP_HIT: Type = 2;
-    pub const IOOP_REUSE: Type = 3;
-    pub const IOOP_WRITEBACK: Type = 4;
-    pub const IOOP_EXTEND: Type = 5;
-    pub const IOOP_READ: Type = 6;
-    pub const IOOP_WRITE: Type = 7;
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_BktypeIO {
-    pub bytes: [[[uint64; 8usize]; 5usize]; 3usize],
-    pub counts: [[[PgStat_Counter; 8usize]; 5usize]; 3usize],
-    pub times: [[[PgStat_Counter; 8usize]; 5usize]; 3usize],
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_PendingIO {
-    pub bytes: [[[uint64; 8usize]; 5usize]; 3usize],
-    pub counts: [[[PgStat_Counter; 8usize]; 5usize]; 3usize],
-    pub pending_times: [[[instr_time; 8usize]; 5usize]; 3usize],
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_IO {
-    pub stat_reset_timestamp: TimestampTz,
-    pub stats: [PgStat_BktypeIO; 18usize],
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_StatDBEntry {
-    pub xact_commit: PgStat_Counter,
-    pub xact_rollback: PgStat_Counter,
-    pub blocks_fetched: PgStat_Counter,
-    pub blocks_hit: PgStat_Counter,
-    pub tuples_returned: PgStat_Counter,
-    pub tuples_fetched: PgStat_Counter,
-    pub tuples_inserted: PgStat_Counter,
-    pub tuples_updated: PgStat_Counter,
-    pub tuples_deleted: PgStat_Counter,
-    pub last_autovac_time: TimestampTz,
-    pub conflict_tablespace: PgStat_Counter,
-    pub conflict_lock: PgStat_Counter,
-    pub conflict_snapshot: PgStat_Counter,
-    pub conflict_logicalslot: PgStat_Counter,
-    pub conflict_bufferpin: PgStat_Counter,
-    pub conflict_startup_deadlock: PgStat_Counter,
-    pub temp_files: PgStat_Counter,
-    pub temp_bytes: PgStat_Counter,
-    pub deadlocks: PgStat_Counter,
-    pub checksum_failures: PgStat_Counter,
-    pub last_checksum_failure: TimestampTz,
-    pub blk_read_time: PgStat_Counter,
-    pub blk_write_time: PgStat_Counter,
-    pub sessions: PgStat_Counter,
-    pub session_time: PgStat_Counter,
-    pub active_time: PgStat_Counter,
-    pub idle_in_transaction_time: PgStat_Counter,
-    pub sessions_abandoned: PgStat_Counter,
-    pub sessions_fatal: PgStat_Counter,
-    pub sessions_killed: PgStat_Counter,
-    pub parallel_workers_to_launch: PgStat_Counter,
-    pub parallel_workers_launched: PgStat_Counter,
-    pub stat_reset_timestamp: TimestampTz,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_StatFuncEntry {
-    pub numcalls: PgStat_Counter,
-    pub total_time: PgStat_Counter,
-    pub self_time: PgStat_Counter,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_StatReplSlotEntry {
-    pub spill_txns: PgStat_Counter,
-    pub spill_count: PgStat_Counter,
-    pub spill_bytes: PgStat_Counter,
-    pub stream_txns: PgStat_Counter,
-    pub stream_count: PgStat_Counter,
-    pub stream_bytes: PgStat_Counter,
-    pub total_txns: PgStat_Counter,
-    pub total_bytes: PgStat_Counter,
-    pub stat_reset_timestamp: TimestampTz,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_SLRUStats {
-    pub blocks_zeroed: PgStat_Counter,
-    pub blocks_hit: PgStat_Counter,
-    pub blocks_read: PgStat_Counter,
-    pub blocks_written: PgStat_Counter,
-    pub blocks_exists: PgStat_Counter,
-    pub flush: PgStat_Counter,
-    pub truncate: PgStat_Counter,
-    pub stat_reset_timestamp: TimestampTz,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_StatSubEntry {
-    pub apply_error_count: PgStat_Counter,
-    pub sync_error_count: PgStat_Counter,
-    pub conflict_count: [PgStat_Counter; 7usize],
-    pub stat_reset_timestamp: TimestampTz,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_StatTabEntry {
-    pub numscans: PgStat_Counter,
-    pub lastscan: TimestampTz,
-    pub tuples_returned: PgStat_Counter,
-    pub tuples_fetched: PgStat_Counter,
-    pub tuples_inserted: PgStat_Counter,
-    pub tuples_updated: PgStat_Counter,
-    pub tuples_deleted: PgStat_Counter,
-    pub tuples_hot_updated: PgStat_Counter,
-    pub tuples_newpage_updated: PgStat_Counter,
-    pub live_tuples: PgStat_Counter,
-    pub dead_tuples: PgStat_Counter,
-    pub mod_since_analyze: PgStat_Counter,
-    pub ins_since_vacuum: PgStat_Counter,
-    pub blocks_fetched: PgStat_Counter,
-    pub blocks_hit: PgStat_Counter,
-    pub last_vacuum_time: TimestampTz,
-    pub vacuum_count: PgStat_Counter,
-    pub last_autovacuum_time: TimestampTz,
-    pub autovacuum_count: PgStat_Counter,
-    pub last_analyze_time: TimestampTz,
-    pub analyze_count: PgStat_Counter,
-    pub last_autoanalyze_time: TimestampTz,
-    pub autoanalyze_count: PgStat_Counter,
-    pub total_vacuum_time: PgStat_Counter,
-    pub total_autovacuum_time: PgStat_Counter,
-    pub total_analyze_time: PgStat_Counter,
-    pub total_autoanalyze_time: PgStat_Counter,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_WalCounters {
-    pub wal_records: PgStat_Counter,
-    pub wal_fpi: PgStat_Counter,
-    pub wal_bytes: uint64,
-    pub wal_buffers_full: PgStat_Counter,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_WalStats {
-    pub wal_counters: PgStat_WalCounters,
-    pub stat_reset_timestamp: TimestampTz,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_Backend {
-    pub stat_reset_timestamp: TimestampTz,
-    pub io_stats: PgStat_BktypeIO,
-    pub wal_counters: PgStat_WalCounters,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_BackendPending {
-    pub pending_io: PgStat_PendingIO,
-}
-pub type RmgrId = uint8;
-pub mod RmgrIds {
-    pub type Type = ::core::ffi::c_uint;
-    pub const RM_XLOG_ID: Type = 0;
-    pub const RM_XACT_ID: Type = 1;
-    pub const RM_SMGR_ID: Type = 2;
-    pub const RM_CLOG_ID: Type = 3;
-    pub const RM_DBASE_ID: Type = 4;
-    pub const RM_TBLSPC_ID: Type = 5;
-    pub const RM_MULTIXACT_ID: Type = 6;
-    pub const RM_RELMAP_ID: Type = 7;
-    pub const RM_STANDBY_ID: Type = 8;
-    pub const RM_HEAP2_ID: Type = 9;
-    pub const RM_HEAP_ID: Type = 10;
-    pub const RM_BTREE_ID: Type = 11;
-    pub const RM_HASH_ID: Type = 12;
-    pub const RM_GIN_ID: Type = 13;
-    pub const RM_GIST_ID: Type = 14;
-    pub const RM_SEQ_ID: Type = 15;
-    pub const RM_SPGIST_ID: Type = 16;
-    pub const RM_BRIN_ID: Type = 17;
-    pub const RM_COMMIT_TS_ID: Type = 18;
-    pub const RM_REPLORIGIN_ID: Type = 19;
-    pub const RM_GENERIC_ID: Type = 20;
-    pub const RM_LOGICALMSG_ID: Type = 21;
-    pub const RM_NEXT_ID: Type = 22;
-}
-pub type pg_crc32c = uint32;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct XLogRecord {
-    pub xl_tot_len: uint32,
-    pub xl_xid: TransactionId,
-    pub xl_prev: XLogRecPtr,
-    pub xl_info: uint8,
-    pub xl_rmid: RmgrId,
-    pub xl_crc: pg_crc32c,
-}
-impl Default for XLogRecord {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct XLogRecordBlockHeader {
-    pub id: uint8,
-    pub fork_flags: uint8,
-    pub data_length: uint16,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct XLogRecordBlockImageHeader {
-    pub length: uint16,
-    pub hole_offset: uint16,
-    pub bimg_info: uint8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct XLogRecordBlockCompressHeader {
-    pub hole_length: uint16,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct XLogRecordDataHeaderShort {
-    pub id: uint8,
-    pub data_length: uint8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct XLogRecordDataHeaderLong {
-    pub id: uint8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct WALOpenSegment {
-    pub ws_file: ::core::ffi::c_int,
-    pub ws_segno: XLogSegNo,
-    pub ws_tli: TimeLineID,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct WALSegmentContext {
-    pub ws_dir: [::core::ffi::c_char; 1024usize],
-    pub ws_segsize: ::core::ffi::c_int,
-}
-impl Default for WALSegmentContext {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type XLogPageReadCB = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        xlogreader: *mut XLogReaderState,
-        targetPagePtr: XLogRecPtr,
-        reqLen: ::core::ffi::c_int,
-        targetRecPtr: XLogRecPtr,
-        readBuf: *mut ::core::ffi::c_char,
-    ) -> ::core::ffi::c_int,
->;
-pub type WALSegmentOpenCB = ::core::option::Option<
-    unsafe extern "C-unwind" fn(
-        xlogreader: *mut XLogReaderState,
-        nextSegNo: XLogSegNo,
-        tli_p: *mut TimeLineID,
-    ),
->;
-pub type WALSegmentCloseCB =
-    ::core::option::Option<unsafe extern "C-unwind" fn(xlogreader: *mut XLogReaderState)>;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct XLogReaderRoutine {
-    pub page_read: XLogPageReadCB,
-    pub segment_open: WALSegmentOpenCB,
-    pub segment_close: WALSegmentCloseCB,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DecodedBkpBlock {
-    pub in_use: bool,
-    pub rlocator: RelFileLocator,
-    pub forknum: ForkNumber::Type,
-    pub blkno: BlockNumber,
-    pub prefetch_buffer: Buffer,
-    pub flags: uint8,
-    pub has_image: bool,
-    pub apply_image: bool,
-    pub bkp_image: *mut ::core::ffi::c_char,
-    pub hole_offset: uint16,
-    pub hole_length: uint16,
-    pub bimg_len: uint16,
-    pub bimg_info: uint8,
-    pub has_data: bool,
-    pub data: *mut ::core::ffi::c_char,
-    pub data_len: uint16,
-    pub data_bufsz: uint16,
-}
-impl Default for DecodedBkpBlock {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct DecodedXLogRecord {
-    pub size: usize,
-    pub oversized: bool,
-    pub next: *mut DecodedXLogRecord,
-    pub lsn: XLogRecPtr,
-    pub next_lsn: XLogRecPtr,
-    pub header: XLogRecord,
-    pub record_origin: RepOriginId,
-    pub toplevel_xid: TransactionId,
-    pub main_data: *mut ::core::ffi::c_char,
-    pub main_data_len: uint32,
-    pub max_block_id: ::core::ffi::c_int,
-    pub blocks: __IncompleteArrayField<DecodedBkpBlock>,
-}
-impl Default for DecodedXLogRecord {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct XLogReaderState {
-    pub routine: XLogReaderRoutine,
-    pub system_identifier: uint64,
-    pub private_data: *mut ::core::ffi::c_void,
-    pub ReadRecPtr: XLogRecPtr,
-    pub EndRecPtr: XLogRecPtr,
-    pub abortedRecPtr: XLogRecPtr,
-    pub missingContrecPtr: XLogRecPtr,
-    pub overwrittenRecPtr: XLogRecPtr,
-    pub DecodeRecPtr: XLogRecPtr,
-    pub NextRecPtr: XLogRecPtr,
-    pub PrevRecPtr: XLogRecPtr,
-    pub record: *mut DecodedXLogRecord,
-    pub decode_buffer: *mut ::core::ffi::c_char,
-    pub decode_buffer_size: usize,
-    pub free_decode_buffer: bool,
-    pub decode_buffer_head: *mut ::core::ffi::c_char,
-    pub decode_buffer_tail: *mut ::core::ffi::c_char,
-    pub decode_queue_head: *mut DecodedXLogRecord,
-    pub decode_queue_tail: *mut DecodedXLogRecord,
-    pub readBuf: *mut ::core::ffi::c_char,
-    pub readLen: uint32,
-    pub segcxt: WALSegmentContext,
-    pub seg: WALOpenSegment,
-    pub segoff: uint32,
-    pub latestPagePtr: XLogRecPtr,
-    pub latestPageTLI: TimeLineID,
-    pub currRecPtr: XLogRecPtr,
-    pub currTLI: TimeLineID,
-    pub currTLIValidUntil: XLogRecPtr,
-    pub nextTLI: TimeLineID,
-    pub readRecordBuf: *mut ::core::ffi::c_char,
-    pub readRecordBufSize: uint32,
-    pub errormsg_buf: *mut ::core::ffi::c_char,
-    pub errormsg_deferred: bool,
-    pub nonblocking: bool,
-}
-impl Default for XLogReaderState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub mod XLogPageReadResult {
-    pub type Type = ::core::ffi::c_int;
-    pub const XLREAD_SUCCESS: Type = 0;
-    pub const XLREAD_FAIL: Type = -1;
-    pub const XLREAD_WOULDBLOCK: Type = -2;
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct WALReadError {
-    pub wre_errno: ::core::ffi::c_int,
-    pub wre_off: ::core::ffi::c_int,
-    pub wre_req: ::core::ffi::c_int,
-    pub wre_read: ::core::ffi::c_int,
-    pub wre_seg: WALOpenSegment,
-}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct GenericXLogState {
     _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ShmemIndexEnt {
+    pub key: [::core::ffi::c_char; 48usize],
+    pub location: *mut ::core::ffi::c_void,
+    pub size: Size,
+    pub allocated_size: Size,
+}
+impl Default for ShmemIndexEnt {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -22595,6 +22055,46 @@ impl Default for xl_xact_parsed_abort {
         }
     }
 }
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ResourceOwnerData {
+    _unused: [u8; 0],
+}
+pub type ResourceOwner = *mut ResourceOwnerData;
+pub mod ResourceReleasePhase {
+    pub type Type = ::core::ffi::c_uint;
+    pub const RESOURCE_RELEASE_BEFORE_LOCKS: Type = 1;
+    pub const RESOURCE_RELEASE_LOCKS: Type = 2;
+    pub const RESOURCE_RELEASE_AFTER_LOCKS: Type = 3;
+}
+pub type ResourceReleasePriority = uint32;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ResourceOwnerDesc {
+    pub name: *const ::core::ffi::c_char,
+    pub release_phase: ResourceReleasePhase::Type,
+    pub release_priority: ResourceReleasePriority,
+    pub ReleaseResource: ::core::option::Option<unsafe extern "C-unwind" fn(res: Datum)>,
+    pub DebugPrint:
+        ::core::option::Option<unsafe extern "C-unwind" fn(res: Datum) -> *mut ::core::ffi::c_char>,
+}
+impl Default for ResourceOwnerDesc {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type ResourceReleaseCallback = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        phase: ResourceReleasePhase::Type,
+        isCommit: bool,
+        isTopLevel: bool,
+        arg: *mut ::core::ffi::c_void,
+    ),
+>;
 pub type Block = *mut ::core::ffi::c_void;
 pub mod BufferAccessStrategyType {
     pub type Type = ::core::ffi::c_uint;
@@ -23311,6 +22811,324 @@ impl Default for xl_multixact_truncate {
             s.assume_init()
         }
     }
+}
+pub mod LWLockWaitState {
+    pub type Type = ::core::ffi::c_uint;
+    pub const LW_WS_NOT_WAITING: Type = 0;
+    pub const LW_WS_WAITING: Type = 1;
+    pub const LW_WS_PENDING_WAKEUP: Type = 2;
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct LWLock {
+    pub tranche: uint16,
+    pub state: pg_atomic_uint32,
+    pub waiters: proclist_head,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union LWLockPadded {
+    pub lock: LWLock,
+    pub pad: [::core::ffi::c_char; 128usize],
+}
+impl Default for LWLockPadded {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct NamedLWLockTranche {
+    pub trancheId: ::core::ffi::c_int,
+    pub trancheName: *mut ::core::ffi::c_char,
+}
+impl Default for NamedLWLockTranche {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub mod LWLockMode {
+    pub type Type = ::core::ffi::c_uint;
+    pub const LW_EXCLUSIVE: Type = 0;
+    pub const LW_SHARED: Type = 1;
+    pub const LW_WAIT_UNTIL_FREE: Type = 2;
+}
+pub mod BuiltinTrancheIds {
+    pub type Type = ::core::ffi::c_uint;
+    pub const LWTRANCHE_XACT_BUFFER: Type = 54;
+    pub const LWTRANCHE_COMMITTS_BUFFER: Type = 55;
+    pub const LWTRANCHE_SUBTRANS_BUFFER: Type = 56;
+    pub const LWTRANCHE_MULTIXACTOFFSET_BUFFER: Type = 57;
+    pub const LWTRANCHE_MULTIXACTMEMBER_BUFFER: Type = 58;
+    pub const LWTRANCHE_NOTIFY_BUFFER: Type = 59;
+    pub const LWTRANCHE_SERIAL_BUFFER: Type = 60;
+    pub const LWTRANCHE_WAL_INSERT: Type = 61;
+    pub const LWTRANCHE_BUFFER_CONTENT: Type = 62;
+    pub const LWTRANCHE_REPLICATION_ORIGIN_STATE: Type = 63;
+    pub const LWTRANCHE_REPLICATION_SLOT_IO: Type = 64;
+    pub const LWTRANCHE_LOCK_FASTPATH: Type = 65;
+    pub const LWTRANCHE_BUFFER_MAPPING: Type = 66;
+    pub const LWTRANCHE_LOCK_MANAGER: Type = 67;
+    pub const LWTRANCHE_PREDICATE_LOCK_MANAGER: Type = 68;
+    pub const LWTRANCHE_PARALLEL_HASH_JOIN: Type = 69;
+    pub const LWTRANCHE_PARALLEL_BTREE_SCAN: Type = 70;
+    pub const LWTRANCHE_PARALLEL_QUERY_DSA: Type = 71;
+    pub const LWTRANCHE_PER_SESSION_DSA: Type = 72;
+    pub const LWTRANCHE_PER_SESSION_RECORD_TYPE: Type = 73;
+    pub const LWTRANCHE_PER_SESSION_RECORD_TYPMOD: Type = 74;
+    pub const LWTRANCHE_SHARED_TUPLESTORE: Type = 75;
+    pub const LWTRANCHE_SHARED_TIDBITMAP: Type = 76;
+    pub const LWTRANCHE_PARALLEL_APPEND: Type = 77;
+    pub const LWTRANCHE_PER_XACT_PREDICATE_LIST: Type = 78;
+    pub const LWTRANCHE_PGSTATS_DSA: Type = 79;
+    pub const LWTRANCHE_PGSTATS_HASH: Type = 80;
+    pub const LWTRANCHE_PGSTATS_DATA: Type = 81;
+    pub const LWTRANCHE_LAUNCHER_DSA: Type = 82;
+    pub const LWTRANCHE_LAUNCHER_HASH: Type = 83;
+    pub const LWTRANCHE_DSM_REGISTRY_DSA: Type = 84;
+    pub const LWTRANCHE_DSM_REGISTRY_HASH: Type = 85;
+    pub const LWTRANCHE_COMMITTS_SLRU: Type = 86;
+    pub const LWTRANCHE_MULTIXACTMEMBER_SLRU: Type = 87;
+    pub const LWTRANCHE_MULTIXACTOFFSET_SLRU: Type = 88;
+    pub const LWTRANCHE_NOTIFY_SLRU: Type = 89;
+    pub const LWTRANCHE_SERIAL_SLRU: Type = 90;
+    pub const LWTRANCHE_SUBTRANS_SLRU: Type = 91;
+    pub const LWTRANCHE_XACT_SLRU: Type = 92;
+    pub const LWTRANCHE_PARALLEL_VACUUM_DSA: Type = 93;
+    pub const LWTRANCHE_AIO_URING_COMPLETION: Type = 94;
+    pub const LWTRANCHE_FIRST_USER_DEFINED: Type = 95;
+}
+pub type LWLockId = *mut LWLock;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct VirtualTransactionId {
+    pub procNumber: ProcNumber,
+    pub localTransactionId: LocalTransactionId,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LockMethodData {
+    pub numLockModes: ::core::ffi::c_int,
+    pub conflictTab: *const LOCKMASK,
+    pub lockModeNames: *const *const ::core::ffi::c_char,
+    pub trace_flag: *const bool,
+}
+impl Default for LockMethodData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type LockMethod = *const LockMethodData;
+pub type LOCKMETHODID = uint16;
+pub mod LockTagType {
+    pub type Type = ::core::ffi::c_uint;
+    pub const LOCKTAG_RELATION: Type = 0;
+    pub const LOCKTAG_RELATION_EXTEND: Type = 1;
+    pub const LOCKTAG_DATABASE_FROZEN_IDS: Type = 2;
+    pub const LOCKTAG_PAGE: Type = 3;
+    pub const LOCKTAG_TUPLE: Type = 4;
+    pub const LOCKTAG_TRANSACTION: Type = 5;
+    pub const LOCKTAG_VIRTUALTRANSACTION: Type = 6;
+    pub const LOCKTAG_SPECULATIVE_TOKEN: Type = 7;
+    pub const LOCKTAG_OBJECT: Type = 8;
+    pub const LOCKTAG_USERLOCK: Type = 9;
+    pub const LOCKTAG_ADVISORY: Type = 10;
+    pub const LOCKTAG_APPLY_TRANSACTION: Type = 11;
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct LOCKTAG {
+    pub locktag_field1: uint32,
+    pub locktag_field2: uint32,
+    pub locktag_field3: uint32,
+    pub locktag_field4: uint16,
+    pub locktag_type: uint8,
+    pub locktag_lockmethodid: uint8,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LOCK {
+    pub tag: LOCKTAG,
+    pub grantMask: LOCKMASK,
+    pub waitMask: LOCKMASK,
+    pub procLocks: dlist_head,
+    pub waitProcs: dclist_head,
+    pub requested: [::core::ffi::c_int; 10usize],
+    pub nRequested: ::core::ffi::c_int,
+    pub granted: [::core::ffi::c_int; 10usize],
+    pub nGranted: ::core::ffi::c_int,
+}
+impl Default for LOCK {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PROCLOCKTAG {
+    pub myLock: *mut LOCK,
+    pub myProc: *mut PGPROC,
+}
+impl Default for PROCLOCKTAG {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PROCLOCK {
+    pub tag: PROCLOCKTAG,
+    pub groupLeader: *mut PGPROC,
+    pub holdMask: LOCKMASK,
+    pub releaseMask: LOCKMASK,
+    pub lockLink: dlist_node,
+    pub procLink: dlist_node,
+}
+impl Default for PROCLOCK {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct LOCALLOCKTAG {
+    pub lock: LOCKTAG,
+    pub mode: LOCKMODE,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LOCALLOCKOWNER {
+    pub owner: *mut ResourceOwnerData,
+    pub nLocks: int64,
+}
+impl Default for LOCALLOCKOWNER {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LOCALLOCK {
+    pub tag: LOCALLOCKTAG,
+    pub hashcode: uint32,
+    pub lock: *mut LOCK,
+    pub proclock: *mut PROCLOCK,
+    pub nLocks: int64,
+    pub numLockOwners: ::core::ffi::c_int,
+    pub maxLockOwners: ::core::ffi::c_int,
+    pub lockOwners: *mut LOCALLOCKOWNER,
+    pub holdsStrongLockCount: bool,
+    pub lockCleared: bool,
+}
+impl Default for LOCALLOCK {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct LockInstanceData {
+    pub locktag: LOCKTAG,
+    pub holdMask: LOCKMASK,
+    pub waitLockMode: LOCKMODE,
+    pub vxid: VirtualTransactionId,
+    pub waitStart: TimestampTz,
+    pub pid: ::core::ffi::c_int,
+    pub leaderPid: ::core::ffi::c_int,
+    pub fastpath: bool,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LockData {
+    pub nelements: ::core::ffi::c_int,
+    pub locks: *mut LockInstanceData,
+}
+impl Default for LockData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct BlockedProcData {
+    pub pid: ::core::ffi::c_int,
+    pub first_lock: ::core::ffi::c_int,
+    pub num_locks: ::core::ffi::c_int,
+    pub first_waiter: ::core::ffi::c_int,
+    pub num_waiters: ::core::ffi::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct BlockedProcsData {
+    pub procs: *mut BlockedProcData,
+    pub locks: *mut LockInstanceData,
+    pub waiter_pids: *mut ::core::ffi::c_int,
+    pub nprocs: ::core::ffi::c_int,
+    pub maxprocs: ::core::ffi::c_int,
+    pub nlocks: ::core::ffi::c_int,
+    pub maxlocks: ::core::ffi::c_int,
+    pub npids: ::core::ffi::c_int,
+    pub maxpids: ::core::ffi::c_int,
+}
+impl Default for BlockedProcsData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub mod LockAcquireResult {
+    pub type Type = ::core::ffi::c_uint;
+    pub const LOCKACQUIRE_NOT_AVAIL: Type = 0;
+    pub const LOCKACQUIRE_OK: Type = 1;
+    pub const LOCKACQUIRE_ALREADY_HELD: Type = 2;
+    pub const LOCKACQUIRE_ALREADY_CLEAR: Type = 3;
+}
+pub mod DeadLockState {
+    pub type Type = ::core::ffi::c_uint;
+    pub const DS_NOT_YET_CHECKED: Type = 0;
+    pub const DS_NO_DEADLOCK: Type = 1;
+    pub const DS_SOFT_DEADLOCK: Type = 2;
+    pub const DS_HARD_DEADLOCK: Type = 3;
+    pub const DS_BLOCKED_BY_AUTOVACUUM: Type = 4;
 }
 pub mod relopt_type {
     pub type Type = ::core::ffi::c_uint;
@@ -24405,8 +24223,6 @@ pub type CoerceParamHook = ::core::option::Option<
 pub struct ParseState {
     pub parentParseState: *mut ParseState,
     pub p_sourcetext: *const ::core::ffi::c_char,
-    pub p_stmt_location: ParseLoc,
-    pub p_stmt_len: ParseLoc,
     pub p_rtable: *mut List,
     pub p_rteperminfos: *mut List,
     pub p_joinexprs: *mut List,
@@ -25294,6 +25110,106 @@ pub type ExplainOptionHandler = ::core::option::Option<
 pub type explain_validate_options_hook_type = ::core::option::Option<
     unsafe extern "C-unwind" fn(es: *mut ExplainState, options: *mut List, pstate: *mut ParseState),
 >;
+pub mod PlanCacheMode {
+    pub type Type = ::core::ffi::c_uint;
+    pub const PLAN_CACHE_MODE_AUTO: Type = 0;
+    pub const PLAN_CACHE_MODE_FORCE_GENERIC_PLAN: Type = 1;
+    pub const PLAN_CACHE_MODE_FORCE_CUSTOM_PLAN: Type = 2;
+}
+pub type PostRewriteHook = ::core::option::Option<
+    unsafe extern "C-unwind" fn(querytree_list: *mut List, arg: *mut ::core::ffi::c_void),
+>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CachedPlanSource {
+    pub magic: ::core::ffi::c_int,
+    pub raw_parse_tree: *mut RawStmt,
+    pub analyzed_parse_tree: *mut Query,
+    pub query_string: *const ::core::ffi::c_char,
+    pub commandTag: CommandTag::Type,
+    pub param_types: *mut Oid,
+    pub num_params: ::core::ffi::c_int,
+    pub parserSetup: ParserSetupHook,
+    pub parserSetupArg: *mut ::core::ffi::c_void,
+    pub postRewrite: PostRewriteHook,
+    pub postRewriteArg: *mut ::core::ffi::c_void,
+    pub cursor_options: ::core::ffi::c_int,
+    pub fixed_result: bool,
+    pub resultDesc: TupleDesc,
+    pub context: MemoryContext,
+    pub query_list: *mut List,
+    pub relationOids: *mut List,
+    pub invalItems: *mut List,
+    pub search_path: *mut SearchPathMatcher,
+    pub query_context: MemoryContext,
+    pub rewriteRoleId: Oid,
+    pub rewriteRowSecurity: bool,
+    pub dependsOnRLS: bool,
+    pub gplan: *mut CachedPlan,
+    pub is_oneshot: bool,
+    pub is_complete: bool,
+    pub is_saved: bool,
+    pub is_valid: bool,
+    pub generation: ::core::ffi::c_int,
+    pub node: dlist_node,
+    pub generic_cost: f64,
+    pub total_custom_cost: f64,
+    pub num_custom_plans: int64,
+    pub num_generic_plans: int64,
+}
+impl Default for CachedPlanSource {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CachedPlan {
+    pub magic: ::core::ffi::c_int,
+    pub stmt_list: *mut List,
+    pub is_oneshot: bool,
+    pub is_saved: bool,
+    pub is_valid: bool,
+    pub planRoleId: Oid,
+    pub dependsOnRole: bool,
+    pub saved_xmin: TransactionId,
+    pub generation: ::core::ffi::c_int,
+    pub refcount: ::core::ffi::c_int,
+    pub context: MemoryContext,
+}
+impl Default for CachedPlan {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CachedExpression {
+    pub magic: ::core::ffi::c_int,
+    pub expr: *mut Node,
+    pub is_valid: bool,
+    pub relationOids: *mut List,
+    pub invalItems: *mut List,
+    pub context: MemoryContext,
+    pub node: dlist_node,
+}
+impl Default for CachedExpression {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PreparedStatement {
@@ -27261,7 +27177,6 @@ pub struct PortalData {
     pub qc: QueryCompletion,
     pub stmts: *mut List,
     pub cplan: *mut CachedPlan,
-    pub plansource: *mut CachedPlanSource,
     pub portalParams: ParamListInfo,
     pub queryEnv: *mut QueryEnvironment,
     pub strategy: PortalStrategy::Type,
@@ -27415,7 +27330,6 @@ pub struct PlannerGlobal {
     pub finalrteperminfos: *mut List,
     pub finalrowmarks: *mut List,
     pub resultRelations: *mut List,
-    pub firstResultRels: *mut List,
     pub appendRelations: *mut List,
     pub partPruneInfos: *mut List,
     pub relationOids: *mut List,
@@ -28288,6 +28202,7 @@ pub struct MergePath {
     pub path_mergeclauses: *mut List,
     pub outersortkeys: *mut List,
     pub innersortkeys: *mut List,
+    pub outer_presorted_keys: ::core::ffi::c_int,
     pub skip_mark_restore: bool,
     pub materialize_inner: bool,
 }
@@ -30165,6 +30080,7 @@ pub struct LocationLen {
     pub location: ::core::ffi::c_int,
     pub length: ::core::ffi::c_int,
     pub squashed: bool,
+    pub extern_param: bool,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -30175,6 +30091,7 @@ pub struct JumbleState {
     pub clocations_buf_size: ::core::ffi::c_int,
     pub clocations_count: ::core::ffi::c_int,
     pub highest_extern_param_id: ::core::ffi::c_int,
+    pub has_squashed_lists: bool,
     pub pending_nulls: ::core::ffi::c_uint,
     pub total_jumble_len: Size,
 }
@@ -31839,6 +31756,8 @@ pub struct ReorderBufferTXN {
     pub nsubtxns: uint32,
     pub ninvalidations: uint32,
     pub invalidations: *mut SharedInvalidationMessage,
+    pub ninvalidations_distributed: uint32,
+    pub invalidations_distributed: *mut SharedInvalidationMessage,
     pub node: dlist_node,
     pub catchange_node: dlist_node,
     pub txn_node: pairingheap_node,
@@ -32733,6 +32652,7 @@ pub struct ReplicationSlot {
     pub candidate_restart_lsn: XLogRecPtr,
     pub last_saved_confirmed_flush: XLogRecPtr,
     pub inactive_since: TimestampTz,
+    pub last_saved_restart_lsn: XLogRecPtr,
 }
 impl Default for ReplicationSlot {
     fn default() -> Self {
@@ -32959,6 +32879,18 @@ pub struct BufFile {
 pub type pg_on_exit_callback =
     ::core::option::Option<unsafe extern "C-unwind" fn(code: ::core::ffi::c_int, arg: Datum)>;
 pub type shmem_startup_hook_type = ::core::option::Option<unsafe extern "C-unwind" fn()>;
+pub mod XLTW_Oper {
+    pub type Type = ::core::ffi::c_uint;
+    pub const XLTW_None: Type = 0;
+    pub const XLTW_Update: Type = 1;
+    pub const XLTW_Delete: Type = 2;
+    pub const XLTW_Lock: Type = 3;
+    pub const XLTW_LockUpdated: Type = 4;
+    pub const XLTW_InsertIndex: Type = 5;
+    pub const XLTW_InsertIndexUnique: Type = 6;
+    pub const XLTW_FetchUpdated: Type = 7;
+    pub const XLTW_RecheckExclusionConstr: Type = 8;
+}
 pub mod ProcSignalReason {
     pub type Type = ::core::ffi::c_uint;
     pub const PROCSIG_CATCHUP_INTERRUPT: Type = 0;
@@ -32967,17 +32899,16 @@ pub mod ProcSignalReason {
     pub const PROCSIG_WALSND_INIT_STOPPING: Type = 3;
     pub const PROCSIG_BARRIER: Type = 4;
     pub const PROCSIG_LOG_MEMORY_CONTEXT: Type = 5;
-    pub const PROCSIG_GET_MEMORY_CONTEXT: Type = 6;
-    pub const PROCSIG_PARALLEL_APPLY_MESSAGE: Type = 7;
-    pub const PROCSIG_RECOVERY_CONFLICT_FIRST: Type = 8;
-    pub const PROCSIG_RECOVERY_CONFLICT_DATABASE: Type = 8;
-    pub const PROCSIG_RECOVERY_CONFLICT_TABLESPACE: Type = 9;
-    pub const PROCSIG_RECOVERY_CONFLICT_LOCK: Type = 10;
-    pub const PROCSIG_RECOVERY_CONFLICT_SNAPSHOT: Type = 11;
-    pub const PROCSIG_RECOVERY_CONFLICT_LOGICALSLOT: Type = 12;
-    pub const PROCSIG_RECOVERY_CONFLICT_BUFFERPIN: Type = 13;
-    pub const PROCSIG_RECOVERY_CONFLICT_STARTUP_DEADLOCK: Type = 14;
-    pub const PROCSIG_RECOVERY_CONFLICT_LAST: Type = 14;
+    pub const PROCSIG_PARALLEL_APPLY_MESSAGE: Type = 6;
+    pub const PROCSIG_RECOVERY_CONFLICT_FIRST: Type = 7;
+    pub const PROCSIG_RECOVERY_CONFLICT_DATABASE: Type = 7;
+    pub const PROCSIG_RECOVERY_CONFLICT_TABLESPACE: Type = 8;
+    pub const PROCSIG_RECOVERY_CONFLICT_LOCK: Type = 9;
+    pub const PROCSIG_RECOVERY_CONFLICT_SNAPSHOT: Type = 10;
+    pub const PROCSIG_RECOVERY_CONFLICT_LOGICALSLOT: Type = 11;
+    pub const PROCSIG_RECOVERY_CONFLICT_BUFFERPIN: Type = 12;
+    pub const PROCSIG_RECOVERY_CONFLICT_STARTUP_DEADLOCK: Type = 13;
+    pub const PROCSIG_RECOVERY_CONFLICT_LAST: Type = 13;
 }
 pub mod ProcSignalBarrierType {
     pub type Type = ::core::ffi::c_uint;
@@ -36325,133 +36256,6 @@ unsafe extern "C-unwind" {
         name: *const ::core::ffi::c_char,
     ) -> EphemeralNamedRelation;
     pub fn ENRMetadataGetTupDesc(enrmd: EphemeralNamedRelationMetadata) -> TupleDesc;
-    pub fn makeInteger(i: ::core::ffi::c_int) -> *mut Integer;
-    pub fn makeFloat(numericStr: *mut ::core::ffi::c_char) -> *mut Float;
-    pub fn makeBoolean(val: bool) -> *mut Boolean;
-    pub fn makeString(str_: *mut ::core::ffi::c_char) -> *mut String;
-    pub fn makeBitString(str_: *mut ::core::ffi::c_char) -> *mut BitString;
-    pub fn InitializeQueryCompletion(qc: *mut QueryCompletion);
-    pub fn GetCommandTagName(commandTag: CommandTag::Type) -> *const ::core::ffi::c_char;
-    pub fn GetCommandTagNameAndLen(
-        commandTag: CommandTag::Type,
-        len: *mut Size,
-    ) -> *const ::core::ffi::c_char;
-    pub fn command_tag_display_rowcount(commandTag: CommandTag::Type) -> bool;
-    pub fn command_tag_event_trigger_ok(commandTag: CommandTag::Type) -> bool;
-    pub fn command_tag_table_rewrite_ok(commandTag: CommandTag::Type) -> bool;
-    pub fn GetCommandTagEnum(commandname: *const ::core::ffi::c_char) -> CommandTag::Type;
-    pub fn BuildQueryCompletionString(
-        buff: *mut ::core::ffi::c_char,
-        qc: *const QueryCompletion,
-        nameonly: bool,
-    ) -> Size;
-    pub static mut CurrentResourceOwner: ResourceOwner;
-    pub static mut CurTransactionResourceOwner: ResourceOwner;
-    pub static mut TopTransactionResourceOwner: ResourceOwner;
-    pub static mut AuxProcessResourceOwner: ResourceOwner;
-    pub fn ResourceOwnerCreate(
-        parent: ResourceOwner,
-        name: *const ::core::ffi::c_char,
-    ) -> ResourceOwner;
-    pub fn ResourceOwnerRelease(
-        owner: ResourceOwner,
-        phase: ResourceReleasePhase::Type,
-        isCommit: bool,
-        isTopLevel: bool,
-    );
-    pub fn ResourceOwnerDelete(owner: ResourceOwner);
-    pub fn ResourceOwnerGetParent(owner: ResourceOwner) -> ResourceOwner;
-    pub fn ResourceOwnerNewParent(owner: ResourceOwner, newparent: ResourceOwner);
-    pub fn ResourceOwnerEnlarge(owner: ResourceOwner);
-    pub fn ResourceOwnerRemember(
-        owner: ResourceOwner,
-        value: Datum,
-        kind: *const ResourceOwnerDesc,
-    );
-    pub fn ResourceOwnerForget(owner: ResourceOwner, value: Datum, kind: *const ResourceOwnerDesc);
-    pub fn ResourceOwnerReleaseAllOfKind(owner: ResourceOwner, kind: *const ResourceOwnerDesc);
-    pub fn RegisterResourceReleaseCallback(
-        callback: ResourceReleaseCallback,
-        arg: *mut ::core::ffi::c_void,
-    );
-    pub fn UnregisterResourceReleaseCallback(
-        callback: ResourceReleaseCallback,
-        arg: *mut ::core::ffi::c_void,
-    );
-    pub fn CreateAuxProcessResourceOwner();
-    pub fn ReleaseAuxProcessResources(isCommit: bool);
-    pub fn ResourceOwnerRememberLock(owner: ResourceOwner, locallock: *mut LOCALLOCK);
-    pub fn ResourceOwnerForgetLock(owner: ResourceOwner, locallock: *mut LOCALLOCK);
-    pub fn ResourceOwnerRememberAioHandle(owner: ResourceOwner, ioh_node: *mut dlist_node);
-    pub fn ResourceOwnerForgetAioHandle(owner: ResourceOwner, ioh_node: *mut dlist_node);
-    pub static mut plan_cache_mode: ::core::ffi::c_int;
-    pub fn InitPlanCache();
-    pub fn ResetPlanCache();
-    pub fn ReleaseAllPlanCacheRefsInOwner(owner: ResourceOwner);
-    pub fn CreateCachedPlan(
-        raw_parse_tree: *mut RawStmt,
-        query_string: *const ::core::ffi::c_char,
-        commandTag: CommandTag::Type,
-    ) -> *mut CachedPlanSource;
-    pub fn CreateCachedPlanForQuery(
-        analyzed_parse_tree: *mut Query,
-        query_string: *const ::core::ffi::c_char,
-        commandTag: CommandTag::Type,
-    ) -> *mut CachedPlanSource;
-    pub fn CreateOneShotCachedPlan(
-        raw_parse_tree: *mut RawStmt,
-        query_string: *const ::core::ffi::c_char,
-        commandTag: CommandTag::Type,
-    ) -> *mut CachedPlanSource;
-    pub fn CompleteCachedPlan(
-        plansource: *mut CachedPlanSource,
-        querytree_list: *mut List,
-        querytree_context: MemoryContext,
-        param_types: *mut Oid,
-        num_params: ::core::ffi::c_int,
-        parserSetup: ParserSetupHook,
-        parserSetupArg: *mut ::core::ffi::c_void,
-        cursor_options: ::core::ffi::c_int,
-        fixed_result: bool,
-    );
-    pub fn SetPostRewriteHook(
-        plansource: *mut CachedPlanSource,
-        postRewrite: PostRewriteHook,
-        postRewriteArg: *mut ::core::ffi::c_void,
-    );
-    pub fn SaveCachedPlan(plansource: *mut CachedPlanSource);
-    pub fn DropCachedPlan(plansource: *mut CachedPlanSource);
-    pub fn CachedPlanSetParentContext(plansource: *mut CachedPlanSource, newcontext: MemoryContext);
-    pub fn CopyCachedPlan(plansource: *mut CachedPlanSource) -> *mut CachedPlanSource;
-    pub fn CachedPlanIsValid(plansource: *mut CachedPlanSource) -> bool;
-    pub fn CachedPlanGetTargetList(
-        plansource: *mut CachedPlanSource,
-        queryEnv: *mut QueryEnvironment,
-    ) -> *mut List;
-    pub fn GetCachedPlan(
-        plansource: *mut CachedPlanSource,
-        boundParams: ParamListInfo,
-        owner: ResourceOwner,
-        queryEnv: *mut QueryEnvironment,
-    ) -> *mut CachedPlan;
-    pub fn UpdateCachedPlan(
-        plansource: *mut CachedPlanSource,
-        query_index: ::core::ffi::c_int,
-        queryEnv: *mut QueryEnvironment,
-    ) -> *mut PlannedStmt;
-    pub fn ReleaseCachedPlan(plan: *mut CachedPlan, owner: ResourceOwner);
-    pub fn CachedPlanAllowsSimpleValidityCheck(
-        plansource: *mut CachedPlanSource,
-        plan: *mut CachedPlan,
-        owner: ResourceOwner,
-    ) -> bool;
-    pub fn CachedPlanIsSimplyValid(
-        plansource: *mut CachedPlanSource,
-        plan: *mut CachedPlan,
-        owner: ResourceOwner,
-    ) -> bool;
-    pub fn GetCachedExpression(expr: *mut Node) -> *mut CachedExpression;
-    pub fn FreeCachedExpression(cexpr: *mut CachedExpression);
     pub static mut max_files_per_process: ::core::ffi::c_int;
     pub static mut data_sync_retry: bool;
     pub static mut recovery_init_sync_method: ::core::ffi::c_int;
@@ -37375,6 +37179,21 @@ unsafe extern "C-unwind" {
         iter: *mut tuplehash_iterator,
     ) -> *mut TupleHashEntryData;
     pub fn tuplehash_stat(tb: *mut tuplehash_hash);
+    pub fn InitializeQueryCompletion(qc: *mut QueryCompletion);
+    pub fn GetCommandTagName(commandTag: CommandTag::Type) -> *const ::core::ffi::c_char;
+    pub fn GetCommandTagNameAndLen(
+        commandTag: CommandTag::Type,
+        len: *mut Size,
+    ) -> *const ::core::ffi::c_char;
+    pub fn command_tag_display_rowcount(commandTag: CommandTag::Type) -> bool;
+    pub fn command_tag_event_trigger_ok(commandTag: CommandTag::Type) -> bool;
+    pub fn command_tag_table_rewrite_ok(commandTag: CommandTag::Type) -> bool;
+    pub fn GetCommandTagEnum(commandname: *const ::core::ffi::c_char) -> CommandTag::Type;
+    pub fn BuildQueryCompletionString(
+        buff: *mut ::core::ffi::c_char,
+        qc: *const QueryCompletion,
+        nameonly: bool,
+    ) -> Size;
     pub static mut None_Receiver: *mut DestReceiver;
     pub fn BeginCommand(commandTag: CommandTag::Type, dest: CommandDest::Type);
     pub fn CreateDestReceiver(dest: CommandDest::Type) -> *mut DestReceiver;
@@ -37388,7 +37207,6 @@ unsafe extern "C-unwind" {
     pub fn ReadyForQuery(dest: CommandDest::Type);
     pub fn CreateQueryDesc(
         plannedstmt: *mut PlannedStmt,
-        cplan: *mut CachedPlan,
         sourceText: *const ::core::ffi::c_char,
         snapshot: Snapshot,
         crosscheck_snapshot: Snapshot,
@@ -37398,746 +37216,11 @@ unsafe extern "C-unwind" {
         instrument_options: ::core::ffi::c_int,
     ) -> *mut QueryDesc;
     pub fn FreeQueryDesc(qdesc: *mut QueryDesc);
-    pub static mut MainLWLockArray: *mut LWLockPadded;
-    pub static mut NamedLWLockTrancheArray: *mut NamedLWLockTranche;
-    pub static mut NamedLWLockTrancheRequests: ::core::ffi::c_int;
-    pub fn LWLockAcquire(lock: *mut LWLock, mode: LWLockMode::Type) -> bool;
-    pub fn LWLockConditionalAcquire(lock: *mut LWLock, mode: LWLockMode::Type) -> bool;
-    pub fn LWLockAcquireOrWait(lock: *mut LWLock, mode: LWLockMode::Type) -> bool;
-    pub fn LWLockRelease(lock: *mut LWLock);
-    pub fn LWLockReleaseClearVar(lock: *mut LWLock, valptr: *mut pg_atomic_uint64, val: uint64);
-    pub fn LWLockReleaseAll();
-    pub fn LWLockDisown(lock: *mut LWLock);
-    pub fn LWLockReleaseDisowned(lock: *mut LWLock, mode: LWLockMode::Type);
-    pub fn ForEachLWLockHeldByMe(
-        callback: ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                arg1: *mut LWLock,
-                arg2: LWLockMode::Type,
-                arg3: *mut ::core::ffi::c_void,
-            ),
-        >,
-        context: *mut ::core::ffi::c_void,
-    );
-    pub fn LWLockHeldByMe(lock: *mut LWLock) -> bool;
-    pub fn LWLockAnyHeldByMe(lock: *mut LWLock, nlocks: ::core::ffi::c_int, stride: usize) -> bool;
-    pub fn LWLockHeldByMeInMode(lock: *mut LWLock, mode: LWLockMode::Type) -> bool;
-    pub fn LWLockWaitForVar(
-        lock: *mut LWLock,
-        valptr: *mut pg_atomic_uint64,
-        oldval: uint64,
-        newval: *mut uint64,
-    ) -> bool;
-    pub fn LWLockUpdateVar(lock: *mut LWLock, valptr: *mut pg_atomic_uint64, val: uint64);
-    pub fn LWLockShmemSize() -> Size;
-    pub fn CreateLWLocks();
-    pub fn InitLWLockAccess();
-    pub fn GetLWLockIdentifier(classId: uint32, eventId: uint16) -> *const ::core::ffi::c_char;
-    pub fn RequestNamedLWLockTranche(
-        tranche_name: *const ::core::ffi::c_char,
-        num_lwlocks: ::core::ffi::c_int,
-    );
-    pub fn GetNamedLWLockTranche(tranche_name: *const ::core::ffi::c_char) -> *mut LWLockPadded;
-    pub fn LWLockNewTrancheId() -> ::core::ffi::c_int;
-    pub fn LWLockRegisterTranche(
-        tranche_id: ::core::ffi::c_int,
-        tranche_name: *const ::core::ffi::c_char,
-    );
-    pub fn LWLockInitialize(lock: *mut LWLock, tranche_id: ::core::ffi::c_int);
-    pub static mut ShmemLock: *mut slock_t;
-    pub fn InitShmemAccess(seghdr: *mut PGShmemHeader);
-    pub fn InitShmemAllocation();
-    pub fn ShmemAlloc(size: Size) -> *mut ::core::ffi::c_void;
-    pub fn ShmemAllocNoError(size: Size) -> *mut ::core::ffi::c_void;
-    pub fn ShmemAllocUnlocked(size: Size) -> *mut ::core::ffi::c_void;
-    pub fn ShmemAddrIsValid(addr: *const ::core::ffi::c_void) -> bool;
-    pub fn InitShmemIndex();
-    pub fn ShmemInitHash(
-        name: *const ::core::ffi::c_char,
-        init_size: ::core::ffi::c_long,
-        max_size: ::core::ffi::c_long,
-        infoP: *mut HASHCTL,
-        hash_flags: ::core::ffi::c_int,
-    ) -> *mut HTAB;
-    pub fn ShmemInitStruct(
-        name: *const ::core::ffi::c_char,
-        size: Size,
-        foundPtr: *mut bool,
-    ) -> *mut ::core::ffi::c_void;
-    pub fn add_size(s1: Size, s2: Size) -> Size;
-    pub fn mul_size(s1: Size, s2: Size) -> Size;
-    pub fn pg_get_shmem_pagesize() -> Size;
-    pub fn RequestAddinShmemSpace(size: Size);
-    pub fn pg_localtime(timep: *const pg_time_t, tz: *const pg_tz) -> *mut pg_tm;
-    pub fn pg_gmtime(timep: *const pg_time_t) -> *mut pg_tm;
-    pub fn pg_next_dst_boundary(
-        timep: *const pg_time_t,
-        before_gmtoff: *mut ::core::ffi::c_long,
-        before_isdst: *mut ::core::ffi::c_int,
-        boundary: *mut pg_time_t,
-        after_gmtoff: *mut ::core::ffi::c_long,
-        after_isdst: *mut ::core::ffi::c_int,
-        tz: *const pg_tz,
-    ) -> ::core::ffi::c_int;
-    pub fn pg_interpret_timezone_abbrev(
-        abbrev: *const ::core::ffi::c_char,
-        timep: *const pg_time_t,
-        gmtoff: *mut ::core::ffi::c_long,
-        isdst: *mut ::core::ffi::c_int,
-        tz: *const pg_tz,
-    ) -> bool;
-    pub fn pg_timezone_abbrev_is_known(
-        abbrev: *const ::core::ffi::c_char,
-        isfixed: *mut bool,
-        gmtoff: *mut ::core::ffi::c_long,
-        isdst: *mut ::core::ffi::c_int,
-        tz: *const pg_tz,
-    ) -> bool;
-    pub fn pg_get_next_timezone_abbrev(
-        indx: *mut ::core::ffi::c_int,
-        tz: *const pg_tz,
-    ) -> *const ::core::ffi::c_char;
-    pub fn pg_get_timezone_offset(tz: *const pg_tz, gmtoff: *mut ::core::ffi::c_long) -> bool;
-    pub fn pg_get_timezone_name(tz: *mut pg_tz) -> *const ::core::ffi::c_char;
-    pub fn pg_tz_acceptable(tz: *mut pg_tz) -> bool;
-    pub fn pg_strftime(
-        s: *mut ::core::ffi::c_char,
-        maxsize: usize,
-        format: *const ::core::ffi::c_char,
-        t: *const pg_tm,
-    ) -> usize;
-    pub static mut session_timezone: *mut pg_tz;
-    pub static mut log_timezone: *mut pg_tz;
-    pub fn pg_timezone_initialize();
-    pub fn pg_tzset(tzname: *const ::core::ffi::c_char) -> *mut pg_tz;
-    pub fn pg_tzset_offset(gmtoffset: ::core::ffi::c_long) -> *mut pg_tz;
-    pub fn pg_tzenumerate_start() -> *mut pg_tzenum;
-    pub fn pg_tzenumerate_next(dir: *mut pg_tzenum) -> *mut pg_tz;
-    pub fn pg_tzenumerate_end(dir: *mut pg_tzenum);
-    pub static mut PgStartTime: TimestampTz;
-    pub static mut PgReloadTime: TimestampTz;
-    pub fn anytimestamp_typmod_check(istz: bool, typmod: int32) -> int32;
-    pub fn GetCurrentTimestamp() -> TimestampTz;
-    pub fn GetSQLCurrentTimestamp(typmod: int32) -> TimestampTz;
-    pub fn GetSQLLocalTimestamp(typmod: int32) -> Timestamp;
-    pub fn TimestampDifference(
-        start_time: TimestampTz,
-        stop_time: TimestampTz,
-        secs: *mut ::core::ffi::c_long,
-        microsecs: *mut ::core::ffi::c_int,
-    );
-    pub fn TimestampDifferenceMilliseconds(
-        start_time: TimestampTz,
-        stop_time: TimestampTz,
-    ) -> ::core::ffi::c_long;
-    pub fn TimestampDifferenceExceeds(
-        start_time: TimestampTz,
-        stop_time: TimestampTz,
-        msec: ::core::ffi::c_int,
-    ) -> bool;
-    pub fn TimestampDifferenceExceedsSeconds(
-        start_time: TimestampTz,
-        stop_time: TimestampTz,
-        threshold_sec: ::core::ffi::c_int,
-    ) -> bool;
-    pub fn time_t_to_timestamptz(tm: pg_time_t) -> TimestampTz;
-    pub fn timestamptz_to_time_t(t: TimestampTz) -> pg_time_t;
-    pub fn timestamptz_to_str(t: TimestampTz) -> *const ::core::ffi::c_char;
-    pub fn tm2timestamp(
-        tm: *mut pg_tm,
-        fsec: fsec_t,
-        tzp: *mut ::core::ffi::c_int,
-        result: *mut Timestamp,
-    ) -> ::core::ffi::c_int;
-    pub fn timestamp2tm(
-        dt: Timestamp,
-        tzp: *mut ::core::ffi::c_int,
-        tm: *mut pg_tm,
-        fsec: *mut fsec_t,
-        tzn: *mut *const ::core::ffi::c_char,
-        attimezone: *mut pg_tz,
-    ) -> ::core::ffi::c_int;
-    pub fn dt2time(
-        jd: Timestamp,
-        hour: *mut ::core::ffi::c_int,
-        min: *mut ::core::ffi::c_int,
-        sec: *mut ::core::ffi::c_int,
-        fsec: *mut fsec_t,
-    );
-    pub fn interval2itm(span: Interval, itm: *mut pg_itm);
-    pub fn itm2interval(itm: *mut pg_itm, span: *mut Interval) -> ::core::ffi::c_int;
-    pub fn itmin2interval(itm_in: *mut pg_itm_in, span: *mut Interval) -> ::core::ffi::c_int;
-    pub fn SetEpochTimestamp() -> Timestamp;
-    pub fn GetEpochTime(tm: *mut pg_tm);
-    pub fn timestamp_cmp_internal(dt1: Timestamp, dt2: Timestamp) -> ::core::ffi::c_int;
-    pub fn timestamp2timestamptz_opt_overflow(
-        timestamp: Timestamp,
-        overflow: *mut ::core::ffi::c_int,
-    ) -> TimestampTz;
-    pub fn timestamp_cmp_timestamptz_internal(timestampVal: Timestamp, dt2: TimestampTz) -> int32;
-    pub fn isoweek2j(year: ::core::ffi::c_int, week: ::core::ffi::c_int) -> ::core::ffi::c_int;
-    pub fn isoweek2date(
-        woy: ::core::ffi::c_int,
-        year: *mut ::core::ffi::c_int,
-        mon: *mut ::core::ffi::c_int,
-        mday: *mut ::core::ffi::c_int,
-    );
-    pub fn isoweekdate2date(
-        isoweek: ::core::ffi::c_int,
-        wday: ::core::ffi::c_int,
-        year: *mut ::core::ffi::c_int,
-        mon: *mut ::core::ffi::c_int,
-        mday: *mut ::core::ffi::c_int,
-    );
-    pub fn date2isoweek(
-        year: ::core::ffi::c_int,
-        mon: ::core::ffi::c_int,
-        mday: ::core::ffi::c_int,
-    ) -> ::core::ffi::c_int;
-    pub fn date2isoyear(
-        year: ::core::ffi::c_int,
-        mon: ::core::ffi::c_int,
-        mday: ::core::ffi::c_int,
-    ) -> ::core::ffi::c_int;
-    pub fn date2isoyearday(
-        year: ::core::ffi::c_int,
-        mon: ::core::ffi::c_int,
-        mday: ::core::ffi::c_int,
-    ) -> ::core::ffi::c_int;
-    pub fn TimestampTimestampTzRequiresRewrite() -> bool;
-    pub static mut max_locks_per_xact: ::core::ffi::c_int;
-    pub static mut log_lock_failure: bool;
-    pub static LockTagTypeNames: [*const ::core::ffi::c_char; 0usize];
-    pub fn LockManagerShmemInit();
-    pub fn LockManagerShmemSize() -> Size;
-    pub fn InitLockManagerAccess();
-    pub fn GetLocksMethodTable(lock: *const LOCK) -> LockMethod;
-    pub fn GetLockTagsMethodTable(locktag: *const LOCKTAG) -> LockMethod;
-    pub fn LockTagHashCode(locktag: *const LOCKTAG) -> uint32;
-    pub fn DoLockModesConflict(mode1: LOCKMODE, mode2: LOCKMODE) -> bool;
-    pub fn LockAcquire(
-        locktag: *const LOCKTAG,
-        lockmode: LOCKMODE,
-        sessionLock: bool,
-        dontWait: bool,
-    ) -> LockAcquireResult::Type;
-    pub fn LockAcquireExtended(
-        locktag: *const LOCKTAG,
-        lockmode: LOCKMODE,
-        sessionLock: bool,
-        dontWait: bool,
-        reportMemoryError: bool,
-        locallockp: *mut *mut LOCALLOCK,
-        logLockFailure: bool,
-    ) -> LockAcquireResult::Type;
-    pub fn AbortStrongLockAcquire();
-    pub fn MarkLockClear(locallock: *mut LOCALLOCK);
-    pub fn LockRelease(locktag: *const LOCKTAG, lockmode: LOCKMODE, sessionLock: bool) -> bool;
-    pub fn LockReleaseAll(lockmethodid: LOCKMETHODID, allLocks: bool);
-    pub fn LockReleaseSession(lockmethodid: LOCKMETHODID);
-    pub fn LockReleaseCurrentOwner(locallocks: *mut *mut LOCALLOCK, nlocks: ::core::ffi::c_int);
-    pub fn LockReassignCurrentOwner(locallocks: *mut *mut LOCALLOCK, nlocks: ::core::ffi::c_int);
-    pub fn LockHeldByMe(locktag: *const LOCKTAG, lockmode: LOCKMODE, orstronger: bool) -> bool;
-    pub fn GetLockMethodLocalHash() -> *mut HTAB;
-    pub fn LockHasWaiters(locktag: *const LOCKTAG, lockmode: LOCKMODE, sessionLock: bool) -> bool;
-    pub fn GetLockConflicts(
-        locktag: *const LOCKTAG,
-        lockmode: LOCKMODE,
-        countp: *mut ::core::ffi::c_int,
-    ) -> *mut VirtualTransactionId;
-    pub fn AtPrepare_Locks();
-    pub fn PostPrepare_Locks(xid: TransactionId);
-    pub fn LockCheckConflicts(
-        lockMethodTable: LockMethod,
-        lockmode: LOCKMODE,
-        lock: *mut LOCK,
-        proclock: *mut PROCLOCK,
-    ) -> bool;
-    pub fn GrantLock(lock: *mut LOCK, proclock: *mut PROCLOCK, lockmode: LOCKMODE);
-    pub fn GrantAwaitedLock();
-    pub fn GetAwaitedLock() -> *mut LOCALLOCK;
-    pub fn ResetAwaitedLock();
-    pub fn RemoveFromWaitQueue(proc_: *mut PGPROC, hashcode: uint32);
-    pub fn GetLockStatusData() -> *mut LockData;
-    pub fn GetBlockerStatusData(blocked_pid: ::core::ffi::c_int) -> *mut BlockedProcsData;
-    pub fn GetRunningTransactionLocks(nlocks: *mut ::core::ffi::c_int) -> *mut xl_standby_lock;
-    pub fn GetLockmodeName(
-        lockmethodid: LOCKMETHODID,
-        mode: LOCKMODE,
-    ) -> *const ::core::ffi::c_char;
-    pub fn lock_twophase_recover(
-        xid: TransactionId,
-        info: uint16,
-        recdata: *mut ::core::ffi::c_void,
-        len: uint32,
-    );
-    pub fn lock_twophase_postcommit(
-        xid: TransactionId,
-        info: uint16,
-        recdata: *mut ::core::ffi::c_void,
-        len: uint32,
-    );
-    pub fn lock_twophase_postabort(
-        xid: TransactionId,
-        info: uint16,
-        recdata: *mut ::core::ffi::c_void,
-        len: uint32,
-    );
-    pub fn lock_twophase_standby_recover(
-        xid: TransactionId,
-        info: uint16,
-        recdata: *mut ::core::ffi::c_void,
-        len: uint32,
-    );
-    pub fn DeadLockCheck(proc_: *mut PGPROC) -> DeadLockState::Type;
-    pub fn GetBlockingAutoVacuumPgproc() -> *mut PGPROC;
-    pub fn DeadLockReport();
-    pub fn RememberSimpleDeadLock(
-        proc1: *mut PGPROC,
-        lockmode: LOCKMODE,
-        lock: *mut LOCK,
-        proc2: *mut PGPROC,
-    );
-    pub fn InitDeadLockChecking();
-    pub fn LockWaiterCount(locktag: *const LOCKTAG) -> ::core::ffi::c_int;
-    pub fn VirtualXactLockTableInsert(vxid: VirtualTransactionId);
-    pub fn VirtualXactLockTableCleanup();
-    pub fn VirtualXactLock(vxid: VirtualTransactionId, wait: bool) -> bool;
-    pub fn build_backup_content(
-        state: *mut BackupState,
-        ishistoryfile: bool,
-    ) -> *mut ::core::ffi::c_char;
-    pub static mut wal_sync_method: ::core::ffi::c_int;
-    pub static mut ProcLastRecPtr: XLogRecPtr;
-    pub static mut XactLastRecEnd: XLogRecPtr;
-    pub static mut XactLastCommitEnd: XLogRecPtr;
-    pub static mut wal_segment_size: ::core::ffi::c_int;
-    pub static mut min_wal_size_mb: ::core::ffi::c_int;
-    pub static mut max_wal_size_mb: ::core::ffi::c_int;
-    pub static mut wal_keep_size_mb: ::core::ffi::c_int;
-    pub static mut max_slot_wal_keep_size_mb: ::core::ffi::c_int;
-    pub static mut XLOGbuffers: ::core::ffi::c_int;
-    pub static mut XLogArchiveTimeout: ::core::ffi::c_int;
-    pub static mut wal_retrieve_retry_interval: ::core::ffi::c_int;
-    pub static mut XLogArchiveCommand: *mut ::core::ffi::c_char;
-    pub static mut EnableHotStandby: bool;
-    pub static mut fullPageWrites: bool;
-    pub static mut wal_log_hints: bool;
-    pub static mut wal_compression: ::core::ffi::c_int;
-    pub static mut wal_init_zero: bool;
-    pub static mut wal_recycle: bool;
-    pub static mut wal_consistency_checking: *mut bool;
-    pub static mut wal_consistency_checking_string: *mut ::core::ffi::c_char;
-    pub static mut log_checkpoints: bool;
-    pub static mut CommitDelay: ::core::ffi::c_int;
-    pub static mut CommitSiblings: ::core::ffi::c_int;
-    pub static mut track_wal_io_timing: bool;
-    pub static mut wal_decode_buffer_size: ::core::ffi::c_int;
-    pub static mut CheckPointSegments: ::core::ffi::c_int;
-    pub static mut XLogArchiveMode: ::core::ffi::c_int;
-    pub static mut wal_level: ::core::ffi::c_int;
-    pub static mut CheckpointStats: CheckpointStatsData;
-    pub fn XLogInsertRecord(
-        rdata: *mut XLogRecData,
-        fpw_lsn: XLogRecPtr,
-        flags: uint8,
-        num_fpi: ::core::ffi::c_int,
-        topxid_included: bool,
-    ) -> XLogRecPtr;
-    pub fn XLogFlush(record: XLogRecPtr);
-    pub fn XLogBackgroundFlush() -> bool;
-    pub fn XLogNeedsFlush(record: XLogRecPtr) -> bool;
-    pub fn XLogFileInit(logsegno: XLogSegNo, logtli: TimeLineID) -> ::core::ffi::c_int;
-    pub fn XLogFileOpen(segno: XLogSegNo, tli: TimeLineID) -> ::core::ffi::c_int;
-    pub fn CheckXLogRemoved(segno: XLogSegNo, tli: TimeLineID);
-    pub fn XLogGetLastRemovedSegno() -> XLogSegNo;
-    pub fn XLogGetOldestSegno(tli: TimeLineID) -> XLogSegNo;
-    pub fn XLogSetAsyncXactLSN(asyncXactLSN: XLogRecPtr);
-    pub fn XLogSetReplicationSlotMinimumLSN(lsn: XLogRecPtr);
-    pub fn xlog_redo(record: *mut XLogReaderState);
-    pub fn xlog_desc(buf: StringInfo, record: *mut XLogReaderState);
-    pub fn xlog_identify(info: uint8) -> *const ::core::ffi::c_char;
-    pub fn issue_xlog_fsync(fd: ::core::ffi::c_int, segno: XLogSegNo, tli: TimeLineID);
-    pub fn RecoveryInProgress() -> bool;
-    pub fn GetRecoveryState() -> RecoveryState::Type;
-    pub fn XLogInsertAllowed() -> bool;
-    pub fn GetXLogInsertRecPtr() -> XLogRecPtr;
-    pub fn GetXLogWriteRecPtr() -> XLogRecPtr;
-    pub fn GetSystemIdentifier() -> uint64;
-    pub fn GetMockAuthenticationNonce() -> *mut ::core::ffi::c_char;
-    pub fn DataChecksumsEnabled() -> bool;
-    pub fn GetDefaultCharSignedness() -> bool;
-    pub fn GetFakeLSNForUnloggedRel() -> XLogRecPtr;
-    pub fn XLOGShmemSize() -> Size;
-    pub fn XLOGShmemInit();
-    pub fn BootStrapXLOG(data_checksum_version: uint32);
-    pub fn InitializeWalConsistencyChecking();
-    pub fn LocalProcessControlFile(reset: bool);
-    pub fn GetActiveWalLevelOnStandby() -> WalLevel::Type;
-    pub fn StartupXLOG();
-    pub fn ShutdownXLOG(code: ::core::ffi::c_int, arg: Datum);
-    pub fn CreateCheckPoint(flags: ::core::ffi::c_int) -> bool;
-    pub fn CreateRestartPoint(flags: ::core::ffi::c_int) -> bool;
-    pub fn GetWALAvailability(targetLSN: XLogRecPtr) -> WALAvailability::Type;
-    pub fn XLogPutNextOid(nextOid: Oid);
-    pub fn XLogRestorePoint(rpName: *const ::core::ffi::c_char) -> XLogRecPtr;
-    pub fn UpdateFullPageWrites();
-    pub fn GetFullPageWriteInfo(RedoRecPtr_p: *mut XLogRecPtr, doPageWrites_p: *mut bool);
-    pub fn GetRedoRecPtr() -> XLogRecPtr;
-    pub fn GetInsertRecPtr() -> XLogRecPtr;
-    pub fn GetFlushRecPtr(insertTLI: *mut TimeLineID) -> XLogRecPtr;
-    pub fn GetWALInsertionTimeLine() -> TimeLineID;
-    pub fn GetWALInsertionTimeLineIfSet() -> TimeLineID;
-    pub fn GetLastImportantRecPtr() -> XLogRecPtr;
-    pub fn SetWalWriterSleeping(sleeping: bool);
-    pub fn WALReadFromBuffers(
-        dstbuf: *mut ::core::ffi::c_char,
-        startptr: XLogRecPtr,
-        count: Size,
-        tli: TimeLineID,
-    ) -> Size;
-    pub fn RemoveNonParentXlogFiles(switchpoint: XLogRecPtr, newTLI: TimeLineID);
-    pub fn XLogCheckpointNeeded(new_segno: XLogSegNo) -> bool;
-    pub fn SwitchIntoArchiveRecovery(EndRecPtr: XLogRecPtr, replayTLI: TimeLineID);
-    pub fn ReachedEndOfBackup(EndRecPtr: XLogRecPtr, tli: TimeLineID);
-    pub fn SetInstallXLogFileSegmentActive();
-    pub fn IsInstallXLogFileSegmentActive() -> bool;
-    pub fn XLogShutdownWalRcv();
-    pub fn do_pg_backup_start(
-        backupidstr: *const ::core::ffi::c_char,
-        fast: bool,
-        tablespaces: *mut *mut List,
-        state: *mut BackupState,
-        tblspcmapfile: StringInfo,
-    );
-    pub fn do_pg_backup_stop(state: *mut BackupState, waitforarchive: bool);
-    pub fn do_pg_abort_backup(code: ::core::ffi::c_int, arg: Datum);
-    pub fn register_persistent_abort_backup_handler();
-    pub fn get_backup_status() -> SessionBackupState::Type;
-    pub fn errdetail_relkind_not_supported(relkind: ::core::ffi::c_char) -> ::core::ffi::c_int;
-    pub fn IsSystemRelation(relation: Relation) -> bool;
-    pub fn IsToastRelation(relation: Relation) -> bool;
-    pub fn IsCatalogRelation(relation: Relation) -> bool;
-    pub fn IsInplaceUpdateRelation(relation: Relation) -> bool;
-    pub fn IsSystemClass(relid: Oid, reltuple: Form_pg_class) -> bool;
-    pub fn IsToastClass(reltuple: Form_pg_class) -> bool;
-    pub fn IsCatalogRelationOid(relid: Oid) -> bool;
-    pub fn IsCatalogTextUniqueIndexOid(relid: Oid) -> bool;
-    pub fn IsInplaceUpdateOid(relid: Oid) -> bool;
-    pub fn IsCatalogNamespace(namespaceId: Oid) -> bool;
-    pub fn IsToastNamespace(namespaceId: Oid) -> bool;
-    pub fn IsReservedName(name: *const ::core::ffi::c_char) -> bool;
-    pub fn IsSharedRelation(relationId: Oid) -> bool;
-    pub fn IsPinnedObject(classId: Oid, objectId: Oid) -> bool;
-    pub fn GetNewOidWithIndex(relation: Relation, indexId: Oid, oidcolumn: AttrNumber) -> Oid;
-    pub fn GetNewRelFileNumber(
-        reltablespace: Oid,
-        pg_class: Relation,
-        relpersistence: ::core::ffi::c_char,
-    ) -> RelFileNumber;
-    pub static InvalidObjectAddress: ObjectAddress;
-    pub fn get_object_address(
-        objtype: ObjectType::Type,
-        object: *mut Node,
-        relp: *mut Relation,
-        lockmode: LOCKMODE,
-        missing_ok: bool,
-    ) -> ObjectAddress;
-    pub fn get_object_address_rv(
-        objtype: ObjectType::Type,
-        rel: *mut RangeVar,
-        object: *mut List,
-        relp: *mut Relation,
-        lockmode: LOCKMODE,
-        missing_ok: bool,
-    ) -> ObjectAddress;
-    pub fn check_object_ownership(
-        roleid: Oid,
-        objtype: ObjectType::Type,
-        address: ObjectAddress,
-        object: *mut Node,
-        relation: Relation,
-    );
-    pub fn get_object_namespace(address: *const ObjectAddress) -> Oid;
-    pub fn is_objectclass_supported(class_id: Oid) -> bool;
-    pub fn get_object_class_descr(class_id: Oid) -> *const ::core::ffi::c_char;
-    pub fn get_object_oid_index(class_id: Oid) -> Oid;
-    pub fn get_object_catcache_oid(class_id: Oid) -> ::core::ffi::c_int;
-    pub fn get_object_catcache_name(class_id: Oid) -> ::core::ffi::c_int;
-    pub fn get_object_attnum_oid(class_id: Oid) -> AttrNumber;
-    pub fn get_object_attnum_name(class_id: Oid) -> AttrNumber;
-    pub fn get_object_attnum_namespace(class_id: Oid) -> AttrNumber;
-    pub fn get_object_attnum_owner(class_id: Oid) -> AttrNumber;
-    pub fn get_object_attnum_acl(class_id: Oid) -> AttrNumber;
-    pub fn get_object_type(class_id: Oid, object_id: Oid) -> ObjectType::Type;
-    pub fn get_object_namensp_unique(class_id: Oid) -> bool;
-    pub fn get_catalog_object_by_oid(
-        catalog: Relation,
-        oidcol: AttrNumber,
-        objectId: Oid,
-    ) -> HeapTuple;
-    pub fn get_catalog_object_by_oid_extended(
-        catalog: Relation,
-        oidcol: AttrNumber,
-        objectId: Oid,
-        locktup: bool,
-    ) -> HeapTuple;
-    pub fn getObjectDescription(
-        object: *const ObjectAddress,
-        missing_ok: bool,
-    ) -> *mut ::core::ffi::c_char;
-    pub fn getObjectDescriptionOids(classid: Oid, objid: Oid) -> *mut ::core::ffi::c_char;
-    pub fn read_objtype_from_string(objtype: *const ::core::ffi::c_char) -> ::core::ffi::c_int;
-    pub fn getObjectTypeDescription(
-        object: *const ObjectAddress,
-        missing_ok: bool,
-    ) -> *mut ::core::ffi::c_char;
-    pub fn getObjectIdentity(
-        object: *const ObjectAddress,
-        missing_ok: bool,
-    ) -> *mut ::core::ffi::c_char;
-    pub fn getObjectIdentityParts(
-        object: *const ObjectAddress,
-        objname: *mut *mut List,
-        objargs: *mut *mut List,
-        missing_ok: bool,
-    ) -> *mut ::core::ffi::c_char;
-    pub fn strlist_to_textarray(list: *mut List) -> *mut ArrayType;
-    pub fn get_relkind_objtype(relkind: ::core::ffi::c_char) -> ObjectType::Type;
-    pub fn GetPublication(pubid: Oid) -> *mut Publication;
-    pub fn GetPublicationByName(
-        pubname: *const ::core::ffi::c_char,
-        missing_ok: bool,
-    ) -> *mut Publication;
-    pub fn GetRelationPublications(relid: Oid) -> *mut List;
-    pub fn GetPublicationRelations(pubid: Oid, pub_partopt: PublicationPartOpt::Type) -> *mut List;
-    pub fn GetAllTablesPublications() -> *mut List;
-    pub fn GetAllTablesPublicationRelations(pubviaroot: bool) -> *mut List;
-    pub fn GetPublicationSchemas(pubid: Oid) -> *mut List;
-    pub fn GetSchemaPublications(schemaid: Oid) -> *mut List;
-    pub fn GetSchemaPublicationRelations(
-        schemaid: Oid,
-        pub_partopt: PublicationPartOpt::Type,
-    ) -> *mut List;
-    pub fn GetAllSchemaPublicationRelations(
-        pubid: Oid,
-        pub_partopt: PublicationPartOpt::Type,
-    ) -> *mut List;
-    pub fn GetPubPartitionOptionRelations(
-        result: *mut List,
-        pub_partopt: PublicationPartOpt::Type,
-        relid: Oid,
-    ) -> *mut List;
-    pub fn GetTopMostAncestorInPublication(
-        puboid: Oid,
-        ancestors: *mut List,
-        ancestor_level: *mut ::core::ffi::c_int,
-    ) -> Oid;
-    pub fn is_publishable_relation(rel: Relation) -> bool;
-    pub fn is_schema_publication(pubid: Oid) -> bool;
-    pub fn check_and_fetch_column_list(
-        pub_: *mut Publication,
-        relid: Oid,
-        mcxt: MemoryContext,
-        cols: *mut *mut Bitmapset,
-    ) -> bool;
-    pub fn publication_add_relation(
-        pubid: Oid,
-        pri: *mut PublicationRelInfo,
-        if_not_exists: bool,
-    ) -> ObjectAddress;
-    pub fn pub_collist_validate(targetrel: Relation, columns: *mut List) -> *mut Bitmapset;
-    pub fn publication_add_schema(pubid: Oid, schemaid: Oid, if_not_exists: bool) -> ObjectAddress;
-    pub fn pub_collist_to_bitmapset(
-        columns: *mut Bitmapset,
-        pubcols: Datum,
-        mcxt: MemoryContext,
-    ) -> *mut Bitmapset;
-    pub fn pub_form_cols_map(
-        relation: Relation,
-        include_gencols_type: PublishGencolsType::Type,
-    ) -> *mut Bitmapset;
-    pub static aio_smgr_target_info: PgAioTargetInfo;
-    pub fn smgrinit();
-    pub fn smgropen(rlocator: RelFileLocator, backend: ProcNumber) -> SMgrRelation;
-    pub fn smgrexists(reln: SMgrRelation, forknum: ForkNumber::Type) -> bool;
-    pub fn smgrpin(reln: SMgrRelation);
-    pub fn smgrunpin(reln: SMgrRelation);
-    pub fn smgrclose(reln: SMgrRelation);
-    pub fn smgrdestroyall();
-    pub fn smgrrelease(reln: SMgrRelation);
-    pub fn smgrreleaseall();
-    pub fn smgrreleaserellocator(rlocator: RelFileLocatorBackend);
-    pub fn smgrcreate(reln: SMgrRelation, forknum: ForkNumber::Type, isRedo: bool);
-    pub fn smgrdosyncall(rels: *mut SMgrRelation, nrels: ::core::ffi::c_int);
-    pub fn smgrdounlinkall(rels: *mut SMgrRelation, nrels: ::core::ffi::c_int, isRedo: bool);
-    pub fn smgrextend(
-        reln: SMgrRelation,
-        forknum: ForkNumber::Type,
-        blocknum: BlockNumber,
-        buffer: *const ::core::ffi::c_void,
-        skipFsync: bool,
-    );
-    pub fn smgrzeroextend(
-        reln: SMgrRelation,
-        forknum: ForkNumber::Type,
-        blocknum: BlockNumber,
-        nblocks: ::core::ffi::c_int,
-        skipFsync: bool,
-    );
-    pub fn smgrprefetch(
-        reln: SMgrRelation,
-        forknum: ForkNumber::Type,
-        blocknum: BlockNumber,
-        nblocks: ::core::ffi::c_int,
-    ) -> bool;
-    pub fn smgrmaxcombine(
-        reln: SMgrRelation,
-        forknum: ForkNumber::Type,
-        blocknum: BlockNumber,
-    ) -> uint32;
-    pub fn smgrreadv(
-        reln: SMgrRelation,
-        forknum: ForkNumber::Type,
-        blocknum: BlockNumber,
-        buffers: *mut *mut ::core::ffi::c_void,
-        nblocks: BlockNumber,
-    );
-    pub fn smgrstartreadv(
-        ioh: *mut PgAioHandle,
-        reln: SMgrRelation,
-        forknum: ForkNumber::Type,
-        blocknum: BlockNumber,
-        buffers: *mut *mut ::core::ffi::c_void,
-        nblocks: BlockNumber,
-    );
-    pub fn smgrwritev(
-        reln: SMgrRelation,
-        forknum: ForkNumber::Type,
-        blocknum: BlockNumber,
-        buffers: *mut *const ::core::ffi::c_void,
-        nblocks: BlockNumber,
-        skipFsync: bool,
-    );
-    pub fn smgrwriteback(
-        reln: SMgrRelation,
-        forknum: ForkNumber::Type,
-        blocknum: BlockNumber,
-        nblocks: BlockNumber,
-    );
-    pub fn smgrnblocks(reln: SMgrRelation, forknum: ForkNumber::Type) -> BlockNumber;
-    pub fn smgrnblocks_cached(reln: SMgrRelation, forknum: ForkNumber::Type) -> BlockNumber;
-    pub fn smgrtruncate(
-        reln: SMgrRelation,
-        forknum: *mut ForkNumber::Type,
-        nforks: ::core::ffi::c_int,
-        old_nblocks: *mut BlockNumber,
-        nblocks: *mut BlockNumber,
-    );
-    pub fn smgrimmedsync(reln: SMgrRelation, forknum: ForkNumber::Type);
-    pub fn smgrregistersync(reln: SMgrRelation, forknum: ForkNumber::Type);
-    pub fn AtEOXact_SMgr();
-    pub fn ProcessBarrierSmgrRelease() -> bool;
-    pub fn pgaio_io_set_target_smgr(
-        ioh: *mut PgAioHandle,
-        smgr: *mut SMgrRelationData,
-        forknum: ForkNumber::Type,
-        blocknum: BlockNumber,
-        nblocks: ::core::ffi::c_int,
-        skip_fsync: bool,
-    );
-    pub fn RelationIncrementReferenceCount(rel: Relation);
-    pub fn RelationDecrementReferenceCount(rel: Relation);
-    pub fn RelationInitLockInfo(relation: Relation);
-    pub fn LockRelationOid(relid: Oid, lockmode: LOCKMODE);
-    pub fn LockRelationId(relid: *mut LockRelId, lockmode: LOCKMODE);
-    pub fn ConditionalLockRelationOid(relid: Oid, lockmode: LOCKMODE) -> bool;
-    pub fn UnlockRelationId(relid: *mut LockRelId, lockmode: LOCKMODE);
-    pub fn UnlockRelationOid(relid: Oid, lockmode: LOCKMODE);
-    pub fn LockRelation(relation: Relation, lockmode: LOCKMODE);
-    pub fn ConditionalLockRelation(relation: Relation, lockmode: LOCKMODE) -> bool;
-    pub fn UnlockRelation(relation: Relation, lockmode: LOCKMODE);
-    pub fn CheckRelationLockedByMe(
-        relation: Relation,
-        lockmode: LOCKMODE,
-        orstronger: bool,
-    ) -> bool;
-    pub fn CheckRelationOidLockedByMe(relid: Oid, lockmode: LOCKMODE, orstronger: bool) -> bool;
-    pub fn LockHasWaitersRelation(relation: Relation, lockmode: LOCKMODE) -> bool;
-    pub fn LockRelationIdForSession(relid: *mut LockRelId, lockmode: LOCKMODE);
-    pub fn UnlockRelationIdForSession(relid: *mut LockRelId, lockmode: LOCKMODE);
-    pub fn LockRelationForExtension(relation: Relation, lockmode: LOCKMODE);
-    pub fn UnlockRelationForExtension(relation: Relation, lockmode: LOCKMODE);
-    pub fn ConditionalLockRelationForExtension(relation: Relation, lockmode: LOCKMODE) -> bool;
-    pub fn RelationExtensionLockWaiterCount(relation: Relation) -> ::core::ffi::c_int;
-    pub fn LockDatabaseFrozenIds(lockmode: LOCKMODE);
-    pub fn LockPage(relation: Relation, blkno: BlockNumber, lockmode: LOCKMODE);
-    pub fn ConditionalLockPage(relation: Relation, blkno: BlockNumber, lockmode: LOCKMODE) -> bool;
-    pub fn UnlockPage(relation: Relation, blkno: BlockNumber, lockmode: LOCKMODE);
-    pub fn LockTuple(relation: Relation, tid: ItemPointer, lockmode: LOCKMODE);
-    pub fn ConditionalLockTuple(
-        relation: Relation,
-        tid: ItemPointer,
-        lockmode: LOCKMODE,
-        logLockFailure: bool,
-    ) -> bool;
-    pub fn UnlockTuple(relation: Relation, tid: ItemPointer, lockmode: LOCKMODE);
-    pub fn XactLockTableInsert(xid: TransactionId);
-    pub fn XactLockTableDelete(xid: TransactionId);
-    pub fn XactLockTableWait(
-        xid: TransactionId,
-        rel: Relation,
-        ctid: ItemPointer,
-        oper: XLTW_Oper::Type,
-    );
-    pub fn ConditionalXactLockTableWait(xid: TransactionId, logLockFailure: bool) -> bool;
-    pub fn WaitForLockers(heaplocktag: LOCKTAG, lockmode: LOCKMODE, progress: bool);
-    pub fn WaitForLockersMultiple(locktags: *mut List, lockmode: LOCKMODE, progress: bool);
-    pub fn SpeculativeInsertionLockAcquire(xid: TransactionId) -> uint32;
-    pub fn SpeculativeInsertionLockRelease(xid: TransactionId);
-    pub fn SpeculativeInsertionWait(xid: TransactionId, token: uint32);
-    pub fn LockDatabaseObject(classid: Oid, objid: Oid, objsubid: uint16, lockmode: LOCKMODE);
-    pub fn ConditionalLockDatabaseObject(
-        classid: Oid,
-        objid: Oid,
-        objsubid: uint16,
-        lockmode: LOCKMODE,
-    ) -> bool;
-    pub fn UnlockDatabaseObject(classid: Oid, objid: Oid, objsubid: uint16, lockmode: LOCKMODE);
-    pub fn LockSharedObject(classid: Oid, objid: Oid, objsubid: uint16, lockmode: LOCKMODE);
-    pub fn ConditionalLockSharedObject(
-        classid: Oid,
-        objid: Oid,
-        objsubid: uint16,
-        lockmode: LOCKMODE,
-    ) -> bool;
-    pub fn UnlockSharedObject(classid: Oid, objid: Oid, objsubid: uint16, lockmode: LOCKMODE);
-    pub fn LockSharedObjectForSession(
-        classid: Oid,
-        objid: Oid,
-        objsubid: uint16,
-        lockmode: LOCKMODE,
-    );
-    pub fn UnlockSharedObjectForSession(
-        classid: Oid,
-        objid: Oid,
-        objsubid: uint16,
-        lockmode: LOCKMODE,
-    );
-    pub fn LockApplyTransactionForSession(
-        suboid: Oid,
-        xid: TransactionId,
-        objid: uint16,
-        lockmode: LOCKMODE,
-    );
-    pub fn UnlockApplyTransactionForSession(
-        suboid: Oid,
-        xid: TransactionId,
-        objid: uint16,
-        lockmode: LOCKMODE,
-    );
-    pub fn DescribeLockTag(buf: StringInfo, tag: *const LOCKTAG);
-    pub fn GetLockNameFromTagType(locktag_type: uint16) -> *const ::core::ffi::c_char;
+    pub fn makeInteger(i: ::core::ffi::c_int) -> *mut Integer;
+    pub fn makeFloat(numericStr: *mut ::core::ffi::c_char) -> *mut Float;
+    pub fn makeBoolean(val: bool) -> *mut Boolean;
+    pub fn makeString(str_: *mut ::core::ffi::c_char) -> *mut String;
+    pub fn makeBitString(str_: *mut ::core::ffi::c_char) -> *mut BitString;
     pub static mut TopMemoryContext: MemoryContext;
     pub static mut ErrorContext: MemoryContext;
     pub static mut PostmasterContext: MemoryContext;
@@ -38197,15 +37280,6 @@ unsafe extern "C-unwind" {
         initBlockSize: Size,
         maxBlockSize: Size,
     ) -> MemoryContext;
-    pub static mut memCxtState: *mut MemoryStatsBackendState;
-    pub static mut memCxtArea: *mut MemoryStatsCtl;
-    pub static mut MemoryStatsDsaArea: *mut dsa_area;
-    pub fn ProcessGetMemoryContextInterrupt();
-    pub fn ContextTypeToString(type_: NodeTag) -> *const ::core::ffi::c_char;
-    pub fn HandleGetMemoryContextInterrupt();
-    pub fn MemoryContextReportingShmemSize() -> Size;
-    pub fn MemoryContextReportingShmemInit();
-    pub fn AtProcExit_memstats_cleanup(code: ::core::ffi::c_int, arg: Datum);
     pub static mut ExecutorStart_hook: ExecutorStart_hook_type;
     pub static mut ExecutorRun_hook: ExecutorRun_hook_type;
     pub static mut ExecutorFinish_hook: ExecutorFinish_hook_type;
@@ -38291,14 +37365,8 @@ unsafe extern "C-unwind" {
         junkfilter: *mut JunkFilter,
         slot: *mut TupleTableSlot,
     ) -> *mut TupleTableSlot;
-    pub fn ExecutorStart(queryDesc: *mut QueryDesc, eflags: ::core::ffi::c_int) -> bool;
-    pub fn ExecutorStartCachedPlan(
-        queryDesc: *mut QueryDesc,
-        eflags: ::core::ffi::c_int,
-        plansource: *mut CachedPlanSource,
-        query_index: ::core::ffi::c_int,
-    );
-    pub fn standard_ExecutorStart(queryDesc: *mut QueryDesc, eflags: ::core::ffi::c_int) -> bool;
+    pub fn ExecutorStart(queryDesc: *mut QueryDesc, eflags: ::core::ffi::c_int);
+    pub fn standard_ExecutorStart(queryDesc: *mut QueryDesc, eflags: ::core::ffi::c_int);
     pub fn ExecutorRun(queryDesc: *mut QueryDesc, direction: ScanDirection::Type, count: uint64);
     pub fn standard_ExecutorRun(
         queryDesc: *mut QueryDesc,
@@ -38808,6 +37876,52 @@ unsafe extern "C-unwind" {
         types: *mut *mut Oid,
         nulls: *mut *mut bool,
     ) -> ::core::ffi::c_int;
+    pub fn pg_localtime(timep: *const pg_time_t, tz: *const pg_tz) -> *mut pg_tm;
+    pub fn pg_gmtime(timep: *const pg_time_t) -> *mut pg_tm;
+    pub fn pg_next_dst_boundary(
+        timep: *const pg_time_t,
+        before_gmtoff: *mut ::core::ffi::c_long,
+        before_isdst: *mut ::core::ffi::c_int,
+        boundary: *mut pg_time_t,
+        after_gmtoff: *mut ::core::ffi::c_long,
+        after_isdst: *mut ::core::ffi::c_int,
+        tz: *const pg_tz,
+    ) -> ::core::ffi::c_int;
+    pub fn pg_interpret_timezone_abbrev(
+        abbrev: *const ::core::ffi::c_char,
+        timep: *const pg_time_t,
+        gmtoff: *mut ::core::ffi::c_long,
+        isdst: *mut ::core::ffi::c_int,
+        tz: *const pg_tz,
+    ) -> bool;
+    pub fn pg_timezone_abbrev_is_known(
+        abbrev: *const ::core::ffi::c_char,
+        isfixed: *mut bool,
+        gmtoff: *mut ::core::ffi::c_long,
+        isdst: *mut ::core::ffi::c_int,
+        tz: *const pg_tz,
+    ) -> bool;
+    pub fn pg_get_next_timezone_abbrev(
+        indx: *mut ::core::ffi::c_int,
+        tz: *const pg_tz,
+    ) -> *const ::core::ffi::c_char;
+    pub fn pg_get_timezone_offset(tz: *const pg_tz, gmtoff: *mut ::core::ffi::c_long) -> bool;
+    pub fn pg_get_timezone_name(tz: *mut pg_tz) -> *const ::core::ffi::c_char;
+    pub fn pg_tz_acceptable(tz: *mut pg_tz) -> bool;
+    pub fn pg_strftime(
+        s: *mut ::core::ffi::c_char,
+        maxsize: usize,
+        format: *const ::core::ffi::c_char,
+        t: *const pg_tm,
+    ) -> usize;
+    pub static mut session_timezone: *mut pg_tz;
+    pub static mut log_timezone: *mut pg_tz;
+    pub fn pg_timezone_initialize();
+    pub fn pg_tzset(tzname: *const ::core::ffi::c_char) -> *mut pg_tz;
+    pub fn pg_tzset_offset(gmtoffset: ::core::ffi::c_long) -> *mut pg_tz;
+    pub fn pg_tzenumerate_start() -> *mut pg_tzenum;
+    pub fn pg_tzenumerate_next(dir: *mut pg_tzenum) -> *mut pg_tz;
+    pub fn pg_tzenumerate_end(dir: *mut pg_tzenum);
     #[doc = "\t  System interrupt and critical section handling\n\n There are two types of interrupts that a running backend needs to accept\n without messing up its state: QueryCancel (SIGINT) and ProcDie (SIGTERM).\n In both cases, we need to be able to clean up the current transaction\n gracefully, so we can't respond to the interrupt instantaneously ---\n there's no guarantee that internal data structures would be self-consistent\n if the code is interrupted at an arbitrary instant.  Instead, the signal\n handlers set flags that are checked periodically during execution.\n\n The CHECK_FOR_INTERRUPTS() macro is called at strategically located spots\n where it is normally safe to accept a cancel or die interrupt.  In some\n cases, we invoke CHECK_FOR_INTERRUPTS() inside low-level subroutines that\n might sometimes be called in contexts that do *not* want to allow a cancel\n or die interrupt.  The HOLD_INTERRUPTS() and RESUME_INTERRUPTS() macros\n allow code to ensure that no cancel or die interrupt will be accepted,\n even if CHECK_FOR_INTERRUPTS() gets called in a subroutine.  The interrupt\n will be held off until CHECK_FOR_INTERRUPTS() is done outside any\n HOLD_INTERRUPTS() ... RESUME_INTERRUPTS() section.\n\n There is also a mechanism to prevent query cancel interrupts, while still\n allowing die interrupts: HOLD_CANCEL_INTERRUPTS() and\n RESUME_CANCEL_INTERRUPTS().\n\n Note that ProcessInterrupts() has also acquired a number of tasks that\n do not necessarily cause a query-cancel-or-die response.  Hence, it's\n possible that it will just clear InterruptPending and return.\n\n INTERRUPTS_PENDING_CONDITION() can be checked to see whether an\n interrupt needs to be serviced, without trying to do so immediately.\n Some callers are also interested in INTERRUPTS_CAN_BE_PROCESSED(),\n which tells whether ProcessInterrupts is sure to clear the interrupt.\n\n Special mechanisms are used to let an interrupt be accepted when we are\n waiting for a lock or when we are waiting for command input (but, of\n course, only if the interrupt holdoff counter is zero).  See the\n related code for details.\n\n A lost connection is handled similarly, although the loss of connection\n does not raise a signal, but is detected when we fail to write to the\n socket. If there was a signal for a broken connection, we could make use of\n it by setting ClientConnectionLost in the signal handler.\n\n A related, but conceptually distinct, mechanism is the \"critical section\"\n mechanism.  A critical section not only holds off cancel/die interrupts,\n but causes any ereport(ERROR) or ereport(FATAL) to become ereport(PANIC)\n --- that is, a system-wide reset is forced.  Needless to say, only really\n *critical* code should be marked as a critical section!\tCurrently, this\n mechanism is only used for XLOG-related code.\n"]
     pub static mut InterruptPending: sig_atomic_t;
     pub static mut QueryCancelPending: sig_atomic_t;
@@ -38818,7 +37932,6 @@ unsafe extern "C-unwind" {
     pub static mut ProcSignalBarrierPending: sig_atomic_t;
     pub static mut LogMemoryContextPending: sig_atomic_t;
     pub static mut IdleStatsUpdateTimeoutPending: sig_atomic_t;
-    pub static mut PublishMemoryContextPending: sig_atomic_t;
     pub static mut CheckClientConnectionPending: sig_atomic_t;
     pub static mut ClientConnectionLost: sig_atomic_t;
     pub static mut InterruptHoldoffCount: uint32;
@@ -38850,7 +37963,7 @@ unsafe extern "C-unwind" {
     pub static mut MyStartTimestamp: TimestampTz;
     pub static mut MyProcPort: *mut Port;
     pub static mut MyLatch: *mut Latch;
-    pub static mut MyCancelKey: [::core::ffi::c_char; 0usize];
+    pub static mut MyCancelKey: [uint8; 0usize];
     pub static mut MyCancelKeyLength: ::core::ffi::c_int;
     pub static mut MyPMChildSlot: ::core::ffi::c_int;
     pub static mut OutputFileName: [::core::ffi::c_char; 0usize];
@@ -38977,6 +38090,97 @@ unsafe extern "C-unwind" {
     pub fn PgArchiverMain(startup_data: *const ::core::ffi::c_void, startup_data_len: usize);
     pub fn PgArchWakeup();
     pub fn PgArchForceDirScan();
+    pub static mut PgStartTime: TimestampTz;
+    pub static mut PgReloadTime: TimestampTz;
+    pub fn anytimestamp_typmod_check(istz: bool, typmod: int32) -> int32;
+    pub fn GetCurrentTimestamp() -> TimestampTz;
+    pub fn GetSQLCurrentTimestamp(typmod: int32) -> TimestampTz;
+    pub fn GetSQLLocalTimestamp(typmod: int32) -> Timestamp;
+    pub fn TimestampDifference(
+        start_time: TimestampTz,
+        stop_time: TimestampTz,
+        secs: *mut ::core::ffi::c_long,
+        microsecs: *mut ::core::ffi::c_int,
+    );
+    pub fn TimestampDifferenceMilliseconds(
+        start_time: TimestampTz,
+        stop_time: TimestampTz,
+    ) -> ::core::ffi::c_long;
+    pub fn TimestampDifferenceExceeds(
+        start_time: TimestampTz,
+        stop_time: TimestampTz,
+        msec: ::core::ffi::c_int,
+    ) -> bool;
+    pub fn TimestampDifferenceExceedsSeconds(
+        start_time: TimestampTz,
+        stop_time: TimestampTz,
+        threshold_sec: ::core::ffi::c_int,
+    ) -> bool;
+    pub fn time_t_to_timestamptz(tm: pg_time_t) -> TimestampTz;
+    pub fn timestamptz_to_time_t(t: TimestampTz) -> pg_time_t;
+    pub fn timestamptz_to_str(t: TimestampTz) -> *const ::core::ffi::c_char;
+    pub fn tm2timestamp(
+        tm: *mut pg_tm,
+        fsec: fsec_t,
+        tzp: *mut ::core::ffi::c_int,
+        result: *mut Timestamp,
+    ) -> ::core::ffi::c_int;
+    pub fn timestamp2tm(
+        dt: Timestamp,
+        tzp: *mut ::core::ffi::c_int,
+        tm: *mut pg_tm,
+        fsec: *mut fsec_t,
+        tzn: *mut *const ::core::ffi::c_char,
+        attimezone: *mut pg_tz,
+    ) -> ::core::ffi::c_int;
+    pub fn dt2time(
+        jd: Timestamp,
+        hour: *mut ::core::ffi::c_int,
+        min: *mut ::core::ffi::c_int,
+        sec: *mut ::core::ffi::c_int,
+        fsec: *mut fsec_t,
+    );
+    pub fn interval2itm(span: Interval, itm: *mut pg_itm);
+    pub fn itm2interval(itm: *mut pg_itm, span: *mut Interval) -> ::core::ffi::c_int;
+    pub fn itmin2interval(itm_in: *mut pg_itm_in, span: *mut Interval) -> ::core::ffi::c_int;
+    pub fn SetEpochTimestamp() -> Timestamp;
+    pub fn GetEpochTime(tm: *mut pg_tm);
+    pub fn timestamp_cmp_internal(dt1: Timestamp, dt2: Timestamp) -> ::core::ffi::c_int;
+    pub fn timestamp2timestamptz_opt_overflow(
+        timestamp: Timestamp,
+        overflow: *mut ::core::ffi::c_int,
+    ) -> TimestampTz;
+    pub fn timestamp_cmp_timestamptz_internal(timestampVal: Timestamp, dt2: TimestampTz) -> int32;
+    pub fn isoweek2j(year: ::core::ffi::c_int, week: ::core::ffi::c_int) -> ::core::ffi::c_int;
+    pub fn isoweek2date(
+        woy: ::core::ffi::c_int,
+        year: *mut ::core::ffi::c_int,
+        mon: *mut ::core::ffi::c_int,
+        mday: *mut ::core::ffi::c_int,
+    );
+    pub fn isoweekdate2date(
+        isoweek: ::core::ffi::c_int,
+        wday: ::core::ffi::c_int,
+        year: *mut ::core::ffi::c_int,
+        mon: *mut ::core::ffi::c_int,
+        mday: *mut ::core::ffi::c_int,
+    );
+    pub fn date2isoweek(
+        year: ::core::ffi::c_int,
+        mon: ::core::ffi::c_int,
+        mday: ::core::ffi::c_int,
+    ) -> ::core::ffi::c_int;
+    pub fn date2isoyear(
+        year: ::core::ffi::c_int,
+        mon: ::core::ffi::c_int,
+        mday: ::core::ffi::c_int,
+    ) -> ::core::ffi::c_int;
+    pub fn date2isoyearday(
+        year: ::core::ffi::c_int,
+        mon: ::core::ffi::c_int,
+        mday: ::core::ffi::c_int,
+    ) -> ::core::ffi::c_int;
+    pub fn TimestampTimestampTzRequiresRewrite() -> bool;
     pub fn GetTupleTransactionInfo(
         localslot: *mut TupleTableSlot,
         xmin: *mut TransactionId,
@@ -39014,8 +38218,8 @@ unsafe extern "C-unwind" {
     pub fn pgstat_bestart_final();
     pub fn pgstat_clear_backend_activity_snapshot();
     pub fn pgstat_report_activity(state: BackendState::Type, cmd_str: *const ::core::ffi::c_char);
-    pub fn pgstat_report_query_id(query_id: uint64, force: bool);
-    pub fn pgstat_report_plan_id(plan_id: uint64, force: bool);
+    pub fn pgstat_report_query_id(query_id: int64, force: bool);
+    pub fn pgstat_report_plan_id(plan_id: int64, force: bool);
     pub fn pgstat_report_tempfile(filesize: usize);
     pub fn pgstat_report_appname(appname: *const ::core::ffi::c_char);
     pub fn pgstat_report_xact_timestamp(tstamp: TimestampTz);
@@ -39028,8 +38232,8 @@ unsafe extern "C-unwind" {
         buffer: *mut ::core::ffi::c_char,
         buflen: ::core::ffi::c_int,
     ) -> *const ::core::ffi::c_char;
-    pub fn pgstat_get_my_query_id() -> uint64;
-    pub fn pgstat_get_my_plan_id() -> uint64;
+    pub fn pgstat_get_my_query_id() -> int64;
+    pub fn pgstat_get_my_plan_id() -> int64;
     pub fn pgstat_get_backend_type_by_proc_number(procNumber: ProcNumber) -> BackendType::Type;
     pub fn pgstat_fetch_stat_numbackends() -> ::core::ffi::c_int;
     pub fn pgstat_get_beentry_by_proc_number(procNumber: ProcNumber) -> *mut PgBackendStatus;
@@ -39249,6 +38453,117 @@ unsafe extern "C-unwind" {
     ) -> *mut varlena;
     pub fn toast_raw_datum_size(value: Datum) -> Size;
     pub fn toast_datum_size(value: Datum) -> Size;
+    pub fn build_backup_content(
+        state: *mut BackupState,
+        ishistoryfile: bool,
+    ) -> *mut ::core::ffi::c_char;
+    pub static mut wal_sync_method: ::core::ffi::c_int;
+    pub static mut ProcLastRecPtr: XLogRecPtr;
+    pub static mut XactLastRecEnd: XLogRecPtr;
+    pub static mut XactLastCommitEnd: XLogRecPtr;
+    pub static mut wal_segment_size: ::core::ffi::c_int;
+    pub static mut min_wal_size_mb: ::core::ffi::c_int;
+    pub static mut max_wal_size_mb: ::core::ffi::c_int;
+    pub static mut wal_keep_size_mb: ::core::ffi::c_int;
+    pub static mut max_slot_wal_keep_size_mb: ::core::ffi::c_int;
+    pub static mut XLOGbuffers: ::core::ffi::c_int;
+    pub static mut XLogArchiveTimeout: ::core::ffi::c_int;
+    pub static mut wal_retrieve_retry_interval: ::core::ffi::c_int;
+    pub static mut XLogArchiveCommand: *mut ::core::ffi::c_char;
+    pub static mut EnableHotStandby: bool;
+    pub static mut fullPageWrites: bool;
+    pub static mut wal_log_hints: bool;
+    pub static mut wal_compression: ::core::ffi::c_int;
+    pub static mut wal_init_zero: bool;
+    pub static mut wal_recycle: bool;
+    pub static mut wal_consistency_checking: *mut bool;
+    pub static mut wal_consistency_checking_string: *mut ::core::ffi::c_char;
+    pub static mut log_checkpoints: bool;
+    pub static mut CommitDelay: ::core::ffi::c_int;
+    pub static mut CommitSiblings: ::core::ffi::c_int;
+    pub static mut track_wal_io_timing: bool;
+    pub static mut wal_decode_buffer_size: ::core::ffi::c_int;
+    pub static mut CheckPointSegments: ::core::ffi::c_int;
+    pub static mut XLogArchiveMode: ::core::ffi::c_int;
+    pub static mut wal_level: ::core::ffi::c_int;
+    pub static mut CheckpointStats: CheckpointStatsData;
+    pub fn XLogInsertRecord(
+        rdata: *mut XLogRecData,
+        fpw_lsn: XLogRecPtr,
+        flags: uint8,
+        num_fpi: ::core::ffi::c_int,
+        topxid_included: bool,
+    ) -> XLogRecPtr;
+    pub fn XLogFlush(record: XLogRecPtr);
+    pub fn XLogBackgroundFlush() -> bool;
+    pub fn XLogNeedsFlush(record: XLogRecPtr) -> bool;
+    pub fn XLogFileInit(logsegno: XLogSegNo, logtli: TimeLineID) -> ::core::ffi::c_int;
+    pub fn XLogFileOpen(segno: XLogSegNo, tli: TimeLineID) -> ::core::ffi::c_int;
+    pub fn CheckXLogRemoved(segno: XLogSegNo, tli: TimeLineID);
+    pub fn XLogGetLastRemovedSegno() -> XLogSegNo;
+    pub fn XLogGetOldestSegno(tli: TimeLineID) -> XLogSegNo;
+    pub fn XLogSetAsyncXactLSN(asyncXactLSN: XLogRecPtr);
+    pub fn XLogSetReplicationSlotMinimumLSN(lsn: XLogRecPtr);
+    pub fn xlog_redo(record: *mut XLogReaderState);
+    pub fn xlog_desc(buf: StringInfo, record: *mut XLogReaderState);
+    pub fn xlog_identify(info: uint8) -> *const ::core::ffi::c_char;
+    pub fn issue_xlog_fsync(fd: ::core::ffi::c_int, segno: XLogSegNo, tli: TimeLineID);
+    pub fn RecoveryInProgress() -> bool;
+    pub fn GetRecoveryState() -> RecoveryState::Type;
+    pub fn XLogInsertAllowed() -> bool;
+    pub fn GetXLogInsertRecPtr() -> XLogRecPtr;
+    pub fn GetXLogWriteRecPtr() -> XLogRecPtr;
+    pub fn GetSystemIdentifier() -> uint64;
+    pub fn GetMockAuthenticationNonce() -> *mut ::core::ffi::c_char;
+    pub fn DataChecksumsEnabled() -> bool;
+    pub fn GetDefaultCharSignedness() -> bool;
+    pub fn GetFakeLSNForUnloggedRel() -> XLogRecPtr;
+    pub fn XLOGShmemSize() -> Size;
+    pub fn XLOGShmemInit();
+    pub fn BootStrapXLOG(data_checksum_version: uint32);
+    pub fn InitializeWalConsistencyChecking();
+    pub fn LocalProcessControlFile(reset: bool);
+    pub fn GetActiveWalLevelOnStandby() -> WalLevel::Type;
+    pub fn StartupXLOG();
+    pub fn ShutdownXLOG(code: ::core::ffi::c_int, arg: Datum);
+    pub fn CreateCheckPoint(flags: ::core::ffi::c_int) -> bool;
+    pub fn CreateRestartPoint(flags: ::core::ffi::c_int) -> bool;
+    pub fn GetWALAvailability(targetLSN: XLogRecPtr) -> WALAvailability::Type;
+    pub fn XLogPutNextOid(nextOid: Oid);
+    pub fn XLogRestorePoint(rpName: *const ::core::ffi::c_char) -> XLogRecPtr;
+    pub fn UpdateFullPageWrites();
+    pub fn GetFullPageWriteInfo(RedoRecPtr_p: *mut XLogRecPtr, doPageWrites_p: *mut bool);
+    pub fn GetRedoRecPtr() -> XLogRecPtr;
+    pub fn GetInsertRecPtr() -> XLogRecPtr;
+    pub fn GetFlushRecPtr(insertTLI: *mut TimeLineID) -> XLogRecPtr;
+    pub fn GetWALInsertionTimeLine() -> TimeLineID;
+    pub fn GetWALInsertionTimeLineIfSet() -> TimeLineID;
+    pub fn GetLastImportantRecPtr() -> XLogRecPtr;
+    pub fn SetWalWriterSleeping(sleeping: bool);
+    pub fn WALReadFromBuffers(
+        dstbuf: *mut ::core::ffi::c_char,
+        startptr: XLogRecPtr,
+        count: Size,
+        tli: TimeLineID,
+    ) -> Size;
+    pub fn RemoveNonParentXlogFiles(switchpoint: XLogRecPtr, newTLI: TimeLineID);
+    pub fn XLogCheckpointNeeded(new_segno: XLogSegNo) -> bool;
+    pub fn SwitchIntoArchiveRecovery(EndRecPtr: XLogRecPtr, replayTLI: TimeLineID);
+    pub fn ReachedEndOfBackup(EndRecPtr: XLogRecPtr, tli: TimeLineID);
+    pub fn SetInstallXLogFileSegmentActive();
+    pub fn IsInstallXLogFileSegmentActive() -> bool;
+    pub fn XLogShutdownWalRcv();
+    pub fn do_pg_backup_start(
+        backupidstr: *const ::core::ffi::c_char,
+        fast: bool,
+        tablespaces: *mut *mut List,
+        state: *mut BackupState,
+        tblspcmapfile: StringInfo,
+    );
+    pub fn do_pg_backup_stop(state: *mut BackupState, waitforarchive: bool);
+    pub fn do_pg_abort_backup(code: ::core::ffi::c_int, arg: Datum);
+    pub fn register_persistent_abort_backup_handler();
+    pub fn get_backup_status() -> SessionBackupState::Type;
     pub fn pg_comp_crc32c_sb8(
         crc: pg_crc32c,
         data: *const ::core::ffi::c_void,
@@ -39385,6 +38700,240 @@ unsafe extern "C-unwind" {
     );
     pub fn XLogSaveBufferForHint(buffer: Buffer, buffer_std: bool) -> XLogRecPtr;
     pub fn InitXLogInsert();
+    pub fn errdetail_relkind_not_supported(relkind: ::core::ffi::c_char) -> ::core::ffi::c_int;
+    pub fn IsSystemRelation(relation: Relation) -> bool;
+    pub fn IsToastRelation(relation: Relation) -> bool;
+    pub fn IsCatalogRelation(relation: Relation) -> bool;
+    pub fn IsInplaceUpdateRelation(relation: Relation) -> bool;
+    pub fn IsSystemClass(relid: Oid, reltuple: Form_pg_class) -> bool;
+    pub fn IsToastClass(reltuple: Form_pg_class) -> bool;
+    pub fn IsCatalogRelationOid(relid: Oid) -> bool;
+    pub fn IsCatalogTextUniqueIndexOid(relid: Oid) -> bool;
+    pub fn IsInplaceUpdateOid(relid: Oid) -> bool;
+    pub fn IsCatalogNamespace(namespaceId: Oid) -> bool;
+    pub fn IsToastNamespace(namespaceId: Oid) -> bool;
+    pub fn IsReservedName(name: *const ::core::ffi::c_char) -> bool;
+    pub fn IsSharedRelation(relationId: Oid) -> bool;
+    pub fn IsPinnedObject(classId: Oid, objectId: Oid) -> bool;
+    pub fn GetNewOidWithIndex(relation: Relation, indexId: Oid, oidcolumn: AttrNumber) -> Oid;
+    pub fn GetNewRelFileNumber(
+        reltablespace: Oid,
+        pg_class: Relation,
+        relpersistence: ::core::ffi::c_char,
+    ) -> RelFileNumber;
+    pub static InvalidObjectAddress: ObjectAddress;
+    pub fn get_object_address(
+        objtype: ObjectType::Type,
+        object: *mut Node,
+        relp: *mut Relation,
+        lockmode: LOCKMODE,
+        missing_ok: bool,
+    ) -> ObjectAddress;
+    pub fn get_object_address_rv(
+        objtype: ObjectType::Type,
+        rel: *mut RangeVar,
+        object: *mut List,
+        relp: *mut Relation,
+        lockmode: LOCKMODE,
+        missing_ok: bool,
+    ) -> ObjectAddress;
+    pub fn check_object_ownership(
+        roleid: Oid,
+        objtype: ObjectType::Type,
+        address: ObjectAddress,
+        object: *mut Node,
+        relation: Relation,
+    );
+    pub fn get_object_namespace(address: *const ObjectAddress) -> Oid;
+    pub fn is_objectclass_supported(class_id: Oid) -> bool;
+    pub fn get_object_class_descr(class_id: Oid) -> *const ::core::ffi::c_char;
+    pub fn get_object_oid_index(class_id: Oid) -> Oid;
+    pub fn get_object_catcache_oid(class_id: Oid) -> ::core::ffi::c_int;
+    pub fn get_object_catcache_name(class_id: Oid) -> ::core::ffi::c_int;
+    pub fn get_object_attnum_oid(class_id: Oid) -> AttrNumber;
+    pub fn get_object_attnum_name(class_id: Oid) -> AttrNumber;
+    pub fn get_object_attnum_namespace(class_id: Oid) -> AttrNumber;
+    pub fn get_object_attnum_owner(class_id: Oid) -> AttrNumber;
+    pub fn get_object_attnum_acl(class_id: Oid) -> AttrNumber;
+    pub fn get_object_type(class_id: Oid, object_id: Oid) -> ObjectType::Type;
+    pub fn get_object_namensp_unique(class_id: Oid) -> bool;
+    pub fn get_catalog_object_by_oid(
+        catalog: Relation,
+        oidcol: AttrNumber,
+        objectId: Oid,
+    ) -> HeapTuple;
+    pub fn get_catalog_object_by_oid_extended(
+        catalog: Relation,
+        oidcol: AttrNumber,
+        objectId: Oid,
+        locktup: bool,
+    ) -> HeapTuple;
+    pub fn getObjectDescription(
+        object: *const ObjectAddress,
+        missing_ok: bool,
+    ) -> *mut ::core::ffi::c_char;
+    pub fn getObjectDescriptionOids(classid: Oid, objid: Oid) -> *mut ::core::ffi::c_char;
+    pub fn read_objtype_from_string(objtype: *const ::core::ffi::c_char) -> ::core::ffi::c_int;
+    pub fn getObjectTypeDescription(
+        object: *const ObjectAddress,
+        missing_ok: bool,
+    ) -> *mut ::core::ffi::c_char;
+    pub fn getObjectIdentity(
+        object: *const ObjectAddress,
+        missing_ok: bool,
+    ) -> *mut ::core::ffi::c_char;
+    pub fn getObjectIdentityParts(
+        object: *const ObjectAddress,
+        objname: *mut *mut List,
+        objargs: *mut *mut List,
+        missing_ok: bool,
+    ) -> *mut ::core::ffi::c_char;
+    pub fn strlist_to_textarray(list: *mut List) -> *mut ArrayType;
+    pub fn get_relkind_objtype(relkind: ::core::ffi::c_char) -> ObjectType::Type;
+    pub fn GetPublication(pubid: Oid) -> *mut Publication;
+    pub fn GetPublicationByName(
+        pubname: *const ::core::ffi::c_char,
+        missing_ok: bool,
+    ) -> *mut Publication;
+    pub fn GetRelationPublications(relid: Oid) -> *mut List;
+    pub fn GetPublicationRelations(pubid: Oid, pub_partopt: PublicationPartOpt::Type) -> *mut List;
+    pub fn GetAllTablesPublications() -> *mut List;
+    pub fn GetAllTablesPublicationRelations(pubviaroot: bool) -> *mut List;
+    pub fn GetPublicationSchemas(pubid: Oid) -> *mut List;
+    pub fn GetSchemaPublications(schemaid: Oid) -> *mut List;
+    pub fn GetSchemaPublicationRelations(
+        schemaid: Oid,
+        pub_partopt: PublicationPartOpt::Type,
+    ) -> *mut List;
+    pub fn GetAllSchemaPublicationRelations(
+        pubid: Oid,
+        pub_partopt: PublicationPartOpt::Type,
+    ) -> *mut List;
+    pub fn GetPubPartitionOptionRelations(
+        result: *mut List,
+        pub_partopt: PublicationPartOpt::Type,
+        relid: Oid,
+    ) -> *mut List;
+    pub fn GetTopMostAncestorInPublication(
+        puboid: Oid,
+        ancestors: *mut List,
+        ancestor_level: *mut ::core::ffi::c_int,
+    ) -> Oid;
+    pub fn is_publishable_relation(rel: Relation) -> bool;
+    pub fn is_schema_publication(pubid: Oid) -> bool;
+    pub fn check_and_fetch_column_list(
+        pub_: *mut Publication,
+        relid: Oid,
+        mcxt: MemoryContext,
+        cols: *mut *mut Bitmapset,
+    ) -> bool;
+    pub fn publication_add_relation(
+        pubid: Oid,
+        pri: *mut PublicationRelInfo,
+        if_not_exists: bool,
+    ) -> ObjectAddress;
+    pub fn pub_collist_validate(targetrel: Relation, columns: *mut List) -> *mut Bitmapset;
+    pub fn publication_add_schema(pubid: Oid, schemaid: Oid, if_not_exists: bool) -> ObjectAddress;
+    pub fn pub_collist_to_bitmapset(
+        columns: *mut Bitmapset,
+        pubcols: Datum,
+        mcxt: MemoryContext,
+    ) -> *mut Bitmapset;
+    pub fn pub_form_cols_map(
+        relation: Relation,
+        include_gencols_type: PublishGencolsType::Type,
+    ) -> *mut Bitmapset;
+    pub static aio_smgr_target_info: PgAioTargetInfo;
+    pub fn smgrinit();
+    pub fn smgropen(rlocator: RelFileLocator, backend: ProcNumber) -> SMgrRelation;
+    pub fn smgrexists(reln: SMgrRelation, forknum: ForkNumber::Type) -> bool;
+    pub fn smgrpin(reln: SMgrRelation);
+    pub fn smgrunpin(reln: SMgrRelation);
+    pub fn smgrclose(reln: SMgrRelation);
+    pub fn smgrdestroyall();
+    pub fn smgrrelease(reln: SMgrRelation);
+    pub fn smgrreleaseall();
+    pub fn smgrreleaserellocator(rlocator: RelFileLocatorBackend);
+    pub fn smgrcreate(reln: SMgrRelation, forknum: ForkNumber::Type, isRedo: bool);
+    pub fn smgrdosyncall(rels: *mut SMgrRelation, nrels: ::core::ffi::c_int);
+    pub fn smgrdounlinkall(rels: *mut SMgrRelation, nrels: ::core::ffi::c_int, isRedo: bool);
+    pub fn smgrextend(
+        reln: SMgrRelation,
+        forknum: ForkNumber::Type,
+        blocknum: BlockNumber,
+        buffer: *const ::core::ffi::c_void,
+        skipFsync: bool,
+    );
+    pub fn smgrzeroextend(
+        reln: SMgrRelation,
+        forknum: ForkNumber::Type,
+        blocknum: BlockNumber,
+        nblocks: ::core::ffi::c_int,
+        skipFsync: bool,
+    );
+    pub fn smgrprefetch(
+        reln: SMgrRelation,
+        forknum: ForkNumber::Type,
+        blocknum: BlockNumber,
+        nblocks: ::core::ffi::c_int,
+    ) -> bool;
+    pub fn smgrmaxcombine(
+        reln: SMgrRelation,
+        forknum: ForkNumber::Type,
+        blocknum: BlockNumber,
+    ) -> uint32;
+    pub fn smgrreadv(
+        reln: SMgrRelation,
+        forknum: ForkNumber::Type,
+        blocknum: BlockNumber,
+        buffers: *mut *mut ::core::ffi::c_void,
+        nblocks: BlockNumber,
+    );
+    pub fn smgrstartreadv(
+        ioh: *mut PgAioHandle,
+        reln: SMgrRelation,
+        forknum: ForkNumber::Type,
+        blocknum: BlockNumber,
+        buffers: *mut *mut ::core::ffi::c_void,
+        nblocks: BlockNumber,
+    );
+    pub fn smgrwritev(
+        reln: SMgrRelation,
+        forknum: ForkNumber::Type,
+        blocknum: BlockNumber,
+        buffers: *mut *const ::core::ffi::c_void,
+        nblocks: BlockNumber,
+        skipFsync: bool,
+    );
+    pub fn smgrwriteback(
+        reln: SMgrRelation,
+        forknum: ForkNumber::Type,
+        blocknum: BlockNumber,
+        nblocks: BlockNumber,
+    );
+    pub fn smgrnblocks(reln: SMgrRelation, forknum: ForkNumber::Type) -> BlockNumber;
+    pub fn smgrnblocks_cached(reln: SMgrRelation, forknum: ForkNumber::Type) -> BlockNumber;
+    pub fn smgrtruncate(
+        reln: SMgrRelation,
+        forknum: *mut ForkNumber::Type,
+        nforks: ::core::ffi::c_int,
+        old_nblocks: *mut BlockNumber,
+        nblocks: *mut BlockNumber,
+    );
+    pub fn smgrimmedsync(reln: SMgrRelation, forknum: ForkNumber::Type);
+    pub fn smgrregistersync(reln: SMgrRelation, forknum: ForkNumber::Type);
+    pub fn AtEOXact_SMgr();
+    pub fn ProcessBarrierSmgrRelease() -> bool;
+    pub fn pgaio_io_set_target_smgr(
+        ioh: *mut PgAioHandle,
+        smgr: *mut SMgrRelationData,
+        forknum: ForkNumber::Type,
+        blocknum: BlockNumber,
+        nblocks: ::core::ffi::c_int,
+        skip_fsync: bool,
+    );
+    pub fn RelationIncrementReferenceCount(rel: Relation);
+    pub fn RelationDecrementReferenceCount(rel: Relation);
     pub fn GenericXLogStart(relation: Relation) -> *mut GenericXLogState;
     pub fn GenericXLogRegisterBuffer(
         state: *mut GenericXLogState,
@@ -39397,6 +38946,30 @@ unsafe extern "C-unwind" {
     pub fn generic_identify(info: uint8) -> *const ::core::ffi::c_char;
     pub fn generic_desc(buf: StringInfo, record: *mut XLogReaderState);
     pub fn generic_mask(page: *mut ::core::ffi::c_char, blkno: BlockNumber);
+    pub static mut ShmemLock: *mut slock_t;
+    pub fn InitShmemAccess(seghdr: *mut PGShmemHeader);
+    pub fn InitShmemAllocation();
+    pub fn ShmemAlloc(size: Size) -> *mut ::core::ffi::c_void;
+    pub fn ShmemAllocNoError(size: Size) -> *mut ::core::ffi::c_void;
+    pub fn ShmemAllocUnlocked(size: Size) -> *mut ::core::ffi::c_void;
+    pub fn ShmemAddrIsValid(addr: *const ::core::ffi::c_void) -> bool;
+    pub fn InitShmemIndex();
+    pub fn ShmemInitHash(
+        name: *const ::core::ffi::c_char,
+        init_size: ::core::ffi::c_long,
+        max_size: ::core::ffi::c_long,
+        infoP: *mut HASHCTL,
+        hash_flags: ::core::ffi::c_int,
+    ) -> *mut HTAB;
+    pub fn ShmemInitStruct(
+        name: *const ::core::ffi::c_char,
+        size: Size,
+        foundPtr: *mut bool,
+    ) -> *mut ::core::ffi::c_void;
+    pub fn add_size(s1: Size, s2: Size) -> Size;
+    pub fn mul_size(s1: Size, s2: Size) -> Size;
+    pub fn pg_get_shmem_pagesize() -> Size;
+    pub fn RequestAddinShmemSpace(size: Size);
     pub fn shm_toc_create(
         magic: uint64,
         address: *mut ::core::ffi::c_void,
@@ -39615,6 +39188,45 @@ unsafe extern "C-unwind" {
     pub fn EnterParallelMode();
     pub fn ExitParallelMode();
     pub fn IsInParallelMode() -> bool;
+    pub static mut CurrentResourceOwner: ResourceOwner;
+    pub static mut CurTransactionResourceOwner: ResourceOwner;
+    pub static mut TopTransactionResourceOwner: ResourceOwner;
+    pub static mut AuxProcessResourceOwner: ResourceOwner;
+    pub fn ResourceOwnerCreate(
+        parent: ResourceOwner,
+        name: *const ::core::ffi::c_char,
+    ) -> ResourceOwner;
+    pub fn ResourceOwnerRelease(
+        owner: ResourceOwner,
+        phase: ResourceReleasePhase::Type,
+        isCommit: bool,
+        isTopLevel: bool,
+    );
+    pub fn ResourceOwnerDelete(owner: ResourceOwner);
+    pub fn ResourceOwnerGetParent(owner: ResourceOwner) -> ResourceOwner;
+    pub fn ResourceOwnerNewParent(owner: ResourceOwner, newparent: ResourceOwner);
+    pub fn ResourceOwnerEnlarge(owner: ResourceOwner);
+    pub fn ResourceOwnerRemember(
+        owner: ResourceOwner,
+        value: Datum,
+        kind: *const ResourceOwnerDesc,
+    );
+    pub fn ResourceOwnerForget(owner: ResourceOwner, value: Datum, kind: *const ResourceOwnerDesc);
+    pub fn ResourceOwnerReleaseAllOfKind(owner: ResourceOwner, kind: *const ResourceOwnerDesc);
+    pub fn RegisterResourceReleaseCallback(
+        callback: ResourceReleaseCallback,
+        arg: *mut ::core::ffi::c_void,
+    );
+    pub fn UnregisterResourceReleaseCallback(
+        callback: ResourceReleaseCallback,
+        arg: *mut ::core::ffi::c_void,
+    );
+    pub fn CreateAuxProcessResourceOwner();
+    pub fn ReleaseAuxProcessResources(isCommit: bool);
+    pub fn ResourceOwnerRememberLock(owner: ResourceOwner, locallock: *mut LOCALLOCK);
+    pub fn ResourceOwnerForgetLock(owner: ResourceOwner, locallock: *mut LOCALLOCK);
+    pub fn ResourceOwnerRememberAioHandle(owner: ResourceOwner, ioh_node: *mut dlist_node);
+    pub fn ResourceOwnerForgetAioHandle(owner: ResourceOwner, ioh_node: *mut dlist_node);
     pub static mut FirstSnapshotSet: bool;
     pub static mut TransactionXmin: TransactionId;
     pub static mut RecentXmin: TransactionId;
@@ -40278,6 +39890,150 @@ unsafe extern "C-unwind" {
         nmembers: ::core::ffi::c_int,
         members: *mut MultiXactMember,
     ) -> *mut ::core::ffi::c_char;
+    pub static mut MainLWLockArray: *mut LWLockPadded;
+    pub static mut NamedLWLockTrancheArray: *mut NamedLWLockTranche;
+    pub static mut NamedLWLockTrancheRequests: ::core::ffi::c_int;
+    pub fn LWLockAcquire(lock: *mut LWLock, mode: LWLockMode::Type) -> bool;
+    pub fn LWLockConditionalAcquire(lock: *mut LWLock, mode: LWLockMode::Type) -> bool;
+    pub fn LWLockAcquireOrWait(lock: *mut LWLock, mode: LWLockMode::Type) -> bool;
+    pub fn LWLockRelease(lock: *mut LWLock);
+    pub fn LWLockReleaseClearVar(lock: *mut LWLock, valptr: *mut pg_atomic_uint64, val: uint64);
+    pub fn LWLockReleaseAll();
+    pub fn LWLockDisown(lock: *mut LWLock);
+    pub fn LWLockReleaseDisowned(lock: *mut LWLock, mode: LWLockMode::Type);
+    pub fn ForEachLWLockHeldByMe(
+        callback: ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                arg1: *mut LWLock,
+                arg2: LWLockMode::Type,
+                arg3: *mut ::core::ffi::c_void,
+            ),
+        >,
+        context: *mut ::core::ffi::c_void,
+    );
+    pub fn LWLockHeldByMe(lock: *mut LWLock) -> bool;
+    pub fn LWLockAnyHeldByMe(lock: *mut LWLock, nlocks: ::core::ffi::c_int, stride: usize) -> bool;
+    pub fn LWLockHeldByMeInMode(lock: *mut LWLock, mode: LWLockMode::Type) -> bool;
+    pub fn LWLockWaitForVar(
+        lock: *mut LWLock,
+        valptr: *mut pg_atomic_uint64,
+        oldval: uint64,
+        newval: *mut uint64,
+    ) -> bool;
+    pub fn LWLockUpdateVar(lock: *mut LWLock, valptr: *mut pg_atomic_uint64, val: uint64);
+    pub fn LWLockShmemSize() -> Size;
+    pub fn CreateLWLocks();
+    pub fn InitLWLockAccess();
+    pub fn GetLWLockIdentifier(classId: uint32, eventId: uint16) -> *const ::core::ffi::c_char;
+    pub fn RequestNamedLWLockTranche(
+        tranche_name: *const ::core::ffi::c_char,
+        num_lwlocks: ::core::ffi::c_int,
+    );
+    pub fn GetNamedLWLockTranche(tranche_name: *const ::core::ffi::c_char) -> *mut LWLockPadded;
+    pub fn LWLockNewTrancheId() -> ::core::ffi::c_int;
+    pub fn LWLockRegisterTranche(
+        tranche_id: ::core::ffi::c_int,
+        tranche_name: *const ::core::ffi::c_char,
+    );
+    pub fn LWLockInitialize(lock: *mut LWLock, tranche_id: ::core::ffi::c_int);
+    pub static mut max_locks_per_xact: ::core::ffi::c_int;
+    pub static mut log_lock_failures: bool;
+    pub static LockTagTypeNames: [*const ::core::ffi::c_char; 0usize];
+    pub fn LockManagerShmemInit();
+    pub fn LockManagerShmemSize() -> Size;
+    pub fn InitLockManagerAccess();
+    pub fn GetLocksMethodTable(lock: *const LOCK) -> LockMethod;
+    pub fn GetLockTagsMethodTable(locktag: *const LOCKTAG) -> LockMethod;
+    pub fn LockTagHashCode(locktag: *const LOCKTAG) -> uint32;
+    pub fn DoLockModesConflict(mode1: LOCKMODE, mode2: LOCKMODE) -> bool;
+    pub fn LockAcquire(
+        locktag: *const LOCKTAG,
+        lockmode: LOCKMODE,
+        sessionLock: bool,
+        dontWait: bool,
+    ) -> LockAcquireResult::Type;
+    pub fn LockAcquireExtended(
+        locktag: *const LOCKTAG,
+        lockmode: LOCKMODE,
+        sessionLock: bool,
+        dontWait: bool,
+        reportMemoryError: bool,
+        locallockp: *mut *mut LOCALLOCK,
+        logLockFailure: bool,
+    ) -> LockAcquireResult::Type;
+    pub fn AbortStrongLockAcquire();
+    pub fn MarkLockClear(locallock: *mut LOCALLOCK);
+    pub fn LockRelease(locktag: *const LOCKTAG, lockmode: LOCKMODE, sessionLock: bool) -> bool;
+    pub fn LockReleaseAll(lockmethodid: LOCKMETHODID, allLocks: bool);
+    pub fn LockReleaseSession(lockmethodid: LOCKMETHODID);
+    pub fn LockReleaseCurrentOwner(locallocks: *mut *mut LOCALLOCK, nlocks: ::core::ffi::c_int);
+    pub fn LockReassignCurrentOwner(locallocks: *mut *mut LOCALLOCK, nlocks: ::core::ffi::c_int);
+    pub fn LockHeldByMe(locktag: *const LOCKTAG, lockmode: LOCKMODE, orstronger: bool) -> bool;
+    pub fn GetLockMethodLocalHash() -> *mut HTAB;
+    pub fn LockHasWaiters(locktag: *const LOCKTAG, lockmode: LOCKMODE, sessionLock: bool) -> bool;
+    pub fn GetLockConflicts(
+        locktag: *const LOCKTAG,
+        lockmode: LOCKMODE,
+        countp: *mut ::core::ffi::c_int,
+    ) -> *mut VirtualTransactionId;
+    pub fn AtPrepare_Locks();
+    pub fn PostPrepare_Locks(xid: TransactionId);
+    pub fn LockCheckConflicts(
+        lockMethodTable: LockMethod,
+        lockmode: LOCKMODE,
+        lock: *mut LOCK,
+        proclock: *mut PROCLOCK,
+    ) -> bool;
+    pub fn GrantLock(lock: *mut LOCK, proclock: *mut PROCLOCK, lockmode: LOCKMODE);
+    pub fn GrantAwaitedLock();
+    pub fn GetAwaitedLock() -> *mut LOCALLOCK;
+    pub fn ResetAwaitedLock();
+    pub fn RemoveFromWaitQueue(proc_: *mut PGPROC, hashcode: uint32);
+    pub fn GetLockStatusData() -> *mut LockData;
+    pub fn GetBlockerStatusData(blocked_pid: ::core::ffi::c_int) -> *mut BlockedProcsData;
+    pub fn GetRunningTransactionLocks(nlocks: *mut ::core::ffi::c_int) -> *mut xl_standby_lock;
+    pub fn GetLockmodeName(
+        lockmethodid: LOCKMETHODID,
+        mode: LOCKMODE,
+    ) -> *const ::core::ffi::c_char;
+    pub fn lock_twophase_recover(
+        xid: TransactionId,
+        info: uint16,
+        recdata: *mut ::core::ffi::c_void,
+        len: uint32,
+    );
+    pub fn lock_twophase_postcommit(
+        xid: TransactionId,
+        info: uint16,
+        recdata: *mut ::core::ffi::c_void,
+        len: uint32,
+    );
+    pub fn lock_twophase_postabort(
+        xid: TransactionId,
+        info: uint16,
+        recdata: *mut ::core::ffi::c_void,
+        len: uint32,
+    );
+    pub fn lock_twophase_standby_recover(
+        xid: TransactionId,
+        info: uint16,
+        recdata: *mut ::core::ffi::c_void,
+        len: uint32,
+    );
+    pub fn DeadLockCheck(proc_: *mut PGPROC) -> DeadLockState::Type;
+    pub fn GetBlockingAutoVacuumPgproc() -> *mut PGPROC;
+    pub fn DeadLockReport();
+    pub fn RememberSimpleDeadLock(
+        proc1: *mut PGPROC,
+        lockmode: LOCKMODE,
+        lock: *mut LOCK,
+        proc2: *mut PGPROC,
+    );
+    pub fn InitDeadLockChecking();
+    pub fn LockWaiterCount(locktag: *const LOCKTAG) -> ::core::ffi::c_int;
+    pub fn VirtualXactLockTableInsert(vxid: VirtualTransactionId);
+    pub fn VirtualXactLockTableCleanup();
+    pub fn VirtualXactLock(vxid: VirtualTransactionId, wait: bool) -> bool;
     pub fn add_reloption_kind() -> relopt_kind::Type;
     pub fn add_bool_reloption(
         kinds: bits32,
@@ -41987,9 +41743,6 @@ unsafe extern "C-unwind" {
     );
     pub fn ExplainOnePlan(
         plannedstmt: *mut PlannedStmt,
-        cplan: *mut CachedPlan,
-        plansource: *mut CachedPlanSource,
-        query_index: ::core::ffi::c_int,
         into: *mut IntoClause,
         es: *mut ExplainState,
         queryString: *const ::core::ffi::c_char,
@@ -42146,6 +41899,69 @@ unsafe extern "C-unwind" {
         opt: *mut DefElem,
         pstate: *mut ParseState,
     ) -> bool;
+    pub static mut plan_cache_mode: ::core::ffi::c_int;
+    pub fn InitPlanCache();
+    pub fn ResetPlanCache();
+    pub fn ReleaseAllPlanCacheRefsInOwner(owner: ResourceOwner);
+    pub fn CreateCachedPlan(
+        raw_parse_tree: *mut RawStmt,
+        query_string: *const ::core::ffi::c_char,
+        commandTag: CommandTag::Type,
+    ) -> *mut CachedPlanSource;
+    pub fn CreateCachedPlanForQuery(
+        analyzed_parse_tree: *mut Query,
+        query_string: *const ::core::ffi::c_char,
+        commandTag: CommandTag::Type,
+    ) -> *mut CachedPlanSource;
+    pub fn CreateOneShotCachedPlan(
+        raw_parse_tree: *mut RawStmt,
+        query_string: *const ::core::ffi::c_char,
+        commandTag: CommandTag::Type,
+    ) -> *mut CachedPlanSource;
+    pub fn CompleteCachedPlan(
+        plansource: *mut CachedPlanSource,
+        querytree_list: *mut List,
+        querytree_context: MemoryContext,
+        param_types: *mut Oid,
+        num_params: ::core::ffi::c_int,
+        parserSetup: ParserSetupHook,
+        parserSetupArg: *mut ::core::ffi::c_void,
+        cursor_options: ::core::ffi::c_int,
+        fixed_result: bool,
+    );
+    pub fn SetPostRewriteHook(
+        plansource: *mut CachedPlanSource,
+        postRewrite: PostRewriteHook,
+        postRewriteArg: *mut ::core::ffi::c_void,
+    );
+    pub fn SaveCachedPlan(plansource: *mut CachedPlanSource);
+    pub fn DropCachedPlan(plansource: *mut CachedPlanSource);
+    pub fn CachedPlanSetParentContext(plansource: *mut CachedPlanSource, newcontext: MemoryContext);
+    pub fn CopyCachedPlan(plansource: *mut CachedPlanSource) -> *mut CachedPlanSource;
+    pub fn CachedPlanIsValid(plansource: *mut CachedPlanSource) -> bool;
+    pub fn CachedPlanGetTargetList(
+        plansource: *mut CachedPlanSource,
+        queryEnv: *mut QueryEnvironment,
+    ) -> *mut List;
+    pub fn GetCachedPlan(
+        plansource: *mut CachedPlanSource,
+        boundParams: ParamListInfo,
+        owner: ResourceOwner,
+        queryEnv: *mut QueryEnvironment,
+    ) -> *mut CachedPlan;
+    pub fn ReleaseCachedPlan(plan: *mut CachedPlan, owner: ResourceOwner);
+    pub fn CachedPlanAllowsSimpleValidityCheck(
+        plansource: *mut CachedPlanSource,
+        plan: *mut CachedPlan,
+        owner: ResourceOwner,
+    ) -> bool;
+    pub fn CachedPlanIsSimplyValid(
+        plansource: *mut CachedPlanSource,
+        plan: *mut CachedPlan,
+        owner: ResourceOwner,
+    ) -> bool;
+    pub fn GetCachedExpression(expr: *mut Node) -> *mut CachedExpression;
+    pub fn FreeCachedExpression(cexpr: *mut CachedExpression);
     pub fn PrepareQuery(
         pstate: *mut ParseState,
         stmt: *mut PrepareStmt,
@@ -42471,7 +42287,6 @@ unsafe extern "C-unwind" {
     pub fn AfterTriggerBeginXact();
     pub fn AfterTriggerBeginQuery();
     pub fn AfterTriggerEndQuery(estate: *mut EState);
-    pub fn AfterTriggerAbortQuery();
     pub fn AfterTriggerFireDeferred();
     pub fn AfterTriggerEndXact(isCommit: bool);
     pub fn AfterTriggerBeginSubXact();
@@ -42508,7 +42323,7 @@ unsafe extern "C-unwind" {
         role: *const ::core::ffi::c_char,
         shadow_pass: *const ::core::ffi::c_char,
         client_pass: *const ::core::ffi::c_char,
-        md5_salt: *const ::core::ffi::c_char,
+        md5_salt: *const uint8,
         md5_salt_len: ::core::ffi::c_int,
         logdetail: *mut *const ::core::ffi::c_char,
     ) -> ::core::ffi::c_int;
@@ -43421,7 +43236,6 @@ unsafe extern "C-unwind" {
         commandTag: CommandTag::Type,
         stmts: *mut List,
         cplan: *mut CachedPlan,
-        plansource: *mut CachedPlanSource,
     );
     pub fn PortalGetPrimaryStmt(portal: Portal) -> *mut PlannedStmt;
     pub fn PortalCreateHoldStore(portal: Portal);
@@ -44555,6 +44369,7 @@ unsafe extern "C-unwind" {
         inner_path: *mut Path,
         outersortkeys: *mut List,
         innersortkeys: *mut List,
+        outer_presorted_keys: ::core::ffi::c_int,
         extra: *mut JoinPathExtraData,
     );
     pub fn final_cost_mergejoin(
@@ -45062,6 +44877,7 @@ unsafe extern "C-unwind" {
         mergeclauses: *mut List,
         outersortkeys: *mut List,
         innersortkeys: *mut List,
+        outer_presorted_keys: ::core::ffi::c_int,
     ) -> *mut MergePath;
     pub fn create_hashjoin_path(
         root: *mut PlannerInfo,
@@ -45393,11 +45209,6 @@ unsafe extern "C-unwind" {
         root: *mut PlannerInfo,
         rel1: *mut RelOptInfo,
         rel2: *mut RelOptInfo,
-    ) -> bool;
-    pub fn have_dangerous_phv(
-        root: *mut PlannerInfo,
-        outer_relids: Relids,
-        inner_params: Relids,
     ) -> bool;
     pub fn mark_dummy_rel(rel: *mut RelOptInfo);
     pub fn init_dummy_sjinfo(
@@ -47051,6 +46862,13 @@ unsafe extern "C-unwind" {
         nmsgs: Size,
         msgs: *mut SharedInvalidationMessage,
     );
+    pub fn ReorderBufferAddDistributedInvalidations(
+        rb: *mut ReorderBuffer,
+        xid: TransactionId,
+        lsn: XLogRecPtr,
+        nmsgs: Size,
+        msgs: *mut SharedInvalidationMessage,
+    );
     pub fn ReorderBufferImmediateInvalidation(
         rb: *mut ReorderBuffer,
         ninvalidations: uint32,
@@ -47305,7 +47123,7 @@ unsafe extern "C-unwind" {
     pub static mut MyReplicationSlot: *mut ReplicationSlot;
     pub static mut max_replication_slots: ::core::ffi::c_int;
     pub static mut synchronized_standby_slots: *mut ::core::ffi::c_char;
-    pub static mut idle_replication_slot_timeout_mins: ::core::ffi::c_int;
+    pub static mut idle_replication_slot_timeout_secs: ::core::ffi::c_int;
     pub fn ReplicationSlotsShmemSize() -> Size;
     pub fn ReplicationSlotsShmemInit();
     pub fn ReplicationSlotCreate(
@@ -47647,9 +47465,99 @@ unsafe extern "C-unwind" {
     pub fn CalculateShmemSize(num_semaphores: *mut ::core::ffi::c_int) -> Size;
     pub fn CreateSharedMemoryAndSemaphores();
     pub fn InitializeShmemGUCs();
+    pub fn RelationInitLockInfo(relation: Relation);
+    pub fn LockRelationOid(relid: Oid, lockmode: LOCKMODE);
+    pub fn LockRelationId(relid: *mut LockRelId, lockmode: LOCKMODE);
+    pub fn ConditionalLockRelationOid(relid: Oid, lockmode: LOCKMODE) -> bool;
+    pub fn UnlockRelationId(relid: *mut LockRelId, lockmode: LOCKMODE);
+    pub fn UnlockRelationOid(relid: Oid, lockmode: LOCKMODE);
+    pub fn LockRelation(relation: Relation, lockmode: LOCKMODE);
+    pub fn ConditionalLockRelation(relation: Relation, lockmode: LOCKMODE) -> bool;
+    pub fn UnlockRelation(relation: Relation, lockmode: LOCKMODE);
+    pub fn CheckRelationLockedByMe(
+        relation: Relation,
+        lockmode: LOCKMODE,
+        orstronger: bool,
+    ) -> bool;
+    pub fn CheckRelationOidLockedByMe(relid: Oid, lockmode: LOCKMODE, orstronger: bool) -> bool;
+    pub fn LockHasWaitersRelation(relation: Relation, lockmode: LOCKMODE) -> bool;
+    pub fn LockRelationIdForSession(relid: *mut LockRelId, lockmode: LOCKMODE);
+    pub fn UnlockRelationIdForSession(relid: *mut LockRelId, lockmode: LOCKMODE);
+    pub fn LockRelationForExtension(relation: Relation, lockmode: LOCKMODE);
+    pub fn UnlockRelationForExtension(relation: Relation, lockmode: LOCKMODE);
+    pub fn ConditionalLockRelationForExtension(relation: Relation, lockmode: LOCKMODE) -> bool;
+    pub fn RelationExtensionLockWaiterCount(relation: Relation) -> ::core::ffi::c_int;
+    pub fn LockDatabaseFrozenIds(lockmode: LOCKMODE);
+    pub fn LockPage(relation: Relation, blkno: BlockNumber, lockmode: LOCKMODE);
+    pub fn ConditionalLockPage(relation: Relation, blkno: BlockNumber, lockmode: LOCKMODE) -> bool;
+    pub fn UnlockPage(relation: Relation, blkno: BlockNumber, lockmode: LOCKMODE);
+    pub fn LockTuple(relation: Relation, tid: ItemPointer, lockmode: LOCKMODE);
+    pub fn ConditionalLockTuple(
+        relation: Relation,
+        tid: ItemPointer,
+        lockmode: LOCKMODE,
+        logLockFailure: bool,
+    ) -> bool;
+    pub fn UnlockTuple(relation: Relation, tid: ItemPointer, lockmode: LOCKMODE);
+    pub fn XactLockTableInsert(xid: TransactionId);
+    pub fn XactLockTableDelete(xid: TransactionId);
+    pub fn XactLockTableWait(
+        xid: TransactionId,
+        rel: Relation,
+        ctid: ItemPointer,
+        oper: XLTW_Oper::Type,
+    );
+    pub fn ConditionalXactLockTableWait(xid: TransactionId, logLockFailure: bool) -> bool;
+    pub fn WaitForLockers(heaplocktag: LOCKTAG, lockmode: LOCKMODE, progress: bool);
+    pub fn WaitForLockersMultiple(locktags: *mut List, lockmode: LOCKMODE, progress: bool);
+    pub fn SpeculativeInsertionLockAcquire(xid: TransactionId) -> uint32;
+    pub fn SpeculativeInsertionLockRelease(xid: TransactionId);
+    pub fn SpeculativeInsertionWait(xid: TransactionId, token: uint32);
+    pub fn LockDatabaseObject(classid: Oid, objid: Oid, objsubid: uint16, lockmode: LOCKMODE);
+    pub fn ConditionalLockDatabaseObject(
+        classid: Oid,
+        objid: Oid,
+        objsubid: uint16,
+        lockmode: LOCKMODE,
+    ) -> bool;
+    pub fn UnlockDatabaseObject(classid: Oid, objid: Oid, objsubid: uint16, lockmode: LOCKMODE);
+    pub fn LockSharedObject(classid: Oid, objid: Oid, objsubid: uint16, lockmode: LOCKMODE);
+    pub fn ConditionalLockSharedObject(
+        classid: Oid,
+        objid: Oid,
+        objsubid: uint16,
+        lockmode: LOCKMODE,
+    ) -> bool;
+    pub fn UnlockSharedObject(classid: Oid, objid: Oid, objsubid: uint16, lockmode: LOCKMODE);
+    pub fn LockSharedObjectForSession(
+        classid: Oid,
+        objid: Oid,
+        objsubid: uint16,
+        lockmode: LOCKMODE,
+    );
+    pub fn UnlockSharedObjectForSession(
+        classid: Oid,
+        objid: Oid,
+        objsubid: uint16,
+        lockmode: LOCKMODE,
+    );
+    pub fn LockApplyTransactionForSession(
+        suboid: Oid,
+        xid: TransactionId,
+        objid: uint16,
+        lockmode: LOCKMODE,
+    );
+    pub fn UnlockApplyTransactionForSession(
+        suboid: Oid,
+        xid: TransactionId,
+        objid: uint16,
+        lockmode: LOCKMODE,
+    );
+    pub fn DescribeLockTag(buf: StringInfo, tag: *const LOCKTAG);
+    pub fn GetLockNameFromTagType(locktag_type: uint16) -> *const ::core::ffi::c_char;
     pub fn ProcSignalShmemSize() -> Size;
     pub fn ProcSignalShmemInit();
-    pub fn ProcSignalInit(cancel_key: *mut ::core::ffi::c_char, cancel_key_len: ::core::ffi::c_int);
+    pub fn ProcSignalInit(cancel_key: *const uint8, cancel_key_len: ::core::ffi::c_int);
     pub fn SendProcSignal(
         pid: pid_t,
         reason: ProcSignalReason::Type,
@@ -47657,7 +47565,7 @@ unsafe extern "C-unwind" {
     ) -> ::core::ffi::c_int;
     pub fn SendCancelRequest(
         backendPID: ::core::ffi::c_int,
-        cancel_key: *mut ::core::ffi::c_char,
+        cancel_key: *const uint8,
         cancel_key_len: ::core::ffi::c_int,
     );
     pub fn EmitProcSignalBarrier(type_: ProcSignalBarrierType::Type) -> uint64;
@@ -49269,7 +49177,6 @@ unsafe extern "C-unwind" {
     pub fn width_bucket_numeric(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_cancel_backend(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_backup_start(fcinfo: FunctionCallInfo) -> Datum;
-    pub fn pg_get_process_memory_contexts(fcinfo: FunctionCallInfo) -> Datum;
     pub fn bpchar_pattern_lt(fcinfo: FunctionCallInfo) -> Datum;
     pub fn bpchar_pattern_le(fcinfo: FunctionCallInfo) -> Datum;
     pub fn array_length(fcinfo: FunctionCallInfo) -> Datum;
@@ -50931,6 +50838,7 @@ unsafe extern "C-unwind" {
     pub fn pg_stat_get_lastscan(fcinfo: FunctionCallInfo) -> Datum;
     pub fn system_user(fcinfo: FunctionCallInfo) -> Datum;
     pub fn binary_upgrade_logical_slot_has_caught_up(fcinfo: FunctionCallInfo) -> Datum;
+    pub fn pg_stat_get_backend_wal(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_stat_get_checkpointer_stat_reset_time(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_basetype(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_column_toast_chunk_id(fcinfo: FunctionCallInfo) -> Datum;
@@ -50963,8 +50871,7 @@ unsafe extern "C-unwind" {
     pub fn pg_sync_replication_slots(fcinfo: FunctionCallInfo) -> Datum;
     pub fn range_contains_elem_support(fcinfo: FunctionCallInfo) -> Datum;
     pub fn elem_contained_by_range_support(fcinfo: FunctionCallInfo) -> Datum;
-    pub fn pg_stat_get_backend_wal(fcinfo: FunctionCallInfo) -> Datum;
-    pub fn gist_stratnum_common(fcinfo: FunctionCallInfo) -> Datum;
+    pub fn gist_translate_cmptype_common(fcinfo: FunctionCallInfo) -> Datum;
     pub fn has_largeobject_privilege_name_id(fcinfo: FunctionCallInfo) -> Datum;
     pub fn has_largeobject_privilege_id(fcinfo: FunctionCallInfo) -> Datum;
     pub fn has_largeobject_privilege_id_id(fcinfo: FunctionCallInfo) -> Datum;
@@ -52919,19 +52826,9 @@ pub const BuiltinTrancheIds_LWTRANCHE_PARALLEL_VACUUM_DSA: u32 = 93;
 pub const BuiltinTrancheIds_LWTRANCHE_AIO_URING_COMPLETION: u32 = 94;
 #[deprecated(
     since = "0.12.0",
-    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_MEMORY_CONTEXT_REPORTING_STATE"
-)]
-pub const BuiltinTrancheIds_LWTRANCHE_MEMORY_CONTEXT_REPORTING_STATE: u32 = 95;
-#[deprecated(
-    since = "0.12.0",
-    note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_MEMORY_CONTEXT_REPORTING_PROC"
-)]
-pub const BuiltinTrancheIds_LWTRANCHE_MEMORY_CONTEXT_REPORTING_PROC: u32 = 96;
-#[deprecated(
-    since = "0.12.0",
     note = "you want pg_sys::BuiltinTrancheIds::LWTRANCHE_FIRST_USER_DEFINED"
 )]
-pub const BuiltinTrancheIds_LWTRANCHE_FIRST_USER_DEFINED: u32 = 97;
+pub const BuiltinTrancheIds_LWTRANCHE_FIRST_USER_DEFINED: u32 = 95;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CRSSnapshotAction::CRS_EXPORT_SNAPSHOT")]
 pub const CRSSnapshotAction_CRS_EXPORT_SNAPSHOT: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::CRSSnapshotAction::CRS_NOEXPORT_SNAPSHOT")]
@@ -55462,59 +55359,54 @@ pub const ProcSignalReason_PROCSIG_BARRIER: u32 = 4;
 pub const ProcSignalReason_PROCSIG_LOG_MEMORY_CONTEXT: u32 = 5;
 #[deprecated(
     since = "0.12.0",
-    note = "you want pg_sys::ProcSignalReason::PROCSIG_GET_MEMORY_CONTEXT"
-)]
-pub const ProcSignalReason_PROCSIG_GET_MEMORY_CONTEXT: u32 = 6;
-#[deprecated(
-    since = "0.12.0",
     note = "you want pg_sys::ProcSignalReason::PROCSIG_PARALLEL_APPLY_MESSAGE"
 )]
-pub const ProcSignalReason_PROCSIG_PARALLEL_APPLY_MESSAGE: u32 = 7;
+pub const ProcSignalReason_PROCSIG_PARALLEL_APPLY_MESSAGE: u32 = 6;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_FIRST"
 )]
-pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_FIRST: u32 = 8;
+pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_FIRST: u32 = 7;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_DATABASE"
 )]
-pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_DATABASE: u32 = 8;
+pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_DATABASE: u32 = 7;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_TABLESPACE"
 )]
-pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_TABLESPACE: u32 = 9;
+pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_TABLESPACE: u32 = 8;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_LOCK"
 )]
-pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_LOCK: u32 = 10;
+pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_LOCK: u32 = 9;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_SNAPSHOT"
 )]
-pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_SNAPSHOT: u32 = 11;
+pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_SNAPSHOT: u32 = 10;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_LOGICALSLOT"
 )]
-pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_LOGICALSLOT: u32 = 12;
+pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_LOGICALSLOT: u32 = 11;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_BUFFERPIN"
 )]
-pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_BUFFERPIN: u32 = 13;
+pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_BUFFERPIN: u32 = 12;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_STARTUP_DEADLOCK"
 )]
-pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_STARTUP_DEADLOCK: u32 = 14;
+pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_STARTUP_DEADLOCK: u32 = 13;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::ProcSignalReason::PROCSIG_RECOVERY_CONFLICT_LAST"
 )]
-pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_LAST: u32 = 14;
+pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_LAST: u32 = 13;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ProcWaitStatus::PROC_WAIT_STATUS_OK")]
 pub const ProcWaitStatus_PROC_WAIT_STATUS_OK: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::ProcWaitStatus::PROC_WAIT_STATUS_WAITING")]
@@ -57176,112 +57068,110 @@ pub const WaitEventIPC_WAIT_EVENT_LOGICAL_SYNC_DATA: u32 = 134217759;
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE"
 )]
 pub const WaitEventIPC_WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE: u32 = 134217760;
-#[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_MEM_CXT_PUBLISH")]
-pub const WaitEventIPC_WAIT_EVENT_MEM_CXT_PUBLISH: u32 = 134217761;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_MESSAGE_QUEUE_INTERNAL"
 )]
-pub const WaitEventIPC_WAIT_EVENT_MESSAGE_QUEUE_INTERNAL: u32 = 134217762;
+pub const WaitEventIPC_WAIT_EVENT_MESSAGE_QUEUE_INTERNAL: u32 = 134217761;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_MESSAGE_QUEUE_PUT_MESSAGE"
 )]
-pub const WaitEventIPC_WAIT_EVENT_MESSAGE_QUEUE_PUT_MESSAGE: u32 = 134217763;
+pub const WaitEventIPC_WAIT_EVENT_MESSAGE_QUEUE_PUT_MESSAGE: u32 = 134217762;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_MESSAGE_QUEUE_RECEIVE"
 )]
-pub const WaitEventIPC_WAIT_EVENT_MESSAGE_QUEUE_RECEIVE: u32 = 134217764;
+pub const WaitEventIPC_WAIT_EVENT_MESSAGE_QUEUE_RECEIVE: u32 = 134217763;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_MESSAGE_QUEUE_SEND"
 )]
-pub const WaitEventIPC_WAIT_EVENT_MESSAGE_QUEUE_SEND: u32 = 134217765;
+pub const WaitEventIPC_WAIT_EVENT_MESSAGE_QUEUE_SEND: u32 = 134217764;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_MULTIXACT_CREATION"
 )]
-pub const WaitEventIPC_WAIT_EVENT_MULTIXACT_CREATION: u32 = 134217766;
+pub const WaitEventIPC_WAIT_EVENT_MULTIXACT_CREATION: u32 = 134217765;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PARALLEL_BITMAP_SCAN"
 )]
-pub const WaitEventIPC_WAIT_EVENT_PARALLEL_BITMAP_SCAN: u32 = 134217767;
+pub const WaitEventIPC_WAIT_EVENT_PARALLEL_BITMAP_SCAN: u32 = 134217766;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN"
 )]
-pub const WaitEventIPC_WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN: u32 = 134217768;
+pub const WaitEventIPC_WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN: u32 = 134217767;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PARALLEL_FINISH")]
-pub const WaitEventIPC_WAIT_EVENT_PARALLEL_FINISH: u32 = 134217769;
+pub const WaitEventIPC_WAIT_EVENT_PARALLEL_FINISH: u32 = 134217768;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PROCARRAY_GROUP_UPDATE"
 )]
-pub const WaitEventIPC_WAIT_EVENT_PROCARRAY_GROUP_UPDATE: u32 = 134217770;
+pub const WaitEventIPC_WAIT_EVENT_PROCARRAY_GROUP_UPDATE: u32 = 134217769;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PROC_SIGNAL_BARRIER"
 )]
-pub const WaitEventIPC_WAIT_EVENT_PROC_SIGNAL_BARRIER: u32 = 134217771;
+pub const WaitEventIPC_WAIT_EVENT_PROC_SIGNAL_BARRIER: u32 = 134217770;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_PROMOTE")]
-pub const WaitEventIPC_WAIT_EVENT_PROMOTE: u32 = 134217772;
+pub const WaitEventIPC_WAIT_EVENT_PROMOTE: u32 = 134217771;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_RECOVERY_CONFLICT_SNAPSHOT"
 )]
-pub const WaitEventIPC_WAIT_EVENT_RECOVERY_CONFLICT_SNAPSHOT: u32 = 134217773;
+pub const WaitEventIPC_WAIT_EVENT_RECOVERY_CONFLICT_SNAPSHOT: u32 = 134217772;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE"
 )]
-pub const WaitEventIPC_WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE: u32 = 134217774;
+pub const WaitEventIPC_WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE: u32 = 134217773;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_RECOVERY_END_COMMAND"
 )]
-pub const WaitEventIPC_WAIT_EVENT_RECOVERY_END_COMMAND: u32 = 134217775;
+pub const WaitEventIPC_WAIT_EVENT_RECOVERY_END_COMMAND: u32 = 134217774;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_RECOVERY_PAUSE")]
-pub const WaitEventIPC_WAIT_EVENT_RECOVERY_PAUSE: u32 = 134217776;
+pub const WaitEventIPC_WAIT_EVENT_RECOVERY_PAUSE: u32 = 134217775;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_REPLICATION_ORIGIN_DROP"
 )]
-pub const WaitEventIPC_WAIT_EVENT_REPLICATION_ORIGIN_DROP: u32 = 134217777;
+pub const WaitEventIPC_WAIT_EVENT_REPLICATION_ORIGIN_DROP: u32 = 134217776;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_REPLICATION_SLOT_DROP"
 )]
-pub const WaitEventIPC_WAIT_EVENT_REPLICATION_SLOT_DROP: u32 = 134217778;
+pub const WaitEventIPC_WAIT_EVENT_REPLICATION_SLOT_DROP: u32 = 134217777;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_RESTORE_COMMAND")]
-pub const WaitEventIPC_WAIT_EVENT_RESTORE_COMMAND: u32 = 134217779;
+pub const WaitEventIPC_WAIT_EVENT_RESTORE_COMMAND: u32 = 134217778;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_SAFE_SNAPSHOT")]
-pub const WaitEventIPC_WAIT_EVENT_SAFE_SNAPSHOT: u32 = 134217780;
+pub const WaitEventIPC_WAIT_EVENT_SAFE_SNAPSHOT: u32 = 134217779;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_SYNC_REP")]
-pub const WaitEventIPC_WAIT_EVENT_SYNC_REP: u32 = 134217781;
+pub const WaitEventIPC_WAIT_EVENT_SYNC_REP: u32 = 134217780;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_WAL_BUFFER_INIT")]
-pub const WaitEventIPC_WAIT_EVENT_WAL_BUFFER_INIT: u32 = 134217782;
+pub const WaitEventIPC_WAIT_EVENT_WAL_BUFFER_INIT: u32 = 134217781;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_WAL_RECEIVER_EXIT"
 )]
-pub const WaitEventIPC_WAIT_EVENT_WAL_RECEIVER_EXIT: u32 = 134217783;
+pub const WaitEventIPC_WAIT_EVENT_WAL_RECEIVER_EXIT: u32 = 134217782;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_WAL_RECEIVER_WAIT_START"
 )]
-pub const WaitEventIPC_WAIT_EVENT_WAL_RECEIVER_WAIT_START: u32 = 134217784;
+pub const WaitEventIPC_WAIT_EVENT_WAL_RECEIVER_WAIT_START: u32 = 134217783;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_WAL_SUMMARY_READY"
 )]
-pub const WaitEventIPC_WAIT_EVENT_WAL_SUMMARY_READY: u32 = 134217785;
+pub const WaitEventIPC_WAIT_EVENT_WAL_SUMMARY_READY: u32 = 134217784;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventIPC::WAIT_EVENT_XACT_GROUP_UPDATE"
 )]
-pub const WaitEventIPC_WAIT_EVENT_XACT_GROUP_UPDATE: u32 = 134217786;
+pub const WaitEventIPC_WAIT_EVENT_XACT_GROUP_UPDATE: u32 = 134217785;
 #[deprecated(
     since = "0.12.0",
     note = "you want pg_sys::WaitEventTimeout::WAIT_EVENT_BASE_BACKUP_THROTTLE"
