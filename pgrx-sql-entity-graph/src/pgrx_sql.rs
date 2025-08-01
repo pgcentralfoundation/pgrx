@@ -461,6 +461,10 @@ impl PgrxSql {
             String::from("MODULE_PATHNAME")
         }
     }
+
+    pub fn find_matching_fn(&self, name: &str) -> Option<&PgExternEntity> {
+        self.externs.keys().find(|key| key.full_path.ends_with(name))
+    }
 }
 
 fn build_base_edges(
@@ -832,6 +836,20 @@ fn connect_externs(
                         } else {
                             return Err(eyre!("Could not find `requires` target: {:?}", requires));
                         }
+                    }
+                }
+                crate::ExternArgs::Support(support_fn) => {
+                    if let Some(target) = find_positioning_ref_target(
+                        support_fn,
+                        types,
+                        enums,
+                        externs,
+                        schemas,
+                        extension_sqls,
+                        triggers,
+                    ) {
+                        graph.add_edge(*target, index, SqlGraphRequires::By);
+                        has_explicit_requires = true
                     }
                 }
                 crate::ExternArgs::Schema(declared_schema_name) => {

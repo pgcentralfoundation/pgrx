@@ -39,6 +39,7 @@ pub enum Attribute {
     ParallelRestricted,
     ShouldPanic(syn::LitStr),
     Schema(syn::LitStr),
+    Support(PositioningRef),
     Name(syn::LitStr),
     Cost(syn::Expr),
     Requires(Punctuated<PositioningRef, Token![,]>),
@@ -81,6 +82,9 @@ impl Attribute {
             }
             Attribute::Schema(s) => {
                 quote! { ::pgrx::pgrx_sql_entity_graph::ExternArgs::Schema(String::from(#s)) }
+            }
+            Attribute::Support(item) => {
+                quote! { ::pgrx::pgrx_sql_entity_graph::ExternArgs::Support(#item) }
             }
             Attribute::Name(s) => {
                 quote! { ::pgrx::pgrx_sql_entity_graph::ExternArgs::Name(String::from(#s)) }
@@ -131,6 +135,9 @@ impl ToTokens for Attribute {
             Attribute::Schema(s) => {
                 quote! { schema = #s }
             }
+            Attribute::Support(item) => {
+                quote! { support = #item }
+            }
             Attribute::Name(s) => {
                 quote! { name = #s }
             }
@@ -175,6 +182,11 @@ impl Parse for Attribute {
                 let _eq: Token![=] = input.parse()?;
                 let literal: syn::LitStr = input.parse()?;
                 Attribute::Schema(literal)
+            }
+            "support" => {
+                let _eq: Token![=] = input.parse()?;
+                let item: PositioningRef = input.parse()?;
+                Self::Support(item)
             }
             "name" => {
                 let _eq: Token![=] = input.parse()?;

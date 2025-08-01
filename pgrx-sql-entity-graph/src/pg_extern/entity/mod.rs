@@ -77,6 +77,18 @@ impl SqlGraphIdentifier for PgExternEntity {
     }
 }
 
+impl PgExternEntity {
+    fn sql_name(&self, context: &PgrxSql) -> String {
+        let self_index = context.externs[self];
+        let schema = self
+            .schema
+            .map(|schema| format!("{schema}."))
+            .unwrap_or_else(|| context.schema_prefix_for(&self_index));
+
+        format!("{schema}\"{}\"", self.name)
+    }
+}
+
 impl ToSql for PgExternEntity {
     fn to_sql(&self, context: &PgrxSql) -> eyre::Result<String> {
         let self_index = context.externs[self];
@@ -126,15 +138,15 @@ impl ToSql for PgExternEntity {
                         let buf = format!("\
                                             \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
                                         ",
-                                            pattern = arg.pattern,
-                                            schema_prefix = context.schema_prefix_for(&graph_index),
-                                            // First try to match on [`TypeId`] since it's most reliable.
-                                            sql_type = argument_sql,
-                                            default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {def}") } else { String::from("") },
-                                            variadic = if metadata_argument.variadic { "VARIADIC " } else { "" },
-                                            maybe_comma = if needs_comma { ", " } else { " " },
-                                            type_name = metadata_argument.type_name,
-                                    );
+                                          pattern = arg.pattern,
+                                          schema_prefix = context.schema_prefix_for(&graph_index),
+                                          // First try to match on [`TypeId`] since it's most reliable.
+                                          sql_type = argument_sql,
+                                          default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {def}") } else { String::from("") },
+                                          variadic = if metadata_argument.variadic { "VARIADIC " } else { "" },
+                                          maybe_comma = if needs_comma { ", " } else { " " },
+                                          type_name = metadata_argument.type_name,
+                        );
                         args.push(buf);
                     }
                     Ok(SqlMapping::Composite { array_brackets }) => {
@@ -150,15 +162,15 @@ impl ToSql for PgExternEntity {
                         let buf = format!("\
                             \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
                         ",
-                            pattern = arg.pattern,
-                            schema_prefix = context.schema_prefix_for(&graph_index),
-                            // First try to match on [`TypeId`] since it's most reliable.
-                            sql_type = sql,
-                            default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {def}") } else { String::from("") },
-                            variadic = if metadata_argument.variadic { "VARIADIC " } else { "" },
-                            maybe_comma = if needs_comma { ", " } else { " " },
-                            type_name = metadata_argument.type_name,
-                    );
+                                          pattern = arg.pattern,
+                                          schema_prefix = context.schema_prefix_for(&graph_index),
+                                          // First try to match on [`TypeId`] since it's most reliable.
+                                          sql_type = sql,
+                                          default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {def}") } else { String::from("") },
+                                          variadic = if metadata_argument.variadic { "VARIADIC " } else { "" },
+                                          maybe_comma = if needs_comma { ", " } else { " " },
+                                          type_name = metadata_argument.type_name,
+                        );
                         args.push(buf);
                     }
                     Ok(SqlMapping::Skip) => (),
@@ -199,11 +211,11 @@ impl ToSql for PgExternEntity {
                     .ok_or_else(|| eyre!("Could not find return type in graph."))?;
                 let metadata_retval = self.metadata.retval.clone();
                 let sql_type = match metadata_retval.return_sql {
-                        Ok(Returns::SetOf(SqlMapping::As(ref sql))) => sql.clone(),
-                        Ok(Returns::SetOf(SqlMapping::Composite { array_brackets })) => fmt::with_array_brackets(ty.composite_type.unwrap().into(), array_brackets),
-                        Ok(_other) => return Err(eyre!("Got non-setof mapped/composite return variant SQL in what macro-expansion thought was a setof")),
-                        Err(err) => return Err(err).wrap_err("Error mapping return SQL"),
-                    };
+                    Ok(Returns::SetOf(SqlMapping::As(ref sql))) => sql.clone(),
+                    Ok(Returns::SetOf(SqlMapping::Composite { array_brackets })) => fmt::with_array_brackets(ty.composite_type.unwrap().into(), array_brackets),
+                    Ok(_other) => return Err(eyre!("Got non-setof mapped/composite return variant SQL in what macro-expansion thought was a setof")),
+                    Err(err) => return Err(err).wrap_err("Error mapping return SQL"),
+                };
                 format!(
                     "RETURNS SETOF {schema_prefix}{sql_type} /* {full_path} */",
                     schema_prefix = context.schema_prefix_for(&graph_index),
@@ -214,21 +226,21 @@ impl ToSql for PgExternEntity {
                 let mut items = String::new();
                 let metadata_retval = self.metadata.retval.clone();
                 let metadata_retval_sqls: Vec<String> = match metadata_retval.return_sql {
-                        Ok(Returns::Table(variants)) => {
-                            variants.iter().enumerate().map(|(idx, variant)| {
-                                match variant {
-                                    SqlMapping::As(sql) => sql.clone(),
-                                    SqlMapping::Composite { array_brackets } => {
-                                        let composite = table_items[idx].ty.composite_type.unwrap();
-                                        fmt::with_array_brackets(composite.into(), *array_brackets)
-                                    },
-                                    SqlMapping::Skip => todo!(),
+                    Ok(Returns::Table(variants)) => {
+                        variants.iter().enumerate().map(|(idx, variant)| {
+                            match variant {
+                                SqlMapping::As(sql) => sql.clone(),
+                                SqlMapping::Composite { array_brackets } => {
+                                    let composite = table_items[idx].ty.composite_type.unwrap();
+                                    fmt::with_array_brackets(composite.into(), *array_brackets)
                                 }
-                            }).collect()
-                        },
-                        Ok(_other) => return Err(eyre!("Got non-table return variant SQL in what macro-expansion thought was a table")),
-                        Err(err) => return Err(err).wrap_err("Error mapping return SQL"),
-                    };
+                                SqlMapping::Skip => todo!(),
+                            }
+                        }).collect()
+                    }
+                    Ok(_other) => return Err(eyre!("Got non-table return variant SQL in what macro-expansion thought was a table")),
+                    Err(err) => return Err(err).wrap_err("Error mapping return SQL"),
+                };
 
                 for (idx, returning::PgExternReturnEntityIteratedItem { ty, name: col_name }) in
                     table_items.iter().enumerate()
@@ -283,7 +295,22 @@ impl ToSql for PgExternEntity {
                 let mut retval = extern_attrs
                     .iter()
                     .filter(|attr| **attr != ExternArgs::CreateOrReplace)
-                    .map(|attr| attr.to_string().to_uppercase())
+                    .map(|attr| {
+                        if matches!(attr, ExternArgs::Support(..)) {
+                            let support_fn_name = attr.to_string();
+
+                            let support_fn_name =
+                            if let Some(entity) = context.find_matching_fn(&support_fn_name) {
+                                entity.sql_name(context)
+                            } else {
+                                panic!("cannot locate SUPPORT function `{support_fn_name}` attached to function `{}`", self.full_path)
+                            };
+
+                            format!("SUPPORT {support_fn_name}")
+                        } else {
+                            attr.to_string().to_uppercase()
+                        }
+                    })
                     .collect::<Vec<_>>()
                     .join(" ");
                 retval.push('\n');
@@ -297,11 +324,13 @@ impl ToSql for PgExternEntity {
                 .extern_attrs
                 .iter()
                 .filter_map(|x| match x {
-                    ExternArgs::Requires(requirements) => Some(requirements),
+                    ExternArgs::Requires(requirements) => Some(requirements.clone()),
+                    ExternArgs::Support(support_fn) => Some(vec![support_fn.clone()]),
                     _ => None,
                 })
                 .flatten()
                 .collect::<Vec<_>>();
+
             if !requires_attrs.is_empty() {
                 format!(
                     "-- requires:\n{}\n",
@@ -436,14 +465,14 @@ impl ToSql for PgExternEntity {
                                                         {optionals}\
                                                     );\
                                                     ",
-                                                    opname = op.opname.unwrap(),
-                                                    left_name = left_arg.type_name,
-                                                    right_name = right_arg.type_name,
-                                                    schema_prefix_left = context.schema_prefix_for(&left_arg_graph_index),
-                                                    schema_prefix_right = context.schema_prefix_for(&right_arg_graph_index),
-                                                    maybe_comma = if !optionals.is_empty() { "," } else { "" },
-                                                    optionals = if !optionals.is_empty() { optionals.join(",\n") + "\n" } else { "".to_string() },
-                                            );
+                                       opname = op.opname.unwrap(),
+                                       left_name = left_arg.type_name,
+                                       right_name = right_arg.type_name,
+                                       schema_prefix_left = context.schema_prefix_for(&left_arg_graph_index),
+                                       schema_prefix_right = context.schema_prefix_for(&right_arg_graph_index),
+                                       maybe_comma = if !optionals.is_empty() { "," } else { "" },
+                                       optionals = if !optionals.is_empty() { optionals.join(",\n") + "\n" } else { "".to_string() },
+            );
             ext_sql += &operator_sql
         };
         if let Some(cast) = &self.cast {
@@ -534,16 +563,16 @@ impl ToSql for PgExternEntity {
                                                     )\n\
                                                     WITH FUNCTION {function_name}{optional};\
                                                     ",
-                                                    file = self.file,
-                                                    line = self.line,
-                                                    name = self.name,
-                                                    module_path = self.module_path,
-                                                    schema_prefix_source = context.schema_prefix_for(&source_arg_graph_index),
-                                                    source_name = source_arg.type_name,
-                                                    schema_prefix_target = context.schema_prefix_for(&target_arg_graph_index),
-                                                    target_name = target_arg.type_name,
-                                                    function_name = self.name,
-                                            );
+                                   file = self.file,
+                                   line = self.line,
+                                   name = self.name,
+                                   module_path = self.module_path,
+                                   schema_prefix_source = context.schema_prefix_for(&source_arg_graph_index),
+                                   source_name = source_arg.type_name,
+                                   schema_prefix_target = context.schema_prefix_for(&target_arg_graph_index),
+                                   target_name = target_arg.type_name,
+                                   function_name = self.name,
+            );
             ext_sql += &cast_sql
         };
         Ok(ext_sql)

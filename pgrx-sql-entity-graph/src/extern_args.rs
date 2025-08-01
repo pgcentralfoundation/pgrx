@@ -28,6 +28,7 @@ pub enum ExternArgs {
     ParallelRestricted,
     ShouldPanic(String),
     Schema(String),
+    Support(PositioningRef),
     Name(String),
     Cost(String),
     Requires(Vec<PositioningRef>),
@@ -47,6 +48,7 @@ impl core::fmt::Display for ExternArgs {
             ExternArgs::SecurityDefiner => write!(f, "SECURITY DEFINER"),
             ExternArgs::SecurityInvoker => write!(f, "SECURITY INVOKER"),
             ExternArgs::ParallelRestricted => write!(f, "PARALLEL RESTRICTED"),
+            ExternArgs::Support(item) => write!(f, "{item}"),
             ExternArgs::ShouldPanic(_) => Ok(()),
             ExternArgs::NoGuard => Ok(()),
             ExternArgs::Schema(_) => Ok(()),
@@ -72,45 +74,13 @@ impl ToTokens for ExternArgs {
             ExternArgs::ParallelSafe => tokens.append(format_ident!("ParallelSafe")),
             ExternArgs::ParallelUnsafe => tokens.append(format_ident!("ParallelUnsafe")),
             ExternArgs::ParallelRestricted => tokens.append(format_ident!("ParallelRestricted")),
-            ExternArgs::ShouldPanic(_s) => {
-                tokens.append_all(
-                    quote! {
-                        Error(String::from("#_s"))
-                    }
-                    .to_token_stream(),
-                );
-            }
-            ExternArgs::Schema(_s) => {
-                tokens.append_all(
-                    quote! {
-                        Schema(String::from("#_s"))
-                    }
-                    .to_token_stream(),
-                );
-            }
-            ExternArgs::Name(_s) => {
-                tokens.append_all(
-                    quote! {
-                        Name(String::from("#_s"))
-                    }
-                    .to_token_stream(),
-                );
-            }
-            ExternArgs::Cost(_s) => {
-                tokens.append_all(
-                    quote! {
-                        Cost(String::from("#_s"))
-                    }
-                    .to_token_stream(),
-                );
-            }
+            ExternArgs::ShouldPanic(_s) => tokens.append_all(quote! { Error(String::from("#_s")) }),
+            ExternArgs::Schema(_s) => tokens.append_all(quote! { Schema(String::from("#_s")) }),
+            ExternArgs::Support(item) => tokens.append_all(quote! { Support(#item) }),
+            ExternArgs::Name(_s) => tokens.append_all(quote! { Name(String::from("#_s")) }),
+            ExternArgs::Cost(_s) => tokens.append_all(quote! { Cost(String::from("#_s")) }),
             ExternArgs::Requires(items) => {
-                tokens.append_all(
-                    quote! {
-                        Requires(vec![#(#items),*])
-                    }
-                    .to_token_stream(),
-                );
+                tokens.append_all(quote! { Requires(vec![#(#items),*]) })
             }
         }
     }

@@ -1,3 +1,4 @@
+use pgrx::Internal;
 //LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
 //LICENSE
 //LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
@@ -9,6 +10,17 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use pgrx::prelude::*;
 
+#[pg_schema]
+mod support_fn_schema {
+    use pgrx::Internal;
+    use pgrx_macros::pg_extern;
+
+    #[pg_extern]
+    fn test_support_fn(i: Internal) -> Internal {
+        i
+    }
+}
+
 #[pg_extern(immutable)]
 fn returns_tuple_with_attributes(
 ) -> TableIterator<'static, (name!(arg, String), name!(arg2, String))> {
@@ -18,6 +30,21 @@ fn returns_tuple_with_attributes(
 // Check we can map a `fdw_handler`
 #[pg_extern]
 fn fdw_handler_return() -> PgBox<pg_sys::FdwRoutine> {
+    unimplemented!("Not a functional test, just a signature test for SQL generation. Feel free to make a functional test!")
+}
+
+#[pg_extern(support = support_fn_schema::test_support_fn)]
+fn test_using_support_fn_in_other_module() {
+    unimplemented!("Not a functional test, just a signature test for SQL generation. Feel free to make a functional test!")
+}
+
+#[pg_extern]
+fn local_support_fn(i: Internal) -> Internal {
+    i
+}
+
+#[pg_extern(support = local_support_fn)]
+fn test_using_support_fn() {
     unimplemented!("Not a functional test, just a signature test for SQL generation. Feel free to make a functional test!")
 }
 
