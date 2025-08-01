@@ -65,7 +65,7 @@ macro_rules! pg_shmem_init {
             unsafe extern "C-unwind" fn on_shmem_request() {
                 unsafe {
                     if let Some(i) = PREV_SHMEM_REQUEST_HOOK {
-                        i();
+                        ::pgrx::pg_sys::submodules::ffi::pg_guard_ffi_boundary(|| i());
                     }
                     $crate::shmem::PgSharedMemoryInitialization::on_shmem_request(&$var);
                 }
@@ -81,7 +81,7 @@ macro_rules! pg_shmem_init {
             unsafe extern "C-unwind" fn on_shmem_startup() {
                 unsafe {
                     if let Some(i) = PREV_SHMEM_STARTUP_HOOK {
-                        i();
+                        ::pgrx::pg_sys::submodules::ffi::pg_guard_ffi_boundary(|| i());
                     }
                     $crate::shmem::PgSharedMemoryInitialization::on_shmem_startup(&$var, $e);
                 }
