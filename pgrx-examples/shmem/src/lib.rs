@@ -29,26 +29,6 @@ pub struct Pgtest {
 
 unsafe impl PGRXSharedMemory for Pgtest {}
 
-#[derive(Default)]
-#[repr(transparent)]
-pub struct AssertPGRXSharedMemory<T>(T);
-
-impl<T> std::ops::Deref for AssertPGRXSharedMemory<T> {
-    type Target = T;
-
-    fn deref(&self) -> &T {
-        &self.0
-    }
-}
-
-impl<T> std::ops::DerefMut for AssertPGRXSharedMemory<T> {
-    fn deref_mut(&mut self) -> &mut T {
-        &mut self.0
-    }
-}
-
-unsafe impl<T> PGRXSharedMemory for AssertPGRXSharedMemory<T> {}
-
 static DEQUE: PgLwLock<AssertPGRXSharedMemory<heapless::Deque<Pgtest, 400>>> =
     unsafe { PgLwLock::new(c"shmem_deque") };
 static VEC: PgLwLock<AssertPGRXSharedMemory<heapless::Vec<Pgtest, 400>>> =
@@ -64,9 +44,9 @@ pub extern "C-unwind" fn _PG_init() {
     if unsafe { !pgrx::pg_sys::process_shared_preload_libraries_in_progress } {
         pgrx::error!("this extension must be loaded via shared_preload_libraries.");
     }
-    pg_shmem_init!(DEQUE);
-    pg_shmem_init!(VEC);
-    pg_shmem_init!(HASH);
+    pg_shmem_init!(DEQUE = unsafe { AssertPGRXSharedMemory::new(Default::default()) });
+    pg_shmem_init!(VEC = unsafe { AssertPGRXSharedMemory::new(Default::default()) });
+    pg_shmem_init!(HASH = unsafe { AssertPGRXSharedMemory::new(Default::default()) });
     pg_shmem_init!(STRUCT);
     pg_shmem_init!(PRIMITIVE);
     pg_shmem_init!(ATOMIC);

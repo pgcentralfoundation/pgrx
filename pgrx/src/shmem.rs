@@ -65,8 +65,10 @@ macro_rules! pg_shmem_init {
             unsafe extern "C-unwind" fn on_shmem_request() {
                 unsafe {
                     if let Some(i) = PREV_SHMEM_REQUEST_HOOK {
-                        ::pgrx::pg_sys::submodules::ffi::pg_guard_ffi_boundary(|| i());
+                        $crate::pg_sys::submodules::ffi::pg_guard_ffi_boundary(|| i());
                     }
+                }
+                unsafe {
                     $crate::shmem::PgSharedMemoryInitialization::on_shmem_request(&$var);
                 }
             }
@@ -78,12 +80,16 @@ macro_rules! pg_shmem_init {
             pg_sys::shmem_startup_hook = Some(on_shmem_startup);
 
             #[pg_guard]
+            #[forbid(unsafe_op_in_unsafe_fn)]
             unsafe extern "C-unwind" fn on_shmem_startup() {
                 unsafe {
                     if let Some(i) = PREV_SHMEM_STARTUP_HOOK {
-                        ::pgrx::pg_sys::submodules::ffi::pg_guard_ffi_boundary(|| i());
+                        $crate::pg_sys::submodules::ffi::pg_guard_ffi_boundary(|| i());
                     }
-                    $crate::shmem::PgSharedMemoryInitialization::on_shmem_startup(&$var, $e);
+                }
+                let value = $e;
+                unsafe {
+                    $crate::shmem::PgSharedMemoryInitialization::on_shmem_startup(&$var, value);
                 }
             }
         }
@@ -193,3 +199,31 @@ pub trait PgSharedMemoryInitialization {
     /// * Be called from inside PostgreSQL `shmem_startup_hook`.
     unsafe fn on_shmem_startup(&'static self, value: Self::Value);
 }
+
+#[repr(transparent)]
+pub struct AssertPGRXSharedMemory<T>(T);
+
+impl<T> AssertPGRXSharedMemory<T> {
+    pub const unsafe fn new(value: T) -> Self {
+        Self(value)
+    }
+    pub fn into_inner(self) -> T {
+        self.0
+    }
+}
+
+impl<T> std::ops::Deref for AssertPGRXSharedMemory<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<T> std::ops::DerefMut for AssertPGRXSharedMemory<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+unsafe impl<T> PGRXSharedMemory for AssertPGRXSharedMemory<T> {}
