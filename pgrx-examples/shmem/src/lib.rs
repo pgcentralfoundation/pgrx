@@ -61,7 +61,7 @@ static ATOMIC: PgAtomic<std::sync::atomic::AtomicBool> = unsafe { PgAtomic::new(
 
 #[pg_guard]
 pub extern "C-unwind" fn _PG_init() {
-    if unsafe { pgrx::pg_sys::IsUnderPostmaster } {
+    if unsafe { !pgrx::pg_sys::process_shared_preload_libraries_in_progress } {
         pgrx::error!("this extension must be loaded via shared_preload_libraries.");
     }
     pg_shmem_init!(DEQUE);

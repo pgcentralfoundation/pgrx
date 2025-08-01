@@ -30,7 +30,7 @@ pgrx::pg_module_magic!(name, version);
 
 #[pg_guard]
 pub extern "C-unwind" fn _PG_init() {
-    if unsafe { pgrx::pg_sys::IsUnderPostmaster } {
+    if unsafe { !pgrx::pg_sys::process_shared_preload_libraries_in_progress } {
         pgrx::error!("this extension must be loaded via shared_preload_libraries.");
     }
     BackgroundWorkerBuilder::new("Background Worker Example")
