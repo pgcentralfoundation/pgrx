@@ -48,9 +48,6 @@ pub mod ffi;
 pub mod fn_call;
 pub mod guc;
 pub mod heap_tuple;
-#[cfg(feature = "cshim")]
-#[allow(deprecated)]
-pub mod hooks;
 pub mod htup;
 pub mod inoutfuncs;
 pub mod itemptr;
@@ -94,9 +91,6 @@ pub use datum::{
 pub use enum_helper::*;
 pub use fcinfo::*;
 pub use guc::*;
-#[cfg(feature = "cshim")]
-#[allow(deprecated)]
-pub use hooks::*;
 pub use htup::*;
 pub use inoutfuncs::*;
 #[cfg(feature = "cshim")]

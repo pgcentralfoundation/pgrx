@@ -31,8 +31,6 @@ mod from_into_datum_tests;
 mod geo_tests;
 mod guc_tests;
 mod heap_tuple;
-#[cfg(feature = "cshim")]
-mod hooks_tests;
 mod inet_tests;
 mod internal_tests;
 mod issue1134;
