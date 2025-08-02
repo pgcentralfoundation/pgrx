@@ -142,6 +142,7 @@ jobs:
             build-essential \
             llvm-14-dev libclang-14-dev clang-14 \
             gcc \
+            libkrb5-dev \
             libssl-dev \
             libz-dev \
             make \
