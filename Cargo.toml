@@ -35,6 +35,7 @@ exclude = [
     "pgrx-examples/datetime",
     "pgrx-examples/wal_decoder",
     "pgrx-examples/errors",
+    "pgrx-examples/hooks",
     "pgrx-examples/nostd",
     "pgrx-examples/numeric",
     "pgrx-examples/pgtrybuilder",
