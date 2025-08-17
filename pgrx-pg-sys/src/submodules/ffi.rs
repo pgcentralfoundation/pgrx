@@ -9,14 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![deny(unsafe_op_in_unsafe_fn)]
 
-#[cfg(not(all(
-    any(target_os = "linux", target_os = "macos"),
-    any(target_arch = "x86_64", target_arch = "aarch64")
-)))]
-mod cee_scape {
-    #[cfg(not(feature = "cshim"))]
-    compile_error!("target platform cannot work without feature cshim");
-
+mod sjlj {
     use libc::{c_int, c_void};
     use std::marker::PhantomData;
 
@@ -26,30 +19,259 @@ mod cee_scape {
         _neither_send_nor_sync: PhantomData<*const u8>,
     }
 
+    #[cfg(not(all(target_os = "linux", target_arch = "x86_64")))]
+    #[cfg(not(all(target_os = "linux", target_arch = "aarch64")))]
+    #[cfg(not(all(target_os = "macos", target_arch = "x86_64")))]
+    #[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
+    #[cfg(feature = "cshim")]
+    unsafe extern "C-unwind" {
+        unsafe fn call_closure_with_sigsetjmp(
+            savemask: c_int,
+            closure_env_ptr: *mut c_void,
+            closure_code: extern "C-unwind" fn(
+                jbuf: *const SigJmpBufFields,
+                env_ptr: *mut c_void,
+            ) -> c_int,
+        ) -> c_int;
+    }
+
+    #[cfg(not(all(target_os = "linux", target_arch = "x86_64")))]
+    #[cfg(not(all(target_os = "linux", target_arch = "aarch64")))]
+    #[cfg(not(all(target_os = "macos", target_arch = "x86_64")))]
+    #[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
+    #[cfg(not(feature = "cshim"))]
+    compile_error!("target platform is not supported without feature `cshim`");
+
+    #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+    #[unsafe(naked)]
+    unsafe extern "C-unwind" fn call_closure_with_sigsetjmp(
+        savemask: c_int,
+        closure_env_ptr: *mut c_void,
+        closure_code: extern "C-unwind" fn(
+            jbuf: *const SigJmpBufFields,
+            env_ptr: *mut c_void,
+        ) -> c_int,
+    ) -> c_int {
+        #[link(name = "c")]
+        unsafe extern "C-unwind" {
+            #[link_name = "__sigsetjmp"]
+            unsafe fn sigsetjmp();
+        }
+        core::arch::naked_asm!(
+            "    .cfi_startproc",
+            "    push    rbp",
+            "    .cfi_def_cfa_offset 16",
+            "    .cfi_offset rbp, -16",
+            "    mov    rbp, rsp",
+            "    .cfi_def_cfa_register rbp",
+            "    push    r14",
+            "    push    rbx",
+            "    sub    rsp, 208",
+            "    .cfi_offset rbx, -32",
+            "    .cfi_offset r14, -24",
+            "    mov    rbx, rdx",
+            "    mov    r14, rsi",
+            "    mov    esi, edi",
+            "    lea    rdi, [rbp - 224]",
+            "    call    {}",
+            "    mov    ecx, eax",
+            "    test    eax, eax",
+            "    jne    2f",
+            "    lea    rdi, [rbp - 224]",
+            "    mov    rsi, r14",
+            "    call    rbx",
+            "    mov    ecx, eax",
+            "2:",
+            "    mov    eax, ecx",
+            "    add    rsp, 208",
+            "    pop    rbx",
+            "    pop    r14",
+            "    pop    rbp",
+            "    .cfi_def_cfa rsp, 8",
+            "    ret",
+            "    .cfi_endproc",
+            sym sigsetjmp,
+        );
+    }
+
+    #[cfg(all(target_os = "linux", target_arch = "aarch64"))]
+    #[unsafe(naked)]
+    unsafe extern "C-unwind" fn call_closure_with_sigsetjmp(
+        savemask: c_int,
+        closure_env_ptr: *mut c_void,
+        closure_code: extern "C-unwind" fn(
+            jbuf: *const SigJmpBufFields,
+            env_ptr: *mut c_void,
+        ) -> c_int,
+    ) -> c_int {
+        #[link(name = "c")]
+        unsafe extern "C-unwind" {
+            #[link_name = "__sigsetjmp"]
+            unsafe fn sigsetjmp();
+        }
+        core::arch::naked_asm!(
+            "    .cfi_startproc",
+            "    sub    sp, sp, #368",
+            "    .cfi_def_cfa_offset 368",
+            "    stp    x29, x30, [sp, #320]",
+            "    str    x28, [sp, #336]",
+            "    stp    x20, x19, [sp, #352]",
+            "    add    x29, sp, #320",
+            "    .cfi_def_cfa w29, 48",
+            "    .cfi_offset w19, -8",
+            "    .cfi_offset w20, -16",
+            "    .cfi_offset w28, -32",
+            "    .cfi_offset w30, -40",
+            "    .cfi_offset w29, -48",
+            "    mov    x20, x1",
+            "    mov    w1, w0",
+            "    add    x0, sp, #8",
+            "    mov    x19, x2",
+            "    bl    {}",
+            "    mov    w1, w0",
+            "    cbnz    w0, 2f",
+            "    add    x0, sp, #8",
+            "    mov    x1, x20",
+            "    blr    x19",
+            "    mov    w1, w0",
+            "2:",
+            "    mov    w0, w1",
+            "    .cfi_def_cfa wsp, 368",
+            "    ldp    x20, x19, [sp, #352]",
+            "    ldr    x28, [sp, #336]",
+            "    ldp    x29, x30, [sp, #320]",
+            "    add    sp, sp, #368",
+            "    .cfi_def_cfa_offset 0",
+            "    .cfi_restore w19",
+            "    .cfi_restore w20",
+            "    .cfi_restore w28",
+            "    .cfi_restore w30",
+            "    .cfi_restore w29",
+            "    ret",
+            "    .cfi_endproc",
+            sym sigsetjmp,
+        );
+    }
+
+    #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
+    #[unsafe(naked)]
+    unsafe extern "C-unwind" fn call_closure_with_sigsetjmp(
+        savemask: c_int,
+        closure_env_ptr: *mut c_void,
+        closure_code: extern "C-unwind" fn(
+            jbuf: *const SigJmpBufFields,
+            env_ptr: *mut c_void,
+        ) -> c_int,
+    ) -> c_int {
+        #[link(name = "c")]
+        unsafe extern "C-unwind" {
+            #[link_name = "sigsetjmp"]
+            unsafe fn sigsetjmp();
+        }
+        core::arch::naked_asm!(
+            "    .cfi_startproc",
+            "    push    rbp",
+            "    .cfi_def_cfa_offset 16",
+            "    .cfi_offset rbp, -16",
+            "    mov    rbp, rsp",
+            "    .cfi_def_cfa_register rbp",
+            "    push    r14",
+            "    push    rbx",
+            "    sub    rsp, 160",
+            "    .cfi_offset rbx, -32",
+            "    .cfi_offset r14, -24",
+            "    mov    rbx, rdx",
+            "    mov    r14, rsi",
+            "    mov    esi, edi",
+            "    lea    rdi, [rbp - 176]",
+            "    call    {}",
+            "    mov    ecx, eax",
+            "    test    eax, eax",
+            "    jne    2f",
+            "    lea    rdi, [rbp - 176]",
+            "    mov    rsi, r14",
+            "    call    rbx",
+            "    mov    ecx, eax",
+            "2:",
+            "    mov    eax, ecx",
+            "    add    rsp, 160",
+            "    pop    rbx",
+            "    pop    r14",
+            "    pop    rbp",
+            "    ret",
+            "    .cfi_endproc",
+            sym sigsetjmp,
+        );
+    }
+
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    #[unsafe(naked)]
+    unsafe extern "C-unwind" fn call_closure_with_sigsetjmp(
+        savemask: c_int,
+        closure_env_ptr: *mut c_void,
+        closure_code: extern "C-unwind" fn(
+            jbuf: *const SigJmpBufFields,
+            env_ptr: *mut c_void,
+        ) -> c_int,
+    ) -> c_int {
+        #[link(name = "c")]
+        unsafe extern "C-unwind" {
+            #[link_name = "sigsetjmp"]
+            unsafe fn sigsetjmp();
+        }
+        core::arch::naked_asm!(
+            "    .cfi_startproc",
+            "    sub    sp, sp, #240",
+            "    .cfi_def_cfa_offset 240",
+            "    stp    x20, x19, [sp, #208]",
+            "    stp    x29, x30, [sp, #224]",
+            "    add    x29, sp, #224",
+            "    .cfi_def_cfa w29, 16",
+            "    .cfi_offset w30, -8",
+            "    .cfi_offset w29, -16",
+            "    .cfi_offset w19, -24",
+            "    .cfi_offset w20, -32",
+            "    mov    x19, x2",
+            "    mov    x20, x1",
+            "    mov    x1, x0",
+            "    add    x0, sp, #12",
+            "    bl    {}",
+            "    mov    x1, x0",
+            "    cbnz    w0, 2f",
+            "    add    x0, sp, #12",
+            "    mov    x1, x20",
+            "    blr    x19",
+            "    mov    x1, x0",
+            "2:",
+            "    mov    x0, x1",
+            "    .cfi_def_cfa wsp, 240",
+            "    ldp    x29, x30, [sp, #224]",
+            "    ldp    x20, x19, [sp, #208]",
+            "    add    sp, sp, #240",
+            "    .cfi_def_cfa_offset 0",
+            "    .cfi_restore w30",
+            "    .cfi_restore w29",
+            "    .cfi_restore w19",
+            "    .cfi_restore w20",
+            "    ret",
+            "    .cfi_endproc",
+            sym sigsetjmp,
+        );
+    }
+
     pub fn call_with_sigsetjmp<F>(savemask: bool, mut callback: F) -> c_int
     where
-        F: for<'a> FnOnce(&'a SigJmpBufFields) -> c_int,
+        F: FnOnce(*const SigJmpBufFields) -> c_int,
     {
-        extern "C-unwind" {
-            fn call_closure_with_sigsetjmp(
-                savemask: c_int,
-                closure_env_ptr: *mut c_void,
-                closure_code: extern "C-unwind" fn(
-                    jbuf: *const SigJmpBufFields,
-                    env_ptr: *mut c_void,
-                ) -> c_int,
-            ) -> c_int;
-        }
-
         extern "C-unwind" fn call_from_c_to_rust<F>(
             jbuf: *const SigJmpBufFields,
             closure_env_ptr: *mut c_void,
         ) -> c_int
         where
-            F: for<'a> FnOnce(&'a SigJmpBufFields) -> c_int,
+            F: FnOnce(*const SigJmpBufFields) -> c_int,
         {
             let closure_env_ptr: *mut F = closure_env_ptr as *mut F;
-            unsafe { (closure_env_ptr.read())(&*jbuf) }
+            unsafe { (closure_env_ptr.read())(jbuf) }
         }
 
         let savemask: libc::c_int = if savemask { 1 } else { 0 };
@@ -66,7 +288,7 @@ mod cee_scape {
     }
 }
 
-use cee_scape::{call_with_sigsetjmp, SigJmpBufFields};
+use sjlj::call_with_sigsetjmp;
 
 /**
 Given a closure that is assumed to be a wrapped Postgres `extern "C-unwind"` function, [pg_guard_ffi_boundary]
@@ -174,7 +396,7 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
         let jump_value = call_with_sigsetjmp(false, |jump_buffer| {
             // Make Postgres' error-handling system aware of our new
             // setjmp/longjmp restore point.
-            pg_sys::PG_exception_stack = std::mem::transmute(jump_buffer as *const SigJmpBufFields);
+            pg_sys::PG_exception_stack = std::mem::transmute(jump_buffer);
 
             // execute the closure, which will be a wrapped internal Postgres function
             result.write(f());

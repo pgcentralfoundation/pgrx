@@ -467,16 +467,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cee-scape"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4d67dfb052149f779f77e9ce089cea126e00657e8f0d11dafc7901fde4291101"
-dependencies = [
- "cc",
- "libc",
-]
-
-[[package]]
 name = "cesu8"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2045,7 +2035,6 @@ dependencies = [
 name = "pgrx-pg-sys"
 version = "0.16.0"
 dependencies = [
- "cee-scape",
  "libc",
  "pgrx-bindgen",
  "pgrx-macros",
