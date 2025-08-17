@@ -27,7 +27,7 @@
 extern crate bitflags;
 extern crate alloc;
 
-use once_cell::sync::Lazy;
+use std::sync::LazyLock as Lazy;
 // expose our various derive macros
 pub use pgrx_macros;
 pub use pgrx_macros::*;
