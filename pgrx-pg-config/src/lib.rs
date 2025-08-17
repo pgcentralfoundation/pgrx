@@ -444,6 +444,10 @@ impl PgConfig {
         Ok(self.run("--cppflags")?.into())
     }
 
+    pub fn libs(&self) -> eyre::Result<PathBuf> {
+        Ok(self.run("--libs")?.into())
+    }
+
     pub fn extension_dir(&self) -> eyre::Result<PathBuf> {
         let mut path = self.sharedir()?;
         path.push("extension");

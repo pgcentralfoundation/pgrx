@@ -374,6 +374,17 @@ fn generate_bindings(
         "cargo:rustc-link-search={}",
         lib_dir.to_str().ok_or(eyre!("{lib_dir:?} is not valid UTF-8 string"))?
     );
+
+    let libs = pg_config.libs()?;
+    for lib in shlex::split(libs.to_str().ok_or(eyre!("{libs:?} is not valid UTF-8 string"))?)
+        .into_iter()
+        .flatten()
+        .filter_map(|p| p.strip_prefix("-l").map(String::from))
+        .filter(|lib| !["pgcommon", "pgport"].contains(&lib.as_str()))
+    {
+        println!("cargo:rustc-link-lib={}", lib);
+    }
+
     Ok(())
 }
 
