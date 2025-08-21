@@ -147,6 +147,8 @@
 #include "replication/logical.h"
 #include "replication/logicalworker.h"
 #include "replication/output_plugin.h"
+#include "replication/syncrep.h"
+#include "replication/walsender_private.h"
 #include "rewrite/rewriteHandler.h"
 #include "rewrite/rowsecurity.h"
 #include "statistics/statistics.h"
