@@ -7,7 +7,7 @@
 #LICENSE All rights reserved.
 #LICENSE
 #LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
- 
+
 [package]
 name = "pgrx-sql-entity-graph"
 version = "0.16.0"
@@ -35,6 +35,7 @@ thiserror.workspace = true
 convert_case = "0.8.0"
 petgraph = "0.8.1"
 unescape = "0.1.0" # for escaped-character-handling
+uuid = { version = "1.18.0", features = ["v4"] } # PgLwLock and shmem
 
 # colorized sql output
 owo-colors = { optional = true, workspace = true }

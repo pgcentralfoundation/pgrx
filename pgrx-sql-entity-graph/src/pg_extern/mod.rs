@@ -356,7 +356,11 @@ impl PgExtern {
             .collect::<Vec<_>>();
         let hrtb = if lifetimes.is_empty() { None } else { Some(quote! { for<#(#lifetimes),*> }) };
 
-        let sql_graph_entity_fn_name = format_ident!("__pgrx_internals_fn_{}", ident);
+        let uuid = uuid::Uuid::new_v4();
+        let sql_graph_entity_fn_name = Ident::new(
+            &format!("__pgrx_internals_fn_{}_{}", ident, uuid.as_simple()),
+            Span::call_site(),
+        );
         quote_spanned! { self.func.sig.span() =>
             #[unsafe(no_mangle)]
             #[doc(hidden)]
