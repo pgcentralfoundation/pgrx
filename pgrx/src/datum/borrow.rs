@@ -95,7 +95,18 @@ macro_rules! impl_borrow_fixed_len {
                 };
 
                 unsafe fn point_from(ptr: ptr::NonNull<u8>) -> ptr::NonNull<Self> {
-                    ptr.cast()
+                    #[cfg(target_endian = "big")]
+                    unsafe {
+                        if mem::size_of::<Self>() <= mem::size_of::<Datum>() {
+                            ptr.add(mem::size_of::<Datum>() - mem::size_of::<Self>()).cast()
+                        } else {
+                            ptr.cast()
+                        }
+                    }
+                    #[cfg(target_endian = "little")]
+                    {
+                        ptr.cast()
+                    }
                 }
             }
         )*

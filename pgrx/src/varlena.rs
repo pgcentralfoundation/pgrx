@@ -20,10 +20,10 @@ use core::{ops::DerefMut, slice, str};
 pub unsafe fn set_varsize_4b(ptr: *mut pg_sys::varlena, len: i32) {
     // #ifdef WORDS_BIGENDIAN
     // #define SET_VARSIZE_4B(PTR,len) \
-    // 	(((varattrib_4b *) (PTR))->va_4byte.va_header = (((uint32) (len)) << 2))
+    // 	(((varattrib_4b *) (PTR))->va_4byte.va_header = (len) & 0x3FFFFFFF)
     // #else
     // #define SET_VARSIZE_4B(PTR,len) \
-    // 	(((varattrib_4b *) (PTR))->va_4byte.va_header = (len) & 0x3FFFFFFF)
+    // 	(((varattrib_4b *) (PTR))->va_4byte.va_header = (((uint32) (len)) << 2))
     // #endif
 
     // SAFETY:  A varlena can be safely cast to a varattrib_4b
