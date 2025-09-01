@@ -67,8 +67,8 @@ pub(crate) fn create_crate_template(
 fn create_directory_structure(root: PathBuf) -> Result<(), std::io::Error> {
     std::fs::create_dir_all(root.join(".cargo"))?;
     std::fs::create_dir_all(root.join("src").join("bin"))?;
-    std::fs::create_dir_all(root.join("pg_regress").join("expected"))?;
-    std::fs::create_dir_all(root.join("pg_regress").join("sql"))?;
+    std::fs::create_dir_all(root.join("tests").join("pg_regress").join("expected"))?;
+    std::fs::create_dir_all(root.join("tests").join("pg_regress").join("sql"))?;
     std::fs::create_dir_all(root.join("sql"))?;
 
     Ok(())
@@ -141,6 +141,7 @@ fn create_pgrx_embed_rs(mut filename: PathBuf) -> Result<(), std::io::Error> {
 }
 
 fn create_setup_sql(mut filename: PathBuf, name: &str) -> Result<(), std::io::Error> {
+    filename.push("tests");
     filename.push("pg_regress");
     filename.push("sql");
     filename.push("setup.sql");
@@ -150,6 +151,7 @@ fn create_setup_sql(mut filename: PathBuf, name: &str) -> Result<(), std::io::Er
 }
 
 fn create_setup_out(mut filename: PathBuf, name: &str) -> Result<(), std::io::Error> {
+    filename.push("tests");
     filename.push("pg_regress");
     filename.push("expected");
     filename.push("setup.out");

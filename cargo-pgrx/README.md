@@ -590,12 +590,12 @@ $ tree
 
 `setup.sql` is a special test in that it's run first, by itself, whenever the test database is first created, or reset using the `--resetdb` argument.
 
-When creating a new test, first make the `.sql` file in `./pg_regress/sql/` and then run `cargo pgrx regress`.  pgrx will detect that the file is new and interactively prompt you to add its output, automatically adding it to git (if the directory is managed by git).
+When creating a new test, first make the `.sql` file in `./tests/pg_regress/sql/` and then run `cargo pgrx regress`.  pgrx will detect that the file is new and interactively prompt you to add its output, automatically adding it to git (if the directory is managed by git).
 
 For example,
 
 ```console
-$ echo "SELECT 1;" > ./pg_regress/sql/example.sql
+$ echo "SELECT 1;" > ./tests/pg_regress/sql/example.sql
 $ cargo pgrx regress                             
        Using DefaultFeature("pg13") and `pg_config` from  ~/.pgrx/13.20/pgrx-install/bin/pg_config
     Stopping Postgres v13
@@ -627,7 +627,7 @@ test `example` generated the above output:
 Accept [Y, n]? 
 ```
 
-Typing `Y` (or just pressing return) will copy the test output to the proper location, `./pg_regress/expected/example.sql` and then run the entire test suite:
+Typing `Y` (or just pressing return) will copy the test output to the proper location, `./tests/pg_regress/expected/example.out` and then run the entire test suite:
 
 ```console
 ...
@@ -657,7 +657,7 @@ Alternatively, you can run `cargo pgrx regress --auto` (or `-a`) to **automatica
 - tests are executed in alphabetical order
 - pgrx creates a database named `$extname_regress` unless `--dbname` is used
 - Postgres' documentation for `pg_regress` [begins here](https://www.postgresql.org/docs/current/regress.html).  While pgrx does not support every knob and dial, its organization is largely compatible (PRs welcome to enhance features)
-- to regenerate the expected test output, delete the `./pg_regress/expected/TEST_NAME.out` file and run `cargo pgrx regress`.  You'll be prompted to accept the new output and it'll automatically be run through `git add`
+- to regenerate the expected test output, delete the `./tests/pg_regress/expected/TEST_NAME.out` file and run `cargo pgrx regress`.  You'll be prompted to accept the new output and it'll automatically be run through `git add`
 - `pg_regress` uses `psql` to run each test and literally diffs the output against the expected output file.  pgrx does two things to help eliminate noise in the test output.  The first is it sets `client_min_messages=warning` when starting the Postgres instance and it also passes `-v VERBOSITY=terse` through to `psql`.   
 
 ### Diffing `psql` Output?
@@ -731,7 +731,7 @@ file " ~/_work/pgrx/tests/pgrx-examples/range/tests/pg_regress/regression.diffs"
 above is saved in the file " ~/_work/pgrx/tests/pgrx-examples/range/tests/pg_regress/regression.out".
 ```
 
-And you see the `bad` test immediately failed!  To see how it failed, look at the `./pg_regress/regression.diffs` file:
+And you see the `bad` test immediately failed!  To see how it failed, look at the `./tests/pg_regress/regression.diffs` file:
 
 ```console
 $ diff -U3  ~/_work/pgrx/tests/pgrx-examples/range/tests/pg_regress/expected/bad.out  ~/_work/pgrx/tests/pgrx-examples/range/tests/pg_regress/results/bad.out
