@@ -1349,7 +1349,7 @@ where
     }
 }
 
-/// This trait allows for arrays of certain numeric types to use Array<T>'s single allocation strategy
+/// This trait allows for arrays of certain numeric types to use Array&lt;T&gt;'s single allocation strategy
 pub trait ArrayFastAllocSubType: Sized + UnboxDatum + IntoDatum {}
 
 // for char

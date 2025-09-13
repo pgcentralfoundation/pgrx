@@ -388,7 +388,7 @@ impl RawArray {
         }
     }
 
-    /// Rustified version of new_intArrayType(int num) from https://github.com/postgres/postgres/blob/master/contrib/intarray/_int_tool.c#L219
+    /// Rustified version of new_intArrayType(int num) from [https://github.com/postgres/postgres/blob/master/contrib/intarray/_int_tool.c#L219]
     pub fn new_array_type_with_len<T>(len: usize) -> Result<RawArray, ArrayAllocError>
     where
         T: ArrayFastAllocSubType,
