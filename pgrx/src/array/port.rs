@@ -127,7 +127,7 @@ pub(super) unsafe fn ARR_DATA_PTR(a: *mut pg_sys::ArrayType) -> *mut u8 {
     unsafe { a.cast::<u8>().add(ARR_DATA_OFFSET(a)) }
 }
 
-/// Returns a pointer to the lower bounds of the array.
+/// Returns a pointer to the list of lower bounds given by Postgres as a series of integers
 /// # Safety
 /// Does a field access, but doesn't deref out of bounds of ArrayType.  The caller asserts that
 /// `a` is a properly allocated [`pg_sys::ArrayType`]
@@ -141,7 +141,7 @@ pub(super) unsafe fn ARR_LBOUND(a: *mut pg_sys::ArrayType) -> *mut i32 {
     //                  sizeof(int) * ARR_NDIM(a)))
 
     a.cast::<u8>()
-        .add(std::mem::size_of::<pg_sys::ArrayType>())
-        .add(std::mem::size_of::<i32>() * ((*a).ndim as usize))
+        .add(mem::size_of::<pg_sys::ArrayType>())
+        .add(mem::size_of::<i32>() * ((*a).ndim as usize))
         .cast::<i32>()
 }

@@ -666,10 +666,9 @@ fn as_mut_slice<'a, T: Sized>(array: &'a mut Array<'_, T>) -> Result<&'a mut [T]
 
 /// Creates an `Array<'a, T>` with zero-elements
 /// Slightly faster than new_array_with_len(0)
-pub fn new_empty_array<'a, T: Sized>() -> Result<Array<'a, T>, ArrayAllocError>
+pub fn new_empty_array<'a, T>() -> Result<Array<'a, T>, ArrayAllocError>
 where
-    T: IntoDatum,
-    T: UnboxDatum,
+    T: ArrayFastAllocSubType,
 {
     unsafe {
         let raw_array = RawArray::new_empty_array_type::<T>()?;
@@ -680,12 +679,11 @@ where
 }
 
 /// Creates an `Array<T>` of a fixed len, with 0 for all elements
-/// Uses a single PG allocation rather than
+/// Uses a single PG allocation rather than pg_sys::accumArrayResult(..)
 #[inline(always)]
-pub fn new_array_with_len<'a, T: Sized>(len: usize) -> Result<Array<'a, T>, ArrayAllocError>
+pub fn new_array_with_len<'a, T>(len: usize) -> Result<Array<'a, T>, ArrayAllocError>
 where
-    T: IntoDatum,
-    T: UnboxDatum,
+    T: ArrayFastAllocSubType,
 {
     if len == 0 {
         return new_empty_array();
@@ -1350,3 +1348,19 @@ where
         true
     }
 }
+
+/// This trait allows for arrays of certain numeric types to use Array<T>'s single allocation strategy
+pub trait ArrayFastAllocSubType: Sized + UnboxDatum + IntoDatum {}
+
+// for char
+impl ArrayFastAllocSubType for i8 {}
+// for smallint
+impl ArrayFastAllocSubType for i16 {}
+// for integer
+impl ArrayFastAllocSubType for i32 {}
+// for bigint
+impl ArrayFastAllocSubType for i64 {}
+// for real
+impl ArrayFastAllocSubType for f32 {}
+// for double precision
+impl ArrayFastAllocSubType for f64 {}

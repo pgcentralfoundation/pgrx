@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::precedence)]
-use crate::datum::{Array, IntoDatum, UnboxDatum};
+use crate::datum::{Array, ArrayFastAllocSubType};
 use crate::toast::{Toast, Toasty};
 use crate::{layout, pg_sys, set_varsize_4b, varlena, PgMemoryContexts};
 use bitvec::ptr::{self as bitptr, BitPtr, BitPtrError, Mut};
@@ -378,9 +378,7 @@ impl RawArray {
     /// Slightly faster than new_array_type_with_len(0)
     pub fn new_empty_array_type<T>() -> Result<RawArray, ArrayAllocError>
     where
-        T: IntoDatum,
-        T: UnboxDatum,
-        T: Sized,
+        T: ArrayFastAllocSubType,
     {
         unsafe {
             let array_type = pg_sys::construct_empty_array(T::type_oid());
@@ -393,9 +391,7 @@ impl RawArray {
     /// Rustified version of new_intArrayType(int num) from https://github.com/postgres/postgres/blob/master/contrib/intarray/_int_tool.c#L219
     pub fn new_array_type_with_len<T>(len: usize) -> Result<RawArray, ArrayAllocError>
     where
-        T: IntoDatum,
-        T: UnboxDatum,
-        T: Sized,
+        T: ArrayFastAllocSubType,
     {
         if len == 0 {
             return Self::new_empty_array_type::<T>();
