@@ -41,6 +41,7 @@ exclude = [
     "pgrx-examples/numeric",
     "pgrx-examples/pgtrybuilder",
     "pgrx-examples/operators",
+    "pgrx-examples/parallel_scan_lwlock",
     "pgrx-examples/range",
     "pgrx-examples/schemas",
     "pgrx-examples/shmem",
