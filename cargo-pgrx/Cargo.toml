@@ -42,7 +42,7 @@ semver = "1.0.26" # checking pgrx versions match
 tempfile = "3.19.1"
 
 # emit better diagnostics
-color-eyre = "0.6.3"
+color-eyre = "0.6.5"
 eyre.workspace = true
 owo-colors.workspace = true
 tracing = "0.1"

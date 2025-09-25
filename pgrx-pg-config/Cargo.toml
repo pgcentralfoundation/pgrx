@@ -32,7 +32,6 @@ thiserror.workspace = true
 toml.workspace = true
 url.workspace = true
 
-home = "0.5.11"
 pathsearch = "0.2.0"
 
 [target.'cfg(target_os = "windows")'.dependencies]

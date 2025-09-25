@@ -1,8 +1,8 @@
 use crate::datum::{Array, FromDatum, PgVarlena, VariadicArray};
 use crate::PgBox;
 use core::any::TypeId;
-use once_cell::sync::Lazy;
 use pgrx_sql_entity_graph::RustSqlMapping;
+use std::sync::LazyLock as Lazy;
 
 /// Obtain a TypeId for T without `T: 'static`
 #[inline]
