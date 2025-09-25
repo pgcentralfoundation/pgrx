@@ -74,6 +74,9 @@ jobs:
       - name: Print sccache stats (before)
         run: sccache --show-stats
 
+      - name: Install rustfmt
+        run: rustup component add rustfmt
+
       - name: Run rustfmt
         run: cargo fmt --all -- --check
 
