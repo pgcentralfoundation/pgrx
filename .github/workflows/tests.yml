@@ -380,6 +380,9 @@ jobs:
       - name: Print sccache stats (before)
         run: sccache --show-stats
 
+      - name: Install clippy
+        run: rustup component add clippy
+
       - name: Install cargo-pgrx
         run: cargo install --path cargo-pgrx/ --debug --force
 
