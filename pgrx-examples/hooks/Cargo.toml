@@ -35,7 +35,7 @@ pg_test = []
 pgrx = { path = "../../pgrx", default-features = false }
 
 [dev-dependencies]
-pgrx = { path = "../../pgrx-tests" }
+pgrx-tests = { path = "../../pgrx-tests" }
 
 # uncomment these if compiling outside of 'pgrx'
 # [profile.dev]
