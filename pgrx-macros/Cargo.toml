@@ -10,7 +10,7 @@
  
 [package]
 name = "pgrx-macros"
-version = "0.16.0"
+version = "0.16.1"
 authors.workspace = true
 license.workspace = true
 description = "Proc Macros for 'pgrx'"

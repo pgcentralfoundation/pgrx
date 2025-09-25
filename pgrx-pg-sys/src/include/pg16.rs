@@ -184,18 +184,18 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &::core::ffi::CStr = c"pgsql-bugs@lists.postgresql.org";
 pub const PACKAGE_NAME: &::core::ffi::CStr = c"PostgreSQL";
-pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 16.9";
+pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 16.10";
 pub const PACKAGE_TARNAME: &::core::ffi::CStr = c"postgresql";
 pub const PACKAGE_URL: &::core::ffi::CStr = c"https://www.postgresql.org/";
-pub const PACKAGE_VERSION: &::core::ffi::CStr = c"16.9";
+pub const PACKAGE_VERSION: &::core::ffi::CStr = c"16.10";
 pub const PG_KRB_SRVNAM: &::core::ffi::CStr = c"postgres";
 pub const PG_MAJORVERSION: &::core::ffi::CStr = c"16";
 pub const PG_MAJORVERSION_NUM: u32 = 16;
-pub const PG_MINORVERSION_NUM: u32 = 9;
+pub const PG_MINORVERSION_NUM: u32 = 10;
 pub const PG_USE_STDBOOL: u32 = 1;
-pub const PG_VERSION: &::core::ffi::CStr = c"16.9";
-pub const PG_VERSION_NUM: u32 = 160009;
-pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 16.9 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit" ;
+pub const PG_VERSION: &::core::ffi::CStr = c"16.10";
+pub const PG_VERSION_NUM: u32 = 160010;
+pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 16.10 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0, 64-bit" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -255,7 +255,7 @@ pub const PG_BINARY_A: &::core::ffi::CStr = c"a";
 pub const PG_BINARY_R: &::core::ffi::CStr = c"r";
 pub const PG_BINARY_W: &::core::ffi::CStr = c"w";
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 16.9\n";
+pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 16.10\n";
 pub const EXE: &::core::ffi::CStr = c"";
 pub const DEVNULL: &::core::ffi::CStr = c"/dev/null";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -2311,6 +2311,7 @@ pub const RBTXN_HAS_PARTIAL_CHANGE: u32 = 32;
 pub const RBTXN_PREPARE: u32 = 64;
 pub const RBTXN_SKIPPED_PREPARE: u32 = 128;
 pub const RBTXN_HAS_STREAMABLE_CHANGE: u32 = 256;
+pub const RBTXN_DISTR_INVAL_OVERFLOWED: u32 = 512;
 pub const LOGICALREP_PROTO_MIN_VERSION_NUM: u32 = 1;
 pub const LOGICALREP_PROTO_VERSION_NUM: u32 = 1;
 pub const LOGICALREP_PROTO_STREAM_VERSION_NUM: u32 = 2;
@@ -2322,6 +2323,18 @@ pub const LOGICALREP_COLUMN_UNCHANGED: u8 = 117u8;
 pub const LOGICALREP_COLUMN_TEXT: u8 = 116u8;
 pub const LOGICALREP_COLUMN_BINARY: u8 = 98u8;
 pub const MAXCONNINFO: u32 = 1024;
+pub const SYNC_REP_NO_WAIT: i32 = -1;
+pub const SYNC_REP_WAIT_WRITE: u32 = 0;
+pub const SYNC_REP_WAIT_FLUSH: u32 = 1;
+pub const SYNC_REP_WAIT_APPLY: u32 = 2;
+pub const NUM_SYNC_REP_WAIT_MODE: u32 = 3;
+pub const SYNC_REP_NOT_WAITING: u32 = 0;
+pub const SYNC_REP_WAITING: u32 = 1;
+pub const SYNC_REP_WAIT_COMPLETE: u32 = 2;
+pub const SYNC_REP_PRIORITY: u32 = 0;
+pub const SYNC_REP_QUORUM: u32 = 1;
+pub const SYNC_STANDBY_INIT: u32 = 1;
+pub const SYNC_STANDBY_DEFINED: u32 = 2;
 pub const STATS_MAX_DIMENSIONS: u32 = 8;
 pub const STATS_NDISTINCT_MAGIC: u32 = 2740109220;
 pub const STATS_NDISTINCT_TYPE_BASIC: u32 = 1;
@@ -29465,6 +29478,8 @@ pub struct ReorderBufferTXN {
     pub total_size: Size,
     pub concurrent_abort: bool,
     pub output_plugin_private: *mut ::core::ffi::c_void,
+    pub ninvalidations_distributed: uint32,
+    pub invalidations_distributed: *mut SharedInvalidationMessage,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -30402,6 +30417,81 @@ pub struct LogicalDecodingContext {
     pub in_create: bool,
 }
 impl Default for LogicalDecodingContext {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct SyncRepStandbyData {
+    pub pid: pid_t,
+    pub write: XLogRecPtr,
+    pub flush: XLogRecPtr,
+    pub apply: XLogRecPtr,
+    pub sync_standby_priority: ::core::ffi::c_int,
+    pub walsnd_index: ::core::ffi::c_int,
+    pub is_me: bool,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct SyncRepConfigData {
+    pub config_size: ::core::ffi::c_int,
+    pub num_sync: ::core::ffi::c_int,
+    pub syncrep_method: uint8,
+    pub nmembers: ::core::ffi::c_int,
+    pub member_names: __IncompleteArrayField<::core::ffi::c_char>,
+}
+pub mod WalSndState {
+    pub type Type = ::core::ffi::c_uint;
+    pub const WALSNDSTATE_STARTUP: Type = 0;
+    pub const WALSNDSTATE_BACKUP: Type = 1;
+    pub const WALSNDSTATE_CATCHUP: Type = 2;
+    pub const WALSNDSTATE_STREAMING: Type = 3;
+    pub const WALSNDSTATE_STOPPING: Type = 4;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WalSnd {
+    pub pid: pid_t,
+    pub state: WalSndState::Type,
+    pub sentPtr: XLogRecPtr,
+    pub needreload: bool,
+    pub write: XLogRecPtr,
+    pub flush: XLogRecPtr,
+    pub apply: XLogRecPtr,
+    pub writeLag: TimeOffset,
+    pub flushLag: TimeOffset,
+    pub applyLag: TimeOffset,
+    pub sync_standby_priority: ::core::ffi::c_int,
+    pub mutex: slock_t,
+    pub latch: *mut Latch,
+    pub replyTime: TimestampTz,
+    pub kind: ReplicationKind::Type,
+}
+impl Default for WalSnd {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct WalSndCtlData {
+    pub SyncRepQueue: [dlist_head; 3usize],
+    pub lsn: [XLogRecPtr; 3usize],
+    pub sync_standbys_status: bits8,
+    pub wal_flush_cv: ConditionVariable,
+    pub wal_replay_cv: ConditionVariable,
+    pub walsnds: __IncompleteArrayField<WalSnd>,
+}
+impl Default for WalSndCtlData {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -34732,6 +34822,7 @@ unsafe extern "C-unwind" {
         rteperminfos: *mut List,
         ereport_on_violation: bool,
     ) -> bool;
+    pub fn ExecCheckOneRelPerms(perminfo: *mut RTEPermissionInfo) -> bool;
     pub fn CheckValidResultRel(resultRelInfo: *mut ResultRelInfo, operation: CmdType::Type);
     pub fn InitResultRelInfo(
         resultRelInfo: *mut ResultRelInfo,
@@ -42485,6 +42576,7 @@ unsafe extern "C-unwind" {
     );
     pub fn get_function_rows(root: *mut PlannerInfo, funcid: Oid, node: *mut Node) -> f64;
     pub fn has_row_triggers(root: *mut PlannerInfo, rti: Index, event: CmdType::Type) -> bool;
+    pub fn has_transition_tables(root: *mut PlannerInfo, rti: Index, event: CmdType::Type) -> bool;
     pub fn has_stored_generated_columns(root: *mut PlannerInfo, rti: Index) -> bool;
     pub fn get_dependent_generated_columns(
         root: *mut PlannerInfo,
@@ -43763,6 +43855,13 @@ unsafe extern "C-unwind" {
         nmsgs: Size,
         msgs: *mut SharedInvalidationMessage,
     );
+    pub fn ReorderBufferAddDistributedInvalidations(
+        rb: *mut ReorderBuffer,
+        xid: TransactionId,
+        lsn: XLogRecPtr,
+        nmsgs: Size,
+        msgs: *mut SharedInvalidationMessage,
+    );
     pub fn ReorderBufferImmediateInvalidation(
         rb: *mut ReorderBuffer,
         ninvalidations: uint32,
@@ -44110,6 +44209,33 @@ unsafe extern "C-unwind" {
     pub fn HandleParallelApplyMessages();
     pub fn LogicalRepWorkersWakeupAtCommit(subid: Oid);
     pub fn AtEOXact_LogicalRepWorkers(isCommit: bool);
+    pub static mut SyncRepConfig: *mut SyncRepConfigData;
+    pub static mut syncrep_parse_result: *mut SyncRepConfigData;
+    pub static mut syncrep_parse_error_msg: *mut ::core::ffi::c_char;
+    pub static mut SyncRepStandbyNames: *mut ::core::ffi::c_char;
+    pub fn SyncRepWaitForLSN(lsn: XLogRecPtr, commit: bool);
+    pub fn SyncRepCleanupAtProcExit();
+    pub fn SyncRepInitConfig();
+    pub fn SyncRepReleaseWaiters();
+    pub fn SyncRepGetCandidateStandbys(
+        standbys: *mut *mut SyncRepStandbyData,
+    ) -> ::core::ffi::c_int;
+    pub fn SyncRepUpdateSyncStandbysDefined();
+    pub fn syncrep_yyparse() -> ::core::ffi::c_int;
+    pub fn syncrep_yylex() -> ::core::ffi::c_int;
+    pub fn syncrep_yyerror(str_: *const ::core::ffi::c_char);
+    pub fn syncrep_scanner_init(str_: *const ::core::ffi::c_char);
+    pub fn syncrep_scanner_finish();
+    pub static mut MyWalSnd: *mut WalSnd;
+    pub static mut WalSndCtl: *mut WalSndCtlData;
+    pub fn WalSndSetState(state: WalSndState::Type);
+    pub fn replication_yyparse() -> ::core::ffi::c_int;
+    pub fn replication_yylex() -> ::core::ffi::c_int;
+    pub fn replication_yyerror(message: *const ::core::ffi::c_char) -> !;
+    pub fn replication_scanner_init(str_: *const ::core::ffi::c_char);
+    pub fn replication_scanner_finish();
+    pub fn replication_scanner_is_replication_command() -> bool;
+    pub static mut replication_parse_result: *mut Node;
     pub fn QueryRewrite(parsetree: *mut Query) -> *mut List;
     pub fn AcquireRewriteLocks(parsetree: *mut Query, forExecute: bool, forUpdatePushedDown: bool);
     pub fn build_column_default(rel: Relation, attrno: ::core::ffi::c_int) -> *mut Node;
@@ -48543,6 +48669,11 @@ unsafe extern "C-unwind" {
         varRelid: ::core::ffi::c_int,
         vardata: *mut VariableStatData,
     );
+    pub fn all_rows_selectable(
+        root: *mut PlannerInfo,
+        varno: Index,
+        varattnos: *mut Bitmapset,
+    ) -> bool;
     pub fn statistic_proc_security_check(vardata: *mut VariableStatData, func_oid: Oid) -> bool;
     pub fn get_restriction_variable(
         root: *mut PlannerInfo,
@@ -53677,6 +53808,16 @@ pub const WalRcvState_WALRCV_WAITING: u32 = 3;
 pub const WalRcvState_WALRCV_RESTARTING: u32 = 4;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::WalRcvState::WALRCV_STOPPING")]
 pub const WalRcvState_WALRCV_STOPPING: u32 = 5;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalSndState::WALSNDSTATE_STARTUP")]
+pub const WalSndState_WALSNDSTATE_STARTUP: u32 = 0;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalSndState::WALSNDSTATE_BACKUP")]
+pub const WalSndState_WALSNDSTATE_BACKUP: u32 = 1;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalSndState::WALSNDSTATE_CATCHUP")]
+pub const WalSndState_WALSNDSTATE_CATCHUP: u32 = 2;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalSndState::WALSNDSTATE_STREAMING")]
+pub const WalSndState_WALSNDSTATE_STREAMING: u32 = 3;
+#[deprecated(since = "0.12.0", note = "you want pg_sys::WalSndState::WALSNDSTATE_STOPPING")]
+pub const WalSndState_WALSNDSTATE_STOPPING: u32 = 4;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::WindowAggStatus::WINDOWAGG_DONE")]
 pub const WindowAggStatus_WINDOWAGG_DONE: u32 = 0;
 #[deprecated(since = "0.12.0", note = "you want pg_sys::WindowAggStatus::WINDOWAGG_RUN")]
