@@ -74,11 +74,10 @@ jobs:
       - name: Print sccache stats (before)
         run: sccache --show-stats
 
-      - name: Install rustfmt
-        run: rustup component add rustfmt
-
-      - name: Install clippy
-        run: rustup component add clippy
+      - name: Install rustfmt & clippy
+        run: |
+          rustup component add rustfmt
+          rustup component add clippy
 
       - name: Run rustfmt
         run: cargo fmt --all -- --check
@@ -224,6 +223,11 @@ jobs:
 
       - name: Print sccache stats (before run)
         run: sccache --show-stats
+
+      - name: Install rustfmt & clippy
+        run: |
+          rustup component add rustfmt
+          rustup component add clippy
 
       - name: Install cargo-pgrx
         run: cargo install --path cargo-pgrx/ --debug --force
@@ -380,6 +384,11 @@ jobs:
       - name: Print sccache stats (before)
         run: sccache --show-stats
 
+      - name: Install rustfmt & clippy
+        run: |
+          rustup component add rustfmt
+          rustup component add clippy
+
       - name: Install cargo-pgrx
         run: cargo install --path cargo-pgrx/ --debug --force
 
@@ -501,6 +510,11 @@ jobs:
       - name: Print sccache stats
         run: sccache --show-stats
 
+      - name: Install rustfmt & clippy
+        run: |
+          rustup component add rustfmt
+          rustup component add clippy
+
       - name: Install cargo-pgrx
         run: cargo install --path cargo-pgrx/ --debug --force
 
@@ -580,6 +594,11 @@ jobs:
 
       - name: Install cargo-pgrx
         run: cargo install --path cargo-pgrx/ --debug --force
+
+      - name: Install rustfmt & clippy
+        run: |
+          rustup component add rustfmt
+          rustup component add clippy
 
       - name: Print sccache stats
         run: sccache --show-stats

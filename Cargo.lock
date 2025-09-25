@@ -1934,6 +1934,7 @@ dependencies = [
  "bitvec",
  "enum-map",
  "libc",
+ "once_cell",
  "pgrx-macros",
  "pgrx-pg-sys",
  "pgrx-sql-entity-graph",

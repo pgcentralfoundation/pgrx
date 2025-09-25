@@ -86,6 +86,11 @@ jobs:
           cargo --version
           pg_config --version
 
+      - name: Install rustfmt & clippy
+        run: |
+          rustup component add rustfmt
+          rustup component add clippy
+
       - name: Install cargo pgrx
         run: cd cargo-pgrx && cargo install --path . --debug
 
