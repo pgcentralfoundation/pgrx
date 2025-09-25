@@ -1,7 +1,18 @@
+#LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
+#LICENSE
+#LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
+#LICENSE
+#LICENSE Portions Copyright 2023-2023 PgCentral Foundation, Inc. <contact@pgcentral.org>
+#LICENSE
+#LICENSE All rights reserved.
+#LICENSE
+#LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
 [package]
 name = "hooks"
 version = "0.0.0"
 edition = "2021"
+publish = false
 
 [lib]
 crate-type = ["cdylib", "lib"]
@@ -24,13 +35,16 @@ pg_test = []
 pgrx = { path = "../../pgrx", default-features = false }
 
 [dev-dependencies]
-pgrx = { path = "../../pgrx-tests", default-features = false }
+pgrx = { path = "../../pgrx-tests" }
 
-[profile.dev]
-panic = "unwind"
+# uncomment these if compiling outside of 'pgrx'
+# [profile.dev]
+# panic = "unwind"
 
-[profile.release]
-panic = "unwind"
-opt-level = 3
-lto = "fat"
-codegen-units = 1
+# [profile.release]
+# panic = "unwind"
+# opt-level = 3
+# lto = "fat"
+# codegen-units = 1
+                                                                                               50,1          Bot
+
