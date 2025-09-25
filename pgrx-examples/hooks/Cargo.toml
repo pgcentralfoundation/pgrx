@@ -46,5 +46,3 @@ pgrx = { path = "../../pgrx-tests" }
 # opt-level = 3
 # lto = "fat"
 # codegen-units = 1
-                                                                                               50,1          Bot
-
