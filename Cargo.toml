@@ -50,6 +50,7 @@ exclude = [
     "pgrx-examples/triggers",
     "pgrx-examples/versioned_custom_libname_so",
     "pgrx-examples/versioned_so",
+    "pgrx-examples/subtrans_infos",
 ]
 
 [workspace.package]
