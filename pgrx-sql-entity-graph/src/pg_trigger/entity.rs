@@ -17,13 +17,18 @@
 */
 use crate::{PgrxSql, SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity};
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct PgTriggerEntity {
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub function_name: &'static str,
     pub to_sql_config: ToSqlConfigEntity,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub file: &'static str,
     pub line: u32,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub module_path: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub full_path: &'static str,
 }
 

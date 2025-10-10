@@ -356,10 +356,17 @@ fn copy_sql_files(
     output_tracking: &mut Vec<PathBuf>,
 ) -> eyre::Result<()> {
     let (_, extname) = find_control_file(package_manifest_path)?;
+    let version = get_version(package_manifest_path)?;
+
+    // Generate main SQL file and snapshot
     {
-        let version = get_version(package_manifest_path)?;
         let filename = format!("{extname}--{version}.sql");
         let dest = extdir.join(filename);
+
+        // Also generate a snapshot for this version
+        let project_dir = package_manifest_path.parent().unwrap();
+        let snapshot_dir = project_dir.join("sql/snapshots");
+        let snapshot_path = snapshot_dir.join(format!("{extname}--{version}.json"));
 
         crate::command::schema::generate_schema(
             user_manifest_path,
@@ -371,6 +378,7 @@ fn copy_sql_files(
             target,
             Some(&dest),
             None,
+            Some(&snapshot_path),
             None,
             skip_build,
             output_tracking,

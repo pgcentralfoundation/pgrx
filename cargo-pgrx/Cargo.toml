@@ -53,6 +53,7 @@ tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 bzip2 = "0.5.2"
 env_proxy = "0.4.1"
 serde.workspace = true
+serde_json.workspace = true
 serde-xml-rs = "0.6.0"
 tar = "0.4.44"
 ureq = { version = "3.0.10", default-features = false, features = ["gzip", "platform-verifier", "rustls"] }

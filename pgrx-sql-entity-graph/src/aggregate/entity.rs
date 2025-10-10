@@ -27,20 +27,32 @@ use crate::{SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity};
 use core::any::TypeId;
 use eyre::{WrapErr, eyre};
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+fn default_type_id() -> TypeId {
+    TypeId::of::<crate::__PgrxInternalTypeIdPlaceholder>()
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct AggregateTypeEntity {
     pub used_ty: UsedTypeEntity,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub name: Option<&'static str>,
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct PgAggregateEntity {
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub full_path: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub module_path: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub file: &'static str,
     pub line: u32,
+    #[serde(skip, default = "default_type_id")]
     pub ty_id: TypeId,
 
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub name: &'static str,
 
     /// If the aggregate is an ordered set aggregate.
@@ -66,11 +78,13 @@ pub struct PgAggregateEntity {
     /// The `SFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `state` in `pgrx::aggregate::Aggregate`.
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub sfunc: &'static str,
 
     /// The `FINALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `finalize` in `pgrx::aggregate::Aggregate`.
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub finalfunc: Option<&'static str>,
 
     /// The `FINALFUNC_MODIFY` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
@@ -81,31 +95,37 @@ pub struct PgAggregateEntity {
     /// The `COMBINEFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `combine` in `pgrx::aggregate::Aggregate`.
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub combinefunc: Option<&'static str>,
 
     /// The `SERIALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `serial` in `pgrx::aggregate::Aggregate`.
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub serialfunc: Option<&'static str>,
 
     /// The `DESERIALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `deserial` in `pgrx::aggregate::Aggregate`.
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub deserialfunc: Option<&'static str>,
 
     /// The `INITCOND` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `INITIAL_CONDITION` in `pgrx::aggregate::Aggregate`.
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub initcond: Option<&'static str>,
 
     /// The `MSFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `moving_state` in `pgrx::aggregate::Aggregate`.
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub msfunc: Option<&'static str>,
 
     /// The `MINVFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `moving_state_inverse` in `pgrx::aggregate::Aggregate`.
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub minvfunc: Option<&'static str>,
 
     /// The `MSTYPE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
@@ -120,6 +140,7 @@ pub struct PgAggregateEntity {
     /// The `MFINALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `moving_state_finalize` in `pgrx::aggregate::Aggregate`.
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub mfinalfunc: Option<&'static str>,
 
     /// The `MFINALFUNC_MODIFY` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
@@ -130,11 +151,13 @@ pub struct PgAggregateEntity {
     /// The `MINITCOND` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `MOVING_INITIAL_CONDITION` in `pgrx::aggregate::Aggregate`.
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub minitcond: Option<&'static str>,
 
     /// The `SORTOP` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `SORT_OPERATOR` in `pgrx::aggregate::Aggregate`.
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub sortop: Option<&'static str>,
 
     /// The `PARALLEL` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)

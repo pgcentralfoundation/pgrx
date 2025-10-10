@@ -54,6 +54,9 @@ pub(crate) struct Schema {
     /// A path to output a produced GraphViz DOT file
     #[clap(long, short, value_parser)]
     dot: Option<PathBuf>,
+    /// A path to output a schema snapshot JSON file (for upgrade script generation)
+    #[clap(long, value_parser)]
+    snapshot: Option<PathBuf>,
     #[clap(long)]
     target: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
@@ -107,6 +110,7 @@ impl CommandExecute for Schema {
             self.target.as_deref(),
             self.out.as_deref(),
             self.dot.as_deref(),
+            self.snapshot.as_deref(),
             log_level,
             self.skip_build,
             &mut vec![],
@@ -119,6 +123,7 @@ impl CommandExecute for Schema {
     test = is_test,
     path = path.map(|path| tracing::field::display(path.display())),
     dot,
+    snapshot,
     features = ?features.features,
 ))]
 pub(crate) fn generate_schema_for_cli(
@@ -131,6 +136,7 @@ pub(crate) fn generate_schema_for_cli(
     target: Option<&str>,
     path: Option<&Path>,
     dot: Option<&Path>,
+    snapshot: Option<&Path>,
     log_level: Option<String>,
     skip_build: bool,
     output_tracking: &mut Vec<PathBuf>,
@@ -163,6 +169,7 @@ pub(crate) fn generate_schema_for_cli(
         target,
         path,
         dot,
+        snapshot,
         output_tracking,
         manifest,
     )
@@ -177,6 +184,7 @@ pub(crate) fn generate_schema_implicit(
     target: Option<&str>,
     path: Option<&Path>,
     dot: Option<&Path>,
+    snapshot: Option<&Path>,
     output_tracking: &mut Vec<PathBuf>,
     manifest: cargo_toml::Manifest,
 ) -> eyre::Result<()> {
@@ -186,8 +194,15 @@ pub(crate) fn generate_schema_implicit(
 
     let symbols = find_and_compute_symbols(profile, &lib_filename, target)?;
 
-    let codegen =
-        compute_codegen(&control_file, package_manifest_path, &symbols, &lib_name, path, dot)?;
+    let codegen = compute_codegen(
+        &control_file,
+        package_manifest_path,
+        &symbols,
+        &lib_name,
+        path,
+        dot,
+        snapshot,
+    )?;
 
     let embed = {
         let mut embed = tempfile::NamedTempFile::new()?;
@@ -358,6 +373,7 @@ fn compute_codegen(
     lib_name: &str,
     path: Option<&Path>,
     dot: Option<&Path>,
+    snapshot: Option<&Path>,
 ) -> eyre::Result<String> {
     use proc_macro2::{Ident, Span, TokenStream};
     let lib_name_ident = Ident::new(lib_name, Span::call_site());
@@ -432,6 +448,104 @@ fn compute_codegen(
                 pgrx_sql
                     .to_dot(#dot)
                     .expect("Could not write Graphviz DOT");
+            });
+        }
+        if let Some(snapshot) = snapshot {
+            let snapshot = str_from_path("snapshot", snapshot)?;
+            let writing = "     Writing".bold().green().to_string();
+            let generating = "   Generating".bold().green().to_string();
+            let wrote = "        Wrote".bold().green().to_string();
+            out.extend(quote::quote! {
+                eprintln!("{} schema snapshot to {}", #writing, #snapshot);
+                let current_snapshot = ::pgrx::pgrx_sql_entity_graph::SchemaSnapshot::from_pgrx_sql(&pgrx_sql);
+                current_snapshot
+                    .save(std::path::Path::new(#snapshot))
+                    .expect(&format!("Could not write snapshot to {}", #snapshot));
+
+                // Generate upgrade script from the previous version only
+                let snapshot_path = std::path::Path::new(#snapshot);
+                let snapshot_dir = snapshot_path.parent().unwrap();
+                let sql_dir = snapshot_dir.parent().unwrap();
+
+                if snapshot_dir.exists() {
+                    let extname = &pgrx_sql.extension_name;
+                    let current_version = &current_snapshot.version;
+
+                    // Collect all version snapshots and sort them
+                    let mut versions: Vec<(String, std::path::PathBuf)> = Vec::new();
+
+                    if let Ok(entries) = std::fs::read_dir(snapshot_dir) {
+                        for entry in entries.flatten() {
+                            let path = entry.path();
+                            if !path.is_file() || path.extension().and_then(|s| s.to_str()) != Some("json") {
+                                continue;
+                            }
+
+                            let filename = path.file_name().unwrap().to_str().unwrap();
+
+                            // Extract version from filename (format: extname--version.json)
+                            if let Some(version) = filename
+                                .strip_prefix(&format!("{extname}--"))
+                                .and_then(|s| s.strip_suffix(".json"))
+                            {
+                                versions.push((version.to_string(), path));
+                            }
+                        }
+                    }
+
+                    // Sort versions (simple string comparison)
+                    // Note: This is a simple lexicographic sort. For proper semantic
+                    // versioning, ensure version strings use consistent formatting (e.g., "0.1.0", "0.10.0")
+                    versions.sort_by(|a, b| a.0.cmp(&b.0));
+
+                    // Find the immediate previous version
+                    let current_idx = versions.iter().position(|(v, _)| v == current_version);
+                    if let Some(idx) = current_idx {
+                        if idx > 0 {
+                            // There is a previous version
+                            let (prev_version, prev_path) = &versions[idx - 1];
+
+                            // Load previous snapshot
+                            let prev_json_str = std::fs::read_to_string(prev_path)
+                                .expect(&format!("Failed to load snapshot for version {}", prev_version));
+
+                            // Leak the JSON string to get 'static lifetime for deserialization
+                            let prev_json_str_static: &'static str = Box::leak(prev_json_str.into_boxed_str());
+
+                            // Deserialize the snapshot
+                            let prev_snapshot_result: Result<::pgrx::pgrx_sql_entity_graph::SchemaSnapshot, _> =
+                                ::pgrx::pgrx_sql_entity_graph::deserialize_snapshot(prev_json_str_static);
+                            let prev_snapshot = prev_snapshot_result
+                                .expect(&format!("Failed to deserialize snapshot for version {}", prev_version));
+
+                            // Generate upgrade script
+                            eprintln!(
+                                "{} upgrade script: {} -> {}",
+                                #generating,
+                                prev_version,
+                                current_version
+                            );
+
+                            let diff = ::pgrx::pgrx_sql_entity_graph::SchemaDiff::compare(&prev_snapshot, &current_snapshot);
+
+                            let upgrade_script = ::pgrx::pgrx_sql_entity_graph::generate_upgrade_script_with_sql(
+                                prev_version,
+                                current_version,
+                                &diff,
+                                &pgrx_sql,
+                            )
+                            .expect(&format!("Failed to generate upgrade script from {} to {}", prev_version, current_version));
+
+                            // Write upgrade script
+                            let upgrade_filename = format!("{extname}--{prev_version}--{current_version}.sql");
+                            let upgrade_path = sql_dir.join(&upgrade_filename);
+                            std::fs::write(&upgrade_path, upgrade_script)
+                                .expect(&format!("Failed to write upgrade script {}", upgrade_filename));
+
+                            eprintln!("{} {}", #wrote, upgrade_filename);
+                        }
+                    }
+                }
             });
         }
         out

@@ -33,10 +33,13 @@ use crate::to_sql::ToSqlFn;
 ///
 /// When `callback` has a value, the corresponding `ToSql` implementation should invoke the
 /// callback instead of performing their default behavior.
-#[derive(Default, Clone)]
+#[derive(Default, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct ToSqlConfigEntity {
     pub enabled: bool,
+    #[serde(skip)]
     pub callback: Option<ToSqlFn>,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub content: Option<&'static str>,
 }
 impl ToSqlConfigEntity {

@@ -43,7 +43,7 @@ use crate::{SqlGraphEntity, SqlGraphIdentifier, TypeMatch};
 
 use super::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord, serde::Serialize, serde::Deserialize)]
 pub enum SqlGraphRequires {
     By,
     ByArg,

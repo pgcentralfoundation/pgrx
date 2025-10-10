@@ -23,14 +23,20 @@ use crate::{SqlGraphEntity, SqlGraphIdentifier, TypeMatch};
 use std::collections::BTreeSet;
 
 /// The output of a [`PostgresEnum`](crate::postgres_enum::PostgresEnum) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd, Hash, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct PostgresEnumEntity {
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub name: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub file: &'static str,
     pub line: u32,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub full_path: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub module_path: &'static str,
     pub mappings: BTreeSet<RustSqlMapping>,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_vec_static_str")]
     pub variants: Vec<&'static str>,
     pub to_sql_config: ToSqlConfigEntity,
 }

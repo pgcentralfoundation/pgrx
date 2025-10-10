@@ -17,12 +17,18 @@
 */
 
 /// The output of a [`PgOperator`](crate::PgOperator) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct PgOperatorEntity {
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub opname: Option<&'static str>,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub commutator: Option<&'static str>,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub negator: Option<&'static str>,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub restrict: Option<&'static str>,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub join: Option<&'static str>,
     pub hashes: bool,
     pub merges: bool,

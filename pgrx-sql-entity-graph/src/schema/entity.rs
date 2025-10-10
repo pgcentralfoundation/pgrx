@@ -20,10 +20,14 @@ use crate::to_sql::ToSql;
 use crate::{SqlGraphEntity, SqlGraphIdentifier};
 
 /// The output of a [`Schema`](crate::schema::Schema) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct SchemaEntity {
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub module_path: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub name: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub file: &'static str,
     pub line: u32,
 }

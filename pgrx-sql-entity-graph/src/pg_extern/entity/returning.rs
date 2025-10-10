@@ -17,7 +17,8 @@
 */
 use crate::UsedTypeEntity;
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = "'de: 'static"))]
 pub enum PgExternReturnEntity {
     None,
     Type { ty: UsedTypeEntity },
@@ -26,8 +27,10 @@ pub enum PgExternReturnEntity {
     Trigger,
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct PgExternReturnEntityIteratedItem {
     pub ty: UsedTypeEntity,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub name: Option<&'static str>,
 }

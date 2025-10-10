@@ -23,7 +23,20 @@ use thiserror::Error;
 use super::return_variant::ReturnsError;
 use super::{FunctionMetadataTypeEntity, Returns};
 
-#[derive(Clone, Copy, Debug, Hash, Ord, PartialOrd, PartialEq, Eq, Error)]
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    Hash,
+    Ord,
+    PartialOrd,
+    PartialEq,
+    Eq,
+    Error,
+    serde::Serialize,
+    serde::Deserialize
+)]
+#[serde(bound(deserialize = ""))]
 pub enum ArgumentError {
     #[error("Cannot use SetOfIterator as an argument")]
     SetOf,
@@ -36,11 +49,14 @@ pub enum ArgumentError {
     #[error("A Datum as an argument means that `sql = \"...\"` must be set in the declaration")]
     Datum,
     #[error("`{0}` is not able to be used as a function argument")]
-    NotValidAsArgument(&'static str),
+    NotValidAsArgument(
+        #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")] &'static str,
+    ),
 }
 
 /// Describes ways that Rust types are mapped into SQL
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub enum SqlMapping {
     /// Explicit mappings provided by PGRX
     As(String),

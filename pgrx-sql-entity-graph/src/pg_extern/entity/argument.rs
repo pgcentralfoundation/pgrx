@@ -18,8 +18,10 @@
 use crate::{SqlGraphIdentifier, UsedTypeEntity};
 
 /// The output of a [`PgExternArgument`](crate::PgExternArgument) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct PgExternArgumentEntity {
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub pattern: &'static str,
     pub used_ty: UsedTypeEntity,
 }

@@ -25,13 +25,19 @@ use crate::{SqlGraphEntity, SqlGraphIdentifier};
 use std::fmt::Display;
 
 /// The output of a [`ExtensionSql`](crate::ExtensionSql) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct ExtensionSqlEntity {
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub module_path: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub full_path: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub sql: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub file: &'static str,
     pub line: u32,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub name: &'static str,
     pub bootstrap: bool,
     pub finalize: bool,
@@ -108,7 +114,8 @@ impl ToSql for ExtensionSqlEntity {
     }
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct SqlDeclaredEntityData {
     sql: String,
     name: String,
@@ -122,7 +129,8 @@ pub struct SqlDeclaredEntityData {
     varlena: String,
     pg_box: Vec<String>,
 }
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub enum SqlDeclaredEntity {
     Type(SqlDeclaredEntityData),
     Enum(SqlDeclaredEntityData),

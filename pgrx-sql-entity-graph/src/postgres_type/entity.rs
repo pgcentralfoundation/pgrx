@@ -28,7 +28,8 @@ use std::collections::BTreeSet;
 use syn::spanned::Spanned;
 use syn::{AttrStyle, Attribute, Lit};
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub enum Alignment {
     On,
     Off,
@@ -93,20 +94,29 @@ impl Alignment {
 }
 
 /// The output of a [`PostgresType`](crate::postgres_type::PostgresTypeDerive) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct PostgresTypeEntity {
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub name: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub file: &'static str,
     pub line: u32,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub full_path: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub module_path: &'static str,
     pub mappings: BTreeSet<RustSqlMapping>,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub in_fn: &'static str,
     pub in_fn_module_path: String,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub out_fn: &'static str,
     pub out_fn_module_path: String,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub receive_fn: Option<&'static str>,
     pub receive_fn_module_path: Option<String>,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub send_fn: Option<&'static str>,
     pub send_fn_module_path: Option<String>,
     pub to_sql_config: ToSqlConfigEntity,

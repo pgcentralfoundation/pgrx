@@ -12,7 +12,7 @@ use proc_macro2::{TokenStream, TokenTree};
 use quote::{ToTokens, TokenStreamExt, format_ident, quote};
 use std::collections::HashSet;
 
-#[derive(Debug, Hash, Eq, PartialEq, Clone, PartialOrd, Ord)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub enum ExternArgs {
     CreateOrReplace,
     Immutable,

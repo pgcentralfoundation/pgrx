@@ -16,6 +16,14 @@ fn hello_versioned_so() -> &'static str {
     "Hello, versioned_so"
 }
 
+
+#[pg_extern]
+fn peos_pne(e: i32) -> String {
+    let p = e + 0;
+    format!("Hello, versioned_so {}", p)
+}
+
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {

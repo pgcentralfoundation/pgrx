@@ -20,6 +20,7 @@ pub use aggregate::{
     AggregateType, AggregateTypeList, FinalizeModify, ParallelOption, PgAggregate,
 };
 pub use control_file::ControlFile;
+pub use diff::{EntityChange, EntityModification, EntityRename, SchemaDiff};
 pub use enrich::CodeEnrichment;
 pub use extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntity};
 pub use extension_sql::{ExtensionSql, ExtensionSqlFile, SqlDeclared};
@@ -45,6 +46,76 @@ pub use postgres_type::PostgresTypeDerive;
 pub use postgres_type::entity::PostgresTypeEntity;
 pub use schema::Schema;
 pub use schema::entity::SchemaEntity;
+pub use snapshot::{
+    DependencyEdge, EntityId, EntityType, SchemaSnapshot, SerializableEntity, deserialize_snapshot,
+};
+pub use snapshot_types::{
+    PgAggregateEntitySnapshot, PostgresHashEntitySnapshot, PostgresOrdEntitySnapshot,
+    SqlGraphEntitySnapshot,
+};
+pub use upgrade::{
+    UpgradeConfig, generate_upgrade_file, generate_upgrade_script, generate_upgrade_script_with_sql,
+};
+
+// Marker type for TypeId placeholder value when converting snapshots back to runtime entities.
+//
+// This type is used ONLY when deserializing snapshot entities back into runtime entities
+// (via `From<SqlGraphEntitySnapshot> for SqlGraphEntity`). Since snapshots don't contain
+// TypeId fields (they're runtime-only), we need a placeholder value for roundtrip compatibility.
+//
+// This private type ensures the placeholder TypeId cannot collide with any user type.
+//
+// NOTE: The proper architectural fix has been implemented - snapshots now use separate
+// types (SqlGraphEntitySnapshot, etc.) that don't contain TypeId at all. TypeId only
+// exists in runtime entity types where it's actually used for runtime type checking.
+pub(crate) struct __PgrxInternalTypeIdPlaceholder {
+    _private: (),
+}
+
+// Helper module for serde deserialization of &'static str
+pub(crate) mod serde_helpers {
+    use serde::{Deserialize, Deserializer};
+
+    pub fn deserialize_static_str<'de, D>(deserializer: D) -> Result<&'static str, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        Ok(Box::leak(s.into_boxed_str()))
+    }
+
+    pub fn deserialize_option_static_str<'de, D>(
+        deserializer: D,
+    ) -> Result<Option<&'static str>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let opt = Option::<String>::deserialize(deserializer)?;
+        Ok(opt.map(|s| Box::leak(s.into_boxed_str()) as &'static str))
+    }
+
+    pub fn deserialize_vec_static_str<'de, D>(
+        deserializer: D,
+    ) -> Result<Vec<&'static str>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let vec = Vec::<String>::deserialize(deserializer)?;
+        Ok(vec.into_iter().map(|s| Box::leak(s.into_boxed_str()) as &'static str).collect())
+    }
+
+    pub fn deserialize_option_vec_static_str<'de, D>(
+        deserializer: D,
+    ) -> Result<Option<Vec<&'static str>>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let opt = Option::<Vec<String>>::deserialize(deserializer)?;
+        Ok(opt.map(|vec| {
+            vec.into_iter().map(|s| Box::leak(s.into_boxed_str()) as &'static str).collect()
+        }))
+    }
+}
 pub use to_sql::entity::ToSqlConfigEntity;
 pub use to_sql::{ToSql, ToSqlConfig};
 pub use used_type::{UsedType, UsedTypeEntity};
@@ -52,6 +123,7 @@ pub use used_type::{UsedType, UsedTypeEntity};
 pub(crate) mod aggregate;
 pub(crate) mod composite_type;
 pub(crate) mod control_file;
+pub(crate) mod diff; // Snapshot comparison for upgrade scripts
 pub(crate) mod enrich;
 pub(crate) mod extension_sql;
 pub(crate) mod extern_args;
@@ -71,7 +143,10 @@ pub(crate) mod postgres_hash;
 pub(crate) mod postgres_ord;
 pub(crate) mod postgres_type;
 pub(crate) mod schema;
+pub(crate) mod snapshot; // Snapshot infrastructure for upgrade scripts
+pub(crate) mod snapshot_types; // Snapshot-only types without TypeId
 pub(crate) mod to_sql;
+pub(crate) mod upgrade; // SQL upgrade script generation
 pub(crate) mod used_type;
 
 /// Able to produce a GraphViz DOT format identifier.
@@ -97,7 +172,8 @@ pub trait SqlGraphIdentifier {
 pub use postgres_type::Alignment;
 
 /// An entity corresponding to some SQL required by the extension.
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = "'de: 'static"))]
 pub enum SqlGraphEntity {
     ExtensionRoot(ControlFile),
     Schema(SchemaEntity),

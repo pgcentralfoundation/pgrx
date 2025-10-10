@@ -31,6 +31,8 @@ proc-macro2.workspace = true
 quote.workspace = true
 syn.workspace = true
 thiserror.workspace = true
+serde.workspace = true
+serde_json.workspace = true
 
 convert_case = "0.8.0"
 petgraph = "0.8.1"

@@ -309,18 +309,28 @@ impl UsedType {
     }
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct UsedTypeEntity {
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub ty_source: &'static str,
+    #[serde(skip, default = "default_type_id")]
     pub ty_id: core::any::TypeId,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub full_path: &'static str,
     pub module_path: String,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub composite_type: Option<&'static str>,
     pub variadic: bool,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub default: Option<&'static str>,
     /// Set via the type being an `Option`.
     pub optional: bool,
     pub metadata: FunctionMetadataTypeEntity,
+}
+
+fn default_type_id() -> core::any::TypeId {
+    core::any::TypeId::of::<crate::__PgrxInternalTypeIdPlaceholder>()
 }
 
 impl crate::TypeIdentifiable for UsedTypeEntity {

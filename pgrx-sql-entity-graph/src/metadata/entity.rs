@@ -18,15 +18,19 @@ Function and type level metadata entities for Rust to SQL translation
 */
 use super::{ArgumentError, Returns, ReturnsError, SqlMapping};
 
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct FunctionMetadataEntity {
     pub arguments: Vec<FunctionMetadataTypeEntity>,
     pub retval: FunctionMetadataTypeEntity,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub path: &'static str,
 }
 
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct FunctionMetadataTypeEntity {
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub type_name: &'static str,
     pub argument_sql: Result<SqlMapping, ArgumentError>,
     pub return_sql: Result<Returns, ReturnsError>,

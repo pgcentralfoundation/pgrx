@@ -35,19 +35,27 @@ use crate::{ExternArgs, SqlGraphEntity, SqlGraphIdentifier, TypeMatch};
 use eyre::{WrapErr, eyre};
 
 /// The output of a [`PgExtern`](crate::pg_extern::PgExtern) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct PgExternEntity {
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub name: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub unaliased_name: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub module_path: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub full_path: &'static str,
     pub metadata: crate::metadata::FunctionMetadataEntity,
     pub fn_args: Vec<PgExternArgumentEntity>,
     pub fn_return: PgExternReturnEntity,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_static_str")]
     pub schema: Option<&'static str>,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub file: &'static str,
     pub line: u32,
     pub extern_attrs: Vec<ExternArgs>,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_option_vec_static_str")]
     pub search_path: Option<Vec<&'static str>>,
     pub operator: Option<PgOperatorEntity>,
     pub cast: Option<PgCastEntity>,

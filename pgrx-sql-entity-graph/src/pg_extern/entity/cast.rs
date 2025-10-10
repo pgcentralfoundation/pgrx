@@ -17,7 +17,7 @@
 */
 
 /// The output of a [`PgCast`](crate::PgCast) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub enum PgCastEntity {
     Default,
     Assignment,

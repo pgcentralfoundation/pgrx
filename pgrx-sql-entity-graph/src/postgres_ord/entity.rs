@@ -21,15 +21,25 @@ use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::{SqlGraphEntity, SqlGraphIdentifier};
 
 /// The output of a [`PostgresOrd`](crate::postgres_ord::PostgresOrd) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[serde(bound(deserialize = ""))]
 pub struct PostgresOrdEntity {
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub name: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub file: &'static str,
     pub line: u32,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub full_path: &'static str,
+    #[serde(deserialize_with = "crate::serde_helpers::deserialize_static_str")]
     pub module_path: &'static str,
+    #[serde(skip, default = "default_type_id")]
     pub id: core::any::TypeId,
     pub to_sql_config: ToSqlConfigEntity,
+}
+
+fn default_type_id() -> core::any::TypeId {
+    core::any::TypeId::of::<crate::__PgrxInternalTypeIdPlaceholder>()
 }
 
 impl PostgresOrdEntity {

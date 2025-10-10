@@ -32,7 +32,7 @@ use thiserror::Error;
 /// # Ok(())
 /// # }
 /// ```
-#[derive(Debug, Clone, Hash, PartialOrd, Ord, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialOrd, Ord, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ControlFile {
     pub comment: String,
     pub default_version: String,
