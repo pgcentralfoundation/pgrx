@@ -71,7 +71,7 @@
 
 ## System Requirements
 
-PGRX has been tested to work on x86_64⹋ and aarch64⹋ Linux and aarch64 macOS and x86_64⹋ Windows targets.
+PGRX has been tested to work on x86_64 Linux, aarch64 Linux, aarch64 macOS, and x86_64 Windows targets⹋.
 It is currently expected to work on other "Unix" OS with possible small changes, but those remain untested.
 
 - A Rust toolchain: `rustc`, `cargo`, and `rustfmt`. The recommended way to get these is from https://rustup.rs †

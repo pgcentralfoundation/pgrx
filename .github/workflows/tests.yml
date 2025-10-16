@@ -424,7 +424,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ "macos-13", "macos-14" ] # macos-14 is M1
+        os: [ "macos-14" ] # macos-14 is M1
         # Since Postgres 16 on macOS the dynamic library extension is "dylib" (instead of "so" on older versions),
         # so it's important to test against both versions (with "old" and "new" extensions).
         #
