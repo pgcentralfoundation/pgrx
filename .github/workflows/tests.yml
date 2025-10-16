@@ -32,9 +32,9 @@ jobs:
       - name: Set up prerequisites and environment
         run: |
           sudo apt-get update -y -qq --fix-missing
-          
+
           echo ""
-          
+
           echo "----- Install / Set up sccache -----"
           mkdir -p $HOME/.local/bin
           curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
@@ -123,7 +123,7 @@ jobs:
       - name: Set up prerequisites and environment
         run: |
           sudo apt-get update -y -qq --fix-missing
-          
+
           echo ""
           echo "----- Install sccache -----"
           mkdir -p $HOME/.local/bin
@@ -133,20 +133,21 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           mkdir -p /home/runner/.cache/sccache
           echo ""
-          
+
           echo "----- Set up dynamic variables -----"
           cat $GITHUB_ENV
           echo ""
-          
+
           echo "----- Remove old postgres -----"
           sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
           echo ""
-          
+
           echo "----- Install system dependencies -----"
           sudo apt-get install -y \
             build-essential \
             llvm-14-dev libclang-14-dev clang-14 \
             gcc \
+            libkrb5-dev \
             libssl-dev \
             libz-dev \
             make \
@@ -163,7 +164,7 @@ jobs:
           echo 'CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc' >> $GITHUB_ENV
           # TODO: not all of these should be needed, but for now it's likely fine.
           echo 'BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu=-target aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc' >> $GITHUB_ENV
-          
+
           echo "----- Print env -----"
           env
           echo ""
@@ -321,9 +322,9 @@ jobs:
       - name: Set up prerequisites and environment
         run: |
           sudo apt-get update -y -qq --fix-missing
-          
+
           echo ""
-          
+
           echo "----- Install / Set up sccache -----"
           mkdir -p $HOME/.local/bin
           curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
@@ -335,14 +336,14 @@ jobs:
 
           cat $GITHUB_ENV
           echo ""
-          
+
           cat $GITHUB_ENV
           echo ""
-          
+
           echo "----- Remove old postgres -----"
           sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
           echo ""
-          
+
           echo "----- Install system dependencies -----"
           sudo apt-get install -y \
             build-essential \
@@ -455,7 +456,7 @@ jobs:
       - name: brew install postgresql
         run: |
           HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 brew install ${FORMULA}
-          
+
           echo "$(brew --prefix ${FORMULA})/bin" >> $GITHUB_PATH
         env:
           FORMULA: postgresql@${{ matrix.postgresql }}
@@ -465,19 +466,19 @@ jobs:
       - name: Set up prerequisites and environment
         run: |
           echo ""
-          
+
           echo "----- Install sccache -----"
           curl -L https://github.com/mozilla/sccache/releases/download/v0.5.4/sccache-v0.5.4-x86_64-apple-darwin.tar.gz | tar xz
           mv -f sccache-v0.5.4-x86_64-apple-darwin/sccache /usr/local/bin
           chmod +x /usr/local/bin/sccache
           mkdir -p $SCCACHE_DIR
           sccache --version
-          
+
           echo "----- Getting pre-installed Postgres major version -----"
           PG_VER=$(pg_config --version | awk '{split($2,a,"."); print a[1]}')
           echo "PG_VER=$PG_VER" >> $GITHUB_ENV
           cat $GITHUB_ENV
-          
+
           echo "----- Set up Postgres permissions -----"
           sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
           # ls -lath `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension

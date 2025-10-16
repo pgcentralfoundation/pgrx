@@ -84,8 +84,8 @@ It is currently expected to work on other "Unix" OS with possible small changes,
    - Linux and MacOS: GCC or Clang if `cshim` feature is enabled, and no need if the `cshim` feature is disabled
    - Windows: MSVC or Clang
 - [PostgreSQL's build dependencies](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code) ‡
-   - Debian-likes: `sudo apt-get install build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config`
-   - RHEL-likes: `sudo yum install -y bison-devel readline-devel zlib-devel openssl-devel wget ccache && sudo yum groupinstall -y 'Development Tools'`
+   - Debian-likes: `sudo apt-get install build-essential libreadline-dev zlib1g-dev flex bison libkrb5-dev libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config`
+   - RHEL-likes: `sudo yum install -y bison-devel readline-devel zlib-devel openssl-devel wget ccache krb5-devel && sudo yum groupinstall -y 'Development Tools'`
 
  † PGRX has no MSRV policy, thus may require the latest stable version of Rust, available via Rustup
 
