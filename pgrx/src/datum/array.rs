@@ -412,95 +412,47 @@ pub enum ArraySliceError {
     ContainsNulls,
 }
 
+/// Marker for "simple scalars" in arrays
+///
+/// A Scalar must have:
+/// - A fixed size
+/// - No padding bits
+/// - All bitpatterns are valid
+/// - Postgres runtime handling which respects these properties
+///
+/// This allows for it to be copied from a Rust slice to a Postgres array,
+/// and obtain a Rust slice from a Postgres array if it contains no nulls.
+pub unsafe trait Scalar: Sized + Copy {}
+
+unsafe impl Scalar for f32 {}
 #[cfg(target_pointer_width = "64")]
-impl Array<'_, f64> {
-    /// Returns a slice of `f64`s which comprise this [`Array`].
+unsafe impl Scalar for f64 {}
+unsafe impl Scalar for i8 {}
+unsafe impl Scalar for i16 {}
+unsafe impl Scalar for i32 {}
+unsafe impl Scalar for i64 {}
+
+impl<T> Array<'_, T>
+where
+    T: Scalar,
+{
+    /// Returns the slice of `T` within this [`Array`].
     ///
     /// # Errors
     ///
     /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
     /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
     #[inline]
-    pub fn as_slice(&self) -> Result<&[f64], ArraySliceError> {
-        as_slice(self)
-    }
-}
+    pub fn as_slice(&self) -> Result<&[T], ArraySliceError> {
+        if self.contains_nulls() {
+            return Err(ArraySliceError::ContainsNulls);
+        }
 
-impl Array<'_, f32> {
-    /// Returns a slice of `f32`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_slice(&self) -> Result<&[f32], ArraySliceError> {
-        as_slice(self)
+        // SAFETY: Sound if the bound of `T: Scalar` holds and the type fulfills those requirements
+        let slice =
+            unsafe { std::slice::from_raw_parts(self.raw.data_ptr() as *const _, self.len()) };
+        Ok(slice)
     }
-}
-
-#[cfg(target_pointer_width = "64")]
-impl Array<'_, i64> {
-    /// Returns a slice of `i64`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_slice(&self) -> Result<&[i64], ArraySliceError> {
-        as_slice(self)
-    }
-}
-
-impl Array<'_, i32> {
-    /// Returns a slice of `i32`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_slice(&self) -> Result<&[i32], ArraySliceError> {
-        as_slice(self)
-    }
-}
-
-impl Array<'_, i16> {
-    /// Returns a slice of `i16`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_slice(&self) -> Result<&[i16], ArraySliceError> {
-        as_slice(self)
-    }
-}
-
-impl Array<'_, i8> {
-    /// Returns a slice of `i8`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_slice(&self) -> Result<&[i8], ArraySliceError> {
-        as_slice(self)
-    }
-}
-
-#[inline(always)]
-fn as_slice<'a, T: Sized>(array: &'a Array<'_, T>) -> Result<&'a [T], ArraySliceError> {
-    if array.contains_nulls() {
-        return Err(ArraySliceError::ContainsNulls);
-    }
-
-    let slice =
-        unsafe { std::slice::from_raw_parts(array.raw.data_ptr() as *const _, array.len()) };
-    Ok(slice)
 }
 
 mod casper {
