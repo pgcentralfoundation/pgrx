@@ -510,7 +510,7 @@ impl BackgroundWorkerBuilder {
         BackgroundWorkerBuilder {
             bgw_name: name.to_string(),
             bgw_type: name.to_string(),
-            bgw_flags: BGWflags::empty(),
+            bgw_flags: BGWflags::BGWORKER_SHMEM_ACCESS, // required since Postgres 15
             bgw_start_time: BgWorkerStartTime::PostmasterStart,
             bgw_restart_time: None,
             bgw_library_name: name.to_string(),
