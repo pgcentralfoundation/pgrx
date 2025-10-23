@@ -20,6 +20,8 @@ mod cstr;
 mod include;
 mod node;
 mod port;
+
+pub mod libpq;
 pub mod submodules;
 
 #[cfg(feature = "cshim")]
