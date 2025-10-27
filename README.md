@@ -120,11 +120,18 @@ export PKG_CONFIG_PATH=/opt/homebrew/opt/icu4c/lib/pkgconfig
 ```
 on the command line before you run ```cargo pgrx init```
 
-Every once in a while, Xcode will update itself and move the directory that contains
+#### Troubleshooting
+
+1. Every once in a while, Xcode will update itself and move the directory that contains
 the C compiler. When the Postgres ./config process runs during the build, it grabs the current directory
 and stores it, which means that there will be build errors if you do a full rebuild of your
 project and the old directory has disappeared. The solution is re-run `cargo pgrx init` so the
 Postgres installs get rebuilt.
+
+2.  If a build fails with errors like `unknown type name: uint8_t`:
+    You may be using too-old Xcode. This often happens with an Apple Clang version below 15.
+    This can be fixed by updating Xcode and the command-line tools. You may require an OS update
+    if the Xcode version you must update to does not support your current macOS version.
 
 ### Windows
 
