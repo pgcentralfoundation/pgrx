@@ -341,7 +341,7 @@ pub unsafe fn heap_tuple_get_struct<T>(htup: super::HeapTuple) -> *mut T {
 // and we route people to the old symbols they were using before on later ones.
 #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
 #[::pgrx_macros::pg_guard]
-extern "C-unwind" {
+unsafe extern "C-unwind" {
     pub fn planstate_tree_walker(
         planstate: *mut super::PlanState,
         walker: ::core::option::Option<
