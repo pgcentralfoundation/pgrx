@@ -835,33 +835,8 @@ fn run_bindgen(
         .wrap_static_fns_suffix("__pgrx_cshim")
         .generate()
         .wrap_err_with(|| format!("Unable to generate bindings for pg{major_version}"))?;
-    let mut binding_str = bindings.to_string();
-    drop(bindings); // So the Rc::into_inner can unwrap
 
-    // FIXME: do this for the Node graph instead of reparsing?
-    let enum_names: EnumMap = Rc::into_inner(enum_names).unwrap().into_inner();
-    binding_str.extend(enum_names.into_iter().flat_map(|(name, variants)| {
-        const MIN_I32: i64 = i32::MIN as _;
-        const MAX_I32: i64 = i32::MAX as _;
-        const MAX_U32: u64 = u32::MAX as _;
-        variants.into_iter().map(move |(variant, value)| {
-            let (ty, value) = match value {
-                EnumVariantValue::Boolean(b) => ("bool", b.to_string()),
-                EnumVariantValue::Signed(v @ MIN_I32..=MAX_I32) => ("i32", v.to_string()),
-                EnumVariantValue::Signed(v) => ("i64", v.to_string()),
-                EnumVariantValue::Unsigned(v @ 0..=MAX_U32) => ("u32", v.to_string()),
-                EnumVariantValue::Unsigned(v) => ("u64", v.to_string()),
-            };
-            format!(
-                r#"
-#[deprecated(since = "0.12.0", note = "you want pg_sys::{module}::{variant}")]
-pub const {module}_{variant}: {ty} = {value};"#,
-                module = &*name, // imprecise closure capture
-            )
-        })
-    }));
-
-    Ok(binding_str)
+    Ok(bindings.to_string())
 }
 
 fn add_blocklists(bind: bindgen::Builder) -> bindgen::Builder {
