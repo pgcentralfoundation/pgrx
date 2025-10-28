@@ -361,7 +361,7 @@ pub struct Drain<'a, 'cx, T> {
     raw: *mut pg_sys::List,
 }
 
-impl<T> Drop for Drain<'_, '_, T> {
+impl<'a, 'cx, T> Drop for Drain<'a, 'cx, T> {
     fn drop(&mut self) {
         if self.raw.is_null() {
             return;

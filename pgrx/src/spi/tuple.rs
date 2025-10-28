@@ -458,7 +458,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
     }
 }
 
-impl SpiHeapTupleDataEntry<'_> {
+impl<'conn> SpiHeapTupleDataEntry<'conn> {
     pub fn value<T: IntoDatum + FromDatum>(&self) -> SpiResult<Option<T>> {
         match self.datum.as_ref() {
             Some(datum) => unsafe {

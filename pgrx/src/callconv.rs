@@ -609,7 +609,7 @@ unsafe impl<T: Copy> BoxRet for PgVarlena<T> {
     }
 }
 
-unsafe impl<A> BoxRet for PgHeapTuple<'_, A>
+unsafe impl<'mcx, A> BoxRet for PgHeapTuple<'mcx, A>
 where
     A: WhoAllocated,
 {
@@ -861,7 +861,7 @@ impl<'fcx> FcInfo<'fcx> {
 // TODO: rebadge this as AnyElement
 pub struct Arg<'a, 'fcx>(&'a FcInfo<'fcx>, usize, &'a pg_sys::NullableDatum);
 
-impl<'fcx> Arg<'_, 'fcx> {
+impl<'a, 'fcx> Arg<'a, 'fcx> {
     /// # Performance note
     /// This uses an FFI call to obtain the Oid, so avoid calling it if not necessary.
     pub fn raw_oid(&self) -> pg_sys::Oid {
