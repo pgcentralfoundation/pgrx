@@ -522,15 +522,15 @@ fn initialize_extension_sqls(
     }
     for (item, index) in &mapped_extension_sqls {
         graph.add_edge(root, *index, SqlGraphRequires::By);
-        if !item.bootstrap {
-            if let Some(bootstrap) = bootstrap {
-                graph.add_edge(bootstrap, *index, SqlGraphRequires::By);
-            }
+        if !item.bootstrap
+            && let Some(bootstrap) = bootstrap
+        {
+            graph.add_edge(bootstrap, *index, SqlGraphRequires::By);
         }
-        if !item.finalize {
-            if let Some(finalize) = finalize {
-                graph.add_edge(*index, finalize, SqlGraphRequires::By);
-            }
+        if !item.finalize
+            && let Some(finalize) = finalize
+        {
+            graph.add_edge(*index, finalize, SqlGraphRequires::By);
         }
     }
     Ok((mapped_extension_sqls, bootstrap, finalize))

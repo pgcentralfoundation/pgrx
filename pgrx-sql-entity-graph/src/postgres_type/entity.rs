@@ -82,10 +82,10 @@ impl Alignment {
 
     pub fn from_attributes(attrs: &[Attribute]) -> Result<Self, syn::Error> {
         for attr in attrs {
-            if attr.path().is_ident("pgrx") {
-                if let Some(v) = Self::from_attribute(attr)? {
-                    return Ok(v);
-                }
+            if attr.path().is_ident("pgrx")
+                && let Some(v) = Self::from_attribute(attr)?
+            {
+                return Ok(v);
             }
         }
         Ok(Self::Off)
