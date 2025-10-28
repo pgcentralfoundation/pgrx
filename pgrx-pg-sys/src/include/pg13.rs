@@ -19593,7 +19593,7 @@ impl Default for relopt_gen {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct relopt_value {
-    pub r#gen: *mut relopt_gen,
+    pub gen_: *mut relopt_gen,
     pub isset: bool,
     pub values: relopt_value__bindgen_ty_1,
 }
@@ -19627,7 +19627,7 @@ impl Default for relopt_value {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct relopt_bool {
-    pub r#gen: relopt_gen,
+    pub gen_: relopt_gen,
     pub default_val: bool,
 }
 impl Default for relopt_bool {
@@ -19642,7 +19642,7 @@ impl Default for relopt_bool {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct relopt_int {
-    pub r#gen: relopt_gen,
+    pub gen_: relopt_gen,
     pub default_val: ::core::ffi::c_int,
     pub min: ::core::ffi::c_int,
     pub max: ::core::ffi::c_int,
@@ -19659,7 +19659,7 @@ impl Default for relopt_int {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct relopt_real {
-    pub r#gen: relopt_gen,
+    pub gen_: relopt_gen,
     pub default_val: f64,
     pub min: f64,
     pub max: f64,
@@ -19691,7 +19691,7 @@ impl Default for relopt_enum_elt_def {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct relopt_enum {
-    pub r#gen: relopt_gen,
+    pub gen_: relopt_gen,
     pub members: *mut relopt_enum_elt_def,
     pub default_val: ::core::ffi::c_int,
     pub detailmsg: *const ::core::ffi::c_char,
@@ -19723,7 +19723,7 @@ pub type relopts_validator = ::core::option::Option<
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct relopt_string {
-    pub r#gen: relopt_gen,
+    pub gen_: relopt_gen,
     pub default_len: ::core::ffi::c_int,
     pub default_isnull: bool,
     pub validate_cb: validate_string_relopt,
