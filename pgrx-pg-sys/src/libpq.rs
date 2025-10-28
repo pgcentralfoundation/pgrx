@@ -83,7 +83,7 @@ pub mod be {
         // NOTE: 5 fields remain on PG17, but two are `#ifdef USE_OPENSSL` in PG17, so treat all
         // as conditioned on PG18, even if that is not strictly accurate for PG17
 
-        // as if USE_OPENSSL == false && ENABLE_SSPI == false
+        // as if USE_OPENSSL == false
         #[cfg(feature = "pg18")]
         ssl: *mut core::ffi::c_void,
         #[cfg(feature = "pg18")]
