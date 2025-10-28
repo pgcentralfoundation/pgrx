@@ -9,14 +9,14 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::CommandExecute;
 use crate::command::get::{find_control_file, get_property};
-use crate::manifest::{get_package_manifest, pg_config_and_version};
+use crate::manifest::{get_package_manifest};
 use crate::profile::CargoProfile;
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
 use object::read::macho::MachOFatFile32;
 use owo_colors::OwoColorize;
 use pgrx_pg_config::cargo::PgrxManifestExt;
-use pgrx_pg_config::{PgConfig, Pgrx, get_target_dir};
+use pgrx_pg_config::get_target_dir;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
@@ -64,7 +64,7 @@ pub(crate) struct Schema {
 
 impl CommandExecute for Schema {
     #[tracing::instrument(level = "error", skip(self))]
-    fn execute(mut self) -> eyre::Result<()> {
+    fn execute(self) -> eyre::Result<()> {
         let log_level = if let Ok(log_level) = std::env::var("RUST_LOG") {
             Some(log_level)
         } else {
@@ -76,18 +76,10 @@ impl CommandExecute for Schema {
             }
         };
 
-        let pgrx = Pgrx::from_config()?;
-        let (package_manifest, package_manifest_path) = get_package_manifest(
+        let (_package_manifest, package_manifest_path) = get_package_manifest(
             &self.features,
             self.package.as_ref(),
             self.manifest_path.as_ref(),
-        )?;
-        let (pg_config, _pg_version) = pg_config_and_version(
-            &pgrx,
-            &package_manifest,
-            self.pg_version.clone(),
-            Some(&mut self.features),
-            true,
         )?;
 
         let profile = CargoProfile::from_flags(
@@ -96,7 +88,6 @@ impl CommandExecute for Schema {
         )?;
 
         generate_schema(
-            &pg_config,
             self.manifest_path.as_ref(),
             self.package.as_ref(),
             package_manifest_path,
@@ -114,7 +105,6 @@ impl CommandExecute for Schema {
 }
 
 #[tracing::instrument(level = "error", skip_all, fields(
-    pg_version = %pg_config.version()?,
     profile = ?profile,
     test = is_test,
     path = path.as_ref().map(|path| tracing::field::display(path.as_ref().display())),
@@ -122,7 +112,6 @@ impl CommandExecute for Schema {
     features = ?features.features,
 ))]
 pub(crate) fn generate_schema(
-    pg_config: &PgConfig,
     user_manifest_path: Option<impl AsRef<Path>>,
     user_package: Option<&String>,
     package_manifest_path: impl AsRef<Path>,
@@ -662,7 +651,7 @@ fn slice_arch32<'a>(data: &'a [u8], arch: &str) -> Option<&'a [u8]> {
 #[cfg(test)]
 mod tests {
     use crate::command::schema::*;
-    use pgrx_pg_config::PgConfigSelector;
+    use pgrx_pg_config::{Pgrx, PgConfigSelector};
 
     #[test]
     fn test_parse_managed_postmasters() {

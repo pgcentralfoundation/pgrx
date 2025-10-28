@@ -364,7 +364,6 @@ fn copy_sql_files(
         let dest = extdir.join(filename);
 
         crate::command::schema::generate_schema(
-            pg_config,
             user_manifest_path,
             user_package,
             &package_manifest_path,
