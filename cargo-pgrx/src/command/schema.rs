@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::CommandExecute;
 use crate::command::get::{find_control_file, get_property};
-use crate::manifest::{get_package_manifest};
+use crate::manifest::get_package_manifest;
 use crate::profile::CargoProfile;
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
@@ -651,7 +651,7 @@ fn slice_arch32<'a>(data: &'a [u8], arch: &str) -> Option<&'a [u8]> {
 #[cfg(test)]
 mod tests {
     use crate::command::schema::*;
-    use pgrx_pg_config::{Pgrx, PgConfigSelector};
+    use pgrx_pg_config::{PgConfigSelector, Pgrx};
 
     #[test]
     fn test_parse_managed_postmasters() {
