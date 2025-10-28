@@ -82,14 +82,6 @@ macro_rules! name {
     };
 }
 
-#[deprecated(since = "0.12.0", note = "try VariadicArray")]
-#[macro_export]
-macro_rules! variadic {
-    ($ty:ty) => {
-        $ty
-    };
-}
-
 /// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as the specified Rust type.
 ///
 /// # Safety
