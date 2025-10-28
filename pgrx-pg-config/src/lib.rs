@@ -280,7 +280,23 @@ impl PgConfig {
 
     pub fn get_version(&self) -> eyre::Result<PgVersion> {
         let version_string = self.run("--version")?;
-        let (major, minor) = Self::parse_version_str(&version_string)?;
+        let (major, minor) = match Self::parse_version_str(&version_string) {
+            Ok(version) => version,
+            Err(e) => {
+                if let Some(path) = self.path()
+                    && let Some(file_name) = path.file_name()
+                    && !file_name.to_string_lossy().contains("pg_config")
+                {
+                    // shouldn't this path be named pg_config?
+                    return Err(e).wrap_err(format!(
+                        "path apparently not to pg_config binary: {}",
+                        path.display()
+                    ));
+                } else {
+                    return Err(e);
+                }
+            }
+        };
         Ok(PgVersion::new(major, minor, None))
     }
 
