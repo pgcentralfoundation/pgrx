@@ -191,7 +191,12 @@ impl PgRelation {
 
     /// If this `PgRelation` represents an index, return the `PgRelation` for the heap
     /// relation to which it is attached
-    pub fn heap_relation(&self) -> Option<PgRelation> {
+    ///
+    /// # Safety
+    ///
+    /// This does not perform locking, even though Postgres requires it.
+    /// Callers must first call `with_lock` before calling this.
+    pub unsafe fn heap_relation(&self) -> Option<PgRelation> {
         // SAFETY: we know self.boxed and its members are correct as we created it
         let rd_index: PgBox<pg_sys::FormData_pg_index> =
             unsafe { PgBox::from_pg(self.boxed.rd_index) };
