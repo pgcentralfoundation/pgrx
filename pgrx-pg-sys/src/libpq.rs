@@ -39,13 +39,15 @@ pub mod be {
         pub database_name: *mut core::ffi::c_char,
         pub user_name: *mut core::ffi::c_char,
         pub cmdline_options: *mut core::ffi::c_char,
-        pub guc_options: *mut core::ffi::c_char,
+        pub guc_options: *mut crate::List,
         pub application_name: *mut core::ffi::c_char,
 
         // The remainder is for completeness, so Rust sees Port's layout as correctly as possible.
         // Ideally we would use `extern type` so the remainder of this was seen as of unknown size.
         // An alternative is to simply treat them as private fields, so we do.
-        HbaLine: *mut core::ffi::c_void,
+
+        // This should be `*mut crate::HbaLine` if we ever bind that
+        hba: *mut core::ffi::c_void,
 
         #[cfg(any(feature = "pg14", feature = "pg15"))]
         authn_id: *const core::ffi::c_char,
