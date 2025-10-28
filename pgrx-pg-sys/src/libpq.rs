@@ -71,10 +71,11 @@ pub mod be {
 
         ssl_in_use: bool,
         peer_cn: *mut core::ffi::c_char,
+        #[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
         peer_dn: *mut core::ffi::c_char,
         peer_cert_valid: bool,
 
-        #[cfg(any(feature = "pg18", feature = "pg17"))]
+        #[cfg(any(feature = "pg17", feature = "pg18"))]
         alpn_used: bool,
         #[cfg(feature = "pg18")]
         last_read_was_eof: bool,
