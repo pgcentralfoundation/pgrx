@@ -93,6 +93,9 @@ winapi = { version = "0.3.9", features = [
 eyre.workspace = true # testing functions that return `eyre::Result`
 trybuild = "1"
 
-[lints]
-rust.unused-lifetimes = "deny"
-clippy.used-underscore-binding = "deny"
+[lints.rust]
+unused-lifetimes = "deny"
+unsafe-op-in-unsafe-fn = "allow"
+
+[lints.clippy]
+used-underscore-binding = "deny"
