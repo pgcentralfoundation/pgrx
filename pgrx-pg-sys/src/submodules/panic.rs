@@ -16,12 +16,12 @@ use std::cell::Cell;
 use std::fmt::{Display, Formatter};
 use std::hint::unreachable_unchecked;
 use std::panic::{
-    catch_unwind, panic_any, resume_unwind, AssertUnwindSafe, Location, PanicHookInfo, UnwindSafe,
+    AssertUnwindSafe, Location, PanicHookInfo, UnwindSafe, catch_unwind, panic_any, resume_unwind,
 };
 
 use crate::elog::PgLogLevel;
 use crate::errcodes::PgSqlErrorCode;
-use crate::{pfree, AsPgCStr, MemoryContextSwitchTo};
+use crate::{AsPgCStr, MemoryContextSwitchTo, pfree};
 
 /// Indicates that something can be reported as a Postgres ERROR, if that's what it might represent.
 pub trait ErrorReportable {

@@ -171,11 +171,7 @@ impl<'conn> SpiTupleTable<'conn> {
             let mut is_null = false;
             let datum = pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal as _, &mut is_null);
 
-            if is_null {
-                Ok(None)
-            } else {
-                Ok(Some(datum))
-            }
+            if is_null { Ok(None) } else { Ok(Some(datum)) }
         }
     }
 

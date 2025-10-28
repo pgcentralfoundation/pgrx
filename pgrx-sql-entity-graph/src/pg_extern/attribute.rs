@@ -18,10 +18,10 @@
 use crate::positioning_ref::PositioningRef;
 use crate::to_sql::ToSqlConfig;
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{quote, ToTokens, TokenStreamExt};
+use quote::{ToTokens, TokenStreamExt, quote};
+use syn::Token;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
-use syn::Token;
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub enum Attribute {

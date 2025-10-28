@@ -10,9 +10,9 @@
 // This is used by some, but not all, examples below.
 const DOG_COMPOSITE_TYPE: &str = "Dog";
 
+use pgrx::VariadicArray;
 use pgrx::pgbox::AllocatedByRust;
 use pgrx::prelude::*;
-use pgrx::VariadicArray;
 
 extension_sql!(
     r#"
@@ -502,8 +502,8 @@ mod sql_generator_tests {
 
     #[allow(unused_parens)]
     #[pg_extern]
-    fn return_table_single(
-    ) -> TableIterator<'static, (name!(dog, pgrx::composite_type!('static, "Dog")),)> {
+    fn return_table_single()
+    -> TableIterator<'static, (name!(dog, pgrx::composite_type!('static, "Dog")),)> {
         let mut tuple = PgHeapTuple::new_composite_type("Dog").unwrap();
 
         tuple.set_by_name("scritches", 0).unwrap();
@@ -513,8 +513,8 @@ mod sql_generator_tests {
     }
 
     #[pg_extern]
-    fn return_table_single_bare(
-    ) -> TableIterator<'static, (name!(dog, pgrx::composite_type!('static, "Dog")),)> {
+    fn return_table_single_bare()
+    -> TableIterator<'static, (name!(dog, pgrx::composite_type!('static, "Dog")),)> {
         let mut tuple = PgHeapTuple::new_composite_type("Dog").unwrap();
 
         tuple.set_by_name("scritches", 0).unwrap();
@@ -581,10 +581,10 @@ mod sql_generator_tests {
 mod tests {
     #[cfg(test)]
     use crate as pgrx_tests;
+    use pgrx::AllocatedByRust;
     use pgrx::datum::TryFromDatumError;
     use pgrx::heap_tuple::PgHeapTupleError;
     use pgrx::prelude::*;
-    use pgrx::AllocatedByRust;
     use std::num::NonZeroUsize;
 
     #[pg_test]

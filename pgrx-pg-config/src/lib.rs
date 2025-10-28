@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Wrapper around Postgres' `pg_config` command-line tool
-use eyre::{eyre, WrapErr};
+use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap};
@@ -531,11 +531,7 @@ pub enum PgConfigSelector<'a> {
 
 impl<'a> PgConfigSelector<'a> {
     pub fn new(label: &'a str) -> Self {
-        if label == "all" {
-            PgConfigSelector::All
-        } else {
-            PgConfigSelector::Specific(label)
-        }
+        if label == "all" { PgConfigSelector::All } else { PgConfigSelector::Specific(label) }
     }
 }
 

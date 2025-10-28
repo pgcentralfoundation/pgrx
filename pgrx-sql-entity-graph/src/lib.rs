@@ -23,28 +23,28 @@ pub use control_file::ControlFile;
 pub use enrich::CodeEnrichment;
 pub use extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntity};
 pub use extension_sql::{ExtensionSql, ExtensionSqlFile, SqlDeclared};
-pub use extern_args::{parse_extern_attributes, ExternArgs};
+pub use extern_args::{ExternArgs, parse_extern_attributes};
 pub use mapping::RustSqlMapping;
 pub use pg_extern::entity::{
     PgCastEntity, PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity,
     PgExternReturnEntityIteratedItem, PgOperatorEntity,
 };
 pub use pg_extern::{NameMacro, PgCast, PgExtern, PgExternArgument, PgOperator};
+pub use pg_trigger::PgTrigger;
 pub use pg_trigger::attribute::PgTriggerAttribute;
 pub use pg_trigger::entity::PgTriggerEntity;
-pub use pg_trigger::PgTrigger;
 pub use pgrx_sql::PgrxSql;
 pub use positioning_ref::PositioningRef;
-pub use postgres_enum::entity::PostgresEnumEntity;
 pub use postgres_enum::PostgresEnum;
-pub use postgres_hash::entity::PostgresHashEntity;
+pub use postgres_enum::entity::PostgresEnumEntity;
 pub use postgres_hash::PostgresHash;
-pub use postgres_ord::entity::PostgresOrdEntity;
+pub use postgres_hash::entity::PostgresHashEntity;
 pub use postgres_ord::PostgresOrd;
-pub use postgres_type::entity::PostgresTypeEntity;
+pub use postgres_ord::entity::PostgresOrdEntity;
 pub use postgres_type::PostgresTypeDerive;
-pub use schema::entity::SchemaEntity;
+pub use postgres_type::entity::PostgresTypeEntity;
 pub use schema::Schema;
+pub use schema::entity::SchemaEntity;
 pub use to_sql::entity::ToSqlConfigEntity;
 pub use to_sql::{ToSql, ToSqlConfig};
 pub use used_type::{UsedType, UsedTypeEntity};
@@ -318,7 +318,7 @@ pub fn ident_is_acceptable_to_postgres(ident: &syn::Ident) -> Result<(), syn::Er
             format!(
                 "Identifier `{ident}` was {len} characters long, PostgreSQL will truncate identifiers with less than \
                 {POSTGRES_IDENTIFIER_MAX_LEN} characters, opt for an identifier which Postgres won't truncate"
-            )
+            ),
         ));
     }
 

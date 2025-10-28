@@ -7,15 +7,15 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use crate::CommandExecute;
 use crate::command::get::get_property;
 use crate::command::run::exec_psql;
 use crate::command::start::start_postgres;
 use crate::manifest::{get_package_manifest, pg_config_and_version};
-use crate::CommandExecute;
 use clap_cargo::Features;
-use eyre::{eyre, WrapErr};
+use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
-use pgrx_pg_config::{createdb, PgConfig, Pgrx};
+use pgrx_pg_config::{PgConfig, Pgrx, createdb};
 use std::path::PathBuf;
 
 /// Connect, via psql, to a Postgres instance

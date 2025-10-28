@@ -7,10 +7,10 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use pgrx::array::RawArray;
-use pgrx::prelude::*;
 use pgrx::Json;
 use pgrx::PostgresEnum;
+use pgrx::array::RawArray;
+use pgrx::prelude::*;
 use serde::Serialize;
 use serde_json::*;
 
@@ -190,8 +190,8 @@ mod tests {
     use crate as pgrx_tests;
 
     use super::ArrayTestEnum;
-    use pgrx::prelude::*;
     use pgrx::Json;
+    use pgrx::prelude::*;
     use serde_json::json;
 
     #[pg_test]

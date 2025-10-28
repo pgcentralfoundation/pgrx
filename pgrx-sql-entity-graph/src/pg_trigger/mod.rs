@@ -24,7 +24,7 @@ use crate::{CodeEnrichment, ToSqlConfig};
 use attribute::PgTriggerAttribute;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
-use syn::{spanned::Spanned, ItemFn, Token};
+use syn::{ItemFn, Token, spanned::Spanned};
 
 #[derive(Debug, Clone)]
 pub struct PgTrigger {

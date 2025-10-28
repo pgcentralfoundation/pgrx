@@ -1,4 +1,4 @@
-use pgrx::{prelude::*, AnyElement};
+use pgrx::{AnyElement, prelude::*};
 
 #[pg_extern]
 fn anyelement_arg(element: AnyElement) -> AnyElement {
@@ -11,7 +11,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
-    use pgrx::{datum::DatumWithOid, prelude::*, AnyElement};
+    use pgrx::{AnyElement, datum::DatumWithOid, prelude::*};
 
     #[pg_test]
     fn test_anyelement_arg() -> Result<(), pgrx::spi::Error> {

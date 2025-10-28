@@ -94,7 +94,7 @@ impl PostgresTypeDerive {
         match derive_input.data {
             syn::Data::Struct(_) | syn::Data::Enum(_) => {}
             syn::Data::Union(_) => {
-                return Err(syn::Error::new(derive_input.ident.span(), "expected struct or enum"))
+                return Err(syn::Error::new(derive_input.ident.span(), "expected struct or enum"));
             }
         };
         let to_sql_config =

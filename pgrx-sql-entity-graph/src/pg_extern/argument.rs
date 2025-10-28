@@ -17,8 +17,8 @@
 */
 use crate::UsedType;
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{spanned::Spanned, FnArg, Pat};
+use quote::{ToTokens, TokenStreamExt, quote};
+use syn::{FnArg, Pat, spanned::Spanned};
 
 /// A parsed `#[pg_extern]` argument.
 ///

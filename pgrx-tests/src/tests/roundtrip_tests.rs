@@ -1,7 +1,7 @@
 use super::Complex;
 use pgrx::datum::Date;
-use rand::distr::{Alphanumeric, StandardUniform};
 use rand::Rng;
+use rand::distr::{Alphanumeric, StandardUniform};
 
 #[derive(pgrx::PostgresType, Clone, PartialEq, Eq, Debug, serde::Serialize, serde::Deserialize)]
 #[pg_binary_protocol]
@@ -43,9 +43,9 @@ mod tests {
     use std::ffi::CStr;
     use std::str::FromStr;
 
+    use pgrx::Uuid;
     use pgrx::pg_sys::BuiltinOid;
     use pgrx::prelude::*;
-    use pgrx::Uuid;
 
     use super::Complex;
     #[allow(unused_imports)]

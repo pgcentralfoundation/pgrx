@@ -17,8 +17,8 @@
 */
 use crate::mapping::RustSqlMapping;
 use crate::pgrx_sql::PgrxSql;
-use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::to_sql::ToSql;
+use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::{SqlGraphEntity, SqlGraphIdentifier, TypeMatch};
 use std::collections::BTreeSet;
 

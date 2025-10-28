@@ -8,8 +8,8 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::{
-    direct_function_call, direct_function_call_as_datum, pg_sys, vardata_any, varsize_any_exhdr,
-    void_mut_ptr, FromDatum, IntoDatum,
+    FromDatum, IntoDatum, direct_function_call, direct_function_call_as_datum, pg_sys, vardata_any,
+    varsize_any_exhdr, void_mut_ptr,
 };
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,

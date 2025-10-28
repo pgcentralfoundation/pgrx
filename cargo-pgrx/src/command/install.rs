@@ -7,16 +7,16 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use crate::CommandExecute;
 use crate::command::get::{find_control_file, get_property};
 use crate::command::sudo_install::SudoInstall;
-use crate::manifest::{display_version_info, PgVersionSource};
+use crate::manifest::{PgVersionSource, display_version_info};
 use crate::profile::CargoProfile;
-use crate::CommandExecute;
 use cargo_metadata::Message as CargoMessage;
 use cargo_toml::Manifest;
-use eyre::{eyre, WrapErr};
+use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
-use pgrx_pg_config::{cargo::PgrxManifestExt, get_target_dir, PgConfig, Pgrx};
+use pgrx_pg_config::{PgConfig, Pgrx, cargo::PgrxManifestExt, get_target_dir};
 use std::collections::HashMap;
 use std::fs;
 use std::io::BufReader;
@@ -472,15 +472,19 @@ pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<Strin
                 crate::metadata::validate(Some(manifest_path), &metadata)?;
                 let manifest_path = crate::manifest::manifest_path(&metadata, None)
                     .wrap_err("Couldn't get manifest path")?;
-                let manifest = Manifest::from_path(manifest_path)
-                    .wrap_err("Couldn't parse manifest")?;
+                let manifest =
+                    Manifest::from_path(manifest_path).wrap_err("Couldn't parse manifest")?;
 
                 manifest.package_version()?
             } else {
                 v
             }
-        },
-        None => return Err(eyre!("cannot determine extension version number.  Is the `default_version` property declared in the control file?")),
+        }
+        None => {
+            return Err(eyre!(
+                "cannot determine extension version number.  Is the `default_version` property declared in the control file?"
+            ));
+        }
     };
 
     CARGO_VERSION
@@ -502,9 +506,11 @@ fn get_git_hash(manifest_path: impl AsRef<Path>) -> eyre::Result<String> {
     } else {
         let hash = match get_property(manifest_path, "git_hash")? {
             Some(hash) => hash,
-            None => return Err(eyre!(
-                "unable to determine git hash.  Is git installed and is this project a git repository?"
-            )),
+            None => {
+                return Err(eyre!(
+                    "unable to determine git hash.  Is git installed and is this project a git repository?"
+                ));
+            }
         };
 
         mutex.insert(path_string, hash.clone());

@@ -18,9 +18,9 @@
 pub mod entity;
 
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{quote, ToTokens, TokenStreamExt};
-use syn::parse::{Parse, ParseStream};
+use quote::{ToTokens, TokenStreamExt, quote};
 use syn::ItemMod;
+use syn::parse::{Parse, ParseStream};
 
 /// A parsed `#[pg_schema] mod example {}` item.
 ///

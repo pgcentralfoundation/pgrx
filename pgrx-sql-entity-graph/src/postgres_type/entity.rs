@@ -18,12 +18,12 @@
 use crate::mapping::RustSqlMapping;
 use crate::pgrx_attribute::{ArgValue, PgrxArg, PgrxAttribute};
 use crate::pgrx_sql::PgrxSql;
-use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::to_sql::ToSql;
+use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::{SqlGraphEntity, SqlGraphIdentifier, TypeMatch};
 use eyre::eyre;
 use proc_macro2::TokenStream;
-use quote::{format_ident, quote, ToTokens, TokenStreamExt};
+use quote::{ToTokens, TokenStreamExt, format_ident, quote};
 use std::collections::BTreeSet;
 use syn::spanned::Spanned;
 use syn::{AttrStyle, Attribute, Lit};

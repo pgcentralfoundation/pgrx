@@ -36,11 +36,7 @@ impl<T> PgList<T> {
 
     #[inline]
     pub fn len(&self) -> usize {
-        if self.list.is_null() {
-            0
-        } else {
-            unsafe { self.list.as_ref() }.unwrap().length as usize
-        }
+        if self.list.is_null() { 0 } else { unsafe { self.list.as_ref() }.unwrap().length as usize }
     }
 
     #[inline]

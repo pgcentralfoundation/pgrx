@@ -39,7 +39,9 @@ mod tests {
 
     #[pg_test]
     fn test_display_uuid() {
-        let result = Spi::get_one::<bool>("SELECT display_uuid('123e4567-e89b-12d3-a456-426614174000'::uuid) = '123e4567-e89b-12d3-a456-426614174000';");
+        let result = Spi::get_one::<bool>(
+            "SELECT display_uuid('123e4567-e89b-12d3-a456-426614174000'::uuid) = '123e4567-e89b-12d3-a456-426614174000';",
+        );
         assert_eq!(result, Ok(Some(true)));
 
         let uuid = Uuid::from_bytes(super::TEST_UUID_V4);
@@ -56,7 +58,9 @@ mod tests {
 
     #[pg_test]
     fn test_accept_uuid() {
-        let result = Spi::get_one::<bool>("SELECT accept_uuid('123e4567-e89b-12d3-a456-426614174000'::uuid) = '123e4567-e89b-12d3-a456-426614174000'::uuid;");
+        let result = Spi::get_one::<bool>(
+            "SELECT accept_uuid('123e4567-e89b-12d3-a456-426614174000'::uuid) = '123e4567-e89b-12d3-a456-426614174000'::uuid;",
+        );
         assert_eq!(result, Ok(Some(true)));
     }
 

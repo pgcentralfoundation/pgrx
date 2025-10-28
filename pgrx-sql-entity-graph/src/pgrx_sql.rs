@@ -27,8 +27,8 @@ use std::path::Path;
 
 use crate::aggregate::entity::PgAggregateEntity;
 use crate::control_file::ControlFile;
-use crate::extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntity};
 use crate::extension_sql::SqlDeclared;
+use crate::extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntity};
 use crate::pg_extern::entity::PgExternEntity;
 use crate::pg_trigger::entity::PgTriggerEntity;
 use crate::positioning_ref::PositioningRef;
@@ -252,7 +252,7 @@ impl PgrxSql {
     }
 
     pub fn to_file(&self, file: impl AsRef<Path> + Debug) -> eyre::Result<()> {
-        use std::fs::{create_dir_all, File};
+        use std::fs::{File, create_dir_all};
         use std::io::Write;
         let generated = self.to_sql()?;
         let path = Path::new(file.as_ref());
@@ -271,7 +271,7 @@ impl PgrxSql {
 
         #[cfg(feature = "syntax-highlighting")]
         {
-            use std::io::{stdout, IsTerminal};
+            use std::io::{IsTerminal, stdout};
             if stdout().is_terminal() {
                 self.write_highlighted(out, &generated)?;
             } else {
@@ -322,7 +322,7 @@ impl PgrxSql {
     }
 
     pub fn to_dot(&self, file: impl AsRef<Path> + Debug) -> eyre::Result<()> {
-        use std::fs::{create_dir_all, File};
+        use std::fs::{File, create_dir_all};
         use std::io::Write;
         let generated = Dot::with_attr_getters(
             &self.graph,
@@ -339,18 +339,18 @@ impl PgrxSql {
                 let dot_id = node.dot_identifier();
                 match node {
                     // Colors derived from https://www.schemecolor.com/touch-of-creativity.php
-                    SqlGraphEntity::Schema(_item) => format!(
-                        "label = \"{dot_id}\", weight = 6, shape = \"tab\""
-                    ),
+                    SqlGraphEntity::Schema(_item) => {
+                        format!("label = \"{dot_id}\", weight = 6, shape = \"tab\"")
+                    }
                     SqlGraphEntity::Function(_item) => format!(
                         "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#ADC7C6\", weight = 4, shape = \"box\"",
                     ),
                     SqlGraphEntity::Type(_item) => format!(
                         "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#AE9BBD\", weight = 5, shape = \"oval\"",
                     ),
-                    SqlGraphEntity::BuiltinType(_item) => format!(
-                        "label = \"{dot_id}\", shape = \"plain\""
-                    ),
+                    SqlGraphEntity::BuiltinType(_item) => {
+                        format!("label = \"{dot_id}\", shape = \"plain\"")
+                    }
                     SqlGraphEntity::Enum(_item) => format!(
                         "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#C9A7C8\", weight = 5, shape = \"oval\""
                     ),
@@ -366,12 +366,12 @@ impl PgrxSql {
                     SqlGraphEntity::Trigger(_item) => format!(
                         "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFE4E0\", weight = 5, shape = \"diamond\""
                     ),
-                    SqlGraphEntity::CustomSql(_item) => format!(
-                        "label = \"{dot_id}\", weight = 3, shape = \"signature\""
-                    ),
-                    SqlGraphEntity::ExtensionRoot(_item) => format!(
-                        "label = \"{dot_id}\", shape = \"cylinder\""
-                    ),
+                    SqlGraphEntity::CustomSql(_item) => {
+                        format!("label = \"{dot_id}\", weight = 3, shape = \"signature\"")
+                    }
+                    SqlGraphEntity::ExtensionRoot(_item) => {
+                        format!("label = \"{dot_id}\", shape = \"cylinder\"")
+                    }
                 }
             },
         );
@@ -860,7 +860,9 @@ fn connect_externs(
                         }
                     }
                     if !found_schema_declaration {
-                        return Err(eyre!("Got manual `schema = \"{declared_schema_name}\"` setting, but that schema did not exist."));
+                        return Err(eyre!(
+                            "Got manual `schema = \"{declared_schema_name}\"` setting, but that schema did not exist."
+                        ));
                     }
                 }
                 _ => (),

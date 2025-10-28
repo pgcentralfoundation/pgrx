@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::CommandExecute;
-use eyre::{eyre, Result, WrapErr};
+use eyre::{Result, WrapErr, eyre};
 use pgrx_pg_config::PgConfig;
 use std::{
     path::{Path, PathBuf},
@@ -125,9 +125,5 @@ fn make_target_info(cmd: &PgrxTarget, tmp: &Path) -> Result<()> {
 fn run(c: &mut Command) -> Result<()> {
     c.stdout(Stdio::inherit()).stderr(Stdio::inherit());
     let status = c.status().wrap_err("Unable to create temporary crate")?;
-    if !status.success() {
-        Err(eyre!("{c:?} failed with exit code: {status}"))
-    } else {
-        Ok(())
-    }
+    if !status.success() { Err(eyre!("{c:?} failed with exit code: {status}")) } else { Ok(()) }
 }

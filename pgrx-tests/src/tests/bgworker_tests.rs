@@ -91,7 +91,7 @@ mod tests {
 
     use pgrx::bgworkers::*;
     use pgrx::prelude::*;
-    use pgrx::{pg_sys, IntoDatum};
+    use pgrx::{IntoDatum, pg_sys};
     #[pg_test]
     fn test_dynamic_bgworker() {
         // Required to avoid bgworker pool exhaustion errors, see `test_dynamic_worker_allocation_failure`

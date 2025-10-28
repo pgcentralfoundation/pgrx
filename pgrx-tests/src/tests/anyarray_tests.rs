@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use pgrx::prelude::*;
-use pgrx::{direct_function_call, AnyArray, Json};
+use pgrx::{AnyArray, Json, direct_function_call};
 
 #[pg_extern]
 fn anyarray_arg(array: AnyArray) -> Json {
@@ -32,8 +32,8 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
-    use pgrx::prelude::*;
     use pgrx::Json;
+    use pgrx::prelude::*;
     use serde_json::*;
 
     #[pg_test]

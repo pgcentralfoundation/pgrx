@@ -14,7 +14,7 @@ use crate::{direct_function_call, pg_sys};
 use core::fmt::{Display, Formatter};
 use core::str::FromStr;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
-use pgrx_pg_sys::{pg_tz, PgTryBuilder};
+use pgrx_pg_sys::{PgTryBuilder, pg_tz};
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 use std::marker::PhantomData;

@@ -7,9 +7,9 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use pgrx::StringInfo;
 use pgrx::nullable::Nullable;
 use pgrx::prelude::*;
-use pgrx::StringInfo;
 use serde::{Deserialize, Serialize};
 
 #[pg_extern]
@@ -182,9 +182,9 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
-    use super::{same_name, NullError, NullStrict};
+    use super::{NullError, NullStrict, same_name};
     use pgrx::prelude::*;
-    use pgrx::{direct_pg_extern_function_call, IntoDatum};
+    use pgrx::{IntoDatum, direct_pg_extern_function_call};
 
     #[test]
     fn make_idea_happy() {

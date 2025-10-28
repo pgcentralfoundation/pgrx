@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Provides a safe wrapper around Postgres' `pg_sys::RelationData` struct
 use crate::{
-    direct_function_call, name_data_to_str, pg_sys, FromDatum, IntoDatum, PgBox, PgTupleDesc,
+    FromDatum, IntoDatum, PgBox, PgTupleDesc, direct_function_call, name_data_to_str, pg_sys,
 };
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
@@ -195,11 +195,7 @@ impl PgRelation {
         // SAFETY: we know self.boxed and its members are correct as we created it
         let rd_index: PgBox<pg_sys::FormData_pg_index> =
             unsafe { PgBox::from_pg(self.boxed.rd_index) };
-        if rd_index.is_null() {
-            None
-        } else {
-            Some(unsafe { PgRelation::open(rd_index.indrelid) })
-        }
+        if rd_index.is_null() { None } else { Some(unsafe { PgRelation::open(rd_index.indrelid) }) }
     }
 
     /// Return an iterator of indices, as `PgRelation`s, attached to this relation
@@ -243,11 +239,7 @@ impl PgRelation {
     pub fn reltuples(&self) -> Option<f32> {
         let reltuples = unsafe { self.boxed.rd_rel.as_ref() }.expect("rd_rel is NULL").reltuples;
 
-        if reltuples == 0f32 {
-            None
-        } else {
-            Some(reltuples)
-        }
+        if reltuples == 0f32 { None } else { Some(reltuples) }
     }
 
     pub fn is_table(&self) -> bool {

@@ -9,8 +9,8 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #[pgrx::pg_schema]
 mod test {
-    use pgrx::prelude::*;
     use pgrx::VariadicArray;
+    use pgrx::prelude::*;
 
     #[pg_extern]
     fn func_with_variadic_array_args<'dat>(

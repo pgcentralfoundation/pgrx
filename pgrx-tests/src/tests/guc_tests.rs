@@ -12,8 +12,8 @@
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
-    use std::ffi::c_char;
     use std::ffi::CString;
+    use std::ffi::c_char;
 
     use pgrx::guc::*;
     use pgrx::prelude::*;

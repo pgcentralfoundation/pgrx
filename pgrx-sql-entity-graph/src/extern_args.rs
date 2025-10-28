@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::PositioningRef;
 use proc_macro2::{TokenStream, TokenTree};
-use quote::{format_ident, quote, ToTokens, TokenStreamExt};
+use quote::{ToTokens, TokenStreamExt, format_ident, quote};
 use std::collections::HashSet;
 
 #[derive(Debug, Hash, Eq, PartialEq, Clone, PartialOrd, Ord)]
@@ -163,7 +163,7 @@ pub fn parse_extern_attributes(attr: TokenStream) -> HashSet<ExternArgs> {
 mod tests {
     use std::str::FromStr;
 
-    use crate::{parse_extern_attributes, ExternArgs};
+    use crate::{ExternArgs, parse_extern_attributes};
 
     #[test]
     fn parse_args() {

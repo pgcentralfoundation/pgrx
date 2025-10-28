@@ -8,13 +8,13 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use eyre::Context;
-use pgrx_pg_config::{get_target_dir, PgConfig, Pgrx};
+use pgrx_pg_config::{PgConfig, Pgrx, get_target_dir};
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 
+use crate::CommandExecute;
 use crate::manifest::{get_package_manifest, pg_config_and_version};
 use crate::profile::CargoProfile;
-use crate::CommandExecute;
 
 /// Run the test suite for this crate
 #[derive(clap::Args, Debug, Clone)]

@@ -19,7 +19,7 @@ use super::LastIdent;
 use crate::UsedType;
 
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{quote, ToTokens, TokenStreamExt};
+use quote::{ToTokens, TokenStreamExt, quote};
 use syn::parse::{Parse, ParseStream};
 
 use syn::spanned::Spanned;
@@ -73,18 +73,21 @@ impl Returning {
                             Some(syn::PathArguments::AngleBracketed(args)) => {
                                 let args_span = args.span();
                                 match args.args.first_mut() {
-                                    Some(syn::GenericArgument::Type(syn::Type::Path(syn::TypePath { qself: _, path }))) => path.clone(),
+                                    Some(syn::GenericArgument::Type(syn::Type::Path(
+                                        syn::TypePath { qself: _, path },
+                                    ))) => path.clone(),
                                     Some(syn::GenericArgument::Type(_)) => {
-                                        let used_ty = UsedType::new(syn::Type::Path(typepath.clone()))?;
-                                        return Ok(Returning::Type(used_ty))
-                                    },
+                                        let used_ty =
+                                            UsedType::new(syn::Type::Path(typepath.clone()))?;
+                                        return Ok(Returning::Type(used_ty));
+                                    }
                                     other => {
                                         return Err(syn::Error::new(
                                             other.as_ref().map(|s| s.span()).unwrap_or(args_span),
                                             format!(
                                                 "Got unexpected generic argument for Option inner: {other:?}"
                                             ),
-                                        ))
+                                        ));
                                     }
                                 }
                             }
@@ -94,7 +97,7 @@ impl Returning {
                                     format!(
                                         "Got unexpected path argument for Option inner: {other:?}"
                                     ),
-                                ))
+                                ));
                             }
                         }
                     } else {
@@ -132,22 +135,24 @@ impl Returning {
                         let used_ty = match &last_path_segment.map(|ps| &ps.arguments) {
                             Some(syn::PathArguments::AngleBracketed(args)) => {
                                 match args.args.last().expect("should have one arg?") {
-                                    syn::GenericArgument::Type(ty) => {
-                                        match ty {
-                                            Type::Path(_) | Type::Macro(_) | Type::Reference(_) => UsedType::new(ty.clone())?,
-                                            ty => return Err(syn::Error::new(
+                                    syn::GenericArgument::Type(ty) => match ty {
+                                        Type::Path(_) | Type::Macro(_) | Type::Reference(_) => {
+                                            UsedType::new(ty.clone())?
+                                        }
+                                        ty => {
+                                            return Err(syn::Error::new(
                                                 ty.span(),
                                                 "SetOf Iterator must have an item",
-                                            )),
+                                            ));
                                         }
-                                    }
+                                    },
                                     other => {
                                         return Err(syn::Error::new(
                                             other.span(),
                                             format!(
                                                 "Got unexpected generic argument for SetOfIterator: {other:?}"
                                             ),
-                                        ))
+                                        ));
                                     }
                                 }
                             }
@@ -159,7 +164,7 @@ impl Returning {
                                     format!(
                                         "Got unexpected path argument for SetOfIterator: {other:?}"
                                     ),
-                                ))
+                                ));
                             }
                         };
                         Ok(Returning::SetOf { ty: used_ty })
@@ -234,7 +239,7 @@ impl Returning {
                                         return Err(syn::Error::new(
                                             other.span(),
                                             format!("Got unexpected generic argument: {other:?}"),
-                                        ))
+                                        ));
                                     }
                                 };
                             }
@@ -242,7 +247,7 @@ impl Returning {
                                 return Err(syn::Error::new(
                                     other.span(),
                                     format!("Got unexpected path argument: {other:?}"),
-                                ))
+                                ));
                             }
                         };
                         Ok(Returning::Iterated { tys: iterated_items })

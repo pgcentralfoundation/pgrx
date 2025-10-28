@@ -1,4 +1,4 @@
-use pgrx::{prelude::*, AnyNumeric};
+use pgrx::{AnyNumeric, prelude::*};
 
 #[pg_extern]
 fn anynumeric_arg(numeric: AnyNumeric) -> AnyNumeric {
@@ -11,7 +11,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
-    use pgrx::{prelude::*, AnyNumeric};
+    use pgrx::{AnyNumeric, prelude::*};
 
     #[pg_test]
     fn test_anynumeric_arg() -> Result<(), pgrx::spi::Error> {

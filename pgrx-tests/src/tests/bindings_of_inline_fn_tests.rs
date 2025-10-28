@@ -18,7 +18,7 @@ mod tests {
     #[pg_test]
     fn test_static_inline_fns() {
         unsafe {
-            use pgrx::pg_sys::{itemptr_encode, BlockIdData, ItemPointerData};
+            use pgrx::pg_sys::{BlockIdData, ItemPointerData, itemptr_encode};
             assert_eq!(
                 itemptr_encode(&mut ItemPointerData {
                     ip_blkid: BlockIdData { bi_hi: 111, bi_lo: 222 },

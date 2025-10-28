@@ -13,7 +13,7 @@ use core::{iter, ptr};
 use crate::callconv::{BoxRet, CallCx, RetAbi};
 use crate::fcinfo::{pg_return_null, srf_is_first_call, srf_return_done, srf_return_next};
 use crate::ptr::PointerExt;
-use crate::{pg_sys, IntoDatum, IntoHeapTuple, PgMemoryContexts};
+use crate::{IntoDatum, IntoHeapTuple, PgMemoryContexts, pg_sys};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };

@@ -10,11 +10,11 @@
 use std::collections::HashSet;
 use std::process::{Command, Stdio};
 
-use eyre::{eyre, WrapErr};
+use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
 use pgrx::prelude::*;
 use pgrx_pg_config::{
-    cargo::PgrxManifestExt, createdb, get_c_locale_flags, get_target_dir, PgConfig, Pgrx,
+    PgConfig, Pgrx, cargo::PgrxManifestExt, createdb, get_c_locale_flags, get_target_dir,
 };
 use postgres::error::DbError;
 use std::collections::HashMap;
@@ -165,11 +165,11 @@ pub fn run_test(
         let session_loglines = format_loglines(&session_id, &loglines);
         panic!(
             "\n\nPostgres Messages:\n{system_loglines}\n\nTest Function Messages:\n{session_loglines}\n\nClient Error:\n{message}\npostgres location: {pg_location}\nrust location: {rust_location}\n\n",
-                system_loglines = system_loglines.dimmed().white(),
-                session_loglines = session_loglines.cyan(),
-                message = message.bold().red(),
-                pg_location = pg_location.dimmed().white(),
-                rust_location = rust_location.yellow()
+            system_loglines = system_loglines.dimmed().white(),
+            session_loglines = session_loglines.cyan(),
+            message = message.bold().red(),
+            pg_location = pg_location.dimmed().white(),
+            rust_location = rust_location.yellow()
         );
     } else if let Some(message) = expected_error {
         // we expected an ERROR, but didn't get one
@@ -715,7 +715,10 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
                 if sender.send(session_id.clone()).is_err() {
                     // The channel is closed.  This is really early in the startup process
                     // and likely indicates that a test crashed Postgres
-                    panic!("{}: `monitor_pg()`:  failed to send back session_id `{session_id}`.  Did Postgres crash?", "ERROR".red().bold());
+                    panic!(
+                        "{}: `monitor_pg()`:  failed to send back session_id `{session_id}`.  Did Postgres crash?",
+                        "ERROR".red().bold()
+                    );
                 }
                 is_started_yet = true;
             }
@@ -765,7 +768,10 @@ fn wait_for_pidfile() -> Result<(), eyre::Report> {
     while pidfile.exists() {
         if retries > MAX_PIDFILE_RETRIES {
             // break out and try to start postgres anyways, maybe it'll report a decent error about what's going on
-            eprintln!("`{}` has existed for ~10s.  There might be some problem with the pgrx testing Postgres instance", pidfile.display());
+            eprintln!(
+                "`{}` has existed for ~10s.  There might be some problem with the pgrx testing Postgres instance",
+                pidfile.display()
+            );
             break;
         }
         eprintln!("`{}` still exists.  Waiting...", pidfile.display());
@@ -1018,8 +1024,8 @@ fn sudo_command<U: AsRef<OsStr>>(user: U) -> Command {
 }
 
 pub mod pipe {
-    use rand::distr::Alphanumeric;
     use rand::Rng;
+    use rand::distr::Alphanumeric;
     use std::fs::File;
     use std::io::Error;
     use std::path::{Path, PathBuf};

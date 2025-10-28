@@ -16,7 +16,7 @@
 
 */
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{quote, ToTokens, TokenStreamExt};
+use quote::{ToTokens, TokenStreamExt, quote};
 use syn::Path;
 
 /// A parsed `#[pg_cast]` operator.

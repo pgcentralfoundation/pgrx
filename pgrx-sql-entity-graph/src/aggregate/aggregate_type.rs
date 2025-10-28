@@ -16,13 +16,13 @@
 
 */
 use super::get_pgrx_attr_macro;
-use crate::pg_extern::NameMacro;
 use crate::UsedType;
+use crate::pg_extern::NameMacro;
 
 use proc_macro2::TokenStream as TokenStream2;
 use quote::ToTokens;
 use syn::parse::{Parse, ParseStream};
-use syn::{parse_quote, Expr, Type};
+use syn::{Expr, Type, parse_quote};
 
 #[derive(Debug, Clone)]
 pub struct AggregateTypeList {
@@ -117,7 +117,7 @@ impl Parse for AggregateType {
 #[cfg(test)]
 mod tests {
     use super::AggregateTypeList;
-    use eyre::{eyre as eyre_err, Result};
+    use eyre::{Result, eyre as eyre_err};
     use syn::parse_quote;
 
     #[test]

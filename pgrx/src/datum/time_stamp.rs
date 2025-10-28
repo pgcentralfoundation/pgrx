@@ -12,8 +12,8 @@ use crate::datum::{
     HasExtractableParts, Interval, IntoDatum, Time, TimestampWithTimeZone, ToIsoString,
 };
 use crate::{direct_function_call, pg_sys};
-use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
+use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };

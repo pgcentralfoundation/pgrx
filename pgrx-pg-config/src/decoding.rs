@@ -15,11 +15,7 @@ pub fn decode_from_bytes(output: &[u8]) -> Cow<'_, str> {
 
     let (decoded, _, had_errors) = ENCODING.decode(output);
 
-    if had_errors {
-        String::from_utf8_lossy(output)
-    } else {
-        decoded
-    }
+    if had_errors { String::from_utf8_lossy(output) } else { decoded }
 }
 
 #[cfg(not(target_os = "windows"))]

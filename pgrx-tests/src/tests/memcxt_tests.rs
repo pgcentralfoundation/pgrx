@@ -13,11 +13,11 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
+    use pgrx::PgMemoryContexts;
     use pgrx::pg_test;
     use pgrx::prelude::*;
-    use pgrx::PgMemoryContexts;
-    use std::sync::atomic::{AtomicBool, Ordering};
     use std::sync::Arc;
+    use std::sync::atomic::{AtomicBool, Ordering};
 
     struct TestObject {
         did_drop: Arc<AtomicBool>,
@@ -146,7 +146,7 @@ mod tests {
     #[cfg(feature = "nightly")]
     #[pg_test]
     fn memcx_allocator_test_string_vecs() {
-        use pgrx::memcx::{current_context, MemCx};
+        use pgrx::memcx::{MemCx, current_context};
         current_context(|mcx: &MemCx| {
             let str1 = "The Quick Brown Fox ";
             let str2 = "Jumped Over ";
@@ -184,7 +184,7 @@ mod tests {
     #[cfg(feature = "nightly")]
     #[pg_test]
     fn memcx_allocator_test_random_bytes() {
-        use pgrx::memcx::{current_context, MemCx};
+        use pgrx::memcx::{MemCx, current_context};
         current_context(|mcx: &MemCx| {
             let mut byte_buffers: Vec<Box<Vec<u8, &MemCx>, &MemCx>, &MemCx> = Vec::new_in(mcx);
             for _ in 0..32 {
@@ -220,7 +220,7 @@ mod tests {
     #[cfg(feature = "nightly")]
     #[pg_test]
     fn highly_aligned_type() {
-        use pgrx::memcx::{current_context, MemCx};
+        use pgrx::memcx::{MemCx, current_context};
         const BUF_SIZE: usize = 3319;
 
         #[repr(align(4096))]

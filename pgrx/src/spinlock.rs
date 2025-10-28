@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-use crate::{pg_sys, PGRXSharedMemory};
+use crate::{PGRXSharedMemory, pg_sys};
 use core::mem::MaybeUninit;
 use core::ops::{Deref, DerefMut};
 use std::cell::UnsafeCell;

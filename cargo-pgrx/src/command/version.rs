@@ -32,12 +32,16 @@ mod rss {
 
     #[cfg(not(target_os = "windows"))]
     fn download_url(major: u16, minor: u16) -> String {
-        format!("https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2")
+        format!(
+            "https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2"
+        )
     }
 
     #[cfg(target_os = "windows")]
     fn download_url(major: u16, minor: u16) -> String {
-        format!("https://get.enterprisedb.com/postgresql/postgresql-{major}.{minor}-1-windows-x64-binaries.zip")
+        format!(
+            "https://get.enterprisedb.com/postgresql/postgresql-{major}.{minor}-1-windows-x64-binaries.zip"
+        )
     }
 
     pub(super) struct PostgreSQLVersionRss;

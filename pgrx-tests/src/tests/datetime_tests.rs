@@ -92,7 +92,7 @@ mod tests {
     use crate as pgrx_tests;
 
     use pgrx::datum::datetime_support::{IntervalConversionError, USECS_PER_DAY};
-    use pgrx::datum::{get_timezone_offset, DateTimeConversionError};
+    use pgrx::datum::{DateTimeConversionError, get_timezone_offset};
     use pgrx::prelude::*;
     use serde_json::*;
     use std::result::Result;
@@ -289,7 +289,9 @@ mod tests {
 
     #[pg_test]
     fn test_accept_timestamp_with_time_zone_not_utc() {
-        let result = Spi::get_one::<bool>("SELECT accept_timestamp_with_time_zone('1990-01-23 03:45:00-07') = '1990-01-23 03:45:00-07'::timestamp with time zone;");
+        let result = Spi::get_one::<bool>(
+            "SELECT accept_timestamp_with_time_zone('1990-01-23 03:45:00-07') = '1990-01-23 03:45:00-07'::timestamp with time zone;",
+        );
         assert_eq!(result, Ok(Some(true)));
     }
 
@@ -373,12 +375,14 @@ mod tests {
 
     #[pg_test]
     fn test_timestamp_with_timezone_infinity() -> Result<(), pgrx::spi::Error> {
-        let result =
-            Spi::get_one::<bool>("SELECT accept_timestamp_with_time_zone('-infinity') = TIMESTAMP WITH TIME ZONE '-infinity';");
+        let result = Spi::get_one::<bool>(
+            "SELECT accept_timestamp_with_time_zone('-infinity') = TIMESTAMP WITH TIME ZONE '-infinity';",
+        );
         assert_eq!(result, Ok(Some(true)));
 
-        let result =
-            Spi::get_one::<bool>("SELECT accept_timestamp_with_time_zone('infinity') = TIMESTAMP WITH TIME ZONE 'infinity';");
+        let result = Spi::get_one::<bool>(
+            "SELECT accept_timestamp_with_time_zone('infinity') = TIMESTAMP WITH TIME ZONE 'infinity';",
+        );
         assert_eq!(result, Ok(Some(true)));
 
         let tstz =

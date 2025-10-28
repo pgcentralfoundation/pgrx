@@ -76,14 +76,14 @@ mod tests {
     }
 
     #[pg_extern]
-    fn return_result_table_iterator(
-    ) -> Result<TableIterator<'static, (name!(a, i32), name!(b, i32))>, pgrx::spi::Error> {
+    fn return_result_table_iterator()
+    -> Result<TableIterator<'static, (name!(a, i32), name!(b, i32))>, pgrx::spi::Error> {
         Ok(TableIterator::once((1, 2)))
     }
 
     #[pg_extern]
-    fn return_result_table_iterator_error(
-    ) -> Result<TableIterator<'static, (name!(a, i32), name!(b, i32))>, pgrx::spi::Error> {
+    fn return_result_table_iterator_error()
+    -> Result<TableIterator<'static, (name!(a, i32), name!(b, i32))>, pgrx::spi::Error> {
         Err(pgrx::spi::Error::InvalidPosition)
     }
 

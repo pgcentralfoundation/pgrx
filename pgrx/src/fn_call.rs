@@ -8,16 +8,16 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+use pgrx_pg_sys::PgTryBuilder;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::ffi::pg_guard_ffi_boundary;
-use pgrx_pg_sys::PgTryBuilder;
 use std::panic::AssertUnwindSafe;
 
 use crate::memcx;
 use crate::pg_catalog::pg_proc::{PgProc, ProArgMode, ProKind};
 use crate::seal::Sealed;
 use crate::{
-    direct_function_call, is_a, list::List, pg_sys, pg_sys::AsPgCStr, Array, FromDatum, IntoDatum,
+    Array, FromDatum, IntoDatum, direct_function_call, is_a, list::List, pg_sys, pg_sys::AsPgCStr,
 };
 
 /// Augments types that can be used as [`fn_call`] arguments.  This is only implemented for the
@@ -69,7 +69,9 @@ pub enum FnCallError {
     #[error("The specified function does not exist")]
     UndefinedFunction,
 
-    #[error("The specified function exists, but has overloaded versions which are ambiguous given the argument types provided")]
+    #[error(
+        "The specified function exists, but has overloaded versions which are ambiguous given the argument types provided"
+    )]
     AmbiguousFunction,
 
     #[error("Can only dynamically call plain functions")]
@@ -81,7 +83,9 @@ pub enum FnCallError {
     #[error("Functions with argument or return types of `internal` are not supported")]
     InternalTypeNotSupported,
 
-    #[error("The requested return type OID `{0:?}` is not compatible with the actual return type OID `{1:?}`")]
+    #[error(
+        "The requested return type OID `{0:?}` is not compatible with the actual return type OID `{1:?}`"
+    )]
     IncompatibleReturnType(pg_sys::Oid, pg_sys::Oid),
 
     #[error("Function call has more arguments than are supported")]
@@ -460,11 +464,7 @@ fn create_default_value(pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys
             let con: *mut pg_sys::Const = evaluated.cast();
             let con_ref = &*con;
 
-            if con_ref.constisnull {
-                Ok(None)
-            } else {
-                Ok(Some(con_ref.constvalue))
-            }
+            if con_ref.constisnull { Ok(None) } else { Ok(Some(con_ref.constvalue)) }
         } else {
             // NB:  I am not sure this case could ever happen in the context of a function argument
             // `DEFAULT` clause, but if it does, we should let the caller know.  I don't know what

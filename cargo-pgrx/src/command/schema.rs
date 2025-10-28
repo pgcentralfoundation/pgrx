@@ -7,16 +7,16 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use crate::CommandExecute;
 use crate::command::get::{find_control_file, get_property};
 use crate::manifest::{get_package_manifest, pg_config_and_version};
 use crate::profile::CargoProfile;
-use crate::CommandExecute;
 use cargo_toml::Manifest;
-use eyre::{eyre, WrapErr};
+use eyre::{WrapErr, eyre};
 use object::read::macho::MachOFatFile32;
 use owo_colors::OwoColorize;
 use pgrx_pg_config::cargo::PgrxManifestExt;
-use pgrx_pg_config::{get_target_dir, PgConfig, Pgrx};
+use pgrx_pg_config::{PgConfig, Pgrx, get_target_dir};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
@@ -302,7 +302,13 @@ fn compute_symbols(
         "  Discovered".bold().green(),
         fns_to_call.len().to_string().bold().cyan(),
         seen_schemas.len().to_string().bold().cyan(),
-        seen_schemas.iter().collect::<std::collections::HashSet<_>>().len().to_string().bold().cyan(),
+        seen_schemas
+            .iter()
+            .collect::<std::collections::HashSet<_>>()
+            .len()
+            .to_string()
+            .bold()
+            .cyan(),
         num_funcs.to_string().bold().cyan(),
         num_types.to_string().bold().cyan(),
         num_enums.to_string().bold().cyan(),
@@ -634,8 +640,8 @@ fn parse_object(data: &[u8]) -> object::Result<object::File<'_>> {
 }
 
 fn slice_arch32<'a>(data: &'a [u8], arch: &str) -> Option<&'a [u8]> {
-    use object::read::macho::FatArch;
     use object::Architecture;
+    use object::read::macho::FatArch;
     let target = match arch {
         "x86" => Architecture::I386,
         "x86_64" => Architecture::X86_64,

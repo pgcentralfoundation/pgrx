@@ -32,10 +32,10 @@ use syn::token::Comma;
 
 use self::returning::Returning;
 use super::UsedType;
+use crate::ToSqlConfig;
 use crate::enrich::{CodeEnrichment, ToEntityGraphTokens, ToRustCodeTokens};
 use crate::finfo::{finfo_v1_extern_c, finfo_v1_tokens};
 use crate::fmt::ErrHarder;
-use crate::ToSqlConfig;
 use operator::{PgrxOperatorAttributeWithIdent, PgrxOperatorOpName};
 use search_path::SearchPathList;
 
@@ -205,11 +205,7 @@ impl PgExtern {
         let mut retval = None;
         let mut in_commented_sql_block = false;
         for meta in self.func.attrs.iter().filter_map(|attr| {
-            if attr.meta.path().is_ident("doc") {
-                Some(attr.meta.clone())
-            } else {
-                None
-            }
+            if attr.meta.path().is_ident("doc") { Some(attr.meta.clone()) } else { None }
         }) {
             let Meta::NameValue(syn::MetaNameValue { ref value, .. }) = meta else { continue };
             let syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(inner), .. }) = value else {

@@ -34,7 +34,7 @@ use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{
-    parse_quote, Expr, ImplItemConst, ImplItemFn, ImplItemType, ItemFn, ItemImpl, Path, Type,
+    Expr, ImplItemConst, ImplItemFn, ImplItemType, ItemFn, ItemImpl, Path, Type, parse_quote,
 };
 
 use crate::ToSqlConfig;
@@ -633,9 +633,19 @@ impl PgAggregate {
                 match &value.expr {
                     syn::Expr::Lit(expr_lit) => match &expr_lit.lit {
                         syn::Lit::Bool(lit) => lit.value,
-                        _ => return Err(syn::Error::new(value.span(), "`#[pg_aggregate]` required the `HYPOTHETICAL` value to be a literal boolean.")),
+                        _ => {
+                            return Err(syn::Error::new(
+                                value.span(),
+                                "`#[pg_aggregate]` required the `HYPOTHETICAL` value to be a literal boolean.",
+                            ));
+                        }
                     },
-                    _ => return Err(syn::Error::new(value.span(), "`#[pg_aggregate]` required the `HYPOTHETICAL` value to be a literal boolean.")),
+                    _ => {
+                        return Err(syn::Error::new(
+                            value.span(),
+                            "`#[pg_aggregate]` required the `HYPOTHETICAL` value to be a literal boolean.",
+                        ));
+                    }
                 }
             } else {
                 false
@@ -765,16 +775,20 @@ fn get_target_path(item_impl: &ItemImpl) -> Result<Path, syn::Error> {
                         ))?;
                         match &first {
                             syn::GenericArgument::Type(Type::Path(ty_path)) => ty_path.path.clone(),
-                            _ => return Err(syn::Error::new(
-                                type_path.span(),
-                                "`#[pg_aggregate]` only works with `PgVarlena` declarations if they have a type path contained.",
-                            )),
+                            _ => {
+                                return Err(syn::Error::new(
+                                    type_path.span(),
+                                    "`#[pg_aggregate]` only works with `PgVarlena` declarations if they have a type path contained.",
+                                ));
+                            }
                         }
-                    },
-                    _ => return Err(syn::Error::new(
-                        type_path.span(),
-                        "`#[pg_aggregate]` only works with `PgVarlena` declarations if they have a type contained.",
-                    )),
+                    }
+                    _ => {
+                        return Err(syn::Error::new(
+                            type_path.span(),
+                            "`#[pg_aggregate]` only works with `PgVarlena` declarations if they have a type contained.",
+                        ));
+                    }
                 }
             } else {
                 type_path.path.clone()
@@ -784,7 +798,7 @@ fn get_target_path(item_impl: &ItemImpl) -> Result<Path, syn::Error> {
             return Err(syn::Error::new(
                 something_else.span(),
                 "`#[pg_aggregate]` only works with types.",
-            ))
+            ));
         }
     };
     Ok(target_ident)
@@ -951,7 +965,7 @@ mod tests {
     use super::PgAggregate;
     use eyre::Result;
     use quote::ToTokens;
-    use syn::{parse_quote, ItemImpl};
+    use syn::{ItemImpl, parse_quote};
 
     #[test]
     fn agg_required_only() -> Result<()> {

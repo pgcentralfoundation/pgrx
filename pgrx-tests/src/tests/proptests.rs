@@ -1,9 +1,9 @@
 use crate::proptest::PgTestRunner;
+use TimeWithTimeZone as TimeTz;
 use core::ffi;
 use paste::paste;
 use pgrx::prelude::*;
 use proptest::prelude::*;
-use TimeWithTimeZone as TimeTz;
 
 /// Generate the roundtrip property tests for a datetime type
 ///

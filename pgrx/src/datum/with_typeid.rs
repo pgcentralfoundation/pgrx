@@ -1,5 +1,5 @@
-use crate::datum::{Array, FromDatum, PgVarlena, VariadicArray};
 use crate::PgBox;
+use crate::datum::{Array, FromDatum, PgVarlena, VariadicArray};
 use core::any::TypeId;
 use pgrx_sql_entity_graph::RustSqlMapping;
 use std::sync::LazyLock as Lazy;

@@ -111,7 +111,10 @@ impl BackgroundWorker {
     #[must_use = "you aren't getting the same bool back if you call this twice"]
     pub fn sighup_received() -> bool {
         unsafe {
-            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+            assert!(
+                !pg_sys::MyBgworkerEntry.is_null(),
+                "BackgroundWorker associated functions can only be called from a registered background worker"
+            );
         }
         // toggle the bool to false, returning whatever it was
         GOT_SIGHUP.swap(false, Ordering::SeqCst)
@@ -123,7 +126,10 @@ impl BackgroundWorker {
     #[must_use = "you aren't getting the same bool back if you call this twice"]
     pub fn sigterm_received() -> bool {
         unsafe {
-            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+            assert!(
+                !pg_sys::MyBgworkerEntry.is_null(),
+                "BackgroundWorker associated functions can only be called from a registered background worker"
+            );
         }
         // toggle the bool to false, returning whatever it was
         GOT_SIGTERM.swap(false, Ordering::SeqCst)
@@ -135,7 +141,10 @@ impl BackgroundWorker {
     #[must_use = "you aren't getting the same bool back if you call this twice"]
     pub fn sigint_received() -> bool {
         unsafe {
-            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+            assert!(
+                !pg_sys::MyBgworkerEntry.is_null(),
+                "BackgroundWorker associated functions can only be called from a registered background worker"
+            );
         }
         // toggle the bool to false, returning whatever it was
         GOT_SIGINT.swap(false, Ordering::SeqCst)
@@ -147,7 +156,10 @@ impl BackgroundWorker {
     #[must_use = "you aren't getting the same bool back if you call this twice"]
     pub fn sigchld_received() -> bool {
         unsafe {
-            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+            assert!(
+                !pg_sys::MyBgworkerEntry.is_null(),
+                "BackgroundWorker associated functions can only be called from a registered background worker"
+            );
         }
         // toggle the bool to false, returning whatever it was
         GOT_SIGCHLD.swap(false, Ordering::SeqCst)
@@ -158,7 +170,10 @@ impl BackgroundWorker {
     /// Returns true if we're still supposed to be alive and haven't received a SIGTERM
     pub fn wait_latch(timeout: Option<Duration>) -> bool {
         unsafe {
-            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+            assert!(
+                !pg_sys::MyBgworkerEntry.is_null(),
+                "BackgroundWorker associated functions can only be called from a registered background worker"
+            );
         }
         let wakeup_flags = match timeout {
             Some(t) => wait_latch(
@@ -175,7 +190,10 @@ impl BackgroundWorker {
     /// Is this `BackgroundWorker` allowed to continue?
     pub fn worker_continue() -> bool {
         unsafe {
-            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+            assert!(
+                !pg_sys::MyBgworkerEntry.is_null(),
+                "BackgroundWorker associated functions can only be called from a registered background worker"
+            );
         }
         pg_sys::WL_POSTMASTER_DEATH as i32 != 0
     }
@@ -184,7 +202,10 @@ impl BackgroundWorker {
     /// connect to via SPI
     pub fn connect_worker_to_spi(dbname: Option<&str>, username: Option<&str>) {
         unsafe {
-            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+            assert!(
+                !pg_sys::MyBgworkerEntry.is_null(),
+                "BackgroundWorker associated functions can only be called from a registered background worker"
+            );
         }
         let db = dbname.and_then(|rs| CString::new(rs).ok());
         let db: *const c_char = db.as_ref().map_or(std::ptr::null(), |i| i.as_ptr());
@@ -209,7 +230,10 @@ impl BackgroundWorker {
     /// connect to via SPI
     pub fn connect_worker_to_spi_by_oid(dboid: Option<pg_sys::Oid>, useroid: Option<pg_sys::Oid>) {
         unsafe {
-            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+            assert!(
+                !pg_sys::MyBgworkerEntry.is_null(),
+                "BackgroundWorker associated functions can only be called from a registered background worker"
+            );
         }
 
         let dboid = dboid.unwrap_or(pg_sys::InvalidOid);
@@ -239,7 +263,10 @@ impl BackgroundWorker {
     /// ```
     pub fn attach_signal_handlers(wake: SignalWakeFlags) {
         unsafe {
-            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+            assert!(
+                !pg_sys::MyBgworkerEntry.is_null(),
+                "BackgroundWorker associated functions can only be called from a registered background worker"
+            );
             if wake.contains(SignalWakeFlags::SIGHUP) {
                 #[cfg(any(
                     feature = "pg13",
@@ -298,7 +325,10 @@ impl BackgroundWorker {
         transaction_body: F,
     ) -> R {
         unsafe {
-            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+            assert!(
+                !pg_sys::MyBgworkerEntry.is_null(),
+                "BackgroundWorker associated functions can only be called from a registered background worker"
+            );
             pg_sys::SetCurrentStatementStartTimestamp();
             pg_sys::StartTransactionCommand();
             pg_sys::PushActiveSnapshot(pg_sys::GetTransactionSnapshot());

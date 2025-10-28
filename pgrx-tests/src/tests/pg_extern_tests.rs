@@ -22,20 +22,24 @@ mod support_fn_schema {
 }
 
 #[pg_extern(immutable)]
-fn returns_tuple_with_attributes(
-) -> TableIterator<'static, (name!(arg, String), name!(arg2, String))> {
+fn returns_tuple_with_attributes()
+-> TableIterator<'static, (name!(arg, String), name!(arg2, String))> {
     TableIterator::once(("hi".to_string(), "bye".to_string()))
 }
 
 // Check we can map a `fdw_handler`
 #[pg_extern]
 fn fdw_handler_return() -> PgBox<pg_sys::FdwRoutine> {
-    unimplemented!("Not a functional test, just a signature test for SQL generation. Feel free to make a functional test!")
+    unimplemented!(
+        "Not a functional test, just a signature test for SQL generation. Feel free to make a functional test!"
+    )
 }
 
 #[pg_extern(support = support_fn_schema::test_support_fn)]
 fn test_using_support_fn_in_other_module() {
-    unimplemented!("Not a functional test, just a signature test for SQL generation. Feel free to make a functional test!")
+    unimplemented!(
+        "Not a functional test, just a signature test for SQL generation. Feel free to make a functional test!"
+    )
 }
 
 #[pg_extern]
@@ -45,7 +49,9 @@ fn local_support_fn(i: Internal) -> Internal {
 
 #[pg_extern(support = local_support_fn)]
 fn test_using_support_fn() {
-    unimplemented!("Not a functional test, just a signature test for SQL generation. Feel free to make a functional test!")
+    unimplemented!(
+        "Not a functional test, just a signature test for SQL generation. Feel free to make a functional test!"
+    )
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -60,8 +66,8 @@ mod tests {
     #[pg_extern]
     fn returns_named_tuple_with_rust_reserved_keyword(/*
                                  `type` is a reserved Rust keyword, but we still need to be able to parse it for SQL generation 
-                                                        */
-    ) -> TableIterator<'static, (name!(type, String), name!(i, i32))> {
+                                                        */)
+     -> TableIterator<'static, (name!(type, String), name!(i, i32))> {
         unimplemented!()
     }
 

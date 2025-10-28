@@ -151,29 +151,33 @@ mod tests {
 
     #[pg_test]
     fn test_accept_range_date() {
-        let matched =
-            Spi::get_one::<bool>("SELECT accept_range_date(daterange'[2000-01-01,2022-01-01)') = daterange'[2000-01-01,2022-01-01)'");
+        let matched = Spi::get_one::<bool>(
+            "SELECT accept_range_date(daterange'[2000-01-01,2022-01-01)') = daterange'[2000-01-01,2022-01-01)'",
+        );
         assert_eq!(matched, Ok(Some(true)));
     }
 
     #[pg_test]
     fn test_accept_range_date_array() {
-        let matched =
-            Spi::get_one::<bool>("SELECT accept_range_date_array(ARRAY[daterange'[2000-01-01,2022-01-01)']::daterange[]) = ARRAY[daterange'[2000-01-01,2022-01-01)']::daterange[]");
+        let matched = Spi::get_one::<bool>(
+            "SELECT accept_range_date_array(ARRAY[daterange'[2000-01-01,2022-01-01)']::daterange[]) = ARRAY[daterange'[2000-01-01,2022-01-01)']::daterange[]",
+        );
         assert_eq!(matched, Ok(Some(true)));
     }
 
     #[pg_test]
     fn test_accept_range_ts() {
-        let matched =
-            Spi::get_one::<bool>("SELECT accept_range_ts(tsrange'[2000-01-01T:12:34:56,2022-01-01T:12:34:56)') = tsrange'[2000-01-01T:12:34:56,2022-01-01T:12:34:56)'");
+        let matched = Spi::get_one::<bool>(
+            "SELECT accept_range_ts(tsrange'[2000-01-01T:12:34:56,2022-01-01T:12:34:56)') = tsrange'[2000-01-01T:12:34:56,2022-01-01T:12:34:56)'",
+        );
         assert_eq!(matched, Ok(Some(true)));
     }
 
     #[pg_test]
     fn test_accept_range_tstz() {
-        let matched =
-            Spi::get_one::<bool>("SELECT accept_range_tstz(tstzrange'[2000-01-01T:12:34:56+00,2022-01-01T:12:34:56+00)') = tstzrange'[2000-01-01T:12:34:56+00,2022-01-01T:12:34:56+00)'");
+        let matched = Spi::get_one::<bool>(
+            "SELECT accept_range_tstz(tstzrange'[2000-01-01T:12:34:56+00,2022-01-01T:12:34:56+00)') = tstzrange'[2000-01-01T:12:34:56+00,2022-01-01T:12:34:56+00)'",
+        );
         assert_eq!(matched, Ok(Some(true)));
     }
 
@@ -235,8 +239,9 @@ mod tests {
 
     #[pg_test]
     fn test_range_date_rt_bounds() {
-        let matched =
-            Spi::get_one::<bool>("SELECT range_date_rt_bounds(daterange'[2000-01-01,2022-01-01)') = daterange'[2000-01-01,2022-01-01)'");
+        let matched = Spi::get_one::<bool>(
+            "SELECT range_date_rt_bounds(daterange'[2000-01-01,2022-01-01)') = daterange'[2000-01-01,2022-01-01)'",
+        );
         assert_eq!(matched, Ok(Some(true)));
     }
 
@@ -250,8 +255,9 @@ mod tests {
 
     #[pg_test]
     fn test_range_ts_rt_bounds() {
-        let matched =
-            Spi::get_one::<bool>("SELECT range_ts_rt_bounds(tsrange'[2000-01-01T12:34:56,2022-01-01T12:34:56)') = tsrange'[2000-01-01T12:34:56,2022-01-01T12:34:56)'");
+        let matched = Spi::get_one::<bool>(
+            "SELECT range_ts_rt_bounds(tsrange'[2000-01-01T12:34:56,2022-01-01T12:34:56)') = tsrange'[2000-01-01T12:34:56,2022-01-01T12:34:56)'",
+        );
         assert_eq!(matched, Ok(Some(true)));
     }
 

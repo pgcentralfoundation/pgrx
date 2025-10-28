@@ -22,7 +22,7 @@ use crate::positioning_ref::PositioningRef;
 
 use crate::enrich::{CodeEnrichment, ToEntityGraphTokens, ToRustCodeTokens};
 use proc_macro2::{Ident, TokenStream as TokenStream2};
-use quote::{format_ident, quote, ToTokens, TokenStreamExt};
+use quote::{ToTokens, TokenStreamExt, format_ident, quote};
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::{LitStr, Token};
@@ -276,7 +276,7 @@ impl Parse for ExtensionSqlAttribute {
                 return Err(syn::Error::new(
                     ident.span(),
                     format!("Unknown extension_sql attribute: {other}"),
-                ))
+                ));
             }
         };
         Ok(found)
@@ -330,10 +330,12 @@ impl Parse for SqlDeclared {
             "Type" => SqlDeclared::Type(identifier_str),
             "Enum" => SqlDeclared::Enum(identifier_str),
             "Function" => SqlDeclared::Function(identifier_str),
-            _ => return Err(syn::Error::new(
-                variant.span(),
-                "SQL declared entities must be `Type(ident)`, `Enum(ident)`, or `Function(ident)`",
-            )),
+            _ => {
+                return Err(syn::Error::new(
+                    variant.span(),
+                    "SQL declared entities must be `Type(ident)`, `Enum(ident)`, or `Function(ident)`",
+                ));
+            }
         };
         Ok(this)
     }

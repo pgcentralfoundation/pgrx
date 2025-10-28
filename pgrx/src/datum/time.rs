@@ -13,8 +13,8 @@ use super::{
     TimestampWithTimeZone,
 };
 use crate::{direct_function_call, pg_sys};
-use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
+use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -94,11 +94,7 @@ impl FromDatum for Time {
         is_null: bool,
         _typoid: pg_sys::Oid,
     ) -> Option<Time> {
-        if is_null {
-            None
-        } else {
-            Some(Time::modular_from_raw(datum.value() as i64))
-        }
+        if is_null { None } else { Some(Time::modular_from_raw(datum.value() as i64)) }
     }
 }
 

@@ -17,9 +17,9 @@ pub(crate) mod profile;
 use clap::Parser;
 use std::io::{self, IsTerminal};
 use tracing_error::ErrorLayer;
+use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
-use tracing_subscriber::EnvFilter;
 
 trait CommandExecute {
     fn execute(self) -> eyre::Result<()>;

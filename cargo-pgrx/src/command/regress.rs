@@ -7,13 +7,13 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use crate::CommandExecute;
 use crate::command::get::get_property;
 use crate::command::run::Run;
 use crate::command::start::collect_postgresql_conf_settings;
 use crate::manifest::get_package_manifest;
-use crate::CommandExecute;
 use owo_colors::OwoColorize;
-use pgrx_pg_config::{createdb, dropdb, PgConfig};
+use pgrx_pg_config::{PgConfig, createdb, dropdb};
 use std::collections::HashSet;
 use std::env::temp_dir;
 use std::fs::{DirEntry, File};

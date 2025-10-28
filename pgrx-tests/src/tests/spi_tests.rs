@@ -12,8 +12,8 @@
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
-    use pgrx::datum::DatumWithOid;
     use pgrx::Uuid;
+    use pgrx::datum::DatumWithOid;
     use std::error::Error;
 
     use pgrx::prelude::*;
@@ -107,11 +107,13 @@ mod tests {
     #[pg_test]
     fn test_spi_get_three_failure() -> Result<(), spi::Error> {
         Spi::connect(|client| {
-            assert!(client
-                .select("SELECT 42, 'test'", None, &[])?
-                .first()
-                .get_three::<i64, &str, bool>()
-                .is_err());
+            assert!(
+                client
+                    .select("SELECT 42, 'test'", None, &[])?
+                    .first()
+                    .get_three::<i64, &str, bool>()
+                    .is_err()
+            );
             Ok(())
         })
     }

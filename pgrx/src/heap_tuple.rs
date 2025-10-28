@@ -10,16 +10,16 @@
 //! Provides a safe interface to Postgres `HeapTuple` objects.
 //!
 //! [`PgHeapTuple`]s also describe composite types as defined by [`pgrx::composite_type!()`][crate::composite_type].
-use crate::datum::{lookup_type_name, UnboxDatum};
+use crate::datum::{UnboxDatum, lookup_type_name};
 use crate::{
-    heap_getattr_raw, pg_sys, trigger_fired_by_delete, trigger_fired_by_insert,
-    trigger_fired_by_update, trigger_fired_for_statement, AllocatedByPostgres, AllocatedByRust,
+    AllocatedByPostgres, AllocatedByRust, heap_getattr_raw, pg_sys, trigger_fired_by_delete,
+    trigger_fired_by_insert, trigger_fired_by_update, trigger_fired_for_statement,
 };
 
 use crate::datum::{FromDatum, IntoDatum, TryFromDatumError};
 use crate::{PgBox, PgMemoryContexts, PgTupleDesc, TriggerTuple, WhoAllocated};
-use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
+use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -64,11 +64,7 @@ impl FromDatum for PgHeapTuple<'_, AllocatedByRust> {
         is_null: bool,
         _oid: pg_sys::Oid,
     ) -> Option<Self> {
-        if is_null {
-            None
-        } else {
-            Some(PgHeapTuple::from_composite_datum(composite))
-        }
+        if is_null { None } else { Some(PgHeapTuple::from_composite_datum(composite)) }
     }
 
     unsafe fn from_datum_in_memory_context(

@@ -16,7 +16,7 @@
 
 */
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{quote, ToTokens, TokenStreamExt};
+use quote::{ToTokens, TokenStreamExt, quote};
 use syn::parse::{Parse, ParseBuffer};
 
 /// A parsed `#[pg_operator]` operator.

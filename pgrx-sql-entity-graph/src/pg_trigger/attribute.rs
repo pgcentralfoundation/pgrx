@@ -17,8 +17,8 @@
 */
 use crate::ToSqlConfig;
 
-use syn::parse::{Parse, ParseStream};
 use syn::Token;
+use syn::parse::{Parse, ParseStream};
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub enum PgTriggerAttribute {
@@ -42,7 +42,7 @@ impl Parse for PgTriggerAttribute {
                         return Err(syn::Error::new(
                             other.span(),
                             "expected boolean, path, or string literal",
-                        ))
+                        ));
                     }
                 }
             }

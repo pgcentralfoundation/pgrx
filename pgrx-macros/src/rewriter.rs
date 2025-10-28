@@ -61,7 +61,9 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
             GenericParam::Const(_) => true,
         })
     {
-        panic!("#[pg_guard] for function with generic parameters must not be combined with #[unsafe(no_mangle)]");
+        panic!(
+            "#[pg_guard] for function with generic parameters must not be combined with #[unsafe(no_mangle)]"
+        );
     }
 
     // but for the inner function (the one we're wrapping) we don't need any kind of
@@ -208,7 +210,7 @@ fn build_arg_list(sig: &Signature, suffix_arg_name: bool) -> syn::Result<proc_ma
                 return Err(syn::Error::new(
                     a.span(),
                     "#[pg_guard] doesn't support external functions with 'self' as the argument",
-                ))
+                ));
             }
         }
     }
@@ -237,7 +239,7 @@ fn rename_arg_list(sig: &Signature) -> syn::Result<proc_macro2::TokenStream> {
                 return Err(syn::Error::new(
                     a.span(),
                     "#[pg_guard] doesn't support external functions with 'self' as the argument",
-                ))
+                ));
             }
         }
     }
@@ -267,7 +269,7 @@ fn rename_arg_list_with_types(sig: &Signature) -> syn::Result<proc_macro2::Token
                 return Err(syn::Error::new(
                     a.span(),
                     "#[pg_guard] doesn't support external functions with 'self' as the argument",
-                ))
+                ));
             }
         }
     }

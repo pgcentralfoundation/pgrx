@@ -12,7 +12,7 @@ use std::ops::{
 };
 
 use super::call_numeric_func;
-use crate::{pg_sys, AnyNumeric, Numeric};
+use crate::{AnyNumeric, Numeric, pg_sys};
 
 impl<const P: u32, const S: u32> Deref for Numeric<P, S> {
     type Target = AnyNumeric;

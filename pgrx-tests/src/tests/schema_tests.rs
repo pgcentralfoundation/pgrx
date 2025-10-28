@@ -142,7 +142,9 @@ mod tests {
     #[pg_test]
     fn custom_to_sql_extern() {
         // Validate that the function we generated has the modifications we expect
-        let result = Spi::get_one::<bool>("SELECT exists(SELECT 1 FROM pg_proc WHERE proname = 'func_generated_with_custom_name');");
+        let result = Spi::get_one::<bool>(
+            "SELECT exists(SELECT 1 FROM pg_proc WHERE proname = 'func_generated_with_custom_name');",
+        );
         assert_eq!(result, Ok(Some(true)));
 
         Spi::run("SELECT test_schema.func_generated_with_custom_name();").expect("SPI failed");

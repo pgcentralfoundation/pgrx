@@ -78,7 +78,7 @@ impl PostgresEnum {
         let data_enum = match derive_input.data {
             syn::Data::Enum(data_enum) => data_enum,
             syn::Data::Union(_) | syn::Data::Struct(_) => {
-                return Err(syn::Error::new(derive_input.ident.span(), "expected enum"))
+                return Err(syn::Error::new(derive_input.ident.span(), "expected enum"));
             }
         };
         Self::new(derive_input.ident, derive_input.generics, data_enum.variants, to_sql_config)

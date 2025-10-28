@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use std::cmp::Ordering;
 
-use crate::{direct_function_call, pg_sys, AnyNumeric, Numeric};
+use crate::{AnyNumeric, Numeric, direct_function_call, pg_sys};
 
 impl PartialEq<AnyNumeric> for AnyNumeric {
     /// Postgres implementation detail:  Unlike in Rust, Postgres considers `NaN` as equal

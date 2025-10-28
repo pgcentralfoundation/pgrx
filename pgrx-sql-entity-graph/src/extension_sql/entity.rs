@@ -176,7 +176,7 @@ impl SqlDeclaredEntity {
             _ => {
                 return Err(eyre::eyre!(
                     "Can only declare `Type(Ident)`, `Enum(Ident)` or `Function(Ident)`"
-                ))
+                ));
             }
         };
         Ok(retval)

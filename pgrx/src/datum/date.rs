@@ -8,8 +8,8 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use core::num::TryFromIntError;
-use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
+use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -96,11 +96,7 @@ impl FromDatum for Date {
     where
         Self: Sized,
     {
-        if is_null {
-            None
-        } else {
-            Some(datum.try_into().expect("Error converting date datum"))
-        }
+        if is_null { None } else { Some(datum.try_into().expect("Error converting date datum")) }
     }
 }
 

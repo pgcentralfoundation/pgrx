@@ -85,8 +85,8 @@ pub use aggregate::*;
 pub use atomics::*;
 pub use callbacks::*;
 pub use datum::{
-    numeric, AnyArray, AnyElement, AnyNumeric, Array, FromDatum, Inet, Internal, IntoDatum, Json,
-    JsonB, Numeric, Range, Uuid, VariadicArray,
+    AnyArray, AnyElement, AnyNumeric, Array, FromDatum, Inet, Internal, IntoDatum, Json, JsonB,
+    Numeric, Range, Uuid, VariadicArray, numeric,
 };
 pub use enum_helper::*;
 pub use fcinfo::*;
@@ -114,16 +114,16 @@ pub use xid::*;
 pub mod pg_sys;
 
 // and re-export these
+pub use pg_sys::PgBuiltInOids;
 pub use pg_sys::elog::PgLogLevel;
 pub use pg_sys::errcodes::PgSqlErrorCode;
 pub use pg_sys::oids::PgOid;
 pub use pg_sys::panic::pgrx_extern_c_guard;
 pub use pg_sys::pg_try::PgTryBuilder;
 pub use pg_sys::utils::name_data_to_str;
-pub use pg_sys::PgBuiltInOids;
 pub use pg_sys::{
-    check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport, error, function_name,
-    info, log, notice, warning, FATAL, PANIC,
+    FATAL, PANIC, check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport, error,
+    function_name, info, log, notice, warning,
 };
 
 #[doc(hidden)]

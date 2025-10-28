@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Helper functions to work with Postgres `varlena *` structures
 
-use crate::{pg_sys, PgBox};
+use crate::{PgBox, pg_sys};
 use core::{ops::DerefMut, slice, str};
 
 /// # Safety
@@ -404,11 +404,7 @@ pub unsafe fn vardata_1b_e(ptr: *const pg_sys::varlena) -> *const std::os::raw::
 /// ```
 #[inline]
 pub unsafe fn vardata_any(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
-    if varatt_is_1b(ptr) {
-        vardata_1b(ptr)
-    } else {
-        vardata_4b(ptr)
-    }
+    if varatt_is_1b(ptr) { vardata_1b(ptr) } else { vardata_4b(ptr) }
 }
 
 /// Convert a Postgres `varlena *` (or `text *`) into a Rust `&str`.

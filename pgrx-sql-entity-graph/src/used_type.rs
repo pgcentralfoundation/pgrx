@@ -15,7 +15,7 @@ Type level metadata for Rust to SQL generation.
 > to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
-use crate::composite_type::{handle_composite_type_macro, CompositeTypeMacro};
+use crate::composite_type::{CompositeTypeMacro, handle_composite_type_macro};
 use crate::lifetimes::anonymize_lifetimes;
 
 use quote::ToTokens;
@@ -189,14 +189,16 @@ impl UsedType {
                                         return Err(syn::Error::new(
                                             type_path.span(),
                                             "Unexpected Item found inside `Result` (expected Type)",
-                                        ))
+                                        ));
                                     }
                                 }
                             }
-                            _ => return Err(syn::Error::new(
-                                type_path.span(),
-                                "Unexpected Item found inside `Result` (expected Angle Brackets)",
-                            )),
+                            _ => {
+                                return Err(syn::Error::new(
+                                    type_path.span(),
+                                    "Unexpected Item found inside `Result` (expected Angle Brackets)",
+                                ));
+                            }
                         }
                     }
                     "Option" => {
@@ -248,15 +250,17 @@ impl UsedType {
                                         return Err(syn::Error::new(
                                             type_path.span(),
                                             "Unexpected Item found inside `Option` (expected Type)",
-                                        ))
+                                        ));
                                     }
                                 }
                             }
                             // Option<T>
-                            _ => return Err(syn::Error::new(
-                                type_path.span(),
-                                "Unexpected Item found inside `Option` (expected Angle Brackets)",
-                            )),
+                            _ => {
+                                return Err(syn::Error::new(
+                                    type_path.span(),
+                                    "Unexpected Item found inside `Option` (expected Angle Brackets)",
+                                ));
+                            }
                         }
                     }
                     // VariadicArray<T>
@@ -375,9 +379,10 @@ fn resolve_vec_inner(
                     let mac = &macro_pat.mac;
                     let archetype = mac.path.segments.last().expect("No last segment");
                     match archetype.ident.to_string().as_str() {
-                        "default" => {
-                            Err(syn::Error::new(mac.span(), "`Vec<default!(T, default)>` not supported, choose `default!(Vec<T>, ident)` instead"))
-                        }
+                        "default" => Err(syn::Error::new(
+                            mac.span(),
+                            "`Vec<default!(T, default)>` not supported, choose `default!(Vec<T>, ident)` instead",
+                        )),
                         "composite_type" => {
                             let composite_mac = handle_composite_type_macro(mac)?;
                             let comp_ty = composite_mac.expand_with_lifetime();
@@ -432,9 +437,10 @@ fn resolve_variadic_array_inner(
                         let mac = &macro_pat.mac;
                         let archetype = mac.path.segments.last().expect("No last segment");
                         match archetype.ident.to_string().as_str() {
-                            "default" => {
-                                Err(syn::Error::new(mac.span(), "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead"))
-                            }
+                            "default" => Err(syn::Error::new(
+                                mac.span(),
+                                "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead",
+                            )),
                             "composite_type" => {
                                 let composite_mac = handle_composite_type_macro(mac)?;
                                 let comp_ty = composite_mac.expand_with_lifetime();
@@ -488,20 +494,21 @@ fn resolve_array_inner(
                     let mac = &macro_pat.mac;
                     let archetype = mac.path.segments.last().expect("No last segment");
                     match archetype.ident.to_string().as_str() {
-                            "default" => {
-                                Err(syn::Error::new(mac.span(), "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead"))
-                            }
-                            "composite_type" => {
-                                let composite_mac = handle_composite_type_macro(mac)?;
-                                let comp_ty = composite_mac.expand_with_lifetime();
-                                let sql = Some(composite_mac);
-                                let ty = syn::parse_quote! {
-                                    ::pgrx::datum::Array<'_, #comp_ty>
-                                };
-                                Ok((ty, sql))
-                            }
-                            _ => Ok((syn::Type::Path(original), None)),
+                        "default" => Err(syn::Error::new(
+                            mac.span(),
+                            "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead",
+                        )),
+                        "composite_type" => {
+                            let composite_mac = handle_composite_type_macro(mac)?;
+                            let comp_ty = composite_mac.expand_with_lifetime();
+                            let sql = Some(composite_mac);
+                            let ty = syn::parse_quote! {
+                                ::pgrx::datum::Array<'_, #comp_ty>
+                            };
+                            Ok((ty, sql))
                         }
+                        _ => Ok((syn::Type::Path(original), None)),
+                    }
                 }
                 syn::Type::Path(arg_type_path) => {
                     let last = arg_type_path.path.segments.last().ok_or(syn::Error::new(
@@ -553,9 +560,12 @@ fn resolve_option_inner(
                                     Option<#comp_ty>
                                 };
                                 Ok((ty, sql))
-                            },
+                            }
                             // Option<default!(composite_type!(..))> isn't valid. If the user wanted the default to be `NULL` they just don't need a default.
-                            "default" => Err(syn::Error::new(mac.span(), "`Option<default!(T, \"my_default\")>` not supported, choose `Option<T>` for a default of `NULL`, or `default!(T, default)` for a non-NULL default")),
+                            "default" => Err(syn::Error::new(
+                                mac.span(),
+                                "`Option<default!(T, \"my_default\")>` not supported, choose `Option<T>` for a default of `NULL`, or `default!(T, default)` for a non-NULL default",
+                            )),
                             _ => Ok((syn::Type::Path(original), None)),
                         }
                     }
@@ -684,11 +694,12 @@ fn resolve_result_inner(
 
                             let ty = type_for_args(without_type_args, comp_ty, err_ty);
                             Ok((ty, sql))
-                        },
-                        // Result<default!(composite_type!(..)), E> 
-                        "default" => {
-                            Err(syn::Error::new(mac.span(), "`Result<default!(T, default), E>` not supported, choose `default!(Result<T, E>, ident)` instead"))
-                        },
+                        }
+                        // Result<default!(composite_type!(..)), E>
+                        "default" => Err(syn::Error::new(
+                            mac.span(),
+                            "`Result<default!(T, default), E>` not supported, choose `default!(Result<T, E>, ident)` instead",
+                        )),
                         _ => Ok((syn::Type::Path(original), None)),
                     }
                 }

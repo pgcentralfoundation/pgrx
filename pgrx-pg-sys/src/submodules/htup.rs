@@ -8,10 +8,10 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::{
-    bits8, getmissingattr, heap_getsysattr, nocachegetattr, CommandId, Datum, FrozenTransactionId,
-    HeapTupleData, HeapTupleHeaderData, TransactionId, TupleDesc, HEAP_HASNULL, HEAP_HOT_UPDATED,
-    HEAP_NATTS_MASK, HEAP_ONLY_TUPLE, HEAP_XMAX_INVALID, HEAP_XMIN_COMMITTED, HEAP_XMIN_FROZEN,
-    HEAP_XMIN_INVALID, SIZEOF_DATUM,
+    CommandId, Datum, FrozenTransactionId, HEAP_HASNULL, HEAP_HOT_UPDATED, HEAP_NATTS_MASK,
+    HEAP_ONLY_TUPLE, HEAP_XMAX_INVALID, HEAP_XMIN_COMMITTED, HEAP_XMIN_FROZEN, HEAP_XMIN_INVALID,
+    HeapTupleData, HeapTupleHeaderData, SIZEOF_DATUM, TransactionId, TupleDesc, bits8,
+    getmissingattr, heap_getsysattr, nocachegetattr,
 };
 
 /// # Safety

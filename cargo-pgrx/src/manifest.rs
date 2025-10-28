@@ -10,7 +10,7 @@
 use cargo_metadata::Metadata;
 use cargo_toml::Manifest;
 use clap_cargo::Features;
-use eyre::{eyre, Context};
+use eyre::{Context, eyre};
 use pgrx_pg_config::{PgConfig, PgConfigSelector, Pgrx};
 use std::path::PathBuf;
 

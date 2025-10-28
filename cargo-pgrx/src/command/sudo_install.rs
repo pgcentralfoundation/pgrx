@@ -3,9 +3,9 @@ use std::process::Command;
 
 use owo_colors::OwoColorize;
 
+use crate::CommandExecute;
 use crate::command::install::Install;
 use crate::command::package::Package;
-use crate::CommandExecute;
 
 /// Like `cargo pgrx install`, but uses `sudo` to copy the extension files
 #[derive(Debug, Clone)]

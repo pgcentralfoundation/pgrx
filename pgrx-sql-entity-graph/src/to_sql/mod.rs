@@ -20,13 +20,13 @@ pub mod entity;
 use std::hash::Hash;
 
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{quote, ToTokens, TokenStreamExt};
+use quote::{ToTokens, TokenStreamExt, quote};
 use syn::spanned::Spanned;
 use syn::{AttrStyle, Attribute, Lit};
 
+use crate::SqlGraphEntity;
 use crate::pgrx_attribute::{ArgValue, PgrxArg, PgrxAttribute};
 use crate::pgrx_sql::PgrxSql;
-use crate::SqlGraphEntity;
 
 /// Able to be transformed into to SQL.
 pub trait ToSql {
@@ -79,8 +79,7 @@ impl Default for ToSqlConfig {
     }
 }
 
-const INVALID_ATTR_CONTENT: &str =
-    "expected `#[pgrx(sql = content)]`, where `content` is a boolean, string, or path to a function";
+const INVALID_ATTR_CONTENT: &str = "expected `#[pgrx(sql = content)]`, where `content` is a boolean, string, or path to a function";
 
 impl ToSqlConfig {
     /// Used for general purpose parsing from an attribute

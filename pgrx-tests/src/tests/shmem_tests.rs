@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use pgrx::prelude::*;
-use pgrx::{pg_shmem_init, PgAtomic, PgLwLock};
+use pgrx::{PgAtomic, PgLwLock, pg_shmem_init};
 use std::sync::atomic::AtomicBool;
 
 #[cfg(feature = "cshim")]

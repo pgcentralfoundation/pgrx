@@ -32,9 +32,9 @@ pub use crate::pgbox::{AllocatedByPostgres, AllocatedByRust, PgBox, WhoAllocated
 pub use crate::inoutfuncs::{InOutFuncs, PgVarlenaInOutFuncs};
 pub use crate::{
     datum::{
-        datetime_support::*, AnyNumeric, Array, ArraySliceError, Date, FromDatum, Interval,
-        IntoDatum, Numeric, PgVarlena, PostgresType, Range, RangeBound, RangeSubType, Time,
-        TimeWithTimeZone, Timestamp, TimestampWithTimeZone, VariadicArray,
+        AnyNumeric, Array, ArraySliceError, Date, FromDatum, Interval, IntoDatum, Numeric,
+        PgVarlena, PostgresType, Range, RangeBound, RangeSubType, Time, TimeWithTimeZone,
+        Timestamp, TimestampWithTimeZone, VariadicArray, datetime_support::*,
     },
     oids_of,
 };
@@ -47,10 +47,10 @@ pub use crate::trigger_support::{
 // Aggregate support
 pub use crate::aggregate::{Aggregate, FinalizeModify, ParallelOption};
 
+pub use crate::pg_sys::PgBuiltInOids;
 pub use crate::pg_sys::oids::PgOid;
 pub use crate::pg_sys::pg_try::PgTryBuilder;
 pub use crate::pg_sys::utils::name_data_to_str;
-pub use crate::pg_sys::PgBuiltInOids;
 
 // It's a database, gotta query it somehow.
 pub use crate::spi;
@@ -60,6 +60,6 @@ pub use crate::spi::Spi;
 pub use crate::pg_sys::elog::PgLogLevel;
 pub use crate::pg_sys::errcodes::PgSqlErrorCode;
 pub use crate::pg_sys::{
-    check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport, error, function_name,
-    info, log, notice, warning, FATAL, PANIC,
+    FATAL, PANIC, check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport, error,
+    function_name, info, log, notice, warning,
 };

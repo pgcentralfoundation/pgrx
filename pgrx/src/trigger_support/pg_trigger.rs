@@ -12,8 +12,8 @@ use crate::pg_sys;
 use crate::pgbox::AllocatedByPostgres;
 use crate::rel::PgRelation;
 use crate::trigger_support::{
-    called_as_trigger, PgTriggerError, PgTriggerLevel, PgTriggerOperation, PgTriggerWhen,
-    TriggerEvent, TriggerTuple,
+    PgTriggerError, PgTriggerLevel, PgTriggerOperation, PgTriggerWhen, TriggerEvent, TriggerTuple,
+    called_as_trigger,
 };
 use std::ffi::c_char;
 

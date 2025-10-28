@@ -7,7 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::{pg_sys, FromDatum, IntoDatum};
+use crate::{FromDatum, IntoDatum, pg_sys};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -54,7 +54,9 @@ impl FromDatum for AnyElement {
     /// and pass a type ID.
     #[inline]
     unsafe fn from_datum(_datum: pg_sys::Datum, _is_null: bool) -> Option<AnyElement> {
-        panic!("Can't create a polymorphic type using from_datum, call FromDatum::from_polymorphic_datum instead")
+        panic!(
+            "Can't create a polymorphic type using from_datum, call FromDatum::from_polymorphic_datum instead"
+        )
     }
 
     #[inline]
@@ -63,11 +65,7 @@ impl FromDatum for AnyElement {
         is_null: bool,
         typoid: pg_sys::Oid,
     ) -> Option<AnyElement> {
-        if is_null {
-            None
-        } else {
-            Some(AnyElement { datum, typoid })
-        }
+        if is_null { None } else { Some(AnyElement { datum, typoid }) }
     }
 }
 

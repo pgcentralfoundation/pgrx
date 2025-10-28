@@ -187,11 +187,7 @@ impl GucSetting<f64> {
 unsafe impl GucValue for Option<CString> {
     type Raw = *mut std::ffi::c_char;
     unsafe fn from_raw(raw: Self::Raw) -> Self {
-        if raw.is_null() {
-            None
-        } else {
-            Some(CStr::from_ptr(raw).to_owned())
-        }
+        if raw.is_null() { None } else { Some(CStr::from_ptr(raw).to_owned()) }
     }
     type BootVal = ();
 }

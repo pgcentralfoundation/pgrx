@@ -12,8 +12,8 @@
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
-    use pgrx::prelude::*;
     use pgrx::AllocatedByRust;
+    use pgrx::prelude::*;
 
     #[pg_test]
     fn pgbox_alloc() {

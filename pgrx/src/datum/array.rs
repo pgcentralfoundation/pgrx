@@ -8,14 +8,14 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::question_mark)]
-use super::{unbox, UnboxDatum};
+use super::{UnboxDatum, unbox};
 use crate::array::RawArray;
 use crate::nullable::{
     BitSliceNulls, IntoNullableIterator, MaybeStrictNulls, NullLayout, Nullable, NullableContainer,
 };
 use crate::toast::Toast;
+use crate::{FromDatum, IntoDatum, PgMemoryContexts, pg_sys};
 use crate::{layout::*, nullable};
-use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use core::fmt::{Debug, Formatter};
 use core::ops::DerefMut;
 use core::ptr::NonNull;
@@ -458,7 +458,7 @@ where
 mod casper {
     use super::UnboxDatum;
     use crate::layout::Align;
-    use crate::{pg_sys, varlena, Array};
+    use crate::{Array, pg_sys, varlena};
 
     // it's a pop-culture reference (https://en.wikipedia.org/wiki/Cha_Cha_Slide) not some fancy crypto thing you nerd
     /// Describes how to instantiate a value `T` from an [`Array`] and its backing byte array pointer.

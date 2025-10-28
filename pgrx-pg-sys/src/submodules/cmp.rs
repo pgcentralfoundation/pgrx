@@ -1,4 +1,4 @@
-use crate::{Point, BOX};
+use crate::{BOX, Point};
 
 impl PartialEq for Point {
     #[inline]

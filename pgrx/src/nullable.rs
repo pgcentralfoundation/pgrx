@@ -323,11 +323,7 @@ impl NullLayout<usize> for BoolSliceNulls<'_> {
     /// or `None` if `idx` is out-of-bounds.
     #[inline]
     fn is_null(&self, idx: usize) -> Option<bool> {
-        if idx < self.0.len() {
-            Some(self.0[idx])
-        } else {
-            None
-        }
+        if idx < self.0.len() { Some(self.0[idx]) } else { None }
     }
 
     #[inline]

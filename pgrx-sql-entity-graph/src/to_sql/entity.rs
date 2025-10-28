@@ -15,9 +15,9 @@
 > to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
+use crate::SqlGraphEntity;
 use crate::pgrx_sql::PgrxSql;
 use crate::to_sql::ToSqlFn;
-use crate::SqlGraphEntity;
 
 /// Represents configuration options for tuning the SQL generator.
 ///
@@ -60,7 +60,7 @@ impl ToSqlConfigEntity {
         entity: &SqlGraphEntity,
         context: &PgrxSql,
     ) -> Option<eyre::Result<String>> {
-        use eyre::{eyre, WrapErr};
+        use eyre::{WrapErr, eyre};
 
         if !self.enabled {
             return Some(Ok(format!(

@@ -14,7 +14,7 @@ mod tests {
     use crate as pgrx_tests;
 
     use pgrx::prelude::*;
-    use pgrx::{info, register_xact_callback, PgXactCallbackEvent};
+    use pgrx::{PgXactCallbackEvent, info, register_xact_callback};
 
     #[test]
     fn make_idea_happy() {}

@@ -218,11 +218,7 @@ impl TryFrom<NullableDatum> for Datum {
     #[inline]
     fn try_from(nd: NullableDatum) -> Result<Datum, ()> {
         let NullableDatum { value, isnull } = nd;
-        if isnull {
-            Err(())
-        } else {
-            Ok(value)
-        }
+        if isnull { Err(()) } else { Ok(value) }
     }
 }
 

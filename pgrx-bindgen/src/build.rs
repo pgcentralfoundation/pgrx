@@ -7,14 +7,14 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use bindgen::callbacks::{DeriveTrait, EnumVariantValue, ImplementsTrait, MacroParsingBehavior};
 use bindgen::NonCopyUnionStyle;
-use eyre::{eyre, WrapErr};
+use bindgen::callbacks::{DeriveTrait, EnumVariantValue, ImplementsTrait, MacroParsingBehavior};
+use eyre::{WrapErr, eyre};
 use pgrx_pg_config::{
-    is_supported_major_version, PgConfig, PgConfigSelector, PgMinorVersion, PgVersion, Pgrx,
-    SUPPORTED_VERSIONS,
+    PgConfig, PgConfigSelector, PgMinorVersion, PgVersion, Pgrx, SUPPORTED_VERSIONS,
+    is_supported_major_version,
 };
-use quote::{quote, ToTokens};
+use quote::{ToTokens, quote};
 use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
@@ -207,7 +207,7 @@ pub fn main() -> eyre::Result<()> {
                         .map(|pgver| format!("`pg{}`", pgver.major))
                         .collect::<Vec<_>>()
                         .join(", ")
-                ))
+                ));
             }
             versions => {
                 return Err(eyre!(
@@ -217,7 +217,7 @@ pub fn main() -> eyre::Result<()> {
                         .map(|version| format!("pg{}", version.major))
                         .collect::<Vec<String>>()
                         .join(", ")
-                ))
+                ));
             }
         };
 
@@ -226,7 +226,9 @@ pub fn main() -> eyre::Result<()> {
             let major_version = pg_config.major_version()?;
 
             if major_version != found_major {
-                panic!("Feature flag `pg{found_major}` does not match version from the environment-described PgConfig (`{major_version}`)")
+                panic!(
+                    "Feature flag `pg{found_major}` does not match version from the environment-described PgConfig (`{major_version}`)"
+                )
             }
             vec![(major_version, pg_config)]
         } else {
@@ -239,9 +241,12 @@ pub fn main() -> eyre::Result<()> {
     for (_, pg_config) in &pg_configs {
         let version = pg_config.get_version()?;
         if YANKED_POSTGRES_VERSIONS.contains(&version) {
-            panic!("Postgres v{}{} is incompatible with \
+            panic!(
+                "Postgres v{}{} is incompatible with \
                     other versions in this major series and is not supported by pgrx.  Please upgrade \
-                    to the latest version in the v{} series.", version.major, version.minor, version.major);
+                    to the latest version in the v{} series.",
+                version.major, version.minor, version.major
+            );
         }
     }
 
@@ -980,11 +985,7 @@ fn find_include(
         .join("") // returning a `/`-ending path
         .display()
         .to_string();
-    if let Some(path) = path.strip_prefix("\\\\?\\") {
-        Ok(path.to_string())
-    } else {
-        Ok(path)
-    }
+    if let Some(path) = path.strip_prefix("\\\\?\\") { Ok(path.to_string()) } else { Ok(path) }
 }
 
 fn pg_target_includes(pg_version: u16, pg_config: &PgConfig) -> eyre::Result<Vec<String>> {
@@ -1184,8 +1185,8 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
 
 fn rewrite_c_abi_to_c_unwind(file: &mut syn::File) {
     use proc_macro2::Span;
-    use syn::visit_mut::VisitMut;
     use syn::LitStr;
+    use syn::visit_mut::VisitMut;
     pub struct Visitor {}
     impl VisitMut for Visitor {
         fn visit_abi_mut(&mut self, abi: &mut syn::Abi) {

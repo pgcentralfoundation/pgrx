@@ -29,8 +29,8 @@ mod pgrx_modqual_tests {
     }
 
     use pgrx_macros::{
-        opname, pg_aggregate, pg_extern, pg_guard, pg_operator, pg_schema, pg_trigger, pgrx,
-        AggregateName, PostgresEq, PostgresHash, PostgresOrd, PostgresType,
+        AggregateName, PostgresEq, PostgresHash, PostgresOrd, PostgresType, opname, pg_aggregate,
+        pg_extern, pg_guard, pg_operator, pg_schema, pg_trigger, pgrx,
     };
 
     ::pgrx::extension_sql!("SELECT 1;", name = "pgrx_module_qualification_test");
@@ -86,8 +86,8 @@ mod pgrx_modqual_tests {
     }
 
     #[pg_extern]
-    fn foo_table(
-    ) -> ::pgrx::iter::TableIterator<'static, (::pgrx::name!(index, i32), ::pgrx::name!(value, f64))>
+    fn foo_table()
+    -> ::pgrx::iter::TableIterator<'static, (::pgrx::name!(index, i32), ::pgrx::name!(value, f64))>
     {
         todo!()
     }
@@ -98,15 +98,15 @@ mod pgrx_modqual_tests {
     }
 
     #[pg_extern]
-    fn foo_result_set(
-    ) -> std::result::Result<::pgrx::iter::SetOfIterator<'static, i64>, Box<dyn std::error::Error>>
+    fn foo_result_set()
+    -> std::result::Result<::pgrx::iter::SetOfIterator<'static, i64>, Box<dyn std::error::Error>>
     {
         todo!()
     }
 
     #[pg_extern]
-    fn foo_result_option_set(
-    ) -> std::result::Result<::pgrx::iter::SetOfIterator<'static, i64>, Box<dyn std::error::Error>>
+    fn foo_result_option_set()
+    -> std::result::Result<::pgrx::iter::SetOfIterator<'static, i64>, Box<dyn std::error::Error>>
     {
         todo!()
     }

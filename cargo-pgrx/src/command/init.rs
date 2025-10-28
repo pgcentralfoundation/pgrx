@@ -7,14 +7,14 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use crate::CommandExecute;
 use crate::command::stop::stop_postgres;
 use crate::command::version::pgrx_default;
-use crate::CommandExecute;
 use bzip2::bufread::BzDecoder;
-use eyre::{eyre, WrapErr};
+use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{
-    get_c_locale_flags, ConfigToml, PgConfig, PgConfigSelector, Pgrx, PgrxHomeError,
+    ConfigToml, PgConfig, PgConfigSelector, Pgrx, PgrxHomeError, get_c_locale_flags,
 };
 use tar::Archive;
 

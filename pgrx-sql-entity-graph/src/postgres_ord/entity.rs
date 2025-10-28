@@ -16,8 +16,8 @@
 
 */
 use crate::pgrx_sql::PgrxSql;
-use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::to_sql::ToSql;
+use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::{SqlGraphEntity, SqlGraphIdentifier};
 
 /// The output of a [`PostgresOrd`](crate::postgres_ord::PostgresOrd) from `quote::ToTokens::to_tokens`.
@@ -84,7 +84,8 @@ impl SqlGraphIdentifier for PostgresOrdEntity {
 impl ToSql for PostgresOrdEntity {
     fn to_sql(&self, _context: &PgrxSql) -> eyre::Result<String> {
         let PostgresOrdEntity { name, full_path, file, line, .. } = self;
-        let sql = format!("\n\
+        let sql = format!(
+            "\n\
             -- {file}:{line}\n\
             -- {full_path}\n\
             CREATE OPERATOR FAMILY {name}_btree_ops USING btree;\n\

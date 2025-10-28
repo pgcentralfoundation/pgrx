@@ -15,7 +15,7 @@ Positioning references for Rust to SQL mapping support.
 > to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
-use quote::{quote, ToTokens};
+use quote::{ToTokens, quote};
 use std::fmt::Display;
 use syn::parse::{Parse, ParseStream};
 

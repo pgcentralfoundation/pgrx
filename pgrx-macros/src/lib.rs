@@ -14,15 +14,15 @@ use std::collections::HashSet;
 use std::ffi::CString;
 
 use proc_macro2::Ident;
-use quote::{format_ident, quote, ToTokens};
+use quote::{ToTokens, format_ident, quote};
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl};
+use syn::{Attribute, Data, DeriveInput, Item, ItemImpl, parse_macro_input};
 
 use operators::{deriving_postgres_eq, deriving_postgres_hash, deriving_postgres_ord};
 use pgrx_sql_entity_graph as sql_gen;
 use sql_gen::{
-    parse_extern_attributes, CodeEnrichment, ExtensionSql, ExtensionSqlFile, ExternArgs,
-    PgAggregate, PgCast, PgExtern, PostgresEnum, Schema,
+    CodeEnrichment, ExtensionSql, ExtensionSqlFile, ExternArgs, PgAggregate, PgCast, PgExtern,
+    PostgresEnum, Schema, parse_extern_attributes,
 };
 
 mod operators;
@@ -139,7 +139,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
                 "#[pg_test] can only be applied to top-level functions",
             )
             .into_compile_error()
-            .into()
+            .into();
         }
     }
 
@@ -828,7 +828,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             return Err(syn::Error::new(
                 ast.span(),
                 "#[derive(PostgresType)] can only be applied to structs or enums",
-            ))
+            ));
         }
     }
 
@@ -1332,9 +1332,9 @@ fn impl_aggregate_name(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream
                 }
                 _ => {
                     return Err(syn::Error::new_spanned(
-                            attr,
-                            "#[aggregate_name] must be in the form `#[aggregate_name = \"string_literal\"]`",
-                        ));
+                        attr,
+                        "#[aggregate_name] must be in the form `#[aggregate_name = \"string_literal\"]`",
+                    ));
                 }
             }
         }
@@ -1404,9 +1404,9 @@ Review the `pgrx::trigger_support::PgTrigger` documentation for use.
 pub fn pg_trigger(attrs: TokenStream, input: TokenStream) -> TokenStream {
     fn wrapped(attrs: TokenStream, input: TokenStream) -> Result<TokenStream, syn::Error> {
         use pgrx_sql_entity_graph::{PgTrigger, PgTriggerAttribute};
+        use syn::Token;
         use syn::parse::Parser;
         use syn::punctuated::Punctuated;
-        use syn::Token;
 
         let attributes =
             Punctuated::<PgTriggerAttribute, Token![,]>::parse_terminated.parse(attrs)?;
