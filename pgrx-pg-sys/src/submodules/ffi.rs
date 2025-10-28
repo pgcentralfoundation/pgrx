@@ -34,7 +34,7 @@ mod cee_scape {
             fn call_closure_with_sigsetjmp(
                 savemask: c_int,
                 closure_env_ptr: *mut c_void,
-                closure_code: extern "C-unwind" fn(
+                closure_code: unsafe extern "C-unwind" fn(
                     jbuf: *const SigJmpBufFields,
                     env_ptr: *mut c_void,
                 ) -> c_int,
