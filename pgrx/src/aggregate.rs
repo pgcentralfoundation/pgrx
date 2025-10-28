@@ -342,9 +342,6 @@ where
     /// For multiple arguments, provide a tuple.
     ///
     /// Use [`pgrx::name!()`](crate::name) to set the SQL name of the argument.
-    ///
-    /// If the final argument is to be variadic, use [`pgrx::variadic`](crate::variadic). When used
-    /// with [`pgrx::name!()`](crate::name), it must be used **inside** the [`pgrx::name!()`](crate::name) macro.
     type Args;
 
     /// The types of the direct argument(s) to an ordered-set aggregate's `finalize`.
