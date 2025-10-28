@@ -30,7 +30,7 @@ mod cee_scape {
     where
         F: for<'a> FnOnce(&'a SigJmpBufFields) -> c_int,
     {
-        extern "C-unwind" {
+        unsafe extern "C-unwind" {
             fn call_closure_with_sigsetjmp(
                 savemask: c_int,
                 closure_env_ptr: *mut c_void,
@@ -41,7 +41,7 @@ mod cee_scape {
             ) -> c_int;
         }
 
-        extern "C-unwind" fn call_from_c_to_rust<F>(
+        unsafe extern "C-unwind" fn call_from_c_to_rust<F>(
             jbuf: *const SigJmpBufFields,
             closure_env_ptr: *mut c_void,
         ) -> c_int
