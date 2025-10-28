@@ -560,12 +560,10 @@ fn impl_pg_node(items: &[syn::Item]) -> eyre::Result<proc_macro2::TokenStream> {
         };
 
         // grab the type name of the first field
-        let ty_name = if let syn::Type::Path(p) = &first_field.ty {
-            if let Some(last_segment) = p.path.segments.last() {
-                last_segment.ident.to_string()
-            } else {
-                continue;
-            }
+        let ty_name = if let syn::Type::Path(p) = &first_field.ty
+            && let Some(last_segment) = p.path.segments.last()
+        {
+            last_segment.ident.to_string()
         } else {
             continue;
         };
@@ -689,19 +687,18 @@ impl<'a> From<&'a [syn::Item]> for StructGraph<'a> {
                 _ => continue,
             };
 
-            if let syn::Type::Path(p) = &first_field.ty {
-                // We should be guaranteed that just extracting the last path
-                // segment is ok because these structs are all from the same module.
-                // (also, they are all generated from C code, so collisions should be
-                //  impossible anyway thanks to C's single shared namespace).
-                if let Some(last_segment) = p.path.segments.last() {
-                    if let Some(parent_offset) = name_tab.get(&last_segment.ident.to_string()) {
-                        // establish the 2-way link
-                        let child_offset = name_tab[&id];
-                        descriptors[child_offset].parent = Some(*parent_offset);
-                        descriptors[*parent_offset].children.push(child_offset);
-                    }
-                }
+            // We should be guaranteed that just extracting the last path
+            // segment is ok because these structs are all from the same module.
+            // (also, they are all generated from C code, so collisions should be
+            //  impossible anyway thanks to C's single shared namespace).
+            if let syn::Type::Path(p) = &first_field.ty
+                && let Some(last_segment) = p.path.segments.last()
+                && let Some(parent_offset) = name_tab.get(&last_segment.ident.to_string())
+            {
+                // establish the 2-way link
+                let child_offset = name_tab[&id];
+                descriptors[child_offset].parent = Some(*parent_offset);
+                descriptors[*parent_offset].children.push(child_offset);
             }
         }
 
@@ -1190,10 +1187,10 @@ fn rewrite_c_abi_to_c_unwind(file: &mut syn::File) {
     pub struct Visitor {}
     impl VisitMut for Visitor {
         fn visit_abi_mut(&mut self, abi: &mut syn::Abi) {
-            if let Some(name) = &mut abi.name {
-                if name.value() == "C" {
-                    *name = LitStr::new("C-unwind", Span::call_site());
-                }
+            if let Some(name) = &mut abi.name
+                && name.value() == "C"
+            {
+                *name = LitStr::new("C-unwind", Span::call_site());
             }
         }
     }
