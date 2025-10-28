@@ -274,16 +274,13 @@ impl UsedType {
 
         // if the Type is like `Result<T, E>`, this finds the `T`
         let mut resolved_ty_inner: Option<syn::Type> = None;
-        if result {
-            if let syn::Type::Path(tp) = &resolved_ty {
-                if let Some(first_segment) = tp.path.segments.first() {
-                    if let syn::PathArguments::AngleBracketed(ab) = &first_segment.arguments {
-                        if let Some(syn::GenericArgument::Type(ty)) = ab.args.first() {
-                            resolved_ty_inner = Some(ty.clone());
-                        }
-                    }
-                }
-            }
+        if result
+            && let syn::Type::Path(tp) = &resolved_ty
+            && let Some(first_segment) = tp.path.segments.first()
+            && let syn::PathArguments::AngleBracketed(ab) = &first_segment.arguments
+            && let Some(syn::GenericArgument::Type(ty)) = ab.args.first()
+        {
+            resolved_ty_inner = Some(ty.clone());
         }
 
         Ok(Self {
