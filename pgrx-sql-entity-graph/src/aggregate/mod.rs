@@ -158,20 +158,18 @@ fn extract_generic_from_trait(item_impl: &ItemImpl) -> Result<&Type, syn::Error>
 }
 
 fn get_generic_type_name(ty: &syn::Type) -> Result<String, syn::Error> {
-    if let Type::Path(type_path) = ty {
-        if let Some(ident) = type_path.path.segments.last().map(|s| &s.ident) {
-            let ident = ident.to_string();
+    if let Type::Path(type_path) = ty
+        && let Some(ident) = type_path.path.segments.last().map(|s| &s.ident)
+    {
+        let ident = ident.to_string();
 
-            match ident.as_str() {
-                "!" => Ok("never".to_string()),
-                "()" => Ok("unit".to_string()),
-                _ => Ok(ident),
-            }
-        } else {
-            Err(syn::Error::new_spanned(ty, "Generic type path is empty or malformed."))
+        match ident.as_str() {
+            "!" => Ok("never".to_string()),
+            "()" => Ok("unit".to_string()),
+            _ => Ok(ident),
         }
     } else {
-        Err(syn::Error::new_spanned(ty, "Expected a path type for the generic argument."))
+        Err(syn::Error::new_spanned(ty, "Generic type path is empty or malformed."))
     }
 }
 
