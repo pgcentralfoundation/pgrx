@@ -935,7 +935,7 @@ fn remap_self_to_target(ty: &mut syn::Type, target: &syn::Ident) {
     }
 }
 
-fn get_pgrx_attr_macro(attr_name: impl AsRef<str>, ty: &syn::Type) -> Option<TokenStream2> {
+fn get_pgrx_attr_macro(attr_name: &str, ty: &syn::Type) -> Option<TokenStream2> {
     match &ty {
         syn::Type::Macro(ty_macro) => {
             let mut found_pgrx = false;
@@ -944,7 +944,7 @@ fn get_pgrx_attr_macro(attr_name: impl AsRef<str>, ty: &syn::Type) -> Option<Tok
             for (idx, segment) in ty_macro.mac.path.segments.iter().enumerate() {
                 match segment.ident.to_string().as_str() {
                     "pgrx" if idx == 0 => found_pgrx = true,
-                    attr if attr == attr_name.as_ref() => found_attr = true,
+                    attr if attr == attr_name => found_attr = true,
                     _ => (),
                 }
             }
