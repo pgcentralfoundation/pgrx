@@ -75,12 +75,12 @@ impl CommandExecute for Test {
 
             test_extension(
                 &pg_config,
-                me.manifest_path.as_ref(),
+                me.manifest_path.as_deref(),
                 me.package.as_ref(),
                 &profile,
                 me.no_schema,
                 &features,
-                me.testname,
+                me.testname.as_deref(),
                 me.runas,
                 me.pgdata,
             )?;
@@ -117,12 +117,12 @@ impl CommandExecute for Test {
 ))]
 pub fn test_extension(
     pg_config: &PgConfig,
-    user_manifest_path: Option<impl AsRef<Path>>,
+    user_manifest_path: Option<&Path>,
     user_package: Option<&String>,
     profile: &CargoProfile,
     no_schema: bool,
     features: &clap_cargo::Features,
-    testname: Option<impl AsRef<str>>,
+    testname: Option<&str>,
     runas: Option<String>,
     pgdata: Option<PathBuf>,
 ) -> eyre::Result<()> {
@@ -132,7 +132,7 @@ pub fn test_extension(
     }
 
     if let Some(ref testname) = testname {
-        tracing::Span::current().record("testname", tracing::field::display(&testname.as_ref()));
+        tracing::Span::current().record("testname", tracing::field::display(&testname));
     }
     let target_dir = get_target_dir()?;
 
@@ -184,7 +184,7 @@ pub fn test_extension(
 
     if let Some(user_manifest_path) = user_manifest_path {
         command.arg("--manifest-path");
-        command.arg(user_manifest_path.as_ref());
+        command.arg(user_manifest_path);
     }
 
     if let Some(user_package) = user_package {
@@ -193,7 +193,7 @@ pub fn test_extension(
     }
 
     if let Some(testname) = testname {
-        command.arg(testname.as_ref());
+        command.arg(testname);
     }
 
     eprintln!("{command:?}");
