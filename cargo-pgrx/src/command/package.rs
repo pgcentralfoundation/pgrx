@@ -85,7 +85,7 @@ impl Package {
         };
 
         let output_files = package_extension(
-            self.manifest_path.as_ref(),
+            self.manifest_path.as_deref(),
             self.package.as_ref(),
             &package_manifest_path,
             &pg_config,
@@ -114,7 +114,7 @@ impl CommandExecute for Package {
     test = is_test,
 ))]
 pub(crate) fn package_extension(
-    user_manifest_path: Option<impl AsRef<Path>>,
+    user_manifest_path: Option<&Path>,
     user_package: Option<&String>,
     package_manifest_path: &Path,
     pg_config: &PgConfig,

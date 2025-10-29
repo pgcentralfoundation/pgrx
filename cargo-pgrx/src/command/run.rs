@@ -109,7 +109,7 @@ impl Run {
 
         run(
             &pg_config,
-            self.manifest_path.as_ref(),
+            self.manifest_path.as_deref(),
             self.package.as_ref(),
             &package_manifest_path,
             &dbname,
@@ -143,7 +143,7 @@ impl CommandExecute for Run {
 ))]
 pub(crate) fn run(
     pg_config: &PgConfig,
-    user_manifest_path: Option<impl AsRef<Path>>,
+    user_manifest_path: Option<&Path>,
     user_package: Option<&String>,
     package_manifest_path: &Path,
     dbname: &str,

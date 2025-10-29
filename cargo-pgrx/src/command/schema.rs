@@ -97,15 +97,15 @@ impl CommandExecute for Schema {
         )?;
 
         generate_schema(
-            self.manifest_path.as_ref(),
+            self.manifest_path.as_deref(),
             self.package.as_ref(),
-            package_manifest_path,
+            &package_manifest_path,
             &profile,
             self.test,
             &self.features,
             self.target.as_deref(),
-            self.out.as_ref(),
-            self.dot,
+            self.out.as_deref(),
+            self.dot.as_deref(),
             log_level,
             self.skip_build,
             &mut vec![],
@@ -116,20 +116,20 @@ impl CommandExecute for Schema {
 #[tracing::instrument(level = "error", skip_all, fields(
     profile = ?profile,
     test = is_test,
-    path = path.as_ref().map(|path| tracing::field::display(path.as_ref().display())),
+    path = path.map(|path| tracing::field::display(path.display())),
     dot,
     features = ?features.features,
 ))]
 pub(crate) fn generate_schema(
-    user_manifest_path: Option<impl AsRef<Path>>,
+    user_manifest_path: Option<&Path>,
     user_package: Option<&String>,
-    package_manifest_path: impl AsRef<Path>,
+    package_manifest_path: &Path,
     profile: &CargoProfile,
     is_test: bool,
     features: &clap_cargo::Features,
     target: Option<&str>,
-    path: Option<impl AsRef<std::path::Path>>,
-    dot: Option<impl AsRef<std::path::Path>>,
+    path: Option<&Path>,
+    dot: Option<&Path>,
     log_level: Option<String>,
     skip_build: bool,
     output_tracking: &mut Vec<PathBuf>,
@@ -152,7 +152,7 @@ pub(crate) fn generate_schema(
     if !skip_build {
         // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
         first_build(
-            user_manifest_path.as_ref(),
+            user_manifest_path,
             profile,
             features,
             log_level.clone(),
@@ -167,19 +167,19 @@ pub(crate) fn generate_schema(
     let symbols = compute_symbols(profile, &lib_filename, target)?;
 
     let mut out_path = None;
-    if let Some(path) = path.as_ref() {
-        let x = path.as_ref().to_str().expect("`path` is not a valid UTF8 string.");
+    if let Some(path) = path {
+        let x = path.to_str().expect("`path` is not a valid UTF8 string.");
         out_path = Some(x.to_string());
     }
 
     let mut out_dot = None;
-    if let Some(dot) = dot.as_ref() {
-        let x = dot.as_ref().to_str().expect("`dot` is not a valid UTF8 string.");
+    if let Some(dot) = dot {
+        let x = dot.to_str().expect("`dot` is not a valid UTF8 string.");
         out_dot = Some(x.to_string());
     };
 
     let codegen = compute_codegen(
-        control_file,
+        &control_file,
         package_manifest_path,
         &symbols,
         &lib_name,
@@ -195,18 +195,18 @@ pub(crate) fn generate_schema(
     };
 
     if let Some(out_path) = path.as_ref() {
-        if let Some(parent) = out_path.as_ref().parent() {
+        if let Some(parent) = out_path.parent() {
             std::fs::create_dir_all(parent).wrap_err("Could not create parent directory")?;
         }
-        output_tracking.push(out_path.as_ref().to_path_buf());
+        output_tracking.push(out_path.to_path_buf());
     }
 
     if let Some(dot_path) = dot.as_ref() {
-        tracing::info!(dot = %dot_path.as_ref().display(), "Writing Graphviz DOT");
+        tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
     }
 
     second_build(
-        user_manifest_path.as_ref(),
+        user_manifest_path,
         features,
         log_level.clone(),
         &features_arg,
@@ -323,7 +323,7 @@ fn compute_symbols(
 }
 
 fn first_build(
-    user_manifest_path: Option<&impl AsRef<Path>>,
+    user_manifest_path: Option<&Path>,
     profile: &CargoProfile,
     features: &clap_cargo::Features,
     log_level: Option<String>,
@@ -351,7 +351,7 @@ fn first_build(
 
     if let Some(user_manifest_path) = user_manifest_path.as_ref() {
         command.arg("--manifest-path");
-        command.arg(user_manifest_path.as_ref());
+        command.arg(user_manifest_path);
     }
 
     command.args(profile.cargo_args());
@@ -403,8 +403,8 @@ fn first_build(
 }
 
 fn compute_codegen(
-    control_file_path: impl AsRef<Path>,
-    package_manifest_path: impl AsRef<Path>,
+    control_file_path: &Path,
+    package_manifest_path: &Path,
     symbols: &[String],
     lib_name: &str,
     path: Option<String>,
@@ -414,10 +414,8 @@ fn compute_codegen(
     let lib_name_ident = Ident::new(lib_name, Span::call_site());
 
     let inputs = {
-        let control_file_path = control_file_path
-            .as_ref()
-            .to_str()
-            .expect(".control file filename should be valid UTF8");
+        let control_file_path =
+            control_file_path.to_str().expect(".control file filename should be valid UTF8");
         let mut out = quote::quote! {
             // call the marker.  Primarily this ensures that rustc will actually link to the library
             // during the "pgrx_embed" build initiated by `cargo-pgrx schema` generation
@@ -493,12 +491,12 @@ fn compute_codegen(
 }
 
 fn second_build(
-    user_manifest_path: Option<&impl AsRef<Path>>,
+    user_manifest_path: Option<&Path>,
     features: &clap_cargo::Features,
     log_level: Option<String>,
     features_arg: &str,
     flags: &str,
-    embed_path: impl AsRef<Path>,
+    embed_path: &Path,
     package_name: &str,
     manifest: &Manifest,
 ) -> eyre::Result<()> {
@@ -518,7 +516,7 @@ fn second_build(
 
     if let Some(user_manifest_path) = user_manifest_path.as_ref() {
         command.arg("--manifest-path");
-        command.arg(user_manifest_path.as_ref());
+        command.arg(user_manifest_path);
     }
 
     if let Some(log_level) = &log_level {
@@ -546,7 +544,7 @@ fn second_build(
 
     command.args(["--cfg", "pgrx_embed"]);
 
-    command.env("PGRX_EMBED", embed_path.as_ref());
+    command.env("PGRX_EMBED", embed_path);
 
     let command_str = format!("{command:?}");
     eprintln!(

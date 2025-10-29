@@ -100,7 +100,7 @@ impl CommandExecute for Install {
 
         display_version_info(&pg_config, &PgVersionSource::PgConfig(pg_config.label()?));
         install_extension(
-            self.manifest_path.as_ref(),
+            self.manifest_path.as_deref(),
             self.package.as_ref(),
             &package_manifest_path,
             &pg_config,
@@ -122,7 +122,7 @@ impl CommandExecute for Install {
     features = ?features.features,
 ))]
 pub(crate) fn install_extension(
-    user_manifest_path: Option<impl AsRef<Path>>,
+    user_manifest_path: Option<&Path>,
     user_package: Option<&String>,
     package_manifest_path: &Path,
     pg_config: &PgConfig,
@@ -344,7 +344,7 @@ pub(crate) fn build_extension(
 }
 
 fn copy_sql_files(
-    user_manifest_path: Option<impl AsRef<Path>>,
+    user_manifest_path: Option<&Path>,
     user_package: Option<&String>,
     package_manifest_path: impl AsRef<Path>,
     profile: &CargoProfile,
@@ -364,13 +364,13 @@ fn copy_sql_files(
         crate::command::schema::generate_schema(
             user_manifest_path,
             user_package,
-            &package_manifest_path,
+            package_manifest_path.as_ref(),
             profile,
             is_test,
             features,
             target,
             Some(&dest),
-            Option::<String>::None,
+            None,
             None,
             skip_build,
             output_tracking,
