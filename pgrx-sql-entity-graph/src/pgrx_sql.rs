@@ -251,11 +251,11 @@ impl PgrxSql {
         Ok(this)
     }
 
-    pub fn to_file(&self, file: impl AsRef<Path> + Debug) -> eyre::Result<()> {
+    pub fn to_file(&self, file: &Path) -> eyre::Result<()> {
         use std::fs::{File, create_dir_all};
         use std::io::Write;
         let generated = self.to_sql()?;
-        let path = Path::new(file.as_ref());
+        let path = Path::new(file);
 
         let parent = path.parent();
         if let Some(parent) = parent {
@@ -321,7 +321,7 @@ impl PgrxSql {
         Ok(())
     }
 
-    pub fn to_dot(&self, file: impl AsRef<Path> + Debug) -> eyre::Result<()> {
+    pub fn to_dot(&self, path: &Path) -> eyre::Result<()> {
         use std::fs::{File, create_dir_all};
         use std::io::Write;
         let generated = Dot::with_attr_getters(
@@ -375,7 +375,6 @@ impl PgrxSql {
                 }
             },
         );
-        let path = Path::new(file.as_ref());
 
         let parent = path.parent();
         if let Some(parent) = parent {
