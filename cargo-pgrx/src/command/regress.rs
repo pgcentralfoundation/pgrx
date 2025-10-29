@@ -75,7 +75,7 @@ pub(crate) struct Regress {
 
 impl Regress {
     #[rustfmt::skip]
-    fn is_setup_sql_newer(&self, manifest_path: impl AsRef<Path>) -> bool {
+    fn is_setup_sql_newer(&self, manifest_path: &Path) -> bool {
 
         // if we have reset the db, then re-run the setup
         if self.resetdb {
@@ -101,7 +101,7 @@ impl Regress {
 
     fn list_sql_tests(
         &self,
-        manifest_path: impl AsRef<Path>,
+        manifest_path: &Path,
         include_setup: bool,
     ) -> eyre::Result<Vec<DirEntry>> {
         let sql = manifest_path_to_sql_tests_path(manifest_path);
@@ -116,7 +116,7 @@ impl Regress {
 
     fn list_expected_outputs(
         &self,
-        manifest_path: impl AsRef<Path>,
+        manifest_path: &Path,
         include_setup: bool,
     ) -> eyre::Result<Vec<DirEntry>> {
         let expected = manifest_path_to_expected_tests_output_path(manifest_path);
@@ -132,7 +132,7 @@ impl Regress {
 
     fn list_results_outputs(
         &self,
-        manifest_path: impl AsRef<Path>,
+        manifest_path: &Path,
         include_setup: bool,
     ) -> eyre::Result<Vec<DirEntry>> {
         let results = manifest_path_to_results_output_path(manifest_path);
@@ -188,15 +188,14 @@ impl Regress {
 
     fn accept_new_test(
         &self,
-        manifest_path: impl AsRef<Path>,
-        test_result_output: impl AsRef<Path>,
+        manifest_path: &Path,
+        test_result_output: &Path,
         auto: bool,
     ) -> eyre::Result<()> {
         if !std::io::stdin().is_terminal() {
             panic!("not a terminal: cannot perform user interaction to accept tests")
         }
         let test_name = test_result_output
-            .as_ref()
             .file_stem()
             .expect("test result output should have a stem")
             .to_str()
@@ -255,15 +254,15 @@ impl Regress {
             std::fs::copy(test_result_output, &expected_path)?;
 
             // make sure to add the file to git
-            add_to_git(expected_path)
+            add_to_git(&expected_path)
         }
     }
 
     fn run_all_tests(
         &self,
         pg_config: &PgConfig,
-        manifest_path: impl AsRef<Path>,
-        pgregress_path: impl AsRef<Path>,
+        manifest_path: &Path,
+        pgregress_path: &Path,
         dbname: &str,
         test_files: &[&DirEntry],
         output_files: &[&DirEntry],
@@ -295,7 +294,7 @@ impl Regress {
                     dbname,
                     new_test,
                 )? {
-                    self.accept_new_test(&manifest_path, test_result_output, auto)?;
+                    self.accept_new_test(&manifest_path, &test_result_output, auto)?;
                 }
             }
         }
@@ -416,7 +415,7 @@ impl CommandExecute for Regress {
 
 fn run_tests(
     pg_config: &PgConfig,
-    pg_regress_bin: impl AsRef<Path>,
+    pg_regress_bin: &Path,
     dbname: &str,
     test_files: &[&DirEntry],
 ) -> eyre::Result<bool> {
@@ -436,8 +435,8 @@ fn run_tests(
 
 fn create_regress_output(
     pg_config: &PgConfig,
-    manifest_path: impl AsRef<Path>,
-    pg_regress_bin: impl AsRef<Path>,
+    manifest_path: &Path,
+    pg_regress_bin: &Path,
     dbname: &str,
     test_file: &DirEntry,
 ) -> eyre::Result<Option<PathBuf>> {
@@ -469,9 +468,9 @@ fn create_regress_output(
 
 fn pg_regress(
     pg_config: &PgConfig,
-    bin: impl AsRef<Path>,
+    bin: &Path,
     dbname: &str,
-    input_dir: impl AsRef<Path>,
+    input_dir: &Path,
     tests: &[&DirEntry],
 ) -> eyre::Result<ExitStatus> {
     if tests.is_empty() {
@@ -480,7 +479,7 @@ fn pg_regress(
     let test_dir = tests[0].path().parent().unwrap().parent().unwrap().to_path_buf();
     let tests = tests.iter().map(|entry| make_test_name(entry));
 
-    let mut command = Command::new(bin.as_ref());
+    let mut command = Command::new(bin);
     command
         .current_dir(test_dir)
         .env_remove("PGDATABASE")
@@ -495,8 +494,8 @@ fn pg_regress(
         .arg(pg_config.port()?.to_string())
         .arg("--use-existing")
         .arg(format!("--dbname={dbname}"))
-        .arg(format!("--inputdir={}", input_dir.as_ref().display()))
-        .arg(format!("--outputdir={}", input_dir.as_ref().display()))
+        .arg(format!("--inputdir={}", input_dir.display()))
+        .arg(format!("--outputdir={}", input_dir.display()))
         .args(tests);
 
     #[cfg(not(target_os = "windows"))]
@@ -642,8 +641,8 @@ fn make_test_name(entry: &DirEntry) -> String {
     filename.to_string()
 }
 
-fn manifest_path_to_sql_tests_path(manifest_path: impl AsRef<Path>) -> PathBuf {
-    let mut path = PathBuf::from(manifest_path.as_ref());
+fn manifest_path_to_sql_tests_path(manifest_path: &Path) -> PathBuf {
+    let mut path = PathBuf::from(manifest_path);
     path.pop(); // pop `Cargo.toml`
     path.push("tests");
     path.push("pg_regress");
@@ -651,16 +650,16 @@ fn manifest_path_to_sql_tests_path(manifest_path: impl AsRef<Path>) -> PathBuf {
     path
 }
 
-fn manifest_path_to_expected_tests_output_path(manifest_path: impl AsRef<Path>) -> PathBuf {
-    let mut path = PathBuf::from(manifest_path.as_ref());
+fn manifest_path_to_expected_tests_output_path(manifest_path: &Path) -> PathBuf {
+    let mut path = PathBuf::from(manifest_path);
     path.pop(); // pop `Cargo.toml`
     path.push("tests");
     path.push("pg_regress");
     path.push("expected");
     path
 }
-fn manifest_path_to_results_output_path(manifest_path: impl AsRef<Path>) -> PathBuf {
-    let mut path = PathBuf::from(manifest_path.as_ref());
+fn manifest_path_to_results_output_path(manifest_path: &Path) -> PathBuf {
+    let mut path = PathBuf::from(manifest_path);
     path.pop(); // pop `Cargo.toml`
     path.push("tests");
     path.push("pg_regress");
@@ -668,18 +667,17 @@ fn manifest_path_to_results_output_path(manifest_path: impl AsRef<Path>) -> Path
     path
 }
 
-fn add_to_git(path: impl AsRef<Path>) -> eyre::Result<()> {
+fn add_to_git(path: &Path) -> eyre::Result<()> {
     if let Ok(git) = which::which("git") {
-        if is_git_repo(&git) && !Command::new(git).arg("add").arg(path.as_ref()).status()?.success()
-        {
-            panic!("unable to add {} to git", path.as_ref().display());
+        if is_git_repo(&git) && !Command::new(git).arg("add").arg(path).status()?.success() {
+            panic!("unable to add {} to git", path.display());
         }
     }
     Ok(())
 }
 
-fn is_git_repo(git: impl AsRef<Path>) -> bool {
-    Command::new(git.as_ref())
+fn is_git_repo(git: &Path) -> bool {
+    Command::new(git)
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .arg("rev-parse")
