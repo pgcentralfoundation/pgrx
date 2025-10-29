@@ -147,7 +147,7 @@ pub(crate) fn package_extension(
 
 pub(crate) fn build_base_path(
     pg_config: &PgConfig,
-    manifest_path: impl AsRef<Path>,
+    manifest_path: &Path,
     profile: &CargoProfile,
     target: Option<&str>,
 ) -> eyre::Result<PathBuf> {

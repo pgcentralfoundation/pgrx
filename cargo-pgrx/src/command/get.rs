@@ -40,7 +40,7 @@ impl CommandExecute for Get {
             crate::manifest::manifest_path(&metadata, self.package.as_ref())
                 .wrap_err("Couldn't get manifest path")?;
 
-        if let Some(value) = get_property(package_manifest_path, &self.name)? {
+        if let Some(value) = get_property(&package_manifest_path, &self.name)? {
             println!("{value}");
         }
         Ok(())
@@ -49,9 +49,9 @@ impl CommandExecute for Get {
 
 #[tracing::instrument(level = "error", skip_all, fields(
     %name,
-    manifest_path = %manifest_path.as_ref().display(),
+    manifest_path = %manifest_path.display(),
 ))]
-pub fn get_property(manifest_path: impl AsRef<Path>, name: &str) -> eyre::Result<Option<String>> {
+pub fn get_property(manifest_path: &Path, name: &str) -> eyre::Result<Option<String>> {
     let (control_file, extname) = find_control_file(manifest_path)?;
 
     if name == "extname" {
@@ -84,13 +84,10 @@ pub fn get_property(manifest_path: impl AsRef<Path>, name: &str) -> eyre::Result
     Ok(None)
 }
 
-pub(crate) fn find_control_file(
-    manifest_path: impl AsRef<Path>,
-) -> eyre::Result<(PathBuf, String)> {
+pub(crate) fn find_control_file(manifest_path: &Path) -> eyre::Result<(PathBuf, String)> {
     let parent = manifest_path
-        .as_ref()
         .parent()
-        .ok_or_else(|| eyre!("could not get parent of `{}`", manifest_path.as_ref().display()))?;
+        .ok_or_else(|| eyre!("could not get parent of `{}`", manifest_path.display()))?;
 
     for f in (std::fs::read_dir(parent).wrap_err_with(|| {
         eyre!("cannot open current directory `{}` for reading", parent.display())
@@ -112,7 +109,7 @@ pub(crate) fn find_control_file(
         }
     }
 
-    Err(eyre!("control file not found in `{}`", manifest_path.as_ref().display()))
+    Err(eyre!("control file not found in `{}`", manifest_path.display()))
 }
 
 fn determine_git_hash() -> eyre::Result<Option<String>> {
