@@ -140,7 +140,7 @@ pub(crate) fn install_extension(
     let versioned_so = get_property(package_manifest_path, "module_pathname")?.is_none();
 
     let build_command_output =
-        build_extension(user_manifest_path.as_ref(), user_package, profile, features, target)?;
+        build_extension(user_manifest_path, user_package, profile, features, target)?;
     let build_command_bytes = build_command_output.stdout;
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = CargoMessage::parse_stream(build_command_reader);
@@ -241,7 +241,7 @@ fn copy_file(
     dest: PathBuf,
     msg: &str,
     do_filter: bool,
-    package_manifest_path: impl AsRef<Path>,
+    package_manifest_path: &Path,
     output_tracking: &mut Vec<PathBuf>,
 ) -> eyre::Result<()> {
     let Some(dest_dir) = dest.parent() else {
@@ -281,7 +281,7 @@ fn copy_file(
 }
 
 pub(crate) fn build_extension(
-    user_manifest_path: Option<impl AsRef<Path>>,
+    user_manifest_path: Option<&Path>,
     user_package: Option<&String>,
     profile: &CargoProfile,
     features: &clap_cargo::Features,
@@ -295,7 +295,7 @@ pub(crate) fn build_extension(
 
     if let Some(user_manifest_path) = user_manifest_path {
         command.arg("--manifest-path");
-        command.arg(user_manifest_path.as_ref());
+        command.arg(user_manifest_path);
     }
 
     if let Some(user_package) = user_package {
@@ -346,7 +346,7 @@ pub(crate) fn build_extension(
 fn copy_sql_files(
     user_manifest_path: Option<&Path>,
     user_package: Option<&String>,
-    package_manifest_path: impl AsRef<Path>,
+    package_manifest_path: &Path,
     profile: &CargoProfile,
     is_test: bool,
     features: &clap_cargo::Features,
@@ -378,7 +378,7 @@ fn copy_sql_files(
     }
 
     // now copy all the version upgrade files too
-    if let Ok(dir) = fs::read_dir(package_manifest_path.as_ref().parent().unwrap().join("sql/")) {
+    if let Ok(dir) = fs::read_dir(package_manifest_path.parent().unwrap().join("sql/")) {
         for sql in dir.flatten() {
             let filename = sql.file_name().into_string().unwrap();
 
@@ -444,8 +444,8 @@ pub(crate) fn find_library_file(
 
 static CARGO_VERSION: OnceLock<MemoizeKeyValue> = OnceLock::new();
 
-pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<String> {
-    let path_string = manifest_path.as_ref().to_owned();
+pub(crate) fn get_version(manifest_path: &Path) -> eyre::Result<String> {
+    let path_string = manifest_path.to_owned();
 
     if let Some(version) =
         CARGO_VERSION.get_or_init(Default::default).lock().unwrap().get(&path_string)
@@ -486,8 +486,8 @@ pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<Strin
 
 static GIT_HASH: OnceLock<MemoizeKeyValue> = OnceLock::new();
 
-fn get_git_hash(manifest_path: impl AsRef<Path>) -> eyre::Result<String> {
-    let path_string = manifest_path.as_ref().to_owned();
+fn get_git_hash(manifest_path: &Path) -> eyre::Result<String> {
+    let path_string = manifest_path.to_owned();
 
     let mut mutex = GIT_HASH.get_or_init(Default::default).lock().unwrap();
     if let Some(hash) = mutex.get(&path_string) {
@@ -540,8 +540,7 @@ fn make_relative_extdir(_: PathBuf) -> PathBuf {
     "share/extension".into()
 }
 
-pub(crate) fn format_display_path(path: impl AsRef<Path>) -> eyre::Result<String> {
-    let path = path.as_ref();
+pub(crate) fn format_display_path(path: &Path) -> eyre::Result<String> {
     let out = path
         .strip_prefix(get_target_dir()?.parent().unwrap())
         .unwrap_or(path)
@@ -550,7 +549,7 @@ pub(crate) fn format_display_path(path: impl AsRef<Path>) -> eyre::Result<String
     Ok(out)
 }
 
-fn filter_contents(manifest_path: impl AsRef<Path>, mut input: String) -> eyre::Result<String> {
+fn filter_contents(manifest_path: &Path, mut input: String) -> eyre::Result<String> {
     if input.contains("@GIT_HASH@") {
         // avoid doing this if we don't actually have the token
         // the project might not be a git repo so running `git`
