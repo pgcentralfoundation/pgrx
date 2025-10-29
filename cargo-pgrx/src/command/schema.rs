@@ -80,7 +80,7 @@ impl CommandExecute for Schema {
         let (package_manifest, package_manifest_path) = get_package_manifest(
             &self.features,
             self.package.as_ref(),
-            self.manifest_path.as_ref(),
+            self.manifest_path.as_deref(),
         )?;
         // This does meaningful mutation, unfortunately
         let (_pg_config, _pg_version) = pg_config_and_version(

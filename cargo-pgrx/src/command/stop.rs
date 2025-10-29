@@ -40,7 +40,7 @@ impl CommandExecute for Stop {
             let (package_manifest, _) = get_package_manifest(
                 &clap_cargo::Features::default(),
                 me.package.as_ref(),
-                me.manifest_path.clone(),
+                me.manifest_path.as_deref(),
             )?;
             let (pg_config, _) =
                 pg_config_and_version(pgrx, &package_manifest, me.pg_version, None, false)?;
@@ -52,7 +52,7 @@ impl CommandExecute for Stop {
         let (package_manifest, _) = get_package_manifest(
             &clap_cargo::Features::default(),
             self.package.as_ref(),
-            self.manifest_path.clone(),
+            self.manifest_path.as_deref(),
         )?;
         if self.pg_version == Some("all".into()) {
             for v in crate::manifest::all_pg_in_both_tomls(&package_manifest, &pgrx) {

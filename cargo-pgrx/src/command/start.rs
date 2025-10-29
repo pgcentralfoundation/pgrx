@@ -53,7 +53,7 @@ impl CommandExecute for Start {
             let (package_manifest, _) = get_package_manifest(
                 &clap_cargo::Features::default(),
                 me.package.as_ref(),
-                me.manifest_path,
+                me.manifest_path.as_deref(),
             )?;
 
             let (pg_config, _) =
@@ -64,7 +64,7 @@ impl CommandExecute for Start {
         let (package_manifest, _) = get_package_manifest(
             &clap_cargo::Features::default(),
             self.package.as_ref(),
-            self.manifest_path.clone(),
+            self.manifest_path.as_deref(),
         )?;
 
         let postgresql_conf = collect_postgresql_conf_settings(&self.postgresql_conf)?;

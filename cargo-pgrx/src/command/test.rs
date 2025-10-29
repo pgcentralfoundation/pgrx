@@ -58,8 +58,11 @@ impl CommandExecute for Test {
         #[tracing::instrument(level = "error", skip(me))]
         fn perform(me: Test, pgrx: &Pgrx) -> eyre::Result<()> {
             let mut features = me.features.clone();
-            let (package_manifest, _package_manifest_path) =
-                get_package_manifest(&me.features, me.package.as_ref(), me.manifest_path.as_ref())?;
+            let (package_manifest, _package_manifest_path) = get_package_manifest(
+                &me.features,
+                me.package.as_ref(),
+                me.manifest_path.as_deref(),
+            )?;
             let (pg_config, _pg_version) = pg_config_and_version(
                 pgrx,
                 &package_manifest,
@@ -91,7 +94,7 @@ impl CommandExecute for Test {
         let (package_manifest, _) = get_package_manifest(
             &self.features,
             self.package.as_ref(),
-            self.manifest_path.as_ref(),
+            self.manifest_path.as_deref(),
         )?;
         let pgrx = Pgrx::from_config()?;
         if self.pg_version == Some("all".to_string()) {
