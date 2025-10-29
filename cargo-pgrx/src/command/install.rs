@@ -71,9 +71,9 @@ impl CommandExecute for Install {
             return sudo_install.execute();
         }
 
-        let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
+        let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_deref())
             .wrap_err("couldn't get cargo metadata")?;
-        crate::metadata::validate(self.manifest_path.as_ref(), &metadata)?;
+        crate::metadata::validate(self.manifest_path.as_deref(), &metadata)?;
         let package_manifest_path =
             crate::manifest::manifest_path(&metadata, self.package.as_ref())
                 .wrap_err("Couldn't get manifest path")?;
