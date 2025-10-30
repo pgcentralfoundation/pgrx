@@ -167,26 +167,8 @@ pub(crate) fn generate_schema(
 
     let symbols = find_and_compute_symbols(profile, &lib_filename, target)?;
 
-    let mut out_path = None;
-    if let Some(path) = path {
-        let x = path.to_str().expect("`path` is not a valid UTF8 string.");
-        out_path = Some(x.to_string());
-    }
-
-    let mut out_dot = None;
-    if let Some(dot) = dot {
-        let x = dot.to_str().expect("`dot` is not a valid UTF8 string.");
-        out_dot = Some(x.to_string());
-    };
-
-    let codegen = compute_codegen(
-        &control_file,
-        package_manifest_path,
-        &symbols,
-        &lib_name,
-        out_path,
-        out_dot,
-    )?;
+    let codegen =
+        compute_codegen(&control_file, package_manifest_path, &symbols, &lib_name, path, dot)?;
 
     let embed = {
         let mut embed = tempfile::NamedTempFile::new()?;
@@ -407,11 +389,18 @@ fn compute_codegen(
     package_manifest_path: &Path,
     symbols: &[String],
     lib_name: &str,
-    path: Option<String>,
-    dot: Option<String>,
+    path: Option<&Path>,
+    dot: Option<&Path>,
 ) -> eyre::Result<String> {
     use proc_macro2::{Ident, Span, TokenStream};
     let lib_name_ident = Ident::new(lib_name, Span::call_site());
+
+    let str_from_path = |name: &str, path: &Path| {
+        path.to_str().map(|s| s.to_owned()).ok_or_else(|| {
+            let err_str = path.to_string_lossy();
+            eyre!("{name} path is not UTF8: {err_str}")
+        })
+    };
 
     let inputs = {
         let control_file_path =
@@ -454,6 +443,7 @@ fn compute_codegen(
     let outputs = {
         let mut out = TokenStream::new();
         if let Some(path) = path {
+            let path = str_from_path("out", path)?;
             let writing = "     Writing".bold().green().to_string();
             out.extend(quote::quote! {
                 eprintln!("{} SQL entities to {}", #writing, #path);
@@ -471,6 +461,7 @@ fn compute_codegen(
             });
         }
         if let Some(dot) = dot {
+            let dot = str_from_path("dot", dot)?;
             out.extend(quote::quote! {
                 pgrx_sql
                     .to_dot(#dot)
