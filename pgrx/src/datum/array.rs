@@ -351,6 +351,137 @@ impl<T> Array<'_, T> {
     }
 }
 
+impl<'mcx, T> Array<'mcx, T>
+where
+    T: ArrayFastAllocSubType,
+{
+    /// Returns a mutable slice of `T`s which comprise this [`Array`].
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
+    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    ///
+    /// # Safety
+    /// Use internally only for array construction,
+    /// We don't want to pass around a mutable reference to array data which we didn't specifically create
+    #[inline(always)]
+    pub(crate) fn as_mut_slice(&mut self) -> Result<&mut [T], ArraySliceError> {
+        if self.contains_nulls() {
+            return Err(ArraySliceError::ContainsNulls);
+        }
+        let slice =
+            unsafe { std::slice::from_raw_parts_mut(self.raw.data_ptr() as *mut _, self.len()) };
+        Ok(slice)
+    }
+
+    // Returns a slice of `T`s which comprise this [`Array`].
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
+    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    #[inline]
+    pub fn as_slice(&self) -> Result<&[T], ArraySliceError> {
+        if self.contains_nulls() {
+            return Err(ArraySliceError::ContainsNulls);
+        }
+
+        let slice =
+            unsafe { std::slice::from_raw_parts(self.raw.data_ptr() as *const _, self.len()) };
+        Ok(slice)
+    }
+
+    /// Creates an `Array<'a, T>` with zero-elements
+    /// Slightly faster than new_array_with_len(0)
+    pub fn new_empty_array<'a>() -> Result<Array<'a, T>, ArrayAllocError>
+    where
+        T: ArrayFastAllocSubType,
+    {
+        unsafe {
+            let raw_array = RawArray::new_empty_array_type::<T>()?;
+            let datum: pgrx_pg_sys::Datum = pg_sys::Datum::from(raw_array.into_ptr().as_ptr());
+            Array::<'a, T>::from_polymorphic_datum(
+                datum,
+                false,
+                pg_sys::get_array_type(T::type_oid()),
+            )
+            .ok_or(ArrayAllocError::MemoryAllocationFailed)
+        }
+    }
+
+    /// Creates an `Array<'a, T>` of a fixed len, with 0 for all elements
+    /// Uses a single PG allocation rather than pg_sys::accumArrayResult(..)
+    pub fn new_with_len<'a>(len: usize) -> Result<Array<'a, T>, ArrayAllocError>
+    where
+        T: ArrayFastAllocSubType,
+    {
+        if len == 0 {
+            return Self::new_empty_array();
+        }
+
+        let raw_array = RawArray::new_array_type_with_len::<T>(len)?;
+        let datum: pgrx_pg_sys::Datum = pg_sys::Datum::from(raw_array.into_ptr().as_ptr());
+        unsafe {
+            Array::<'a, T>::from_polymorphic_datum(
+                datum,
+                false,
+                pg_sys::get_array_type(T::type_oid()),
+            )
+            .ok_or(ArrayAllocError::MemoryAllocationFailed)
+        }
+    }
+
+    /// Constructs an `Array<'a, T>` with a single allocation and enumerating the iter
+    ///
+    /// iter_len must equal the total length of the iter.  You must know the iter_len ahead of time to prevent multiple enumerations/allocations
+    ///
+    /// # Errors
+    /// Returns a [`ArrayAllocError::IterLenMismatch`] iter's total len != iter_len
+    pub fn new_from_iter<'a, I>(iter: I, iter_len: usize) -> Result<Array<'a, T>, ArrayAllocError>
+    where
+        T: ArrayFastAllocSubType,
+        I: Iterator<Item = T>,
+    {
+        let mut array = Self::new_with_len(iter_len)?;
+        let slice = array.as_mut_slice().unwrap();
+        let mut count = 0;
+        for (idx, item) in iter.enumerate() {
+            if idx < iter_len {
+                slice[idx] = item;
+            }
+            count += 1;
+        }
+        if count != iter_len {
+            return Err(ArrayAllocError::IterLenMismatch(iter_len, count));
+        }
+        Ok(array)
+    }
+
+    /// Constructs an `Array<'a, T>` with a single allocation and copy_from_slice
+    pub fn new_from_slice<'a>(slice: &[T]) -> Result<Array<'a, T>, ArrayAllocError>
+    where
+        T: ArrayFastAllocSubType,
+    {
+        let mut array = Self::new_with_len(slice.len())?;
+        let array_slice = array.as_mut_slice().unwrap();
+        array_slice.copy_from_slice(slice);
+        Ok(array)
+    }
+
+    /// Constructs an `Array<'a, T>` with a single allocation and running init_fn on the Array's `&mut [T]`
+    pub fn new_with_init_fn<'a, F>(len: usize, init_fn: F) -> Result<Array<'a, T>, ArrayAllocError>
+    where
+        T: ArrayFastAllocSubType,
+        F: FnOnce(&mut [T]) -> (),
+    {
+        let mut array = Self::new_with_len(len)?;
+        let slice = array.as_mut_slice().unwrap();
+        init_fn(slice);
+        Ok(array)
+    }
+}
+
 /// Adapter to use `Nullable<T>` for array iteration.
 pub struct NullableArrayIterator<'mcx, T>
 where
@@ -412,289 +543,40 @@ pub enum ArraySliceError {
     ContainsNulls,
 }
 
-#[cfg(target_pointer_width = "64")]
-impl Array<'_, f64> {
-    /// Returns a slice of `f64`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_slice(&self) -> Result<&[f64], ArraySliceError> {
-        as_slice(self)
-    }
-
-    /// Returns a mutable slice of `f64`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_mut_slice(&mut self) -> Result<&mut [f64], ArraySliceError> {
-        as_mut_slice(self)
-    }
-}
-
-impl<'mcx> Array<'mcx, f64> {
-    #[inline]
-    pub fn new_with_len(len: usize) -> Result<Array<'mcx, f64>, ArrayAllocError> {
-        new_array_with_len(len)
-    }
-
-    #[inline(always)]
-    pub fn new_from_slice(slice: &'_ [f64]) -> Result<Array<'mcx, f64>, ArrayAllocError> {
-        let mut array = Self::new_with_len(slice.len())?;
-        array.as_mut_slice().unwrap().copy_from_slice(slice);
-        Ok(array)
-    }
-}
-
-impl Array<'_, f32> {
-    /// Returns a slice of `f32`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_slice(&self) -> Result<&[f32], ArraySliceError> {
-        as_slice(self)
-    }
-
-    /// Returns a mutable slice of `f32`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_mut_slice(&mut self) -> Result<&mut [f32], ArraySliceError> {
-        as_mut_slice(self)
-    }
-}
-
-impl<'mcx> Array<'mcx, f32> {
-    #[inline]
-    pub fn new_with_len(len: usize) -> Result<Array<'mcx, f32>, ArrayAllocError> {
-        new_array_with_len(len)
-    }
-
-    #[inline(always)]
-    pub fn new_from_slice(slice: &'_ [f32]) -> Result<Array<'mcx, f32>, ArrayAllocError> {
-        let mut array = Self::new_with_len(slice.len())?;
-        array.as_mut_slice().unwrap().copy_from_slice(slice);
-        Ok(array)
-    }
-}
-
-#[cfg(target_pointer_width = "64")]
-impl Array<'_, i64> {
-    /// Returns a slice of `i64`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_slice(&self) -> Result<&[i64], ArraySliceError> {
-        as_slice(self)
-    }
-
-    /// Returns a mutable slice of `i64`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_mut_slice(&mut self) -> Result<&mut [i64], ArraySliceError> {
-        as_mut_slice(self)
-    }
-}
-
-impl<'mcx> Array<'mcx, i64> {
-    #[inline]
-    pub fn new_with_len(len: usize) -> Result<Array<'mcx, i64>, ArrayAllocError> {
-        new_array_with_len(len)
-    }
-
-    #[inline(always)]
-    pub fn new_from_slice(slice: &'_ [i64]) -> Result<Array<'mcx, i64>, ArrayAllocError> {
-        let mut array = Self::new_with_len(slice.len())?;
-        array.as_mut_slice().unwrap().copy_from_slice(slice);
-        Ok(array)
-    }
-}
-
-impl Array<'_, i32> {
-    /// Returns a slice of `i32`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_slice(&self) -> Result<&[i32], ArraySliceError> {
-        as_slice(self)
-    }
-
-    /// Returns a mutable slice of `i32`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_mut_slice(&mut self) -> Result<&mut [i32], ArraySliceError> {
-        as_mut_slice(self)
-    }
-}
-
 impl<'mcx> Array<'mcx, i32> {
-    #[inline]
-    pub fn new_with_len(len: usize) -> Result<Array<'mcx, i32>, ArrayAllocError> {
-        new_array_with_len(len)
-    }
+    // #[inline]
+    // pub fn new_with_len(len: usize) -> Result<Array<'mcx, i32>, ArrayAllocError> {
+    //     new_array_with_len(len)
+    // }
 
-    #[inline(always)]
-    pub fn new_from_slice(slice: &'_ [i32]) -> Result<Array<'mcx, i32>, ArrayAllocError> {
-        let mut array = Self::new_with_len(slice.len())?;
-        array.as_mut_slice().unwrap().copy_from_slice(slice);
-        Ok(array)
-    }
-}
+    // #[inline(always)]
+    // pub fn new_from_slice(slice: &'_ [i32]) -> Result<Array<'mcx, i32>, ArrayAllocError> {
+    //     let mut array = Self::new_with_len(slice.len())?;
+    //     array.as_mut_slice().unwrap().copy_from_slice(slice);
+    //     Ok(array)
+    // }
 
-impl Array<'_, i16> {
-    /// Returns a slice of `i16`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_slice(&self) -> Result<&[i16], ArraySliceError> {
-        as_slice(self)
-    }
-
-    /// Returns a mutable slice of `i16`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_mut_slice(&mut self) -> Result<&mut [i16], ArraySliceError> {
-        as_mut_slice(self)
-    }
-}
-
-impl<'mcx> Array<'mcx, i16> {
-    #[inline]
-    pub fn new_with_len(len: usize) -> Result<Array<'mcx, i16>, ArrayAllocError> {
-        new_array_with_len(len)
-    }
-
-    #[inline(always)]
-    pub fn new_from_slice(slice: &'_ [i16]) -> Result<Array<'mcx, i16>, ArrayAllocError> {
-        let mut array = Self::new_with_len(slice.len())?;
-        array.as_mut_slice().unwrap().copy_from_slice(slice);
-        Ok(array)
-    }
-}
-
-impl Array<'_, i8> {
-    /// Returns a slice of `i8`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_slice(&self) -> Result<&[i8], ArraySliceError> {
-        as_slice(self)
-    }
-
-    /// Returns a mutable slice of `i8`s which comprise this [`Array`].
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
-    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    #[inline]
-    pub fn as_mut_slice(&mut self) -> Result<&mut [i8], ArraySliceError> {
-        as_mut_slice(self)
-    }
-}
-
-impl<'mcx> Array<'mcx, i8> {
-    #[inline]
-    pub fn new_with_len(len: usize) -> Result<Array<'mcx, i8>, ArrayAllocError> {
-        new_array_with_len(len)
-    }
-
-    #[inline(always)]
-    pub fn new_from_slice(slice: &'_ [i8]) -> Result<Array<'mcx, i8>, ArrayAllocError> {
-        let mut array = Self::new_with_len(slice.len())?;
-        array.as_mut_slice().unwrap().copy_from_slice(slice);
-        Ok(array)
-    }
-}
-
-#[inline(always)]
-fn as_slice<'a, T: Sized>(array: &'a Array<'_, T>) -> Result<&'a [T], ArraySliceError> {
-    if array.contains_nulls() {
-        return Err(ArraySliceError::ContainsNulls);
-    }
-
-    let slice =
-        unsafe { std::slice::from_raw_parts(array.raw.data_ptr() as *const _, array.len()) };
-    Ok(slice)
-}
-
-#[inline(always)]
-fn as_mut_slice<'a, T: Sized>(array: &'a mut Array<'_, T>) -> Result<&'a mut [T], ArraySliceError> {
-    if array.contains_nulls() {
-        return Err(ArraySliceError::ContainsNulls);
-    }
-
-    let slice =
-        unsafe { std::slice::from_raw_parts_mut(array.raw.data_ptr() as *mut _, array.len()) };
-    Ok(slice)
-}
-
-/// Creates an `Array<'a, T>` with zero-elements
-/// Slightly faster than new_array_with_len(0)
-pub fn new_empty_array<'a, T>() -> Result<Array<'a, T>, ArrayAllocError>
-where
-    T: ArrayFastAllocSubType,
-{
-    unsafe {
-        let raw_array = RawArray::new_empty_array_type::<T>()?;
-        let datum: pgrx_pg_sys::Datum = pg_sys::Datum::from(raw_array.into_ptr().as_ptr());
-        Array::<'a, T>::from_polymorphic_datum(datum, false, pg_sys::get_array_type(T::type_oid()))
-            .ok_or(ArrayAllocError::MemoryAllocationFailed)
-    }
-}
-
-/// Creates an `Array<T>` of a fixed len, with 0 for all elements
-/// Uses a single PG allocation rather than pg_sys::accumArrayResult(..)
-#[inline(always)]
-pub fn new_array_with_len<'a, T>(len: usize) -> Result<Array<'a, T>, ArrayAllocError>
-where
-    T: ArrayFastAllocSubType,
-{
-    if len == 0 {
-        return new_empty_array();
-    }
-
-    let raw_array = RawArray::new_array_type_with_len::<T>(len)?;
-    let datum: pgrx_pg_sys::Datum = pg_sys::Datum::from(raw_array.into_ptr().as_ptr());
-    unsafe {
-        Array::<'a, T>::from_polymorphic_datum(datum, false, pg_sys::get_array_type(T::type_oid()))
-            .ok_or(ArrayAllocError::MemoryAllocationFailed)
-    }
+    // #[inline(always)]
+    // pub fn new_from_iter<I>(iter: I, iter_len: usize) -> Result<Array<'mcx, i32>, ArrayAllocError>
+    // where
+    //     I: Iterator<Item = i32>,
+    // {
+    //     Self::new_from_iter(iter, iter_len)
+    //     let mut array = Self::new_with_len(iter_len)?;
+    //     let slice = array.as_mut_slice().unwrap();
+    //     let mut count = 0;
+    //     for (idx, item) in iter.enumerate() {
+    //         if idx >= iter_len {
+    //             return Err(ArrayAllocError::IterLenMismatch(iter_len, idx + iter.count()));
+    //         }
+    //         slice[idx] = item;
+    //         count += 1;
+    //     }
+    //     if count != iter_len {
+    //         return Err(ArrayAllocError::IterLenMismatch(iter_len, count));
+    //     }
+    //     Ok(array)
+    // }
 }
 
 mod casper {
@@ -1350,7 +1232,7 @@ where
 }
 
 /// This trait allows for arrays of certain numeric types to use `Array<T>`'s single allocation strategy
-pub trait ArrayFastAllocSubType: Sized + UnboxDatum + IntoDatum {}
+pub trait ArrayFastAllocSubType: Sized + UnboxDatum + IntoDatum + Copy {}
 
 // for char
 impl ArrayFastAllocSubType for i8 {}
@@ -1359,8 +1241,10 @@ impl ArrayFastAllocSubType for i16 {}
 // for integer
 impl ArrayFastAllocSubType for i32 {}
 // for bigint
+#[cfg(target_pointer_width = "64")]
 impl ArrayFastAllocSubType for i64 {}
 // for real
 impl ArrayFastAllocSubType for f32 {}
 // for double precision
+#[cfg(target_pointer_width = "64")]
 impl ArrayFastAllocSubType for f64 {}

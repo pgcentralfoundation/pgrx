@@ -195,6 +195,7 @@ mod tests {
     use crate as pgrx_tests;
 
     use super::ArrayTestEnum;
+    use pgrx::array::ArrayAllocError;
     use pgrx::prelude::*;
     use pgrx::Json;
     use serde_json::json;
@@ -589,6 +590,111 @@ mod tests {
         let a = Array::<f64>::new_with_len(5).expect("failed to create array");
 
         assert_eq!(a.as_slice()?, &[0.0, 0.0, 0.0, 0.0, 0.0]);
+
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_new_array_from_iter() -> Result<(), Box<dyn std::error::Error>> {
+        let a = Array::<i8>::new_from_iter(vec![1, 2, 3, 4, 5].into_iter(), 5)
+            .expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[1, 2, 3, 4, 5]);
+
+        let a = Array::<i16>::new_from_iter(vec![1, 2, 3, 4, 5].into_iter(), 5)
+            .expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[1, 2, 3, 4, 5]);
+
+        let a = Array::<i32>::new_from_iter(vec![1, 2, 3, 4, 5].into_iter(), 5)
+            .expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[1, 2, 3, 4, 5]);
+
+        let a = Array::<i64>::new_from_iter(vec![1, 2, 3, 4, 5].into_iter(), 5)
+            .expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[1, 2, 3, 4, 5]);
+
+        let a = Array::<f32>::new_from_iter(vec![1.0, 2.0, 3.0, 4.0, 5.0].into_iter(), 5)
+            .expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[1.0, 2.0, 3.0, 4.0, 5.0]);
+
+        let a = Array::<f64>::new_from_iter(vec![1.0, 2.0, 3.0, 4.0, 5.0].into_iter(), 5)
+            .expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[1.0, 2.0, 3.0, 4.0, 5.0]);
+
+        // a more complex iter
+        let iter = vec![1i32, 2, 3].into_iter().chain(vec![4i32, 5].into_iter());
+        let a = Array::<i32>::new_from_iter(iter, 5).expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[1, 2, 3, 4, 5]);
+
+        // make sure the expected allocated len matches the enumerated len
+        let a = Array::<i32>::new_from_iter(vec![1, 2, 3, 4, 5].into_iter(), 3);
+
+        assert_eq!(a.err(), Some(ArrayAllocError::IterLenMismatch(3, 5))); // expected 3, saw 5
+
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_new_array_with_init_fn() -> Result<(), Box<dyn std::error::Error>> {
+        let a = Array::<i8>::new_with_init_fn(5, |slice| {
+            for (i, elem) in slice.iter_mut().enumerate() {
+                *elem = (i + 1) as i8;
+            }
+        })
+        .expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[1, 2, 3, 4, 5]);
+
+        let a = Array::<i16>::new_with_init_fn(5, |slice| {
+            for (i, elem) in slice.iter_mut().enumerate() {
+                *elem = (i + 1) as i16;
+            }
+        })
+        .expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[1, 2, 3, 4, 5]);
+
+        let a = Array::<i32>::new_with_init_fn(5, |slice| {
+            for (i, elem) in slice.iter_mut().enumerate() {
+                *elem = (i + 1) as i32;
+            }
+        })
+        .expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[1, 2, 3, 4, 5]);
+
+        let a = Array::<i64>::new_with_init_fn(5, |slice| {
+            for (i, elem) in slice.iter_mut().enumerate() {
+                *elem = (i + 1) as i64;
+            }
+        })
+        .expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[1, 2, 3, 4, 5]);
+
+        let a = Array::<f32>::new_with_init_fn(5, |slice| {
+            for (i, elem) in slice.iter_mut().enumerate() {
+                *elem = (i + 1) as f32;
+            }
+        })
+        .expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[1.0, 2.0, 3.0, 4.0, 5.0]);
+
+        let a = Array::<f64>::new_with_init_fn(5, |slice| {
+            for (i, elem) in slice.iter_mut().enumerate() {
+                *elem = (i + 1) as f64;
+            }
+        })
+        .expect("failed to create array");
+
+        assert_eq!(a.as_slice()?, &[1.0, 2.0, 3.0, 4.0, 5.0]);
 
         Ok(())
     }

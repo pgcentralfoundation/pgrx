@@ -431,4 +431,6 @@ impl Toasty for RawArray {
 pub enum ArrayAllocError {
     #[error("Failed to allocate memory for Array")]
     MemoryAllocationFailed,
+    #[error("Expected len {0}, found {1}")]
+    IterLenMismatch(usize, usize),
 }
