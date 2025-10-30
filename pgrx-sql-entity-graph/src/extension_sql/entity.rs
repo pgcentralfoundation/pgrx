@@ -168,7 +168,7 @@ impl SqlDeclaredEntity {
                 format!("pgrx::pgbox::PgBox<{}, pgrx::pgbox::AllocatedByPostgres>", name),
             ],
         };
-        let retval = match variant.as_ref() {
+        let retval = match variant {
             "Type" => Self::Type(data),
             "Enum" => Self::Enum(data),
             "Function" => Self::Function(data),
