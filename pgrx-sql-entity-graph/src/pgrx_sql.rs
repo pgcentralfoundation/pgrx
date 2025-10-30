@@ -251,6 +251,7 @@ impl PgrxSql {
         Ok(this)
     }
 
+    // NOTE: this signature is demanded by the codegen we embed via cargo-pgrx
     pub fn to_file(&self, file: impl AsRef<Path> + Debug) -> eyre::Result<()> {
         use std::fs::{File, create_dir_all};
         use std::io::Write;
@@ -321,6 +322,7 @@ impl PgrxSql {
         Ok(())
     }
 
+    // NOTE: this signature is demanded by the codegen we embed via cargo-pgrx
     pub fn to_dot(&self, file: impl AsRef<Path> + Debug) -> eyre::Result<()> {
         use std::fs::{File, create_dir_all};
         use std::io::Write;
