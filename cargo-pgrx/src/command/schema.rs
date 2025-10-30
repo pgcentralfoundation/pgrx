@@ -622,6 +622,7 @@ fn parse_object(data: &[u8]) -> object::Result<object::File<'_>> {
 
     match kind {
         object::FileKind::MachOFat32 => {
+            // FIXME: properly parse the target tuple per https://github.com/pgcentralfoundation/pgrx/issues/2183
             let arch = std::env::consts::ARCH;
 
             match slice_arch32(data, arch) {
