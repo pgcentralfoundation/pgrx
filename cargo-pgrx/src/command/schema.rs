@@ -121,7 +121,7 @@ impl CommandExecute for Schema {
     dot,
     features = ?features.features,
 ))]
-pub(crate) fn generate_schema(
+pub(crate) fn generate_schema_for_cli(
     user_manifest_path: Option<&Path>,
     user_package: Option<&str>,
     package_manifest_path: &Path,
@@ -164,7 +164,45 @@ pub(crate) fn generate_schema(
             &package_name,
         )?;
     };
+    generate_schema_implicit(
+        user_manifest_path,
+        package_name,
+        package_manifest_path,
+        profile,
+        features,
+        features_arg,
+        target,
+        path,
+        dot,
+        log_level,
+        output_tracking,
+        manifest,
+        control_file,
+        lib_name,
+        lib_filename,
+        flags,
+    )
+}
+pub(crate) use generate_schema_for_cli as generate_schema;
 
+pub(crate) fn generate_schema_implicit(
+    user_manifest_path: Option<&Path>,
+    package_name: String,
+    package_manifest_path: &Path,
+    profile: &CargoProfile,
+    features: &clap_cargo::Features,
+    features_arg: String,
+    target: Option<&str>,
+    path: Option<&Path>,
+    dot: Option<&Path>,
+    log_level: Option<String>,
+    output_tracking: &mut Vec<PathBuf>,
+    manifest: cargo_toml::Manifest,
+    control_file: PathBuf,
+    lib_name: String,
+    lib_filename: String,
+    flags: String,
+) -> eyre::Result<()> {
     let symbols = find_and_compute_symbols(profile, &lib_filename, target)?;
 
     let codegen =
@@ -177,7 +215,7 @@ pub(crate) fn generate_schema(
         embed
     };
 
-    if let Some(out_path) = path.as_ref() {
+    if let Some(out_path) = path {
         if let Some(parent) = out_path.parent() {
             std::fs::create_dir_all(parent).wrap_err("Could not create parent directory")?;
         }
