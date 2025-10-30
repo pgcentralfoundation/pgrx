@@ -55,7 +55,7 @@ impl Package {
             .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(self.manifest_path.as_deref(), &metadata)?;
         let package_manifest_path =
-            crate::manifest::manifest_path(&metadata, self.package.as_ref())
+            crate::manifest::manifest_path(&metadata, self.package.as_deref())
                 .wrap_err("Couldn't get manifest path")?;
         let package_manifest =
             Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
@@ -86,7 +86,7 @@ impl Package {
 
         let output_files = package_extension(
             self.manifest_path.as_deref(),
-            self.package.as_ref(),
+            self.package.as_deref(),
             &package_manifest_path,
             &pg_config,
             out_dir.clone(),
@@ -115,7 +115,7 @@ impl CommandExecute for Package {
 ))]
 pub(crate) fn package_extension(
     user_manifest_path: Option<&Path>,
-    user_package: Option<&String>,
+    user_package: Option<&str>,
     package_manifest_path: &Path,
     pg_config: &PgConfig,
     out_dir: PathBuf,

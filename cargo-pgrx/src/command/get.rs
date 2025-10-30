@@ -38,7 +38,7 @@ impl CommandExecute for Get {
                 .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(self.manifest_path.as_deref(), &metadata)?;
         let package_manifest_path =
-            crate::manifest::manifest_path(&metadata, self.package.as_ref())
+            crate::manifest::manifest_path(&metadata, self.package.as_deref())
                 .wrap_err("Couldn't get manifest path")?;
 
         if let Some(value) = get_property(&package_manifest_path, &self.name)? {

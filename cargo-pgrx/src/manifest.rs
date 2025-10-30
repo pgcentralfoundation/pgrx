@@ -47,7 +47,7 @@ impl PgVersionSource {
 #[tracing::instrument(skip_all)]
 pub(crate) fn manifest_path(
     metadata: &Metadata,
-    package_name: Option<&String>,
+    package_name: Option<&str>,
 ) -> eyre::Result<PathBuf> {
     let manifest_path = if let Some(package_name) = package_name {
         let found = metadata
@@ -196,7 +196,7 @@ pub(crate) fn display_version_info(pg_config: &PgConfig, pg_version: &PgVersionS
 
 pub(crate) fn get_package_manifest(
     features: &Features,
-    package_name: Option<&String>,
+    package_name: Option<&str>,
     manifest_path: Option<&Path>,
 ) -> eyre::Result<(Manifest, PathBuf)> {
     let metadata = crate::metadata::metadata(features, manifest_path)

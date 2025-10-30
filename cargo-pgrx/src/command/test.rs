@@ -60,7 +60,7 @@ impl CommandExecute for Test {
             let mut features = me.features.clone();
             let (package_manifest, _package_manifest_path) = get_package_manifest(
                 &me.features,
-                me.package.as_ref(),
+                me.package.as_deref(),
                 me.manifest_path.as_deref(),
             )?;
             let (pg_config, _pg_version) = pg_config_and_version(
@@ -79,7 +79,7 @@ impl CommandExecute for Test {
             test_extension(
                 &pg_config,
                 me.manifest_path.as_deref(),
-                me.package.as_ref(),
+                me.package.as_deref(),
                 &profile,
                 me.no_schema,
                 &features,
@@ -93,7 +93,7 @@ impl CommandExecute for Test {
 
         let (package_manifest, _) = get_package_manifest(
             &self.features,
-            self.package.as_ref(),
+            self.package.as_deref(),
             self.manifest_path.as_deref(),
         )?;
         let pgrx = Pgrx::from_config()?;
@@ -121,7 +121,7 @@ impl CommandExecute for Test {
 pub fn test_extension(
     pg_config: &PgConfig,
     user_manifest_path: Option<&Path>,
-    user_package: Option<&String>,
+    user_package: Option<&str>,
     profile: &CargoProfile,
     no_schema: bool,
     features: &clap_cargo::Features,

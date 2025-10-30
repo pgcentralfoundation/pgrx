@@ -79,7 +79,7 @@ impl CommandExecute for Schema {
         let pgrx = Pgrx::from_config()?;
         let (package_manifest, package_manifest_path) = get_package_manifest(
             &self.features,
-            self.package.as_ref(),
+            self.package.as_deref(),
             self.manifest_path.as_deref(),
         )?;
         // This does meaningful mutation, unfortunately
@@ -98,7 +98,7 @@ impl CommandExecute for Schema {
 
         generate_schema(
             self.manifest_path.as_deref(),
-            self.package.as_ref(),
+            self.package.as_deref(),
             &package_manifest_path,
             &profile,
             self.test,
@@ -122,7 +122,7 @@ impl CommandExecute for Schema {
 ))]
 pub(crate) fn generate_schema(
     user_manifest_path: Option<&Path>,
-    user_package: Option<&String>,
+    user_package: Option<&str>,
     package_manifest_path: &Path,
     profile: &CargoProfile,
     is_test: bool,
@@ -142,7 +142,7 @@ pub(crate) fn generate_schema(
     let features_arg = features.features.join(" ");
 
     let package_name = if let Some(user_package) = user_package {
-        user_package.clone()
+        user_package.to_owned()
     } else {
         manifest.package_name()?
     };

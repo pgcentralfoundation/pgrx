@@ -86,7 +86,7 @@ impl Run {
         let pgrx = Pgrx::from_config()?;
         let (package_manifest, package_manifest_path) = get_package_manifest(
             &self.features,
-            self.package.as_ref(),
+            self.package.as_deref(),
             self.manifest_path.as_deref(),
         )?;
         let (pg_config, _pg_version) = pg_config_and_version(
@@ -110,7 +110,7 @@ impl Run {
         run(
             &pg_config,
             self.manifest_path.as_deref(),
-            self.package.as_ref(),
+            self.package.as_deref(),
             &package_manifest_path,
             &dbname,
             create_database,
@@ -144,7 +144,7 @@ impl CommandExecute for Run {
 pub(crate) fn run(
     pg_config: &PgConfig,
     user_manifest_path: Option<&Path>,
-    user_package: Option<&String>,
+    user_package: Option<&str>,
     package_manifest_path: &Path,
     dbname: &str,
     create_database: bool,

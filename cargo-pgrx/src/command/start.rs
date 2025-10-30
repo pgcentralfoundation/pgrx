@@ -52,7 +52,7 @@ impl CommandExecute for Start {
         ) -> eyre::Result<()> {
             let (package_manifest, _) = get_package_manifest(
                 &clap_cargo::Features::default(),
-                me.package.as_ref(),
+                me.package.as_deref(),
                 me.manifest_path.as_deref(),
             )?;
 
@@ -63,7 +63,7 @@ impl CommandExecute for Start {
         }
         let (package_manifest, _) = get_package_manifest(
             &clap_cargo::Features::default(),
-            self.package.as_ref(),
+            self.package.as_deref(),
             self.manifest_path.as_deref(),
         )?;
 

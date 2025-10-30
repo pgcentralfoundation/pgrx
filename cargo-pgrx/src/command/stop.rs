@@ -39,7 +39,7 @@ impl CommandExecute for Stop {
         fn perform(me: Stop, pgrx: &Pgrx) -> eyre::Result<()> {
             let (package_manifest, _) = get_package_manifest(
                 &clap_cargo::Features::default(),
-                me.package.as_ref(),
+                me.package.as_deref(),
                 me.manifest_path.as_deref(),
             )?;
             let (pg_config, _) =
@@ -51,7 +51,7 @@ impl CommandExecute for Stop {
         let pgrx = Pgrx::from_config()?;
         let (package_manifest, _) = get_package_manifest(
             &clap_cargo::Features::default(),
-            self.package.as_ref(),
+            self.package.as_deref(),
             self.manifest_path.as_deref(),
         )?;
         if self.pg_version == Some("all".into()) {

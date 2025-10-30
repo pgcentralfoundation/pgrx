@@ -50,7 +50,7 @@ impl CommandExecute for Connect {
 
         let (package_manifest, package_manifest_path) = get_package_manifest(
             &Features::default(),
-            self.package.as_ref(),
+            self.package.as_deref(),
             self.manifest_path.as_deref(),
         )?;
         let (pg_config, _pg_version) = match pg_config_and_version(
