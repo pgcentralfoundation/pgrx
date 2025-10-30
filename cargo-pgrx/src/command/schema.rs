@@ -20,6 +20,7 @@ use pgrx_pg_config::{Pgrx, get_target_dir};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
+use std::str;
 
 /// Generate extension schema files
 #[derive(clap::Args, Debug)]
@@ -164,7 +165,7 @@ pub(crate) fn generate_schema(
         )?;
     };
 
-    let symbols = compute_symbols(profile, &lib_filename, target)?;
+    let symbols = find_and_compute_symbols(profile, &lib_filename, target)?;
 
     let mut out_path = None;
     if let Some(path) = path {
@@ -221,14 +222,11 @@ pub(crate) fn generate_schema(
     Ok(())
 }
 
-fn compute_symbols(
+fn find_and_compute_symbols(
     profile: &CargoProfile,
     lib_filename: &str,
     target: Option<&str>,
 ) -> eyre::Result<Vec<String>> {
-    use object::Object;
-    use std::collections::HashSet;
-
     // Inspect the symbol table for a list of `__pgrx_internals` we should have the generator call
     let mut lib_so = get_target_dir()?;
     if let Some(target) = target {
@@ -240,26 +238,28 @@ fn compute_symbols(
     let lib_so_data = std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")?;
     let lib_so_obj_file =
         parse_object(&lib_so_data).wrap_err("couldn't parse extension shared object")?;
-    let lib_so_exports =
-        lib_so_obj_file.exports().wrap_err("couldn't get exports from extension shared object")?;
 
+    // FIXME: properly parse the target tuple per https://github.com/pgcentralfoundation/pgrx/issues/2183
+    let symbol_prefix = if cfg!(target_os = "macos") { "_" } else { "" };
+    compute_symbols(&lib_so_obj_file, symbol_prefix)
+}
+
+fn compute_symbols(obj_file: &object::File<'_>, symbol_prefix: &str) -> eyre::Result<Vec<String>> {
+    use std::collections::HashSet;
+    let lib_so_exports = object::Object::exports(obj_file)
+        .wrap_err("couldn't get exports from extension shared object")?;
     // Some users reported experiencing duplicate entries if we don't ensure `fns_to_call`
     // has unique entries.
     let mut fns_to_call = HashSet::new();
     for export in lib_so_exports {
-        let name = std::str::from_utf8(export.name())?.to_string();
-        #[cfg(target_os = "macos")]
-        let name = {
-            // Mac will prefix symbols with `_` automatically, so we remove it to avoid getting
-            // two.
-            let mut name = name;
-            let rename = name.split_off(1);
-            assert_eq!(name, "_");
-            rename
-        };
+        let name = str::from_utf8(export.name()).expect("Rust symbol names are UTF8");
+        // macOS will prefix symbols with `_` automatically, so we remove one
+        let name = name
+            .strip_prefix(symbol_prefix)
+            .ok_or(eyre!("platform symbol prefix not found on {name}"))?;
 
         if name.starts_with("__pgrx_internals") {
-            fns_to_call.insert(name);
+            fns_to_call.insert(name.to_owned());
         }
     }
     let mut seen_schemas = Vec::new();
