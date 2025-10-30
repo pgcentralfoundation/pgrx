@@ -403,8 +403,7 @@ fn compute_codegen(
     };
 
     let inputs = {
-        let control_file_path =
-            control_file_path.to_str().expect(".control file filename should be valid UTF8");
+        let control_file_path = str_from_path(".control file", control_file_path)?;
         let mut out = quote::quote! {
             // call the marker.  Primarily this ensures that rustc will actually link to the library
             // during the "pgrx_embed" build initiated by `cargo-pgrx schema` generation
