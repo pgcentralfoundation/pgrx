@@ -154,20 +154,12 @@ pub(crate) fn generate_schema_for_cli(
     let cargo = Cargo::default()
         .package(package_name)
         .std_streams([cargo::Stdio::Null, cargo::Stdio::Null, cargo::Stdio::Inherit])
-        .manifest(user_manifest_path.map(|p| p.to_owned()));
+        .manifest(user_manifest_path.map(|p| p.to_owned()))
+        .log_level(log_level);
 
     if !skip_build {
         // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
-        first_build(
-            cargo.clone(),
-            profile,
-            features,
-            log_level.clone(),
-            is_test,
-            &features_arg,
-            &flags,
-            target,
-        )?;
+        first_build(cargo.clone(), profile, features, is_test, &features_arg, &flags, target)?;
     };
     generate_schema_implicit(
         cargo,
@@ -178,7 +170,6 @@ pub(crate) fn generate_schema_for_cli(
         target,
         path,
         dot,
-        log_level,
         output_tracking,
         manifest,
         control_file,
@@ -198,7 +189,6 @@ pub(crate) fn generate_schema_implicit(
     target: Option<&str>,
     path: Option<&Path>,
     dot: Option<&Path>,
-    log_level: Option<String>,
     output_tracking: &mut Vec<PathBuf>,
     manifest: cargo_toml::Manifest,
     control_file: PathBuf,
@@ -229,15 +219,7 @@ pub(crate) fn generate_schema_implicit(
         tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
     }
 
-    second_build(
-        cargo,
-        features,
-        log_level.clone(),
-        &features_arg,
-        &flags,
-        embed.path(),
-        &manifest,
-    )?;
+    second_build(cargo, features, &features_arg, &flags, embed.path(), &manifest)?;
 
     compute_sql(&manifest)?;
 
@@ -348,7 +330,6 @@ fn first_build(
     cargo: Cargo,
     profile: &CargoProfile,
     features: &clap_cargo::Features,
-    log_level: Option<String>,
     is_test: bool,
     features_arg: &str,
     flags: &str,
@@ -365,10 +346,6 @@ fn first_build(
     };
 
     command.args(profile.cargo_args());
-
-    if let Some(log_level) = &log_level {
-        command.env("RUST_LOG", log_level);
-    }
 
     if !features_arg.trim().is_empty() {
         command.arg("--features");
@@ -511,7 +488,6 @@ fn compute_codegen(
 fn second_build(
     cargo: Cargo,
     features: &clap_cargo::Features,
-    log_level: Option<String>,
     features_arg: &str,
     flags: &str,
     embed_path: &Path,
@@ -522,10 +498,6 @@ fn second_build(
     let mut command = cargo.subcommand("rustc").into_command();
     command.arg("--bin");
     command.arg(pgrx_embed_name(manifest)?);
-
-    if let Some(log_level) = &log_level {
-        command.env("RUST_LOG", log_level);
-    }
 
     if !features_arg.trim().is_empty() {
         command.arg("--features");
