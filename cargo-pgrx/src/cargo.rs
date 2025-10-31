@@ -99,6 +99,7 @@ impl Cargo {
         // set most-interesting flags first, like profile, target, and manifest-path
         // so that when we read dumped command lines we can see that info first
         cmd.args(profile.cargo_args());
+
         if let Some(target) = target {
             cmd.arg("--target").arg(target);
         }
@@ -128,8 +129,11 @@ impl Cargo {
 
         if features.all_features {
             cmd.arg("--all-features");
-        } else if !features.features.is_empty() {
-            cmd.arg("--features").args(features.features);
+        }
+
+        if !features.features.is_empty() {
+            cmd.arg("--features");
+            cmd.arg(features.features.join(" "));
         }
 
         // And now the miscellaneous build flags!
