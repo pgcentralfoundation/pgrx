@@ -151,7 +151,11 @@ pub(crate) fn generate_schema_for_cli(
     let lib_name = manifest.lib_name()?;
     let lib_filename = manifest.lib_filename()?;
 
-    let cargo = Cargo::default().package(package_name);
+    let cargo = Cargo::default().package(package_name).std_streams([
+        cargo::Stdio::Null,
+        cargo::Stdio::Null,
+        cargo::Stdio::Inherit,
+    ]);
 
     if !skip_build {
         // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
@@ -366,10 +370,6 @@ fn first_build(
         command
     };
 
-    command.stdin(Stdio::null());
-    command.stdout(Stdio::null());
-    command.stderr(Stdio::inherit());
-
     if let Some(user_manifest_path) = user_manifest_path.as_ref() {
         command.arg("--manifest-path");
         command.arg(user_manifest_path);
@@ -534,10 +534,6 @@ fn second_build(
     let mut command = cargo.subcommand("rustc").into_command();
     command.arg("--bin");
     command.arg(pgrx_embed_name(manifest)?);
-
-    command.stdin(Stdio::null());
-    command.stdout(Stdio::null());
-    command.stderr(Stdio::inherit());
 
     if let Some(user_manifest_path) = user_manifest_path.as_ref() {
         command.arg("--manifest-path");
