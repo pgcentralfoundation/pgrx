@@ -99,7 +99,7 @@ impl Cargo {
             profile,
             package,
             subcmd: _,
-            more_args,
+            more_args: _,
         } = self;
 
         // set most-interesting flags first, like profile, target, and manifest-path
@@ -143,10 +143,10 @@ impl Cargo {
         }
 
         // And now the miscellaneous build flags!
-        // let flags = env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
-        // for arg in flags.split_ascii_whitespace() {
-        //     cmd.arg(arg);
-        // }
+        let flags = env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
+        for arg in flags.split_ascii_whitespace() {
+            cmd.arg(arg);
+        }
 
         // set envs
         if let Some(log_level) = log_level {

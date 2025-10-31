@@ -139,8 +139,6 @@ pub(crate) fn generate_schema_for_cli(
     let manifest = Manifest::from_path(&package_manifest_path)?;
     let (control_file, _extname) = find_control_file(&package_manifest_path)?;
 
-    let flags = std::env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
-
     let features_arg = features.features.join(" ");
 
     let package_name = if let Some(user_package) = user_package {
@@ -160,7 +158,7 @@ pub(crate) fn generate_schema_for_cli(
 
     if !skip_build {
         // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
-        first_build(cargo.clone(), profile, is_test, &features_arg, &flags, target)?;
+        first_build(cargo.clone(), profile, is_test, &features_arg, target)?;
     };
     generate_schema_implicit(
         cargo,
@@ -175,7 +173,6 @@ pub(crate) fn generate_schema_for_cli(
         control_file,
         lib_name,
         lib_filename,
-        flags,
     )
 }
 pub(crate) use generate_schema_for_cli as generate_schema;
@@ -193,7 +190,6 @@ pub(crate) fn generate_schema_implicit(
     control_file: PathBuf,
     lib_name: String,
     lib_filename: String,
-    flags: String,
 ) -> eyre::Result<()> {
     let symbols = find_and_compute_symbols(profile, &lib_filename, target)?;
 
@@ -218,7 +214,7 @@ pub(crate) fn generate_schema_implicit(
         tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
     }
 
-    second_build(cargo, &features_arg, &flags, embed.path(), &manifest)?;
+    second_build(cargo, &features_arg, embed.path(), &manifest)?;
 
     compute_sql(&manifest)?;
 
@@ -330,7 +326,6 @@ fn first_build(
     profile: &CargoProfile,
     is_test: bool,
     features_arg: &str,
-    flags: &str,
     target: Option<&str>,
 ) -> eyre::Result<()> {
     let cargo = if is_test {
@@ -342,10 +337,6 @@ fn first_build(
     let cargo = cargo.profile(profile.clone()).target(target.map(|t| t.to_owned()));
 
     let mut command = cargo.into_command();
-
-    for arg in flags.split_ascii_whitespace() {
-        command.arg(arg);
-    }
 
     let command_str = format!("{command:?}");
     eprintln!(
@@ -466,7 +457,6 @@ fn compute_codegen(
 fn second_build(
     cargo: Cargo,
     features_arg: &str,
-    flags: &str,
     embed_path: &Path,
     manifest: &Manifest,
 ) -> eyre::Result<()> {
@@ -475,10 +465,6 @@ fn second_build(
     let mut command = cargo.subcommand("rustc").into_command();
     command.arg("--bin");
     command.arg(pgrx_embed_name(manifest)?);
-
-    for arg in flags.split_ascii_whitespace() {
-        command.arg(arg);
-    }
 
     command.arg("--");
 
