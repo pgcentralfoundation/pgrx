@@ -173,7 +173,6 @@ impl Stdio {
     fn into_stdio(self) -> Option<process::Stdio> {
         match self {
             Stdio::Inherit => Some(process::Stdio::inherit()),
-            Stdio::Piped => Some(process::Stdio::piped()),
             Stdio::Null => Some(process::Stdio::null()),
             Stdio::Default => None,
         }
