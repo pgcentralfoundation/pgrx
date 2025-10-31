@@ -137,8 +137,6 @@ pub(crate) fn generate_schema_for_cli(
     output_tracking: &mut Vec<PathBuf>,
 ) -> eyre::Result<()> {
     let manifest = Manifest::from_path(&package_manifest_path)?;
-    let (control_file, _extname) = find_control_file(&package_manifest_path)?;
-
     let features_arg = features.features.join(" ");
 
     let package_name = if let Some(user_package) = user_package {
@@ -146,8 +144,6 @@ pub(crate) fn generate_schema_for_cli(
     } else {
         manifest.package_name()?
     };
-    let lib_name = manifest.lib_name()?;
-    let lib_filename = manifest.lib_filename()?;
 
     let cargo = Cargo::default()
         .package(package_name)
@@ -170,9 +166,6 @@ pub(crate) fn generate_schema_for_cli(
         dot,
         output_tracking,
         manifest,
-        control_file,
-        lib_name,
-        lib_filename,
     )
 }
 pub(crate) use generate_schema_for_cli as generate_schema;
@@ -187,10 +180,11 @@ pub(crate) fn generate_schema_implicit(
     dot: Option<&Path>,
     output_tracking: &mut Vec<PathBuf>,
     manifest: cargo_toml::Manifest,
-    control_file: PathBuf,
-    lib_name: String,
-    lib_filename: String,
 ) -> eyre::Result<()> {
+    let (control_file, _extname) = find_control_file(&package_manifest_path)?;
+    let lib_name = manifest.lib_name()?;
+    let lib_filename = manifest.lib_filename()?;
+
     let symbols = find_and_compute_symbols(profile, &lib_filename, target)?;
 
     let codegen =
