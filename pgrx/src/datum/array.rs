@@ -543,42 +543,6 @@ pub enum ArraySliceError {
     ContainsNulls,
 }
 
-impl<'mcx> Array<'mcx, i32> {
-    // #[inline]
-    // pub fn new_with_len(len: usize) -> Result<Array<'mcx, i32>, ArrayAllocError> {
-    //     new_array_with_len(len)
-    // }
-
-    // #[inline(always)]
-    // pub fn new_from_slice(slice: &'_ [i32]) -> Result<Array<'mcx, i32>, ArrayAllocError> {
-    //     let mut array = Self::new_with_len(slice.len())?;
-    //     array.as_mut_slice().unwrap().copy_from_slice(slice);
-    //     Ok(array)
-    // }
-
-    // #[inline(always)]
-    // pub fn new_from_iter<I>(iter: I, iter_len: usize) -> Result<Array<'mcx, i32>, ArrayAllocError>
-    // where
-    //     I: Iterator<Item = i32>,
-    // {
-    //     Self::new_from_iter(iter, iter_len)
-    //     let mut array = Self::new_with_len(iter_len)?;
-    //     let slice = array.as_mut_slice().unwrap();
-    //     let mut count = 0;
-    //     for (idx, item) in iter.enumerate() {
-    //         if idx >= iter_len {
-    //             return Err(ArrayAllocError::IterLenMismatch(iter_len, idx + iter.count()));
-    //         }
-    //         slice[idx] = item;
-    //         count += 1;
-    //     }
-    //     if count != iter_len {
-    //         return Err(ArrayAllocError::IterLenMismatch(iter_len, count));
-    //     }
-    //     Ok(array)
-    // }
-}
-
 mod casper {
     use super::UnboxDatum;
     use crate::layout::Align;
