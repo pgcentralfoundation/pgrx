@@ -151,7 +151,7 @@ pub(crate) fn generate_schema_for_cli(
     let lib_name = manifest.lib_name()?;
     let lib_filename = manifest.lib_filename()?;
 
-    let cargo = Cargo::default();
+    let cargo = Cargo::default().package(package_name);
 
     if !skip_build {
         // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
@@ -165,13 +165,11 @@ pub(crate) fn generate_schema_for_cli(
             &features_arg,
             &flags,
             target,
-            &package_name,
         )?;
     };
     generate_schema_implicit(
         cargo,
         user_manifest_path,
-        package_name,
         package_manifest_path,
         profile,
         features,
@@ -193,7 +191,6 @@ pub(crate) use generate_schema_for_cli as generate_schema;
 pub(crate) fn generate_schema_implicit(
     cargo: Cargo,
     user_manifest_path: Option<&Path>,
-    package_name: String,
     package_manifest_path: &Path,
     profile: &CargoProfile,
     features: &clap_cargo::Features,
@@ -240,7 +237,6 @@ pub(crate) fn generate_schema_implicit(
         &features_arg,
         &flags,
         embed.path(),
-        &package_name,
         &manifest,
     )?;
 
@@ -359,7 +355,6 @@ fn first_build(
     features_arg: &str,
     flags: &str,
     target: Option<&str>,
-    package_name: &str,
 ) -> eyre::Result<()> {
     let mut command = if is_test {
         let mut command = cargo.subcommand("test").into_command();
@@ -374,9 +369,6 @@ fn first_build(
     command.stdin(Stdio::null());
     command.stdout(Stdio::null());
     command.stderr(Stdio::inherit());
-
-    command.arg("--package");
-    command.arg(package_name);
 
     if let Some(user_manifest_path) = user_manifest_path.as_ref() {
         command.arg("--manifest-path");
@@ -535,7 +527,6 @@ fn second_build(
     features_arg: &str,
     flags: &str,
     embed_path: &Path,
-    package_name: &str,
     manifest: &Manifest,
 ) -> eyre::Result<()> {
     // We do pass cfg to the binary and do not pass cfg to dependencies to avoid recompilation
@@ -547,9 +538,6 @@ fn second_build(
     command.stdin(Stdio::null());
     command.stdout(Stdio::null());
     command.stderr(Stdio::inherit());
-
-    command.arg("--package");
-    command.arg(package_name);
 
     if let Some(user_manifest_path) = user_manifest_path.as_ref() {
         command.arg("--manifest-path");
