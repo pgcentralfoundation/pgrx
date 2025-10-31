@@ -7,6 +7,171 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use crate::profile::CargoProfile;
+use std::collections::BTreeMap;
+use std::path::PathBuf;
+use std::{env, process};
+
+/// Configuration for building a cargo execution
+#[derive(Default, Clone)]
+pub struct Cargo {
+    subcmd: String,
+    features: clap_cargo::Features,
+    stdio: [Stdio; 3],
+    manifest: Option<PathBuf>,
+    package: String,
+    log_level: Option<String>,
+    target: Option<String>,
+    profile: CargoProfile,
+    // use a BTreeMap for deterministic order of iteration
+    more_args: BTreeMap<String, Vec<String>>,
+}
+
+impl Cargo {
+    pub fn subcommand(mut self, s: &str) -> Self {
+        self.subcmd.clear();
+        self.subcmd.push_str(s);
+        self
+    }
+
+    pub fn std_streams(mut self, streams: [Stdio; 3]) -> Self {
+        self.stdio = streams;
+        self
+    }
+
+    pub fn manifest(mut self, path: Option<PathBuf>) -> Self {
+        self.manifest = path;
+        self
+    }
+
+    pub fn package(mut self, package: String) -> Self {
+        self.package = package;
+        self
+    }
+
+    pub fn target(mut self, target: Option<String>) -> Self {
+        self.target = target;
+        self
+    }
+
+    pub fn profile(mut self, profile: CargoProfile) -> Self {
+        self.profile = profile;
+        self
+    }
+
+    pub fn log_level(mut self, level: Option<String>) -> Self {
+        self.log_level = level;
+        self
+    }
+
+    pub fn flag(mut self, flag: impl Into<String>) -> Self {
+        self.more_args.insert(flag.into(), Vec::new());
+        self
+    }
+
+    pub fn flag_args(mut self, flag: impl Into<String>, args: Vec<String>) -> Self {
+        self.more_args.insert(flag.into(), args);
+        self
+    }
+
+    pub fn features(mut self, features: clap_cargo::Features) -> Self {
+        self.features = features;
+        self
+    }
+
+    pub fn into_command(self) -> process::Command {
+        let Cargo {
+            features,
+            stdio,
+            manifest,
+            log_level,
+            target,
+            profile,
+            package,
+            subcmd,
+            more_args,
+        } = self;
+
+        let mut cmd = cargo();
+        // subcommand *must* go first
+        cmd.arg(subcmd);
+
+        // set most-interesting flags first, like profile, target, and manifest-path
+        // so that when we read dumped command lines we can see that info first
+        cmd.args(profile.cargo_args());
+        if let Some(target) = target {
+            cmd.arg("--target").arg(target);
+        }
+        if let Some(manifest) = manifest {
+            cmd.arg("--manifest-path").arg(manifest);
+        }
+        if !package.is_empty() {
+            cmd.arg("--package").arg(package);
+        }
+
+        // set std streams
+        let [stdin, stdout, stderr] = stdio;
+        if let Some(stdio) = stdin.into_stdio() {
+            cmd.stdin(stdio);
+        }
+        if let Some(stdio) = stdout.into_stdio() {
+            cmd.stdout(stdio);
+        }
+        if let Some(stdio) = stderr.into_stdio() {
+            cmd.stderr(stdio);
+        }
+
+        // set features
+        if features.no_default_features {
+            cmd.arg("--no-default-features");
+        }
+
+        if features.all_features {
+            cmd.arg("--all-features");
+        } else if !features.features.is_empty() {
+            cmd.arg("--features").args(features.features);
+        }
+
+        // And now the miscellaneous build flags!
+        let flags = env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
+        for arg in flags.split_ascii_whitespace() {
+            cmd.arg(arg);
+        }
+
+        // set envs
+        if let Some(log_level) = log_level {
+            cmd.env("RUST_LOG", log_level);
+        }
+
+        for (flag, args) in more_args {
+            cmd.arg(flag).args(args);
+        }
+
+        cmd
+    }
+}
+
+#[derive(Clone, Copy, Default, PartialEq)]
+pub enum Stdio {
+    Inherit,
+    #[allow(unused)]
+    Piped,
+    Null,
+    #[default]
+    Default,
+}
+
+impl Stdio {
+    fn into_stdio(self) -> Option<process::Stdio> {
+        match self {
+            Stdio::Inherit => Some(process::Stdio::inherit()),
+            Stdio::Piped => Some(process::Stdio::piped()),
+            Stdio::Null => Some(process::Stdio::null()),
+            _ => None,
+        }
+    }
+}
+
 pub(crate) fn cargo() -> std::process::Command {
     let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
     std::process::Command::new(cargo)

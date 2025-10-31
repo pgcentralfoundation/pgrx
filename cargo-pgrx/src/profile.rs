@@ -10,9 +10,10 @@
 /// Represents a selected cargo profile
 ///
 /// Generally chosen from flags like `--release`, `--profile <profile name>`.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub enum CargoProfile {
     /// The default non-release profile, `[profile.dev]`
+    #[default]
     Dev,
     /// The default release profile, `[profile.release]`
     Release,
