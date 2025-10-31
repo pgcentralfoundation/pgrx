@@ -155,17 +155,17 @@ pub(crate) fn generate_schema_for_cli(
         .package(package_name)
         .std_streams([cargo::Stdio::Null, cargo::Stdio::Null, cargo::Stdio::Inherit])
         .manifest_path(user_manifest_path.map(|p| p.to_owned()))
-        .log_level(log_level);
+        .log_level(log_level)
+        .features(features.clone());
 
     if !skip_build {
         // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
-        first_build(cargo.clone(), profile, features, is_test, &features_arg, &flags, target)?;
+        first_build(cargo.clone(), profile, is_test, &features_arg, &flags, target)?;
     };
     generate_schema_implicit(
         cargo,
         package_manifest_path,
         profile,
-        features,
         features_arg,
         target,
         path,
@@ -184,7 +184,6 @@ pub(crate) fn generate_schema_implicit(
     cargo: Cargo,
     package_manifest_path: &Path,
     profile: &CargoProfile,
-    features: &clap_cargo::Features,
     features_arg: String,
     target: Option<&str>,
     path: Option<&Path>,
@@ -219,7 +218,7 @@ pub(crate) fn generate_schema_implicit(
         tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
     }
 
-    second_build(cargo, features, &features_arg, &flags, embed.path(), &manifest)?;
+    second_build(cargo, &features_arg, &flags, embed.path(), &manifest)?;
 
     compute_sql(&manifest)?;
 
@@ -329,7 +328,6 @@ fn compute_symbols(obj_file: &object::File<'_>, symbol_prefix: &str) -> eyre::Re
 fn first_build(
     cargo: Cargo,
     profile: &CargoProfile,
-    features: &clap_cargo::Features,
     is_test: bool,
     features_arg: &str,
     flags: &str,
@@ -346,19 +344,6 @@ fn first_build(
     };
 
     command.args(profile.cargo_args());
-
-    if !features_arg.trim().is_empty() {
-        command.arg("--features");
-        command.arg(features_arg);
-    }
-
-    if features.no_default_features {
-        command.arg("--no-default-features");
-    }
-
-    if features.all_features {
-        command.arg("--all-features");
-    }
 
     for arg in flags.split_ascii_whitespace() {
         command.arg(arg);
@@ -487,7 +472,6 @@ fn compute_codegen(
 
 fn second_build(
     cargo: Cargo,
-    features: &clap_cargo::Features,
     features_arg: &str,
     flags: &str,
     embed_path: &Path,
@@ -498,19 +482,6 @@ fn second_build(
     let mut command = cargo.subcommand("rustc").into_command();
     command.arg("--bin");
     command.arg(pgrx_embed_name(manifest)?);
-
-    if !features_arg.trim().is_empty() {
-        command.arg("--features");
-        command.arg(features_arg);
-    }
-
-    if features.no_default_features {
-        command.arg("--no-default-features");
-    }
-
-    if features.all_features {
-        command.arg("--all-features");
-    }
 
     for arg in flags.split_ascii_whitespace() {
         command.arg(arg);
