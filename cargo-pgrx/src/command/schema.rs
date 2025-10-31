@@ -151,17 +151,15 @@ pub(crate) fn generate_schema_for_cli(
     let lib_name = manifest.lib_name()?;
     let lib_filename = manifest.lib_filename()?;
 
-    let cargo = Cargo::default().package(package_name).std_streams([
-        cargo::Stdio::Null,
-        cargo::Stdio::Null,
-        cargo::Stdio::Inherit,
-    ]);
+    let cargo = Cargo::default()
+        .package(package_name)
+        .std_streams([cargo::Stdio::Null, cargo::Stdio::Null, cargo::Stdio::Inherit])
+        .manifest(user_manifest_path.map(|p| p.to_owned()));
 
     if !skip_build {
         // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
         first_build(
             cargo.clone(),
-            user_manifest_path,
             profile,
             features,
             log_level.clone(),
@@ -173,7 +171,6 @@ pub(crate) fn generate_schema_for_cli(
     };
     generate_schema_implicit(
         cargo,
-        user_manifest_path,
         package_manifest_path,
         profile,
         features,
@@ -194,7 +191,6 @@ pub(crate) use generate_schema_for_cli as generate_schema;
 
 pub(crate) fn generate_schema_implicit(
     cargo: Cargo,
-    user_manifest_path: Option<&Path>,
     package_manifest_path: &Path,
     profile: &CargoProfile,
     features: &clap_cargo::Features,
@@ -235,7 +231,6 @@ pub(crate) fn generate_schema_implicit(
 
     second_build(
         cargo,
-        user_manifest_path,
         features,
         log_level.clone(),
         &features_arg,
@@ -351,7 +346,6 @@ fn compute_symbols(obj_file: &object::File<'_>, symbol_prefix: &str) -> eyre::Re
 
 fn first_build(
     cargo: Cargo,
-    user_manifest_path: Option<&Path>,
     profile: &CargoProfile,
     features: &clap_cargo::Features,
     log_level: Option<String>,
@@ -369,11 +363,6 @@ fn first_build(
         command.arg("--lib");
         command
     };
-
-    if let Some(user_manifest_path) = user_manifest_path.as_ref() {
-        command.arg("--manifest-path");
-        command.arg(user_manifest_path);
-    }
 
     command.args(profile.cargo_args());
 
@@ -521,7 +510,6 @@ fn compute_codegen(
 
 fn second_build(
     cargo: Cargo,
-    user_manifest_path: Option<&Path>,
     features: &clap_cargo::Features,
     log_level: Option<String>,
     features_arg: &str,
@@ -534,11 +522,6 @@ fn second_build(
     let mut command = cargo.subcommand("rustc").into_command();
     command.arg("--bin");
     command.arg(pgrx_embed_name(manifest)?);
-
-    if let Some(user_manifest_path) = user_manifest_path.as_ref() {
-        command.arg("--manifest-path");
-        command.arg(user_manifest_path);
-    }
 
     if let Some(log_level) = &log_level {
         command.env("RUST_LOG", log_level);
