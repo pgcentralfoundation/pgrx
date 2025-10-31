@@ -139,7 +139,7 @@ pub fn test_extension(
     }
     let target_dir = get_target_dir()?;
 
-    let mut command = crate::env::cargo();
+    let mut command = crate::cargo::cargo();
 
     let no_default_features_arg = features.no_default_features;
     let mut features_arg = features.features.join(" ");

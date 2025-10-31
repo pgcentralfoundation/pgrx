@@ -289,7 +289,7 @@ pub(crate) fn build_extension(
 ) -> eyre::Result<std::process::Output> {
     let flags = std::env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
 
-    let mut command = crate::env::cargo();
+    let mut command = crate::cargo::cargo();
     command.arg("build");
     command.arg("--lib");
 

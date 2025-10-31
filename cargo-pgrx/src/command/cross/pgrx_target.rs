@@ -87,7 +87,7 @@ fn make_target_info(cmd: &PgrxTarget, tmp: &Path) -> Result<()> {
         );
     }
 
-    run(crate::env::cargo().args(["init", "--lib", "--name", "temp-crate"]).current_dir(tmp))?;
+    run(crate::cargo::cargo().args(["init", "--lib", "--name", "temp-crate"]).current_dir(tmp))?;
 
     let cargo_add: Vec<String> = if let Some(pg_sys_path) = &cmd.pg_sys_path {
         let abs = pg_sys_path.canonicalize().wrap_err_with(|| {
@@ -99,14 +99,14 @@ fn make_target_info(cmd: &PgrxTarget, tmp: &Path) -> Result<()> {
         vec![format!("pgrx-pg-sys@={own_version}")]
     };
 
-    run(crate::env::cargo()
+    run(crate::cargo::cargo()
         .arg("add")
         .args(cargo_add)
         .arg("--no-default-features")
         .current_dir(tmp))?;
 
     let filename = format!("pg{major_version}_raw_bindings.rs");
-    run(crate::env::cargo()
+    run(crate::cargo::cargo()
         .current_dir(tmp)
         .arg("build")
         .arg("--features")

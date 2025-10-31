@@ -11,7 +11,7 @@ mod command;
 mod manifest;
 mod metadata;
 
-pub(crate) mod env;
+pub(crate) mod cargo;
 pub(crate) mod profile;
 
 use clap::Parser;
@@ -58,7 +58,7 @@ impl CommandExecute for CargoSubcommands {
 
 fn main() -> color_eyre::Result<()> {
     let stderr_is_tty = io::stderr().is_terminal();
-    env::initialize();
+    cargo::initialize();
     color_eyre::config::HookBuilder::default().theme(color_eyre::config::Theme::new()).install()?;
 
     let cargo_cli = CargoCommand::parse();

@@ -333,7 +333,7 @@ fn first_build(
     target: Option<&str>,
     package_name: &str,
 ) -> eyre::Result<()> {
-    let mut command = crate::env::cargo();
+    let mut command = crate::cargo::cargo();
     command.stdin(Stdio::null());
     command.stdout(Stdio::null());
     command.stderr(Stdio::inherit());
@@ -500,7 +500,7 @@ fn second_build(
     package_name: &str,
     manifest: &Manifest,
 ) -> eyre::Result<()> {
-    let mut command = crate::env::cargo();
+    let mut command = crate::cargo::cargo();
     command.stdin(Stdio::null());
     command.stdout(Stdio::null());
     command.stderr(Stdio::inherit());
