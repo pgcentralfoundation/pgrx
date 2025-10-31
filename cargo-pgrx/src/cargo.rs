@@ -69,11 +69,6 @@ impl Cargo {
         self
     }
 
-    pub fn flag_args(mut self, flag: impl Into<String>, args: Vec<String>) -> Self {
-        self.more_args.insert(flag.into(), args);
-        self
-    }
-
     pub fn features(mut self, features: clap_cargo::Features) -> Self {
         self.features = features;
         self
@@ -99,7 +94,7 @@ impl Cargo {
             profile,
             package,
             subcmd: _,
-            more_args: _,
+            more_args,
         } = self;
 
         // set most-interesting flags first, like profile, target, and manifest-path
@@ -153,9 +148,9 @@ impl Cargo {
             cmd.env("RUST_LOG", log_level);
         }
 
-        // for (flag, args) in more_args {
-        //     cmd.arg(flag).args(args);
-        // }
+        for (flag, args) in more_args {
+            cmd.arg(flag).args(args);
+        }
 
         cmd
     }
