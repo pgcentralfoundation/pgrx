@@ -462,9 +462,10 @@ fn second_build(
 ) -> eyre::Result<()> {
     // We do pass cfg to the binary and do not pass cfg to dependencies to avoid recompilation
     // The only cargo command respecting our need is `cargo rustc`
-    let mut command = cargo.subcommand("rustc").into_command();
-    command.arg("--bin");
-    command.arg(pgrx_embed_name(manifest)?);
+    let mut command = cargo
+        .subcommand("rustc")
+        .flag_args("--bin", vec![pgrx_embed_name(manifest)?])
+        .into_command();
 
     command.arg("--");
 
