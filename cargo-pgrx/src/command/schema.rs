@@ -8,7 +8,6 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::CommandExecute;
-use crate::cargo::{self, Cargo};
 use crate::command::get::{find_control_file, get_property};
 use crate::manifest::{get_package_manifest, pg_config_and_version};
 use crate::profile::CargoProfile;
@@ -139,6 +138,8 @@ pub(crate) fn generate_schema_for_cli(
     let manifest = Manifest::from_path(&package_manifest_path)?;
     let (control_file, _extname) = find_control_file(&package_manifest_path)?;
 
+    let flags = std::env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
+
     let features_arg = features.features.join(" ");
 
     let package_name = if let Some(user_package) = user_package {
@@ -149,49 +150,58 @@ pub(crate) fn generate_schema_for_cli(
     let lib_name = manifest.lib_name()?;
     let lib_filename = manifest.lib_filename()?;
 
-    let cargo = Cargo::default()
-        .target(target.map(|s| s.to_owned()))
-        .manifest(user_manifest_path.map(|p| p.to_owned()))
-        .package(package_name)
-        .std_streams([cargo::Stdio::Null, cargo::Stdio::Null, cargo::Stdio::Inherit])
-        .profile(profile.clone())
-        .log_level(log_level)
-        .features(features.clone());
-
     if !skip_build {
         // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
-        first_build(cargo.clone(), is_test, &features_arg)?;
+        first_build(
+            user_manifest_path,
+            profile,
+            features,
+            log_level.clone(),
+            is_test,
+            &features_arg,
+            &flags,
+            target,
+            &package_name,
+        )?;
     };
     generate_schema_implicit(
-        cargo,
+        user_manifest_path,
+        package_name,
         package_manifest_path,
         profile,
+        features,
         features_arg,
         target,
         path,
         dot,
+        log_level,
         output_tracking,
         manifest,
         control_file,
         lib_name,
         lib_filename,
+        flags,
     )
 }
 pub(crate) use generate_schema_for_cli as generate_schema;
 
 pub(crate) fn generate_schema_implicit(
-    cargo: Cargo,
+    user_manifest_path: Option<&Path>,
+    package_name: String,
     package_manifest_path: &Path,
     profile: &CargoProfile,
+    features: &clap_cargo::Features,
     features_arg: String,
     target: Option<&str>,
     path: Option<&Path>,
     dot: Option<&Path>,
+    log_level: Option<String>,
     output_tracking: &mut Vec<PathBuf>,
     manifest: cargo_toml::Manifest,
     control_file: PathBuf,
     lib_name: String,
     lib_filename: String,
+    flags: String,
 ) -> eyre::Result<()> {
     let symbols = find_and_compute_symbols(profile, &lib_filename, target)?;
 
@@ -216,7 +226,16 @@ pub(crate) fn generate_schema_implicit(
         tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
     }
 
-    second_build(cargo, &features_arg, embed.path(), &manifest)?;
+    second_build(
+        user_manifest_path,
+        features,
+        log_level.clone(),
+        &features_arg,
+        &flags,
+        embed.path(),
+        &package_name,
+        &manifest,
+    )?;
 
     compute_sql(&manifest)?;
 
@@ -323,14 +342,65 @@ fn compute_symbols(obj_file: &object::File<'_>, symbol_prefix: &str) -> eyre::Re
     Ok(fns_to_call.into_iter().collect())
 }
 
-fn first_build(cargo: Cargo, is_test: bool, features_arg: &str) -> eyre::Result<()> {
-    let cargo = if is_test {
-        cargo.subcommand("test").flag("--no-run")
-    } else {
-        cargo.subcommand("build").flag("--lib")
-    };
+fn first_build(
+    user_manifest_path: Option<&Path>,
+    profile: &CargoProfile,
+    features: &clap_cargo::Features,
+    log_level: Option<String>,
+    is_test: bool,
+    features_arg: &str,
+    flags: &str,
+    target: Option<&str>,
+    package_name: &str,
+) -> eyre::Result<()> {
+    let mut command = crate::cargo::cargo();
+    command.stdin(Stdio::null());
+    command.stdout(Stdio::null());
+    command.stderr(Stdio::inherit());
 
-    let mut command = cargo.into_command();
+    if is_test {
+        command.arg("test");
+        command.arg("--no-run");
+    } else {
+        command.arg("build");
+        command.arg("--lib");
+    }
+
+    command.arg("--package");
+    command.arg(package_name);
+
+    if let Some(user_manifest_path) = user_manifest_path.as_ref() {
+        command.arg("--manifest-path");
+        command.arg(user_manifest_path);
+    }
+
+    command.args(profile.cargo_args());
+
+    if let Some(log_level) = &log_level {
+        command.env("RUST_LOG", log_level);
+    }
+
+    if !features_arg.trim().is_empty() {
+        command.arg("--features");
+        command.arg(features_arg);
+    }
+
+    if features.no_default_features {
+        command.arg("--no-default-features");
+    }
+
+    if features.all_features {
+        command.arg("--all-features");
+    }
+
+    for arg in flags.split_ascii_whitespace() {
+        command.arg(arg);
+    }
+
+    if let Some(target) = target {
+        command.arg("--target");
+        command.arg(target);
+    }
 
     let command_str = format!("{command:?}");
     eprintln!(
@@ -449,16 +519,54 @@ fn compute_codegen(
 }
 
 fn second_build(
-    cargo: Cargo,
+    user_manifest_path: Option<&Path>,
+    features: &clap_cargo::Features,
+    log_level: Option<String>,
     features_arg: &str,
+    flags: &str,
     embed_path: &Path,
+    package_name: &str,
     manifest: &Manifest,
 ) -> eyre::Result<()> {
+    let mut command = crate::cargo::cargo();
+    command.stdin(Stdio::null());
+    command.stdout(Stdio::null());
+    command.stderr(Stdio::inherit());
+
     // We do pass cfg to the binary and do not pass cfg to dependencies to avoid recompilation
     // The only cargo command respecting our need is `cargo rustc`
-    let cargo = cargo.subcommand("rustc").flag_args("--bin", vec![pgrx_embed_name(manifest)?]);
+    command.arg("rustc");
+    command.arg("--bin");
+    command.arg(pgrx_embed_name(manifest)?);
 
-    let mut command = cargo.into_command();
+    command.arg("--package");
+    command.arg(package_name);
+
+    if let Some(user_manifest_path) = user_manifest_path.as_ref() {
+        command.arg("--manifest-path");
+        command.arg(user_manifest_path);
+    }
+
+    if let Some(log_level) = &log_level {
+        command.env("RUST_LOG", log_level);
+    }
+
+    if !features_arg.trim().is_empty() {
+        command.arg("--features");
+        command.arg(features_arg);
+    }
+
+    if features.no_default_features {
+        command.arg("--no-default-features");
+    }
+
+    if features.all_features {
+        command.arg("--all-features");
+    }
+
+    for arg in flags.split_ascii_whitespace() {
+        command.arg(arg);
+    }
 
     command.arg("--");
 
