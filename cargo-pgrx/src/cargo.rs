@@ -164,8 +164,6 @@ impl Cargo {
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub enum Stdio {
     Inherit,
-    #[allow(unused)]
-    Piped,
     Null,
     #[default]
     Default,
