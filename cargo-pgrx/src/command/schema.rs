@@ -154,7 +154,7 @@ pub(crate) fn generate_schema_for_cli(
     let cargo = Cargo::default()
         .package(package_name)
         .std_streams([cargo::Stdio::Null, cargo::Stdio::Null, cargo::Stdio::Inherit])
-        .manifest(user_manifest_path.map(|p| p.to_owned()))
+        .manifest_path(user_manifest_path.map(|p| p.to_owned()))
         .log_level(log_level);
 
     if !skip_build {

@@ -39,7 +39,7 @@ impl Cargo {
         self
     }
 
-    pub fn manifest(mut self, path: Option<PathBuf>) -> Self {
+    pub fn manifest_path(mut self, path: Option<PathBuf>) -> Self {
         self.manifest = path;
         self
     }
