@@ -333,25 +333,18 @@ fn first_build(
     flags: &str,
     target: Option<&str>,
 ) -> eyre::Result<()> {
-    let mut command = if is_test {
-        let mut command = cargo.subcommand("test").into_command();
-        command.arg("--no-run");
-        command
+    let cargo = if is_test {
+        cargo.subcommand("test").flag("--no-run")
     } else {
-        let mut command = cargo.subcommand("build").into_command();
-        command.arg("--lib");
-        command
+        cargo.subcommand("build").flag("--lib")
     };
 
-    command.args(profile.cargo_args());
+    let cargo = cargo.profile(profile.clone()).target(target.map(|t| t.to_owned()));
+
+    let mut command = cargo.into_command();
 
     for arg in flags.split_ascii_whitespace() {
         command.arg(arg);
-    }
-
-    if let Some(target) = target {
-        command.arg("--target");
-        command.arg(target);
     }
 
     let command_str = format!("{command:?}");

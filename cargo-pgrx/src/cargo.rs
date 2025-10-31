@@ -98,7 +98,7 @@ impl Cargo {
 
         // set most-interesting flags first, like profile, target, and manifest-path
         // so that when we read dumped command lines we can see that info first
-        // cmd.args(profile.cargo_args());
+        cmd.args(profile.cargo_args());
 
         if let Some(target) = target {
             cmd.arg("--target").arg(target);
