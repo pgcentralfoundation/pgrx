@@ -13,7 +13,7 @@ use std::path::PathBuf;
 use std::{env, process};
 
 /// Configuration for building a cargo execution
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub struct Cargo {
     subcmd: String,
     features: clap_cargo::Features,
@@ -79,7 +79,17 @@ impl Cargo {
         self
     }
 
+    #[track_caller]
     pub fn into_command(self) -> process::Command {
+        let mut cmd = cargo();
+
+        // subcommand *must* go first
+        if self.subcmd != "" {
+            cmd.arg(&self.subcmd);
+        } else {
+            panic!("`Cargo::into_command` requires a subcommand to be set, was: {self:?}")
+        }
+
         let Cargo {
             features,
             stdio,
@@ -88,13 +98,9 @@ impl Cargo {
             target,
             profile,
             package,
-            subcmd,
+            subcmd: _,
             more_args,
         } = self;
-
-        let mut cmd = cargo();
-        // subcommand *must* go first
-        cmd.arg(subcmd);
 
         // set most-interesting flags first, like profile, target, and manifest-path
         // so that when we read dumped command lines we can see that info first
@@ -155,7 +161,7 @@ impl Cargo {
     }
 }
 
-#[derive(Clone, Copy, Default, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub enum Stdio {
     Inherit,
     #[allow(unused)]
