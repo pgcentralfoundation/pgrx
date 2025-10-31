@@ -8,6 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::CommandExecute;
+use crate::cargo::{self, Cargo};
 use crate::command::get::{find_control_file, get_property};
 use crate::manifest::{get_package_manifest, pg_config_and_version};
 use crate::profile::CargoProfile;
@@ -150,9 +151,12 @@ pub(crate) fn generate_schema_for_cli(
     let lib_name = manifest.lib_name()?;
     let lib_filename = manifest.lib_filename()?;
 
+    let cargo = Cargo::default();
+
     if !skip_build {
         // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
         first_build(
+            cargo.clone(),
             user_manifest_path,
             profile,
             features,
@@ -165,6 +169,7 @@ pub(crate) fn generate_schema_for_cli(
         )?;
     };
     generate_schema_implicit(
+        cargo,
         user_manifest_path,
         package_name,
         package_manifest_path,
@@ -186,6 +191,7 @@ pub(crate) fn generate_schema_for_cli(
 pub(crate) use generate_schema_for_cli as generate_schema;
 
 pub(crate) fn generate_schema_implicit(
+    cargo: Cargo,
     user_manifest_path: Option<&Path>,
     package_name: String,
     package_manifest_path: &Path,
@@ -227,6 +233,7 @@ pub(crate) fn generate_schema_implicit(
     }
 
     second_build(
+        cargo,
         user_manifest_path,
         features,
         log_level.clone(),
@@ -343,6 +350,7 @@ fn compute_symbols(obj_file: &object::File<'_>, symbol_prefix: &str) -> eyre::Re
 }
 
 fn first_build(
+    cargo: Cargo,
     user_manifest_path: Option<&Path>,
     profile: &CargoProfile,
     features: &clap_cargo::Features,
@@ -353,18 +361,19 @@ fn first_build(
     target: Option<&str>,
     package_name: &str,
 ) -> eyre::Result<()> {
-    let mut command = crate::cargo::cargo();
+    let mut command = if is_test {
+        let mut command = cargo.subcommand("test").into_command();
+        command.arg("--no-run");
+        command
+    } else {
+        let mut command = cargo.subcommand("build").into_command();
+        command.arg("--lib");
+        command
+    };
+
     command.stdin(Stdio::null());
     command.stdout(Stdio::null());
     command.stderr(Stdio::inherit());
-
-    if is_test {
-        command.arg("test");
-        command.arg("--no-run");
-    } else {
-        command.arg("build");
-        command.arg("--lib");
-    }
 
     command.arg("--package");
     command.arg(package_name);
@@ -519,6 +528,7 @@ fn compute_codegen(
 }
 
 fn second_build(
+    cargo: Cargo,
     user_manifest_path: Option<&Path>,
     features: &clap_cargo::Features,
     log_level: Option<String>,
@@ -528,16 +538,15 @@ fn second_build(
     package_name: &str,
     manifest: &Manifest,
 ) -> eyre::Result<()> {
-    let mut command = crate::cargo::cargo();
+    // We do pass cfg to the binary and do not pass cfg to dependencies to avoid recompilation
+    // The only cargo command respecting our need is `cargo rustc`
+    let mut command = cargo.subcommand("rustc").into_command();
+    command.arg("--bin");
+    command.arg(pgrx_embed_name(manifest)?);
+
     command.stdin(Stdio::null());
     command.stdout(Stdio::null());
     command.stderr(Stdio::inherit());
-
-    // We do pass cfg to the binary and do not pass cfg to dependencies to avoid recompilation
-    // The only cargo command respecting our need is `cargo rustc`
-    command.arg("rustc");
-    command.arg("--bin");
-    command.arg(pgrx_embed_name(manifest)?);
 
     command.arg("--package");
     command.arg(package_name);

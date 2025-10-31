@@ -98,7 +98,7 @@ impl Cargo {
 
         // set most-interesting flags first, like profile, target, and manifest-path
         // so that when we read dumped command lines we can see that info first
-        cmd.args(profile.cargo_args());
+        // cmd.args(profile.cargo_args());
 
         if let Some(target) = target {
             cmd.arg("--target").arg(target);
@@ -137,19 +137,19 @@ impl Cargo {
         }
 
         // And now the miscellaneous build flags!
-        let flags = env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
-        for arg in flags.split_ascii_whitespace() {
-            cmd.arg(arg);
-        }
+        // let flags = env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
+        // for arg in flags.split_ascii_whitespace() {
+        //     cmd.arg(arg);
+        // }
 
         // set envs
         if let Some(log_level) = log_level {
             cmd.env("RUST_LOG", log_level);
         }
 
-        for (flag, args) in more_args {
-            cmd.arg(flag).args(args);
-        }
+        // for (flag, args) in more_args {
+        //     cmd.arg(flag).args(args);
+        // }
 
         cmd
     }
@@ -171,7 +171,7 @@ impl Stdio {
             Stdio::Inherit => Some(process::Stdio::inherit()),
             Stdio::Piped => Some(process::Stdio::piped()),
             Stdio::Null => Some(process::Stdio::null()),
-            _ => None,
+            Stdio::Default => None,
         }
     }
 }
