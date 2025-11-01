@@ -8,9 +8,10 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::CommandExecute;
+use crate::cargo::CargoProfile;
+use crate::command::get::get_property;
 use crate::command::install::install_extension;
 use crate::manifest::{PgVersionSource, display_version_info};
-use crate::{command::get::get_property, profile::CargoProfile};
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
 use pgrx_pg_config::{PgConfig, Pgrx, get_target_dir};

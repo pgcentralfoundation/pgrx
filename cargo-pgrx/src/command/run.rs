@@ -9,13 +9,13 @@ use std::collections::HashMap;
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::CommandExecute;
+use crate::cargo::CargoProfile;
 use crate::command::get::get_property;
 use crate::command::install::install_extension;
 use crate::command::regress::Regress;
 use crate::command::start::start_postgres;
 use crate::command::stop::stop_postgres;
 use crate::manifest::{get_package_manifest, pg_config_and_version};
-use crate::profile::CargoProfile;
 use eyre::eyre;
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{PgConfig, Pgrx, createdb};

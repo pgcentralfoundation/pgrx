@@ -13,8 +13,8 @@ use std::path::{Path, PathBuf};
 use std::process::Stdio;
 
 use crate::CommandExecute;
+use crate::cargo::CargoProfile;
 use crate::manifest::{get_package_manifest, pg_config_and_version};
-use crate::profile::CargoProfile;
 
 /// Run the test suite for this crate
 #[derive(clap::Args, Debug, Clone)]

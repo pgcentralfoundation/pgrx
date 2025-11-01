@@ -8,10 +8,10 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::CommandExecute;
+use crate::cargo::CargoProfile;
 use crate::command::get::{find_control_file, get_property};
 use crate::command::sudo_install::SudoInstall;
 use crate::manifest::{PgVersionSource, display_version_info};
-use crate::profile::CargoProfile;
 use cargo_metadata::Message as CargoMessage;
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};

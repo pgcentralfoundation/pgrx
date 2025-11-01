@@ -8,10 +8,9 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::CommandExecute;
-use crate::cargo::{self, Cargo};
+use crate::cargo::{self, Cargo, CargoProfile};
 use crate::command::get::{find_control_file, get_property};
 use crate::manifest::{get_package_manifest, pg_config_and_version};
-use crate::profile::CargoProfile;
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
 use object::read::macho::MachOFatFile32;

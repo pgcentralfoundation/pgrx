@@ -12,7 +12,6 @@ mod manifest;
 mod metadata;
 
 pub(crate) mod cargo;
-pub(crate) mod profile;
 
 use clap::Parser;
 use std::io::{self, IsTerminal};
