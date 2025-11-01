@@ -61,13 +61,11 @@ impl PgrxManifestExt for Manifest {
         // `cargo_manifest` auto fills lib.name with package.name;
         // hyphen replaced with underscore if crate type is lib.
         // So we will always have a lib.name for lib crates.
-        Ok(self
-            .package
+        self.package
             .as_ref()
-            .and_then(|_| self.lib.as_ref())
-            .map(|lib| lib.name.to_owned())
-            .flatten()
-            .ok_or_else(|| eyre!("Could not get [lib] name from manifest."))?)
+            .and(self.lib.as_ref())
+            .and_then(|lib| lib.name.to_owned())
+            .ok_or_else(|| eyre!("Could not get [lib] name from manifest."))
     }
 
     fn lib_filename(&self) -> eyre::Result<String> {
