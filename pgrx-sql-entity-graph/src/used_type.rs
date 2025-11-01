@@ -456,50 +456,51 @@ fn resolve_array_inner(
         .last_mut()
         .ok_or(syn::Error::new(original_span, "Could not read last segment of path"))?;
 
-    match last.arguments {
-        syn::PathArguments::AngleBracketed(ref mut path_arg) => match path_arg.args.last() {
-            Some(syn::GenericArgument::Type(ty)) => match ty.clone() {
-                syn::Type::Macro(macro_pat) => {
-                    let mac = &macro_pat.mac;
-                    let archetype = mac.path.segments.last().expect("No last segment");
-                    match archetype.ident.to_string().as_str() {
-                        "default" => Err(syn::Error::new(
-                            mac.span(),
-                            "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead",
-                        )),
-                        "composite_type" => {
-                            let composite_mac = handle_composite_type_macro(mac)?;
-                            let comp_ty = composite_mac.expand_with_lifetime();
-                            let sql = Some(composite_mac);
-                            let ty = syn::parse_quote! {
-                                ::pgrx::datum::Array<'_, #comp_ty>
-                            };
-                            Ok((ty, sql))
-                        }
-                        _ => Ok((syn::Type::Path(original), None)),
+    if let syn::PathArguments::AngleBracketed(ref mut path_arg) = last.arguments
+        && let Some(syn::GenericArgument::Type(ty)) = path_arg.args.last()
+    {
+        match ty.clone() {
+            syn::Type::Macro(macro_pat) => {
+                let mac = &macro_pat.mac;
+                let archetype = mac.path.segments.last().expect("No last segment");
+                match archetype.ident.to_string().as_str() {
+                    "default" => Err(syn::Error::new(
+                        mac.span(),
+                        "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead",
+                    )),
+                    "composite_type" => {
+                        let composite_mac = handle_composite_type_macro(mac)?;
+                        let comp_ty = composite_mac.expand_with_lifetime();
+                        let sql = Some(composite_mac);
+                        let ty = syn::parse_quote! {
+                            ::pgrx::datum::Array<'_, #comp_ty>
+                        };
+                        Ok((ty, sql))
                     }
+                    _ => Ok((syn::Type::Path(original), None)),
                 }
-                syn::Type::Path(arg_type_path) => {
-                    let last = arg_type_path.path.segments.last().ok_or(syn::Error::new(
-                        arg_type_path.span(),
-                        "No last segment in type path",
-                    ))?;
-                    match last.ident.to_string().as_str() {
-                        "Option" => {
-                            let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
-                            let wrapped_ty = syn::parse_quote! {
-                                ::pgrx::datum::Array<'_, #inner_ty>
-                            };
-                            Ok((wrapped_ty, expr))
-                        }
-                        _ => Ok((syn::Type::Path(original), None)),
+            }
+            syn::Type::Path(arg_type_path) => {
+                let last = arg_type_path
+                    .path
+                    .segments
+                    .last()
+                    .ok_or(syn::Error::new(arg_type_path.span(), "No last segment in type path"))?;
+                match last.ident.to_string().as_str() {
+                    "Option" => {
+                        let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
+                        let wrapped_ty = syn::parse_quote! {
+                            ::pgrx::datum::Array<'_, #inner_ty>
+                        };
+                        Ok((wrapped_ty, expr))
                     }
+                    _ => Ok((syn::Type::Path(original), None)),
                 }
-                _ => Ok((syn::Type::Path(original), None)),
-            },
+            }
             _ => Ok((syn::Type::Path(original), None)),
-        },
-        _ => Ok((syn::Type::Path(original), None)),
+        }
+    } else {
+        Ok((syn::Type::Path(original), None))
     }
 }
 
