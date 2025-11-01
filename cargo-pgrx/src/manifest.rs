@@ -132,11 +132,9 @@ pub(crate) fn pg_config_and_version(
         } else if let Some(features) = user_features.as_ref() {
             // the user did not give us an explicit Postgres version, so see if there's one in the set
             // of `--feature` flags they gave us
-            for flag in &features.features {
-                if pgrx.is_feature_flag(flag) {
-                    // use the first feature flag that is a Postgres version we support
-                    return Some(PgVersionSource::FeatureFlag(flag.clone()));
-                }
+            if let Some(flag) = features.features.iter().find(|flag| pgrx.is_feature_flag(flag)) {
+                // use the first feature flag that is a Postgres version we support
+                return Some(PgVersionSource::FeatureFlag(flag.clone()));
             }
 
             // user didn't give us a feature flag that is a Postgres version
