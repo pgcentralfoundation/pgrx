@@ -138,129 +138,101 @@ impl UsedType {
                 let ident_string = last_segment.ident.to_string();
                 match ident_string.as_str() {
                     "Result" => {
-                        match &last_segment.arguments {
-                            syn::PathArguments::AngleBracketed(angle_bracketed) => {
-                                match angle_bracketed.args.first().ok_or(syn::Error::new(
-                                    angle_bracketed.span(),
+                        if let syn::PathArguments::AngleBracketed(angles) = &last_segment.arguments
+                            && let syn::GenericArgument::Type(inner_ty) =
+                                angles.args.first().ok_or(syn::Error::new(
+                                    angles.span(),
                                     "No inner arg for Result<T, E> found",
-                                ))? {
-                                    syn::GenericArgument::Type(inner_ty) => {
-                                        match inner_ty {
-                                            // Result<$Type<T>>
-                                            syn::Type::Path(inner_type_path) => {
-                                                let path = &inner_type_path.path;
-                                                let last_segment =
-                                                    path.segments.last().ok_or(syn::Error::new(
-                                                        path.span(),
-                                                        "No last segment found while scanning path",
-                                                    ))?;
-                                                let ident_string = last_segment.ident.to_string();
-                                                match ident_string.as_str() {
-                                                    "VariadicArray" => (
-                                                        syn::Type::Path(type_path.clone()),
-                                                        true,
-                                                        Some(inner_ty.clone()),
-                                                        false,
-                                                    ),
-                                                    "Option" => (
-                                                        syn::Type::Path(type_path.clone()),
-                                                        false,
-                                                        Some(inner_ty.clone()),
-                                                        true,
-                                                    ),
-                                                    _ => (
-                                                        syn::Type::Path(type_path.clone()),
-                                                        false,
-                                                        None,
-                                                        true,
-                                                    ),
-                                                }
-                                            }
-                                            // Result<T>
-                                            _ => (
-                                                syn::Type::Path(type_path.clone()),
-                                                false,
-                                                None,
-                                                true,
-                                            ),
+                                ))?
+                        {
+                            match inner_ty {
+                                // Result<$Type<T>>
+                                syn::Type::Path(inner_type_path) => {
+                                    let path = &inner_type_path.path;
+                                    let last_segment = inner_type_path.path.segments.last().ok_or(
+                                        syn::Error::new(
+                                            path.span(),
+                                            "No last segment found while scanning path",
+                                        ),
+                                    )?;
+                                    let ident_string = last_segment.ident.to_string();
+                                    match ident_string.as_str() {
+                                        "VariadicArray" => (
+                                            syn::Type::Path(type_path.clone()),
+                                            true,
+                                            Some(inner_ty.clone()),
+                                            false,
+                                        ),
+                                        "Option" => (
+                                            syn::Type::Path(type_path.clone()),
+                                            false,
+                                            Some(inner_ty.clone()),
+                                            true,
+                                        ),
+                                        _ => {
+                                            (syn::Type::Path(type_path.clone()), false, None, true)
                                         }
                                     }
-                                    _ => {
-                                        return Err(syn::Error::new(
-                                            type_path.span(),
-                                            "Unexpected Item found inside `Result` (expected Type)",
-                                        ));
-                                    }
                                 }
+                                // Result<T>
+                                _ => (syn::Type::Path(type_path.clone()), false, None, true),
                             }
-                            _ => {
-                                return Err(syn::Error::new(
-                                    type_path.span(),
-                                    "Unexpected Item found inside `Result` (expected Angle Brackets)",
-                                ));
-                            }
+                        } else {
+                            return Err(syn::Error::new(
+                                type_path.span(),
+                                "Unexpected Item found inside `Result` (expected `<T>`)",
+                            ));
                         }
                     }
                     "Option" => {
                         // Option<VariadicArray<T>>
-                        match &last_segment.arguments {
-                            syn::PathArguments::AngleBracketed(angle_bracketed) => {
-                                match angle_bracketed.args.first().ok_or(syn::Error::new(
-                                    angle_bracketed.span(),
+                        if let syn::PathArguments::AngleBracketed(angles) = &last_segment.arguments
+                            && let syn::GenericArgument::Type(inner_ty) =
+                                angles.args.first().ok_or(syn::Error::new(
+                                    angles.span(),
                                     "No inner arg for Option<T> found",
-                                ))? {
-                                    syn::GenericArgument::Type(inner_ty) => {
-                                        match inner_ty {
-                                            // Option<VariadicArray<T>>
-                                            syn::Type::Path(inner_type_path) => {
-                                                let path = &inner_type_path.path;
-                                                let last_segment =
-                                                    path.segments.last().ok_or(syn::Error::new(
-                                                        path.span(),
-                                                        "No last segment found while scanning path",
-                                                    ))?;
-                                                let ident_string = last_segment.ident.to_string();
-                                                match ident_string.as_str() {
-                                                    // Option<VariadicArray<T>>
-                                                    "VariadicArray" => (
-                                                        syn::Type::Path(type_path.clone()),
-                                                        true,
-                                                        Some(inner_ty.clone()),
-                                                        false,
-                                                    ),
-                                                    _ => (
-                                                        syn::Type::Path(type_path.clone()),
-                                                        false,
-                                                        Some(inner_ty.clone()),
-                                                        false,
-                                                    ),
-                                                }
-                                            }
-                                            // Option<T>
-                                            _ => (
-                                                syn::Type::Path(type_path.clone()),
-                                                false,
-                                                Some(inner_ty.clone()),
-                                                false,
-                                            ),
-                                        }
-                                    }
-                                    // Option<T>
-                                    _ => {
-                                        return Err(syn::Error::new(
-                                            type_path.span(),
-                                            "Unexpected Item found inside `Option` (expected Type)",
-                                        ));
+                                ))?
+                        {
+                            match inner_ty {
+                                // Option<VariadicArray<T>>
+                                syn::Type::Path(inner_type_path) => {
+                                    let path = &inner_type_path.path;
+                                    let last_segment =
+                                        path.segments.last().ok_or(syn::Error::new(
+                                            path.span(),
+                                            "No last segment found while scanning path",
+                                        ))?;
+                                    let ident_string = last_segment.ident.to_string();
+                                    match ident_string.as_str() {
+                                        // Option<VariadicArray<T>>
+                                        "VariadicArray" => (
+                                            syn::Type::Path(type_path.clone()),
+                                            true,
+                                            Some(inner_ty.clone()),
+                                            false,
+                                        ),
+                                        _ => (
+                                            syn::Type::Path(type_path.clone()),
+                                            false,
+                                            Some(inner_ty.clone()),
+                                            false,
+                                        ),
                                     }
                                 }
+                                // Option<T>
+                                _ => (
+                                    syn::Type::Path(type_path.clone()),
+                                    false,
+                                    Some(inner_ty.clone()),
+                                    false,
+                                ),
                             }
+                        } else {
                             // Option<T>
-                            _ => {
-                                return Err(syn::Error::new(
-                                    type_path.span(),
-                                    "Unexpected Item found inside `Option` (expected Angle Brackets)",
-                                ));
-                            }
+                            return Err(syn::Error::new(
+                                type_path.span(),
+                                "Unexpected Item found inside `Option` (expected `<T>`)",
+                            ));
                         }
                     }
                     // VariadicArray<T>
