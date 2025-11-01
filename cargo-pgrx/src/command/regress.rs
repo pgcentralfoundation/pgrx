@@ -82,9 +82,9 @@ impl Regress {
             return true;
         }
 
-        let sql = manifest_path_to_sql_tests_path(&manifest_path);
+        let sql = manifest_path_to_sql_tests_path(manifest_path);
         if !sql.exists() { return false; }
-        let expected = manifest_path_to_expected_tests_output_path(&manifest_path);
+        let expected = manifest_path_to_expected_tests_output_path(manifest_path);
         if !expected.exists() {return false; }
 
         let setup_sql = sql.join("setup.sql");
@@ -164,12 +164,10 @@ impl Regress {
 
         // `setup.{only}` is a special file that we handle separately
         let is_setup = |entry: &DirEntry| {
-            if let Some(filename) = entry.file_name().to_str() {
-                if filename.ends_with(&format!("setup.{only}")) {
-                    return true;
-                }
-            }
-            false
+            entry
+                .file_name()
+                .to_str()
+                .is_some_and(|filename| filename.ends_with(&format!("setup.{only}")))
         };
 
         // remove the "setup" file from the list
@@ -179,10 +177,10 @@ impl Regress {
         files.sort_unstable_by_key(|entry| entry.file_name());
 
         // if we detected a setup file and the caller wants to include it, make it the first entry
-        if let Some(setup_entry) = setup_entry {
-            if include_setup {
-                files.insert(0, setup_entry);
-            }
+        if let Some(setup_entry) = setup_entry
+            && include_setup
+        {
+            files.insert(0, setup_entry);
         }
     }
 
@@ -201,7 +199,7 @@ impl Regress {
             .to_str()
             .expect("test result output filename should be valid UTF8")
             .to_string();
-        let test_output = std::fs::read_to_string(&test_result_output)?;
+        let test_output = std::fs::read_to_string(test_result_output)?;
 
         let variant_suffix: Option<String>;
 
@@ -289,12 +287,12 @@ impl Regress {
             for new_test in new_tests {
                 if let Some(test_result_output) = create_regress_output(
                     pg_config,
-                    &manifest_path,
-                    &pgregress_path,
+                    manifest_path,
+                    pgregress_path,
                     dbname,
                     new_test,
                 )? {
-                    self.accept_new_test(&manifest_path, &test_result_output, auto)?;
+                    self.accept_new_test(manifest_path, &test_result_output, auto)?;
                 }
             }
         }
@@ -304,14 +302,14 @@ impl Regress {
 
         if !success && auto {
             // tests failed, but the user asked to `auto`matically accept their output as new output
-            let results_files = self.list_results_outputs(&manifest_path, include_setup)?;
+            let results_files = self.list_results_outputs(manifest_path, include_setup)?;
 
             println!();
             for entry in results_files {
                 let filename =
                     entry.file_name().to_str().expect("filename should be valid UTF8").to_owned();
                 let expected_path =
-                    manifest_path_to_expected_tests_output_path(&manifest_path).join(filename);
+                    manifest_path_to_expected_tests_output_path(manifest_path).join(filename);
 
                 if !expected_path.exists() {
                     // this is a file from `results/test-name.out` for which we don't have an expected file
@@ -455,7 +453,7 @@ fn create_regress_output(
         // doesn't exist, since we are creating the test output.  So if that's the case, if we have
         // a `.out` file for it in the results/ directory, then we're successful
         let out_file =
-            manifest_path_to_results_output_path(&manifest_path).join(format!("{test_name}.out"));
+            manifest_path_to_results_output_path(manifest_path).join(format!("{test_name}.out"));
         if out_file.exists() {
             return Ok(Some(out_file));
         } else {
@@ -668,10 +666,11 @@ fn manifest_path_to_results_output_path(manifest_path: &Path) -> PathBuf {
 }
 
 fn add_to_git(path: &Path) -> eyre::Result<()> {
-    if let Ok(git) = which::which("git") {
-        if is_git_repo(&git) && !Command::new(git).arg("add").arg(path).status()?.success() {
-            panic!("unable to add {} to git", path.display());
-        }
+    if let Ok(git) = which::which("git")
+        && is_git_repo(&git)
+        && !Command::new(git).arg("add").arg(path).status()?.success()
+    {
+        panic!("unable to add {} to git", path.display());
     }
     Ok(())
 }

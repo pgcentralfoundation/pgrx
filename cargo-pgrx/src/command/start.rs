@@ -146,10 +146,10 @@ pub(crate) fn start_postgres(
         command.arg("--time-stamp=yes");
         command.arg("--error-markers=VALGRINDERROR-BEGIN,VALGRINDERROR-END");
         command.arg("--trace-children=yes");
-        if let Ok(path) = valgrind_suppressions_path(&pg_config) {
-            if let Ok(true) = std::fs::exists(&path) {
-                command.arg(format!("--suppressions={}", path.display()));
-            }
+        if let Ok(path) = valgrind_suppressions_path(pg_config)
+            && let Ok(true) = std::fs::exists(&path)
+        {
+            command.arg(format!("--suppressions={}", path.display()));
         }
         command.arg(pg_config.postmaster_path()?.display().to_string());
         file.write_all(format!("{command:?}").as_bytes())?;

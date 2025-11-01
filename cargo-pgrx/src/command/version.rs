@@ -79,12 +79,12 @@ mod rss {
                 let major = major.unwrap().parse::<u16>().unwrap_or_default();
                 let minor = minor.unwrap().parse::<u16>().unwrap_or_default();
 
-                if let Some(known_pgver) = versions.get_mut(&major) {
-                    if matches!(known_pgver.minor, PgMinorVersion::Latest) {
-                        // fill in the latest minor version number and its url
-                        known_pgver.minor = PgMinorVersion::Release(minor);
-                        known_pgver.url = Some(Url::parse(&download_url(major, minor))?);
-                    }
+                if let Some(known_pgver) = versions.get_mut(&major)
+                    && matches!(known_pgver.minor, PgMinorVersion::Latest)
+                {
+                    // fill in the latest minor version number and its url
+                    known_pgver.minor = PgMinorVersion::Release(minor);
+                    known_pgver.url = Some(Url::parse(&download_url(major, minor))?);
                 }
             }
 

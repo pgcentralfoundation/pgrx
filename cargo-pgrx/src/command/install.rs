@@ -355,16 +355,16 @@ fn copy_sql_files(
     skip_build: bool,
     output_tracking: &mut Vec<PathBuf>,
 ) -> eyre::Result<()> {
-    let (_, extname) = find_control_file(&package_manifest_path)?;
+    let (_, extname) = find_control_file(package_manifest_path)?;
     {
-        let version = get_version(&package_manifest_path)?;
+        let version = get_version(package_manifest_path)?;
         let filename = format!("{extname}--{version}.sql");
         let dest = extdir.join(filename);
 
         crate::command::schema::generate_schema(
             user_manifest_path,
             user_package,
-            package_manifest_path.as_ref(),
+            package_manifest_path,
             profile,
             is_test,
             features,
@@ -392,7 +392,7 @@ fn copy_sql_files(
                     extdir.join(filename),
                     "extension schema upgrade file",
                     true,
-                    &package_manifest_path,
+                    package_manifest_path,
                     output_tracking,
                 )?;
             }
@@ -453,10 +453,10 @@ pub(crate) fn get_version(manifest_path: &Path) -> eyre::Result<String> {
         return Ok(version.clone());
     }
 
-    let version = match get_property(&manifest_path, "default_version")? {
+    let version = match get_property(manifest_path, "default_version")? {
         Some(v) => {
             if v == "@CARGO_VERSION@" {
-                let metadata = crate::metadata::metadata(&Default::default(), Some(&manifest_path))
+                let metadata = crate::metadata::metadata(&Default::default(), Some(manifest_path))
                     .wrap_err("couldn't get cargo metadata")?;
                 crate::metadata::validate(Some(manifest_path), &metadata)?;
                 let manifest_path = crate::manifest::manifest_path(&metadata, None)
@@ -554,10 +554,10 @@ fn filter_contents(manifest_path: &Path, mut input: String) -> eyre::Result<Stri
         // avoid doing this if we don't actually have the token
         // the project might not be a git repo so running `git`
         // would fail
-        input = input.replace("@GIT_HASH@", &get_git_hash(&manifest_path)?);
+        input = input.replace("@GIT_HASH@", &get_git_hash(manifest_path)?);
     }
 
-    input = input.replace("@CARGO_VERSION@", &get_version(&manifest_path)?);
+    input = input.replace("@CARGO_VERSION@", &get_version(manifest_path)?);
 
     Ok(input)
 }

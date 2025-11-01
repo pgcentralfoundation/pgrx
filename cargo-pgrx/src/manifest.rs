@@ -75,21 +75,21 @@ pub(crate) fn modify_features_for_version(
     test: bool,
 ) {
     if let Some(features) = features {
-        if let Some(default_features) = manifest.features.get("default") {
-            if !features.no_default_features {
-                // if the user didn't specify `--no-default-features`, which would otherwise indicate
-                // they think they know what they're doing, we need to build an explicit set of features
-                // to use and turn on `--no-default-features`
+        if let Some(default_features) = manifest.features.get("default")
+            && !features.no_default_features
+        {
+            // if the user didn't specify `--no-default-features`, which would otherwise indicate
+            // they think they know what they're doing, we need to build an explicit set of features
+            // to use and turn on `--no-default-features`
 
-                features.no_default_features = true;
-                features.features.extend(
-                    default_features
-                        .iter()
-                        // only include default features that aren't known pgXX version features
-                        .filter(|flag| !pgrx.is_feature_flag(flag))
-                        .cloned(),
-                );
-            }
+            features.no_default_features = true;
+            features.features.extend(
+                default_features
+                    .iter()
+                    // only include default features that aren't known pgXX version features
+                    .filter(|flag| !pgrx.is_feature_flag(flag))
+                    .cloned(),
+            );
         }
 
         // if we know we're running from the `pgrx-tests/src/framework.rs`, remove any user-specified features
@@ -143,14 +143,11 @@ pub(crate) fn pg_config_and_version(
 
             // if they didn't ask for `--no-default-features` lets see if we have a default
             // postgres version feature specified in the manifest
-            if !features.no_default_features {
-                if let Some(default_features) = manifest.features.get("default") {
-                    for flag in default_features {
-                        if pgrx.is_feature_flag(flag) {
-                            return Some(PgVersionSource::DefaultFeature(flag.clone()));
-                        }
-                    }
-                }
+            if !features.no_default_features
+                && let Some(default_features) = manifest.features.get("default")
+                && let Some(flag) = default_features.iter().find(|flag| pgrx.is_feature_flag(flag))
+            {
+                return Some(PgVersionSource::DefaultFeature(flag.clone()));
             }
         } else {
             // lets check the manifest for a default feature

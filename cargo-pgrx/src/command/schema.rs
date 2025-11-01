@@ -135,7 +135,7 @@ pub(crate) fn generate_schema_for_cli(
     skip_build: bool,
     output_tracking: &mut Vec<PathBuf>,
 ) -> eyre::Result<()> {
-    let manifest = Manifest::from_path(&package_manifest_path)?;
+    let manifest = Manifest::from_path(package_manifest_path)?;
     let features_arg = features.features.join(" ");
 
     let package_name = if let Some(user_package) = user_package {
@@ -180,7 +180,7 @@ pub(crate) fn generate_schema_implicit(
     output_tracking: &mut Vec<PathBuf>,
     manifest: cargo_toml::Manifest,
 ) -> eyre::Result<()> {
-    let (control_file, _extname) = find_control_file(&package_manifest_path)?;
+    let (control_file, _extname) = find_control_file(package_manifest_path)?;
     let lib_name = manifest.lib_name()?;
     let lib_filename = manifest.lib_filename()?;
 
@@ -396,7 +396,7 @@ fn compute_codegen(
         out
     };
     let build = {
-        let versioned_so = get_property(&package_manifest_path, "module_pathname")?.is_none();
+        let versioned_so = get_property(package_manifest_path, "module_pathname")?.is_none();
         quote::quote! {
             let pgrx_sql = ::pgrx::pgrx_sql_entity_graph::PgrxSql::build(
                 entities.into_iter(),
@@ -525,15 +525,15 @@ fn pgrx_embed_name(manifest: &Manifest) -> eyre::Result<String> {
 
     let package_name = name_from(&manifest.package_name()?);
     let lib_name = name_from(&manifest.lib_name()?);
-    (&manifest.bin)
-        .into_iter()
+    manifest
+        .bin
+        .iter()
         .find(|bin| {
             // As cargo_anifest autofills lib.name if it's empty, it's impossible to
             // check only against one name. Perhaps, cargo-util-schemas can help with that.
             bin.name.as_ref().is_some_and(|name| name == &package_name || name == &lib_name)
         })
-        .map(|bin| bin.name.to_owned())
-        .flatten()
+        .and_then(|bin| bin.name.to_owned())
         .ok_or_else(|| eyre!("Failed to find a pgrx_embed binary."))
 }
 
