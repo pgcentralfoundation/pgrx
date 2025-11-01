@@ -147,15 +147,10 @@ pub(crate) fn pg_config_and_version(
             {
                 return Some(PgVersionSource::DefaultFeature(flag.clone()));
             }
-        } else {
-            // lets check the manifest for a default feature
-            if let Some(default_features) = manifest.features.get("default") {
-                for flag in default_features {
-                    if pgrx.is_feature_flag(flag) {
-                        return Some(PgVersionSource::DefaultFeature(flag.clone()));
-                    }
-                }
-            }
+        } else if let Some(default_features) = manifest.features.get("default")
+            && let Some(flag) = default_features.iter().find(|flag| pgrx.is_feature_flag(flag))
+        {
+            return Some(PgVersionSource::DefaultFeature(flag.clone()));
         }
 
         // we cannot determine the Postgres version the user wants to use
