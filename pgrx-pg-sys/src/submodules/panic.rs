@@ -90,10 +90,10 @@ impl Display for ErrorReportLocation {
             }
         }
 
-        if let Some(backtrace) = &self.backtrace {
-            if backtrace.status() == std::backtrace::BacktraceStatus::Captured {
-                write!(f, "\n{backtrace}")?;
-            }
+        if let Some(backtrace) = &self.backtrace
+            && backtrace.status() == std::backtrace::BacktraceStatus::Captured
+        {
+            write!(f, "\n{backtrace}")?;
         }
 
         Ok(())
