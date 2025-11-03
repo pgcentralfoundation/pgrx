@@ -97,11 +97,14 @@ pub mod be {
         #[cfg(feature = "pg18")]
         peer: *mut core::ffi::c_void,
 
-        #[cfg(feature = "pg18")]
+        #[cfg(any(feature = "pg17", feature = "pg18"))]
+        #[cfg_attr(feature = "pg17", deprecated(since = "0.17.0", note = "may be unsound to access on Postgres 17 depending on build `#define`s")]
         raw_buf: *mut core::ffi::c_char,
-        #[cfg(feature = "pg18")]
+        #[cfg(any(feature = "pg17", feature = "pg18"))]
+        #[cfg_attr(feature = "pg17", deprecated(since = "0.17.0", note = "may be unsound to access on Postgres 17 depending on build `#define`s")]
         raw_buf_consumed: isize,
-        #[cfg(feature = "pg18")]
+        #[cfg(any(feature = "pg17", feature = "pg18"))]
+        #[cfg_attr(feature = "pg17", deprecated(since = "0.17.0", note = "may be unsound to access on Postgres 17 depending on build `#define`s")]
         raw_buf_remaining: isize,
     }
 }
