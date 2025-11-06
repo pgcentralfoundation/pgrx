@@ -112,6 +112,7 @@ pub mod be {
 
         ssl_in_use: bool,
         peer_cn: *mut core::ffi::c_char,
+        peer_dn: *mut core::ffi::c_char,
         peer_cert_valid: bool,
 
         alpn_used: bool,
@@ -186,6 +187,7 @@ pub mod be {
 
         ssl_in_use: bool,
         peer_cn: *mut core::ffi::c_char,
+        peer_dn: *mut core::ffi::c_char,
         peer_cert_valid: bool,
 
         alpn_used: bool,
