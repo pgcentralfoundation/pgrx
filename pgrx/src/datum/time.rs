@@ -8,10 +8,8 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use super::datetime_support::*;
-use super::{
-    DateTimeTypeVisitor, FromDatum, Interval, IntoDatum, TimeWithTimeZone, Timestamp,
-    TimestampWithTimeZone,
-};
+use super::{DateTimeTypeVisitor, Interval, TimeWithTimeZone, Timestamp, TimestampWithTimeZone};
+use crate::datum::{FromDatum, IntoDatum};
 use crate::{direct_function_call, pg_sys};
 use pgrx_pg_sys::PgTryBuilder;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;

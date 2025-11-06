@@ -7,9 +7,8 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::datum::{
-    AnyNumeric, Date, Interval, IntoDatum, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
-};
+use super::{Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone};
+use crate::datum::{AnyNumeric, IntoDatum};
 use crate::{direct_function_call, pg_sys};
 use core::fmt::{Display, Formatter};
 use core::str::FromStr;

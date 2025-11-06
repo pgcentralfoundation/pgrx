@@ -7,10 +7,11 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::datum::{
-    Date, DateTimeConversionError, DateTimeParts, DateTimeTypeVisitor, FromDatum,
-    HasExtractableParts, Interval, IntoDatum, Time, TimestampWithTimeZone, ToIsoString,
+use super::{
+    Date, DateTimeConversionError, DateTimeParts, DateTimeTypeVisitor, HasExtractableParts,
+    Interval, Time, TimestampWithTimeZone, ToIsoString,
 };
+use crate::datum::{FromDatum, IntoDatum};
 use crate::{direct_function_call, pg_sys};
 use pgrx_pg_sys::PgTryBuilder;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;

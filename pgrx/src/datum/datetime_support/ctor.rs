@@ -9,7 +9,8 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Exposes constructor methods for creating [`TimestampWithTimeZone`]s based on the various
 //! ways Postgres likes to interpret the "current time".
-use crate::datum::{Date, IntoDatum, Timestamp, TimestampWithTimeZone};
+use super::{Date, Timestamp, TimestampWithTimeZone};
+use crate::datum::IntoDatum;
 use crate::{direct_function_call, pg_sys};
 
 /// Current date and time (start of current transaction)

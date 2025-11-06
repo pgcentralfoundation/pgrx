@@ -7,9 +7,8 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::datum::{
-    Date, Interval, IntoDatum, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
-};
+use super::{Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone};
+use crate::datum::IntoDatum;
 use crate::{direct_function_call, pg_sys};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 

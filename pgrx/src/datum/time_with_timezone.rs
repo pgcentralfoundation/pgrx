@@ -7,11 +7,9 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use super::{
-    DateTimeConversionError, FromDatum, Interval, IntoDatum, Time, TimestampWithTimeZone,
-    ToIsoString,
-};
-use crate::datum::datetime_support::{DateTimeParts, HasExtractableParts, USECS_PER_DAY};
+use super::datetime_support::{DateTimeParts, HasExtractableParts, USECS_PER_DAY};
+use super::{DateTimeConversionError, Interval, Time, TimestampWithTimeZone, ToIsoString};
+use crate::datum::{FromDatum, IntoDatum};
 use crate::{PgMemoryContexts, direct_function_call, direct_function_call_as_datum, pg_sys};
 use pgrx_pg_sys::PgTryBuilder;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;

@@ -15,10 +15,10 @@ use pgrx_sql_entity_graph::metadata::{
 };
 
 use super::datetime_support::{DateTimeParts, HasExtractableParts};
-use crate::datum::{
-    DateTimeConversionError, DateTimeTypeVisitor, FromDatum, IntoDatum, Timestamp,
-    TimestampWithTimeZone, ToIsoString,
+use super::{
+    DateTimeConversionError, DateTimeTypeVisitor, Timestamp, TimestampWithTimeZone, ToIsoString,
 };
+use crate::datum::{FromDatum, IntoDatum};
 use crate::{direct_function_call, pg_sys};
 
 const JULIAN_DAY_ZERO: i32 = pg_sys::DATETIME_MIN_JULIAN as i32 - POSTGRES_EPOCH_JDATE;
