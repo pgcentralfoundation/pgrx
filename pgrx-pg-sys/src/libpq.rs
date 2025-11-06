@@ -23,6 +23,7 @@ pub mod be {
 
     /// Port for Postgres 13..=16
     #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
+    #[repr(C)]
     pub struct Port {
         pub sock: crate::pgsocket,
         pub noblock: bool,
