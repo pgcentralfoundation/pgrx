@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::question_mark)]
 use super::{UnboxDatum, unbox};
-use crate::array::RawArray;
+use crate::array::{RawArray, Scalar};
 use crate::nullable::{
     BitSliceNulls, IntoNullableIterator, MaybeStrictNulls, NullLayout, Nullable, NullableContainer,
 };
@@ -411,26 +411,6 @@ pub enum ArraySliceError {
     #[error("Cannot create a slice of an Array that contains nulls")]
     ContainsNulls,
 }
-
-/// Marker for "simple scalars" in arrays
-///
-/// A Scalar must have:
-/// - A fixed size
-/// - No padding bits
-/// - All bitpatterns are valid
-/// - Postgres runtime handling which respects these properties
-///
-/// This allows for it to be copied from a Rust slice to a Postgres array,
-/// and obtain a Rust slice from a Postgres array if it contains no nulls.
-pub unsafe trait Scalar: Sized + Copy {}
-
-unsafe impl Scalar for f32 {}
-#[cfg(target_pointer_width = "64")]
-unsafe impl Scalar for f64 {}
-unsafe impl Scalar for i8 {}
-unsafe impl Scalar for i16 {}
-unsafe impl Scalar for i32 {}
-unsafe impl Scalar for i64 {}
 
 impl<T> Array<'_, T>
 where
