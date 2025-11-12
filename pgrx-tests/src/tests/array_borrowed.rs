@@ -85,7 +85,7 @@ fn borrow_return_zero_length_vec() -> Vec<i32> {
 
 #[pg_extern]
 fn borrow_get_arr_nelems(arr: &FlatArray<'_, i32>) -> libc::c_int {
-    arr.count() as _
+    arr.cardinality() as _
 }
 
 #[pg_extern]
@@ -105,11 +105,11 @@ fn borrow_display_get_arr_nullbitmap(arr: &FlatArray<'_, i32>) -> String {
     }
 }
 
-#[pg_extern]
-fn borrow_get_arr_ndim(arr: &FlatArray<'_, i32>) -> libc::c_int {
-    // SAFETY: This is a valid FlatArrayType and it's just a field access.
-    arr.dims().len() as libc::c_int
-}
+// #[pg_extern]
+// fn borrow_get_arr_ndim(arr: &FlatArray<'_, i32>) -> libc::c_int {
+//     // SAFETY: This is a valid FlatArrayType and it's just a field access.
+//     arr.dims().len() as libc::c_int
+// }
 
 // This deliberately iterates the FlatArray.
 // Because FlatArray::iter currently iterates the FlatArray as Datums, this is guaranteed to be "bug-free" regarding size.
