@@ -13,6 +13,7 @@ use pgrx_sql_entity_graph::metadata::{
 use crate::callconv::{Arg, ArgAbi};
 use crate::nullable::Nullable;
 use crate::pg_sys;
+use core::mem;
 use core::{marker::PhantomData, ptr::NonNull};
 
 /// A borrowed memory context.

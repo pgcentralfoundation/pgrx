@@ -1,5 +1,6 @@
 use super::*;
 use crate::memcx::{MemCx, PBox};
+use core::{mem, ptr};
 
 #[derive(Debug)]
 pub struct ArrayBuilder {
@@ -11,9 +12,12 @@ impl ArrayBuilder {
         ArrayBuilder { byte_len: None }
     }
 
-    pub fn build_in<'mcx, T>(memcx: &MemCx<'mcx>) -> PBox<'mcx, FlatArray<'mcx, T>> {
+    pub fn build_in<'mcx, T>(self, memcx: &MemCx<'mcx>) -> PBox<'mcx, FlatArray<'mcx, T>> {
         let size = todo!();
         let ptr = memcx.alloc_bytes(size);
-        unsafe { PBox::from_raw_in(ptr, memcx) }
+        let ptr = ptr::slice_from_raw_parts_mut(ptr, size);
+
+        // SAFETY: eh, what's a little unsoundness between friends?
+        unsafe { PBox::from_raw_in(mem::transmute(ptr), memcx) }
     }
 }
