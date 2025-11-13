@@ -42,6 +42,7 @@ pub trait FunctionMetadata<A> {
 
 macro_rules! impl_fn {
     ($($A:ident),* $(,)?) => {
+        #[diagnostic::do_not_recommend]
         impl<$($A,)* R, F> FunctionMetadata<($($A,)*)> for F
         where
             $($A: SqlTranslatable,)*
@@ -56,6 +57,8 @@ macro_rules! impl_fn {
                 }
             }
         }
+
+        #[diagnostic::do_not_recommend]
         impl<$($A,)* R> FunctionMetadata<($($A,)*)> for unsafe fn($($A,)*) -> R
         where
             $($A: SqlTranslatable,)*

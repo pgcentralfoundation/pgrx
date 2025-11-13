@@ -70,6 +70,10 @@ or the Rust handling in PGRX may emit undefined behavior.
 It cannot be made private or sealed due to details of the structure of the PGRX framework.
 Nonetheless, if you are not confident the translation is valid: do not implement this trait.
 */
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` has no representation in SQL",
+    label = "non-SQL type"
+)]
 pub unsafe trait SqlTranslatable {
     fn type_name() -> &'static str {
         core::any::type_name::<Self>()
