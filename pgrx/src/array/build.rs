@@ -13,6 +13,7 @@ impl ArrayBuilder {
     }
 
     pub fn build_in<'mcx, T>(self, memcx: &MemCx<'mcx>) -> PBox<'mcx, FlatArray<'mcx, T>> {
+        let base_size = mem::size_of::<pg_sys::ArrayType>();
         let size = todo!();
         let ptr = memcx.alloc_bytes(size);
         let ptr = ptr::slice_from_raw_parts_mut(ptr, size);

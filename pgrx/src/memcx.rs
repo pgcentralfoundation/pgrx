@@ -11,6 +11,8 @@ use pgrx_sql_entity_graph::metadata::{
 // Search engines will see "memc[tx]{2}" and assume you mean memcpy!
 // And it's nice-ish to have shorter lifetime names and have 'mcx consistently mean the lifetime.
 use crate::callconv::{Arg, ArgAbi};
+use crate::callconv::{BoxRet, FcInfo};
+use crate::datum::{BorrowDatum, Datum};
 use crate::nullable::Nullable;
 use crate::pg_sys;
 use core::mem;
