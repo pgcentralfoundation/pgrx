@@ -6,10 +6,13 @@
 // - mctx
 // Search engines will see "memc[tx]{2}" and assume you mean memcpy!
 // And it's nice-ish to have shorter lifetime names and have 'mcx consistently mean the lifetime.
+use crate::callconv::{Arg, ArgAbi, BoxRet, FcInfo};
+use crate::datum::{BorrowDatum, Datum};
 use crate::pg_sys;
 use core::{marker::PhantomData, ptr::NonNull};
 
 /// A borrowed memory context.
+#[repr(transparent)]
 pub struct MemCx<'mcx> {
     ptr: NonNull<pg_sys::MemoryContextData>,
     _marker: PhantomData<&'mcx pg_sys::MemoryContextData>,
@@ -116,5 +119,22 @@ mod nightly {
                 Ok(NonNull::new_unchecked(slice))
             }
         }
+    }
+}
+
+unsafe impl<'fcx> ArgAbi<'fcx> for &MemCx<'fcx> {
+    unsafe fn unbox_arg_unchecked(_arg: Arg<'_, 'fcx>) -> Self {
+        // SAFETY: We are called to unbox an argument, which means the backend was initialized.
+        // We use this horrific expression to allow the lifetime to be extended arbitrarily
+        // and achieve an "in-place" transformation of CurrentMemoryContext's pointer.
+        unsafe { &*((&raw mut pg_sys::CurrentMemoryContext).cast()) }
+    }
+
+    unsafe fn unbox_nullable_arg(_arg: Arg<'_, 'fcx>) -> crate::nullable::Nullable<Self> {
+        crate::nullable::Nullable::Null
+    }
+
+    fn is_virtual_arg() -> bool {
+        true
     }
 }
