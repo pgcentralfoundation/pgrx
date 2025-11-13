@@ -12,6 +12,7 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 use crate::datum::{Array, BorrowDatum, Datum};
 use crate::layout::{Align, Layout};
+use crate::memcx::{MemCx, PBox};
 use crate::nullable::Nullable;
 use crate::pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
@@ -74,6 +75,32 @@ where
     pub fn contains_nulls(&self) -> bool {
         // SAFETY: Constructive validity from ref and function is non-mutating
         unsafe { pg_sys::array_contains_nulls((&raw const self.head).cast_mut()) }
+    }
+}
+
+impl<'mcx, T> FlatArray<'mcx, T>
+where
+    T: Scalar + Sized,
+{
+    pub fn new_zeroed_dims_in<'cx, const N: usize>(
+        dims: [usize; N],
+        memcx: &MemCx<'cx>,
+    ) -> PBox<'cx, FlatArray<'cx, T>> {
+        let base_size = size_of::<pg_sys::ArrayType>();
+        let nelems = dims.iter().product::<usize>();
+        let array_size = size_of::<T>() * nelems;
+        let padding = todo!();
+        let size = todo!();
+        // let size = base_size + array_size + padding;
+        let ptr = memcx.alloc_zeroed_bytes(size);
+        let ptr = ptr::slice_from_raw_parts_mut(ptr, size);
+
+        // need to: initialize dims
+        // initialize varlena header
+        // set len
+
+        // SAFETY: eh, what's a little unsoundness between friends?
+        unsafe { PBox::from_raw_in(mem::transmute(ptr), memcx) }
     }
 }
 

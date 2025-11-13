@@ -45,6 +45,12 @@ impl<'mcx> MemCx<'mcx> {
         unsafe { NonNull::new_unchecked(ptr) }
     }
 
+    /// Allocate a raw byte buffer `size` bytes in length
+    /// and returns a pointer to the new allocation.
+    pub fn alloc_zeroed_bytes(&self, size: usize) -> *mut u8 {
+        unsafe { pg_sys::MemoryContextAllocZero(self.ptr.as_ptr(), size).cast() }
+    }
+
     /// Stores the current memory context, switches to *this* memory context,
     /// and executes the closure `f`.
     /// Once `f` completes, the previous current memory context is restored.
