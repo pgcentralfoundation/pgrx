@@ -19,7 +19,7 @@ use serde::Serialize;
 use serde_json::json;
 
 #[pg_extern]
-fn return_box_array() -> PBox<'static, FlatArray<'static, i32>> {
+fn return_box_array<'mcx>() -> PBox<'mcx, FlatArray<'mcx, i32>> {
     pgrx::memcx::current_context(|mcx| ArrayBuilder::new().build_in(mcx))
 }
 
