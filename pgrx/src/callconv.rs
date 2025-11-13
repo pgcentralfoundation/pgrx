@@ -60,6 +60,9 @@ static VIRTUAL_ARGUMENT: ReadOnly<pg_sys::NullableDatum> =
 /// This trait is exposed to external code so macro-generated wrapper fn may expand to calls to it.
 /// The number of invariants implementers must uphold is unlikely to be adequately documented.
 /// Prefer to use ArgAbi as a trait bound instead of implementing it, or even calling it, yourself.
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` cannot be passed into a Postgres function as a Datum"
+)]
 pub unsafe trait ArgAbi<'fcx>: Sized {
     /// Unbox an argument with a matching type.
     ///
@@ -378,6 +381,10 @@ pub unsafe trait RetAbi: Sized {
 /// Postgres functions, pgrx uses a very complicated trait, RetAbi. In practice, however, most
 /// types do not need to think about its many sharp-edged cases. Instead, they should implement
 /// this simplified trait, BoxRet. A blanket impl of RetAbi for BoxRet takes care of the rest.
+#[diagnostic::on_unimplemented(
+    message = "{Self} cannot be returned from a Postgres function as a Datum",
+    note = "implement BoxRet instead if possible"
+)]
 pub unsafe trait BoxRet: Sized {
     /// # Safety
     /// You have to actually return the resulting Datum to the function.
