@@ -1,4 +1,4 @@
-error[E0277]: the trait bound `Vec<Option<&str>>: ArgAbi<'_>` is not satisfied
+error[E0277]: `Vec<Option<&str>>` cannot be passed into a Postgres function as a Datum
  --> tests/todo/random-vec-strs-arent-okay.rs:8:5
   |
 5 | #[pg_extern]

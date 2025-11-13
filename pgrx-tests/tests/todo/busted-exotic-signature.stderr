@@ -1,4 +1,4 @@
-error[E0277]: the trait bound `Vec<Option<PgHeapTuple<'_, AllocatedByRust>>>: ArgAbi<'_>` is not satisfied
+error[E0277]: `Vec<Option<PgHeapTuple<'_, AllocatedByRust>>>` cannot be passed into a Postgres function as a Datum
   --> tests/todo/busted-exotic-signature.rs:12:9
    |
 10 |     #[pg_extern]
