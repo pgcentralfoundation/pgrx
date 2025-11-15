@@ -82,25 +82,57 @@ impl<'mcx, T> FlatArray<'mcx, T>
 where
     T: Scalar + Sized,
 {
-    pub fn new_zeroed_dims_in<'cx, const N: usize>(
+    pub fn new_zeroed_in<'cx, const N: usize>(
         dims: [usize; N],
+        has_nulls: bool,
         memcx: &MemCx<'cx>,
     ) -> PBox<'cx, FlatArray<'cx, T>> {
         let base_size = size_of::<pg_sys::ArrayType>();
-        let nelems = dims.iter().product::<usize>();
-        let array_size = size_of::<T>() * nelems;
-        let padding = todo!();
-        let size = todo!();
-        // let size = base_size + array_size + padding;
-        let ptr = memcx.alloc_zeroed_bytes(size);
-        let ptr = ptr::slice_from_raw_parts_mut(ptr, size);
+        let ndims = N;
+        let dims_size = size_of::<ffi::c_int>() * ndims;
+        const { assert!(N != 0) };
+        let dims = dims.map(|i| ffi::c_int::try_from(i).unwrap());
+        let mut product = 1i32;
+        let lbounds = dims.map(|dim| {
+            product = product.checked_mul(dim).unwrap();
+            product + 1
+        });
+        let nelems = product as usize;
+        let null_size = if has_nulls { nelems.div_ceil(8) } else { 0 };
 
-        // need to: initialize dims
-        // initialize varlena header
-        // set len
+        let prefix_size = base_size + dims_size * 2 + null_size;
+        const MAX_ELEM_ALIGN: usize = pg_sys::MAXIMUM_ALIGNOF as _;
+        const { assert!(align_of::<T>() <= MAX_ELEM_ALIGN) };
+        let prefix_size = prefix_size.next_multiple_of(MAX_ELEM_ALIGN);
+        let size = prefix_size + size_of::<T>() * nelems;
+        if let Ok(nbytes) = i32::try_from(size)
+            && let Ok(dataoffset) = i32::try_from(prefix_size)
+        {
+            let ptr = memcx.alloc_zeroed_bytes(size);
 
-        // SAFETY: eh, what's a little unsoundness between friends?
-        unsafe { PBox::from_raw_in(mem::transmute(ptr), memcx) }
+            let dataoffset = if has_nulls { dataoffset } else { 0 };
+            let elemtype = <T as Scalar>::OID;
+
+            let head_ptr = ptr.cast::<pg_sys::ArrayType>();
+            unsafe {
+                // COMPAT: assign so fields must be initialized even if ArrayType changes
+                (*head_ptr) = pg_sys::ArrayType {
+                    vl_len_: varlena::encode_vlen_4b(nbytes) as i32,
+                    ndim: ndims as ffi::c_int,
+                    dataoffset,
+                    elemtype,
+                };
+                *(head_ptr.add(base_size).cast()) = dims;
+                *(head_ptr.add(base_size + dims_size).cast()) = lbounds;
+            }
+            // TODO: fix the size parameter as it should be instead the byte len that isn't accounted for by the header
+            let ptr = ptr::slice_from_raw_parts_mut(ptr, size);
+
+            // SAFETY: eh, what's a little unsoundness between friends?
+            unsafe { PBox::from_raw_in(mem::transmute(ptr), memcx) }
+        } else {
+            todo!()
+        }
     }
 }
 
