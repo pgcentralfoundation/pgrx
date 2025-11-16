@@ -30,11 +30,23 @@ pub unsafe fn set_varsize_4b(ptr: *mut pg_sys::varlena, len: i32) {
     let header = &mut (*ptr.cast::<pg_sys::varattrib_4b>()).va_4byte.deref_mut().va_header;
     // Using core::ptr::write(), which never calls drop(), to prevent
     // automatically dropping a field of a ManuallyDrop<T>
+    core::ptr::write(header, encode_vlen_4b(len))
+}
+
+pub(crate) fn encode_vlen_4b(len: i32) -> u32 {
     #[cfg(target_endian = "big")]
     let value = (len as u32) & 0x3FFFFFFFu32;
     #[cfg(target_endian = "little")]
     let value = (len as u32) << 2u32;
-    core::ptr::write(header, value)
+    value
+}
+
+pub(crate) fn encode_vlen_1b(len: i32) -> u8 {
+    #[cfg(target_endian = "big")]
+    let value = (len as u8) | 0x80;
+    #[cfg(target_endian = "little")]
+    let value = ((len as u8) << 1) | 0x01;
+    value
 }
 
 /// # Safety
@@ -62,11 +74,7 @@ pub unsafe fn set_varsize_1b(ptr: *mut pg_sys::varlena, len: i32) {
     // #endif
 
     // SAFETY:  A varlena can be safely cast to a varattrib_1b
-    #[cfg(target_endian = "big")]
-    let value = (len as u8) | 0x80;
-    #[cfg(target_endian = "little")]
-    let value = ((len as u8) << 1) | 0x01;
-    (*ptr.cast::<pg_sys::varattrib_1b>()).va_header = value;
+    (*ptr.cast::<pg_sys::varattrib_1b>()).va_header = encode_vlen_1b(len);
 }
 
 /// # Safety
