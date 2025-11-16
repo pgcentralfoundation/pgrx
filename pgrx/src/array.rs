@@ -388,15 +388,30 @@ impl Toasty for RawArray {
 /// - No padding bits
 /// - All bitpatterns are valid
 /// - Postgres runtime handling which respects these properties
+/// - ...which also means it must have a statically-known OID
 ///
 /// This allows for it to be copied from a Rust slice to a Postgres array,
 /// and obtain a Rust slice from a Postgres array if it contains no nulls.
-pub unsafe trait Scalar: Sized + Copy {}
+pub unsafe trait Scalar: Sized + Copy {
+    const OID: pg_sys::Oid;
+}
 
-unsafe impl Scalar for f32 {}
+unsafe impl Scalar for f32 {
+    const OID: pg_sys::Oid = pg_sys::FLOAT4OID;
+}
 #[cfg(target_pointer_width = "64")]
-unsafe impl Scalar for f64 {}
-unsafe impl Scalar for i8 {}
-unsafe impl Scalar for i16 {}
-unsafe impl Scalar for i32 {}
-unsafe impl Scalar for i64 {}
+unsafe impl Scalar for f64 {
+    const OID: pg_sys::Oid = pg_sys::FLOAT8OID;
+}
+unsafe impl Scalar for i8 {
+    const OID: pg_sys::Oid = pg_sys::CHAROID;
+}
+unsafe impl Scalar for i16 {
+    const OID: pg_sys::Oid = pg_sys::INT2OID;
+}
+unsafe impl Scalar for i32 {
+    const OID: pg_sys::Oid = pg_sys::INT4OID;
+}
+unsafe impl Scalar for i64 {
+    const OID: pg_sys::Oid = pg_sys::INT8OID;
+}
