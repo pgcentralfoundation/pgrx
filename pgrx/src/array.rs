@@ -134,6 +134,7 @@ where
             // SAFETY: we've allocated enough space so we can initialize everything
             unsafe {
                 // COMPAT: assign so fields must be initialized even if ArrayType changes
+                // SAFETY: ArrayType has no padding, so we will not deinitialize any bytes
                 (*head_ptr) = pg_sys::ArrayType {
                     vl_len_: varlena::encode_vlen_4b(nbytes) as i32,
                     ndim: ndims as ffi::c_int,
