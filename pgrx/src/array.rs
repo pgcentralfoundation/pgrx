@@ -78,6 +78,13 @@ where
     }
 }
 
+pub struct ArrayAllocError {
+    _stuff: (),
+}
+const MAX_ALLOC_SIZE: usize = 0x3fffffff;
+const MAX_ARRAY_SIZE: usize = MAX_ALLOC_SIZE / size_of::<pg_sys::Datum>();
+const MAX_DIMS: usize = pg_sys::MAXDIM as usize;
+
 impl<'mcx, T> FlatArray<'mcx, T>
 where
     T: Scalar + Sized,
@@ -86,11 +93,12 @@ where
         dims: [usize; N],
         has_nulls: bool,
         memcx: &MemCx<'cx>,
-    ) -> PBox<'cx, FlatArray<'cx, T>> {
+    ) -> Result<PBox<'cx, FlatArray<'cx, T>>, ArrayAllocError> {
         let base_size = size_of::<pg_sys::ArrayType>();
         let ndims = N;
         let dims_size = size_of::<ffi::c_int>() * ndims;
         const { assert!(N != 0) };
+        const { assert!(N <= MAX_DIMS) };
         let dims = dims.map(|i| ffi::c_int::try_from(i).unwrap());
         let mut product = 1i32;
         let lbounds = dims.map(|dim| {
@@ -98,6 +106,7 @@ where
             product + 1
         });
         let nelems = product as usize;
+
         let null_size = if has_nulls { nelems.div_ceil(8) } else { 0 };
 
         let prefix_size = base_size + dims_size * 2 + null_size;
@@ -105,6 +114,14 @@ where
         const { assert!(align_of::<T>() <= MAX_ELEM_ALIGN) };
         let prefix_size = prefix_size.next_multiple_of(MAX_ELEM_ALIGN);
         let size = prefix_size + size_of::<T>() * nelems;
+        // FIXME: put in correcter size checks?
+        //
+        if nelems > MAX_ARRAY_SIZE {
+            return Err(ArrayAllocError { _stuff: () });
+        } else if size > MAX_ALLOC_SIZE {
+            return Err(ArrayAllocError { _stuff: () });
+        };
+
         if let Ok(nbytes) = i32::try_from(size)
             && let Ok(dataoffset) = i32::try_from(prefix_size)
         {
@@ -132,9 +149,9 @@ where
 
             // SAFETY: size of the metadata matches the bytes of the varlena header,
             // and there is no padding in ArrayType to make any offsets incorrect
-            unsafe { PBox::from_raw_in(ptr, memcx) }
+            Ok(unsafe { PBox::from_raw_in(ptr, memcx) })
         } else {
-            todo!()
+            Err(ArrayAllocError { _stuff: () })
         }
     }
 }
