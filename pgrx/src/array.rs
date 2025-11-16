@@ -114,6 +114,7 @@ where
             let elemtype = <T as Scalar>::OID;
 
             let head_ptr = ptr.cast::<pg_sys::ArrayType>();
+            // SAFETY: we've allocated enough space so we can initialize everything
             unsafe {
                 // COMPAT: assign so fields must be initialized even if ArrayType changes
                 (*head_ptr) = pg_sys::ArrayType {
@@ -125,11 +126,13 @@ where
                 *(head_ptr.add(base_size).cast()) = dims;
                 *(head_ptr.add(base_size + dims_size).cast()) = lbounds;
             }
-            // TODO: fix the size parameter as it should be instead the byte len that isn't accounted for by the header
-            let ptr = ptr::slice_from_raw_parts_mut(ptr, size);
+            let ptr = ptr::slice_from_raw_parts_mut(ptr, size - base_size);
+            let ptr = ptr as *mut FlatArray<_>;
+            let ptr = NonNull::new(ptr).unwrap();
 
-            // SAFETY: eh, what's a little unsoundness between friends?
-            unsafe { PBox::from_raw_in(mem::transmute(ptr), memcx) }
+            // SAFETY: size of the metadata matches the bytes of the varlena header,
+            // and there is no padding in ArrayType to make any offsets incorrect
+            unsafe { PBox::from_raw_in(ptr, memcx) }
         } else {
             todo!()
         }
