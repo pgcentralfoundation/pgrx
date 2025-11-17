@@ -14,6 +14,7 @@ mod tests {
     use crate as pgrx_tests;
 
     use pgrx::PgMemoryContexts;
+    use pgrx::memcx::MemCx;
     use pgrx::pg_test;
     use pgrx::prelude::*;
     use std::sync::Arc;
@@ -27,6 +28,11 @@ mod tests {
         fn drop(&mut self) {
             self.did_drop.store(true, Ordering::SeqCst);
         }
+    }
+
+    #[pg_extern]
+    pub fn accept_return_memcx<'mcx>(memcx: &'mcx MemCx<'mcx>) -> &'mcx MemCx<'mcx> {
+        memcx
     }
 
     #[pg_test]
