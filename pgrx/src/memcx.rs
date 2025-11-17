@@ -175,5 +175,18 @@ where
     }
 }
 
+unsafe impl<'mcx, T> SqlTranslatable for PBox<'mcx, T>
+where
+    T: SqlTranslatable + ?Sized,
+{
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        T::argument_sql()
+    }
+
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        T::return_sql()
+    }
+}
+
 /// An "owning" palloc.
 pub struct Palloc<'mcx, T>(T, &'mcx MemCx<'mcx>);
