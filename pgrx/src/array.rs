@@ -30,6 +30,10 @@ mod port;
 
 pub use element::Element;
 
+mod build;
+
+pub use build::ArrayBuilder;
+
 /** `pg_sys::ArrayType` and its unsized varlena
 
 # Safety
