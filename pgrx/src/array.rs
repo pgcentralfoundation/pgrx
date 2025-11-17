@@ -84,6 +84,11 @@ pub struct ArrayAllocError {
 const MAX_ALLOC_SIZE: usize = 0x3fffffff;
 const MAX_ARRAY_SIZE: usize = MAX_ALLOC_SIZE / size_of::<pg_sys::Datum>();
 const MAX_DIMS: usize = pg_sys::MAXDIM as usize;
+// COMPAT: this has to be the last field of ArrayType
+const _ARRAY_TYPE_IS_PADDING_FREE: () = assert!(
+    size_of::<pg_sys::ArrayType>()
+        == (mem::offset_of!(pg_sys::ArrayType, elemtype) + size_of::<pg_sys::Oid>())
+);
 
 impl<'mcx, T> FlatArray<'mcx, T>
 where
@@ -134,7 +139,7 @@ where
             // SAFETY: we've allocated enough space so we can initialize everything
             unsafe {
                 // COMPAT: assign so fields must be initialized even if ArrayType changes
-                // SAFETY: ArrayType has no padding, so we will not deinitialize any bytes
+                // SAFETY: _ARRAY_TYPE_IS_PADDING_FREE means we will not deinitialize any bytes
                 (*head_ptr) = pg_sys::ArrayType {
                     vl_len_: varlena::encode_vlen_4b(nbytes) as i32,
                     ndim: ndims as ffi::c_int,
