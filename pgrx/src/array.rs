@@ -119,9 +119,12 @@ where
         const { assert!(align_of::<T>() <= MAX_ELEM_ALIGN) };
         let prefix_size = prefix_size.next_multiple_of(MAX_ELEM_ALIGN);
         let size = prefix_size + size_of::<T>() * nelems;
-        // FIXME: put in correcter size checks?
-        //
-        if nelems > MAX_ARRAY_SIZE {
+        if nelems == 0 {
+            // we could technically handle this by returning what is called an "empty array",
+            // but a 0-len dimension is more likely an error so return an error.
+            // if someone actually needs this, expose a different constructor function?
+            return Err(ArrayAllocError { _stuff: () });
+        } else if nelems > MAX_ARRAY_SIZE {
             return Err(ArrayAllocError { _stuff: () });
         } else if size > MAX_ALLOC_SIZE {
             return Err(ArrayAllocError { _stuff: () });
