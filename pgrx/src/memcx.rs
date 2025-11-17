@@ -1,4 +1,8 @@
 //! Memory Contexts in PostgreSQL, now with lifetimes.
+use pgrx_sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
+
 // "Why isn't this pgrx::mem or pgrx::memcxt?"
 // Postgres actually uses all of:
 // - mcxt
@@ -136,5 +140,15 @@ unsafe impl<'fcx> ArgAbi<'fcx> for &MemCx<'fcx> {
 
     fn is_virtual_arg() -> bool {
         true
+    }
+}
+
+unsafe impl<'mcx> SqlTranslatable for &MemCx<'mcx> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::Skip)
+    }
+
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::Skip))
     }
 }
