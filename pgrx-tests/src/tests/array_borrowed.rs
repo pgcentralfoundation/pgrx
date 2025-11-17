@@ -11,16 +11,16 @@
 use core::ffi::CStr;
 use pgrx::Json;
 use pgrx::PostgresEnum;
-use pgrx::array::{ArrayBuilder, FlatArray, RawArray};
-use pgrx::memcx::PBox;
+use pgrx::array::{FlatArray, RawArray};
+use pgrx::memcx::{MemCx, PBox};
 use pgrx::nullable::Nullable;
 use pgrx::prelude::*;
 use serde::Serialize;
 use serde_json::json;
 
 #[pg_extern]
-fn return_box_array<'mcx>() -> PBox<'mcx, FlatArray<'mcx, i32>> {
-    pgrx::memcx::current_context(|mcx| ArrayBuilder::new().build_in(mcx))
+fn return_box_array<'mcx>(memcx: &MemCx<'mcx>) -> PBox<'mcx, FlatArray<'mcx, i32>> {
+    FlatArray::new_zeroed_in([1; 1], false, memcx).unwrap()
 }
 
 #[pg_extern(name = "borrow_sum_array")]
