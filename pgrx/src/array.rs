@@ -237,7 +237,7 @@ where
     }
 
     pub fn nulls(&self) -> Option<&[u8]> {
-        let len = self.cardinality() + 7 >> 3; // Obtains 0 if len was 0.
+        let len = self.cardinality().div_ceil(8);
 
         // SAFETY: This obtains the nulls pointer from a function that must either
         // return a null pointer or a pointer to a valid null bitmap.
