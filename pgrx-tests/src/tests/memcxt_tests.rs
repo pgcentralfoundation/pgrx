@@ -14,9 +14,10 @@ mod tests {
     use crate as pgrx_tests;
 
     use pgrx::PgMemoryContexts;
-    use pgrx::memcx::MemCx;
+    use pgrx::memcx::{MemCx, PBox};
     use pgrx::pg_test;
     use pgrx::prelude::*;
+    use std::ptr::NonNull;
     use std::sync::Arc;
     use std::sync::atomic::{AtomicBool, Ordering};
 
@@ -31,8 +32,15 @@ mod tests {
     }
 
     #[pg_extern]
-    pub fn accept_return_memcx<'mcx>(memcx: &'mcx MemCx<'mcx>) -> &'mcx MemCx<'mcx> {
-        memcx
+    pub fn accept_mcx_return_timetz<'mcx>(
+        memcx: &'mcx MemCx<'mcx>,
+    ) -> PBox<'mcx, TimeWithTimeZone> {
+        let palloc = memcx.alloc_bytes(size_of::<TimeWithTimeZone>());
+        let timetz = TimeWithTimeZone::new(4, 20, 0.0).unwrap();
+        unsafe {
+            *(palloc as *mut _) = timetz;
+            PBox::from_raw_in(NonNull::new(palloc.cast()).unwrap(), memcx)
+        }
     }
 
     #[pg_test]
