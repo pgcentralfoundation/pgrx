@@ -187,6 +187,3 @@ where
         T::return_sql()
     }
 }
-
-/// An "owning" palloc.
-pub struct Palloc<'mcx, T>(T, &'mcx MemCx<'mcx>);
