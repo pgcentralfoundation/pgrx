@@ -171,7 +171,7 @@ where
 {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
         // SAFETY: by proxy
-        unsafe { fcinfo.return_raw_datum(mem::transmute(self.ptr)) }
+        unsafe { fcinfo.return_raw_datum(pg_sys::Datum::from(self.ptr.cast::<u8>().as_ptr())) }
     }
 }
 
