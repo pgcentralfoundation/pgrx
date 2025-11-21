@@ -25,6 +25,17 @@ impl<'mcx, T: ?Sized> PBox<'mcx, T> {
     }
 }
 
+impl<'mcx, T: Sized> PBox<'mcx, T> {
+    pub fn new_in(val: T, memcx: &MemCx<'mcx>) -> Self {
+        const { assert!(align_of::<T>() <= 8) };
+        let ptr = memcx.alloc_bytes(size_of::<T>()).cast();
+        // We were guaranteed an appropriately sized allocation to write to,
+        // and we have asserted our alignment maximum was upheld
+        unsafe { ptr.write(val) };
+        PBox { ptr, _cx: PhantomData }
+    }
+}
+
 unsafe impl<'mcx, T> BoxRet for PBox<'mcx, T>
 where
     T: ?Sized + BorrowDatum,

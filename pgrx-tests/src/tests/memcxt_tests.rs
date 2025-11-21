@@ -37,10 +37,7 @@ mod tests {
     ) -> PBox<'mcx, TimeWithTimeZone> {
         let palloc = memcx.alloc_bytes(size_of::<TimeWithTimeZone>());
         let timetz = TimeWithTimeZone::new(4, 20, 0.0).unwrap();
-        unsafe {
-            *(palloc as *mut _) = timetz;
-            PBox::from_raw_in(NonNull::new(palloc.cast()).unwrap(), memcx)
-        }
+        PBox::new_in(timetz, memcx)
     }
 
     #[pg_test]
