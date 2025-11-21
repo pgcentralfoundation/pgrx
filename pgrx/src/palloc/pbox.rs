@@ -19,7 +19,7 @@ pub struct PBox<'mcx, T: ?Sized> {
     _cx: PhantomData<MemCx<'mcx>>,
 }
 
-impl<'mcx, T> PBox<'mcx, T> {
+impl<'mcx, T: ?Sized> PBox<'mcx, T> {
     pub unsafe fn from_raw_in(ptr: NonNull<T>, _cx: &MemCx<'mcx>) -> PBox<'mcx, T> {
         PBox { ptr, _cx: PhantomData }
     }
