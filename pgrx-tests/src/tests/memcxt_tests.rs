@@ -18,7 +18,6 @@ mod tests {
     use pgrx::palloc::PBox;
     use pgrx::pg_test;
     use pgrx::prelude::*;
-    use std::ptr::NonNull;
     use std::sync::Arc;
     use std::sync::atomic::{AtomicBool, Ordering};
 
