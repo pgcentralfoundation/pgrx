@@ -14,7 +14,8 @@ mod tests {
     use crate as pgrx_tests;
 
     use pgrx::PgMemoryContexts;
-    use pgrx::memcx::{MemCx, PBox};
+    use pgrx::memcx::MemCx;
+    use pgrx::palloc::PBox;
     use pgrx::pg_test;
     use pgrx::prelude::*;
     use std::ptr::NonNull;
