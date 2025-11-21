@@ -59,7 +59,7 @@ where
             }
             PassBy::Ref => pg_sys::Datum::from(self.ptr.cast::<u8>().as_ptr()),
         };
-        // SAFETY: by proxy, BorroWDatum is an `unsafe` trait so the above impl must be correct
+        // SAFETY: by proxy, BorrowDatum is an `unsafe traitw so the above impl must be correct
         unsafe { fcinfo.return_raw_datum(datum) }
     }
 }
