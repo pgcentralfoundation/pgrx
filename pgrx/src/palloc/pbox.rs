@@ -1,5 +1,6 @@
 use crate::callconv::{BoxRet, FcInfo};
 use crate::datum::{BorrowDatum, Datum};
+use crate::layout::PassBy;
 use crate::memcx::MemCx;
 use crate::pg_sys;
 use core::marker::PhantomData;
@@ -41,8 +42,25 @@ where
     T: ?Sized + BorrowDatum,
 {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
-        // SAFETY: by proxy
-        unsafe { fcinfo.return_raw_datum(pg_sys::Datum::from(self.ptr.cast::<u8>().as_ptr())) }
+        let datum = match T::PASS {
+            PassBy::Value => {
+                // start with a zeroed Datum, just to minimize funny business
+                let mut datum = pg_sys::Datum::null();
+                // SAFETY: we know this type is Sized and has a size less than the Datum, and
+                // a PBox must have an initialized pointee, so a copy is sound-by-construction
+                unsafe {
+                    let size = size_of_val(&*self.ptr.as_ptr());
+                    debug_assert!(size <= size_of::<pg_sys::Datum>());
+                    // using `BorrowDatum::point_from` handles endianness
+                    let datum_ptr = T::point_from(NonNull::from_mut(&mut datum).cast::<u8>());
+                    datum_ptr.cast::<u8>().copy_from_nonoverlapping(self.ptr.cast(), size);
+                }
+                datum
+            }
+            PassBy::Ref => pg_sys::Datum::from(self.ptr.cast::<u8>().as_ptr()),
+        };
+        // SAFETY: by proxy, BorroWDatum is an `unsafe` trait so the above impl must be correct
+        unsafe { fcinfo.return_raw_datum(datum) }
     }
 }
 
