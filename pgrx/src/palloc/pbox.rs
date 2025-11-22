@@ -23,7 +23,7 @@ pub struct PBox<'mcx, T: ?Sized> {
 
 impl<'mcx, T: ?Sized> PBox<'mcx, T> {
     // # Safety
-    // The same constraints as [`Box::from_raw`], AND 
+    // The same constraints as [`Box::from_raw`], AND
     // - you assert the pointer was allocated in the `MemCx`
     // - you assert the pointer may be freed by `pfree`
     pub unsafe fn from_raw_in(ptr: NonNull<T>, _cx: &MemCx<'mcx>) -> PBox<'mcx, T> {
