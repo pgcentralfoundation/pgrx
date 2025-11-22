@@ -35,7 +35,6 @@ mod tests {
     pub fn accept_mcx_return_timetz<'mcx>(
         memcx: &'mcx MemCx<'mcx>,
     ) -> PBox<'mcx, TimeWithTimeZone> {
-        let palloc = memcx.alloc_bytes(size_of::<TimeWithTimeZone>());
         let timetz = TimeWithTimeZone::new(4, 20, 0.0).unwrap();
         PBox::new_in(timetz, memcx)
     }
