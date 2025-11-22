@@ -11,6 +11,7 @@ use pgrx_sql_entity_graph::metadata::{
 // Search engines will see "memc[tx]{2}" and assume you mean memcpy!
 // And it's nice-ish to have shorter lifetime names and have 'mcx consistently mean the lifetime.
 use crate::callconv::{Arg, ArgAbi};
+use crate::nullable::Nullable;
 use crate::pg_sys;
 use core::{marker::PhantomData, ptr::NonNull};
 
@@ -130,6 +131,8 @@ unsafe impl<'fcx> ArgAbi<'fcx> for &MemCx<'fcx> {
         // SAFETY: We are called to unbox an argument, which means the backend was initialized.
         // We use this horrific expression to allow the lifetime to be extended arbitrarily
         // and achieve an "in-place" transformation of CurrentMemoryContext's pointer.
+        // The soundness of this is riding on the lifetimes used for `unbox_arg_unchecked` in our macros,
+        // as the expanded code is designed so that `fcinfo` and each `arg` are truly "borrowed" in rustc's eyes.
         unsafe { &*((&raw mut pg_sys::CurrentMemoryContext).cast()) }
     }
 
@@ -142,6 +145,7 @@ unsafe impl<'fcx> ArgAbi<'fcx> for &MemCx<'fcx> {
     }
 }
 
+/// SAFETY: virtual argument
 unsafe impl<'mcx> SqlTranslatable for &MemCx<'mcx> {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::Skip)

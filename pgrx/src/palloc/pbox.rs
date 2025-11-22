@@ -21,6 +21,10 @@ pub struct PBox<'mcx, T: ?Sized> {
 }
 
 impl<'mcx, T: ?Sized> PBox<'mcx, T> {
+    // # Safety
+    // The same constraints as [`Box::from_raw`], AND 
+    // - you assert the pointer was allocated in the `MemCx`
+    // - you assert the pointer may be freed by `pfree`
     pub unsafe fn from_raw_in(ptr: NonNull<T>, _cx: &MemCx<'mcx>) -> PBox<'mcx, T> {
         PBox { ptr, _cx: PhantomData }
     }
@@ -30,7 +34,7 @@ impl<'mcx, T: Sized> PBox<'mcx, T> {
     pub fn new_in(val: T, memcx: &MemCx<'mcx>) -> Self {
         const { assert!(align_of::<T>() <= 8) };
         let ptr = memcx.alloc_bytes(size_of::<T>()).cast();
-        // We were guaranteed an appropriately sized allocation to write to,
+        // SAFETY: We were guaranteed an appropriately sized allocation to write to,
         // and we have asserted our alignment maximum was upheld
         unsafe { ptr.write(val) };
         PBox { ptr, _cx: PhantomData }
@@ -46,8 +50,8 @@ where
             PassBy::Value => {
                 // start with a zeroed Datum, just to minimize funny business
                 let mut datum = pg_sys::Datum::null();
-                // SAFETY: we know this type is Sized and has a size less than the Datum, and
-                // a PBox must have an initialized pointee, so a copy is sound-by-construction
+                // SAFETY: Due to BorrowDatum, this type has a definite size less than a Datum,
+                // and PBox must have an initialized pointee, so a copy is sound-by-construction.
                 unsafe {
                     let size = size_of_val(&*self.ptr.as_ptr());
                     debug_assert!(size <= size_of::<pg_sys::Datum>());
@@ -59,11 +63,13 @@ where
             }
             PassBy::Ref => pg_sys::Datum::from(self.ptr.cast::<u8>().as_ptr()),
         };
-        // SAFETY: by proxy, BorrowDatum is an `unsafe traitw so the above impl must be correct
+        // SAFETY: by proxy, BorrowDatum is an `unsafe trait` so the above impl must be correct
         unsafe { fcinfo.return_raw_datum(datum) }
     }
 }
 
+/// SAFETY: SQL has no "pointers" so by-val and by-ref calling conventions are identical,
+/// and all `PBox` truly does is enable pass-by-ref returns of unsized values.
 unsafe impl<'mcx, T> SqlTranslatable for PBox<'mcx, T>
 where
     T: SqlTranslatable + ?Sized,
