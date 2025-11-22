@@ -12,8 +12,9 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 use crate::datum::{Array, BorrowDatum, Datum};
 use crate::layout::{Align, Layout};
-use crate::memcx::{MemCx, PBox};
+use crate::memcx::MemCx;
 use crate::nullable::Nullable;
+use crate::palloc::PBox;
 use crate::pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -61,11 +62,6 @@ where
     #[doc(alias = "nelems")]
     pub fn cardinality(&self) -> usize {
         self.as_raw().len()
-    }
-
-    pub fn contains_nulls(&self) -> bool {
-        // SAFETY: Constructive validity from ref and function is non-mutating
-        unsafe { pg_sys::array_contains_nulls((&raw const self.head).cast_mut()) }
     }
 
     pub fn contains_nulls(&self) -> bool {
