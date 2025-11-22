@@ -143,6 +143,7 @@ unsafe impl<'fcx> ArgAbi<'fcx> for &MemCx<'fcx> {
         } else {
             Nullable::Valid(Self::unbox_arg_unchecked(_arg))
         }
+    }
 
     fn is_virtual_arg() -> bool {
         true
