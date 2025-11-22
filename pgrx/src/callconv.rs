@@ -91,7 +91,7 @@ pub unsafe trait ArgAbi<'fcx>: Sized {
         }
     }
 
-    /// "Is this a virtual arg?"
+    /// Virtual args do not affect Datum arg iteration
     fn is_virtual_arg() -> bool {
         false
     }
