@@ -16,6 +16,7 @@ use pgrx_sql_entity_graph::metadata::{
 
 [stdbox]: alloc::boxed::Box
 */
+#[repr(transparent)]
 pub struct PBox<'mcx, T: ?Sized> {
     ptr: NonNull<T>,
     _cx: PhantomData<MemCx<'mcx>>,
@@ -33,7 +34,7 @@ impl<'mcx, T: ?Sized> PBox<'mcx, T> {
 
 impl<'mcx, T: Sized> PBox<'mcx, T> {
     pub fn new_in(val: T, memcx: &MemCx<'mcx>) -> Self {
-        const { assert!(align_of::<T>() <= 8) };
+        const { assert!(align_of::<T>() <= size_of::<pg_sys::Datum>()) };
         let ptr = memcx.alloc_bytes(size_of::<T>()).cast();
         // SAFETY: We were guaranteed an appropriately sized allocation to write to,
         // and we have asserted our alignment maximum was upheld

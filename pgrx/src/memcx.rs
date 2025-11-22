@@ -136,12 +136,12 @@ unsafe impl<'fcx> ArgAbi<'fcx> for &MemCx<'fcx> {
         unsafe { &*((&raw mut pg_sys::CurrentMemoryContext).cast()) }
     }
 
-    unsafe fn unbox_nullable_arg(_arg: Arg<'_, 'fcx>) -> Nullable<Self> {
+    unsafe fn unbox_nullable_arg(arg: Arg<'_, 'fcx>) -> Nullable<Self> {
         // SAFETY: Should never happen in actuality, but as long as we're here...
         if unsafe { pg_sys::CurrentMemoryContext.is_null() } {
             Nullable::Null
         } else {
-            Nullable::Valid(Self::unbox_arg_unchecked(_arg))
+            Nullable::Valid(Self::unbox_arg_unchecked(arg))
         }
     }
 
