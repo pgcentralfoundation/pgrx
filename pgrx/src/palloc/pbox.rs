@@ -4,6 +4,7 @@ use crate::layout::PassBy;
 use crate::memcx::MemCx;
 use crate::pg_sys;
 use core::marker::PhantomData;
+use core::ops::{Deref, DerefMut};
 use core::ptr::NonNull;
 
 use pgrx_sql_entity_graph::metadata::{
@@ -80,5 +81,27 @@ where
 
     fn return_sql() -> Result<Returns, ReturnsError> {
         T::return_sql()
+    }
+}
+
+impl<'mcx, T> Deref for PBox<'mcx, T>
+where
+    T: BorrowDatum + ?Sized,
+{
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        // SAFETY: by construction
+        unsafe { self.ptr.as_ref() }
+    }
+}
+
+impl<'mcx, T> DerefMut for PBox<'mcx, T>
+where
+    T: BorrowDatum + ?Sized,
+{
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        // SAFETY: by construction
+        unsafe { self.ptr.as_mut() }
     }
 }
