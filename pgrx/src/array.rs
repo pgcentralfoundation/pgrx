@@ -161,7 +161,7 @@ where
 
 impl<'mcx, T> FlatArray<'mcx, T>
 where
-    T: ?Sized + BorrowDatum,
+    T: ?Sized + Element,
 {
     /// Iterate the array
     #[doc(alias = "unnest")]
@@ -317,7 +317,7 @@ where
 #[derive(Clone)]
 pub struct ArrayIter<'arr, T>
 where
-    T: ?Sized + BorrowDatum,
+    T: ?Sized + Element,
 {
     arr: &'arr FlatArray<'arr, T>,
     data: ptr::NonNull<u8>,
@@ -330,7 +330,7 @@ where
 
 impl<'arr, T> Iterator for ArrayIter<'arr, T>
 where
-    T: ?Sized + BorrowDatum,
+    T: ?Sized + Element,
 {
     type Item = Nullable<&'arr T>;
 
@@ -359,7 +359,7 @@ where
 
 impl<'arr, 'mcx, T> IntoIterator for &'arr FlatArray<'mcx, T>
 where
-    T: ?Sized + BorrowDatum,
+    T: ?Sized + Element,
 {
     type IntoIter = ArrayIter<'arr, T>;
     type Item = Nullable<&'arr T>;
@@ -368,8 +368,8 @@ where
     }
 }
 
-impl<'arr, T> ExactSizeIterator for ArrayIter<'arr, T> where T: ?Sized + BorrowDatum {}
-impl<'arr, T> FusedIterator for ArrayIter<'arr, T> where T: ?Sized + BorrowDatum {}
+impl<'arr, T> ExactSizeIterator for ArrayIter<'arr, T> where T: ?Sized + Element {}
+impl<'arr, T> FusedIterator for ArrayIter<'arr, T> where T: ?Sized + Element {}
 
 /**
 An aligned, dereferenceable `NonNull<ArrayType>` with low-level accessors.
