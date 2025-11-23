@@ -288,7 +288,7 @@ unsafe impl<T: ?Sized> BorrowDatum for FlatArray<'_, T> {
 // that any datum passed from the outside is mutable
 unsafe impl<T> SqlTranslatable for FlatArray<'_, T>
 where
-    T: ?Sized + SqlTranslatable,
+    T: ?Sized + SqlTranslatable + Element,
 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         match T::argument_sql()? {
