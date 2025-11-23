@@ -33,6 +33,10 @@ assert_eq!(
 );
 ```
  */
+#[diagnostic::on_unimplemented(
+    message = "cannot generate SQL schema for this function",
+    label = "some types in {Self} cannot be translated to SQL"
+)]
 pub trait FunctionMetadata<A> {
     fn path() -> &'static str {
         core::any::type_name::<Self>()

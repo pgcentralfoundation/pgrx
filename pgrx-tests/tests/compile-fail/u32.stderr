@@ -1,11 +1,12 @@
-error[E0277]: the trait bound `fn(u32) -> u32: FunctionMetadata<_>` is not satisfied
+error[E0277]: cannot generate SQL schema for this function
  --> tests/compile-fail/u32.rs:6:5
   |
 5 | #[pg_extern]
   | ------------ in this procedural macro expansion
 6 | pub fn whatever(a: u32) -> u32 {
-  |     ^^ the trait `FunctionMetadata<_>` is not implemented for `fn(u32) -> u32`
+  |     ^^ some types in fn(u32) -> u32 cannot be translated to SQL
   |
+  = help: the trait `FunctionMetadata<_>` is not implemented for `fn(u32) -> u32`
   = note: this error originates in the attribute macro `pg_extern` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error[E0599]: `u32` has no representation in SQL
