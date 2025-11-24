@@ -1,5 +1,7 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 use super::*;
+use crate::array::Element;
+use crate::callconv::DatumPass;
 use crate::layout::PassBy;
 use core::{ffi, mem, ptr};
 
@@ -87,13 +89,14 @@ where
 macro_rules! impl_borrow_fixed_len {
     ($($value_ty:ty),*) => {
         $(
-            unsafe impl BorrowDatum for $value_ty {
+            unsafe impl DatumPass for $value_ty {
                 const PASS: PassBy = if mem::size_of::<Self>() <= mem::size_of::<Datum>() {
                     PassBy::Value
                 } else {
                     PassBy::Ref
                 };
-
+            }
+            unsafe impl Element for $value_ty {
                 unsafe fn point_from(ptr: ptr::NonNull<u8>) -> ptr::NonNull<Self> {
                     #[cfg(target_endian = "big")]
                     unsafe {
@@ -120,9 +123,10 @@ impl_borrow_fixed_len! {
 }
 
 /// It is rare to pass CStr via Datums, but not unheard of
-unsafe impl BorrowDatum for ffi::CStr {
+unsafe impl DatumPass for ffi::CStr {
     const PASS: PassBy = PassBy::Ref;
-
+}
+unsafe impl Element for ffi::CStr {
     unsafe fn point_from(ptr: ptr::NonNull<u8>) -> ptr::NonNull<Self> {
         let char_ptr: *mut ffi::c_char = ptr.as_ptr().cast();
         unsafe {

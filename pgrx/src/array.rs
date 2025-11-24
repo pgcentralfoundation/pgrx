@@ -16,7 +16,10 @@ use bitvec::slice::BitSlice;
 use core::ptr::{self, NonNull};
 use core::slice;
 
+mod element;
 mod port;
+
+pub use element::Element;
 
 /**
 An aligned, dereferenceable `NonNull<ArrayType>` with low-level accessors.

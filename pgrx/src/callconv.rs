@@ -1031,3 +1031,8 @@ impl<'fcx> ReturnSetInfoWrapper<'fcx> {
         unsafe { (*self.0).setDesc }
     }
 }
+
+/// Denotes a type that may be passed as a Datum
+pub unsafe trait DatumPass {
+    const PASS: PassBy;
+}
