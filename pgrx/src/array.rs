@@ -74,6 +74,7 @@ where
 pub struct ArrayAllocError {
     _stuff: (),
 }
+
 const MAX_ALLOC_SIZE: usize = 0x3fffffff;
 const MAX_ARRAY_SIZE: usize = MAX_ALLOC_SIZE / size_of::<pg_sys::Datum>();
 const MAX_DIMS: usize = pg_sys::MAXDIM as usize;
