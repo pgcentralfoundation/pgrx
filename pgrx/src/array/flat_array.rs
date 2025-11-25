@@ -12,8 +12,7 @@ use bitvec::ptr::{self as bitptr, BitPtr, BitPtrError, Const, Mut};
 use bitvec::slice::{self as bitslice, BitSlice};
 use core::iter::{ExactSizeIterator, FusedIterator};
 use core::marker::PhantomData;
-use core::ptr::{self, NonNull};
-use core::{ffi, mem, slice};
+use core::{ffi, mem, ptr, slice};
 
 use super::port;
 use super::{Element, RawArray, Scalar};
@@ -37,7 +36,7 @@ where
 {
     fn as_raw(&self) -> RawArray {
         unsafe {
-            let ptr = NonNull::new_unchecked(ptr::from_ref(self).cast_mut());
+            let ptr = ptr::NonNull::new_unchecked(ptr::from_ref(self).cast_mut());
             RawArray::from_ptr(ptr.cast())
         }
     }
@@ -139,7 +138,7 @@ where
             }
             let ptr = ptr::slice_from_raw_parts_mut(ptr, size - base_size);
             let ptr = ptr as *mut FlatArray<_>;
-            let ptr = NonNull::new(ptr).unwrap();
+            let ptr = ptr::NonNull::new(ptr).unwrap();
 
             // SAFETY: size of the metadata matches the bytes of the varlena header,
             // and there is no padding in ArrayType to make any offsets incorrect
@@ -162,7 +161,7 @@ where
         let nulls =
             raw.nulls_bitptr().map(|p| unsafe { bitslice::from_raw_parts(p, nelems).unwrap() });
 
-        let data = unsafe { NonNull::new_unchecked(raw.data_ptr().cast_mut()) };
+        let data = unsafe { ptr::NonNull::new_unchecked(raw.data_ptr().cast_mut()) };
         let arr = self;
         let index = 0;
         let offset = 0;
