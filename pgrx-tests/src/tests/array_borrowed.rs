@@ -141,21 +141,6 @@ fn borrow_arr_sort_uniq(arr: &FlatArray<'_, i32>) -> Vec<i32> {
     v
 }
 
-// FIXME: BorrowDatum for PostgresEnum?
-// #[derive(Debug, Eq, PartialEq, PostgresEnum, Serialize)]
-// pub enum BorrowFlatArrayTestEnum {
-//     One,
-//     Two,
-//     Three,
-// }
-
-// #[pg_extern]
-// fn borrow_enum_array_roundtrip(
-//     a: &FlatArray<'_, BorrowFlatArrayTestEnum>,
-// ) -> Vec<Option<BorrowFlatArrayTestEnum>> {
-//     a.iter().cloned().collect()
-// }
-
 #[pg_extern]
 fn borrow_validate_cstring_array(
     a: &FlatArray<'_, CStr>,
@@ -186,16 +171,6 @@ mod tests {
     use pgrx::prelude::*;
     use pgrx::{IntoDatum, Json};
     use serde_json::json;
-
-    // #[pg_test]
-    // fn borrow_test_enum_array_roundtrip() -> spi::Result<()> {
-    //     let a = Spi::get_one::<Vec<Option<BorrowFlatArrayTestEnum>>>(
-    //         "SELECT borrow_enum_array_roundtrip(ARRAY['One', 'Two']::BorrowFlatArrayTestEnum[])",
-    //     )?
-    //     .expect("SPI result was null");
-    //     assert_eq!(a, vec![Some(BorrowFlatArrayTestEnum::One), Some(BorrowFlatArrayTestEnum::Two)]);
-    //     Ok(())
-    // }
 
     #[pg_test]
     fn borrow_test_sum_array_i32() {
