@@ -234,29 +234,6 @@ where
             ptr::slice_from_raw_parts(nulls_ptr, len).as_ref()
         }
     }
-
-    /** Oxidized form of [ARR_NULLBITMAP(ArrayType*)][arr_nullbitmap]
-
-    If this returns None, the array *cannot* have nulls.
-    Note that unlike the `is_null: bool` that appears elsewhere, 1 is "valid" and 0 is "null".
-
-    # Safety
-    Trailing bits must be set to 0, and all elements marked with 1 must be initialized.
-    The null bitmap is linear but the layout of elements may be nonlinear, so for some arrays
-    these cannot be calculated directly from each other.
-
-    [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
-    */
-    pub unsafe fn nulls_mut(&mut self) -> Option<&mut [u8]> {
-        let len = self.nelems() + 7 >> 3; // Obtains 0 if len was 0.
-
-        // SAFETY: This obtains the nulls pointer from a function that must either
-        // return a null pointer or a pointer to a valid null bitmap.
-        unsafe {
-            let nulls_ptr = port::ARR_NULLBITMAP(ptr::addr_of_mut!(self.head));
-            ptr::slice_from_raw_parts_mut(nulls_ptr, len).as_mut()
-        }
-    }
 }
 
 unsafe impl<T: ?Sized> BorrowDatum for FlatArray<'_, T> {
