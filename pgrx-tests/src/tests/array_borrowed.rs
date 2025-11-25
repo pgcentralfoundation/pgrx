@@ -168,6 +168,7 @@ mod tests {
     use crate as pgrx_tests;
 
     use super::*;
+    use pgrx::datum::DatumWithOid;
     use pgrx::prelude::*;
     use pgrx::{IntoDatum, Json};
     use serde_json::json;
@@ -227,15 +228,15 @@ mod tests {
         assert_eq!(sum, Ok(Some(6)));
     }
 
-    // #[pg_test]
-    // fn borrow_test_serde_serialize_array_i32() -> Result<(), pgrx::spi::Error> {
-    //     let json = Spi::get_one::<Json>(
-    //         "SELECT borrow_serde_serialize_array_i32(ARRAY[1, null, 2, 3, null, 4, 5])",
-    //     )?
-    //     .expect("returned json was null");
-    //     assert_eq!(json.0, json! {{"values": [1,null,2,3,null,4, 5]}});
-    //     Ok(())
-    // }
+    #[pg_test]
+    fn borrow_test_serde_serialize_array_i32() -> Result<(), pgrx::spi::Error> {
+        let json = Spi::get_one::<Json>(
+            "SELECT borrow_serde_serialize_array_i32(ARRAY[1, null, 2, 3, null, 4, 5])",
+        )?
+        .expect("returned json was null");
+        assert_eq!(json.0, json! {{"values": [1,null,2,3,null,4, 5]}});
+        Ok(())
+    }
 
     #[pg_test]
     fn borrow_test_return_text_array() {
@@ -249,26 +250,25 @@ mod tests {
         assert_eq!(rc, Ok(Some(true)));
     }
 
-    // #[pg_test]
-    // fn borrow_test_slice_to_array() -> Result<(), pgrx::spi::Error> {
-    //     let owned_vec = vec![Some(1), None, Some(2), Some(3), None, Some(4), Some(5)];
-    //     let json = Spi::connect(|client| {
-    //         client
-    //             .select(
-    //                 "SELECT borrow_serde_serialize_array_i32($1)",
-    //                 None,
-    //                 Some(vec![(
-    //                     PgBuiltInOids::INT4ARRAYOID.oid(),
-    //                     owned_vec.as_slice().into_datum(),
-    //                 )]),
-    //             )?
-    //             .first()
-    //             .get_one::<Json>()
-    //     })?
-    //     .expect("Failed to return json even though it's right there ^^");
-    //     assert_eq!(json.0, json! {{"values": [1, null, 2, 3, null, 4, 5]}});
-    //     Ok(())
-    // }
+    #[pg_test]
+    fn borrow_test_slice_to_array() -> Result<(), pgrx::spi::Error> {
+        let owned_vec = vec![Some(1), None, Some(2), Some(3), None, Some(4), Some(5)];
+        let args = unsafe {
+            [DatumWithOid::new(
+                owned_vec.as_slice().into_datum(),
+                PgBuiltInOids::INT4ARRAYOID.value(),
+            )]
+        };
+        let json = Spi::connect(|client| {
+            client
+                .select("SELECT borrow_serde_serialize_array_i32($1)", None, &args)?
+                .first()
+                .get_one::<Json>()
+        })?
+        .expect("Failed to return json even though it's right there ^^");
+        assert_eq!(json.0, json! {{"values": [1, null, 2, 3, null, 4, 5]}});
+        Ok(())
+    }
 
     #[pg_test]
     fn borrow_test_arr_data_ptr() {
