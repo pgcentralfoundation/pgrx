@@ -68,17 +68,17 @@ fn borrow_optional_array_with_default(
     values.unwrap().iter().map(|v| v.into_option().copied().unwrap_or(0)).sum()
 }
 
-// TODO: fix this test by fixing serde impls for `FlatArray<'a, &'a str> -> Json`
+// FIXME: replace with Text
 // #[pg_extern]
 // fn borrow_serde_serialize_array<'dat>(values: &FlatArray<'dat, &'dat str>) -> Json {
 //     Json(json! { { "values": values } })
 // }
 
-// FIXME: serialize for FlatArray?
-// #[pg_extern]
-// fn borrow_serde_serialize_array_i32(values: &FlatArray<'_, i32>) -> Json {
-//     Json(json! { { "values": values } })
-// }
+#[pg_extern]
+fn borrow_serde_serialize_array_i32(values: &FlatArray<'_, i32>) -> Json {
+    let values = values.into_iter().map(|v| v.into_option()).collect::<Vec<Option<_>>>();
+    Json(json! { { "values": values } })
+}
 
 #[pg_extern]
 fn borrow_return_text_array() -> Vec<&'static str> {
