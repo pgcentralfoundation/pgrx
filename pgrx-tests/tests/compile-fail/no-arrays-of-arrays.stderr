@@ -15,15 +15,15 @@ error[E0599]: `PBox<'_, FlatArray<'_, FlatArray<'_, i32>>>` has no representatio
 6 | #[pg_extern]
   | ^^^^^^^^^^^^ non-SQL type
   |
- ::: $WORKSPACE/pgrx/src/array.rs
-  |
-  | pub struct FlatArray<'mcx, T: ?Sized> {
-  | ------------------------------------- doesn't satisfy `FlatArray<'_, FlatArray<'_, i32>>: SqlTranslatable`
-  |
  ::: $WORKSPACE/pgrx/src/palloc/pbox.rs
   |
   | pub struct PBox<'mcx, T: ?Sized> {
   | -------------------------------- doesn't satisfy `_: SqlTranslatable`
+  |
+ ::: $WORKSPACE/pgrx/src/array/flat_array.rs
+  |
+  | pub struct FlatArray<'mcx, T: ?Sized> {
+  | ------------------------------------- doesn't satisfy `FlatArray<'_, FlatArray<'_, i32>>: SqlTranslatable`
   |
 note: if you're trying to build a new `PBox<'_, FlatArray<'_, FlatArray<'_, i32>>>`, consider using `PBox::<'mcx, T>::from_raw_in` which returns `PBox<'_, _>`
  --> $WORKSPACE/pgrx/src/palloc/pbox.rs
