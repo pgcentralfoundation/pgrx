@@ -224,7 +224,7 @@ where
         }
     }
 
-    pub fn nulls(&self) -> Option<&[u8]> {
+    pub fn nullbitmap_bytes(&self) -> Option<&[u8]> {
         let len = self.nelems().div_ceil(8);
 
         // SAFETY: This obtains the nulls pointer from a function that must either

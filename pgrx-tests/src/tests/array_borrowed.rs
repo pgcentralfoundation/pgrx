@@ -102,7 +102,7 @@ fn borrow_get_arr_data_ptr_nth_elem(arr: &FlatArray<'_, i32>, elem: i32) -> Opti
 
 #[pg_extern]
 fn borrow_display_get_arr_nullbitmap(arr: &FlatArray<'_, i32>) -> String {
-    if let Some(slice) = arr.nulls() {
+    if let Some(slice) = arr.nullbitmap_bytes() {
         // SAFETY: If the test has gotten this far, the ptr is good for 0+ bytes,
         // so reborrow NonNull<[u8]> as &[u8] for the hot second we're looking at it.
         // might panic if the array is len 0
