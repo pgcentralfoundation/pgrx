@@ -42,12 +42,17 @@ where
         }
     }
 
-    /// Number of elements in the Array, including nulls
+    /// Number of elements in the array, including nulls
     ///
-    /// Note that for many Arrays, this doesn't have a linear relationship with array byte-len.
-    #[doc(alias = "nelems")]
-    pub fn cardinality(&self) -> usize {
+    /// Note that for many arrays, this doesn't have a linear relationship with array byte-len.
+    #[doc(alias = "cardinality")]
+    pub fn nelems(&self) -> usize {
         self.as_raw().len()
+    }
+
+    /// Number of dimensions the array has
+    pub fn ndims(&self) -> usize {
+        self.head.ndim as _
     }
 
     pub fn contains_nulls(&self) -> bool {
@@ -152,7 +157,7 @@ where
     /// Iterate the array
     #[doc(alias = "unnest")]
     pub fn iter(&self) -> ArrayIter<'_, T> {
-        let nelems = self.cardinality();
+        let nelems = self.nelems();
         let raw = self.as_raw();
         let nulls =
             raw.nulls_bitptr().map(|p| unsafe { bitslice::from_raw_parts(p, nelems).unwrap() });
@@ -211,7 +216,7 @@ where
         if self.contains_nulls() {
             None
         } else {
-            let elements = self.cardinality();
+            let elements = self.nelems();
             // SAFETY: We start with a valid ArrayType
             let data_ptr = unsafe { port::ARR_DATA_PTR(&raw mut self.head as _) };
             // SAFETY: Sound if the bound of `T: Scalar` holds and there are no nulls
@@ -220,7 +225,7 @@ where
     }
 
     pub fn nulls(&self) -> Option<&[u8]> {
-        let len = self.cardinality().div_ceil(8);
+        let len = self.nelems().div_ceil(8);
 
         // SAFETY: This obtains the nulls pointer from a function that must either
         // return a null pointer or a pointer to a valid null bitmap.
@@ -243,7 +248,7 @@ where
     [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
     */
     pub unsafe fn nulls_mut(&mut self) -> Option<&mut [u8]> {
-        let len = self.cardinality() + 7 >> 3; // Obtains 0 if len was 0.
+        let len = self.nelems() + 7 >> 3; // Obtains 0 if len was 0.
 
         // SAFETY: This obtains the nulls pointer from a function that must either
         // return a null pointer or a pointer to a valid null bitmap.

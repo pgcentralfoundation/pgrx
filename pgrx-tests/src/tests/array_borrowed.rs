@@ -92,7 +92,7 @@ fn borrow_return_zero_length_vec() -> Vec<i32> {
 
 #[pg_extern]
 fn borrow_get_arr_nelems(arr: &FlatArray<'_, i32>) -> libc::c_int {
-    arr.cardinality() as _
+    arr.nelems() as _
 }
 
 #[pg_extern]
@@ -112,11 +112,11 @@ fn borrow_display_get_arr_nullbitmap(arr: &FlatArray<'_, i32>) -> String {
     }
 }
 
-// #[pg_extern]
-// fn borrow_get_arr_ndim(arr: &FlatArray<'_, i32>) -> libc::c_int {
-//     // SAFETY: This is a valid FlatArrayType and it's just a field access.
-//     arr.dims().len() as libc::c_int
-// }
+#[pg_extern]
+fn borrow_get_arr_ndim(arr: &FlatArray<'_, i32>) -> libc::c_int {
+    // SAFETY: This is a valid FlatArrayType and it's just a field access.
+    arr.ndims() as libc::c_int
+}
 
 // This deliberately iterates the FlatArray.
 // Because FlatArray::iter currently iterates the FlatArray as Datums, this is guaranteed to be "bug-free" regarding size.
@@ -301,19 +301,19 @@ mod tests {
         Ok(())
     }
 
-    // #[pg_test]
-    // fn borrow_test_get_arr_ndim() -> Result<(), pgrx::spi::Error> {
-    //     let ndim = Spi::get_one::<i32>("SELECT borrow_get_arr_ndim(ARRAY[1,2,3,4,5]::int[])")?
-    //         .expect("datum was null");
+    #[pg_test]
+    fn borrow_test_get_arr_ndim() -> Result<(), pgrx::spi::Error> {
+        let ndim = Spi::get_one::<i32>("SELECT borrow_get_arr_ndim(ARRAY[1,2,3,4,5]::int[])")?
+            .expect("datum was null");
 
-    //     assert_eq!(ndim, 1);
+        assert_eq!(ndim, 1);
 
-    //     let ndim = Spi::get_one::<i32>("SELECT borrow_get_arr_ndim('{{1,2,3},{4,5,6}}'::int[])")?
-    //         .expect("datum was null");
+        let ndim = Spi::get_one::<i32>("SELECT borrow_get_arr_ndim('{{1,2,3},{4,5,6}}'::int[])")?
+            .expect("datum was null");
 
-    //     assert_eq!(ndim, 2);
-    //     Ok(())
-    // }
+        assert_eq!(ndim, 2);
+        Ok(())
+    }
 
     #[pg_test]
     fn borrow_test_arr_to_vec() {
