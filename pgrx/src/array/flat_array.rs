@@ -60,9 +60,18 @@ where
     }
 }
 
+// TODO: remove `non_exhaustive` when the errors have been worked out
+#[non_exhaustive]
 #[derive(Debug)]
-pub struct ArrayAllocError {
-    _stuff: (),
+pub enum ArrayAllocError {
+    TooManyBytes {
+        over: usize,
+    },
+    TooManyElems {
+        over: usize,
+    },
+    /// One or more dimensions are zero
+    ZeroLenDim(usize),
 }
 
 const MAX_ALLOC_SIZE: usize = 0x3fffffff;
@@ -103,16 +112,16 @@ where
         const { assert!(align_of::<T>() <= MAX_ELEM_ALIGN) };
         let prefix_size = prefix_size.next_multiple_of(MAX_ELEM_ALIGN);
         let size = prefix_size + size_of::<T>() * nelems;
-        if nelems == 0 {
-            // we could technically handle this by returning what is called an "empty array",
-            // but a 0-len dimension is more likely an error so return an error.
-            // if someone actually needs this, expose a different constructor function?
-            return Err(ArrayAllocError { _stuff: () });
-        } else if nelems > MAX_ARRAY_SIZE {
-            return Err(ArrayAllocError { _stuff: () });
-        } else if size > MAX_ALLOC_SIZE {
-            return Err(ArrayAllocError { _stuff: () });
-        };
+
+        if let Some((zlen_dim, _)) = dims.into_iter().enumerate().find(|(i, len)| *len == 0) {
+            return Err(ArrayAllocError::ZeroLenDim(zlen_dim));
+        }
+        if let Some(over) = nelems.checked_sub(MAX_ARRAY_SIZE + 1) {
+            return Err(ArrayAllocError::TooManyElems { over });
+        }
+        if let Some(over) = size.checked_sub(MAX_ALLOC_SIZE + 1) {
+            return Err(ArrayAllocError::TooManyBytes { over });
+        }
 
         if let Ok(nbytes) = i32::try_from(size)
             && let Ok(dataoffset) = i32::try_from(prefix_size)
@@ -144,7 +153,8 @@ where
             // and there is no padding in ArrayType to make any offsets incorrect
             Ok(unsafe { PBox::from_raw_in(ptr, memcx) })
         } else {
-            Err(ArrayAllocError { _stuff: () })
+            // Shouldn't happen?
+            unreachable!()
         }
     }
 }
