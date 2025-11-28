@@ -126,7 +126,7 @@ where
         if let Ok(nbytes) = i32::try_from(size)
             && let Ok(dataoffset) = i32::try_from(prefix_size)
         {
-            let ptr = memcx.alloc_zeroed_bytes(size);
+            let ptr = memcx.alloc_zeroed_bytes(size).as_ptr();
 
             let dataoffset = if has_nulls { dataoffset } else { 0 };
             let elemtype = <T as Scalar>::OID;
