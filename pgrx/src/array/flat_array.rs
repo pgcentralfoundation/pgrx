@@ -93,10 +93,14 @@ where
         memcx: &MemCx<'cx>,
     ) -> Result<PBox<'cx, FlatArray<'cx, T>>, ArrayAllocError> {
         let base_size = size_of::<pg_sys::ArrayType>();
+
         let ndims = N;
-        let dims_size = size_of::<ffi::c_int>() * ndims;
-        const { assert!(N != 0) };
+        if N == 0 {
+            return Ok(FlatArray::new_empty(memcx));
+        }
         const { assert!(N <= MAX_DIMS) };
+
+        let dims_size = size_of::<ffi::c_int>() * ndims;
         let dims = dims.map(|i| ffi::c_int::try_from(i).unwrap());
         let mut product = 1i32;
         let lbounds = dims.map(|dim| {
