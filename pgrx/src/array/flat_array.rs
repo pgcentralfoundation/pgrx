@@ -206,7 +206,7 @@ where
     }
 
     /// Obtain `&mut [T]` if the array has no nulls
-    pub fn as_non_null_slice_mut(&mut self) -> Option<&[T]>
+    pub fn as_non_null_slice_mut(&mut self) -> Option<&mut [T]>
     where
         T: Scalar,
     {
