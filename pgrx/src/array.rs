@@ -415,7 +415,7 @@ impl Toasty for RawArray {
 ///
 /// This allows for it to be copied from a Rust slice to a Postgres array,
 /// and obtain a Rust slice from a Postgres array if it contains no nulls.
-pub unsafe trait Scalar: Sized + Copy {
+pub unsafe trait Scalar: Sized + Copy + Element {
     const OID: pg_sys::Oid;
 }
 
