@@ -157,6 +157,44 @@ where
             unreachable!()
         }
     }
+
+    // Allocate a 0-dimension array
+    pub fn new_empty<'cx>(memcx: &MemCx<'cx>) -> PBox<'cx, FlatArray<'cx, T>> {
+        let nbytes = mem::size_of::<pg_sys::ArrayType>();
+        let palloc = memcx.alloc_zeroed_bytes(nbytes);
+        unsafe {
+            palloc.cast().write(pg_sys::ArrayType {
+                vl_len_: varlena::encode_vlen_4b(nbytes as _) as i32,
+                ndim: 0,
+                dataoffset: 0,
+                elemtype: <T as Scalar>::OID,
+            })
+        }
+        let unsized_palloc = ptr::slice_from_raw_parts(palloc.as_ptr(), 0);
+        let array_palloc = unsized_palloc as *mut FlatArray<_>;
+        // SAFETY: We already had it as NonNull
+        unsafe {
+            let array_palloc = ptr::NonNull::new_unchecked(array_palloc);
+            PBox::from_raw_in(array_palloc, memcx)
+        }
+    }
+
+    // Allocate an array sized to fit a slice and copy it
+    //
+    // This produces a 0-dimension array if the slice has 0 length. Otherwise it is 1-dimensional.
+    pub fn new_from_slice<'cx>(
+        data: &[T],
+        memcx: &MemCx<'cx>,
+    ) -> Result<PBox<'cx, FlatArray<'cx, T>>, ArrayAllocError> {
+        match data.len() {
+            0 => Ok(FlatArray::new_empty(memcx)),
+            len => {
+                let mut array = FlatArray::new_zeroed_in([len], false, memcx)?;
+                array.as_non_null_slice_mut().unwrap().copy_from_slice(data);
+                Ok(array)
+            }
+        }
+    }
 }
 
 impl<'mcx, T> FlatArray<'mcx, T>
