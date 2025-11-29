@@ -103,8 +103,6 @@ where
         for (&dsize, dint) in dim_lens.iter().zip(dim_ints.iter_mut()) {
             if dsize == 0 {
                 return Err(ArrayAllocError::ZeroLenDim);
-            } else if dsize > MAX_ARRAY_SIZE {
-                return Err(ArrayAllocError::TooManyElems);
             } else {
                 *dint = dsize as ffi::c_int;
             }
@@ -120,6 +118,9 @@ where
             *lbound = product;
         }
         let nelems = product as usize;
+        if nelems > MAX_ARRAY_SIZE {
+            return Err(ArrayAllocError::TooManyElems);
+        }
 
         let null_size = if has_nulls { nelems.div_ceil(8) } else { 0 };
 
