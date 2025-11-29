@@ -133,47 +133,28 @@ where
             return Err(ArrayAllocError::TooManyBytes);
         }
 
-        let nbytes = size as ffi::c_int;
         let dataoffset = if has_nulls { prefix_size as ffi::c_int } else { 0 };
         let elemtype = <T as Scalar>::OID;
+        let tail_size = size - base_size;
 
-        let ptr = memcx.alloc_zeroed_bytes(size);
-
-        // SAFETY: we've allocated enough space so we can initialize everything
+        let ptr = alloc_zeroed_head(memcx, tail_size, ndims as i32, dataoffset, elemtype);
+        // SAFETY: we allocated enough for our dimensions and lbounds
         unsafe {
-            // COMPAT: write ArrayType so fields must be initialized even if ArrayType changes
-            // SAFETY: _ARRAY_TYPE_IS_PADDING_FREE means we will not deinitialize any bytes
-            ptr.cast().write(pg_sys::ArrayType {
-                vl_len_: varlena::encode_vlen_4b(nbytes) as i32,
-                ndim: ndims as ffi::c_int,
-                dataoffset,
-                elemtype,
-            });
             ptr.byte_add(base_size).cast().write(dim_ints);
             ptr.byte_add(base_size + dims_size).cast().write(lbounds);
         }
-        let ptr = FlatArray::cast_tailed(ptr, size - base_size);
 
         // SAFETY: size of the metadata matches the bytes of the varlena header,
         // and there is no padding in ArrayType to make any offsets incorrect
-        Ok(unsafe { PBox::from_raw_in(ptr, memcx) })
+        Ok(unsafe { PBox::from_raw_in(FlatArray::cast_tailed(ptr), memcx) })
     }
 
     /// Allocate a 0-dimension array
     pub fn new_empty<'cx>(memcx: &MemCx<'cx>) -> PBox<'cx, FlatArray<'cx, T>> {
         let nbytes = mem::size_of::<pg_sys::ArrayType>();
-        let palloc = memcx.alloc_zeroed_bytes(nbytes);
-        unsafe {
-            palloc.cast().write(pg_sys::ArrayType {
-                vl_len_: varlena::encode_vlen_4b(nbytes as _) as i32,
-                ndim: 0,
-                dataoffset: 0,
-                elemtype: <T as Scalar>::OID,
-            })
-        }
-        let palloc = FlatArray::cast_tailed(palloc, 0);
+        let ptr = alloc_zeroed_head(memcx, 0, 0, 0, <T as Scalar>::OID);
         // SAFETY: it's valid, if 0-dimensional
-        unsafe { PBox::from_raw_in(palloc, memcx) }
+        unsafe { PBox::from_raw_in(FlatArray::cast_tailed(ptr), memcx) }
     }
 
     /// Allocate an array sized to fit a slice and copy it
@@ -273,11 +254,33 @@ impl<'mcx, T> FlatArray<'mcx, T>
 where
     T: ?Sized,
 {
-    fn cast_tailed(ptr: ptr::NonNull<u8>, tail_bytes: usize) -> ptr::NonNull<FlatArray<'mcx, T>> {
-        let ptr = ptr::NonNull::slice_from_raw_parts(ptr, tail_bytes);
+    fn cast_tailed(ptr: ptr::NonNull<[u8]>) -> ptr::NonNull<FlatArray<'mcx, T>> {
         // SAFETY: round-tripped from NonNull
         unsafe { ptr::NonNull::new_unchecked(ptr.as_ptr() as *mut FlatArray<_>) }
     }
+}
+
+fn alloc_zeroed_head(
+    memcx: &MemCx<'_>,
+    tail_size: usize,
+    ndim: ffi::c_int,
+    dataoffset: i32,
+    elemtype: pg_sys::Oid,
+) -> ptr::NonNull<[u8]> {
+    let nbytes = size_of::<pg_sys::ArrayType>() + tail_size;
+    let ptr = memcx.alloc_zeroed_bytes(nbytes);
+    // SAFETY: We allocated at least the ArrayType's prefix of bytes
+    unsafe {
+        // COMPAT: write ArrayType so fields must be initialized even if ArrayType changes
+        // SAFETY: _ARRAY_TYPE_IS_PADDING_FREE means we will not deinitialize any bytes
+        ptr.cast().write(pg_sys::ArrayType {
+            vl_len_: varlena::encode_vlen_4b(nbytes as i32) as i32,
+            dataoffset,
+            ndim,
+            elemtype,
+        })
+    }
+    ptr::NonNull::slice_from_raw_parts(ptr, tail_size)
 }
 
 unsafe impl<T: ?Sized> BorrowDatum for FlatArray<'_, T> {
