@@ -131,13 +131,12 @@ where
         if size > MAX_ALLOC_SIZE {
             return Err(ArrayAllocError::TooManyBytes);
         }
+
         let nbytes = size as ffi::c_int;
-        let dataoffset = prefix_size as ffi::c_int;
+        let dataoffset = if has_nulls { prefix_size as ffi::c_int } else { 0 };
+        let elemtype = <T as Scalar>::OID;
 
         let ptr = memcx.alloc_zeroed_bytes(size).as_ptr();
-
-        let dataoffset = if has_nulls { dataoffset } else { 0 };
-        let elemtype = <T as Scalar>::OID;
 
         let head_ptr = ptr.cast::<pg_sys::ArrayType>();
         // SAFETY: we've allocated enough space so we can initialize everything
