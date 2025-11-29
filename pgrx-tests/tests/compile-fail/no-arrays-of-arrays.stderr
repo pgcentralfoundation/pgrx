@@ -3,7 +3,7 @@ error[E0277]: cannot generate SQL schema for this function
   |
 6 | #[pg_extern]
   | ------------ in this procedural macro expansion
-7 | fn something<'a>(mcx: &MemCx<'a>) -> PBox<'a, FlatArray<'a, FlatArray<'a, i32>>> {
+7 | fn something<'a>(_mcx: &MemCx<'a>) -> PBox<'a, FlatArray<'a, FlatArray<'a, i32>>> {
   | ^^ some types in for<'b, 'a> fn(&'b MemCx<'a>) -> PBox<'a, FlatArray<'a, FlatArray<'a, i32>>> cannot be translated to SQL
   |
   = help: the trait `FunctionMetadata<_>` is not implemented for `for<'b, 'a> fn(&'b MemCx<'a>) -> PBox<'a, FlatArray<'a, FlatArray<'a, i32>>>`
@@ -36,11 +36,3 @@ note: if you're trying to build a new `PBox<'_, FlatArray<'_, FlatArray<'_, i32>
           `PBox<'_, FlatArray<'_, FlatArray<'_, i32>>>: SqlTranslatable`
           which is required by `&PBox<'_, FlatArray<'_, FlatArray<'_, i32>>>: SqlTranslatable`
   = note: this error originates in the attribute macro `pg_extern` (in Nightly builds, run with -Z macro-backtrace for more info)
-
-warning: unused variable: `mcx`
- --> tests/compile-fail/no-arrays-of-arrays.rs:7:18
-  |
-7 | fn something<'a>(mcx: &MemCx<'a>) -> PBox<'a, FlatArray<'a, FlatArray<'a, i32>>> {
-  |                  ^^^ help: if this is intentional, prefix it with an underscore: `_mcx`
-  |
-  = note: `#[warn(unused_variables)]` on by default
