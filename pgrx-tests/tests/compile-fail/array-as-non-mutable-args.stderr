@@ -1,18 +1,18 @@
 error[E0277]: cannot generate SQL schema for this function
- --> tests/compile-fail/array-as-non-mutable-args.rs:5:1
+ --> tests/compile-fail/array-as-non-mutable-args.rs:7:1
   |
-4 | #[pg_extern]
+6 | #[pg_extern]
   | ------------ in this procedural macro expansion
-5 | fn something<'a>(_arr: &mut FlatArray<'a, i32>) {
+7 | fn something<'a>(_arr: &mut FlatArray<'a, i32>) {
   | ^^ some types in for<'b, 'a> fn(&'b mut FlatArray<'a, i32>) cannot be translated to SQL
   |
   = help: the trait `FunctionMetadata<_>` is not implemented for `for<'b, 'a> fn(&'b mut FlatArray<'a, i32>)`
   = note: this error originates in the attribute macro `pg_extern` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error[E0599]: `&mut FlatArray<'_, i32>` has no representation in SQL
- --> tests/compile-fail/array-as-non-mutable-args.rs:4:1
+ --> tests/compile-fail/array-as-non-mutable-args.rs:6:1
   |
-4 | #[pg_extern]
+6 | #[pg_extern]
   | ^^^^^^^^^^^^ non-SQL type
   |
   = note: the following trait bounds were not satisfied:
@@ -21,11 +21,11 @@ error[E0599]: `&mut FlatArray<'_, i32>` has no representation in SQL
   = note: this error originates in the attribute macro `pg_extern` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error[E0277]: `&mut FlatArray<'_, i32>` cannot be passed into a Postgres function as a Datum
- --> tests/compile-fail/array-as-non-mutable-args.rs:5:18
+ --> tests/compile-fail/array-as-non-mutable-args.rs:7:18
   |
-4 | #[pg_extern]
+6 | #[pg_extern]
   | ------------ in this procedural macro expansion
-5 | fn something<'a>(_arr: &mut FlatArray<'a, i32>) {
+7 | fn something<'a>(_arr: &mut FlatArray<'a, i32>) {
   |                  ^^^^ the trait `ArgAbi<'_>` is not implemented for `&mut FlatArray<'_, i32>`
   |
   = help: the following other types implement trait `ArgAbi<'fcx>`:
