@@ -1,3 +1,4 @@
+#![deny(missing_docs)]
 use crate::datum::{Array, BorrowDatum, Datum};
 use crate::layout::{Align, Layout};
 use crate::memcx::MemCx;
@@ -50,10 +51,15 @@ where
     }
 
     /// Number of dimensions the array has
+    ///
+    /// This will be between `0` and `pg_sys::MAXDIM`.
     pub fn ndims(&self) -> usize {
         self.head.ndim as _
     }
 
+    /// Does the array contain nulls?
+    ///
+    /// Note this is still `false` if the array has a null bitmap but no actual SQL-null elements.
     pub fn contains_nulls(&self) -> bool {
         // SAFETY: Constructive validity from ref and function is non-mutating
         unsafe { pg_sys::array_contains_nulls((&raw const self.head).cast_mut()) }
@@ -85,6 +91,7 @@ impl<'mcx, T> FlatArray<'mcx, T>
 where
     T: Scalar + Sized,
 {
+    /// Create a zeroed array with arbitrary dimensions for sized, zeroable elements
     pub fn new_zeroed_in<'cx, const N: usize>(
         dim_lens: [usize; N],
         has_nulls: bool,
@@ -179,7 +186,7 @@ impl<'mcx, T> FlatArray<'mcx, T>
 where
     T: ?Sized + Element,
 {
-    /// Iterate the array
+    /// Iterate all elements of the array, including nulls
     #[doc(alias = "unnest")]
     pub fn iter(&self) -> ArrayIter<'_, T> {
         let nelems = self.nelems();
@@ -196,7 +203,12 @@ where
         ArrayIter { data, nulls, nelems, arr, index, offset, align }
     }
 
+    /// Iterate only non-null elements of the array
+    ///
+    /// This is permissive and disregards SQL-null elements entirely rather than causing a panic.
+    /// It can perform better in some cases by minimizing handling overhead for SQL nulls.
     pub fn iter_non_null(&self) -> impl Iterator<Item = &T> {
+        // FIXME(perf): the performance note in the doc comment is currently unimplemented
         self.iter().filter_map(|elem| elem.into_option())
     }
 
@@ -204,10 +216,13 @@ where
     ///
     /// `FlatArray::get` may have to iterate elements, so this is `O(n)` in the general case
     pub fn get(&self, index: usize) -> Option<Nullable<&T>> {
+        // FIXME(perf): we can do better than iteration if T: Sized and the array is null-free
         self.iter().nth(index)
     }
 
     /// Obtain `&[T]` if the array has no nulls
+    ///
+    /// Note this treats the data as linear even if the array is multidimensional
     pub fn as_non_null_slice(&self) -> Option<&[T]>
     where
         T: Scalar,
@@ -222,6 +237,8 @@ where
     }
 
     /// Obtain `&mut [T]` if the array has no nulls
+    ///
+    /// Note this treats the data as linear even if the array is multidimensional
     pub fn as_non_null_slice_mut(&mut self) -> Option<&mut [T]>
     where
         T: Scalar,
@@ -237,6 +254,7 @@ where
         }
     }
 
+    /// A byte slice containing the null bitmap
     pub fn nullbitmap_bytes(&self) -> Option<&[u8]> {
         let len = self.nelems().div_ceil(8);
 
