@@ -64,14 +64,10 @@ where
 #[non_exhaustive]
 #[derive(Debug)]
 pub enum ArrayAllocError {
-    TooManyBytes {
-        over: usize,
-    },
-    TooManyElems {
-        over: usize,
-    },
+    TooManyBytes,
+    TooManyElems,
     /// One or more dimensions are zero
-    ZeroLenDim(usize),
+    ZeroLenDim,
 }
 
 const MAX_ALLOC_SIZE: usize = 0x3fffffff;
@@ -82,13 +78,15 @@ const _ARRAY_TYPE_IS_PADDING_FREE: () = assert!(
     size_of::<pg_sys::ArrayType>()
         == (mem::offset_of!(pg_sys::ArrayType, elemtype) + size_of::<pg_sys::Oid>())
 );
+const _MAX_ARRAY_SIZE_FITS_CINT_MAX: () = assert!(ffi::c_int::MAX as usize >= MAX_ARRAY_SIZE);
+const _MAX_ALLOC_SIZE_FITS_CINT_MAX: () = assert!(ffi::c_int::MAX as usize >= MAX_ALLOC_SIZE);
 
 impl<'mcx, T> FlatArray<'mcx, T>
 where
     T: Scalar + Sized,
 {
     pub fn new_zeroed_in<'cx, const N: usize>(
-        dims: [usize; N],
+        dim_lens: [usize; N],
         has_nulls: bool,
         memcx: &MemCx<'cx>,
     ) -> Result<PBox<'cx, FlatArray<'cx, T>>, ArrayAllocError> {
@@ -101,12 +99,26 @@ where
         const { assert!(N <= MAX_DIMS) };
 
         let dims_size = size_of::<ffi::c_int>() * ndims;
-        let dims = dims.map(|i| ffi::c_int::try_from(i).unwrap());
+        let mut dim_ints = [0 as ffi::c_int; N];
+        for (&dsize, dint) in dim_lens.iter().zip(dim_ints.iter_mut()) {
+            if dsize == 0 {
+                return Err(ArrayAllocError::ZeroLenDim);
+            } else if dsize > MAX_ARRAY_SIZE {
+                return Err(ArrayAllocError::TooManyElems);
+            } else {
+                *dint = dsize as ffi::c_int;
+            }
+        }
         let mut product = 1i32;
-        let lbounds = dims.map(|dim| {
-            product = product.checked_mul(dim).unwrap();
-            product + 1
-        });
+        let mut lbounds = [0 as ffi::c_int; N];
+        for (&dim, lbound) in dim_ints.iter().zip(lbounds.iter_mut()) {
+            product = if let Some(val) = product.checked_mul(dim) {
+                val
+            } else {
+                return Err(ArrayAllocError::TooManyElems);
+            };
+            *lbound = product;
+        }
         let nelems = product as usize;
 
         let null_size = if has_nulls { nelems.div_ceil(8) } else { 0 };
@@ -116,50 +128,38 @@ where
         const { assert!(align_of::<T>() <= MAX_ELEM_ALIGN) };
         let prefix_size = prefix_size.next_multiple_of(MAX_ELEM_ALIGN);
         let size = prefix_size + size_of::<T>() * nelems;
-
-        if let Some((zlen_dim, _)) = dims.into_iter().enumerate().find(|(i, len)| *len == 0) {
-            return Err(ArrayAllocError::ZeroLenDim(zlen_dim));
+        if size > MAX_ALLOC_SIZE {
+            return Err(ArrayAllocError::TooManyBytes);
         }
-        if let Some(over) = nelems.checked_sub(MAX_ARRAY_SIZE + 1) {
-            return Err(ArrayAllocError::TooManyElems { over });
+        let nbytes = size as ffi::c_int;
+        let dataoffset = prefix_size as ffi::c_int;
+
+        let ptr = memcx.alloc_zeroed_bytes(size).as_ptr();
+
+        let dataoffset = if has_nulls { dataoffset } else { 0 };
+        let elemtype = <T as Scalar>::OID;
+
+        let head_ptr = ptr.cast::<pg_sys::ArrayType>();
+        // SAFETY: we've allocated enough space so we can initialize everything
+        unsafe {
+            // COMPAT: assign so fields must be initialized even if ArrayType changes
+            // SAFETY: _ARRAY_TYPE_IS_PADDING_FREE means we will not deinitialize any bytes
+            (*head_ptr) = pg_sys::ArrayType {
+                vl_len_: varlena::encode_vlen_4b(nbytes) as i32,
+                ndim: ndims as ffi::c_int,
+                dataoffset,
+                elemtype,
+            };
+            *(head_ptr.add(base_size).cast()) = dim_ints;
+            *(head_ptr.add(base_size + dims_size).cast()) = lbounds;
         }
-        if let Some(over) = size.checked_sub(MAX_ALLOC_SIZE + 1) {
-            return Err(ArrayAllocError::TooManyBytes { over });
-        }
+        let ptr = ptr::slice_from_raw_parts_mut(ptr, size - base_size);
+        let ptr = ptr as *mut FlatArray<_>;
+        let ptr = ptr::NonNull::new(ptr).unwrap();
 
-        if let Ok(nbytes) = i32::try_from(size)
-            && let Ok(dataoffset) = i32::try_from(prefix_size)
-        {
-            let ptr = memcx.alloc_zeroed_bytes(size).as_ptr();
-
-            let dataoffset = if has_nulls { dataoffset } else { 0 };
-            let elemtype = <T as Scalar>::OID;
-
-            let head_ptr = ptr.cast::<pg_sys::ArrayType>();
-            // SAFETY: we've allocated enough space so we can initialize everything
-            unsafe {
-                // COMPAT: assign so fields must be initialized even if ArrayType changes
-                // SAFETY: _ARRAY_TYPE_IS_PADDING_FREE means we will not deinitialize any bytes
-                (*head_ptr) = pg_sys::ArrayType {
-                    vl_len_: varlena::encode_vlen_4b(nbytes) as i32,
-                    ndim: ndims as ffi::c_int,
-                    dataoffset,
-                    elemtype,
-                };
-                *(head_ptr.add(base_size).cast()) = dims;
-                *(head_ptr.add(base_size + dims_size).cast()) = lbounds;
-            }
-            let ptr = ptr::slice_from_raw_parts_mut(ptr, size - base_size);
-            let ptr = ptr as *mut FlatArray<_>;
-            let ptr = ptr::NonNull::new(ptr).unwrap();
-
-            // SAFETY: size of the metadata matches the bytes of the varlena header,
-            // and there is no padding in ArrayType to make any offsets incorrect
-            Ok(unsafe { PBox::from_raw_in(ptr, memcx) })
-        } else {
-            // Shouldn't happen?
-            unreachable!()
-        }
+        // SAFETY: size of the metadata matches the bytes of the varlena header,
+        // and there is no padding in ArrayType to make any offsets incorrect
+        Ok(unsafe { PBox::from_raw_in(ptr, memcx) })
     }
 
     /// Allocate a 0-dimension array
