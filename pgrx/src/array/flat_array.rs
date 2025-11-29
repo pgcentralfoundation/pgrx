@@ -114,10 +114,14 @@ where
                 *dint = dsize as ffi::c_int;
             }
         }
-        let mut product = 1i32;
+        let mut product = 1 as ffi::c_int;
         let mut lbounds = [0 as ffi::c_int; N];
-        for (&dim, lbound) in dim_ints.iter().zip(lbounds.iter_mut()) {
-            product = if let Some(val) = product.checked_mul(dim) {
+        for (&dim, lbound) in dim_lens.iter().zip(lbounds.iter_mut()) {
+            // We handle the multiplication as usize, then use try_from to fit it down,
+            // to avoid a risk of an unguarded overflow happening from casts
+            product = if let Some(val) = dim.checked_mul(product as usize)
+                && let Ok(val) = ffi::c_int::try_from(val)
+            {
                 val
             } else {
                 return Err(ArrayAllocError::TooManyElems);
