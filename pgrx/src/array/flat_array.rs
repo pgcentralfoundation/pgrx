@@ -162,7 +162,7 @@ where
         }
     }
 
-    // Allocate a 0-dimension array
+    /// Allocate a 0-dimension array
     pub fn new_empty<'cx>(memcx: &MemCx<'cx>) -> PBox<'cx, FlatArray<'cx, T>> {
         let nbytes = mem::size_of::<pg_sys::ArrayType>();
         let palloc = memcx.alloc_zeroed_bytes(nbytes);
@@ -183,9 +183,9 @@ where
         }
     }
 
-    // Allocate an array sized to fit a slice and copy it
-    //
-    // This produces a 0-dimension array if the slice has 0 length. Otherwise it is 1-dimensional.
+    /// Allocate an array sized to fit a slice and copy it
+    ///
+    /// This produces a 0-dimension array if the slice has 0 length. Otherwise it is 1-dimensional.
     pub fn new_from_slice<'cx>(
         data: &[T],
         memcx: &MemCx<'cx>,
