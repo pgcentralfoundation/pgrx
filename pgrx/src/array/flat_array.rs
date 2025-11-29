@@ -152,9 +152,7 @@ where
             ptr.byte_add(base_size).cast().write(dim_ints);
             ptr.byte_add(base_size + dims_size).cast().write(lbounds);
         }
-        let ptr = NonNull::slice_from_raw_parts_mut(ptr, size - base_size);
-        // SAFETY: round-tripped
-        let ptr = unsafe { ptr::NonNull::new_unchecked(ptr.as_ptr() as *mut FlatArray<_>) };
+        let ptr = FlatArray::cast_tailed(ptr, size - base_size);
 
         // SAFETY: size of the metadata matches the bytes of the varlena header,
         // and there is no padding in ArrayType to make any offsets incorrect
@@ -173,13 +171,9 @@ where
                 elemtype: <T as Scalar>::OID,
             })
         }
-        let unsized_palloc = ptr::slice_from_raw_parts(palloc.as_ptr(), 0);
-        let array_palloc = unsized_palloc as *mut FlatArray<_>;
-        // SAFETY: We already had it as NonNull
-        unsafe {
-            let array_palloc = ptr::NonNull::new_unchecked(array_palloc);
-            PBox::from_raw_in(array_palloc, memcx)
-        }
+        let palloc = FlatArray::cast_tailed(palloc, 0);
+        // SAFETY: it's valid, if 0-dimensional
+        unsafe { PBox::from_raw_in(palloc, memcx) }
     }
 
     /// Allocate an array sized to fit a slice and copy it
@@ -271,6 +265,18 @@ where
             let nulls_ptr = port::ARR_NULLBITMAP(ptr::addr_of!(self.head).cast_mut());
             ptr::slice_from_raw_parts(nulls_ptr, len).as_ref()
         }
+    }
+}
+
+// Internal constructors
+impl<'mcx, T> FlatArray<'mcx, T>
+where
+    T: ?Sized,
+{
+    fn cast_tailed(ptr: ptr::NonNull<u8>, tail_bytes: usize) -> ptr::NonNull<FlatArray<'mcx, T>> {
+        let ptr = ptr::NonNull::slice_from_raw_parts(ptr, tail_bytes);
+        // SAFETY: round-tripped from NonNull
+        unsafe { ptr::NonNull::new_unchecked(ptr.as_ptr() as *mut FlatArray<_>) }
     }
 }
 
