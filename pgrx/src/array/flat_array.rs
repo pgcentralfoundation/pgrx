@@ -288,11 +288,9 @@ unsafe impl<T: ?Sized> BorrowDatum for FlatArray<'_, T> {
     }
 }
 
-// `T[]` in Postgres
-//
-// # Safety
-// Note that this is currently only implemented for `&FlatArray<'_, T>`, because we cannot assume
-// that any datum passed from the outside is mutable
+/// `T[]` in Postgres
+///
+/// As an unsized type, this relies on `impl<T> SqlTranslatable for &T where T: SqlTranslatable`.
 unsafe impl<T> SqlTranslatable for FlatArray<'_, T>
 where
     T: ?Sized + SqlTranslatable + Element,
