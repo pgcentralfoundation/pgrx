@@ -152,9 +152,9 @@ where
             ptr.byte_add(base_size).cast().write(dim_ints);
             ptr.byte_add(base_size + dims_size).cast().write(lbounds);
         }
-        let ptr = ptr::slice_from_raw_parts_mut(ptr, size - base_size);
-        let ptr = ptr as *mut FlatArray<_>;
-        let ptr = ptr::NonNull::new(ptr).unwrap();
+        let ptr = NonNull::slice_from_raw_parts_mut(ptr, size - base_size);
+        // SAFETY: round-tripped
+        let ptr = unsafe { ptr::NonNull::new_unchecked(ptr.as_ptr() as *mut FlatArray<_>) };
 
         // SAFETY: size of the metadata matches the bytes of the varlena header,
         // and there is no padding in ArrayType to make any offsets incorrect
