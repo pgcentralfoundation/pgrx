@@ -137,21 +137,20 @@ where
         let dataoffset = if has_nulls { prefix_size as ffi::c_int } else { 0 };
         let elemtype = <T as Scalar>::OID;
 
-        let ptr = memcx.alloc_zeroed_bytes(size).as_ptr();
+        let ptr = memcx.alloc_zeroed_bytes(size);
 
-        let head_ptr = ptr.cast::<pg_sys::ArrayType>();
         // SAFETY: we've allocated enough space so we can initialize everything
         unsafe {
-            // COMPAT: assign so fields must be initialized even if ArrayType changes
+            // COMPAT: write ArrayType so fields must be initialized even if ArrayType changes
             // SAFETY: _ARRAY_TYPE_IS_PADDING_FREE means we will not deinitialize any bytes
-            (*head_ptr) = pg_sys::ArrayType {
+            ptr.cast().write(pg_sys::ArrayType {
                 vl_len_: varlena::encode_vlen_4b(nbytes) as i32,
                 ndim: ndims as ffi::c_int,
                 dataoffset,
                 elemtype,
-            };
-            *(head_ptr.add(base_size).cast()) = dim_ints;
-            *(head_ptr.add(base_size + dims_size).cast()) = lbounds;
+            });
+            ptr.byte_add(base_size).cast().write(dim_ints);
+            ptr.byte_add(base_size + dims_size).cast().write(lbounds);
         }
         let ptr = ptr::slice_from_raw_parts_mut(ptr, size - base_size);
         let ptr = ptr as *mut FlatArray<_>;
