@@ -162,6 +162,15 @@ fn borrow_validate_cstring_array(
     Ok(true)
 }
 
+#[pg_extern]
+fn new_array<'cx>(memcx: &'cx MemCx<'cx>) -> PBox<'cx, FlatArray<'cx, i32>> {
+    let mut array = FlatArray::new_zeroed_in([3, 4], false, memcx).unwrap();
+    for (i, elem) in array.as_non_null_slice_mut().unwrap().iter_mut().enumerate() {
+        *elem = i as i32;
+    }
+    array
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
@@ -169,9 +178,22 @@ mod tests {
 
     use super::*;
     use pgrx::datum::DatumWithOid;
+    use pgrx::memcx;
     use pgrx::prelude::*;
     use pgrx::{IntoDatum, Json};
     use serde_json::json;
+
+    #[pg_test]
+    fn read_array_back() {
+        memcx::current_context(|memcx| {
+            let array = new_array(memcx);
+            for (i, elem) in array.iter_non_null().enumerate() {
+                assert_eq!(i as i32, *elem);
+            }
+            let elems = array.nelems();
+            assert_eq!(array.iter_non_null().count(), elems);
+        })
+    }
 
     #[pg_test]
     fn borrow_test_sum_array_i32() {
