@@ -67,10 +67,13 @@ where
 }
 
 // TODO: remove `non_exhaustive` when the errors have been worked out
+/// Errors occurring when constructing fresh arrays
 #[non_exhaustive]
 #[derive(Debug)]
 pub enum ArrayAllocError {
+    /// Postgres has a maximum varlena size imit
     TooManyBytes,
+    /// Postgres has a maximum array element limit
     TooManyElems,
     /// One or more dimensions are zero
     ZeroLenDim,

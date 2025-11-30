@@ -177,6 +177,7 @@ mod tests {
     use crate as pgrx_tests;
 
     use super::*;
+    use pgrx::array::ArrayAllocError;
     use pgrx::datum::DatumWithOid;
     use pgrx::memcx;
     use pgrx::prelude::*;
@@ -192,6 +193,22 @@ mod tests {
             }
             let elems = array.nelems();
             assert_eq!(array.iter_non_null().count(), elems);
+        })
+    }
+
+    #[pg_test]
+    fn size_tests() {
+        memcx::current_context(|memcx| {
+            let result = FlatArray::<i32>::new_zeroed_in([i32::MAX as usize], false, memcx);
+            assert!(match result {
+                Err(ArrayAllocError::TooManyElems) => true,
+                _ => false,
+            });
+            let result = FlatArray::<i32>::new_zeroed_in([i32::MAX as usize + 1], false, memcx);
+            assert!(match result {
+                Err(ArrayAllocError::TooManyElems) => true,
+                _ => false,
+            });
         })
     }
 

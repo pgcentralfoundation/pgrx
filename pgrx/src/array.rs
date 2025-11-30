@@ -32,7 +32,7 @@ mod flat_array;
 mod port;
 
 pub use element::Element;
-pub use flat_array::FlatArray;
+pub use flat_array::{ArrayAllocError, FlatArray};
 
 /**
 An aligned, dereferenceable `NonNull<ArrayType>` with low-level accessors.
