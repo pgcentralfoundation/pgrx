@@ -197,7 +197,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn size_tests() {
+    fn error_cases() {
         memcx::current_context(|memcx| {
             let result = FlatArray::<i32>::new_zeroed_in([i32::MAX as usize], false, memcx);
             assert!(match result {
@@ -207,6 +207,21 @@ mod tests {
             let result = FlatArray::<i32>::new_zeroed_in([i32::MAX as usize + 1], false, memcx);
             assert!(match result {
                 Err(ArrayAllocError::TooManyElems) => true,
+                _ => false,
+            });
+            let result = FlatArray::<i32>::new_zeroed_in([0], false, memcx);
+            assert!(match result {
+                Err(ArrayAllocError::ZeroLenDim) => true,
+                _ => false,
+            });
+            let result = FlatArray::<i64>::new_zeroed_in(
+                // this is just under the element limit, but it remains too big to allocate
+                [0x3fffffff / size_of::<pg_sys::Datum>() - 1],
+                true,
+                memcx,
+            );
+            assert!(match result {
+                Err(ArrayAllocError::TooManyBytes) => true,
                 _ => false,
             });
         })
