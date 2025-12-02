@@ -112,7 +112,8 @@ impl<'cx, T: Enlist> List<'cx, T> {
                 // No silly reasoning, simply allocate ~2 cache lines for a list
                 let list_size = 128;
                 unsafe {
-                    let list: *mut pg_sys::List = mcx.alloc_bytes(list_size).cast().as_ptr();
+                    let list: *mut pg_sys::List =
+                        mcx.alloc_bytes(list_size).unwrap().cast().as_ptr();
                     assert!(list.is_non_null());
                     (*list).type_ = T::LIST_TAG;
                     (*list).max_length = ((list_size - mem::size_of::<pg_sys::List>())

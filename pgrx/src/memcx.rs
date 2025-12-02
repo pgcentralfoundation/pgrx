@@ -36,18 +36,18 @@ impl<'mcx> MemCx<'mcx> {
 
     /// Allocate a raw byte buffer `size` bytes in length
     /// and returns a pointer to the new allocation.
-    pub fn alloc_bytes(&self, size: usize) -> NonNull<u8> {
-        let ptr = unsafe { pg_sys::MemoryContextAlloc(self.ptr.as_ptr(), size).cast() };
-        // SAFETY: `pg_sys::MemoryContextAlloc` is not allowed to return NULL, it must error.
-        unsafe { NonNull::new_unchecked(ptr) }
+    pub fn alloc_bytes(&self, size: usize) -> Result<NonNull<u8>, OutOfMemory> {
+        let flags = (pg_sys::MCXT_ALLOC_NO_OOM) as i32;
+        let ptr = unsafe { pg_sys::MemoryContextAllocExtended(self.ptr.as_ptr(), size, flags) };
+        NonNull::new(ptr.cast()).ok_or(OutOfMemory::new())
     }
 
     /// Allocate a raw byte buffer `size` bytes in length
     /// and returns a pointer to the new allocation.
-    pub fn alloc_zeroed_bytes(&self, size: usize) -> NonNull<u8> {
-        let ptr = unsafe { pg_sys::MemoryContextAllocZero(self.ptr.as_ptr(), size).cast() };
-        // SAFETY: `pg_sys::MemoryContextAlloc` is not allowed to return NULL, it must error.
-        unsafe { NonNull::new_unchecked(ptr) }
+    pub fn alloc_zeroed_bytes(&self, size: usize) -> Result<NonNull<u8>, OutOfMemory> {
+        let flags = (pg_sys::MCXT_ALLOC_NO_OOM | pg_sys::MCXT_ALLOC_ZERO) as i32;
+        let ptr = unsafe { pg_sys::MemoryContextAllocExtended(self.ptr.as_ptr(), size, flags) };
+        NonNull::new(ptr.cast()).ok_or(OutOfMemory::new())
     }
 
     /// Stores the current memory context, switches to *this* memory context,
@@ -65,6 +65,16 @@ impl<'mcx> MemCx<'mcx> {
         let res = f();
         pg_sys::MemoryContextSwitchTo(remembered);
         res
+    }
+}
+
+#[derive(Debug)]
+pub struct OutOfMemory {
+    _reserve: (),
+}
+impl OutOfMemory {
+    pub fn new() -> OutOfMemory {
+        OutOfMemory { _reserve: () }
     }
 }
 

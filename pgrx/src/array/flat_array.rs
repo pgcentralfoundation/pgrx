@@ -1,7 +1,7 @@
 #![deny(missing_docs)]
 use crate::datum::{Array, BorrowDatum, Datum};
 use crate::layout::{Align, Layout};
-use crate::memcx::MemCx;
+use crate::memcx::{MemCx, OutOfMemory};
 use crate::nullable::Nullable;
 use crate::palloc::PBox;
 use crate::pgrx_sql_entity_graph::metadata::{
@@ -77,6 +77,8 @@ pub enum ArrayAllocError {
     TooManyElems,
     /// One or more dimensions are zero
     ZeroLenDim,
+    /// There is insufficient memory in this context
+    OutOfMemory,
 }
 
 const MAX_ALLOC_SIZE: usize = 0x3fffffff;
@@ -104,7 +106,7 @@ where
 
         let ndims = N;
         if N == 0 {
-            return Ok(FlatArray::new_empty(memcx));
+            return FlatArray::new_empty(memcx);
         }
         const { assert!(N <= MAX_DIMS) };
 
@@ -151,7 +153,7 @@ where
         let elemtype = <T as Scalar>::OID;
         let tail_size = size - base_size;
 
-        let ptr = alloc_zeroed_head(memcx, tail_size, ndims as i32, dataoffset, elemtype);
+        let ptr = alloc_zeroed_head(memcx, tail_size, ndims as i32, dataoffset, elemtype)?;
         // SAFETY: we allocated enough for our dimensions and lbounds
         unsafe {
             ptr.byte_add(base_size).cast().write(dim_ints);
@@ -164,11 +166,13 @@ where
     }
 
     /// Allocate a 0-dimension array
-    pub fn new_empty<'cx>(memcx: &MemCx<'cx>) -> PBox<'cx, FlatArray<'cx, T>> {
+    pub fn new_empty<'cx>(
+        memcx: &MemCx<'cx>,
+    ) -> Result<PBox<'cx, FlatArray<'cx, T>>, ArrayAllocError> {
         let nbytes = mem::size_of::<pg_sys::ArrayType>();
-        let ptr = alloc_zeroed_head(memcx, 0, 0, 0, <T as Scalar>::OID);
+        let ptr = alloc_zeroed_head(memcx, 0, 0, 0, <T as Scalar>::OID)?;
         // SAFETY: it's valid, if 0-dimensional
-        unsafe { PBox::from_raw_in(FlatArray::cast_tailed(ptr), memcx) }
+        Ok(unsafe { PBox::from_raw_in(FlatArray::cast_tailed(ptr), memcx) })
     }
 
     /// Allocate an array sized to fit a slice and copy it
@@ -179,7 +183,7 @@ where
         memcx: &MemCx<'cx>,
     ) -> Result<PBox<'cx, FlatArray<'cx, T>>, ArrayAllocError> {
         match data.len() {
-            0 => Ok(FlatArray::new_empty(memcx)),
+            0 => FlatArray::new_empty(memcx),
             len => {
                 let mut array = FlatArray::new_zeroed_in([len], false, memcx)?;
                 array.as_non_null_slice_mut().unwrap().copy_from_slice(data);
@@ -291,9 +295,9 @@ fn alloc_zeroed_head(
     ndim: ffi::c_int,
     dataoffset: i32,
     elemtype: pg_sys::Oid,
-) -> ptr::NonNull<[u8]> {
+) -> Result<ptr::NonNull<[u8]>, ArrayAllocError> {
     let nbytes = size_of::<pg_sys::ArrayType>() + tail_size;
-    let ptr = memcx.alloc_zeroed_bytes(nbytes);
+    let ptr = memcx.alloc_zeroed_bytes(nbytes)?;
     // SAFETY: We allocated at least the ArrayType's prefix of bytes
     unsafe {
         // COMPAT: write ArrayType so fields must be initialized even if ArrayType changes
@@ -305,7 +309,7 @@ fn alloc_zeroed_head(
             elemtype,
         })
     }
-    ptr::NonNull::slice_from_raw_parts(ptr, tail_size)
+    Ok(ptr::NonNull::slice_from_raw_parts(ptr, tail_size))
 }
 
 unsafe impl<T: ?Sized> BorrowDatum for FlatArray<'_, T> {
@@ -408,3 +412,9 @@ where
 
 impl<'arr, T> ExactSizeIterator for ArrayIter<'arr, T> where T: ?Sized + Element {}
 impl<'arr, T> FusedIterator for ArrayIter<'arr, T> where T: ?Sized + Element {}
+
+impl From<OutOfMemory> for ArrayAllocError {
+    fn from(value: OutOfMemory) -> Self {
+        ArrayAllocError::OutOfMemory
+    }
+}

@@ -1,7 +1,7 @@
 use crate::callconv::{BoxRet, FcInfo};
 use crate::datum::{BorrowDatum, Datum};
 use crate::layout::PassBy;
-use crate::memcx::MemCx;
+use crate::memcx::{MemCx, OutOfMemory};
 use crate::pg_sys;
 use core::marker::PhantomData;
 use core::ops::{Deref, DerefMut};
@@ -33,13 +33,13 @@ impl<'mcx, T: ?Sized> PBox<'mcx, T> {
 }
 
 impl<'mcx, T: Sized> PBox<'mcx, T> {
-    pub fn new_in(val: T, memcx: &MemCx<'mcx>) -> Self {
+    pub fn new_in(val: T, memcx: &MemCx<'mcx>) -> Result<Self, OutOfMemory> {
         const { assert!(align_of::<T>() <= size_of::<pg_sys::Datum>()) };
-        let ptr = memcx.alloc_bytes(size_of::<T>()).cast();
+        let ptr = memcx.alloc_bytes(size_of::<T>())?.cast();
         // SAFETY: We were guaranteed an appropriately sized allocation to write to,
         // and we have asserted our alignment maximum was upheld
         unsafe { ptr.write(val) };
-        PBox { ptr, _cx: PhantomData }
+        Ok(PBox { ptr, _cx: PhantomData })
     }
 }
 
