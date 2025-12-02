@@ -9,7 +9,7 @@ error[E0521]: borrowed data escapes outside of function
 6 |   pub fn accept_mcx_return_timetz(memcx: &MemCx<'static>) -> PBox<'static, TimeWithTimeZone> {
   |  ____________________________________________________________________________________________^
 7 | |     let timetz = TimeWithTimeZone::new(4, 20, 0.0).unwrap();
-8 | |     PBox::new_in(timetz, memcx)
+8 | |     PBox::new_in(timetz, memcx).unwrap()
 9 | | }
   | | ^
   | | |
