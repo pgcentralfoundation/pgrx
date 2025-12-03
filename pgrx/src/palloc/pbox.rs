@@ -33,7 +33,12 @@ impl<'mcx, T: ?Sized> PBox<'mcx, T> {
 }
 
 impl<'mcx, T: Sized> PBox<'mcx, T> {
-    pub fn new_in(val: T, memcx: &MemCx<'mcx>) -> Result<Self, OutOfMemory> {
+    #[track_caller]
+    pub fn new_in(val: T, memcx: &MemCx<'mcx>) -> Self {
+        PBox::try_new_in(val, memcx).unwrap()
+    }
+
+    pub fn try_new_in(val: T, memcx: &MemCx<'mcx>) -> Result<Self, OutOfMemory> {
         const { assert!(align_of::<T>() <= size_of::<pg_sys::Datum>()) };
         let ptr = memcx.alloc_bytes(size_of::<T>())?.cast();
         // SAFETY: We were guaranteed an appropriately sized allocation to write to,
