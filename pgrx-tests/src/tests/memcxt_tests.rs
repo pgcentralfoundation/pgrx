@@ -36,7 +36,7 @@ mod tests {
         memcx: &'mcx MemCx<'mcx>,
     ) -> PBox<'mcx, TimeWithTimeZone> {
         let timetz = TimeWithTimeZone::new(4, 20, 0.0).unwrap();
-        PBox::new_in(timetz, memcx).unwrap()
+        PBox::new_in(timetz, memcx)
     }
 
     #[pg_test]
