@@ -63,6 +63,9 @@ pub(crate) struct Regress {
     pub(crate) features: clap_cargo::Features,
     #[clap(from_global, action = clap::ArgAction::Count)]
     pub(crate) verbose: u8,
+    /// verbosity of error reports: default, verbose, terse, or sqlstate
+    #[clap(long, value_name = "VERBOSITY")]
+    pub(crate) psql_verbosity: Option<String>,
 
     /// Custom `postgresql.conf` settings in the form of `key=value`, ie `log_min_messages=debug1`
     #[clap(long)]
@@ -91,7 +94,7 @@ impl Regress {
         let setup_out = expected.join("setup.out");
 
         let Ok(setup_sql) = std::fs::metadata(setup_sql) else { return false; };
-        let Ok(setup_out) = std::fs::metadata(setup_out) else { return true; }; // there is no output file, so setup.sql is definitely newer 
+        let Ok(setup_out) = std::fs::metadata(setup_out) else { return true; }; // there is no output file, so setup.sql is definitely newer
 
         let Ok(sql_modified) = setup_sql.modified() else { return false; };
         let Ok(out_modified) = setup_out.modified() else { return false; };
@@ -278,6 +281,10 @@ impl Regress {
             })
             .collect::<Vec<_>>();
 
+        // The default verbosity is terse in order to avoid verbose log output
+        // being enshrined in expected test output
+        let verbosity = &self.psql_verbosity.clone().unwrap_or("terse".into());
+
         if !new_tests.is_empty() {
             println!(
                 "{} {} new tests, running each individually to create output",
@@ -291,6 +298,7 @@ impl Regress {
                     pgregress_path,
                     dbname,
                     new_test,
+                    &verbosity,
                 )? {
                     self.accept_new_test(manifest_path, &test_result_output, auto)?;
                 }
@@ -298,7 +306,7 @@ impl Regress {
         }
 
         // now that all tests have outputs, run them all
-        let success = run_tests(pg_config, pgregress_path, dbname, test_files)?;
+        let success = run_tests(pg_config, pgregress_path, dbname, test_files,verbosity)?;
 
         if !success && auto {
             // tests failed, but the user asked to `auto`matically accept their output as new output
@@ -416,6 +424,7 @@ fn run_tests(
     pg_regress_bin: &Path,
     dbname: &str,
     test_files: &[&DirEntry],
+    verbosity: &str,
 ) -> eyre::Result<bool> {
     if test_files.is_empty() {
         return Ok(true);
@@ -427,7 +436,7 @@ fn run_tests(
         .parent()
         .expect("test file should be in a directory named `sql/`")
         .to_path_buf();
-    pg_regress(pg_config, pg_regress_bin, dbname, &input_dir, test_files)
+    pg_regress(pg_config, pg_regress_bin, dbname, &input_dir, test_files, verbosity)
         .map(|status| status.success())
 }
 
@@ -437,6 +446,7 @@ fn create_regress_output(
     pg_regress_bin: &Path,
     dbname: &str,
     test_file: &DirEntry,
+    verbosity: &str,
 ) -> eyre::Result<Option<PathBuf>> {
     let test_name = make_test_name(test_file);
     let input_dir = test_file.path();
@@ -446,7 +456,7 @@ fn create_regress_output(
         .parent()
         .expect("test file should be in a directory named `sql/`")
         .to_path_buf();
-    let status = pg_regress(pg_config, pg_regress_bin, dbname, &input_dir, &[test_file])?;
+    let status = pg_regress(pg_config, pg_regress_bin, dbname, &input_dir, &[test_file], verbosity)?;
 
     if !status.success() {
         // pg_regress returned with an error code, but that is most likely because the test's output file
@@ -470,6 +480,7 @@ fn pg_regress(
     dbname: &str,
     input_dir: &Path,
     tests: &[&DirEntry],
+    verbosity: &str,
 ) -> eyre::Result<ExitStatus> {
     if tests.is_empty() {
         eyre::bail!("no tests to run");
@@ -498,21 +509,23 @@ fn pg_regress(
 
     #[cfg(not(target_os = "windows"))]
     let launcher_script = {
-        fn make_launcher_script() -> eyre::Result<PathBuf> {
+        fn make_launcher_script(verbosity: &str) -> eyre::Result<PathBuf> {
             use std::os::unix::fs::PermissionsExt;
 
-            // in order to avoid verbose log output being enshrined in expected test output
-            const LAUNCHER_SCRIPT: &[u8] = b"#! /bin/bash\n$* -v VERBOSITY=terse";
+            let launcher_script = format!(
+                "#! /bin/bash\n$* -v VERBOSITY={}",
+                verbosity.to_string(),
+            ).into_bytes();
 
             let path = temp_dir().join(format!("pgrx-pg_regress-runner-{}.sh", std::process::id()));
             let mut tmpfile = File::create(&path)?;
-            tmpfile.write_all(LAUNCHER_SCRIPT)?;
+            tmpfile.write_all(&launcher_script)?;
             let mut perms = path.metadata()?.permissions();
             perms.set_mode(0o700);
             tmpfile.set_permissions(perms)?;
             Ok(path)
         }
-        let launcher_script = make_launcher_script()?;
+        let launcher_script = make_launcher_script(verbosity)?;
         command.arg(format!("--launcher={}", launcher_script.display()));
         launcher_script
     };
