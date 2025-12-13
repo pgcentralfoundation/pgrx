@@ -306,7 +306,7 @@ impl Regress {
         }
 
         // now that all tests have outputs, run them all
-        let success = run_tests(pg_config, pgregress_path, dbname, test_files,verbosity)?;
+        let success = run_tests(pg_config, pgregress_path, dbname, test_files, verbosity)?;
 
         if !success && auto {
             // tests failed, but the user asked to `auto`matically accept their output as new output
@@ -456,7 +456,8 @@ fn create_regress_output(
         .parent()
         .expect("test file should be in a directory named `sql/`")
         .to_path_buf();
-    let status = pg_regress(pg_config, pg_regress_bin, dbname, &input_dir, &[test_file], verbosity)?;
+    let status =
+        pg_regress(pg_config, pg_regress_bin, dbname, &input_dir, &[test_file], verbosity)?;
 
     if !status.success() {
         // pg_regress returned with an error code, but that is most likely because the test's output file
@@ -512,10 +513,8 @@ fn pg_regress(
         fn make_launcher_script(verbosity: &str) -> eyre::Result<PathBuf> {
             use std::os::unix::fs::PermissionsExt;
 
-            let launcher_script = format!(
-                "#! /bin/bash\n$* -v VERBOSITY={}",
-                verbosity.to_string(),
-            ).into_bytes();
+            let launcher_script =
+                format!("#! /bin/bash\n$* -v VERBOSITY={}", verbosity.to_string(),).into_bytes();
 
             let path = temp_dir().join(format!("pgrx-pg_regress-runner-{}.sh", std::process::id()));
             let mut tmpfile = File::create(&path)?;
