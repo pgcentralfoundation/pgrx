@@ -9,6 +9,10 @@ use pgrx::prelude::*;
 
 ::pgrx::pg_module_magic!(name, version);
 
+fn knock_knock() {
+    todo!()
+}
+
 fn delete_must_have_a_where(query: PgBox<pg_sys::Query>) {
     if query.commandType != pg_sys::CmdType::CMD_DELETE {
         return ();
@@ -33,6 +37,25 @@ fn only_superusers_can_truncate(pstmt: PgBox<pg_sys::PlannedStmt>) {
 }
 
 unsafe fn register_hooks() {
+
+    //
+    // Client Authentication hook
+    //
+    static mut PREV_CLIENTAUTHENTICATION_HOOK: pg_sys::libpq::ClientAuthentication_hook_type = None;
+    PREV_CLIENTAUTHENTICATION_HOOK = pg_sys::libpq::ClientAuthentication_hook;
+    pg_sys::libpq::ClientAuthentication_hook = Some(client_authentication_hook);
+
+    #[pg_guard]
+    unsafe extern "C-unwind" fn client_authentication_hook(
+        port: *mut pg_sys::libpq::be::Port,
+        status: i32,
+    ) {
+        knock_knock();
+        if let Some(prev_hook) = PREV_CLIENTAUTHENTICATION_HOOK {
+            pg_guard_ffi_boundary(|| prev_hook(port, status));
+        }
+    }
+
     //
     // Post Parse Analyze hook
     //

@@ -203,3 +203,13 @@ pub mod be {
         raw_buf_remaining: isize,
     }
 }
+
+// The ClientAuthentication Hook cannot be implemented simply with bindgen
+/// Hook type to get control in ClientAuthentication()
+pub type ClientAuthentication_hook_type =
+    Option<unsafe extern "C-unwind" fn(port: *mut be::Port, status: i32)>;
+
+#[pgrx_macros::pg_guard]
+unsafe extern "C-unwind" {
+    pub static mut ClientAuthentication_hook: ClientAuthentication_hook_type;
+}
