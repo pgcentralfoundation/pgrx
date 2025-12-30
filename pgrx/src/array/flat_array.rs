@@ -122,6 +122,8 @@ where
         let mut product = 1 as ffi::c_int;
         let mut lbounds = [0 as ffi::c_int; N];
         for (&dim, lbound) in dim_lens.iter().zip(lbounds.iter_mut()) {
+            // current lower bound is last product
+            *lbound = product;
             // We handle the multiplication as usize, then use try_from to fit it down,
             // to avoid a risk of an unguarded overflow happening from casts
             product = if let Some(val) = dim.checked_mul(product as usize)
@@ -131,7 +133,6 @@ where
             } else {
                 return Err(ArrayAllocError::TooManyElems);
             };
-            *lbound = product;
         }
         let nelems = product as usize;
         if nelems > MAX_ARRAY_SIZE {
