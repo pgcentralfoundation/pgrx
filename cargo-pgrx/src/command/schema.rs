@@ -207,9 +207,9 @@ pub(crate) fn generate_schema_implicit(
         tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
     }
 
-    second_build(cargo, &features_arg, embed.path(), &manifest)?;
+    second_build(cargo, &features_arg, embed.path(), &manifest, profile)?;
 
-    compute_sql(&manifest)?;
+    compute_sql(&manifest, profile)?;
 
     Ok(())
 }
@@ -452,6 +452,7 @@ fn second_build(
     features_arg: &str,
     embed_path: &Path,
     manifest: &Manifest,
+    profile: &CargoProfile,
 ) -> eyre::Result<()> {
     // We do pass cfg to the binary and do not pass cfg to dependencies to avoid recompilation
     // The only cargo command respecting our need is `cargo rustc`
@@ -459,6 +460,8 @@ fn second_build(
         .subcommand("rustc")
         .flag_args("--bin", vec![pgrx_embed_name(manifest)?])
         .into_command();
+
+    command.args(profile.cargo_args());
 
     command.arg("--");
 
@@ -468,7 +471,7 @@ fn second_build(
 
     let command_str = format!("{command:?}");
     eprintln!(
-        "{} {}, in debug mode, for SQL generation with features {}",
+        "{} {} for SQL generation with features {}",
         "  Rebuilding".bold().green(),
         "pgrx_embed".cyan(),
         features_arg.cyan(),
@@ -487,9 +490,9 @@ fn second_build(
     Ok(())
 }
 
-fn compute_sql(manifest: &Manifest) -> eyre::Result<()> {
+fn compute_sql(manifest: &Manifest, profile: &CargoProfile) -> eyre::Result<()> {
     let mut bin = get_target_dir()?;
-    bin.push("debug"); // pgrx_embed_ is always compiled in debug mode
+    bin.push(profile.target_subdir());
     bin.push(pgrx_embed_name(manifest)?);
 
     let mut command = std::process::Command::new(bin);
