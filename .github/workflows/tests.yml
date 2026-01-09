@@ -609,6 +609,9 @@ jobs:
       - name: Run tests
         run: cargo test --all --no-default-features --features "pg$env:PG_VER pg_test cshim proptest" --all-targets
 
+      - name: Test pg_regress_path returns existing executable
+        run: cargo test --package pgrx-pg-config pg_regress_path_exists -- --ignored
+
       - name: Print sccache stats
         run: sccache --show-stats
 

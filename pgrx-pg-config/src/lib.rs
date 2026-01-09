@@ -953,3 +953,40 @@ fn from_empty_env() -> eyre::Result<()> {
     assert!(pg_config.sharedir().is_err());
     Ok(())
 }
+
+/// Test that pg_regress_path() returns an existing executable for all configured PostgreSQL versions.
+///
+/// This test is ignored by default because it requires `cargo pgrx init` to have been run.
+/// Run with: cargo test --package pgrx-pg-config pg_regress_path_exists -- --ignored --nocapture
+///
+/// Known issue: On Windows with PostgreSQL 13-16 (EnterpriseDB precompiled binaries),
+/// pg_regress.exe is located in /bin/ rather than /lib/pgxs/src/test/regress/.
+/// PostgreSQL 17+ (using Meson build system) installs to /lib/pgxs/src/test/regress/.
+#[test]
+#[ignore]
+fn pg_regress_path_exists() -> eyre::Result<()> {
+    let pgrx = Pgrx::from_config()?;
+
+    let mut failures: Vec<String> = Vec::new();
+
+    for pg_config_result in pgrx.iter(PgConfigSelector::All) {
+        let pg_config = pg_config_result?;
+        let version = pg_config.major_version()?;
+
+        let pg_regress_path = pg_config.pg_regress_path()?;
+        // Add executable suffix for Windows
+        let pg_regress_exe = pg_regress_path.with_extension(if cfg!(windows) { "exe" } else { "" });
+
+        if pg_regress_exe.exists() {
+            println!("pg{version}: OK - {}", pg_regress_exe.display());
+        } else {
+            let msg = format!("pg{version}: MISSING - {}", pg_regress_exe.display());
+            println!("{msg}");
+            failures.push(msg);
+        }
+    }
+
+    assert!(failures.is_empty(), "pg_regress not found:\n{}", failures.join("\n"));
+
+    Ok(())
+}
