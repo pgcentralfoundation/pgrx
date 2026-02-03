@@ -1,5 +1,8 @@
 use std::process::{Command, ExitCode};
 
+use std::fs;
+use std::path::PathBuf;
+
 fn main() -> Result<ExitCode, Box<dyn std::error::Error>> {
     println!("cargo:rerun-if-changed=c_ext/c_ext.c");
     println!("cargo:rerun-if-changed=c_ext/Makefile");
@@ -21,8 +24,34 @@ fn main() -> Result<ExitCode, Box<dyn std::error::Error>> {
 
     let output = std::env::current_dir()?.join("c_ext");
     println!("cargo:rustc-link-arg-cdylib={}/c_ext.o", output.display());
-    println!("cargo:rustc-link-arg-cdylib=-Wl,-u,_start_thread");
-    println!("cargo:rustc-link-arg-cdylib=-Wl,-exported_symbol,_start_thread"); // export
-    println!("cargo:rustc-link-arg-cdylib=-Wl,-exported_symbol,_pg_finfo_start_thread");
+
+    let out_dir = PathBuf::from(std::env::var("OUT_DIR")?);
+
+    // Force-export these symbols from the final .so
+    let vers = out_dir.join("exports.map");
+    fs::write(
+        &vers,
+        r#"
+{
+  global:
+    start_thread;
+    pg_finfo_start_thread;
+  local:
+    *;
+};
+"#,
+    )?;
+
+    let target = std::env::var("TARGET")?;
+    if target.contains("apple-darwin") {
+        println!("cargo:rustc-link-arg-cdylib=-Wl,-u,_start_thread");
+        println!("cargo:rustc-link-arg-cdylib=-Wl,-exported_symbol,_start_thread");
+        println!("cargo:rustc-link-arg-cdylib=-Wl,-exported_symbol,_pg_finfo_start_thread");
+    } else if target.contains("unknown-linux-gnu") {
+        println!("cargo:rustc-link-arg-cdylib=-Wl,--undefined=start_thread");
+        println!("cargo:rustc-link-arg-cdylib=-Wl,--undefined=pg_finfo_start_thread");
+        println!("cargo:rustc-link-arg-cdylib=-Wl,--version-script={}", vers.display());
+    }
+
     Ok(ExitCode::SUCCESS)
 }

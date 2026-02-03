@@ -87,7 +87,7 @@ static void *spi_thread_main(void *arg)
     return NULL;
 }
 
-Datum
+PGDLLEXPORT Datum
 start_thread(PG_FUNCTION_ARGS)
 {
     pthread_t tid;
