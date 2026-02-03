@@ -31,7 +31,7 @@ mod rewriter;
 /// Declare a function as `#[pg_guard]` to indicate that it is called from a Postgres `extern "C-unwind"`
 /// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgrx`
 #[proc_macro_attribute]
-pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn pg_guard(attr: TokenStream, item: TokenStream) -> TokenStream {
     // get a usable token stream
     let ast = parse_macro_input!(item as syn::Item);
 
@@ -41,7 +41,7 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
         Item::ForeignMod(block) => Ok(rewriter::extern_block(block)),
 
         // process top-level functions
-        Item::Fn(func) => rewriter::item_fn_without_rewrite(func),
+        Item::Fn(func) => rewriter::item_fn_without_rewrite(func, attr),
         unknown => Err(syn::Error::new(
             unknown.span(),
             "#[pg_guard] can only be applied to extern \"C-unwind\" blocks and top-level functions",

@@ -9,6 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 extern crate proc_macro;
 
+use proc_macro::TokenStream;
 use quote::{quote, quote_spanned};
 use std::mem;
 use std::ops::Deref;
@@ -41,7 +42,10 @@ pub fn extern_block(block: ItemForeignMod) -> proc_macro2::TokenStream {
     stream
 }
 
-pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::TokenStream> {
+pub fn item_fn_without_rewrite(
+    mut func: ItemFn,
+    attr: TokenStream,
+) -> syn::Result<proc_macro2::TokenStream> {
     // remember the original visibility and signature classifications as we want
     // to use those for the outer function
     let input_func_name = func.sig.ident.to_string();
@@ -49,6 +53,10 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
     let vis = func.vis.clone();
     let attrs = mem::take(&mut func.attrs);
     let generics = func.sig.generics.clone();
+
+    // looking for this pattern: #[pg_guard(unsafe_entry_thread)]
+    let unsafe_entry_thread =
+        attr.into_iter().find(|tt| tt.to_string() == "unsafe_entry_thread").is_some();
 
     if sig.abi.clone().and_then(|abi| abi.name).is_none_or(|name| name.value() != "C-unwind") {
         panic!("#[pg_guard] must be combined with extern \"C-unwind\"");
@@ -88,7 +96,7 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
         quote! {}
     };
 
-    let body = if generics.params.is_empty() {
+    let mut body = if generics.params.is_empty() {
         quote! { #func_name(#arg_list) }
     } else {
         let ty = generics
@@ -103,6 +111,18 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
         quote! { #func_name::<#ty>(#arg_list) }
     };
 
+    if unsafe_entry_thread {
+        body = quote! {
+            pgrx::pg_sys::submodules::thread_check::active_thread::clear();
+            let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| { #body }));
+            pgrx::pg_sys::submodules::thread_check::active_thread::clear();
+            match result {
+                Ok(result) => result,
+                Err(e) => std::panic::resume_unwind(e),
+            }
+        }
+    }
+
     let synthetic = proc_macro2::Span::mixed_site().located_at(func.span());
 
     Ok(quote_spanned! {synthetic=>
@@ -115,7 +135,7 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
             #[allow(unused_unsafe)]
             unsafe {
                 // NB: this is purposely not spelled `::pgrx` as pgrx itself uses #[pg_guard]
-                pgrx::pg_sys::submodules::panic::pgrx_extern_c_guard(move || #body )
+                pgrx::pg_sys::submodules::panic::pgrx_extern_c_guard(move || { #body } )
             }
         }
     })

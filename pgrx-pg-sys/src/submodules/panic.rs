@@ -575,6 +575,9 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
                 pfree(context.cast());
             }
 
+            if level >= PgLogLevel::ERROR {
+                crate::submodules::thread_check::active_thread::clear();
+            }
             errfinish(file, lineno as _, funcname);
 
             if level >= PgLogLevel::ERROR {
