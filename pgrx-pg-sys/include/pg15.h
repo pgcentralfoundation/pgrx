@@ -184,6 +184,7 @@
 #include "utils/fmgrprotos.h"
 #include "utils/geo_decls.h"
 #include "utils/guc.h"
+#include "utils/guc_tables.h"
 #include "utils/json.h"
 #include "utils/jsonb.h"
 #include "utils/lsyscache.h"
