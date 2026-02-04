@@ -40,6 +40,7 @@ pub fn check_active_thread() {
     }
 }
 
+#[doc(hidden)]
 pub mod active_thread {
 
     /// Clear the concept of the "active thread", allowing whatever the current thread is to claim
