@@ -47,11 +47,7 @@ where
     fn change_bit(byte: u8, index: usize, val: bool) -> u8 {
         let bit_index = if cfg!(target_endian = "big") { 7 - (index % 8) } else { index % 8 };
         let mask = 1 << bit_index;
-        if val {
-            byte | mask
-        } else {
-            byte & !mask
-        }
+        if val { byte | mask } else { byte & !mask }
     }
     #[inline]
     pub fn set_bit(&mut self, index: usize, val: bool) {
@@ -32401,7 +32397,7 @@ unsafe extern "C-unwind" {
     pub fn pfree(pointer: *mut ::core::ffi::c_void);
     pub fn MemoryContextAllocHuge(context: MemoryContext, size: Size) -> *mut ::core::ffi::c_void;
     pub fn repalloc_huge(pointer: *mut ::core::ffi::c_void, size: Size)
-        -> *mut ::core::ffi::c_void;
+    -> *mut ::core::ffi::c_void;
     pub fn MemoryContextRegisterResetCallback(
         context: MemoryContext,
         cb: *mut MemoryContextCallback,
@@ -32677,7 +32673,7 @@ unsafe extern "C-unwind" {
         bit: *mut bits8,
     );
     pub fn heap_attisnull(tup: HeapTuple, attnum: ::core::ffi::c_int, tupleDesc: TupleDesc)
-        -> bool;
+    -> bool;
     pub fn nocachegetattr(tup: HeapTuple, attnum: ::core::ffi::c_int, att: TupleDesc) -> Datum;
     pub fn heap_getsysattr(
         tup: HeapTuple,
@@ -32843,7 +32839,7 @@ unsafe extern "C-unwind" {
         msg: *const ::core::ffi::c_char,
     ) -> *mut TupleConversionMap;
     pub fn convert_tuples_by_name(indesc: TupleDesc, outdesc: TupleDesc)
-        -> *mut TupleConversionMap;
+    -> *mut TupleConversionMap;
     pub fn execute_attr_map_tuple(tuple: HeapTuple, map: *mut TupleConversionMap) -> HeapTuple;
     pub fn execute_attr_map_slot(
         attrMap: *mut AttrMap,
@@ -32851,7 +32847,7 @@ unsafe extern "C-unwind" {
         out_slot: *mut TupleTableSlot,
     ) -> *mut TupleTableSlot;
     pub fn execute_attr_map_cols(attrMap: *mut AttrMap, inbitmap: *mut Bitmapset)
-        -> *mut Bitmapset;
+    -> *mut Bitmapset;
     pub fn free_conversion_map(map: *mut TupleConversionMap);
     pub static mut pgBufferUsage: BufferUsage;
     pub static mut pgWalUsage: WalUsage;
@@ -33058,7 +33054,7 @@ unsafe extern "C-unwind" {
     pub fn OidFunctionCall0Coll(functionId: Oid, collation: Oid) -> Datum;
     pub fn OidFunctionCall1Coll(functionId: Oid, collation: Oid, arg1: Datum) -> Datum;
     pub fn OidFunctionCall2Coll(functionId: Oid, collation: Oid, arg1: Datum, arg2: Datum)
-        -> Datum;
+    -> Datum;
     pub fn OidFunctionCall3Coll(
         functionId: Oid,
         collation: Oid,
@@ -33341,7 +33337,7 @@ unsafe extern "C-unwind" {
     pub fn tbm_end_iterate(iterator: *mut TBMIterator);
     pub fn tbm_end_shared_iterate(iterator: *mut TBMSharedIterator);
     pub fn tbm_attach_shared_iterate(dsa: *mut dsa_area, dp: dsa_pointer)
-        -> *mut TBMSharedIterator;
+    -> *mut TBMSharedIterator;
     pub fn tbm_calculate_entries(maxbytes: f64) -> ::core::ffi::c_long;
     pub static mut dummy_spinlock: slock_t;
     pub fn s_lock(
@@ -33352,7 +33348,7 @@ unsafe extern "C-unwind" {
     ) -> ::core::ffi::c_int;
     pub fn set_spins_per_delay(shared_spins_per_delay: ::core::ffi::c_int);
     pub fn update_spins_per_delay(shared_spins_per_delay: ::core::ffi::c_int)
-        -> ::core::ffi::c_int;
+    -> ::core::ffi::c_int;
     pub fn perform_spin_delay(status: *mut SpinDelayStatus);
     pub fn finish_spin_delay(status: *mut SpinDelayStatus);
     pub fn SpinlockSemas() -> ::core::ffi::c_int;
@@ -33976,7 +33972,7 @@ unsafe extern "C-unwind" {
     pub fn MemoryContextAllowInCriticalSection(context: MemoryContext, allow: bool);
     pub fn MemoryContextCheck(context: MemoryContext);
     pub fn MemoryContextContains(context: MemoryContext, pointer: *mut ::core::ffi::c_void)
-        -> bool;
+    -> bool;
     pub fn MemoryContextCreate(
         node: MemoryContext,
         tag: NodeTag,
@@ -34165,7 +34161,7 @@ unsafe extern "C-unwind" {
     ) -> LockTupleMode::Type;
     pub fn ExecFindRowMark(estate: *mut EState, rti: Index, missing_ok: bool) -> *mut ExecRowMark;
     pub fn ExecBuildAuxRowMark(erm: *mut ExecRowMark, targetlist: *mut List)
-        -> *mut ExecAuxRowMark;
+    -> *mut ExecAuxRowMark;
     pub fn EvalPlanQual(
         epqstate: *mut EPQState,
         relation: Relation,
@@ -36200,7 +36196,7 @@ unsafe extern "C-unwind" {
     );
     pub fn table_block_parallelscan_estimate(rel: Relation) -> Size;
     pub fn table_block_parallelscan_initialize(rel: Relation, pscan: ParallelTableScanDesc)
-        -> Size;
+    -> Size;
     pub fn table_block_parallelscan_reinitialize(rel: Relation, pscan: ParallelTableScanDesc);
     pub fn table_block_parallelscan_nextpage(
         rel: Relation,
@@ -38249,7 +38245,7 @@ unsafe extern "C-unwind" {
     pub fn smgrDoPendingDeletes(isCommit: bool);
     pub fn smgrDoPendingSyncs(isCommit: bool, isParallelWorker: bool);
     pub fn smgrGetPendingDeletes(forCommit: bool, ptr: *mut *mut RelFileNode)
-        -> ::core::ffi::c_int;
+    -> ::core::ffi::c_int;
     pub fn AtSubCommit_smgr();
     pub fn AtSubAbort_smgr();
     pub fn PostPrepare_smgr();
@@ -38329,7 +38325,7 @@ unsafe extern "C-unwind" {
     ) -> Oid;
     pub fn AlterDatabaseSet(stmt: *mut AlterDatabaseSetStmt) -> Oid;
     pub fn AlterDatabaseOwner(dbname: *const ::core::ffi::c_char, newOwnerId: Oid)
-        -> ObjectAddress;
+    -> ObjectAddress;
     pub fn get_database_oid(dbname: *const ::core::ffi::c_char, missing_ok: bool) -> Oid;
     pub fn get_database_name(dbid: Oid) -> *mut ::core::ffi::c_char;
     pub fn check_encoding_locale_matches(
@@ -39701,7 +39697,7 @@ unsafe extern "C-unwind" {
         Nulls: *const ::core::ffi::c_char,
     ) -> HeapTuple;
     pub fn SPI_fnumber(tupdesc: TupleDesc, fname: *const ::core::ffi::c_char)
-        -> ::core::ffi::c_int;
+    -> ::core::ffi::c_int;
     pub fn SPI_fname(tupdesc: TupleDesc, fnumber: ::core::ffi::c_int) -> *mut ::core::ffi::c_char;
     pub fn SPI_getvalue(
         tuple: HeapTuple,
@@ -39715,7 +39711,7 @@ unsafe extern "C-unwind" {
         isnull: *mut bool,
     ) -> Datum;
     pub fn SPI_gettype(tupdesc: TupleDesc, fnumber: ::core::ffi::c_int)
-        -> *mut ::core::ffi::c_char;
+    -> *mut ::core::ffi::c_char;
     pub fn SPI_gettypeid(tupdesc: TupleDesc, fnumber: ::core::ffi::c_int) -> Oid;
     pub fn SPI_getrelname(rel: Relation) -> *mut ::core::ffi::c_char;
     pub fn SPI_getnspname(rel: Relation) -> *mut ::core::ffi::c_char;
@@ -39869,7 +39865,7 @@ unsafe extern "C-unwind" {
     ) -> *mut ::core::ffi::c_uchar;
     pub fn utf8_to_unicode(c: *const ::core::ffi::c_uchar) -> pg_wchar;
     pub fn pg_utf8_islegal(source: *const ::core::ffi::c_uchar, length: ::core::ffi::c_int)
-        -> bool;
+    -> bool;
     pub fn pg_utf_mblen(s: *const ::core::ffi::c_uchar) -> ::core::ffi::c_int;
     pub fn pg_mule_mblen(s: *const ::core::ffi::c_uchar) -> ::core::ffi::c_int;
     pub fn pg_mb2wchar(from: *const ::core::ffi::c_char, to: *mut pg_wchar) -> ::core::ffi::c_int;
@@ -39986,7 +39982,7 @@ unsafe extern "C-unwind" {
         lc: *mut ::core::ffi::c_uchar,
     ) -> ::core::ffi::c_ushort;
     pub fn CNStoBIG5(cns: ::core::ffi::c_ushort, lc: ::core::ffi::c_uchar)
-        -> ::core::ffi::c_ushort;
+    -> ::core::ffi::c_ushort;
     pub fn UtfToLocal(
         utf: *const ::core::ffi::c_uchar,
         len: ::core::ffi::c_int,
@@ -40860,7 +40856,7 @@ unsafe extern "C-unwind" {
     pub fn contain_var_clause(node: *mut Node) -> bool;
     pub fn contain_vars_of_level(node: *mut Node, levelsup: ::core::ffi::c_int) -> bool;
     pub fn locate_var_of_level(node: *mut Node, levelsup: ::core::ffi::c_int)
-        -> ::core::ffi::c_int;
+    -> ::core::ffi::c_int;
     pub fn pull_var_clause(node: *mut Node, flags: ::core::ffi::c_int) -> *mut List;
     pub fn flatten_join_alias_vars(query: *mut Query, node: *mut Node) -> *mut Node;
     pub fn compare_path_costs(
@@ -41085,7 +41081,7 @@ unsafe extern "C-unwind" {
         inner_paramrels: Relids,
     ) -> Relids;
     pub fn calc_non_nestloop_required_outer(outer_path: *mut Path, inner_path: *mut Path)
-        -> Relids;
+    -> Relids;
     pub fn create_nestloop_path(
         root: *mut PlannerInfo,
         joinrel: *mut RelOptInfo,
@@ -41333,7 +41329,7 @@ unsafe extern "C-unwind" {
         required_outer: Relids,
     ) -> *mut ParamPathInfo;
     pub fn find_param_path_info(rel: *mut RelOptInfo, required_outer: Relids)
-        -> *mut ParamPathInfo;
+    -> *mut ParamPathInfo;
     pub fn build_child_join_rel(
         root: *mut PlannerInfo,
         outer_rel: *mut RelOptInfo,
@@ -41842,7 +41838,7 @@ unsafe extern "C-unwind" {
         otherquals: *mut *mut List,
     );
     pub fn has_pseudoconstant_clauses(root: *mut PlannerInfo, restrictinfo_list: *mut List)
-        -> bool;
+    -> bool;
     pub fn join_clause_is_movable_to(rinfo: *mut RestrictInfo, baserel: *mut RelOptInfo) -> bool;
     pub fn join_clause_is_movable_into(
         rinfo: *mut RestrictInfo,
@@ -41923,14 +41919,14 @@ unsafe extern "C-unwind" {
         pushedDown: bool,
     );
     pub fn BuildOnConflictExcludedTargetlist(targetrel: Relation, exclRelIndex: Index)
-        -> *mut List;
+    -> *mut List;
     pub fn makeSortGroupClauseForSetOp(rescoltype: Oid, require_hash: bool)
-        -> *mut SortGroupClause;
+    -> *mut SortGroupClause;
     pub fn assign_query_collations(pstate: *mut ParseState, query: *mut Query);
     pub fn assign_list_collations(pstate: *mut ParseState, exprs: *mut List);
     pub fn assign_expr_collations(pstate: *mut ParseState, expr: *mut Node);
     pub fn select_common_collation(pstate: *mut ParseState, exprs: *mut List, none_ok: bool)
-        -> Oid;
+    -> Oid;
     pub static mut Transform_null_equals: bool;
     pub fn transformExpr(
         pstate: *mut ParseState,
@@ -42555,7 +42551,7 @@ unsafe extern "C-unwind" {
     ) -> ::core::ffi::c_int;
     pub fn RelationGetPartitionDesc(rel: Relation, omit_detached: bool) -> PartitionDesc;
     pub fn CreatePartitionDirectory(mcxt: MemoryContext, omit_detached: bool)
-        -> PartitionDirectory;
+    -> PartitionDirectory;
     pub fn PartitionDirectoryLookup(arg1: PartitionDirectory, arg2: Relation) -> PartitionDesc;
     pub fn DestroyPartitionDirectory(pdir: PartitionDirectory);
     pub fn get_default_oid_from_partdesc(partdesc: PartitionDesc) -> Oid;
@@ -42780,7 +42776,7 @@ unsafe extern "C-unwind" {
     pub fn plpgsql_ns_find_nearest_loop(ns_cur: *mut PLpgSQL_nsitem) -> *mut PLpgSQL_nsitem;
     pub fn plpgsql_stmt_typename(stmt: *mut PLpgSQL_stmt) -> *const ::core::ffi::c_char;
     pub fn plpgsql_getdiag_kindname(kind: PLpgSQL_getdiag_kind::Type)
-        -> *const ::core::ffi::c_char;
+    -> *const ::core::ffi::c_char;
     pub fn plpgsql_free_function_memory(func: *mut PLpgSQL_function);
     pub fn plpgsql_dumptree(func: *mut PLpgSQL_function);
     pub fn plpgsql_base_yylex() -> ::core::ffi::c_int;
@@ -43089,7 +43085,7 @@ unsafe extern "C-unwind" {
     pub fn logicalrep_read_typ(out: StringInfo, ltyp: *mut LogicalRepTyp);
     pub fn logicalrep_write_stream_start(out: StringInfo, xid: TransactionId, first_segment: bool);
     pub fn logicalrep_read_stream_start(in_: StringInfo, first_segment: *mut bool)
-        -> TransactionId;
+    -> TransactionId;
     pub fn logicalrep_write_stream_stop(out: StringInfo);
     pub fn logicalrep_write_stream_commit(
         out: StringInfo,
@@ -47200,7 +47196,7 @@ unsafe extern "C-unwind" {
     pub fn get_ordering_op_for_equality_op(opno: Oid, use_lhs_type: bool) -> Oid;
     pub fn get_mergejoin_opfamilies(opno: Oid) -> *mut List;
     pub fn get_compatible_hash_operators(opno: Oid, lhs_opno: *mut Oid, rhs_opno: *mut Oid)
-        -> bool;
+    -> bool;
     pub fn get_op_hash_functions(
         opno: Oid,
         lhs_procno: *mut RegProcedure,
@@ -47357,7 +47353,7 @@ unsafe extern "C-unwind" {
     pub fn set_ps_display(activity: *const ::core::ffi::c_char);
     pub fn get_ps_display(displen: *mut ::core::ffi::c_int) -> *const ::core::ffi::c_char;
     pub fn format_procedure_extended(procedure_oid: Oid, flags: bits16)
-        -> *mut ::core::ffi::c_char;
+    -> *mut ::core::ffi::c_char;
     pub fn format_operator_extended(operator_oid: Oid, flags: bits16) -> *mut ::core::ffi::c_char;
     pub fn stringToQualifiedNameList(string: *const ::core::ffi::c_char) -> *mut List;
     pub fn format_procedure(procedure_oid: Oid) -> *mut ::core::ffi::c_char;
