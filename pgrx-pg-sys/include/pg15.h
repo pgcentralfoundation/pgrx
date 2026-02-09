@@ -160,6 +160,8 @@
 #include "storage/bufmgr.h"
 #include "storage/buffile.h"
 #include "storage/bufpage.h"
+#include "storage/dsm.h"
+#include "storage/dsm_impl.h"
 #include "storage/indexfsm.h"
 #include "storage/freespace.h"
 #include "storage/ipc.h"
