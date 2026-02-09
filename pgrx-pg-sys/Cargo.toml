@@ -10,7 +10,7 @@
 
 [package]
 name = "pgrx-pg-sys"
-version = "0.16.1"
+version = "0.17.0"
 authors.workspace = true
 license.workspace = true
 description = "Generated Rust bindings for Postgres internals, for use with 'pgrx'"
