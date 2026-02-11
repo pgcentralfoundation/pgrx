@@ -120,7 +120,7 @@ impl From<Oid> for u32 {
     }
 }
 
-impl From<Oid> for crate::Datum {
+impl From<Oid> for Datum {
     fn from(oid: Oid) -> Self {
         Datum::from(oid.0)
     }
@@ -168,16 +168,16 @@ impl TryFrom<Oid> for BuiltinOid {
     }
 }
 
-impl TryFrom<crate::Datum> for BuiltinOid {
+impl TryFrom<Datum> for BuiltinOid {
     type Error = NotBuiltinOid;
-    fn try_from(datum: crate::Datum) -> Result<BuiltinOid, NotBuiltinOid> {
+    fn try_from(datum: Datum) -> Result<BuiltinOid, NotBuiltinOid> {
         let uint = u32::try_from(datum.value()).map_err(|_| NotBuiltinOid::TooBig)?;
         BuiltinOid::from_u32(uint)
     }
 }
 
 impl BuiltinOid {
-    pub const fn value(self) -> pg_sys::Oid {
+    pub const fn value(self) -> Oid {
         Oid(self as u32)
     }
 
@@ -218,7 +218,7 @@ impl From<Oid> for PgOid {
 
 impl PgOid {
     #[inline]
-    pub const fn value(self) -> pg_sys::Oid {
+    pub const fn value(self) -> Oid {
         match self {
             PgOid::Invalid => pg_sys::InvalidOid,
             PgOid::Custom(custom) => custom,

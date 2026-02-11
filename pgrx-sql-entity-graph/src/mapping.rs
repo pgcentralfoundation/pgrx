@@ -44,7 +44,7 @@ impl RustSqlMapping {
         Self {
             rust: core::any::type_name::<T>().to_string(),
             sql: sql.to_string(),
-            id: core::any::TypeId::of::<T>(),
+            id: TypeId::of::<T>(),
         }
     }
 }

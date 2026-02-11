@@ -60,9 +60,7 @@ impl<'conn> SpiClient<'conn> {
         query.execute(self, limit, args)
     }
 
-    pub(super) fn prepare_tuple_table(
-        status_code: i32,
-    ) -> std::result::Result<SpiTupleTable<'conn>, SpiError> {
+    pub(super) fn prepare_tuple_table(status_code: i32) -> Result<SpiTupleTable<'conn>, SpiError> {
         Ok(SpiTupleTable {
             status_code: Spi::check_status(status_code)?,
             // SAFETY: no concurrent access

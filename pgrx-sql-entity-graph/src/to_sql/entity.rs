@@ -113,22 +113,22 @@ impl ToSqlConfigEntity {
     }
 }
 
-impl std::cmp::PartialOrd for ToSqlConfigEntity {
+impl PartialOrd for ToSqlConfigEntity {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.cmp(other))
     }
 }
-impl std::cmp::Ord for ToSqlConfigEntity {
+impl Ord for ToSqlConfigEntity {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.fields().cmp(&other.fields())
     }
 }
-impl std::cmp::PartialEq for ToSqlConfigEntity {
+impl PartialEq for ToSqlConfigEntity {
     fn eq(&self, other: &Self) -> bool {
         self.fields() == other.fields()
     }
 }
-impl std::cmp::Eq for ToSqlConfigEntity {}
+impl Eq for ToSqlConfigEntity {}
 impl std::hash::Hash for ToSqlConfigEntity {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.fields().hash(state);

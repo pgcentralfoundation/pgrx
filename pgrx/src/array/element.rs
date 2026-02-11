@@ -36,7 +36,7 @@ where
 {
     const PASS: PassBy = <T as DatumPass>::PASS;
 
-    unsafe fn point_from(ptr: ptr::NonNull<u8>) -> std::ptr::NonNull<Self> {
+    unsafe fn point_from(ptr: ptr::NonNull<u8>) -> ptr::NonNull<Self> {
         unsafe { Element::point_from(ptr) }
     }
 

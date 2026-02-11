@@ -285,13 +285,13 @@ where
             PassBy::Value => ptr::addr_of!(arg.0.raw_args()[arg.1].value).cast_mut().cast(),
         };
         unsafe {
-            let ptr = ptr::NonNull::new_unchecked(ptr);
+            let ptr = NonNull::new_unchecked(ptr);
             T::borrow_unchecked(ptr)
         }
     }
 
     unsafe fn unbox_nullable_arg(arg: Arg<'_, 'fcx>) -> Nullable<Self> {
-        let ptr: Option<ptr::NonNull<u8>> = NonNull::new(match T::PASS {
+        let ptr: Option<NonNull<u8>> = NonNull::new(match T::PASS {
             PassBy::Ref => arg.2.value.cast_mut_ptr(),
             PassBy::Value => ptr::addr_of!(arg.0.raw_args()[arg.1].value).cast_mut().cast(),
         });

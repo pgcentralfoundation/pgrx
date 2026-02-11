@@ -45,11 +45,10 @@ pub trait ToSql {
 ///
 /// Implementations can invoke `ToSql::to_sql(entity, context)` on the unwrapped SqlGraphEntity
 /// type should they wish to delegate to the default behavior for any reason.
-pub type ToSqlFn =
-    fn(
-        &SqlGraphEntity,
-        &PgrxSql,
-    ) -> std::result::Result<String, Box<dyn std::error::Error + Send + Sync + 'static>>;
+pub type ToSqlFn = fn(
+    &SqlGraphEntity,
+    &PgrxSql,
+) -> Result<String, Box<dyn std::error::Error + Send + Sync + 'static>>;
 
 /// A parsed `sql` option from a `pgrx` related procedural macro.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

@@ -1,4 +1,4 @@
-/** Manually-constructed bindings to libpq
+/*! Manually-constructed bindings to libpq
 
 Because pgrx is for extensions which run in the Postgres server, it rarely needs access to libpq.
 However, some server-side extensions need to interact with the reality that clients exist.
@@ -7,7 +7,6 @@ areas of concern that are far beyond what pgrx wants to involve itself with or b
 
 We define some types and signatures here to allow a minimal amount of usage of items from libpq,
 while largely rejecting the notion that we should involve ourselves in security-laden concerns.
-
 */
 
 pub mod be {

@@ -178,7 +178,7 @@ pub(crate) fn generate_schema_implicit(
     path: Option<&Path>,
     dot: Option<&Path>,
     output_tracking: &mut Vec<PathBuf>,
-    manifest: cargo_toml::Manifest,
+    manifest: Manifest,
 ) -> eyre::Result<()> {
     let (control_file, _extname) = find_control_file(package_manifest_path)?;
     let lib_name = manifest.lib_name()?;
@@ -292,13 +292,7 @@ fn compute_symbols(obj_file: &object::File<'_>, symbol_prefix: &str) -> eyre::Re
         "  Discovered".bold().green(),
         fns_to_call.len().to_string().bold().cyan(),
         seen_schemas.len().to_string().bold().cyan(),
-        seen_schemas
-            .iter()
-            .collect::<std::collections::HashSet<_>>()
-            .len()
-            .to_string()
-            .bold()
-            .cyan(),
+        seen_schemas.iter().collect::<HashSet<_>>().len().to_string().bold().cyan(),
         num_funcs.to_string().bold().cyan(),
         num_types.to_string().bold().cyan(),
         num_enums.to_string().bold().cyan(),

@@ -116,8 +116,8 @@ impl<'cx, T: Enlist> List<'cx, T> {
                         mcx.alloc_bytes(list_size).unwrap().cast().as_ptr();
                     assert!(list.is_non_null());
                     (*list).type_ = T::LIST_TAG;
-                    (*list).max_length = ((list_size - mem::size_of::<pg_sys::List>())
-                        / mem::size_of::<pg_sys::ListCell>())
+                    (*list).max_length = ((list_size - size_of::<pg_sys::List>())
+                        / size_of::<pg_sys::ListCell>())
                         as _;
                     (*list).elements = ptr::addr_of_mut!((*list).initial_elements).cast();
                     T::endocytosis((*list).elements.as_mut().unwrap(), value);
@@ -311,7 +311,7 @@ impl<T: Enlist> ListHead<'_, T> {
 
 unsafe fn grow_list(list: &mut pg_sys::List, target: usize) {
     assert!((i32::MAX as usize) >= target, "Cannot allocate more than c_int::MAX elements");
-    let alloc_size = target * mem::size_of::<pg_sys::ListCell>();
+    let alloc_size = target * size_of::<pg_sys::ListCell>();
     if list.elements == ptr::addr_of_mut!(list.initial_elements).cast() {
         // first realloc, we can't dealloc the elements ptr, as it isn't its own alloc
         let context = pg_sys::GetMemoryChunkContext(list as *mut pg_sys::List as *mut _);

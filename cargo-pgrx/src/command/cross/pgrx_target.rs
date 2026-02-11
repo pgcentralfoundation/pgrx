@@ -58,7 +58,7 @@ pub(crate) struct PgrxTarget {
 }
 
 impl CommandExecute for PgrxTarget {
-    fn execute(self) -> eyre::Result<()> {
+    fn execute(self) -> Result<()> {
         let mut temp: Option<tempfile::TempDir> = None;
         let temp_path = if let Some(scratch) = &self.scratch_dir {
             &**scratch

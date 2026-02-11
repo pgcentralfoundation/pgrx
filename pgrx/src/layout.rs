@@ -22,7 +22,6 @@ then we may want to offer more help.
 */
 #![allow(dead_code)]
 use crate::pg_sys::{self, TYPALIGN_CHAR, TYPALIGN_DOUBLE, TYPALIGN_INT, TYPALIGN_SHORT};
-use core::mem;
 
 /// Postgres type information, corresponds to part of a row in pg_type
 /// This layout describes T, not &T, even if passbyval: false, which would mean the datum array is effectively `&[&T]`
@@ -86,10 +85,10 @@ impl TryFrom<libc::c_char> for Align {
 impl Align {
     pub(crate) fn as_usize(self) -> usize {
         match self {
-            Align::Byte => mem::align_of::<libc::c_char>(),
-            Align::Short => mem::align_of::<libc::c_short>(),
-            Align::Int => mem::align_of::<libc::c_int>(),
-            Align::Double => mem::align_of::<libc::c_double>(),
+            Align::Byte => align_of::<libc::c_char>(),
+            Align::Short => align_of::<libc::c_short>(),
+            Align::Int => align_of::<libc::c_int>(),
+            Align::Double => align_of::<libc::c_double>(),
         }
     }
 

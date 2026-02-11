@@ -170,7 +170,7 @@ where
     pub fn new_empty<'cx>(
         memcx: &MemCx<'cx>,
     ) -> Result<PBox<'cx, FlatArray<'cx, T>>, ArrayAllocError> {
-        let nbytes = mem::size_of::<pg_sys::ArrayType>();
+        let nbytes = size_of::<pg_sys::ArrayType>();
         let ptr = alloc_zeroed_head(memcx, 0, 0, 0, <T as Scalar>::OID)?;
         // SAFETY: it's valid, if 0-dimensional
         Ok(unsafe { PBox::from_raw_in(FlatArray::cast_tailed(ptr), memcx) })
@@ -317,8 +317,7 @@ unsafe impl<T: ?Sized> BorrowDatum for FlatArray<'_, T> {
     const PASS: layout::PassBy = layout::PassBy::Ref;
     unsafe fn point_from(ptr: ptr::NonNull<u8>) -> ptr::NonNull<Self> {
         unsafe {
-            let len =
-                varlena::varsize_any(ptr.as_ptr().cast()) - mem::size_of::<pg_sys::ArrayType>();
+            let len = varlena::varsize_any(ptr.as_ptr().cast()) - size_of::<pg_sys::ArrayType>();
             ptr::NonNull::new_unchecked(
                 ptr::slice_from_raw_parts_mut(ptr.as_ptr(), len) as *mut Self
             )
@@ -394,7 +393,7 @@ where
         } else {
             let borrow = unsafe { T::borrow_unchecked(self.data.add(self.offset)) };
             // As we always have a borrow, we just ask Rust what the array element's size is
-            self.offset += self.align.pad(mem::size_of_val(borrow));
+            self.offset += self.align.pad(size_of_val(borrow));
             Some(Nullable::Valid(borrow))
         }
     }

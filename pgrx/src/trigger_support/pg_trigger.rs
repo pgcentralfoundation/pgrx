@@ -175,7 +175,7 @@ impl<'a> PgTrigger<'a> {
     }
 
     /// The `PgRelation` corresponding to the trigger.
-    pub fn relation(&self) -> Result<crate::PgRelation, PgTriggerError> {
+    pub fn relation(&self) -> Result<PgRelation, PgTriggerError> {
         // SAFETY:  The creator of this PgTrigger asserted they used a correctly initialized
         // "fcinfo" structures that represent a trigger and that Postgres was in the proper
         // state to call a trigger.  This includes that the relation is already open with at

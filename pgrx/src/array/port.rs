@@ -52,7 +52,7 @@ pub(super) const unsafe fn ARR_DIMS(a: *mut pg_sys::ArrayType) -> *mut i32 {
     // ((int *) (((char *) (a)) + sizeof(ArrayType)))
 
     // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
-    unsafe { a.cast::<u8>().add(mem::size_of::<pg_sys::ArrayType>()).cast::<i32>() }
+    unsafe { a.cast::<u8>().add(size_of::<pg_sys::ArrayType>()).cast::<i32>() }
 }
 
 /// Returns the "null bitmap" of the specified array.  If there isn't one (the array contains no nulls)
@@ -75,8 +75,7 @@ pub(super) unsafe fn ARR_NULLBITMAP(a: *mut pg_sys::ArrayType) -> *mut pg_sys::b
     // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
     unsafe {
         if ARR_HASNULL(a) {
-            a.cast::<u8>()
-                .add(mem::size_of::<pg_sys::ArrayType>() + 2 * mem::size_of::<i32>() * ARR_NDIM(a))
+            a.cast::<u8>().add(size_of::<pg_sys::ArrayType>() + 2 * size_of::<i32>() * ARR_NDIM(a))
         } else {
             ptr::null_mut()
         }
@@ -90,7 +89,7 @@ pub(super) const fn ARR_OVERHEAD_NONULLS(ndims: usize) -> usize {
     // #define ARR_OVERHEAD_NONULLS(ndims) \
     // MAXALIGN(sizeof(ArrayType) + 2 * sizeof(int) * (ndims))
 
-    MAXALIGN(mem::size_of::<pg_sys::ArrayType>() + 2 * mem::size_of::<i32>() * ndims)
+    MAXALIGN(size_of::<pg_sys::ArrayType>() + 2 * size_of::<i32>() * ndims)
 }
 
 /// # Safety

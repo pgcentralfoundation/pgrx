@@ -40,7 +40,7 @@ pub fn heap_tuple_header_get_datum_length(htup_header: pg_sys::HeapTupleHeader) 
         panic!("Attempt to dereference a null HeapTupleHeader");
     }
 
-    unsafe { crate::varlena::varsize(htup_header as *const pg_sys::varlena) }
+    unsafe { varsize(htup_header as *const pg_sys::varlena) }
 }
 
 /// convert a HeapTupleHeader to a Datum.

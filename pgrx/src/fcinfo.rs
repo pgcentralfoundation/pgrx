@@ -97,7 +97,7 @@ pub unsafe fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usi
     let datum = pg_get_nullable_datum(fcinfo, num);
     unsafe {
         if T::GET_TYPOID {
-            T::from_polymorphic_datum(datum.value, datum.isnull, super::pg_getarg_type(fcinfo, num))
+            T::from_polymorphic_datum(datum.value, datum.isnull, pg_getarg_type(fcinfo, num))
         } else {
             T::from_datum(datum.value, datum.isnull)
         }
@@ -327,14 +327,14 @@ unsafe fn direct_function_call_as_datum_internal(
 ) -> Option<pg_sys::Datum> {
     let nargs: i16 = args.len().try_into().expect("too many args passed to function");
     let fcinfo = pg_sys::palloc0(
-        std::mem::size_of::<pg_sys::FunctionCallInfoBaseData>()
-            + std::mem::size_of::<pg_sys::NullableDatum>() * args.len(),
+        size_of::<pg_sys::FunctionCallInfoBaseData>()
+            + size_of::<pg_sys::NullableDatum>() * args.len(),
     )
     .cast::<pg_sys::FunctionCallInfoBaseData>();
 
-    (*fcinfo).flinfo = std::ptr::null_mut();
-    (*fcinfo).context = std::ptr::null_mut();
-    (*fcinfo).resultinfo = std::ptr::null_mut();
+    (*fcinfo).flinfo = ptr::null_mut();
+    (*fcinfo).context = ptr::null_mut();
+    (*fcinfo).resultinfo = ptr::null_mut();
     (*fcinfo).fncollation = pg_sys::InvalidOid;
     (*fcinfo).isnull = false;
     (*fcinfo).nargs = nargs;

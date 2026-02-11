@@ -67,13 +67,7 @@ pub struct ErrorReportLocation {
 
 impl Default for ErrorReportLocation {
     fn default() -> Self {
-        Self {
-            file: std::string::String::from("<unknown>"),
-            funcname: None,
-            line: 0,
-            col: 0,
-            backtrace: None,
-        }
+        Self { file: String::from("<unknown>"), funcname: None, line: 0, col: 0, backtrace: None }
     }
 }
 

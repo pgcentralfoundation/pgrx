@@ -222,8 +222,8 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
             let natts = tuple_desc.len();
 
             unsafe {
-                let datums = pg_sys::palloc0(natts * std::mem::size_of::<pg_sys::Datum>())
-                    as *mut pg_sys::Datum;
+                let datums =
+                    pg_sys::palloc0(natts * size_of::<pg_sys::Datum>()) as *mut pg_sys::Datum;
                 let mut is_null = vec![true; natts];
 
                 let heap_tuple =
@@ -431,7 +431,7 @@ impl<'mcx, AllocatedBy: WhoAllocated> IntoDatum for PgHeapTuple<'mcx, AllocatedB
     }
 
     fn type_oid() -> pg_sys::Oid {
-        crate::pg_sys::RECORDOID
+        pg_sys::RECORDOID
     }
 
     fn composite_type_oid(&self) -> Option<pg_sys::Oid> {
@@ -483,7 +483,7 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
     /// The return value is `(attribute_number: NonZeroUsize, attribute_info: &pg_sys::FormData_pg_attribute)`.
     pub fn attributes(
         &self,
-    ) -> impl std::iter::Iterator<Item = (NonZeroUsize, &pg_sys::FormData_pg_attribute)> {
+    ) -> impl Iterator<Item = (NonZeroUsize, &pg_sys::FormData_pg_attribute)> {
         self.tupdesc.iter().enumerate().map(|(i, att)| (NonZeroUsize::new(i + 1).unwrap(), att))
     }
 
@@ -710,7 +710,7 @@ macro_rules! composite_type {
     };
 }
 
-unsafe impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByPostgres> {
+unsafe impl SqlTranslatable for PgHeapTuple<'static, AllocatedByPostgres> {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::Composite { array_brackets: false })
     }
@@ -719,7 +719,7 @@ unsafe impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, Allocate
     }
 }
 
-unsafe impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByRust> {
+unsafe impl SqlTranslatable for PgHeapTuple<'static, AllocatedByRust> {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::Composite { array_brackets: false })
     }

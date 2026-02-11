@@ -196,7 +196,7 @@ unsafe impl SqlTranslatable for Json {
     }
 }
 
-unsafe impl SqlTranslatable for crate::datum::JsonB {
+unsafe impl SqlTranslatable for JsonB {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("jsonb"))
     }

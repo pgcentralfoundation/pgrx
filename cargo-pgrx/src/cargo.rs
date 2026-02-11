@@ -178,18 +178,18 @@ impl Stdio {
     }
 }
 
-pub(crate) fn cargo() -> std::process::Command {
-    let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
-    std::process::Command::new(cargo)
+pub(crate) fn cargo() -> process::Command {
+    let cargo = env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
+    process::Command::new(cargo)
 }
 
 /// Set some environment variables for use downstream (in `pgrx-test` for
 /// example). Does nothing if already set.
 pub(crate) fn initialize() {
-    match (std::env::var_os("CARGO_PGRX"), std::env::current_exe()) {
+    match (env::var_os("CARGO_PGRX"), env::current_exe()) {
         (None, Ok(path)) => {
             unsafe {
-                std::env::set_var("CARGO_PGRX", path);
+                env::set_var("CARGO_PGRX", path);
             }
             // TODO: Should we set `CARGO_PGRX_{CARGO,RUSTC}` to `RUSTC`/`CARGO`
             // if unset, then prefer those? The issue with `RUSTC`/`CARGO` vars

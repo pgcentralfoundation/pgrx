@@ -27,11 +27,11 @@ use syn::{Expr, Type, parse_quote};
 #[derive(Debug, Clone)]
 pub struct AggregateTypeList {
     pub found: Vec<AggregateType>,
-    pub original: syn::Type,
+    pub original: Type,
 }
 
 impl AggregateTypeList {
-    pub fn new(maybe_type_list: syn::Type) -> Result<Self, syn::Error> {
+    pub fn new(maybe_type_list: Type) -> Result<Self, syn::Error> {
         match &maybe_type_list {
             Type::Tuple(tuple) => {
                 let mut coll = Vec::new();
@@ -75,7 +75,7 @@ pub struct AggregateType {
 }
 
 impl AggregateType {
-    pub fn new(ty: syn::Type) -> Result<Self, syn::Error> {
+    pub fn new(ty: Type) -> Result<Self, syn::Error> {
         let (name_macro, name) = if let Some(name_macro) = get_pgrx_attr_macro("name", &ty) {
             let name_macro = syn::parse2::<NameMacro>(name_macro)?;
             let name = Some(name_macro.ident.clone());

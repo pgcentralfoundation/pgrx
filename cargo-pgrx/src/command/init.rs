@@ -453,9 +453,9 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &Path, init: &Init) -> eyre::
         command.arg(flag);
     }
     command
-        .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::piped())
-        .stdin(std::process::Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .stdin(Stdio::null())
         .env("PATH", prefix_path(pgdir))
         .current_dir(pgdir);
     for var in PROCESS_ENV_DENYLIST {
@@ -498,9 +498,9 @@ fn make_postgres(pg_config: &PgConfig, pgdir: &Path, init: &Init) -> eyre::Resul
 
     command
         .arg("world-bin")
-        .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::piped())
-        .stdin(std::process::Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .stdin(Stdio::null())
         .current_dir(pgdir);
 
     for var in PROCESS_ENV_DENYLIST {
@@ -542,9 +542,9 @@ fn make_install_postgres(version: &PgConfig, pgdir: &Path, init: &Init) -> eyre:
 
     command
         .arg("install-world-bin")
-        .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::piped())
-        .stdin(std::process::Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .stdin(Stdio::null())
         .current_dir(pgdir);
     for var in PROCESS_ENV_DENYLIST {
         command.env_remove(var);

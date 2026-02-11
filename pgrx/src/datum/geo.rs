@@ -31,7 +31,7 @@ impl IntoDatum for pg_sys::BOX {
     fn into_datum(mut self) -> Option<pg_sys::Datum> {
         unsafe {
             let ptr = PgMemoryContexts::CurrentMemoryContext
-                .copy_ptr_into(&mut self, std::mem::size_of::<pg_sys::BOX>());
+                .copy_ptr_into(&mut self, size_of::<pg_sys::BOX>());
             Some(ptr.into())
         }
     }
@@ -63,7 +63,7 @@ impl IntoDatum for pg_sys::Point {
     fn into_datum(mut self) -> Option<pg_sys::Datum> {
         unsafe {
             let copy = PgMemoryContexts::CurrentMemoryContext
-                .copy_ptr_into(&mut self, std::mem::size_of::<pg_sys::Point>());
+                .copy_ptr_into(&mut self, size_of::<pg_sys::Point>());
             Some(copy.into())
         }
     }

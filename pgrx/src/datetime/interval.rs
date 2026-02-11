@@ -232,8 +232,7 @@ impl FromDatum for Interval {
 impl IntoDatum for Interval {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         unsafe {
-            let ptr =
-                pg_sys::palloc(std::mem::size_of::<pg_sys::Interval>()).cast::<pg_sys::Interval>();
+            let ptr = pg_sys::palloc(size_of::<pg_sys::Interval>()).cast::<pg_sys::Interval>();
             ptr.write(self.0);
             Some(pg_sys::Datum::from(ptr))
         }
@@ -291,7 +290,7 @@ impl serde::Serialize for Interval {
     fn serialize<S>(
         &self,
         serializer: S,
-    ) -> std::result::Result<<S as serde::Serializer>::Ok, <S as serde::Serializer>::Error>
+    ) -> Result<<S as serde::Serializer>::Ok, <S as serde::Serializer>::Error>
     where
         S: serde::Serializer,
     {

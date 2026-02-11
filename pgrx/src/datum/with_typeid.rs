@@ -7,19 +7,19 @@ use std::sync::LazyLock as Lazy;
 /// Obtain a TypeId for T without `T: 'static`
 #[inline]
 #[doc(hidden)]
-pub fn nonstatic_typeid<T: ?Sized>() -> core::any::TypeId {
+pub fn nonstatic_typeid<T: ?Sized>() -> TypeId {
     trait NonStaticAny {
-        fn type_id(&self) -> core::any::TypeId
+        fn type_id(&self) -> TypeId
         where
             Self: 'static;
     }
     impl<T: ?Sized> NonStaticAny for core::marker::PhantomData<T> {
         #[inline]
-        fn type_id(&self) -> core::any::TypeId
+        fn type_id(&self) -> TypeId
         where
             Self: 'static,
         {
-            core::any::TypeId::of::<T>()
+            TypeId::of::<T>()
         }
     }
     let it = core::marker::PhantomData::<T>;
@@ -184,7 +184,7 @@ impl<T> WithSizedTypeIds<T> {
         let set_sql = format!("{single_sql}[]");
 
         if let Some(id) = *WithSizedTypeIds::<T>::PG_BOX_ID {
-            let rust = core::any::type_name::<crate::PgBox<T>>().to_string();
+            let rust = core::any::type_name::<PgBox<T>>().to_string();
             assert!(
                 map.insert(RustSqlMapping { sql: single_sql.clone(), rust: rust.to_string(), id }),
                 "Cannot map `{rust}` twice.",
@@ -192,7 +192,7 @@ impl<T> WithSizedTypeIds<T> {
         }
 
         if let Some(id) = *WithSizedTypeIds::<T>::PG_BOX_OPTION_ID {
-            let rust = core::any::type_name::<crate::PgBox<Option<T>>>().to_string();
+            let rust = core::any::type_name::<PgBox<Option<T>>>().to_string();
             assert!(
                 map.insert(RustSqlMapping { sql: single_sql.clone(), rust: rust.to_string(), id }),
                 "Cannot map `{rust}` twice.",
@@ -200,7 +200,7 @@ impl<T> WithSizedTypeIds<T> {
         }
 
         if let Some(id) = *WithSizedTypeIds::<T>::PG_BOX_VEC_ID {
-            let rust = core::any::type_name::<crate::PgBox<Vec<T>>>().to_string();
+            let rust = core::any::type_name::<PgBox<Vec<T>>>().to_string();
             assert!(
                 map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id }),
                 "Cannot map `{rust}` twice.",

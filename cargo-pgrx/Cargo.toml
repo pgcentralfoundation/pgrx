@@ -83,4 +83,7 @@ rustls = [
 
 [lints.clippy]
 or-fun-call = "allow" # kinda sus lint imo
-too_many_arguments = "allow"
+too-many-arguments = "allow"
+
+[lints.rust]
+unused-qualifications = "warn"

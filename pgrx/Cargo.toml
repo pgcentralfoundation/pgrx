@@ -65,14 +65,15 @@ serde.workspace = true # impls on pub types
 serde_cbor = "0.11.2" # derive(PostgresType)
 serde_json.workspace = true # everything JSON
 
-[lints]
-clippy.cast_ptr_alignment = "allow"
-clippy.len_without_is_empty = "allow"
-clippy.missing_safety_doc = "allow"
-clippy.too_many_arguments = "allow"
-clippy.type_complexity = "allow"
-clippy.unnecessary_cast = "allow"
-clippy.needless_lifetimes = "allow"
+[lints.clippy]
+cast-ptr-alignment = "allow"
+len-without-is-empty = "allow"
+missing-safety-doc = "allow"
+needless-lifetimes = "allow"
+too-many-arguments = "allow"
+type-complexity = "allow"
+unnecessary-cast = "allow"
 
 [lints.rust]
 unsafe-op-in-unsafe-fn = "allow" # repo-wide issue
+unused-qualifications = "warn"

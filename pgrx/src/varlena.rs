@@ -121,11 +121,11 @@ pub unsafe fn vartag_is_expanded(tag: pg_sys::vartag_external::Type) -> bool {
 #[inline]
 pub unsafe fn vartag_size(tag: pg_sys::vartag_external::Type) -> usize {
     if tag == pg_sys::vartag_external::VARTAG_INDIRECT {
-        std::mem::size_of::<pg_sys::varatt_indirect>()
+        size_of::<pg_sys::varatt_indirect>()
     } else if vartag_is_expanded(tag) {
-        std::mem::size_of::<pg_sys::varatt_expanded>()
+        size_of::<pg_sys::varatt_expanded>()
     } else if tag == pg_sys::vartag_external::VARTAG_ONDISK {
-        std::mem::size_of::<pg_sys::varatt_external>()
+        size_of::<pg_sys::varatt_external>()
     } else {
         panic!("unrecognized TOAST vartag")
     }

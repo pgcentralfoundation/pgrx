@@ -309,7 +309,7 @@ impl serde::Serialize for Timestamp {
     fn serialize<S>(
         &self,
         serializer: S,
-    ) -> std::result::Result<<S as serde::Serializer>::Ok, <S as serde::Serializer>::Error>
+    ) -> Result<<S as serde::Serializer>::Ok, <S as serde::Serializer>::Error>
     where
         S: serde::Serializer,
     {
@@ -328,7 +328,7 @@ impl<'de> serde::Deserialize<'de> for Timestamp {
     }
 }
 
-unsafe impl SqlTranslatable for crate::datum::Timestamp {
+unsafe impl SqlTranslatable for Timestamp {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("timestamp"))
     }

@@ -173,9 +173,7 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
     #[inline]
     pub unsafe fn alloc() -> PgBox<T, AllocatedByRust> {
         PgBox::<T, AllocatedByRust> {
-            ptr: Some(unsafe {
-                NonNull::new_unchecked(pg_sys::palloc(std::mem::size_of::<T>()) as *mut T)
-            }),
+            ptr: Some(unsafe { NonNull::new_unchecked(pg_sys::palloc(size_of::<T>()) as *mut T) }),
             __marker: PhantomData,
         }
     }
@@ -203,9 +201,7 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
     #[inline]
     pub unsafe fn alloc0() -> PgBox<T, AllocatedByRust> {
         PgBox::<T, AllocatedByRust> {
-            ptr: Some(unsafe {
-                NonNull::new_unchecked(pg_sys::palloc0(std::mem::size_of::<T>()) as *mut T)
-            }),
+            ptr: Some(unsafe { NonNull::new_unchecked(pg_sys::palloc0(size_of::<T>()) as *mut T) }),
             __marker: PhantomData,
         }
     }
@@ -236,7 +232,7 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
             ptr: Some(unsafe {
                 NonNull::new_unchecked(pg_sys::MemoryContextAlloc(
                     memory_context.value(),
-                    std::mem::size_of::<T>(),
+                    size_of::<T>(),
                 ) as *mut T)
             }),
             __marker: PhantomData,
@@ -269,7 +265,7 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
             ptr: Some(unsafe {
                 NonNull::new_unchecked(pg_sys::MemoryContextAllocZero(
                     memory_context.value(),
-                    std::mem::size_of::<T>(),
+                    size_of::<T>(),
                 ) as *mut T)
             }),
             __marker: PhantomData,
@@ -383,7 +379,7 @@ where
                 // ensures that we have a fixed-size type can essentially be memcpy'd, which is what
                 // `.copy_ptr_into()` does.
                 let copy = PgMemoryContexts::CurrentMemoryContext
-                    .copy_ptr_into(self.as_ptr(), std::mem::size_of::<T>());
+                    .copy_ptr_into(self.as_ptr(), size_of::<T>());
 
                 PgBox::from_pg(copy)
             }

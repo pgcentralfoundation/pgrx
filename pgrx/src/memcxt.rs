@@ -479,7 +479,7 @@ impl PgMemoryContexts {
     /// We also cannot ensure that the result of this function will stay allocated as long as Rust's
     /// borrow checker thinks it will.
     pub unsafe fn palloc_struct<T>(&mut self) -> *mut T {
-        unsafe { self.palloc(std::mem::size_of::<T>()) as *mut T }
+        unsafe { self.palloc(size_of::<T>()) as *mut T }
     }
 
     /// Allocate a struct in this memory context, returning a pointer to it.  The memory will be
@@ -494,7 +494,7 @@ impl PgMemoryContexts {
     /// We also cannot ensure that the result of this function will stay allocated as long as Rust's
     /// borrow checker thinks it will.
     pub unsafe fn palloc0_struct<T>(&mut self) -> *mut T {
-        unsafe { self.palloc0(std::mem::size_of::<T>()) as *mut T }
+        unsafe { self.palloc0(size_of::<T>()) as *mut T }
     }
 
     /// Allocate a slice in this context, which will be free'd whenever Postgres deletes this MemoryContext
@@ -509,7 +509,7 @@ impl PgMemoryContexts {
     /// borrow checker thinks it will.
     pub unsafe fn palloc_slice<'a, T>(&mut self, len: usize) -> &'a mut [T] {
         unsafe {
-            let buffer = self.palloc(std::mem::size_of::<T>() * len) as *mut T;
+            let buffer = self.palloc(size_of::<T>() * len) as *mut T;
             std::slice::from_raw_parts_mut(buffer, len)
         }
     }
@@ -526,7 +526,7 @@ impl PgMemoryContexts {
     /// borrow checker thinks it will.
     pub unsafe fn palloc0_slice<'a, T>(&mut self, len: usize) -> &'a mut [T] {
         unsafe {
-            let buffer = self.palloc0(std::mem::size_of::<T>() * len) as *mut T;
+            let buffer = self.palloc0(size_of::<T>() * len) as *mut T;
             std::slice::from_raw_parts_mut(buffer, len)
         }
     }

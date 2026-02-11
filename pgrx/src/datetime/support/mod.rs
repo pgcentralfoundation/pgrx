@@ -678,7 +678,7 @@ impl<T> DateTimeTypeVisitor<T> {
 impl<'a, T: FromStr + seal::DateTimeType> serde::de::Visitor<'a> for DateTimeTypeVisitor<T> {
     type Value = T;
 
-    fn expecting(&self, formatter: &mut alloc::fmt::Formatter) -> alloc::fmt::Result {
+    fn expecting(&self, formatter: &mut Formatter) -> alloc::fmt::Result {
         formatter.write_str("a borrowed string")
     }
 

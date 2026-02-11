@@ -8,14 +8,14 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::question_mark)]
-use super::{UnboxDatum, unbox};
+use super::UnboxDatum;
 use crate::array::{RawArray, Scalar};
+use crate::layout::*;
 use crate::nullable::{
     BitSliceNulls, IntoNullableIterator, MaybeStrictNulls, NullLayout, Nullable, NullableContainer,
 };
 use crate::toast::Toast;
 use crate::{FromDatum, IntoDatum, PgMemoryContexts, pg_sys};
-use crate::{layout::*, nullable};
 use core::fmt::{Debug, Formatter};
 use core::ops::DerefMut;
 use core::ptr::NonNull;
@@ -78,7 +78,7 @@ where
 
 type ChaChaSlideImpl<T> = Box<dyn casper::ChaChaSlide<T>>;
 
-impl<'mcx, T: UnboxDatum> serde::Serialize for Array<'mcx, T>
+impl<'mcx, T: UnboxDatum> Serialize for Array<'mcx, T>
 where
     for<'arr> <T as UnboxDatum>::As<'arr>: Serialize,
 {
@@ -99,9 +99,8 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     pub(crate) unsafe fn deconstruct_from(mut raw: Toast<RawArray>) -> Array<'mcx, T> {
         let oid = raw.oid();
         let elem_layout = Layout::lookup_oid(oid);
-        let null_inner = raw
-            .nulls_bitslice()
-            .map(|nonnull| unsafe { nullable::BitSliceNulls(&*nonnull.as_ptr()) });
+        let null_inner =
+            raw.nulls_bitslice().map(|nonnull| unsafe { BitSliceNulls(&*nonnull.as_ptr()) });
         let null_slice = MaybeStrictNulls::new(null_inner);
         // do a little two-step before jumping into the Cha-Cha Slide and figure out
         // which implementation is correct for the type of element in this Array.
@@ -363,7 +362,7 @@ impl<'mcx, T> Iterator for NullableArrayIterator<'mcx, T>
 where
     T: UnboxDatum,
 {
-    type Item = Nullable<<T as unbox::UnboxDatum>::As<'mcx>>;
+    type Item = Nullable<<T as UnboxDatum>::As<'mcx>>;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
@@ -371,7 +370,7 @@ where
     }
 }
 
-impl<'mcx, T> IntoNullableIterator<<T as unbox::UnboxDatum>::As<'mcx>> for &'mcx Array<'mcx, T>
+impl<'mcx, T> IntoNullableIterator<<T as UnboxDatum>::As<'mcx>> for &'mcx Array<'mcx, T>
 where
     T: UnboxDatum,
 {
@@ -382,7 +381,7 @@ where
     }
 }
 
-impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, usize, <T as unbox::UnboxDatum>::As<'mcx>>
+impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, usize, <T as UnboxDatum>::As<'mcx>>
     for Array<'mcx, T>
 {
     type Layout = MaybeStrictNulls<BitSliceNulls<'mcx>>;
@@ -393,7 +392,7 @@ impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, usize, <T as unbox::UnboxDatum
     }
 
     #[inline]
-    unsafe fn get_raw(&'mcx self, idx: usize) -> <T as unbox::UnboxDatum>::As<'mcx> {
+    unsafe fn get_raw(&'mcx self, idx: usize) -> <T as UnboxDatum>::As<'mcx> {
         self.get_strict_inner(idx).expect(
             "get_raw() called with an invalid index, bounds-checking\
             *should* occur before calling this method.",
@@ -468,7 +467,7 @@ mod casper {
 
     #[inline(always)]
     fn is_aligned<T>(p: *const T) -> bool {
-        (p as usize) & (core::mem::align_of::<T>() - 1) == 0
+        (p as usize) & (align_of::<T>() - 1) == 0
     }
 
     /// Safety: Equivalent to a (potentially) aligned read of `ptr`, which
@@ -477,7 +476,7 @@ mod casper {
     #[inline(always)]
     pub(super) unsafe fn byval_read<T: Copy>(ptr: *const u8) -> T {
         let ptr = ptr.cast::<T>();
-        debug_assert!(is_aligned(ptr), "not aligned to {}: {ptr:p}", std::mem::align_of::<T>());
+        debug_assert!(is_aligned(ptr), "not aligned to {}: {ptr:p}", align_of::<T>());
         ptr.read()
     }
 
@@ -680,11 +679,11 @@ impl<'arr, T: UnboxDatum> Iterator for ArrayTypedIterator<'arr, T> {
 }
 
 impl<'a, T: UnboxDatum> ExactSizeIterator for ArrayTypedIterator<'a, T> {}
-impl<'a, T: UnboxDatum> core::iter::FusedIterator for ArrayTypedIterator<'a, T> {}
+impl<'a, T: UnboxDatum> FusedIterator for ArrayTypedIterator<'a, T> {}
 
-impl<'arr, T: UnboxDatum + serde::Serialize> serde::Serialize for ArrayTypedIterator<'arr, T>
+impl<'arr, T: UnboxDatum + Serialize> Serialize for ArrayTypedIterator<'arr, T>
 where
-    <T as UnboxDatum>::As<'arr>: serde::Serialize,
+    <T as UnboxDatum>::As<'arr>: Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where

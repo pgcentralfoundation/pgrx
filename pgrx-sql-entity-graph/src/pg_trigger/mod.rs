@@ -28,7 +28,7 @@ use syn::{ItemFn, Token, spanned::Spanned};
 
 #[derive(Debug, Clone)]
 pub struct PgTrigger {
-    func: syn::ItemFn,
+    func: ItemFn,
     to_sql_config: ToSqlConfig,
 }
 

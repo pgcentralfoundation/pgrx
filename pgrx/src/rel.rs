@@ -129,7 +129,7 @@ impl PgRelation {
     /// nasty race conditions.
     ///
     /// As such, this function is unsafe as we cannot guarantee that this requirement is true.
-    pub unsafe fn open_with_name(relname: &str) -> std::result::Result<Self, &'static str> {
+    pub unsafe fn open_with_name(relname: &str) -> Result<Self, &'static str> {
         match direct_function_call::<pg_sys::Oid>(pg_sys::to_regclass, &[relname.into_datum()]) {
             Some(oid) => Ok(PgRelation::open(oid)),
             None => Err("no such relation"),
@@ -145,7 +145,7 @@ impl PgRelation {
     ///
     /// Additionally, the relation is closed via `pg_sys::RelationClose()` when this instance is
     /// dropped.
-    pub fn open_with_name_and_share_lock(relname: &str) -> std::result::Result<Self, &'static str> {
+    pub fn open_with_name_and_share_lock(relname: &str) -> Result<Self, &'static str> {
         unsafe {
             match direct_function_call::<pg_sys::Oid>(pg_sys::to_regclass, &[relname.into_datum()])
             {
@@ -205,10 +205,7 @@ impl PgRelation {
 
     /// Return an iterator of indices, as `PgRelation`s, attached to this relation
     #[cfg(feature = "cshim")]
-    pub fn indices(
-        &self,
-        lockmode: pg_sys::LOCKMODE,
-    ) -> impl std::iter::Iterator<Item = PgRelation> {
+    pub fn indices(&self, lockmode: pg_sys::LOCKMODE) -> impl Iterator<Item = PgRelation> {
         use crate::PgList;
         // SAFETY: we know self.boxed is a valid pointer as we created it
         let list = unsafe {

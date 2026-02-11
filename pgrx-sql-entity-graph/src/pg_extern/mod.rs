@@ -392,12 +392,9 @@ impl PgExtern {
         let func_name = &signature.ident;
         // we do this odd dance so we can pass the same ident to macros that don't know each other
         let synthetic_ident_span = Span::mixed_site().located_at(signature.ident.span());
-        let fcinfo_ident = syn::Ident::new("fcinfo", synthetic_ident_span);
-        let mut lifetimes = signature
-            .generics
-            .lifetimes()
-            .cloned()
-            .collect::<syn::punctuated::Punctuated<_, Comma>>();
+        let fcinfo_ident = Ident::new("fcinfo", synthetic_ident_span);
+        let mut lifetimes =
+            signature.generics.lifetimes().cloned().collect::<Punctuated<_, Comma>>();
         // we pick an arbitrary lifetime from the provided signature of the fn, if available,
         // so lifetime-bound fn are easier to write with pgrx
         let fc_lt = lifetimes
@@ -414,7 +411,7 @@ impl PgExtern {
         let args = &self.inputs;
         // for unclear reasons the linker vomits if we don't do this
         let arg_pats = args.iter().map(|v| format_ident!("{}_", &v.pat)).collect::<Vec<_>>();
-        let args_ident = proc_macro2::Ident::new("_args", Span::call_site());
+        let args_ident = Ident::new("_args", Span::call_site());
         let arg_fetches = arg_pats.iter().map(|pat| {
                 quote_spanned!{ pat.span() =>
                     let #pat = #args_ident.next_arg_unchecked().unwrap_or_else(|| panic!("unboxing {} argument failed", stringify!(#pat)));

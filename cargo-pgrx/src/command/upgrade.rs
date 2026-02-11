@@ -10,7 +10,6 @@
 use cargo_edit::{CertsSource, Dependency, IndexCache, LocalManifest, registry_url};
 use eyre::eyre;
 use std::path::{Path, PathBuf};
-use toml_edit::KeyMut;
 use tracing::{debug, error, info, warn};
 
 use crate::CommandExecute;
@@ -107,7 +106,7 @@ impl Upgrade {
     fn update_dep(
         &self,
         path: &PathBuf,
-        mut key: KeyMut,
+        mut key: toml_edit::KeyMut,
         dep: &mut toml_edit::Item,
     ) -> eyre::Result<()> {
         let mut index = IndexCache::new(CertsSource::Native);
@@ -260,8 +259,8 @@ impl CommandExecute for Upgrade {
             self.manifest_path.clone().unwrap_or(PathBuf::from("./Cargo.toml")),
         )?;
 
-        let mut manifest = cargo_edit::LocalManifest::find(Some(&path))
-            .map_err(|e| eyre!("Error opening manifest: {e}"))?;
+        let mut manifest =
+            LocalManifest::find(Some(&path)).map_err(|e| eyre!("Error opening manifest: {e}"))?;
 
         // Attempt to determine if this is a workspace and, if so, should we
         // navigate to a crate contained within.

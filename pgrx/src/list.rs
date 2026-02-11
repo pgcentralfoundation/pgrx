@@ -17,7 +17,6 @@ use crate::memcx::MemCx;
 use crate::pg_sys;
 use crate::seal::Sealed;
 use core::marker::PhantomData;
-use core::mem;
 use core::ptr::{self, NonNull};
 
 mod flat_list;
@@ -59,7 +58,7 @@ pub struct ListCell<T> {
 // Note: the size of `ListCell<T>`'s generic `T` doesn't matter,
 // thus it isn't acceptable to implement Enlist for a `T` larger than `pg_sys::ListCell`.
 const _: () = {
-    assert!(mem::size_of::<ListCell<u128>>() == mem::size_of::<pg_sys::ListCell>());
+    assert!(size_of::<ListCell<u128>>() == size_of::<pg_sys::ListCell>());
 };
 
 /// The bound to describe a type which may be used in a Postgres List

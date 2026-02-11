@@ -428,7 +428,7 @@ where
     }
 }
 
-impl<T> From<std::ops::RangeFrom<T>> for Range<T>
+impl<T> From<RangeFrom<T>> for Range<T>
 where
     T: RangeSubType,
 {
@@ -448,7 +448,7 @@ where
     }
 }
 
-impl<T> From<std::ops::RangeInclusive<T>> for Range<T>
+impl<T> From<RangeInclusive<T>> for Range<T>
 where
     T: RangeSubType,
 {
@@ -461,7 +461,7 @@ where
     }
 }
 
-impl<T> From<std::ops::RangeTo<T>> for Range<T>
+impl<T> From<RangeTo<T>> for Range<T>
 where
     T: RangeSubType,
 {
@@ -471,7 +471,7 @@ where
     }
 }
 
-impl<T> From<std::ops::RangeToInclusive<T>> for Range<T>
+impl<T> From<RangeToInclusive<T>> for Range<T>
 where
     T: RangeSubType,
 {

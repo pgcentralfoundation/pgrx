@@ -79,7 +79,7 @@ impl IntoDatum for TimeWithTimeZone {
     fn into_datum(mut self) -> Option<pg_sys::Datum> {
         let timetzadt = unsafe {
             PgMemoryContexts::CurrentMemoryContext
-                .copy_ptr_into(&mut self.0 as *mut _, core::mem::size_of::<pg_sys::TimeTzADT>())
+                .copy_ptr_into(&mut self.0 as *mut _, size_of::<pg_sys::TimeTzADT>())
         };
 
         Some(pg_sys::Datum::from(timetzadt))
@@ -306,7 +306,7 @@ impl serde::Serialize for TimeWithTimeZone {
     fn serialize<S>(
         &self,
         serializer: S,
-    ) -> std::result::Result<<S as serde::Serializer>::Ok, <S as serde::Serializer>::Error>
+    ) -> Result<<S as serde::Serializer>::Ok, <S as serde::Serializer>::Error>
     where
         S: serde::Serializer,
     {

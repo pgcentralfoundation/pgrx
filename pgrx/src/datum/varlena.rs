@@ -128,7 +128,7 @@ where
     /// v.c = 42;
     /// ```
     pub fn new() -> Self {
-        let size_of = std::mem::size_of::<T>();
+        let size_of = size_of::<T>();
 
         let ptr = unsafe { pg_sys::palloc0(pg_sys::VARHDRSZ + size_of) as *mut pg_sys::varlena };
 
@@ -244,7 +244,7 @@ where
 {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.as_ref().cmp(other.as_ref()))
+        Some(self.cmp(other))
     }
 }
 

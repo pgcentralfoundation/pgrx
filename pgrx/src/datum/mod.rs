@@ -142,7 +142,7 @@ impl<'src> Datum<'src> {
     /// If the type is `PassBy::Ref`, this may be `None`.
     pub unsafe fn borrow_as<T: BorrowDatum>(&self) -> Option<&T> {
         let ptr = ptr::NonNull::new_unchecked(ptr::from_ref(self).cast_mut());
-        borrow::datum_ptr_to_bytes::<T>(ptr).map(|ptr| BorrowDatum::borrow_unchecked(ptr))
+        datum_ptr_to_bytes::<T>(ptr).map(|ptr| BorrowDatum::borrow_unchecked(ptr))
     }
 }
 

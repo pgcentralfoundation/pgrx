@@ -268,7 +268,7 @@ impl ToSql for PgExternEntity {
                     Err(err) => return Err(err).wrap_err("Error mapping return SQL"),
                 };
 
-                for (idx, returning::PgExternReturnEntityIteratedItem { ty, name: col_name }) in
+                for (idx, PgExternReturnEntityIteratedItem { ty, name: col_name }) in
                     table_items.iter().enumerate()
                 {
                     let graph_index =

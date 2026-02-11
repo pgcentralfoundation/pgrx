@@ -92,9 +92,9 @@ pub struct PgAggregate {
     type_moving_state: Option<UsedType>,
     type_stype: AggregateType,
     const_ordered_set: bool,
-    const_parallel: Option<syn::Expr>,
-    const_finalize_modify: Option<syn::Expr>,
-    const_moving_finalize_modify: Option<syn::Expr>,
+    const_parallel: Option<Expr>,
+    const_finalize_modify: Option<Expr>,
+    const_moving_finalize_modify: Option<Expr>,
     const_initial_condition: Option<String>,
     const_sort_operator: Option<String>,
     const_moving_intial_condition: Option<String>,
@@ -157,7 +157,7 @@ fn extract_generic_from_trait(item_impl: &ItemImpl) -> Result<&Type, syn::Error>
     }
 }
 
-fn get_generic_type_name(ty: &syn::Type) -> Result<String, syn::Error> {
+fn get_generic_type_name(ty: &Type) -> Result<String, syn::Error> {
     if let Type::Path(type_path) = ty
         && let Some(ident) = type_path.path.segments.last().map(|s| &s.ident)
     {
@@ -312,7 +312,7 @@ impl PgAggregate {
 
         // `Finalize` is an optional value, we default to nothing.
         let impl_type_finalize = get_impl_type_by_name(&item_impl_snapshot, "Finalize");
-        let type_finalize: syn::Type = if let Some(type_finalize) = impl_type_finalize {
+        let type_finalize: Type = if let Some(type_finalize) = impl_type_finalize {
             type_finalize.ty.clone()
         } else {
             item_impl.items.push(parse_quote! {
@@ -629,7 +629,7 @@ impl PgAggregate {
                 get_impl_const_by_name(&item_impl_snapshot, "HYPOTHETICAL")
             {
                 match &value.expr {
-                    syn::Expr::Lit(expr_lit) => match &expr_lit.lit {
+                    Expr::Lit(expr_lit) => match &expr_lit.lit {
                         syn::Lit::Bool(lit) => lit.value,
                         _ => {
                             return Err(syn::Error::new(
@@ -656,7 +656,7 @@ impl PgAggregate {
 impl ToEntityGraphTokens for PgAggregate {
     fn to_entity_graph_tokens(&self) -> TokenStream2 {
         let target_ident = &self.target_ident;
-        let sql_graph_entity_fn_name = syn::Ident::new(
+        let sql_graph_entity_fn_name = Ident::new(
             &format!("__pgrx_internals_aggregate_{}", self.snake_case_target_ident),
             target_ident.span(),
         );
@@ -757,7 +757,7 @@ fn get_target_ident(path: &Path) -> Result<Ident, syn::Error> {
 
 fn get_target_path(item_impl: &ItemImpl) -> Result<Path, syn::Error> {
     let target_ident = match &*item_impl.self_ty {
-        syn::Type::Path(type_path) => {
+        Type::Path(type_path) => {
             let last_segment = type_path.path.segments.last().ok_or_else(|| {
                 syn::Error::new(
                     type_path.span(),
@@ -766,7 +766,7 @@ fn get_target_path(item_impl: &ItemImpl) -> Result<Path, syn::Error> {
             })?;
             if last_segment.ident == "PgVarlena" {
                 match &last_segment.arguments {
-                    syn::PathArguments::AngleBracketed(angled) => {
+                    PathArguments::AngleBracketed(angled) => {
                         let first = angled.args.first().ok_or_else(|| syn::Error::new(
                             type_path.span(),
                             "`#[pg_aggregate]` only works with `PgVarlena` declarations if they have a type contained.",
@@ -876,7 +876,7 @@ fn get_impl_const_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a
 
 fn get_const_litbool(item: &ImplItemConst) -> Option<bool> {
     match &item.expr {
-        syn::Expr::Lit(expr_lit) => match &expr_lit.lit {
+        Expr::Lit(expr_lit) => match &expr_lit.lit {
             syn::Lit::Bool(lit) => Some(lit.value()),
             _ => None,
         },
@@ -886,18 +886,18 @@ fn get_const_litbool(item: &ImplItemConst) -> Option<bool> {
 
 fn get_const_litstr(item: &ImplItemConst) -> syn::Result<Option<String>> {
     match &item.expr {
-        syn::Expr::Lit(expr_lit) => match &expr_lit.lit {
+        Expr::Lit(expr_lit) => match &expr_lit.lit {
             syn::Lit::Str(lit) => Ok(Some(lit.value())),
             _ => Ok(None),
         },
-        syn::Expr::Call(expr_call) => match &*expr_call.func {
-            syn::Expr::Path(expr_path) => {
+        Expr::Call(expr_call) => match &*expr_call.func {
+            Expr::Path(expr_path) => {
                 let Some(last) = expr_path.path.segments.last() else {
                     return Ok(None);
                 };
                 if last.ident == "Some" {
                     match expr_call.args.first() {
-                        Some(syn::Expr::Lit(expr_lit)) => match &expr_lit.lit {
+                        Some(Expr::Lit(expr_lit)) => match &expr_lit.lit {
                             syn::Lit::Str(lit) => Ok(Some(lit.value())),
                             _ => Ok(None),
                         },
@@ -913,7 +913,7 @@ fn get_const_litstr(item: &ImplItemConst) -> syn::Result<Option<String>> {
     }
 }
 
-fn remap_self_to_target(ty: &mut syn::Type, target: &syn::Ident) {
+fn remap_self_to_target(ty: &mut Type, target: &Ident) {
     if let Type::Path(ty_path) = ty {
         for segment in ty_path.path.segments.iter_mut() {
             if segment.ident == "Self" {
@@ -935,9 +935,9 @@ fn remap_self_to_target(ty: &mut syn::Type, target: &syn::Ident) {
     }
 }
 
-fn get_pgrx_attr_macro(attr_name: &str, ty: &syn::Type) -> Option<TokenStream2> {
+fn get_pgrx_attr_macro(attr_name: &str, ty: &Type) -> Option<TokenStream2> {
     match &ty {
-        syn::Type::Macro(ty_macro) => {
+        Type::Macro(ty_macro) => {
             let mut found_pgrx = false;
             let mut found_attr = false;
             // We don't actually have type resolution here, this is a "Best guess".

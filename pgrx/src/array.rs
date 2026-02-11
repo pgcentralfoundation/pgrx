@@ -126,8 +126,8 @@ impl RawArray {
         let array = self.ptr.as_ptr();
 
         // outvals for deconstruct_array
-        let mut elements = core::ptr::null_mut();
-        let mut nulls = core::ptr::null_mut();
+        let mut elements = ptr::null_mut();
+        let mut nulls = ptr::null_mut();
         let mut nelems = 0;
 
         unsafe {

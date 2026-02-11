@@ -170,7 +170,7 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
         let caller_memxct = pg_sys::CurrentMemoryContext;
         let prev_exception_stack = pg_sys::PG_exception_stack;
         let prev_error_context_stack = pg_sys::error_context_stack;
-        let mut result: std::mem::MaybeUninit<T> = MaybeUninit::uninit();
+        let mut result: MaybeUninit<T> = MaybeUninit::uninit();
         let jump_value = call_with_sigsetjmp(false, |jump_buffer| {
             // Make Postgres' error-handling system aware of our new
             // setjmp/longjmp restore point.

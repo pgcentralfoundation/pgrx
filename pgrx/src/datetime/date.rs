@@ -262,7 +262,7 @@ impl serde::Serialize for Date {
     fn serialize<S>(
         &self,
         serializer: S,
-    ) -> std::result::Result<<S as serde::Serializer>::Ok, <S as serde::Serializer>::Error>
+    ) -> Result<<S as serde::Serializer>::Ok, <S as serde::Serializer>::Error>
     where
         S: serde::Serializer,
     {

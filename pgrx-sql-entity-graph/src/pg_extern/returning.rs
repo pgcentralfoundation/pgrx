@@ -42,14 +42,14 @@ pub enum Returning {
 }
 
 impl Returning {
-    fn parse_type_macro(type_macro: &mut syn::TypeMacro) -> Result<Returning, syn::Error> {
+    fn parse_type_macro(type_macro: &mut syn::TypeMacro) -> Result<Returning, Error> {
         let mac = &type_macro.mac;
         let opt_archetype = mac.path.segments.last().map(|archetype| archetype.ident.to_string());
         match opt_archetype.as_deref() {
             Some("composite_type") => {
-                Ok(Returning::Type(UsedType::new(syn::Type::Macro(type_macro.clone()))?))
+                Ok(Returning::Type(UsedType::new(Type::Macro(type_macro.clone()))?))
             }
-            _ => Err(syn::Error::new(
+            _ => Err(Error::new(
                 type_macro.span(),
                 "type macros other than `composite_type!` are not yet implemented",
             )),
@@ -60,7 +60,7 @@ impl Returning {
         let mut ty = Box::new(ty.clone());
 
         match &mut *ty {
-            syn::Type::Path(typepath) => {
+            Type::Path(typepath) => {
                 let is_option = typepath.last_ident_is("Option");
                 let is_result = typepath.last_ident_is("Result");
                 let mut is_setof_iter = typepath.last_ident_is("SetOfIterator");
@@ -70,19 +70,19 @@ impl Returning {
                 if is_option || is_result || is_setof_iter || is_table_iter {
                     let option_inner_path = if is_option || is_result {
                         match path.segments.last_mut().map(|s| &mut s.arguments) {
-                            Some(syn::PathArguments::AngleBracketed(args)) => {
+                            Some(PathArguments::AngleBracketed(args)) => {
                                 let args_span = args.span();
                                 match args.args.first_mut() {
-                                    Some(syn::GenericArgument::Type(syn::Type::Path(
-                                        syn::TypePath { qself: _, path },
-                                    ))) => path.clone(),
-                                    Some(syn::GenericArgument::Type(_)) => {
-                                        let used_ty =
-                                            UsedType::new(syn::Type::Path(typepath.clone()))?;
+                                    Some(GenericArgument::Type(Type::Path(syn::TypePath {
+                                        qself: _,
+                                        path,
+                                    }))) => path.clone(),
+                                    Some(GenericArgument::Type(_)) => {
+                                        let used_ty = UsedType::new(Type::Path(typepath.clone()))?;
                                         return Ok(Returning::Type(used_ty));
                                     }
                                     other => {
-                                        return Err(syn::Error::new(
+                                        return Err(Error::new(
                                             other.as_ref().map(|s| s.span()).unwrap_or(args_span),
                                             format!(
                                                 "Got unexpected generic argument for Option inner: {other:?}"
@@ -92,7 +92,7 @@ impl Returning {
                                 }
                             }
                             other => {
-                                return Err(syn::Error::new(
+                                return Err(Error::new(
                                     other.span(),
                                     format!(
                                         "Got unexpected path argument for Option inner: {other:?}"
@@ -114,7 +114,7 @@ impl Returning {
                             let Some(GenericArgument::Type(Type::Path(this_path))) =
                                 generics.args.last()
                             else {
-                                return Err(syn::Error::new_spanned(
+                                return Err(Error::new_spanned(
                                     generics,
                                     "where's the generic args?",
                                 ));
@@ -133,21 +133,21 @@ impl Returning {
                     if is_setof_iter {
                         let last_path_segment = option_inner_path.segments.last();
                         let used_ty = match &last_path_segment.map(|ps| &ps.arguments) {
-                            Some(syn::PathArguments::AngleBracketed(args)) => {
+                            Some(PathArguments::AngleBracketed(args)) => {
                                 match args.args.last().expect("should have one arg?") {
-                                    syn::GenericArgument::Type(ty) => match ty {
+                                    GenericArgument::Type(ty) => match ty {
                                         Type::Path(_) | Type::Macro(_) | Type::Reference(_) => {
                                             UsedType::new(ty.clone())?
                                         }
                                         ty => {
-                                            return Err(syn::Error::new(
+                                            return Err(Error::new(
                                                 ty.span(),
                                                 "SetOf Iterator must have an item",
                                             ));
                                         }
                                     },
                                     other => {
-                                        return Err(syn::Error::new(
+                                        return Err(Error::new(
                                             other.span(),
                                             format!(
                                                 "Got unexpected generic argument for SetOfIterator: {other:?}"
@@ -157,7 +157,7 @@ impl Returning {
                                 }
                             }
                             other => {
-                                return Err(syn::Error::new(
+                                return Err(Error::new(
                                     other
                                         .map(|s| s.span())
                                         .unwrap_or_else(proc_macro2::Span::call_site),
@@ -173,21 +173,21 @@ impl Returning {
                         let mut iterated_items = vec![];
 
                         match &mut last_path_segment.arguments {
-                            syn::PathArguments::AngleBracketed(args) => {
+                            PathArguments::AngleBracketed(args) => {
                                 match args.args.last_mut().unwrap() {
-                                    syn::GenericArgument::Type(syn::Type::Tuple(type_tuple)) => {
+                                    GenericArgument::Type(Type::Tuple(type_tuple)) => {
                                         for elem in &type_tuple.elems {
                                             match &elem {
-                                                syn::Type::Path(path) => {
+                                                Type::Path(path) => {
                                                     let iterated_item = ReturningIteratedItem {
                                                         name: None,
-                                                        used_ty: UsedType::new(syn::Type::Path(
+                                                        used_ty: UsedType::new(Type::Path(
                                                             path.clone(),
                                                         ))?,
                                                     };
                                                     iterated_items.push(iterated_item);
                                                 }
-                                                syn::Type::Macro(type_macro) => {
+                                                Type::Macro(type_macro) => {
                                                     let mac = &type_macro.mac;
                                                     let archetype =
                                                         mac.path.segments.last().unwrap();
@@ -207,7 +207,7 @@ impl Returning {
                                                                 ReturningIteratedItem {
                                                                     name: None,
                                                                     used_ty: UsedType::new(
-                                                                        syn::Type::Macro(
+                                                                        Type::Macro(
                                                                             type_macro.clone(),
                                                                         ),
                                                                     )?,
@@ -216,7 +216,7 @@ impl Returning {
                                                         }
                                                     }
                                                 }
-                                                reference @ syn::Type::Reference(_) => {
+                                                reference @ Type::Reference(_) => {
                                                     let iterated_item = ReturningIteratedItem {
                                                         name: None,
                                                         used_ty: UsedType::new(
@@ -226,7 +226,7 @@ impl Returning {
                                                     iterated_items.push(iterated_item);
                                                 }
                                                 ty => {
-                                                    return Err(syn::Error::new(
+                                                    return Err(Error::new(
                                                         ty.span(),
                                                         "Table Iterator must have an item",
                                                     ));
@@ -234,9 +234,9 @@ impl Returning {
                                             };
                                         }
                                     }
-                                    syn::GenericArgument::Lifetime(_) => (),
+                                    GenericArgument::Lifetime(_) => (),
                                     other => {
-                                        return Err(syn::Error::new(
+                                        return Err(Error::new(
                                             other.span(),
                                             format!("Got unexpected generic argument: {other:?}"),
                                         ));
@@ -244,7 +244,7 @@ impl Returning {
                                 };
                             }
                             other => {
-                                return Err(syn::Error::new(
+                                return Err(Error::new(
                                     other.span(),
                                     format!("Got unexpected path argument: {other:?}"),
                                 ));
@@ -252,37 +252,36 @@ impl Returning {
                         };
                         Ok(Returning::Iterated { tys: iterated_items })
                     } else {
-                        let used_ty = UsedType::new(syn::Type::Path(typepath.clone()))?;
+                        let used_ty = UsedType::new(Type::Path(typepath.clone()))?;
                         Ok(Returning::Type(used_ty))
                     }
                 } else {
-                    let used_ty = UsedType::new(syn::Type::Path(typepath.clone()))?;
+                    let used_ty = UsedType::new(Type::Path(typepath.clone()))?;
                     Ok(Returning::Type(used_ty))
                 }
             }
-            syn::Type::Reference(ty_ref) => {
-                let used_ty = UsedType::new(syn::Type::Reference(ty_ref.clone()))?;
+            Type::Reference(ty_ref) => {
+                let used_ty = UsedType::new(Type::Reference(ty_ref.clone()))?;
                 Ok(Returning::Type(used_ty))
             }
-            syn::Type::Macro(type_macro) => Self::parse_type_macro(type_macro),
-            syn::Type::Paren(type_paren) => match &mut *type_paren.elem {
-                syn::Type::Macro(type_macro) => Self::parse_type_macro(type_macro),
-                other => Err(syn::Error::new(
+            Type::Macro(type_macro) => Self::parse_type_macro(type_macro),
+            Type::Paren(type_paren) => match &mut *type_paren.elem {
+                Type::Macro(type_macro) => Self::parse_type_macro(type_macro),
+                other => Err(Error::new(
                     other.span(),
                     format!("Got unknown return type (type_paren): {type_paren:?}"),
                 )),
             },
-            syn::Type::Group(tg) => Self::match_type(&tg.elem),
-            other => Err(syn::Error::new(
-                other.span(),
-                format!("Got unknown return type (other): {other:?}"),
-            )),
+            Type::Group(tg) => Self::match_type(&tg.elem),
+            other => {
+                Err(Error::new(other.span(), format!("Got unknown return type (other): {other:?}")))
+            }
         }
     }
 }
 
 impl TryFrom<&syn::ReturnType> for Returning {
-    type Error = syn::Error;
+    type Error = Error;
 
     fn try_from(value: &syn::ReturnType) -> Result<Self, Self::Error> {
         match &value {
@@ -348,19 +347,19 @@ pub struct NameMacro {
 }
 
 impl Parse for NameMacro {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+    fn parse(input: ParseStream) -> Result<Self, Error> {
         let ident = input
             .parse::<syn::Ident>()
             .map(|v| v.to_string())
             // Avoid making folks unable to use rust keywords.
-            .or_else(|_| input.parse::<syn::Token![type]>().map(|_| String::from("type")))
-            .or_else(|_| input.parse::<syn::Token![mod]>().map(|_| String::from("mod")))
-            .or_else(|_| input.parse::<syn::Token![extern]>().map(|_| String::from("extern")))
-            .or_else(|_| input.parse::<syn::Token![async]>().map(|_| String::from("async")))
-            .or_else(|_| input.parse::<syn::Token![crate]>().map(|_| String::from("crate")))
-            .or_else(|_| input.parse::<syn::Token![use]>().map(|_| String::from("use")))?;
+            .or_else(|_| input.parse::<Token![type]>().map(|_| String::from("type")))
+            .or_else(|_| input.parse::<Token![mod]>().map(|_| String::from("mod")))
+            .or_else(|_| input.parse::<Token![extern]>().map(|_| String::from("extern")))
+            .or_else(|_| input.parse::<Token![async]>().map(|_| String::from("async")))
+            .or_else(|_| input.parse::<Token![crate]>().map(|_| String::from("crate")))
+            .or_else(|_| input.parse::<Token![use]>().map(|_| String::from("use")))?;
         let _comma: Token![,] = input.parse()?;
-        let ty: syn::Type = input.parse()?;
+        let ty: Type = input.parse()?;
 
         let used_ty = UsedType::new(ty)?;
 

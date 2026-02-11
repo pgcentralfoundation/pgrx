@@ -8,9 +8,9 @@ pub const InvalidOid: crate::Oid = crate::Oid::INVALID;
 pub const InvalidOffsetNumber: super::OffsetNumber = 0;
 pub const FirstOffsetNumber: super::OffsetNumber = 1;
 pub const MaxOffsetNumber: super::OffsetNumber =
-    (super::BLCKSZ as usize / std::mem::size_of::<super::ItemIdData>()) as super::OffsetNumber;
+    (BLCKSZ as usize / size_of::<super::ItemIdData>()) as super::OffsetNumber;
 pub const InvalidBlockNumber: u32 = 0xFFFF_FFFF as crate::BlockNumber;
-pub const VARHDRSZ: usize = std::mem::size_of::<super::int32>();
+pub const VARHDRSZ: usize = size_of::<super::int32>();
 pub const InvalidCommandId: super::CommandId = (!(0 as super::CommandId)) as super::CommandId;
 pub const FirstCommandId: super::CommandId = 0 as super::CommandId;
 pub const InvalidTransactionId: crate::TransactionId = crate::TransactionId::INVALID;
@@ -96,7 +96,7 @@ pub unsafe fn GetMemoryChunkContext(pointer: *mut std::os::raw::c_void) -> pg_sy
             // means it'll have this header before it
             *(pointer
                 .cast::<::std::os::raw::c_char>()
-                .sub(std::mem::size_of::<*mut ::std::os::raw::c_void>())
+                .sub(size_of::<*mut ::std::os::raw::c_void>())
                 .cast())
         };
 
@@ -154,7 +154,7 @@ pub fn get_pg_major_version_string() -> &'static str {
 
 #[inline]
 pub fn get_pg_major_version_num() -> u16 {
-    u16::from_str(super::get_pg_major_version_string()).unwrap()
+    u16::from_str(get_pg_major_version_string()).unwrap()
 }
 
 #[cfg(any(not(target_env = "msvc"), feature = "pg17", feature = "pg18"))]
@@ -297,8 +297,7 @@ pub unsafe fn BufferGetBlock(buffer: crate::Buffer) -> crate::Block {
     if BufferIsLocal(buffer) {
         *crate::LocalBufferBlockPointers.offset(((-buffer) - 1) as isize)
     } else {
-        crate::BufferBlocks.add(((buffer as crate::Size) - 1) * crate::BLCKSZ as usize)
-            as crate::Block
+        crate::BufferBlocks.add(((buffer as crate::Size) - 1) * BLCKSZ as usize) as crate::Block
     }
 }
 
@@ -691,7 +690,7 @@ pub unsafe fn PageGetMaxOffsetNumber(page: pg_sys::Page) -> pg_sys::OffsetNumber
         0
     } else {
         ((*page_header).pd_lower - SizeOfPageHeaderData as u16)
-            / std::mem::size_of::<pg_sys::ItemIdData>() as u16
+            / size_of::<pg_sys::ItemIdData>() as u16
     }
 }
 

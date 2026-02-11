@@ -139,7 +139,7 @@ impl UsedType {
                 match ident_string.as_str() {
                     "Result" => {
                         if let syn::PathArguments::AngleBracketed(angles) = &last_segment.arguments
-                            && let syn::GenericArgument::Type(inner_ty) =
+                            && let GenericArgument::Type(inner_ty) =
                                 angles.args.first().ok_or(syn::Error::new(
                                     angles.span(),
                                     "No inner arg for Result<T, E> found",
@@ -187,11 +187,9 @@ impl UsedType {
                     "Option" => {
                         // Option<VariadicArray<T>>
                         if let syn::PathArguments::AngleBracketed(angles) = &last_segment.arguments
-                            && let syn::GenericArgument::Type(inner_ty) =
-                                angles.args.first().ok_or(syn::Error::new(
-                                    angles.span(),
-                                    "No inner arg for Option<T> found",
-                                ))?
+                            && let GenericArgument::Type(inner_ty) = angles.args.first().ok_or(
+                                syn::Error::new(angles.span(), "No inner arg for Option<T> found"),
+                            )?
                         {
                             match inner_ty {
                                 // Option<VariadicArray<T>>
@@ -250,7 +248,7 @@ impl UsedType {
             && let syn::Type::Path(tp) = &resolved_ty
             && let Some(first_segment) = tp.path.segments.first()
             && let syn::PathArguments::AngleBracketed(ab) = &first_segment.arguments
-            && let Some(syn::GenericArgument::Type(ty)) = ab.args.first()
+            && let Some(GenericArgument::Type(ty)) = ab.args.first()
         {
             resolved_ty_inner = Some(ty.clone());
         }
@@ -342,7 +340,7 @@ fn resolve_vec_inner(
         .ok_or(syn::Error::new(original.span(), "Could not read last segment of path"))?;
 
     if let syn::PathArguments::AngleBracketed(path_arg) = &last.arguments
-        && let Some(syn::GenericArgument::Type(ty)) = path_arg.args.last()
+        && let Some(GenericArgument::Type(ty)) = path_arg.args.last()
     {
         match ty.clone() {
             syn::Type::Macro(macro_pat) => {
@@ -400,7 +398,7 @@ fn resolve_variadic_array_inner(
 
     if let syn::PathArguments::AngleBracketed(ref mut path_arg) = last.arguments
         // TODO: Lifetime????
-        && let Some(syn::GenericArgument::Type(ty)) = path_arg.args.last()
+        && let Some(GenericArgument::Type(ty)) = path_arg.args.last()
     {
         match ty.clone() {
             syn::Type::Macro(macro_pat) => {
@@ -457,7 +455,7 @@ fn resolve_array_inner(
         .ok_or(syn::Error::new(original_span, "Could not read last segment of path"))?;
 
     if let syn::PathArguments::AngleBracketed(ref mut path_arg) = last.arguments
-        && let Some(syn::GenericArgument::Type(ty)) = path_arg.args.last()
+        && let Some(GenericArgument::Type(ty)) = path_arg.args.last()
     {
         match ty.clone() {
             syn::Type::Macro(macro_pat) => {
@@ -514,7 +512,7 @@ fn resolve_option_inner(
         .ok_or(syn::Error::new(original.span(), "Could not read last segment of path"))?;
 
     if let syn::PathArguments::AngleBracketed(path_arg) = &last.arguments
-        && let Some(syn::GenericArgument::Type(ty)) = path_arg.args.first()
+        && let Some(GenericArgument::Type(ty)) = path_arg.args.first()
     {
         match ty.clone() {
             syn::Type::Macro(macro_pat) => {
@@ -648,7 +646,7 @@ fn resolve_result_inner(
         }
     }
 
-    if let syn::GenericArgument::Type(ty) = ok_ty {
+    if let GenericArgument::Type(ty) = ok_ty {
         match ty.clone() {
             syn::Type::Macro(macro_pat) => {
                 let mac = &macro_pat.mac;

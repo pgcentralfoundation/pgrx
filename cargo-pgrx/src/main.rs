@@ -65,7 +65,7 @@ fn main() -> color_eyre::Result<()> {
     // Initialize tracing with tracing-error, and eyre
     let fmt_layer = tracing_subscriber::fmt::Layer::new()
         .with_ansi(stderr_is_tty)
-        .with_writer(std::io::stderr)
+        .with_writer(io::stderr)
         .pretty();
 
     let filter_layer = match EnvFilter::try_from_default_env() {

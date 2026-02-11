@@ -25,7 +25,7 @@ use syn::{FnArg, Pat, spanned::Spanned};
 /// It is created during [`PgExtern`](crate::PgExtern) parsing.
 #[derive(Debug, Clone)]
 pub struct PgExternArgument {
-    pub fn_arg: syn::FnArg,
+    pub fn_arg: FnArg,
     pub pat: syn::Ident,
     pub used_ty: UsedType,
 }
@@ -33,18 +33,15 @@ pub struct PgExternArgument {
 impl PgExternArgument {
     pub fn build(fn_arg: FnArg) -> Result<Self, syn::Error> {
         match &fn_arg {
-            syn::FnArg::Typed(pat) => Self::build_from_pat_type(fn_arg.clone(), pat.clone()),
-            syn::FnArg::Receiver(_) => {
+            FnArg::Typed(pat) => Self::build_from_pat_type(fn_arg.clone(), pat.clone()),
+            FnArg::Receiver(_) => {
                 // FIXME: Add a UI test for this
                 Err(syn::Error::new(fn_arg.span(), "Unable to parse FnArg that is Self"))
             }
         }
     }
 
-    pub fn build_from_pat_type(
-        fn_arg: syn::FnArg,
-        value: syn::PatType,
-    ) -> Result<Self, syn::Error> {
+    pub fn build_from_pat_type(fn_arg: FnArg, value: syn::PatType) -> Result<Self, syn::Error> {
         let identifier = match *value.pat {
             Pat::Ident(ref p) => p.ident.clone(),
             Pat::Reference(ref p_ref) => match *p_ref.pat {

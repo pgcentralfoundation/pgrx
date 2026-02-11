@@ -281,8 +281,8 @@ pub fn fn_call_with_collation<R: FromDatum + IntoDatum>(
         // we have, and we've asserted that we have the correct number of arguments
         assert_eq!(nargs, pg_proc.pronargs());
         let fcinfo = pg_sys::palloc0(
-            std::mem::size_of::<pg_sys::FunctionCallInfoBaseData>()
-                + std::mem::size_of::<pg_sys::NullableDatum>() * nargs,
+            size_of::<pg_sys::FunctionCallInfoBaseData>()
+                + size_of::<pg_sys::NullableDatum>() * nargs,
         ) as *mut pg_sys::FunctionCallInfoBaseData;
 
         // initialize it
