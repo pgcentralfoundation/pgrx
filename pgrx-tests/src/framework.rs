@@ -82,17 +82,17 @@ where
                     .as_str(),
                 );
 
-                if let Ok(var) = std::env::var("RUST_BACKTRACE") {
-                    if var.eq("1") {
-                        let detail = dberror.detail().unwrap_or("None");
-                        let hint = dberror.hint().unwrap_or("None");
-                        let schema = dberror.hint().unwrap_or("None");
-                        let table = dberror.table().unwrap_or("None");
-                        let more_info = format!(
-                            "\ndetail: {detail}\nhint: {hint}\nschema: {schema}\ntable: {table}"
-                        );
-                        message.push_str(more_info.as_str());
-                    }
+                if let Ok(var) = std::env::var("RUST_BACKTRACE")
+                    && var.eq("1")
+                {
+                    let detail = dberror.detail().unwrap_or("None");
+                    let hint = dberror.hint().unwrap_or("None");
+                    let schema = dberror.hint().unwrap_or("None");
+                    let table = dberror.table().unwrap_or("None");
+                    let more_info = format!(
+                        "\ndetail: {detail}\nhint: {hint}\nschema: {schema}\ntable: {table}"
+                    );
+                    message.push_str(more_info.as_str());
                 }
 
                 Err(eyre!(message))
@@ -176,7 +176,7 @@ pub fn run_test(
         );
     } else if let Some(message) = expected_error {
         // we expected an ERROR, but didn't get one
-        return Err(eyre!("Expected error: {message}"));
+        Err(eyre!("Expected error: {message}"))
     } else {
         Ok(())
     }
@@ -559,10 +559,10 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
         command.arg("--time-stamp=yes");
         command.arg("--error-markers=VALGRINDERROR-BEGIN,VALGRINDERROR-END");
         command.arg("--trace-children=yes");
-        if let Ok(path) = valgrind_suppressions_path(&pg_config) {
-            if let Ok(true) = std::fs::exists(&path) {
-                command.arg(format!("--suppressions={}", path.display()));
-            }
+        if let Ok(path) = valgrind_suppressions_path(&pg_config)
+            && let Ok(true) = std::fs::exists(&path)
+        {
+            command.arg(format!("--suppressions={}", path.display()));
         }
         command.arg(pg_config.postmaster_path()?.display().to_string());
         file.write_all(format!("{command:?}").as_bytes())?;
@@ -658,10 +658,10 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
             use std::io::Read;
             let mut buffer = vec![0u8; 4096];
             let mut result = Vec::new();
-            if let Ok(n) = pipe.read(&mut buffer) {
-                if n > 0 {
-                    result.extend(&buffer[..n]);
-                }
+            if let Ok(n) = pipe.read(&mut buffer)
+                && n > 0
+            {
+                result.extend(&buffer[..n]);
             }
             result
         };

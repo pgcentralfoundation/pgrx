@@ -398,7 +398,7 @@ mod tests {
     #[pg_test]
     fn borrow_test_cstring_array() -> Result<(), pgrx::spi::Error> {
         let strings = Spi::get_one::<bool>("SELECT borrow_validate_cstring_array(ARRAY['one', 'two', NULL, 'four', 'five', NULL, 'seven', NULL, NULL]::cstring[])")?.expect("datum was NULL");
-        assert_eq!(strings, true);
+        assert!(strings);
         Ok(())
     }
 

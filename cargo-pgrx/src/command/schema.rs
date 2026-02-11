@@ -420,7 +420,7 @@ fn compute_codegen(
         } else {
             let writing = "     Writing".bold().green().to_string();
             out.extend(quote::quote! {
-                eprintln!("{} SQL entities to {}", #writing, "/dev/stdout",);
+                eprintln!("{} SQL entities to {}", #writing, "/dev/stdout");
                 pgrx_sql
                     .write(&mut std::io::stdout())
                     .expect("Could not write SQL to stdout");

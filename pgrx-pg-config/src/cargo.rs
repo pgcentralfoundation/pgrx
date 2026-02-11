@@ -71,7 +71,7 @@ impl PgrxManifestExt for Manifest {
     fn lib_filename(&self) -> eyre::Result<String> {
         use std::env::consts::{DLL_PREFIX, DLL_SUFFIX};
         let lib_name = &self.lib_name()?;
-        Ok(format!("{DLL_PREFIX}{}{DLL_SUFFIX}", lib_name))
+        Ok(format!("{DLL_PREFIX}{lib_name}{DLL_SUFFIX}"))
     }
 }
 

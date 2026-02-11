@@ -298,7 +298,7 @@ impl Regress {
                     pgregress_path,
                     dbname,
                     new_test,
-                    &verbosity,
+                    verbosity,
                 )? {
                     self.accept_new_test(manifest_path, &test_result_output, auto)?;
                 }
@@ -513,8 +513,7 @@ fn pg_regress(
         fn make_launcher_script(verbosity: &str) -> eyre::Result<PathBuf> {
             use std::os::unix::fs::PermissionsExt;
 
-            let launcher_script =
-                format!("#! /bin/bash\n$* -v VERBOSITY={}", verbosity.to_string(),).into_bytes();
+            let launcher_script = format!("#! /bin/bash\n$* -v VERBOSITY={verbosity}").into_bytes();
 
             let path = temp_dir().join(format!("pgrx-pg_regress-runner-{}.sh", std::process::id()));
             let mut tmpfile = File::create(&path)?;

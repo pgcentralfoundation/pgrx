@@ -72,6 +72,12 @@ impl<'mcx> MemCx<'mcx> {
 pub struct OutOfMemory {
     _reserve: (),
 }
+impl Default for OutOfMemory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl OutOfMemory {
     pub fn new() -> OutOfMemory {
         OutOfMemory { _reserve: () }

@@ -158,9 +158,7 @@ fn update_files(args: &UpdateFilesArgs) {
             let package_path = workspace_manifest_parent.join(format!("{s}/Cargo.toml"));
             Ok(Manifest::from_path(package_path)?
                 .package
-                .ok_or_else(|| {
-                    cargo_toml::Error::Other("expected package field in workspace member")
-                })?
+                .ok_or({ cargo_toml::Error::Other("expected package field in workspace member") })?
                 .name)
         })
         .collect::<Result<FxHashSet<String>, cargo_toml::Error>>()

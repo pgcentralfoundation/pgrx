@@ -435,7 +435,7 @@ pub(crate) fn find_library_file(
                 .map(|filename| filename.to_string())
         })
         .ok_or_else(|| {
-            eyre!("Could not get shared object file `{lib_filename}` from Cargo output.",)
+            eyre!("Could not get shared object file `{lib_filename}` from Cargo output.")
         })?;
     let library_file_path = PathBuf::from(library_file);
 

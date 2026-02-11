@@ -165,8 +165,8 @@ impl AnyNumeric {
         unsafe {
             let s = pg_sys::numeric_normalize(self.as_ptr() as *mut _);
             let cstr = CStr::from_ptr(s);
-            let normalized = cstr.to_str().unwrap();
-            normalized
+
+            (cstr.to_str().unwrap()) as _
         }
     }
 

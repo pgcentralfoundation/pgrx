@@ -194,12 +194,12 @@ mod tests {
         let new = trigger.new().ok_or(TriggerError::NullTriggerTuple)?;
 
         for index in 1..(new.len() + 1) {
-            if let Some(val) = new.get_by_index::<&str>(index.try_into()?)? {
-                if val == "Bear" {
-                    // We intercepted a bear! Avoid this update, return `old` instead.
-                    let old = trigger.old().ok_or(TriggerError::NullTriggerTuple)?;
-                    return Ok(Some(old));
-                }
+            if let Some(val) = new.get_by_index::<&str>(index.try_into()?)?
+                && val == "Bear"
+            {
+                // We intercepted a bear! Avoid this update, return `old` instead.
+                let old = trigger.old().ok_or(TriggerError::NullTriggerTuple)?;
+                return Ok(Some(old));
             }
         }
 

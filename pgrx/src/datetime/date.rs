@@ -148,8 +148,8 @@ impl Date {
     /// This function will panic, aborting the current transaction, if any part is out-of-bounds.
     pub fn new_unchecked(year: isize, month: u8, day: u8) -> Self {
         let year: i32 = year.try_into().expect("invalid year");
-        let month: i32 = month.try_into().expect("invalid month");
-        let day: i32 = day.try_into().expect("invalid day");
+        let month: i32 = month.into();
+        let day: i32 = day.into();
 
         unsafe {
             direct_function_call(
@@ -241,8 +241,7 @@ impl Date {
     /// Return the date as a stack-allocated [`libc::time_t`] instance
     #[inline]
     pub fn to_posix_time(&self) -> libc::time_t {
-        let secs_per_day: libc::time_t =
-            pg_sys::SECS_PER_DAY.try_into().expect("couldn't fit time into time_t");
+        let secs_per_day: libc::time_t = pg_sys::SECS_PER_DAY.into();
         libc::time_t::from(self.to_unix_epoch_days()) * secs_per_day
     }
 

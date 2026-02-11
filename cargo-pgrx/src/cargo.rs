@@ -83,11 +83,10 @@ impl Cargo {
         let mut cmd = cargo();
 
         // subcommand *must* go first
-        if self.subcmd != "" {
-            cmd.arg(&self.subcmd);
-        } else {
+        if self.subcmd.is_empty() {
             panic!("`Cargo::into_command` requires a subcommand to be set, was: {self:?}")
         }
+        cmd.arg(&self.subcmd);
 
         let Cargo {
             features,
