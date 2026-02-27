@@ -33,4 +33,14 @@ mod tests {
         assert_eq!(b.low.y, 2.0);
         Ok(())
     }
+
+    #[pg_test]
+    fn test_circle_into_datum() -> spi::Result<()> {
+        let c =
+            Spi::get_one::<pg_sys::CIRCLE>("SELECT '1,2,3'::circle")?.expect("SPI result was null");
+        assert_eq!(c.center.x, 1.0);
+        assert_eq!(c.center.y, 2.0);
+        assert_eq!(c.radius, 3.0);
+        Ok(())
+    }
 }

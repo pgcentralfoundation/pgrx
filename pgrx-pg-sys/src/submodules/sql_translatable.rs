@@ -65,6 +65,15 @@ unsafe impl SqlTranslatable for crate::BOX {
     }
 }
 
+unsafe impl SqlTranslatable for crate::CIRCLE {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("circle"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("circle")))
+    }
+}
+
 unsafe impl SqlTranslatable for crate::Point {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("point"))

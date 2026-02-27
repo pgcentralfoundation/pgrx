@@ -257,6 +257,7 @@ cargo pgrx init
 | `anyarray`                 | `pgrx::AnyArray`                                        |
 | `anyelement`               | `pgrx::AnyElement`                                      |
 | `box`                      | `pgrx::pg_sys::BOX`                                     |
+| `circle`                   | `pgrx::pg_sys::CIRCLE`                                  |
 | `point`                    | `pgrx::pg_sys::Point`                                   |
 | `tid`                      | `pgrx::pg_sys::ItemPointerData`                         |
 | `cstring`                  | `&core::ffi::CStr`                                      |
