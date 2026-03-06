@@ -19,6 +19,7 @@ pub(crate) mod init;
 pub(crate) mod install;
 pub(crate) mod new;
 pub(crate) mod package;
+pub(crate) mod pgxn;
 pub(crate) mod pgrx;
 mod regress;
 pub(crate) mod run;

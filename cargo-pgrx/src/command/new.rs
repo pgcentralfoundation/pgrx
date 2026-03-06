@@ -61,7 +61,6 @@ pub(crate) fn create_crate_template(
     create_setup_sql(path.clone(), name)?;
     create_setup_out(path.clone(), name)?;
     create_readme_md(path.clone(), name)?;
-    create_license_file(path.clone())?;
 
     Ok(())
 }
@@ -166,12 +165,5 @@ fn create_readme_md(mut filename: PathBuf, name: &str) -> Result<(), std::io::Er
     filename.push("README.md");
     let mut file = std::fs::File::create(filename)?;
     file.write_all(format!(include_str!("../templates/readme_md"), name = name).as_bytes())?;
-    Ok(())
-}
-
-fn create_license_file(mut filename: PathBuf) -> Result<(), std::io::Error> {
-    filename.push("LICENSE");
-    let mut file = std::fs::File::create(filename)?;
-    file.write_all(include_bytes!("../templates/license"))?;
     Ok(())
 }
