@@ -178,6 +178,7 @@ pub(crate) fn start_postgres(
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .arg("start")
+        .arg("--core-files")
         .arg("-o")
         .arg(postmaster_args.join(" "))
         .arg("-D")
