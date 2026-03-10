@@ -126,6 +126,7 @@ pub struct ErrorReport {
     pub(crate) message: String,
     pub(crate) hint: Option<String>,
     pub(crate) detail: Option<String>,
+    pub(crate) domain: Option<String>,
     pub(crate) location: ErrorReportLocation,
 }
 
@@ -206,6 +207,11 @@ impl ErrorReportWithLevel {
         self.inner.hint()
     }
 
+    /// Returns the domain of this error report, if set
+    pub fn domain(&self) -> Option<&str> {
+        self.inner.domain()
+    }
+
     /// Returns the name of the source file that generated this error report
     pub fn file(&self) -> &str {
         &self.inner.location.file
@@ -247,7 +253,7 @@ impl ErrorReport {
         let mut location: ErrorReportLocation = Location::caller().into();
         location.funcname = Some(funcname.to_string());
 
-        Self { sqlerrcode, message: message.into(), hint: None, detail: None, location }
+        Self { sqlerrcode, message: message.into(), hint: None, detail: None, domain: None, location }
     }
 
     /// Create an [ErrorReport] which can be raised via Rust's [std::panic::panic_any()] or as
@@ -259,7 +265,7 @@ impl ErrorReport {
         message: S,
         location: ErrorReportLocation,
     ) -> Self {
-        Self { sqlerrcode, message: message.into(), hint: None, detail: None, location }
+        Self { sqlerrcode, message: message.into(), hint: None, detail: None, domain: None, location }
     }
 
     /// Set the `detail` property, whose default is `None`
@@ -271,6 +277,16 @@ impl ErrorReport {
     /// Set the `hint` property, whose default is `None`
     pub fn set_hint<S: Into<String>>(mut self, hint: S) -> Self {
         self.hint = Some(hint.into());
+        self
+    }
+
+    /// Set the `domain` property for message translation/internationalization, whose default is `None`.
+    ///
+    /// This corresponds to the `domain` argument in Postgres' `ereport_domain` C macro.
+    /// When set, the domain is passed to `errstart()` to indicate the gettext text domain
+    /// for message translation.
+    pub fn set_domain<S: Into<String>>(mut self, domain: S) -> Self {
+        self.domain = Some(domain.into());
         self
     }
 
@@ -287,6 +303,11 @@ impl ErrorReport {
     /// Returns the hint message of this error report
     pub fn hint(&self) -> Option<&str> {
         self.hint.as_deref()
+    }
+
+    /// Returns the domain of this error report, if set
+    pub fn domain(&self) -> Option<&str> {
+        self.domain.as_deref()
     }
 
     /// Report this [ErrorReport], which will ultimately be reported by Postgres at the specified [PgLogLevel]
@@ -497,7 +518,7 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
 /// trying to roll their own error handling.
 fn do_ereport(ereport: ErrorReportWithLevel) {
     const PERCENT_S: &CStr = c"%s";
-    const DOMAIN: *const ::std::os::raw::c_char = std::ptr::null_mut();
+    const DEFAULT_DOMAIN: *const ::std::os::raw::c_char = std::ptr::null_mut();
 
     // the following code is definitely thread-unsafe -- not-the-main-thread can't be creating Postgres
     // ereports.  Our secret `extern "C"` definitions aren't wrapped by #[pg_guard] so we need to
@@ -530,8 +551,15 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
     }
 
     let level = ereport.level();
+
+    // Use the domain from the ErrorReport if one was set, otherwise use the null default
+    let domain_cstring = ereport.inner.domain.as_ref().map(|d| {
+        std::ffi::CString::new(d.as_str()).expect("domain must not contain interior NUL bytes")
+    });
+    let domain_ptr = domain_cstring.as_ref().map_or(DEFAULT_DOMAIN, |c| c.as_ptr());
+
     unsafe {
-        if errstart(level as _, DOMAIN) {
+        if errstart(level as _, domain_ptr) {
             let sqlerrcode = ereport.sql_error_code();
             let message = ereport.message().as_pg_cstr();
             let detail = ereport.detail_with_backtrace().as_pg_cstr();

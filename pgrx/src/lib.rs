@@ -124,8 +124,8 @@ pub use pg_sys::panic::pgrx_extern_c_guard;
 pub use pg_sys::pg_try::PgTryBuilder;
 pub use pg_sys::utils::name_data_to_str;
 pub use pg_sys::{
-    FATAL, PANIC, check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport, error,
-    function_name, info, log, notice, warning,
+    FATAL, PANIC, check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport,
+    ereport_domain, error, function_name, info, log, notice, warning,
 };
 
 #[doc(hidden)]

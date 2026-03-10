@@ -60,6 +60,6 @@ pub use crate::spi::Spi;
 pub use crate::pg_sys::elog::PgLogLevel;
 pub use crate::pg_sys::errcodes::PgSqlErrorCode;
 pub use crate::pg_sys::{
-    FATAL, PANIC, check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport, error,
-    function_name, info, log, notice, warning,
+    FATAL, PANIC, check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport,
+    ereport_domain, error, function_name, info, log, notice, warning,
 };
