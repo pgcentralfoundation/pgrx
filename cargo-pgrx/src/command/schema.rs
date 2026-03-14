@@ -122,7 +122,7 @@ impl CommandExecute for Schema {
     features = ?features.features,
 ))]
 pub(crate) fn generate_schema_for_cli(
-    user_manifest_path: Option<&Path>,
+    _user_manifest_path: Option<&Path>,
     user_package: Option<&str>,
     package_manifest_path: &Path,
     profile: &CargoProfile,
@@ -147,7 +147,7 @@ pub(crate) fn generate_schema_for_cli(
     let cargo = Cargo::default()
         .package(package_name)
         .std_streams([cargo::Stdio::Null, cargo::Stdio::Null, cargo::Stdio::Inherit])
-        .manifest_path(user_manifest_path.map(|p| p.to_owned()))
+        .manifest_path(Some(package_manifest_path.to_owned()))
         .log_level(log_level)
         .features(features.clone());
 
@@ -505,11 +505,11 @@ fn compute_sql(manifest: &Manifest) -> eyre::Result<()> {
 
     let command_str = format!("{command:?}");
     tracing::debug!(command = %command_str, "Running");
-    let embed_output =
-        command.output().wrap_err_with(|| format!("failed to spawn pgrx_embed: {command_str}"))?;
-    tracing::trace!(status_code = %embed_output.status, command = %command_str, "Finished");
+    let status =
+        command.status().wrap_err_with(|| format!("failed to spawn pgrx_embed: {command_str}"))?;
+    tracing::trace!(status_code = %status, command = %command_str, "Finished");
 
-    if !embed_output.status.success() {
+    if !status.success() {
         // We do not want to return a spantraced error here, to
         // (speculative:) reduce the likelihood of emitting errors twice
         std::process::exit(1)
@@ -578,8 +578,50 @@ fn slice_arch32<'a>(data: &'a [u8], arch: &str) -> Option<&'a [u8]> {
 
 #[cfg(test)]
 mod tests {
+    use crate::cargo::{Cargo, Stdio as CargoStdio};
     use crate::command::schema::*;
     use pgrx_pg_config::{PgConfigSelector, Pgrx};
+    use std::path::Path;
+
+    fn schema_cargo_for_test(
+        user_package: Option<&str>,
+        package_manifest_path: &Path,
+    ) -> eyre::Result<Cargo> {
+        let manifest = Manifest::from_path(package_manifest_path)?;
+        let package_name = if let Some(user_package) = user_package {
+            user_package.to_owned()
+        } else {
+            manifest.package_name()?
+        };
+
+        Ok(Cargo::default()
+            .package(package_name)
+            .std_streams([CargoStdio::Null, CargoStdio::Null, CargoStdio::Inherit])
+            .manifest_path(Some(package_manifest_path.to_owned()))
+            .features(Default::default()))
+    }
+
+    #[test]
+    fn test_schema_cargo_uses_resolved_package_manifest_path() {
+        let tempdir = tempfile::tempdir().unwrap();
+        let manifest_path = tempdir.path().join("Cargo.toml");
+        std::fs::write(
+            &manifest_path,
+            r#"[package]
+name = "sample_ext"
+version = "0.1.0"
+edition = "2021"
+"#,
+        )
+        .unwrap();
+
+        let command =
+            schema_cargo_for_test(None, &manifest_path).unwrap().subcommand("build").into_command();
+        let command_str = format!("{command:?}");
+
+        assert!(command_str.contains(&format!("--manifest-path \"{}\"", manifest_path.display())));
+        assert!(command_str.contains("--package \"sample_ext\""));
+    }
 
     #[test]
     fn test_parse_managed_postmasters() {
