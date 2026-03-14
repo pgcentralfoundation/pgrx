@@ -84,6 +84,32 @@ mod tests {
         )
     }
 
+    #[pg_test]
+    fn test_ereport_domain_value() {
+        let caught = pgrx::PgTryBuilder::new(|| -> Option<pgrx::pg_sys::panic::CaughtError> {
+            pgrx::ereport_domain!(
+                PgLogLevel::ERROR,
+                "test_extension_domain",
+                PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+                "ereport error"
+            );
+            None
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, |e| Some(e))
+        .execute();
+
+        match caught {
+            Some(pgrx::pg_sys::panic::CaughtError::ErrorReport(report))
+            | Some(pgrx::pg_sys::panic::CaughtError::PostgresError(report)) => {
+                assert_eq!(report.sql_error_code(), PgSqlErrorCode::ERRCODE_INTERNAL_ERROR);
+                assert_eq!(report.message(), "ereport error");
+                assert_eq!(report.domain(), Some("test_extension_domain"));
+            }
+            Some(other) => panic!("unexpected error kind: {other:?}"),
+            None => panic!("expected error, but code returned normally"),
+        }
+    }
+
     #[pg_test(error = "panic message")]
     fn test_panic() {
         panic!("panic message")
