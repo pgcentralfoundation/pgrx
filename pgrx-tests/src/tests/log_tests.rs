@@ -74,6 +74,16 @@ mod tests {
         pgrx::ereport!(PgLogLevel::ERROR, PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, "ereport error")
     }
 
+    #[pg_test(error = "ereport error")]
+    fn test_ereport_domain() {
+        pgrx::ereport_domain!(
+            PgLogLevel::ERROR,
+            "test_extension_domain",
+            PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+            "ereport error"
+        )
+    }
+
     #[pg_test(error = "panic message")]
     fn test_panic() {
         panic!("panic message")
