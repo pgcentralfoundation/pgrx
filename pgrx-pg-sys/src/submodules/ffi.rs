@@ -213,6 +213,11 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
             } else {
                 CStr::from_ptr(errdata.message).to_string_lossy().to_string()
             };
+            let domain = if errdata.domain.is_null() {
+                None
+            } else {
+                { Some(CStr::from_ptr(errdata.domain).to_string_lossy().to_string()) }
+            };
             let detail = if errdata.detail.is_null() {
                 None
             } else {
@@ -250,6 +255,7 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
                     message,
                     detail,
                     hint,
+                    domain,
                     location: ErrorReportLocation { file, funcname, line, col: 0, backtrace: None },
                 },
             }))
