@@ -69,9 +69,10 @@ pub(crate) fn manifest_path(
             .filter(|pkg| {
                 // A pgrx extension is a cdylib that depends on pgrx
                 let has_pgrx_dep = pkg.dependencies.iter().any(|dep| dep.name == "pgrx");
-                let is_cdylib = pkg.targets.iter().any(|target| {
-                    target.crate_types.iter().any(|ct| ct == "cdylib")
-                });
+                let is_cdylib = pkg
+                    .targets
+                    .iter()
+                    .any(|target| target.crate_types.iter().any(|ct| ct == "cdylib"));
                 has_pgrx_dep && is_cdylib
             })
             .collect();

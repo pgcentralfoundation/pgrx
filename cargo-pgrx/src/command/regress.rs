@@ -257,7 +257,12 @@ impl Regress {
         // Report skipped tests in the same style as PASS/FAIL
         for new_test in &new_tests {
             let name = make_test_name(new_test);
-            println!("{} {} (use {} to bootstrap)", "SKIP".bold().yellow(), name, "--add".bold().white());
+            println!(
+                "{} {} (use {} to bootstrap)",
+                "SKIP".bold().yellow(),
+                name,
+                "--add".bold().white()
+            );
         }
         let skipped_cnt = new_tests.len();
 
@@ -271,7 +276,8 @@ impl Regress {
         let verbosity = &self.psql_verbosity.clone().unwrap_or("terse".into());
 
         // Run all tests that have expected output
-        let success = run_tests(pg_config, pgregress_path, dbname, &ready_tests, verbosity, skipped_cnt)?;
+        let success =
+            run_tests(pg_config, pgregress_path, dbname, &ready_tests, verbosity, skipped_cnt)?;
 
         if !success {
             // Show the regression diffs path (always) and content (with -v)
@@ -750,11 +756,7 @@ fn print_regression_diffs(manifest_path: &Path, verbose: u8) {
         }
     }
 
-    eprintln!(
-        "\n{} {}",
-        "  Diffs at".bold().red(),
-        diffs_path.display().bold().cyan()
-    );
+    eprintln!("\n{} {}", "  Diffs at".bold().red(), diffs_path.display().bold().cyan());
 }
 
 enum TestResult {
