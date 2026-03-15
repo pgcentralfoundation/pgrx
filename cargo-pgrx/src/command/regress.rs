@@ -254,19 +254,15 @@ impl Regress {
             test_files.iter().partition(|entry| output_names.contains(&make_test_name(entry)));
         let ready_tests: Vec<&DirEntry> = ready_tests.into_iter().copied().collect();
 
-        // Report skipped tests that have no expected output
+        // Report skipped tests in the same style as PASS/FAIL
         for new_test in &new_tests {
             let name = make_test_name(new_test);
-            println!(
-                "{} {}: no expected output (use {} to bootstrap)",
-                "    Skipping".bold().yellow(),
-                name.bold().cyan(),
-                "--add".bold().white(),
-            );
+            println!("{} {} (use {} to bootstrap)", "SKIP".bold().yellow(), name, "--add".bold().white());
         }
+        let skipped_cnt = new_tests.len();
 
         if ready_tests.is_empty() {
-            println!("\n{} no tests with expected output to run", "     Nothing".bold().yellow(),);
+            println!("passed=0 failed=0 skipped={skipped_cnt}");
             return Ok(());
         }
 
@@ -275,7 +271,7 @@ impl Regress {
         let verbosity = &self.psql_verbosity.clone().unwrap_or("terse".into());
 
         // Run all tests that have expected output
-        let success = run_tests(pg_config, pgregress_path, dbname, &ready_tests, verbosity)?;
+        let success = run_tests(pg_config, pgregress_path, dbname, &ready_tests, verbosity, skipped_cnt)?;
 
         if !success {
             // Show the regression diffs path (always) and content (with -v)
@@ -488,7 +484,7 @@ impl Regress {
             } else {
                 // Run setup.sql normally to establish schema/data
                 let verbosity = &self.psql_verbosity.clone().unwrap_or("terse".into());
-                run_tests(pg_config, pgregress_path, dbname, &[&setup_entry], verbosity)?;
+                run_tests(pg_config, pgregress_path, dbname, &[&setup_entry], verbosity, 0)?;
             }
         }
 
@@ -587,6 +583,7 @@ fn run_tests(
     dbname: &str,
     test_files: &[&DirEntry],
     verbosity: &str,
+    skipped_cnt: usize,
 ) -> eyre::Result<bool> {
     if test_files.is_empty() {
         return Ok(true);
@@ -598,7 +595,7 @@ fn run_tests(
         .parent()
         .expect("test file should be in a directory named `sql/`")
         .to_path_buf();
-    pg_regress(pg_config, pg_regress_bin, dbname, &input_dir, test_files, verbosity)
+    pg_regress(pg_config, pg_regress_bin, dbname, &input_dir, test_files, verbosity, skipped_cnt)
         .map(|status| status.success())
 }
 
@@ -619,7 +616,7 @@ fn create_regress_output(
         .expect("test file should be in a directory named `sql/`")
         .to_path_buf();
     let status =
-        pg_regress(pg_config, pg_regress_bin, dbname, &input_dir, &[test_file], verbosity)?;
+        pg_regress(pg_config, pg_regress_bin, dbname, &input_dir, &[test_file], verbosity, 0)?;
 
     if !status.success() {
         // pg_regress returned with an error code, but that is most likely because the test's output file
@@ -644,6 +641,7 @@ fn pg_regress(
     input_dir: &Path,
     tests: &[&DirEntry],
     verbosity: &str,
+    skipped_cnt: usize,
 ) -> eyre::Result<ExitStatus> {
     if tests.is_empty() {
         eyre::bail!("no tests to run");
@@ -722,7 +720,11 @@ fn pg_regress(
     let status = child.wait()?;
     let (passed_cnt, failed_cnt) =
         output_monitor.join().map_err(|_| eyre::eyre!("failed to join output monitor thread"))?;
-    println!("passed={passed_cnt} failed={failed_cnt}");
+    if skipped_cnt > 0 {
+        println!("passed={passed_cnt} failed={failed_cnt} skipped={skipped_cnt}");
+    } else {
+        println!("passed={passed_cnt} failed={failed_cnt}");
+    }
 
     #[cfg(not(target_os = "windows"))]
     {
