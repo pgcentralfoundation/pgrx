@@ -57,12 +57,54 @@ pub(crate) fn manifest_path(
             .ok_or_else(|| eyre!("Could not find package `{package_name}`"))?;
         tracing::debug!(manifest_path = %found.manifest_path, "Found workspace package");
         found.manifest_path.clone().into_std_path_buf()
-    } else {
-        let root = metadata.root_package().ok_or(eyre!(
-            "`pgrx` requires a root package in a workspace when `--package` is not specified."
-        ))?;
+    } else if let Some(root) = metadata.root_package() {
         tracing::debug!(manifest_path = %root.manifest_path, "Found root package");
         root.manifest_path.clone().into_std_path_buf()
+    } else {
+        // No root package — this is a virtual workspace. Try to auto-detect
+        // the single pgrx extension crate among workspace members.
+        let pgrx_members: Vec<_> = metadata
+            .workspace_packages()
+            .into_iter()
+            .filter(|pkg| {
+                // A pgrx extension is a cdylib that depends on pgrx
+                let has_pgrx_dep = pkg.dependencies.iter().any(|dep| dep.name == "pgrx");
+                let is_cdylib = pkg.targets.iter().any(|target| {
+                    target.crate_types.iter().any(|ct| ct == "cdylib")
+                });
+                has_pgrx_dep && is_cdylib
+            })
+            .collect();
+
+        match pgrx_members.len() {
+            0 => {
+                return Err(eyre!(
+                    "No pgrx extension crate found in this workspace.\n\
+                     Use `--package <name>` to specify the package."
+                ));
+            }
+            1 => {
+                let pkg = pgrx_members[0];
+                use owo_colors::OwoColorize;
+                eprintln!(
+                    "{} pgrx extension crate: {} ({})",
+                    "Auto-detected".bold().green(),
+                    pkg.name.bold().white(),
+                    pkg.manifest_path.as_std_path().display().cyan(),
+                );
+                tracing::debug!(manifest_path = %pkg.manifest_path, "Auto-detected pgrx extension");
+                pkg.manifest_path.clone().into_std_path_buf()
+            }
+            n => {
+                let names: Vec<_> = pgrx_members.iter().map(|p| p.name.as_str()).collect();
+                return Err(eyre!(
+                    "Found {} pgrx extension crates in this workspace: {}.\n\
+                     Use `--package <name>` to select one.",
+                    n,
+                    names.join(", "),
+                ));
+            }
+        }
     };
     Ok(manifest_path)
 }
