@@ -25,13 +25,21 @@ use std::process::{Command, ExitStatus, Stdio};
 #[derive(clap::Args, Debug, Clone)]
 #[clap(author)]
 pub(crate) struct Regress {
-    /// Do you want to run against pg13, pg14, pg15, pg16, pg17?  If omitted, uses the version
-    /// from the crate's default feature set
+    /// Positional arguments: [pgXX] [testname]
+    ///
+    /// `cargo pgrx regress` — run all tests against the default pg version
+    /// `cargo pgrx regress <testname>` — run a specific test against the default pg version
+    /// `cargo pgrx regress pgXX` — run all tests against the specified pg version
+    /// `cargo pgrx regress pgXX <testname>` — run a specific test against the specified pg version
     #[clap(env = "PG_VERSION")]
+    pub(crate) args: Vec<String>,
+
+    /// Resolved pg_version (not a CLI arg)
+    #[clap(skip)]
     pub(crate) pg_version: Option<String>,
 
-    /// Only run tests whose names contain this string
-    #[clap(long, short = 't')]
+    /// Resolved test_filter (not a CLI arg)
+    #[clap(skip)]
     pub(crate) test_filter: Option<String>,
 
     /// If specified, use this database name instead of the auto-generated version of `$extname_regress`
@@ -329,6 +337,11 @@ impl CommandExecute for Regress {
             std::env::set_var("PGRX_REGRESS_TESTING", "1");
         }
 
+        // Resolve positional args into pg_version and test_filter.
+        // If the first arg looks like a pg version (pgNN), it's the pg version;
+        // otherwise it's a test name filter.
+        self.resolve_args();
+
         // --add implies --resetdb
         if self.add.is_some() {
             self.resetdb = true;
@@ -436,6 +449,49 @@ impl CommandExecute for Regress {
 }
 
 impl Regress {
+    /// Resolve the positional `args` vec into `pg_version` and `test_filter`.
+    ///
+    /// - `cargo pgrx regress` → both None
+    /// - `cargo pgrx regress my_test` → test_filter = Some("my_test")
+    /// - `cargo pgrx regress pg16` → pg_version = Some("pg16")
+    /// - `cargo pgrx regress pg16 my_test` → pg_version = Some("pg16"), test_filter = Some("my_test")
+    fn resolve_args(&mut self) {
+        fn looks_like_pg_version(s: &str) -> bool {
+            s.starts_with("pg") && s[2..].chars().all(|c| c.is_ascii_digit()) && s.len() > 2
+        }
+
+        match self.args.len() {
+            0 => {}
+            1 => {
+                if looks_like_pg_version(&self.args[0]) {
+                    self.pg_version = Some(self.args[0].clone());
+                } else {
+                    self.test_filter = Some(self.args[0].clone());
+                }
+            }
+            2 => {
+                if looks_like_pg_version(&self.args[0]) {
+                    self.pg_version = Some(self.args[0].clone());
+                    self.test_filter = Some(self.args[1].clone());
+                } else {
+                    eprintln!(
+                        "{} first positional argument must be a PostgreSQL version (e.g., pg16), got `{}`",
+                        "       ERROR".bold().red(),
+                        self.args[0],
+                    );
+                    std::process::exit(1);
+                }
+            }
+            _ => {
+                eprintln!(
+                    "{} too many positional arguments. Usage: cargo pgrx regress [pgXX] [testname]",
+                    "       ERROR".bold().red(),
+                );
+                std::process::exit(1);
+            }
+        }
+    }
+
     /// Handle the --add flag: bootstrap a single new test.
     fn execute_add(
         &self,
