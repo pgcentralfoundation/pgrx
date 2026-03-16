@@ -253,7 +253,14 @@ impl ErrorReport {
         let mut location: ErrorReportLocation = Location::caller().into();
         location.funcname = Some(funcname.to_string());
 
-        Self { sqlerrcode, message: message.into(), hint: None, detail: None, domain: None, location }
+        Self {
+            sqlerrcode,
+            message: message.into(),
+            hint: None,
+            detail: None,
+            domain: None,
+            location,
+        }
     }
 
     /// Create an [ErrorReport] which can be raised via Rust's [std::panic::panic_any()] or as
@@ -265,7 +272,14 @@ impl ErrorReport {
         message: S,
         location: ErrorReportLocation,
     ) -> Self {
-        Self { sqlerrcode, message: message.into(), hint: None, detail: None, domain: None, location }
+        Self {
+            sqlerrcode,
+            message: message.into(),
+            hint: None,
+            detail: None,
+            domain: None,
+            location,
+        }
     }
 
     /// Set the `detail` property, whose default is `None`
