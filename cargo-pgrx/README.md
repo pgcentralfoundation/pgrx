@@ -609,7 +609,7 @@ When tests fail, the path to the `regression.diffs` file is always shown. Use `-
 
 ### Things to Know
 
-- `setup.sql` is only executed when tests are run for the first time, or the `--resetdb` argument is used
+- `setup.sql` is only executed when tests are run for the first time, or the `--resetdb` argument is used.  This includes when running a single test with `--resetdb` — `setup.sql` will always run first to establish the database schema and data before the filtered test executes.
 - The point of `setup.sql` is to perform some heavy-weight database object creation/data-loading _only_ when the test regression database is created.
 - tests are executed in alphabetical order
 - `.sql` files without a corresponding `expected/*.out` file are **skipped** during normal runs — use `--add <name>` to bootstrap new tests

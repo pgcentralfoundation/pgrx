@@ -407,7 +407,12 @@ impl CommandExecute for Regress {
 
         // filter tests
         if let Some(test_filter) = self.test_filter.as_ref() {
-            test_files.retain(|entry| make_test_name(entry).contains(test_filter));
+            test_files.retain(|entry| {
+                let name = make_test_name(entry);
+                // keep setup.sql when the database was just created — it needs to run
+                // even when filtering to a specific test
+                (created_db && name == "setup") || name.contains(test_filter)
+            });
             if test_files.is_empty() {
                 println!(
                     "{} no tests matching filter `{test_filter}`",
