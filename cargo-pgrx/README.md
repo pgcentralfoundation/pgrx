@@ -541,6 +541,7 @@ Key flags:
 | `-a` / `--auto` | Overwrite expected output for failed tests with actual output                                |
 | `-v` / `--verbose` | Print regression diffs to stderr on failure                                                  |
 | `--dry-run` | Print what would happen without doing it                                                     |
+| `--repeat <N>` | Run the entire configuration N times (default: 1)                                            |
 | `-p` / `--package <name>` | Package to build (auto-detected in workspaces with a single pgrx extension)                  |
 | `[PG_VERSION]` | Postgres version (e.g., `pg18`). Optional — defaults to Cargo.toml's default feature         |
 

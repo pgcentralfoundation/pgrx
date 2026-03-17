@@ -94,6 +94,10 @@ pub(crate) struct Regress {
     /// Print what would happen without doing it
     #[clap(long)]
     pub(crate) dry_run: bool,
+
+    /// Run the test suite this many times (default: 1)
+    #[clap(long, default_value_t = 1, value_name = "N")]
+    pub(crate) repeat: u32,
 }
 
 impl Regress {
@@ -245,6 +249,7 @@ impl Regress {
         Ok(())
     }
 
+    /// Returns `Ok(true)` when all tests passed, `Ok(false)` when at least one failed.
     fn run_all_tests(
         &self,
         pg_config: &PgConfig,
@@ -254,7 +259,8 @@ impl Regress {
         test_files: &[&DirEntry],
         output_files: &[&DirEntry],
         include_setup: bool,
-    ) -> eyre::Result<()> {
+        run: u32,
+    ) -> eyre::Result<bool> {
         let output_names = output_files.iter().map(|e| make_test_name(e)).collect::<HashSet<_>>();
 
         // Separate tests into those with expected output and those without
@@ -276,7 +282,7 @@ impl Regress {
 
         if ready_tests.is_empty() {
             println!("passed=0 failed=0 skipped={skipped_cnt}");
-            return Ok(());
+            return Ok(true);
         }
 
         // The default verbosity is terse in order to avoid verbose log output
@@ -288,8 +294,9 @@ impl Regress {
             run_tests(pg_config, pgregress_path, dbname, &ready_tests, verbosity, skipped_cnt)?;
 
         if !success {
-            // Show the regression diffs path (always) and content (with -v)
-            print_regression_diffs(manifest_path, self.verbose);
+            // Show the regression diffs path (always) and content (with -v).
+            // When repeating, rename to regression.<run>.diffs so each attempt is preserved.
+            print_regression_diffs(manifest_path, self.verbose, run, self.repeat);
 
             if self.auto {
                 // Promote actual output to expected for failed tests
@@ -322,11 +329,9 @@ impl Regress {
                     }
                 }
             }
-
-            std::process::exit(1);
         }
 
-        Ok(())
+        Ok(success)
     }
 }
 
@@ -369,87 +374,107 @@ impl CommandExecute for Regress {
         let (pg_config, dbname) = Run::from(&self).install(false, &postgresql_conf)?;
         let pgregress_path = pg_config.pg_regress_path()?;
 
-        if self.is_setup_sql_newer(&manifest_path) {
-            println!(
-                "{} database {} to be (re)created as `setup.sql` is newer than its expected output",
-                "     Forcing".bold().yellow(),
-                dbname.cyan()
-            );
-        }
+        let mut any_failed = false;
 
-        // NB:  the `is_test` argument for both `dropdb()` and `createdb()` is for `cargo pgrx test`,
-        // which creates its own Postgres instance and has its own port and datadir and such, so we
-        // say `false` here.
-        if self.resetdb || self.is_setup_sql_newer(&manifest_path) {
-            dropdb(&pg_config, &dbname, false, self.runas.clone())?;
-        }
-        // won't re-create it if it already exists
-        let created_db = createdb(&pg_config, &dbname, false, true, self.runas.clone())?;
-        if !created_db {
-            println!("{} existing database {dbname}", "    Re-using".bold().cyan());
-        }
+        for run in 1..=self.repeat {
+            if self.repeat > 1 {
+                println!();
+                println!("=== run {run} of {} ===", self.repeat);
+            }
 
-        // Handle --add: bootstrap a single new test and exit
-        if let Some(ref add_name) = self.add {
-            return self.execute_add(
+            if self.is_setup_sql_newer(&manifest_path) {
+                println!(
+                    "{} database {} to be (re)created as `setup.sql` is newer than its expected output",
+                    "     Forcing".bold().yellow(),
+                    dbname.cyan()
+                );
+            }
+
+            // NB:  the `is_test` argument for both `dropdb()` and `createdb()` is for `cargo pgrx test`,
+            // which creates its own Postgres instance and has its own port and datadir and such, so we
+            // say `false` here.
+            if self.resetdb || self.is_setup_sql_newer(&manifest_path) {
+                dropdb(&pg_config, &dbname, false, self.runas.clone())?;
+            }
+            // won't re-create it if it already exists
+            let created_db = createdb(&pg_config, &dbname, false, true, self.runas.clone())?;
+            if !created_db {
+                println!("{} existing database {dbname}", "    Re-using".bold().cyan());
+            }
+
+            // Handle --add: bootstrap a single new test and exit
+            if let Some(ref add_name) = self.add {
+                return self.execute_add(
+                    &pg_config,
+                    &manifest_path,
+                    &pgregress_path,
+                    &dbname,
+                    add_name,
+                    created_db,
+                );
+            }
+
+            // figure out what test and output files we have
+            let mut test_files = self.list_sql_tests(&manifest_path, created_db)?;
+            let output_files = self.list_expected_outputs(&manifest_path, created_db)?;
+
+            // filter tests
+            if let Some(test_filter) = self.test_filter.as_ref() {
+                test_files.retain(|entry| {
+                    let name = make_test_name(entry);
+                    // keep setup.sql when the database was just created — it needs to run
+                    // even when filtering to a specific test
+                    (created_db && name == "setup") || name.contains(test_filter)
+                });
+                if test_files.is_empty() {
+                    println!(
+                        "{} no tests matching filter `{test_filter}`",
+                        "       ERROR".bold().red()
+                    );
+                    std::process::exit(1);
+                }
+
+                // When the user explicitly filters, error if any matched test
+                // has no expected output (they should use --add first)
+                let output_names =
+                    output_files.iter().map(|e| make_test_name(e)).collect::<HashSet<_>>();
+                for entry in &test_files {
+                    let name = make_test_name(entry);
+                    if !output_names.contains(&name) {
+                        eprintln!(
+                            "{} test `{}` has no expected output. Run `cargo pgrx regress --add {}` first.",
+                            "       ERROR".bold().red(),
+                            name.bold().cyan(),
+                            name,
+                        );
+                        std::process::exit(1);
+                    }
+                }
+            }
+
+            println!();
+            println!("--- beginning regression test run ---");
+            let success = self.run_all_tests(
                 &pg_config,
                 &manifest_path,
                 &pgregress_path,
                 &dbname,
-                add_name,
-                created_db,
-            );
-        }
+                &test_files.iter().collect::<Vec<_>>(),
+                &output_files.iter().collect::<Vec<_>>(),
+                created_db, // include_setup
+                run,
+            )?;
 
-        // figure out what test and output files we have
-        let mut test_files = self.list_sql_tests(&manifest_path, created_db)?;
-        let output_files = self.list_expected_outputs(&manifest_path, created_db)?;
-
-        // filter tests
-        if let Some(test_filter) = self.test_filter.as_ref() {
-            test_files.retain(|entry| {
-                let name = make_test_name(entry);
-                // keep setup.sql when the database was just created — it needs to run
-                // even when filtering to a specific test
-                (created_db && name == "setup") || name.contains(test_filter)
-            });
-            if test_files.is_empty() {
-                println!(
-                    "{} no tests matching filter `{test_filter}`",
-                    "       ERROR".bold().red()
-                );
-                std::process::exit(1);
-            }
-
-            // When the user explicitly filters, error if any matched test
-            // has no expected output (they should use --add first)
-            let output_names =
-                output_files.iter().map(|e| make_test_name(e)).collect::<HashSet<_>>();
-            for entry in &test_files {
-                let name = make_test_name(entry);
-                if !output_names.contains(&name) {
-                    eprintln!(
-                        "{} test `{}` has no expected output. Run `cargo pgrx regress --add {}` first.",
-                        "       ERROR".bold().red(),
-                        name.bold().cyan(),
-                        name,
-                    );
-                    std::process::exit(1);
-                }
+            if !success {
+                any_failed = true;
             }
         }
 
-        println!();
-        println!("--- beginning regression test run ---");
-        self.run_all_tests(
-            &pg_config,
-            &manifest_path,
-            &pgregress_path,
-            &dbname,
-            &test_files.iter().collect::<Vec<_>>(),
-            &output_files.iter().collect::<Vec<_>>(),
-            created_db, // include_setup
-        )
+        if any_failed {
+            std::process::exit(1);
+        }
+
+        Ok(())
     }
 }
 
@@ -802,8 +827,9 @@ fn pg_regress(
 }
 
 /// Show the regression diffs path on failure. With `-v`, also print the full
-/// diff content to stderr.
-fn print_regression_diffs(manifest_path: &Path, verbose: u8) {
+/// diff content to stderr.  When `repeat > 1`, rename the file to
+/// `regression.<run>.diffs` so each attempt's diffs are preserved.
+fn print_regression_diffs(manifest_path: &Path, verbose: u8, run: u32, repeat: u32) {
     // pg_regress writes regression.diffs to --outputdir, which is the pg_regress/ directory
     let diffs_path = manifest_path_to_pg_regress_dir(manifest_path).join("regression.diffs");
     if !diffs_path.exists() {
@@ -817,7 +843,27 @@ fn print_regression_diffs(manifest_path: &Path, verbose: u8) {
         }
     }
 
-    eprintln!("\n{} {}", "  Diffs at".bold().red(), diffs_path.display().bold().cyan());
+    // When repeating, rename to regression.<run>.diffs so each run's output is preserved
+    let final_path = if repeat > 1 {
+        let renamed =
+            manifest_path_to_pg_regress_dir(manifest_path).join(format!("regression.{run}.diffs"));
+        // remove any stale file with the same name first
+        let _ = std::fs::remove_file(&renamed);
+        if let Err(e) = std::fs::rename(&diffs_path, &renamed) {
+            eprintln!(
+                "{} failed to rename regression.diffs to {}: {e}",
+                "     WARNING".bold().yellow(),
+                renamed.display()
+            );
+            diffs_path
+        } else {
+            renamed
+        }
+    } else {
+        diffs_path
+    };
+
+    eprintln!("\n{} {}", "  Diffs at".bold().red(), final_path.display().bold().cyan());
 }
 
 enum TestResult {
