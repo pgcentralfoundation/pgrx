@@ -824,6 +824,7 @@ pub fn dropdb(
         } else {
             pg_config.port()?.to_string()
         })
+        .arg("--force")
         .arg(dbname)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
