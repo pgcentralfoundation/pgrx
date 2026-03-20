@@ -66,6 +66,67 @@ mod tests {
         Spi::get_one::<()>("SELECT crash()").map(|_| ())
     }
 
+    /// When a `pg_sys::` FFI call raises a Postgres ERROR (via longjmp), the error should
+    /// carry a Rust backtrace so that it appears in the ERROR's DETAIL line.
+    #[pg_test]
+    fn test_postgres_error_contains_backtrace() {
+        use pgrx::pg_sys::panic::CaughtError;
+
+        let has_backtrace = PgTryBuilder::new(|| {
+            // relation_open with a bogus OID will raise an ERROR inside Postgres
+            unsafe {
+                pg_sys::relation_open(pg_sys::Oid::INVALID, pg_sys::AccessShareLock as _);
+            }
+            unreachable!("relation_open should have raised an ERROR");
+        })
+        .catch_others(|e| match e {
+            CaughtError::PostgresError(ref ereport) => ereport.backtrace().is_some(),
+            _ => panic!("expected CaughtError::PostgresError, got {e:?}"),
+        })
+        .execute();
+
+        assert!(has_backtrace, "PostgresError from a pg_sys FFI call should contain a backtrace");
+    }
+
+    /// When a Postgres ERROR propagates through Rust frames, destructors must run (via panic
+    /// unwinding) AND the resulting error should carry a Rust backtrace in its detail.
+    #[pg_test]
+    fn test_postgres_error_runs_drop_and_has_backtrace() {
+        use pgrx::pg_sys::panic::CaughtError;
+
+        let dropped = Rc::new(AtomicBool::new(false));
+
+        struct Guard(Rc<AtomicBool>);
+        impl Drop for Guard {
+            fn drop(&mut self) {
+                self.0.store(true, Ordering::SeqCst);
+            }
+        }
+
+        let (drop_ran, has_backtrace) = PgTryBuilder::new(|| {
+            let _guard = Guard(dropped.clone());
+
+            // relation_open with a bogus OID raises an ERROR inside Postgres, which
+            // pg_guard_ffi_boundary converts to a panic.  The panic unwinds through
+            // this frame, running Guard's destructor.
+            unsafe {
+                pg_sys::relation_open(pg_sys::Oid::INVALID, pg_sys::AccessShareLock as _);
+            }
+            unreachable!("relation_open should have raised an ERROR");
+        })
+        .catch_others(|e| {
+            let bt = match e {
+                CaughtError::PostgresError(ref ereport) => ereport.backtrace().is_some(),
+                _ => panic!("expected CaughtError::PostgresError, got {e:?}"),
+            };
+            (dropped.load(Ordering::SeqCst), bt)
+        })
+        .execute();
+
+        assert!(drop_ran, "Guard's Drop impl should have run during panic unwinding");
+        assert!(has_backtrace, "PostgresError should carry a Rust backtrace");
+    }
+
     #[pg_test]
     fn test_pg_try_execute_no_error_no_catch() {
         let result = PgTryBuilder::new(|| 42).execute();

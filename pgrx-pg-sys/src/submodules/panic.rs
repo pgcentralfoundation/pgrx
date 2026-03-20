@@ -351,7 +351,6 @@ impl CaughtError {
 #[derive(Debug)]
 enum GuardAction<R> {
     Return(R),
-    ReThrow,
     Report(ErrorReportWithLevel),
 }
 
@@ -393,16 +392,6 @@ where
 {
     match unsafe { run_guarded(AssertUnwindSafe(f)) } {
         GuardAction::Return(r) => r,
-        GuardAction::ReThrow => {
-            #[cfg_attr(target_os = "windows", link(name = "postgres"))]
-            unsafe extern "C-unwind" {
-                fn pg_re_throw() -> !;
-            }
-            unsafe {
-                crate::CurrentMemoryContext = crate::ErrorContext;
-                pg_re_throw()
-            }
-        }
         GuardAction::Report(ereport) => {
             do_ereport(ereport);
             unreachable!("pgrx reported a CaughtError that wasn't raised at ERROR or above");
@@ -419,10 +408,11 @@ where
     match catch_unwind(f) {
         Ok(v) => GuardAction::Return(v),
         Err(e) => match downcast_panic_payload(e) {
-            CaughtError::PostgresError(_) => {
-                // Return to the caller to rethrow -- we can't do it here
-                // since we this function's has non-POF frames.
-                GuardAction::ReThrow
+            CaughtError::PostgresError(ereport) => {
+                // Postgres raised this error via longjmp, which pg_guard_ffi_boundary caught
+                // and converted into a Rust panic.  downcast_panic_payload already attached the
+                // Rust backtrace from the panic hook, so just report it through do_ereport.
+                GuardAction::Report(ereport)
             }
             CaughtError::ErrorReport(ereport) | CaughtError::RustPanic { ereport, .. } => {
                 GuardAction::Report(ereport)
@@ -435,7 +425,20 @@ where
 pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
     if e.downcast_ref::<CaughtError>().is_some() {
         // caught a previously caught CaughtError that is being rethrown
-        *e.downcast::<CaughtError>().unwrap()
+        let mut caught = *e.downcast::<CaughtError>().unwrap();
+
+        // For PostgresErrors (originating from a pg_sys FFI longjmp caught by
+        // pg_guard_ffi_boundary), the panic hook captured a Rust backtrace into
+        // PANIC_LOCATION.  Attach it now so callers (PgTryBuilder, run_guarded,
+        // etc.) can include it in the ERROR's DETAIL line.
+        if let CaughtError::PostgresError(ref mut ereport) = caught {
+            if ereport.inner.location.backtrace.is_none() {
+                let panic_location = take_panic_location();
+                ereport.inner.location.backtrace = panic_location.backtrace;
+            }
+        }
+
+        caught
     } else if e.downcast_ref::<ErrorReportWithLevel>().is_some() {
         // someone called `panic_any(ErrorReportWithLevel)`
         CaughtError::ErrorReport(*e.downcast().unwrap())
