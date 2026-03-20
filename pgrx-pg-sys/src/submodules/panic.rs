@@ -308,17 +308,20 @@ pub fn register_pg_guard_panic_hook() {
 
     let default_hook = std::panic::take_hook();
     std::panic::set_hook(Box::new(move |info: _| {
-        if is_os_main_thread() == Some(true) {
-            // if this is the main thread, swallow the panic message and use postgres' error-reporting mechanism.
-            PANIC_LOCATION.with(|thread_local| {
-                thread_local.replace({
-                    let mut info: ErrorReportLocation = info.into();
-                    info.backtrace = Some(std::backtrace::Backtrace::capture());
-                    Some(info)
-                })
-            });
-        } else {
-            // if this isn't the main thread, we don't know which connection to associate the panic with.
+        // Always capture the backtrace into PANIC_LOCATION so that
+        // downcast_panic_payload can attach it to CaughtError::PostgresError.
+        // This is a thread-local, so it's harmless on non-main threads.
+        PANIC_LOCATION.with(|thread_local| {
+            thread_local.replace({
+                let mut info: ErrorReportLocation = info.into();
+                info.backtrace = Some(std::backtrace::Backtrace::capture());
+                Some(info)
+            })
+        });
+
+        if is_os_main_thread() == Some(false) {
+            // definitely not the main thread -- we don't know which connection
+            // to associate the panic with, so also call the default hook
             default_hook(info)
         }
     }))
