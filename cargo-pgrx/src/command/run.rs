@@ -11,7 +11,7 @@ use std::collections::HashMap;
 use crate::CommandExecute;
 use crate::cargo::CargoProfile;
 use crate::command::get::get_property;
-use crate::command::install::install_extension;
+use crate::command::install::{install_extension, warn_if_pg_bench_enabled};
 use crate::command::regress::Regress;
 use crate::command::start::start_postgres;
 use crate::command::stop::stop_postgres;
@@ -129,6 +129,7 @@ impl Run {
 impl CommandExecute for Run {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(mut self) -> eyre::Result<()> {
+        warn_if_pg_bench_enabled(&self.features, "run");
         let (pg_config, dbname) = self.install(true, &Default::default())?;
 
         // run psql

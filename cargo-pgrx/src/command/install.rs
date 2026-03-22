@@ -64,6 +64,7 @@ pub(crate) struct Install {
 impl CommandExecute for Install {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(mut self) -> eyre::Result<()> {
+        warn_if_pg_bench_enabled(&self.features, "install");
         if self.sudo {
             // user wishes to use `sudo` to install the extension
             // so we re-route through the `SudoInstall` type
@@ -112,6 +113,25 @@ impl CommandExecute for Install {
         )?;
         Ok(())
     }
+}
+
+pub(crate) fn pg_bench_feature_enabled(features: &clap_cargo::Features) -> bool {
+    features.all_features || features.features.iter().any(|feature| feature == "pg_bench")
+}
+
+pub(crate) fn warn_if_pg_bench_enabled(features: &clap_cargo::Features, command: &str) {
+    if !pg_bench_feature_enabled(features) {
+        return;
+    }
+
+    eprintln!(
+        "{}",
+        format!(
+            "WARNING: building with feature `pg_bench`\nbenchmark functions and helper dependencies will be included in this `cargo pgrx {command}` build\nthis is usually not intended for packaged releases"
+        )
+        .red()
+        .bold()
+    );
 }
 
 #[tracing::instrument(skip_all, fields(

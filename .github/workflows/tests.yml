@@ -279,6 +279,14 @@ jobs:
             CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/$example/Cargo.toml  --features "pg$PG_VER" --no-default-features
           done
 
+      - name: Smoke test cargo pgrx bench against the benching example
+        if: ${{ matrix.postgres == 16 && matrix.rust == null }}
+        run: |
+          CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx bench pg$PG_VER \
+            bench_normalize_phrase \
+            --manifest-path=pgrx-examples/benching/Cargo.toml \
+            --group-name ci_benching_smoke
+
       - name: Run custom_types without schema generation example tests
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_types/Cargo.toml  --features "pg$PG_VER no-schema-generation" --no-default-features
 

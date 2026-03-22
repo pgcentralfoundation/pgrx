@@ -11,6 +11,7 @@ use env_proxy::for_url_str;
 use ureq::tls::{RootCerts, TlsConfig};
 use ureq::{Agent, Proxy};
 
+pub(crate) mod bench;
 pub(crate) mod connect;
 pub(crate) mod cross;
 pub(crate) mod get;

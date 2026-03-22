@@ -13,6 +13,7 @@ resolver = "3"
 members = [
     "cargo-pgrx",
     "pgrx",
+    "pgrx-bench",
     "pgrx-macros",
     "pgrx-pg-config",
     "pgrx-pg-sys",
@@ -27,6 +28,7 @@ exclude = [
     "pgrx-examples/arrays",
     "pgrx-examples/bad_ideas",
     "pgrx-examples/bgworker",
+    "pgrx-examples/benching",
     "pgrx-examples/bytea",
     "pgrx-examples/composite_type",
     "pgrx-examples/custom_libname",
@@ -68,6 +70,7 @@ version = "0.16.0"
 cargo-pgrx = { path = "cargo-pgrx" }
 
 [workspace.dependencies]
+pgrx-bench = { path = "./pgrx-bench", version = "=0.17.0" }
 pgrx-macros = { path = "./pgrx-macros", version = "=0.17.0" }
 pgrx-pg-sys = { path = "./pgrx-pg-sys", version = "=0.17.0" }
 pgrx-sql-entity-graph = { path = "./pgrx-sql-entity-graph", version = "=0.17.0" }

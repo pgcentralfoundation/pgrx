@@ -10,7 +10,7 @@
 use crate::CommandExecute;
 use crate::cargo::CargoProfile;
 use crate::command::get::get_property;
-use crate::command::install::install_extension;
+use crate::command::install::{install_extension, warn_if_pg_bench_enabled};
 use crate::manifest::{PgVersionSource, display_version_info};
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
@@ -52,6 +52,7 @@ pub(crate) struct Package {
 
 impl Package {
     pub(crate) fn perform(mut self) -> eyre::Result<(PathBuf, Vec<PathBuf>)> {
+        warn_if_pg_bench_enabled(&self.features, "package");
         let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_deref())
             .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(self.manifest_path.as_deref(), &metadata)?;

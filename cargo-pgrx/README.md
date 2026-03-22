@@ -29,6 +29,7 @@ Cargo subcommand for 'pgrx' to make Postgres extension development easy
 Usage: cargo pgrx [OPTIONS] <COMMAND>
 
 Commands:
+  bench         Run in-process benchmarks for this crate
   init          Initialize pgrx development environment for the first time
   info          Provides information about pgrx-managed development environment
   start         Start a pgrx-managed Postgres instance
@@ -43,6 +44,8 @@ Commands:
   test          Run the test suite for this crate
   get           Get a property from the extension control file
   cross         Commands having to do with cross-compilation. (Experimental)
+  upgrade       Upgrade pgrx crate versions in `Cargo.toml`. Defaults to latest
+  regress       Run the regression test suite for this crate
   help          Print this message or the help of the given subcommand(s)
 
 Options:
@@ -54,7 +57,7 @@ Options:
 ## Environment Variables
 
 - `PGRX_HOME` - Defaults to "${HOME}/.pgrx/" if not set.
-- `PGRX_BUILD_FLAGS` - If set during `cargo pgrx run/test/install`, these additional flags are passed to `cargo build` while building the extension
+- `PGRX_BUILD_FLAGS` - If set during `cargo pgrx run/test/install/package/bench`, these additional flags are passed to `cargo build` while building the extension
 - `PGRX_BUILD_VERBOSE` - Set to true to enable verbose "build.rs" output -- useful for debugging build issues
 - `HTTPS_PROXY` - If set during `cargo pgrx init`, it will download the Postgres sources using these proxy settings. For more details refer to the [env_proxy crate documentation](https://docs.rs/env_proxy/*/env_proxy/fn.for_url.html).
 - `PGRX_IGNORE_RUST_VERSIONS` - Set to true to disable the `rustc` version check we have when performing schema generation (schema generation requires the same version of `rustc` be used to build `cargo-pgrx` as the crate in question).
@@ -525,6 +528,123 @@ Options:
   -V, --version                        Print version
 ```
 
+## Benchmarking with In-Process Benches
+
+`cargo pgrx bench ${VERSION}` runs `#[pg_bench]` benchmarks inside Postgres backends using the
+same managed Postgres instance that `cargo pgrx run` uses.
+
+Unlike `cargo pgrx test`, this is not an ephemeral test harness. Benchmarks are installed into a
+managed benchmark database, by default named `$extname_benches`, and their historical results are
+stored there as well.
+
+The intended authoring model is:
+
+```rust
+#[cfg(feature = "pg_bench")]
+#[pg_schema]
+mod benches {
+    use pgrx::prelude::*;
+    use pgrx_bench::{Bencher, black_box};
+
+    #[pg_bench]
+    fn bench_hello(b: &mut Bencher) {
+        b.iter(|| {
+            black_box(crate::hello());
+        });
+    }
+}
+```
+
+`cargo pgrx bench` automatically enables the `pg_bench` feature, builds in `--release` mode by
+default, installs the extension artifacts using the normal install pipeline, refreshes the
+extension in the benchmark database, and then runs each benchmark in-process.
+
+Key behaviors:
+
+- benchmark functions run inside a backend, not over an external SQL client loop
+- benchmark side effects are rolled back after each benchmark invocation
+- benchmark results are stored in a runner-owned `pgrx_bench` schema so history survives extension refreshes
+- the CLI records environment metadata, `pg_settings`, run groups, and comparison targets
+- the CLI prints which benchmark is currently running and the effective settings for that benchmark
+
+You can list benchmarks and their settings with:
+
+```console
+$ cargo pgrx bench --list
+bench_normalize_phrase [transaction=shared, setup=none, sample_size=100, warm_up=3000ms, measurement=5000ms, nresamples=100000, noise_threshold=0.01, significance_level=0.05]
+bench_spi_insert_batch [transaction=subtransaction_per_batch, setup=prepare_spi_fixture, sample_size=50, warm_up=3000ms, measurement=2000ms, nresamples=100000, noise_threshold=0.01, significance_level=0.05]
+```
+
+To run a single benchmark:
+
+```console
+$ cargo pgrx bench pg16 bench_normalize_phrase
+```
+
+To name the current run group and compare it against another group:
+
+```console
+$ cargo pgrx bench --group-name before-rewrite
+$ cargo pgrx bench --group-name after-rewrite --compare-group before-rewrite
+```
+
+To emit the final summary as JSON:
+
+```console
+$ cargo pgrx bench --json
+```
+
+`cargo pgrx bench` is meant for in-process performance work on extension code. It is not a
+replacement for `cargo pgrx test` or `cargo pgrx regress`, and it is not a client-side SQL load
+testing tool.
+
+```console
+$ cargo pgrx bench --help
+Usage: cargo pgrx bench [OPTIONS] [ARGS]...
+
+Arguments:
+  [ARGS]...  Positional arguments: [pgXX] [benchname] [env: PG_VERSION=]
+
+Options:
+      --dbname <DBNAME>
+          If specified, use this database name instead of `$extname_benches`
+      --group-name <GROUP_NAME>
+          Unique name for this benchmark group
+  -v, --verbose...
+          Enable info logs, -vv for debug, -vvv for trace
+      --compare-group <COMPARE_GROUP>
+          Named benchmark group to compare against
+      --resetdb
+          Recreate the benchmark database before running
+      --cascade
+          Use CASCADE when dropping the extension during refresh
+      --list
+          List discovered benchmark wrappers and exit
+      --json
+          Emit the final summary as JSON
+  -p, --package <PACKAGE>
+          Package to build (see `cargo help pkgid`)
+      --manifest-path <MANIFEST_PATH>
+          Path to Cargo.toml
+      --debug
+          Compile for debug mode instead of the default release mode
+      --profile <PROFILE>
+          Specific profile to use (conflicts with `--debug`)
+      --all-features
+          Activate all available features
+      --no-default-features
+          Do not activate the `default` feature
+  -F, --features <FEATURES>
+          Space-separated list of features to activate
+      --target <TARGET>
+      --postgresql-conf <POSTGRESQL_CONF>
+          Custom `postgresql.conf` settings in the form of `key=value`
+  -h, --help
+          Print help
+  -V, --version
+          Print version
+```
+
 ## Testing with Regression Tests
 
 pgrx supports a regression test system very similar to the one prescribed by Postgres' `pg_regress` tool.  In fact, pgrx uses `pg_regress` to run the regression tests.
@@ -790,7 +910,7 @@ the extensions `.control` file.  Postgres will then execute the scripts along th
 It is your responsibility to hand-write these extension upgrade scripts in whatever manner would allow Postgres to update
 your extension from one version to the next.  pgrx has no ability to auto-generate these scripts.
 
-While pgrx does not generate these upgrade scripts, it does now about them and all pgrx commands (`cargo pgrx test/run/install/package`) 
+While pgrx does not generate these upgrade scripts, it does know about them and all pgrx commands (`cargo pgrx test/run/install/package/bench`) 
 that generate extension artifacts will automatically copy these files, and only these files, from the `./sql` directory 
 to their final destination as dictated by `pg_config`.
 

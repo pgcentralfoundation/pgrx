@@ -28,6 +28,7 @@ impl CommandExecute for Pgrx {
 
 #[derive(clap::Subcommand, Debug)]
 enum CargoPgrxSubCommands {
+    Bench(super::bench::Bench),
     Init(super::init::Init),
     Info(super::info::Info),
     Start(super::start::Start),
@@ -51,6 +52,7 @@ impl CommandExecute for CargoPgrxSubCommands {
         use CargoPgrxSubCommands::*;
         check_for_sql_generator_binary()?;
         match self {
+            Bench(c) => c.execute(),
             Init(c) => c.execute(),
             Info(c) => c.execute(),
             Start(c) => c.execute(),
