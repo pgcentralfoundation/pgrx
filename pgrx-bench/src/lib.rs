@@ -13,22 +13,17 @@ pub mod pgrx;
 use criterion::{Criterion, measurement::WallTime};
 use oorandom::Rand64;
 use crate::pgrx::{
-    BenchArtifact, BenchComparison, BenchComparisonEstimate, BenchConfig, BenchDefinition,
+    BenchArtifact, BenchComparison, BenchComparisonEstimate, BenchConfig, BenchDefinition, Runtime,
     BenchEstimate, BenchResult, BenchSample, BenchStatus, BenchThroughput, CriterionBenchmark,
     TransactionMode,
 };
-use pgrx_pg_sys::pg_try::PgTryBuilder;
 use serde::Deserialize;
 use serde_json::Value;
 use std::any::Any;
 use std::cell::RefCell;
-use std::ffi::CString;
 use std::fs;
-use std::panic::AssertUnwindSafe;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
-
-use pgrx_pg_sys as pg_sys;
 
 /// Re-export of Criterion's `black_box`, which helps keep the optimizer from removing the work
 /// you intend to measure.
@@ -202,10 +197,11 @@ fn build_criterion(
     }
 }
 
-fn run_routine(
+fn run_routine<R: Runtime>(
     criterion_bencher: &mut criterion::Bencher<'_, WallTime>,
     routine: &mut Routine<'_>,
     transaction_mode: TransactionMode,
+    runtime: &R,
 ) {
     match routine {
         Routine::Iter(routine) => match transaction_mode {
@@ -215,7 +211,7 @@ fn run_routine(
                 criterion_bencher.iter_custom(|iters| {
                     let started = Instant::now();
                     for _ in 0..iters {
-                        with_internal_subtransaction(|| routine())
+                        runtime.with_subtransaction(|| routine())
                             .unwrap_or_else(|error| panic!("{error}"));
                     }
                     started.elapsed()
@@ -238,7 +234,7 @@ fn run_routine(
                             }
                         }
                         TransactionMode::SubtransactionPerBatch => {
-                            with_internal_subtransaction(|| {
+                            runtime.with_subtransaction(|| {
                                 for _ in 0..current_batch {
                                     let input = setup();
                                     routine(input);
@@ -248,7 +244,7 @@ fn run_routine(
                         }
                         TransactionMode::SubtransactionPerIteration => {
                             for _ in 0..current_batch {
-                                with_internal_subtransaction(|| {
+                                runtime.with_subtransaction(|| {
                                     let input = setup();
                                     routine(input);
                                 })
@@ -544,50 +540,6 @@ fn parse_throughput(value: Value) -> Option<BenchThroughput> {
     let object = value.as_object()?;
     let (kind, value) = object.iter().next()?;
     value.as_f64().map(|value| BenchThroughput { kind: kind.to_lowercase(), value })
-}
-
-fn caught_error_message(error: pgrx_pg_sys::panic::CaughtError) -> String {
-    match error {
-        pgrx_pg_sys::panic::CaughtError::PostgresError(report)
-        | pgrx_pg_sys::panic::CaughtError::ErrorReport(report) => {
-            report.message().to_string()
-        }
-        pgrx_pg_sys::panic::CaughtError::RustPanic { ereport, .. } => {
-            ereport.message().to_string()
-        }
-    }
-}
-
-fn with_internal_subtransaction<R>(f: impl FnOnce() -> R) -> Result<R, String> {
-    let name = CString::new("pgrx_bench").expect("static string should be CString-safe");
-
-    unsafe {
-        let old_context = pg_sys::CurrentMemoryContext;
-        let old_resource_owner = pg_sys::CurrentResourceOwner;
-
-        pg_sys::BeginInternalSubTransaction(name.as_ptr());
-
-        let result = PgTryBuilder::new(AssertUnwindSafe(|| Ok::<R, String>(f())))
-            .catch_others(|error| Err(caught_error_message(error)))
-            .catch_rust_panic(|error| Err(caught_error_message(error)))
-            .execute();
-
-        match result {
-            Ok(value) => {
-                pg_sys::ReleaseCurrentSubTransaction();
-                pg_sys::MemoryContextSwitchTo(old_context);
-                pg_sys::CurrentResourceOwner = old_resource_owner;
-                Ok(value)
-            }
-            Err(error) => {
-                pg_sys::MemoryContextSwitchTo(old_context);
-                pg_sys::RollbackAndReleaseCurrentSubTransaction();
-                pg_sys::MemoryContextSwitchTo(old_context);
-                pg_sys::CurrentResourceOwner = old_resource_owner;
-                Err(error)
-            }
-        }
-    }
 }
 
 const fn ends_with(value: &[u8], suffix: &[u8]) -> bool {

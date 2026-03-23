@@ -141,7 +141,8 @@ pgrx-tests = "=..."
 
 `pgrx-bench` must be an optional normal dependency, not only a dev-dependency, because benchmark
 code is compiled into the extension shared library when benching. It does not need separate
-user-facing `pgXX` feature flags; the selected `pgrx` Postgres feature is unified transitively.
+user-facing `pgXX` feature flags or any direct `pgrx-*` dependencies; the proc-macro-generated
+wrapper code owns the Postgres-specific boundary.
 
 ## CLI
 

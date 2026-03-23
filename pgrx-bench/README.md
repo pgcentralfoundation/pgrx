@@ -109,8 +109,9 @@ pgrx-tests = "=0.17.0"
 ```
 
 Notice that `pgrx-bench` does not need its own `pg16`/`pg17`/etc. passthrough feature wiring.
-The active Postgres version is already selected on `pgrx`, and Cargo feature unification carries
-that through to `pgrx-bench`'s internal runtime dependencies automatically.
+The active Postgres version is already selected on `pgrx`, and `pgrx-bench` itself stays free of
+`pgrx-*` dependencies and Postgres-version feature flags. The proc-macro-generated wrapper code in
+the extension crate owns the Postgres-specific boundary work instead.
 
 Benchmark functions live under a feature-gated `#[pg_schema] mod benches`.
 

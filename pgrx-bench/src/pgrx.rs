@@ -14,13 +14,12 @@
 //! [`crate::black_box`] APIs instead of the items in this module.
 //!
 //! These helpers intentionally exchange plain `serde_json::Value` payloads with the generated
-//! wrappers so `pgrx-bench` only needs the low-level backend/runtime hooks from `pgrx-pg-sys`;
-//! the `pgrx::JsonB` boundary stays in the macro-generated SQL wrapper layer.
+//! wrappers so `pgrx-bench` can stay free of direct `pgrx-*` crate dependencies; the
+//! `pgrx::JsonB`, `PgTryBuilder`, and subtransaction boundaries stay in the macro-generated SQL
+//! wrapper layer.
 
-use pgrx_pg_sys::pg_try::PgTryBuilder;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::panic::AssertUnwindSafe;
 use tempfile::TempDir;
 
 use crate::Bencher;
@@ -207,15 +206,29 @@ pub struct BenchArtifact {
 }
 
 #[doc(hidden)]
+/// Runtime hooks supplied by pgrx-generated wrappers for Postgres exception and subtransaction
+/// boundaries.
+pub trait Runtime {
+    fn execute_guarded<F, T>(&self, f: F) -> Result<T, String>
+    where
+        F: FnOnce() -> Result<T, String>;
+
+    fn with_subtransaction<F, T>(&self, f: F) -> Result<T, String>
+    where
+        F: FnOnce() -> T;
+}
+
+#[doc(hidden)]
 /// Internal entrypoint used by generated `#[pg_bench]` wrappers.
-pub fn execute_benchmark(
+pub fn execute_benchmark<R: Runtime>(
     definition: BenchDefinition,
     setup_fn: Option<fn()>,
     bench_fn: fn(&mut Bencher<'_>),
     baseline_artifacts: Option<Value>,
+    runtime: &R,
 ) -> Value {
     let definition_for_report = definition.clone();
-    let result = PgTryBuilder::new(AssertUnwindSafe(|| {
+    let result = runtime.execute_guarded(|| {
         let baseline_artifacts = baseline_artifacts
             .map(|baseline_artifacts| {
                 serde_json::from_value::<Vec<BenchArtifact>>(baseline_artifacts).map_err(
@@ -247,7 +260,7 @@ pub fn execute_benchmark(
         let mut routine = routine;
 
         criterion.bench_function(definition.bench_name, |criterion_bencher| {
-            crate::run_routine(criterion_bencher, &mut routine, definition.transaction_mode);
+            crate::run_routine(criterion_bencher, &mut routine, definition.transaction_mode, runtime);
         });
         criterion.final_summary();
 
@@ -257,10 +270,7 @@ pub fn execute_benchmark(
             baseline_artifacts.as_deref(),
         )?;
         Ok::<BenchResult, String>(report)
-    }))
-    .catch_others(|error| Err(crate::caught_error_message(error)))
-    .catch_rust_panic(|error| Err(crate::caught_error_message(error)))
-    .execute();
+    });
 
     match result {
         Ok(report) => serde_json::to_value(report).expect("BenchResult should serialize"),
