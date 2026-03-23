@@ -534,7 +534,6 @@ Columns:
 - `profile_name text not null`
 - `cargo_features text[] not null`
 - `command_line text not null`
-- `hostname text`
 - `os text`
 - `arch text`
 - `rustc_version text`
@@ -700,7 +699,6 @@ The benchmark system should capture, at minimum:
 - selected build profile
 - enabled Cargo features
 - full command line
-- hostname
 - OS
 - architecture
 - `rustc` version

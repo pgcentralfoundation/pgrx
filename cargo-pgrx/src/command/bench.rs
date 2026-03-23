@@ -414,7 +414,6 @@ fn insert_run_group(
     let id = Uuid::new_v4();
     let cargo_features = features.features.clone();
     let command_line = std::env::args().collect::<Vec<_>>().join(" ");
-    let hostname = host_name().ok();
     let rustc_version = command_output("rustc", ["--version"]).ok();
     let cargo_version = command_output("cargo", ["--version"]).ok();
     let os = std::env::consts::OS.to_string();
@@ -433,7 +432,6 @@ fn insert_run_group(
             profile_name,
             cargo_features,
             command_line,
-            hostname,
             os,
             arch,
             rustc_version,
@@ -445,7 +443,7 @@ fn insert_run_group(
             git_dirty,
             git_describe
         ) VALUES (
-            $1, $2, 'running', $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20
+            $1, $2, 'running', $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
         )",
         &[
             &id,
@@ -457,7 +455,6 @@ fn insert_run_group(
             &profile.name(),
             &cargo_features,
             &command_line,
-            &hostname,
             &os,
             &arch,
             &rustc_version,
@@ -935,18 +932,6 @@ fn format_program_and_args(program: &str, args: &[&str]) -> String {
     parts.join(" ")
 }
 
-fn host_name() -> eyre::Result<String> {
-    if let Ok(hostname) = std::env::var("HOSTNAME") {
-        return Ok(hostname);
-    }
-
-    if let Ok(hostname) = std::env::var("COMPUTERNAME") {
-        return Ok(hostname);
-    }
-
-    command_output("hostname", std::iter::empty())
-}
-
 fn collect_git_metadata(root: &Path) -> eyre::Result<GitMetadata> {
     let git_commit = command_output_in_dir("git", ["rev-parse", "HEAD"], root).ok();
     let git_branch = command_output_in_dir("git", ["rev-parse", "--abbrev-ref", "HEAD"], root).ok();
@@ -1359,7 +1344,6 @@ CREATE TABLE IF NOT EXISTS pgrx_bench.run_group (
     profile_name text NOT NULL,
     cargo_features text[] NOT NULL DEFAULT ARRAY[]::text[],
     command_line text NOT NULL,
-    hostname text,
     os text,
     arch text,
     rustc_version text,
