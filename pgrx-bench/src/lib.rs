@@ -1066,7 +1066,7 @@ thread_local! {
     static SEED_RNG: RefCell<Rand64> = RefCell::new(Rand64::new(
         SystemTime::now()
             .duration_since(UNIX_EPOCH)
-            .expect("time went backwards")
+            .unwrap_or_else(|_| panic!("time went backwards"))
             .as_millis(),
     ));
 }
