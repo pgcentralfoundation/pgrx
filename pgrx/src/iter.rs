@@ -15,7 +15,8 @@ use crate::fcinfo::{pg_return_null, srf_is_first_call, srf_return_done, srf_retu
 use crate::ptr::PointerExt;
 use crate::{IntoDatum, IntoHeapTuple, PgMemoryContexts, pg_sys};
 use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable, setof_return_sql,
+    table_item_sql,
 };
 
 /// Support for returning a `SETOF T` from an SQL function.
@@ -83,17 +84,9 @@ unsafe impl<T> SqlTranslatable for SetOfIterator<'_, T>
 where
     T: SqlTranslatable,
 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        T::argument_sql()
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        match T::return_sql() {
-            Ok(Returns::One(sql)) => Ok(Returns::SetOf(sql)),
-            Ok(Returns::SetOf(_)) => Err(ReturnsError::NestedSetOf),
-            Ok(Returns::Table(_)) => Err(ReturnsError::SetOfContainingTable),
-            err @ Err(_) => err,
-        }
-    }
+    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> = setof_return_sql(T::RETURN_SQL);
 }
 
 /// Support for a `TABLE (...)` from an SQL function.
@@ -169,17 +162,12 @@ unsafe impl<'iter, C> SqlTranslatable for TableIterator<'iter, (C,)>
 where
     C: SqlTranslatable + 'iter,
 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Err(ArgumentError::Table)
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        let vec = vec![C::return_sql().and_then(|sql| match sql {
-            Returns::One(sql) => Ok(sql),
-            Returns::SetOf(_) => Err(ReturnsError::TableContainingSetOf),
-            Returns::Table(_) => Err(ReturnsError::NestedTable),
-        })?];
-        Ok(Returns::Table(vec))
-    }
+    const SCHEMA_KEY: &'static str = "TableIterator";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::Table);
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> = match table_item_sql(C::RETURN_SQL) {
+        Ok(C) => Ok(ReturnsRef::Table(&[C])),
+        Err(err) => Err(err),
+    };
 }
 
 unsafe impl<T> RetAbi for SetOfIterator<'_, T>
@@ -369,21 +357,21 @@ macro_rules! impl_table_iter {
         where
             $($C: SqlTranslatable + 'iter,)*
         {
-            fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-                Err(ArgumentError::Table)
-            }
-            fn return_sql() -> Result<Returns, ReturnsError> {
-                let vec = vec![
-                $(
-                    $C::return_sql().and_then(|sql| match sql {
-                        Returns::One(sql) => Ok(sql),
-                        Returns::SetOf(_) => Err(ReturnsError::TableContainingSetOf),
-                        Returns::Table(_) => Err(ReturnsError::NestedTable),
-                    })?,
-                )*
-                ];
-                Ok(Returns::Table(vec))
-            }
+            const SCHEMA_KEY: &'static str = "TableIterator";
+            const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::Table);
+            const RETURN_SQL: Result<ReturnsRef, ReturnsError> = match ($(table_item_sql($C::RETURN_SQL),)*) {
+                ($(Ok($C),)*) => Ok(ReturnsRef::Table(&[$($C),*])),
+                _ => {
+                    $(
+                        if let Err(err) = table_item_sql($C::RETURN_SQL) {
+                            Err(err)
+                        } else
+                    )*
+                    {
+                        unreachable!()
+                    }
+                }
+            };
         }
 
         impl<$($C: IntoDatum),*> IntoHeapTuple for ($($C,)*) {

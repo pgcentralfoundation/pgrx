@@ -46,6 +46,9 @@ pub(crate) struct Package {
     pub(crate) features: clap_cargo::Features,
     #[clap(long)]
     pub(crate) target: Option<String>,
+    /// Keep the embedded `.pgrx_schema` section in packaged artifacts.
+    #[clap(long)]
+    pub(crate) no_schema_strip: bool,
     #[clap(from_global, action = ArgAction::Count)]
     pub(crate) verbose: u8,
 }
@@ -96,6 +99,7 @@ impl Package {
             self.test,
             &self.features,
             self.target.as_deref(),
+            self.no_schema_strip,
         )?;
 
         Ok((out_dir, output_files))
@@ -125,6 +129,7 @@ pub(crate) fn package_extension(
     is_test: bool,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    no_schema_strip: bool,
 ) -> eyre::Result<Vec<PathBuf>> {
     let out_dir_exists = out_dir.try_exists().wrap_err_with(|| {
         format!("failed to access {} while packaging extension", out_dir.display())
@@ -144,6 +149,7 @@ pub(crate) fn package_extension(
         Some(out_dir),
         features,
         target,
+        no_schema_strip,
     )
 }
 

@@ -657,72 +657,341 @@ impl ToEntityGraphTokens for PgAggregate {
     fn to_entity_graph_tokens(&self) -> TokenStream2 {
         let target_ident = &self.target_ident;
         let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgrx_internals_aggregate_{}", self.snake_case_target_ident),
+            &format!("__pgrx_schema_aggregate_{}", self.snake_case_target_ident),
             target_ident.span(),
         );
 
         let name = &self.name;
-        let type_args_iter = &self.type_args.entity_tokens();
-        let type_order_by_args_iter = self.type_ordered_set_args.iter().map(|x| x.entity_tokens());
-
-        let type_moving_state_entity_tokens =
-            self.type_moving_state.clone().map(|v| v.entity_tokens());
-        let type_moving_state_entity_tokens_iter = type_moving_state_entity_tokens.iter();
-        let type_stype = self.type_stype.entity_tokens();
         let const_ordered_set = self.const_ordered_set;
-        let const_parallel_iter = self.const_parallel.iter();
-        let const_finalize_modify_iter = self.const_finalize_modify.iter();
-        let const_moving_finalize_modify_iter = self.const_moving_finalize_modify.iter();
-        let const_initial_condition_iter = self.const_initial_condition.iter();
-        let const_sort_operator_iter = self.const_sort_operator.iter();
-        let const_moving_intial_condition_iter = self.const_moving_intial_condition.iter();
         let hypothetical = self.hypothetical;
         let fn_state = &self.fn_state;
-        let fn_finalize_iter = self.fn_finalize.iter();
-        let fn_combine_iter = self.fn_combine.iter();
-        let fn_serial_iter = self.fn_serial.iter();
-        let fn_deserial_iter = self.fn_deserial.iter();
-        let fn_moving_state_iter = self.fn_moving_state.iter();
-        let fn_moving_state_inverse_iter = self.fn_moving_state_inverse.iter();
-        let fn_moving_finalize_iter = self.fn_moving_finalize.iter();
         let to_sql_config = &self.to_sql_config;
+        let to_sql_config_len = to_sql_config.section_len_tokens();
+        let type_args_len = self.type_args.section_len_tokens();
+        let direct_args_len = self
+            .type_ordered_set_args
+            .as_ref()
+            .map(|value| {
+                let inner = value.section_len_tokens();
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len() + (#inner)
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let stype_len = self.type_stype.section_len_tokens();
+        let moving_state_len = self
+            .type_moving_state
+            .as_ref()
+            .map(|value| {
+                let inner = value.section_len_tokens();
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len() + (#inner)
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let finalfunc_len = self
+            .fn_finalize
+            .as_ref()
+            .map(|value| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#value))
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let combinefunc_len = self
+            .fn_combine
+            .as_ref()
+            .map(|value| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#value))
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let serialfunc_len = self
+            .fn_serial
+            .as_ref()
+            .map(|value| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#value))
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let deserialfunc_len = self
+            .fn_deserial
+            .as_ref()
+            .map(|value| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#value))
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let initcond_len = self
+            .const_initial_condition
+            .as_ref()
+            .map(|value| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + ::pgrx::pgrx_sql_entity_graph::section::str_len(#value)
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let msfunc_len = self
+            .fn_moving_state
+            .as_ref()
+            .map(|value| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#value))
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let minvfunc_len = self
+            .fn_moving_state_inverse
+            .as_ref()
+            .map(|value| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#value))
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let mfinalfunc_len = self
+            .fn_moving_finalize
+            .as_ref()
+            .map(|value| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#value))
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let minitcond_len = self
+            .const_moving_intial_condition
+            .as_ref()
+            .map(|value| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + ::pgrx::pgrx_sql_entity_graph::section::str_len(#value)
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let sortop_len = self
+            .const_sort_operator
+            .as_ref()
+            .map(|value| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + ::pgrx::pgrx_sql_entity_graph::section::str_len(#value)
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let finalize_modify_len = self
+            .const_finalize_modify
+            .as_ref()
+            .map(|value| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + match #value {
+                            Some(_) => ::pgrx::pgrx_sql_entity_graph::section::u8_len(),
+                            None => 0,
+                        }
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let moving_finalize_modify_len = self
+            .const_moving_finalize_modify
+            .as_ref()
+            .map(|value| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + match #value {
+                            Some(_) => ::pgrx::pgrx_sql_entity_graph::section::u8_len(),
+                            None => 0,
+                        }
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let parallel_len = self
+            .const_parallel
+            .as_ref()
+            .map(|value| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + match #value {
+                            Some(_) => ::pgrx::pgrx_sql_entity_graph::section::u8_len(),
+                            None => 0,
+                        }
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let payload_len = quote! {
+            ::pgrx::pgrx_sql_entity_graph::section::u8_len()
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(concat!(module_path!(), "::", stringify!(#target_ident)))
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(module_path!())
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(file!())
+                + ::pgrx::pgrx_sql_entity_graph::section::u32_len()
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(#name)
+                + ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                + (#type_args_len)
+                + (#direct_args_len)
+                + (#stype_len)
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#fn_state))
+                + (#finalfunc_len)
+                + (#finalize_modify_len)
+                + (#combinefunc_len)
+                + (#serialfunc_len)
+                + (#deserialfunc_len)
+                + (#initcond_len)
+                + (#msfunc_len)
+                + (#minvfunc_len)
+                + (#moving_state_len)
+                + (#mfinalfunc_len)
+                + (#moving_finalize_modify_len)
+                + (#minitcond_len)
+                + (#sortop_len)
+                + (#parallel_len)
+                + ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                + (#to_sql_config_len)
+        };
+        let total_len = quote! {
+            ::pgrx::pgrx_sql_entity_graph::section::u32_len() + (#payload_len)
+        };
+
+        let direct_args_writer = self
+            .type_ordered_set_args
+            .as_ref()
+            .map(|value| value.section_writer_tokens(quote! { writer.bool(true) }))
+            .unwrap_or_else(|| quote! { writer.bool(false) });
+        let moving_state_writer = self
+            .type_moving_state
+            .as_ref()
+            .map(|value| value.section_writer_tokens(quote! { writer.bool(true) }))
+            .unwrap_or_else(|| quote! { writer.bool(false) });
+        let finalfunc_writer = self
+            .fn_finalize
+            .as_ref()
+            .map(|value| quote! { writer.bool(true).str(stringify!(#value)) })
+            .unwrap_or_else(|| quote! { writer.bool(false) });
+        let combinefunc_writer = self
+            .fn_combine
+            .as_ref()
+            .map(|value| quote! { writer.bool(true).str(stringify!(#value)) })
+            .unwrap_or_else(|| quote! { writer.bool(false) });
+        let serialfunc_writer = self
+            .fn_serial
+            .as_ref()
+            .map(|value| quote! { writer.bool(true).str(stringify!(#value)) })
+            .unwrap_or_else(|| quote! { writer.bool(false) });
+        let deserialfunc_writer = self
+            .fn_deserial
+            .as_ref()
+            .map(|value| quote! { writer.bool(true).str(stringify!(#value)) })
+            .unwrap_or_else(|| quote! { writer.bool(false) });
+        let initcond_writer = self
+            .const_initial_condition
+            .as_ref()
+            .map(|value| quote! { writer.bool(true).str(#value) })
+            .unwrap_or_else(|| quote! { writer.bool(false) });
+        let msfunc_writer = self
+            .fn_moving_state
+            .as_ref()
+            .map(|value| quote! { writer.bool(true).str(stringify!(#value)) })
+            .unwrap_or_else(|| quote! { writer.bool(false) });
+        let minvfunc_writer = self
+            .fn_moving_state_inverse
+            .as_ref()
+            .map(|value| quote! { writer.bool(true).str(stringify!(#value)) })
+            .unwrap_or_else(|| quote! { writer.bool(false) });
+        let mfinalfunc_writer = self
+            .fn_moving_finalize
+            .as_ref()
+            .map(|value| quote! { writer.bool(true).str(stringify!(#value)) })
+            .unwrap_or_else(|| quote! { writer.bool(false) });
+        let minitcond_writer = self
+            .const_moving_intial_condition
+            .as_ref()
+            .map(|value| quote! { writer.bool(true).str(#value) })
+            .unwrap_or_else(|| quote! { writer.bool(false) });
+        let sortop_writer = self
+            .const_sort_operator
+            .as_ref()
+            .map(|value| quote! { writer.bool(true).str(#value) })
+            .unwrap_or_else(|| quote! { writer.bool(false) });
+        let finalize_modify_writer = self
+            .const_finalize_modify
+            .as_ref()
+            .map(|value| quote! { match #value {
+                Some(::pgrx::pgrx_sql_entity_graph::FinalizeModify::ReadOnly) => writer.bool(true).u8(::pgrx::pgrx_sql_entity_graph::section::AGGREGATE_FINALIZE_READ_ONLY),
+                Some(::pgrx::pgrx_sql_entity_graph::FinalizeModify::Shareable) => writer.bool(true).u8(::pgrx::pgrx_sql_entity_graph::section::AGGREGATE_FINALIZE_SHAREABLE),
+                Some(::pgrx::pgrx_sql_entity_graph::FinalizeModify::ReadWrite) => writer.bool(true).u8(::pgrx::pgrx_sql_entity_graph::section::AGGREGATE_FINALIZE_READ_WRITE),
+                None => writer.bool(false),
+            } })
+            .unwrap_or_else(|| quote! { writer.bool(false) });
+        let moving_finalize_modify_writer = self
+            .const_moving_finalize_modify
+            .as_ref()
+            .map(|value| quote! { match #value {
+                Some(::pgrx::pgrx_sql_entity_graph::FinalizeModify::ReadOnly) => writer.bool(true).u8(::pgrx::pgrx_sql_entity_graph::section::AGGREGATE_FINALIZE_READ_ONLY),
+                Some(::pgrx::pgrx_sql_entity_graph::FinalizeModify::Shareable) => writer.bool(true).u8(::pgrx::pgrx_sql_entity_graph::section::AGGREGATE_FINALIZE_SHAREABLE),
+                Some(::pgrx::pgrx_sql_entity_graph::FinalizeModify::ReadWrite) => writer.bool(true).u8(::pgrx::pgrx_sql_entity_graph::section::AGGREGATE_FINALIZE_READ_WRITE),
+                None => writer.bool(false),
+            } })
+            .unwrap_or_else(|| quote! { writer.bool(false) });
+        let parallel_writer = self
+            .const_parallel
+            .as_ref()
+            .map(|value| quote! { match #value {
+                Some(::pgrx::pgrx_sql_entity_graph::ParallelOption::Safe) => writer.bool(true).u8(::pgrx::pgrx_sql_entity_graph::section::AGGREGATE_PARALLEL_SAFE),
+                Some(::pgrx::pgrx_sql_entity_graph::ParallelOption::Restricted) => writer.bool(true).u8(::pgrx::pgrx_sql_entity_graph::section::AGGREGATE_PARALLEL_RESTRICTED),
+                Some(::pgrx::pgrx_sql_entity_graph::ParallelOption::Unsafe) => writer.bool(true).u8(::pgrx::pgrx_sql_entity_graph::section::AGGREGATE_PARALLEL_UNSAFE),
+                None => writer.bool(false),
+            } })
+            .unwrap_or_else(|| quote! { writer.bool(false) });
+        let args_writer = self.type_args.section_writer_tokens(quote! { writer });
+        let stype_writer = self.type_stype.section_writer_tokens(quote! { writer });
+        let to_sql_config_writer = to_sql_config.section_writer_tokens(quote! { writer });
 
         quote! {
-            #[unsafe(no_mangle)]
-            #[doc(hidden)]
-            #[allow(unknown_lints, clippy::no_mangle_with_rust_abi)]
-            pub extern "Rust" fn #sql_graph_entity_fn_name() -> ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity {
-                let submission = ::pgrx::pgrx_sql_entity_graph::PgAggregateEntity {
-                    full_path: ::core::any::type_name::<#target_ident>(),
-                    module_path: module_path!(),
-                    file: file!(),
-                    line: line!(),
-                    name: #name,
-                    ordered_set: #const_ordered_set,
-                    ty_id: ::core::any::TypeId::of::<#target_ident>(),
-                    args: #type_args_iter,
-                    direct_args: None #( .unwrap_or(Some(#type_order_by_args_iter)) )*,
-                    stype: #type_stype,
-                    sfunc: stringify!(#fn_state),
-                    combinefunc: None #( .unwrap_or(Some(stringify!(#fn_combine_iter))) )*,
-                    finalfunc: None #( .unwrap_or(Some(stringify!(#fn_finalize_iter))) )*,
-                    finalfunc_modify: None #( .unwrap_or(#const_finalize_modify_iter) )*,
-                    initcond: None #( .unwrap_or(Some(#const_initial_condition_iter)) )*,
-                    serialfunc: None #( .unwrap_or(Some(stringify!(#fn_serial_iter))) )*,
-                    deserialfunc: None #( .unwrap_or(Some(stringify!(#fn_deserial_iter))) )*,
-                    msfunc: None #( .unwrap_or(Some(stringify!(#fn_moving_state_iter))) )*,
-                    minvfunc: None #( .unwrap_or(Some(stringify!(#fn_moving_state_inverse_iter))) )*,
-                    mstype: None #( .unwrap_or(Some(#type_moving_state_entity_tokens_iter)) )*,
-                    mfinalfunc: None #( .unwrap_or(Some(stringify!(#fn_moving_finalize_iter))) )*,
-                    mfinalfunc_modify: None #( .unwrap_or(#const_moving_finalize_modify_iter) )*,
-                    minitcond: None #( .unwrap_or(Some(#const_moving_intial_condition_iter)) )*,
-                    sortop: None #( .unwrap_or(Some(#const_sort_operator_iter)) )*,
-                    parallel: None #( .unwrap_or(#const_parallel_iter) )*,
-                    hypothetical: #hypothetical,
-                    to_sql_config: #to_sql_config,
-                };
-                ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity::Aggregate(submission)
-            }
+            ::pgrx::pgrx_sql_entity_graph::__pgrx_schema_entry!(
+                #sql_graph_entity_fn_name,
+                #total_len,
+                {
+                    let writer = ::pgrx::pgrx_sql_entity_graph::section::EntryWriter::<{ #total_len }>::new()
+                        .u32((#payload_len) as u32)
+                        .u8(::pgrx::pgrx_sql_entity_graph::section::ENTITY_AGGREGATE)
+                        .str(concat!(module_path!(), "::", stringify!(#target_ident)))
+                        .str(module_path!())
+                        .str(file!())
+                        .u32(line!())
+                        .str(#name)
+                        .bool(#const_ordered_set);
+                    let writer = { #args_writer };
+                    let writer = { #direct_args_writer };
+                    let writer = { #stype_writer };
+                    let writer = writer.str(stringify!(#fn_state));
+                    let writer = { #finalfunc_writer };
+                    let writer = { #finalize_modify_writer };
+                    let writer = { #combinefunc_writer };
+                    let writer = { #serialfunc_writer };
+                    let writer = { #deserialfunc_writer };
+                    let writer = { #initcond_writer };
+                    let writer = { #msfunc_writer };
+                    let writer = { #minvfunc_writer };
+                    let writer = { #moving_state_writer };
+                    let writer = { #mfinalfunc_writer };
+                    let writer = { #moving_finalize_modify_writer };
+                    let writer = { #minitcond_writer };
+                    let writer = { #sortop_writer };
+                    let writer = { #parallel_writer };
+                    let writer = writer.bool(#hypothetical);
+                    let writer = { #to_sql_config_writer };
+                    writer.finish()
+                }
+            );
         }
     }
 }

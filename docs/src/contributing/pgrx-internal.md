@@ -81,12 +81,17 @@ at least somewhat. Or not.
 
 ## cargo-pgrx
 
-Together with `pgrx-sql-entity-graph`, this implements a rather astounding hack:
+Together with `pgrx-sql-entity-graph`, this is responsible for turning Rust extension code into
+ordered SQL install scripts.
 
-Various functions are injected into the Rust library, which are then dlopened and called to
-extract the required SQL!
+Today, the proc macros emit serialized SQL graph entities into a linker section named
+`.pgrx_schema` in the compiled extension library. `cargo-pgrx` reads that section directly from
+the built artifact, reconstructs the entity graph, orders the SQL objects by dependency, and
+writes the extension SQL file.
 
-See [Forging SQL from Rust](../articles/forging-sql-from-rust.md) for more.
+The old `pgrx_embed` and `__pgrx_internals_*` symbol-scanning pipeline has been removed. If you
+want the background on that older design, see the historical article
+[Forging SQL from Rust](../articles/forging-sql-from-rust.md).
 
 ## pgrx-pg-config
 

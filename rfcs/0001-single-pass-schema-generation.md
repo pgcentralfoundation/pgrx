@@ -111,57 +111,90 @@ incremental compilation support — the linker always produces a complete `.so`.
 
 ### Extended trait: `SqlTranslatable`
 
-Rather than introducing a new trait, we extend the existing `SqlTranslatable` trait
-with a single const:
+Rather than introducing a parallel schema-only trait, we extend
+`SqlTranslatable` so it can describe its SQL behavior in a const-friendly form.
+The proc macros then read that compile-time metadata directly when emitting
+`.pgrx_schema`.
 
 ```rust
 pub unsafe trait SqlTranslatable {
-    /// A compile-time identifier for this type used during schema generation.
-    /// Derive macros set this automatically. Manual implementors should use
-    /// the `pgrx_resolved_type!()` helper macro.
+    /// A compile-time identifier for dependency matching.
     ///
-    /// No default is provided — this is intentionally a required const so that
-    /// a missing implementation is a compile error, not a silent schema bug.
+    /// Derive macros set this automatically. Manual implementors should use
+    /// `pgrx_resolved_type!()`.
     const SCHEMA_KEY: &'static str;
 
-    // Existing methods — all unchanged
+    /// Const-friendly mirror of `argument_sql()`.
+    const ARGUMENT_SQL: SqlMappingRef;
+
+    /// Const-friendly mirror of `return_sql()`.
+    const RETURN_SQL: ReturnsRef;
+
+    const VARIADIC: bool = false;
+    const OPTIONAL: bool = false;
+
+    // Runtime methods remain as compatibility shims over the const metadata.
     fn type_name() -> &'static str { core::any::type_name::<Self>() }
-    fn argument_sql() -> Result<SqlMapping, ArgumentError>;
-    fn return_sql() -> Result<Returns, ReturnsError>;
-    fn variadic() -> bool { false }
-    fn optional() -> bool { false }
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Self::ARGUMENT_SQL.into_runtime()
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Self::RETURN_SQL.into_runtime()
+    }
+    fn variadic() -> bool { Self::VARIADIC }
+    fn optional() -> bool { Self::OPTIONAL }
     fn entity() -> FunctionMetadataTypeEntity { ... }
 }
 ```
 
-This is a **breaking change**: existing `unsafe impl SqlTranslatable` blocks that do
-not set `SCHEMA_KEY` will fail to compile. The fix is one line — see migration guide.
+`SqlMappingRef` and `ReturnsRef` are new internal, const-friendly mirrors of
+`SqlMapping` and `Returns`. They use only `&'static str`, booleans, and small
+enums, so proc macros can embed them without executing code or allocating
+`String`s. This preserves the historical `SqlTranslatable` source of truth for
+SQL spellings while making that information available during the single library
+build.
+
+This is a **breaking change**: existing manual `unsafe impl SqlTranslatable`
+blocks must provide compile-time schema metadata, not just runtime methods. The
+migration is still mechanical, but it is larger than a one-line change.
 
 ### Blanket / generic `SqlTranslatable` impls
 
-pgrx provides blanket `SqlTranslatable` impls for wrapper types: `Option<T>`, `Vec<T>`,
-`&T`, `&mut T`, `*mut T`, `Result<T, E>`, `Array<T>`, `VariadicArray<T>`, `PgBox<T>`,
-`PgVarlena<T>`, etc. These impls delegate SQL mapping behavior to their inner type `T`.
+pgrx provides blanket `SqlTranslatable` impls for wrapper types: `Option<T>`,
+`Vec<T>`, `&T`, `&mut T`, `*mut T`, `Result<T, E>`, `Array<T>`,
+`VariadicArray<T>`, `PgBox<T>`, `PgVarlena<T>`, and others. Under this RFC,
+those impls compose the const metadata the same way they compose the runtime
+methods today.
 
-For `SCHEMA_KEY`, these blanket impls delegate to the inner type:
+For example:
 
 ```rust
 unsafe impl<T: SqlTranslatable> SqlTranslatable for Option<T> {
     const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> { T::argument_sql() }
-    fn return_sql() -> Result<Returns, ReturnsError> { T::return_sql() }
-    fn optional() -> bool { true }
+    const ARGUMENT_SQL: SqlMappingRef = T::ARGUMENT_SQL;
+    const RETURN_SQL: ReturnsRef = T::RETURN_SQL;
+    const OPTIONAL: bool = true;
+}
+
+unsafe impl<T, E> SqlTranslatable for Result<T, E>
+where
+    T: SqlTranslatable,
+{
+    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const ARGUMENT_SQL: SqlMappingRef = T::ARGUMENT_SQL;
+    const RETURN_SQL: ReturnsRef = T::RETURN_SQL;
+    const OPTIONAL: bool = true;
 }
 ```
 
-This is correct: `Option<MyType>` should have the same schema key as `MyType`, since
-the wrapper types are unwrapped to their inner type during schema generation. The graph
-builder matches on the inner type's name, not the wrapper's.
+This is the key compatibility lever: instead of teaching the proc macro a
+separate built-in table, we keep `SqlTranslatable` as the single source of truth
+for built-ins, wrappers, and manual/custom SQL-backed types.
 
 ### Helper macro: `pgrx_resolved_type!()`
 
-A convenience macro is provided so users don't have to hand-write the `concat!()` /
-`module_path!()` incantation:
+A convenience macro is provided so users don't have to hand-write the
+`concat!()` / `module_path!()` incantation:
 
 ```rust
 /// Produces a compile-time string identifying this type for schema generation.
@@ -170,8 +203,8 @@ A convenience macro is provided so users don't have to hand-write the `concat!()
 /// ```rust
 /// unsafe impl SqlTranslatable for HexInt {
 ///     const SCHEMA_KEY: &'static str = pgrx::pgrx_resolved_type!(HexInt);
-///     fn argument_sql() -> Result<SqlMapping, ArgumentError> { ... }
-///     fn return_sql() -> Result<Returns, ReturnsError> { ... }
+///     const ARGUMENT_SQL: SqlMappingRef = SqlMappingRef::literal("hexint");
+///     const RETURN_SQL: ReturnsRef = ReturnsRef::one(SqlMappingRef::literal("hexint"));
 /// }
 /// ```
 #[macro_export]
@@ -182,43 +215,68 @@ macro_rules! pgrx_resolved_type {
 }
 ```
 
-The type name must be passed explicitly because `stringify!(Self)` inside a trait impl
-produces the literal string `"Self"`, not the concrete type name.
+The type name must be passed explicitly because `stringify!(Self)` inside a
+trait impl produces the literal string `"Self"`, not the concrete type name.
 
-**Why `SCHEMA_KEY` has no default:** If a trait default used `module_path!()`, it would
-resolve to `pgrx_sql_entity_graph::metadata::sql_translatable` — the module where the
-trait is defined, not where the user's type lives. `module_path!()` expands to the
-module where it is *lexically written*, so it only produces the correct result when
-emitted at the user's definition site. Omitting the default forces every impl to
-provide the value explicitly, catching errors at compile time rather than producing
-wrong schema output silently.
+**Why `SCHEMA_KEY` has no default:** If a trait default used `module_path!()`, it
+would resolve to `pgrx_sql_entity_graph::metadata::sql_translatable` — the
+module where the trait is defined, not where the user's type lives.
+`module_path!()` expands to the module where it is *lexically written*, so it
+only produces the correct result when emitted at the user's definition or impl
+site intentionally. Omitting the default forces every manual impl to make that
+choice explicitly, catching errors at compile time rather than producing wrong
+schema output silently.
+
+### Meaning of `SCHEMA_KEY`
+
+`SCHEMA_KEY` is the compile-time dependency identity of a Rust type for schema
+generation. It is not the SQL spelling of the type.
+
+- For derive-generated types and enums, `SCHEMA_KEY` is canonical and generated
+  automatically.
+- For aliases and re-exports, the compiler resolves the same underlying
+  `SqlTranslatable` impl, so they naturally reuse the same `SCHEMA_KEY`.
+- For wrapper impls that should order against the underlying SQL type
+  (`Option<T>`, `Result<T, E>`, `Vec<T>`, `Array<T>`, `PgBox<T>`, and similar),
+  the wrapper delegates its `SCHEMA_KEY` to the inner type.
+- For manual impls, the supported/default choice is
+  `pgrx_resolved_type!(ConcreteType)`.
+
+The RFC relies on the normal Rust type system to catch ordinary trait conflicts
+and overlapping impl mistakes at compile time. It does not introduce a separate
+pgrx-specific validation regime for "bad but compilable" manually invented
+`SCHEMA_KEY` strings. Authors are expected to treat `SCHEMA_KEY` as the
+canonical identity of the underlying Rust type they are describing.
 
 ### How entity data is embedded in the `.so`
 
-Each proc macro generates a const string containing the entity's metadata, and places
-it in the `.pgrx_schema` linker section. The string is built using `concat!()` with
-`module_path!()` so that `rustc` resolves the module path at compile time.
+Each proc macro generates const entity data and places its serialized bytes in the
+`.pgrx_schema` linker section. For type-bearing fields, the generated code references
+the relevant `SqlTranslatable` associated consts, so the compiler resolves both the
+type identity and the SQL mapping during the single library build.
 
-The entity data is not assembled via declarative macros. Instead, each proc macro
-(which runs as a normal Rust program at compile time) constructs the entity string
-directly using `format!()` with proper JSON escaping, then emits the result as
-generated Rust code. The proc macro has full access to `serde_json` or manual escaping
-since it's an ordinary Rust program.
+The entity data is not assembled by executing user code. Instead, each proc macro
+constructs an internal const-friendly entity struct, then serializes that struct into
+NDJSON bytes through a generated helper. The proc macro still has full access to
+`serde_json` or manual escaping for fixed strings, but type-dependent fields now come
+from compiler-resolved associated consts instead of a proc-macro-maintained lookup
+table.
 
 **What the proc macro generates** (example for `#[pg_extern]`):
 
 ```rust
-// The proc macro builds this string at macro-expansion time using format!()/serde_json.
-// The only compiler-evaluated piece is module_path!(), spliced in via concat!().
+// The proc macro builds fixed strings at macro-expansion time and lets rustc resolve
+// type-dependent const metadata from `SqlTranslatable`.
 
 const __PGRX_ENTITY_FN_MY_FUNC_JSON: &str = concat!(
     // Proc macro emits this prefix with all values JSON-escaped at expansion time:
     "{\"kind\":\"function\",\"name\":\"my_func\",\"module_path\":\"",
     module_path!(),  // filled in by rustc
     "\",\"file\":\"src/lib.rs\",\"line\":42,\"attrs\":[\"immutable\"],",
-    "\"args\":[{\"name\":\"input\",\"ty\":\"MyType\"},{\"name\":\"count\",",
-    "\"ty\":\"i32\",\"sql\":\"integer\"}],\"ret\":{\"ty\":\"String\",",
-    "\"sql\":\"text\"}}\n",
+    "\"args\":[{\"name\":\"input\",\"schema_key\":\"my_ext::MyType\",",
+    "\"argument_sql\":\"hexint\"},{\"name\":\"count\",\"schema_key\":\"i32\",",
+    "\"argument_sql\":\"integer\"}],\"ret\":{\"schema_key\":\"alloc::string::String\",",
+    "\"return_sql\":\"text\"}}\n",
 );
 
 // Platform-conditional link section name
@@ -239,11 +297,10 @@ static __PGRX_ENTITY_FN_MY_FUNC_BYTES: [u8; __PGRX_ENTITY_FN_MY_FUNC_JSON.len()]
 
 Key implementation details:
 
-- **JSON construction** happens in the proc macro (an ordinary Rust program), which
-  has access to `serde_json`, `format!()`, and proper string escaping. The proc macro
-  constructs all JSON fragments, escaping identifiers, file paths, and SQL content.
-  The only unresolved piece is `module_path!()`, which is spliced into the const via
-  `concat!()` and resolved by `rustc`.
+- **JSON construction** still happens in the proc macro for fixed strings, file paths,
+  SQL bodies, and attribute lists. Type-dependent pieces such as schema identity and
+  SQL mappings come from generated references to `SqlTranslatable::{SCHEMA_KEY,
+  ARGUMENT_SQL, RETURN_SQL}`.
 
 - **Unique static names** are generated by the proc macro using `format_ident!()`
   (from `proc_macro2`), not by declarative macro name-concatenation. This avoids the
@@ -330,8 +387,8 @@ from installed extensions).
 - `FromDatum`, `IntoDatum`, input/output functions, `PostgresType` marker trait
 
 **Will now generate:**
-- `unsafe impl SqlTranslatable for MyType` with `SCHEMA_KEY` set (the derive already
-  generates this impl; it now also sets the new const)
+- `unsafe impl SqlTranslatable for MyType` with `SCHEMA_KEY` and const SQL metadata
+  set automatically
 - All existing trait impls (`FromDatum`, `IntoDatum`, `InOutFuncs`, etc.) — unchanged
 - Input/output `#[pg_extern]` functions — unchanged
 - **A `#[link_section = ".pgrx_schema"]` const** containing the type entity metadata
@@ -350,37 +407,51 @@ Same pattern. The entity metadata (enum name, variants, module path) goes into t
 
 **Will now generate:**
 - The Postgres-callable function — unchanged
-- Compile-time verification for each argument type (see below)
+- Compile-time verification for every normalized argument type and every normalized
+  return leaf type (see below)
+- Function metadata equivalent to today's `FunctionMetadataEntity`, but assembled at
+  compile time from `SqlTranslatable` consts instead of by executing compiled code
 - **A `#[link_section = ".pgrx_schema"]` const** containing the function entity metadata
 
-**Key detail about argument types:** For built-in types (`i32`, `i64`, `bool`, `f32`,
-`f64`, `String`, `&str`, `&CStr`, `Option<T>`, `Vec<T>`, `pg_sys::Oid`,
-`AnyNumeric`, `Date`, `Time`, `Timestamp`, `TimestampWithTimeZone`, etc.), the proc
-macro resolves the SQL mapping directly — it has a hardcoded table of token → SQL type.
-These appear as `"sql":"integer"` in the entity data. For custom types, the `sql` field
-is omitted, and the graph builder resolves it by matching the type token to a registered
-type/enum entity by name.
+**Key detail about type resolution:** The proc macro no longer owns a hardcoded
+built-in table. Instead:
+
+- Syntactic wrappers already understood by pgrx's parsing layer (`default!()`,
+  `composite_type!()`, `Option<T>`, `Result<T, E>`, `Vec<T>`, `Array<T>`,
+  `VariadicArray<T>`, `SetOfIterator<T>`, `TableIterator<(...)>`, etc.) are
+  normalized exactly as they are today.
+- For each resulting leaf type, the generated code references
+  `SqlTranslatable::{SCHEMA_KEY, ARGUMENT_SQL, RETURN_SQL, OPTIONAL, VARIADIC}`.
+- pgrx's own built-ins (`PgRelation`, `TimeWithTimeZone`, `Range<T>`, `PgBox<T>`,
+  `PgVarlena<T>`, and so on) continue to work by implementing those associated consts
+  in pgrx itself, rather than by being duplicated in proc-macro lookup tables.
 
 #### Compile-time verification in `#[pg_extern]`
 
-For each argument whose type token does not match a known built-in type, the proc
-macro generates a const assertion using `SqlTranslatable`:
+For each normalized argument type, the proc macro generates const assertions against
+the schema metadata:
 
 ```rust
 const _: () = {
-    // If MyType doesn't implement SqlTranslatable, this is a compile error.
-    // The compiler resolves MyType through its normal name resolution — the proc
-    // macro only sees the token "MyType", but rustc knows exactly what it is.
     let _ = <MyType as SqlTranslatable>::SCHEMA_KEY;
+    let _ = <MyType as SqlTranslatable>::ARGUMENT_SQL;
+};
+
+const _: () = {
+    let _ = <ReturnType as SqlTranslatable>::SCHEMA_KEY;
+    let _ = <ReturnType as SqlTranslatable>::RETURN_SQL;
 };
 ```
 
-This provides the same compile-time safety that `FunctionMetadata` provides today.
+For `SetOfIterator<T>` and `TableIterator<(name!(col, T), ...)>`, the proc macro emits
+the same checks for each leaf `T`. This restores the current args-and-returns
+compile-time safety of `FunctionMetadata` without keeping a runtime
+`FunctionMetadata` trait in the schema-generation path.
 
 #### `#[derive(PostgresOrd)]`, `#[derive(PostgresHash)]`
 
 Each writes a small entity entry to `.pgrx_schema` with the type name and module path.
-The graph builder connects them to their type entity by name match.
+The graph builder connects them to their type entity by `SCHEMA_KEY`.
 
 #### `#[pg_aggregate]`, `#[pg_trigger]`, `#[pg_schema]`
 
@@ -393,18 +464,20 @@ Each writes its entity data (SQL text, `requires` list, `creates` list,
 
 ### Graph builder changes
 
-The `PgrxSql` graph builder is modified to match entities by name instead of `TypeId`:
+The `PgrxSql` graph builder is modified to match entities by `SCHEMA_KEY` instead of
+`TypeId`.
 
 **Type matching algorithm:**
-1. For path-qualified tokens like `other_mod::MyType`, match on the last path segment
-2. Search all registered type and enum entities for a name match
-3. If exactly one match: create the dependency edge
-4. If no match: create a `BuiltinType` node (type defined elsewhere — same as today)
-5. If multiple matches: disambiguate using `module_path` (prefer same-module), then
-   error if still ambiguous
+1. For each type-bearing edge source (function arg, function return, aggregate state
+   type, `creates = [Type(T)]`, etc.), read the embedded `SCHEMA_KEY`
+2. Search registered type, enum, and `extension_sql!()` `creates` declarations for a
+   matching `SCHEMA_KEY`
+3. In a valid extension, this yields at most one schema-emitting dependency target
+4. If no schema entity matches: treat the type as a preexisting/builtin SQL type and
+   render its SQL spelling from the embedded `ARGUMENT_SQL` / `RETURN_SQL` metadata
 
-For `PostgresOrd`/`PostgresHash`/aggregate connections, match by `name` and
-`module_path` fields.
+For `PostgresOrd`/`PostgresHash`/aggregate connections, the same `SCHEMA_KEY` matching
+logic applies instead of `TypeId`.
 
 ### What gets deleted
 
@@ -432,17 +505,17 @@ For `PostgresOrd`/`PostgresHash`/aggregate connections, match by `name` and
 | Component | Why |
 |-----------|-----|
 | `FromDatum` / `IntoDatum` traits | Not related to schema generation |
-| `SqlTranslatable` trait | Extended with required `SCHEMA_KEY` const (no default — breaking change) |
+| `SqlTranslatable` trait | Still the source of truth for SQL translation; extended with required const schema metadata |
 | `ArgAbi` / `BoxRet` / `UnboxDatum` | Calling convention, not schema |
 | `InOutFuncs` / `PgVarlenaInOutFuncs` | I/O format, not schema |
 | `PgrxSql` graph structure | Same graph, same Tarjan SCC ordering |
 | `ToSql` trait on entities | Same SQL emission logic |
 | `PositioningRef` / `requires` system | Same explicit ordering mechanism |
-| `SqlDeclaredEntity` / `creates` system | Same declaration mechanism |
+| `SqlDeclaredEntity` / `creates` system | Same declaration mechanism, but enriched with `SCHEMA_KEY`/SQL metadata for type-bearing declarations |
 | `extension_sql!()` / `extension_sql_file!()` semantics | Same, section-based now |
 | `object` crate dependency in `cargo-pgrx` | Retained — reads section instead of symbol table |
 | `parse_object()` fat binary helper | Retained |
-| User-facing function/type APIs | Completely unchanged |
+| Most derive-based user APIs | Unchanged; the notable breaking changes are manual `SqlTranslatable` implementations |
 
 ### Why the staleness problem doesn't exist
 
@@ -483,38 +556,46 @@ remove them at their leisure — their presence does not break anything.
 types that bypass `#[derive(PostgresType)]` (for example, the `HexInt` type in
 `pgrx-examples/custom_types`):
 
-**One-line migration required.** `SCHEMA_KEY` has no default, so existing impls need
-one additional line:
+**Small but mechanical migration required.** Manual impls now provide compile-time
+schema metadata in addition to (or instead of) runtime methods:
 
 ```rust
 unsafe impl SqlTranslatable for HexInt {
-    const SCHEMA_KEY: &'static str = pgrx::pgrx_resolved_type!(HexInt); // ADD THIS
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::As("hexint".into()))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::As("hexint".into())))
-    }
+    const SCHEMA_KEY: &'static str = pgrx::pgrx_resolved_type!(HexInt);
+    const ARGUMENT_SQL: SqlMappingRef = SqlMappingRef::literal("hexint");
+    const RETURN_SQL: ReturnsRef = ReturnsRef::one(SqlMappingRef::literal("hexint"));
 }
 ```
 
-Without this line, the code fails to compile with a clear error pointing at the missing
-const. This is intentional — a missing `SCHEMA_KEY` would cause silent schema
-generation bugs, so we make it a hard compile error.
+If an existing impl's SQL behavior can be expressed with static strings, wrappers, and
+the structured `SqlMappingRef` / `ReturnsRef` forms, the migration is straightforward.
+If an impl depends on runtime-only computation, that capability is intentionally no
+longer part of the automatic schema path; users must rewrite it as static metadata.
 
 ### Manual `extension_sql!()` type creation
 
 **Users who create types via raw SQL** (e.g., the `HexInt` pattern with
-`extension_sql!("CREATE TYPE hexint ...", creates = [Type(HexInt)])`) — **no changes
-needed.** The `extension_sql!()` macro embeds its entity data (including the `creates`
-declarations) in `.pgrx_schema`. The graph builder uses the `SqlDeclaredEntity` system
-(unchanged) to resolve `requires` references.
+`extension_sql!("CREATE TYPE hexint ...", creates = [Type(HexInt)])`) keep the same
+surface syntax. Internally, `creates = [Type(HexInt)]` now records `HexInt`'s
+`SCHEMA_KEY` alongside the declaration.
+
+This is important for manual/custom SQL-backed types:
+
+- dependency edges come from `SCHEMA_KEY` matching
+- actual SQL spellings for function args/returns come from `HexInt`'s
+  `ARGUMENT_SQL` / `RETURN_SQL`, not from the Rust identifier `HexInt`
+
+That preserves historically supported patterns where the Rust type name and the SQL
+type name differ.
 
 ### Types from dependency crates
 
-Types from dependency crates are not registered as entities in the extension's schema.
-They appear as function argument/return types and are matched as built-in types (i.e.,
-the graph builder creates a `BuiltinType` node for them). Same behavior as today.
+Types from dependency crates can continue to appear in function signatures as long as
+they implement the const-friendly `SqlTranslatable` metadata required by this RFC.
+If they are not registered schema entities, the graph builder treats them as
+preexisting/builtin SQL types and renders their SQL spelling from the embedded
+metadata. If they cannot provide const metadata, they are outside the automatic
+single-pass schema model described by this RFC.
 
 ### `#[bikeshed_postgres_type_manually_impl_from_into_datum]`
 
@@ -526,7 +607,7 @@ generated — orthogonal to schema generation.
 
 **No changes needed** from the user's perspective. `PostgresOrd` and `PostgresHash`
 embed their entity data in `.pgrx_schema` and the graph builder connects them to their
-type entity by name and module path.
+type entity by `SCHEMA_KEY`.
 
 ### `#[pg_aggregate]` implementations
 
@@ -534,114 +615,70 @@ type entity by name and module path.
 
 ### Custom `#[pg_extern]` argument types via `SqlTranslatable`
 
-**Same one-line migration.** Users who implement `SqlTranslatable` for wrapper/newtype
-types used in function signatures add `const SCHEMA_KEY: &'static str =
-pgrx::pgrx_resolved_type!(Wrapper);` to their impl. The type continues to be matched
-as a built-in in the graph.
+**Same mechanical migration.** Users who implement `SqlTranslatable` for wrapper/newtype
+types used in function signatures add `SCHEMA_KEY` plus const SQL metadata. Once they
+do, those types work for both arguments and return positions under the single-pass
+scheme.
 
 ## Type Matching Strategy: Detailed Rules
 
-### 1. Built-in SQL type resolution (in the proc macro)
+### 1. Type identity comes from `SCHEMA_KEY`
 
-The `#[pg_extern]` proc macro maintains a table of known Rust-to-SQL type mappings:
+For every normalized leaf type appearing in function args, function returns, aggregate
+state, `creates = [Type(T)]`, and similar positions, the proc macro records
+`<T as SqlTranslatable>::SCHEMA_KEY`.
 
-| Rust token(s) | SQL type |
-|-------------|----------|
-| `i8` | `"char"` |
-| `i16` | `smallint` |
-| `i32` | `integer` |
-| `i64` | `bigint` |
-| `f32` | `real` |
-| `f64` | `double precision` |
-| `bool` | `bool` |
-| `String`, `&str` | `text` |
-| `&CStr`, `&std::ffi::CStr` | `cstring` |
-| `()` | `void` |
-| `pg_sys::Oid` | `oid` |
-| `AnyNumeric` | `numeric` |
-| `Date` | `date` |
-| `Time` | `time` |
-| `Timestamp` | `timestamp` |
-| `TimestampWithTimeZone` | `timestamp with time zone` |
-| `Interval` | `interval` |
-| `Json` | `json` |
-| `JsonB` | `jsonb` |
-| `Uuid` | `uuid` |
-| `Inet` | `inet` |
-| `AnyElement` | `anyelement` |
-| `AnyArray` | `anyarray` |
-| `Internal` | `internal` |
+That becomes the primary dependency-matching key across the graph:
 
-Wrapper types (`Option<T>`, `Vec<T>`, `Array<T>`, `VariadicArray<T>`, `PgBox<T>`,
-`default!(T, expr)`, `&T`, `&mut T`) are unwrapped to their inner type before
-matching.
+1. Search registered type and enum entities for a matching `SCHEMA_KEY`
+2. Search `extension_sql!()` `creates` declarations for a matching `SCHEMA_KEY`
+3. If a match is found, create the dependency edge
+4. If no schema entity matches, treat the type as a preexisting/builtin SQL type
 
-### 2. Custom type resolution (in the graph builder)
+### 2. SQL rendering comes from `SqlTranslatable` const metadata
 
-For argument types not resolved by the proc macro:
-1. Extract the short name from the token: `other_mod::MyType` → `MyType`
-2. Search registered type/enum entities for a name match
-3. If no match, search `extension_sql!()` `creates` declarations
-4. If still no match, create a `BuiltinType` node
-5. If multiple matches, disambiguate by `module_path`, then error if ambiguous
+The SQL spelling of a type is not derived from the Rust token and is not guessed from
+`creates = [Type(T)]`. Instead:
+
+- function argument SQL comes from `ARGUMENT_SQL`
+- function return SQL comes from `RETURN_SQL`
+- wrapper behavior (`Result<T, E>`, `Option<T>`, `Vec<T>`, arrays, etc.) comes from the
+  blanket impls' composed const metadata
+
+This preserves cases like a Rust type `HexInt` that must render as SQL `hexint`.
+
+### 3. Local SQL type overrides are deferred
+
+This RFC does not rely on `#[pgrx(sql_type = "...")]` or define new local
+type-spelling override behavior. The single-pass design here is intentionally
+specified in terms of `SqlTranslatable` metadata plus existing entity-level SQL
+customization mechanisms.
+
+If pgrx later adds or retains per-argument/per-return SQL spelling overrides,
+they should be specified as a follow-up design, not as a hidden dependency of
+this RFC.
 
 ## Known Limitations and Edge Cases
 
 ### Type aliases
 
-If a user writes `type MyAlias = MyType;` and uses `MyAlias` in a `#[pg_extern]`
-signature, the proc macro sees the token `MyAlias`, not `MyType`. There is no type
-entity named `MyAlias`, so the graph builder falls through to creating a `BuiltinType`
-node. The dependency edge from the function to `MyType`'s `CREATE TYPE` is lost.
-
-This is a regression from `TypeId`-based matching, where
-`TypeId::of::<MyAlias>() == TypeId::of::<MyType>()` handles aliases transparently.
-
-**Mitigation:** The `#[pgrx(sql_type = "...")]` attribute on a function argument
-provides an explicit override:
-
-```rust
-type MyAlias = MyType;
-
-#[pg_extern]
-fn foo(#[pgrx(sql_type = "my_type")] x: MyAlias) -> i32 { ... }
-```
-
-When `sql_type` is set, the proc macro writes it directly into the entity data and the
-graph builder uses it for matching instead of the token name. This handles aliases,
-re-exports with different names, and any other case where the token doesn't match the
-registered type name.
-
-If `type_name::<T>()` becomes `const fn` in the future, we can embed the
-compiler-resolved name and handle aliases automatically without the attribute.
+For types that implement `SqlTranslatable`, aliases now work naturally: the compiler
+resolves `<MyAlias as SqlTranslatable>::SCHEMA_KEY` and the associated SQL metadata
+through the underlying impl, so `type MyAlias = MyType;` behaves the same as `MyType`
+for schema generation.
 
 ### Re-exported types
 
-If `my_ext::types::Foo` is re-exported as `my_ext::Foo` and a function in `my_ext`
-uses `Foo`, the proc macro sees the token `Foo`. The type entity's `module_path` is
-`my_ext::types` (where the derive macro ran). The function's `module_path` is
-`my_ext`. Name matching finds `Foo` by short name. The `module_path` disambiguation
-does not interfere because there is only one registered type named `Foo` — it matches.
-This case works correctly.
-
-If there are *two* types named `Foo` in different modules and both are registered, the
-disambiguation by `module_path` may pick the wrong one if the function uses a
-re-export from a different module. This is the same ambiguity that exists in any
-name-based resolution system. The graph builder errors on true ambiguity.
+Re-exports are no longer special. As long as the re-exported type resolves to the same
+`SqlTranslatable` impl, it carries the same `SCHEMA_KEY` and the same SQL metadata.
 
 ### Generic types
 
-pgrx does not support generic type parameters in `#[pg_extern]` function signatures
-(e.g., `fn foo<T: PostgresType>(x: T)` is not valid pgrx). Concrete generic
-instantiations like `MyGenericType<i32>` are uncommon with `#[derive(PostgresType)]`
-but possible.
-
-If used, the proc macro sees `MyGenericType<i32>` as the type token. The short name
-extraction gives `MyGenericType`. The type entity from the derive was registered as
-`MyGenericType`. The name matches. The generic parameter is lost in the match, but
-since the dependency edge only needs to order `CREATE TYPE my_generic_type` before the
-function, this is correct — there is only one `CREATE TYPE` regardless of the generic
-parameter.
+pgrx still does not support generic type parameters in `#[pg_extern]` function
+signatures (e.g., `fn foo<T: PostgresType>(x: T)` is not valid pgrx). Concrete generic
+instantiations can work if their `SqlTranslatable` impl exposes a stable `SCHEMA_KEY`
+and const SQL metadata, but the automatic path is intentionally limited to cases that
+can be described without runtime computation.
 
 ### `#[cfg]`-gated entities
 
@@ -695,8 +732,8 @@ logic is a safety net, not the primary mechanism.
 
 Example section content (3 entities):
 ```
-{"kind":"type","name":"MyType","module_path":"my_ext","file":"src/lib.rs","line":10,...}
-{"kind":"function","name":"my_func","module_path":"my_ext","file":"src/lib.rs","line":20,...}
+{"kind":"type","name":"MyType","schema_key":"my_ext::MyType","module_path":"my_ext","file":"src/lib.rs","line":10,...}
+{"kind":"function","name":"my_func","module_path":"my_ext","file":"src/lib.rs","line":20,"args":[{"schema_key":"my_ext::MyType","argument_sql":"my_type"}],...}
 {"kind":"schema","name":"my_schema","module_path":"my_ext::my_schema",...}
 ```
 
@@ -706,15 +743,23 @@ Example section content (3 entities):
 
 If `core::any::type_name::<T>()` is stabilized as `const fn`
 (tracking: [rust-lang/rust#63084](https://github.com/rust-lang/rust/issues/63084)),
-we can embed fully-qualified type names in the section data using the same
-`concat!()` technique, giving us exact type matching instead of token-name matching.
+we can embed compiler-resolved fully-qualified type names directly into the section
+data for diagnostics, consistency checks, and richer debug output.
 
 ### Automatic alias detection
 
-If `type_name::<T>()` becomes `const fn`, we could embed the compiler-resolved
-fully-qualified type name alongside the token name in the section data. The graph
-builder could then detect type aliases automatically without requiring
-`#[pgrx(sql_type = "...")]` annotations.
+The `SCHEMA_KEY` design already handles aliases and re-exports for
+`SqlTranslatable` types. If `type_name::<T>()` becomes `const fn`, we can additionally
+record the compiler-resolved full type name in the emitted metadata and use it as a
+debugging aid or to validate that a manual `SCHEMA_KEY` matches the underlying type the
+user intended.
+
+### Local SQL type overrides
+
+Per-position override attributes such as `#[pgrx(sql_type = "...")]` are deferred
+from this RFC. If we reintroduce them later, they should be defined as a small,
+local rendering feature layered on top of the `SCHEMA_KEY` model, not as a
+replacement for it.
 
 ## Compatibility Notes
 
@@ -737,34 +782,37 @@ major pgrx version bump.
 1. **Delete `src/bin/pgrx_embed.rs`** and remove the `[[bin]]` target from
    `Cargo.toml`.
 
-2. **Add `SCHEMA_KEY` to every `unsafe impl SqlTranslatable` block.** The compiler
-   will tell you exactly which impls need it. The fix is one line per impl:
+2. **Add compile-time schema metadata to every manual `unsafe impl SqlTranslatable`
+   block.** At minimum that means `SCHEMA_KEY`, `ARGUMENT_SQL`, and `RETURN_SQL`:
    ```rust
    const SCHEMA_KEY: &'static str = pgrx::pgrx_resolved_type!(YourType);
+   const ARGUMENT_SQL: SqlMappingRef = SqlMappingRef::literal("your_sql_type");
+   const RETURN_SQL: ReturnsRef = ReturnsRef::one(SqlMappingRef::literal("your_sql_type"));
    ```
 
 3. Types using `#[derive(PostgresType)]`, `#[derive(PostgresEnum)]`, and all other
-   derive macros need **no changes** — the derive generates `SCHEMA_KEY` automatically.
+   derive macros need **no manual changes** — the derives generate the const schema
+   metadata automatically.
 
 ### For pgrx contributors
 
 1. **`pgrx-sql-entity-graph`** — Each entity module's proc macro expansion changes
    from generating `__pgrx_internals_*` functions to emitting `#[link_section]` const
    statics. The entity structs lose their `TypeId` fields. The graph builder switches
-   to name-based matching.
+   to `SCHEMA_KEY`-based matching and consumes const-friendly SQL metadata.
 
 2. **`pgrx-macros`** — The `pg_extern`, `pg_operator`, `pg_cast` macro implementations
-   gain the `concat!()` / `#[link_section]` entity embedding and compile-time
-   verification logic.
+   gain the `#[link_section]` entity embedding and compile-time verification logic for
+   both normalized args and normalized returns.
 
 3. **`cargo-pgrx`** — The `schema.rs` command module is substantially simplified:
    `first_build` remains; symbol scanning, codegen, second build, and binary execution
    are replaced with a single section read + JSON parse.
 
 4. **`pgrx`** — The `pgrx_embed!()` macro and `WithTypeIds` infrastructure are removed.
-   `SqlTranslatable` gains the required `SCHEMA_KEY` const (no default — breaking
-   change). The `pgrx_resolved_type!()` and `__pgrx_schema_entity!()` helper macros
-   are added.
+   `SqlTranslatable` gains required const schema metadata (`SCHEMA_KEY`,
+   `ARGUMENT_SQL`, `RETURN_SQL`, plus const-friendly mirrors of the runtime enums).
+   The `pgrx_resolved_type!()` and `__pgrx_schema_entity!()` helper macros are added.
 
 5. **Templates** — `cargo pgrx new` templates are updated to omit `pgrx_embed.rs` and
    the `[[bin]]` target.

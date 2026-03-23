@@ -57,6 +57,131 @@ impl SqlMapping {
     }
 }
 
+/// Const-friendly SQL mapping metadata.
+#[derive(Clone, Copy, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
+pub enum SqlMappingRef {
+    /// Explicit mappings provided by PGRX
+    As(&'static str),
+    Array(&'static str),
+    Numeric {
+        precision: Option<u32>,
+        scale: Option<u32>,
+        array_brackets: bool,
+    },
+    Composite {
+        array_brackets: bool,
+    },
+    /// A type which does not actually appear in SQL
+    Skip,
+}
+
+impl SqlMappingRef {
+    pub const fn literal(s: &'static str) -> Self {
+        Self::As(s)
+    }
+}
+
+impl From<SqlMappingRef> for SqlMapping {
+    fn from(value: SqlMappingRef) -> Self {
+        match value {
+            SqlMappingRef::As(value) => SqlMapping::literal(value),
+            SqlMappingRef::Array(value) => SqlMapping::As(format!("{value}[]")),
+            SqlMappingRef::Numeric { precision, scale, array_brackets } => {
+                let mut sql = match (precision, scale) {
+                    (None, _) => "NUMERIC".to_string(),
+                    (Some(precision), None) => format!("NUMERIC({precision})"),
+                    (Some(precision), Some(scale)) => format!("NUMERIC({precision}, {scale})"),
+                };
+                if array_brackets {
+                    sql.push_str("[]");
+                }
+                SqlMapping::As(sql)
+            }
+            SqlMappingRef::Composite { array_brackets } => SqlMapping::Composite { array_brackets },
+            SqlMappingRef::Skip => SqlMapping::Skip,
+        }
+    }
+}
+
+/// Const-friendly return metadata.
+#[derive(Clone, Copy, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
+pub enum ReturnsRef {
+    One(SqlMappingRef),
+    SetOf(SqlMappingRef),
+    Table(&'static [SqlMappingRef]),
+}
+
+impl From<ReturnsRef> for Returns {
+    fn from(value: ReturnsRef) -> Self {
+        match value {
+            ReturnsRef::One(value) => Returns::One(value.into()),
+            ReturnsRef::SetOf(value) => Returns::SetOf(value.into()),
+            ReturnsRef::Table(values) => {
+                Returns::Table(values.iter().copied().map(Into::into).collect())
+            }
+        }
+    }
+}
+
+pub const fn array_argument_sql(
+    mapping: Result<SqlMappingRef, ArgumentError>,
+) -> Result<SqlMappingRef, ArgumentError> {
+    match mapping {
+        Ok(SqlMappingRef::As(sql)) | Ok(SqlMappingRef::Array(sql)) => Ok(SqlMappingRef::Array(sql)),
+        Ok(SqlMappingRef::Numeric { precision, scale, .. }) => {
+            Ok(SqlMappingRef::Numeric { precision, scale, array_brackets: true })
+        }
+        Ok(SqlMappingRef::Composite { .. }) => {
+            Ok(SqlMappingRef::Composite { array_brackets: true })
+        }
+        Ok(SqlMappingRef::Skip) => Err(ArgumentError::SkipInArray),
+        Err(err) => Err(err),
+    }
+}
+
+pub const fn array_return_sql(
+    returns: Result<ReturnsRef, ReturnsError>,
+) -> Result<ReturnsRef, ReturnsError> {
+    match returns {
+        Ok(ReturnsRef::One(SqlMappingRef::As(sql)))
+        | Ok(ReturnsRef::One(SqlMappingRef::Array(sql))) => {
+            Ok(ReturnsRef::One(SqlMappingRef::Array(sql)))
+        }
+        Ok(ReturnsRef::One(SqlMappingRef::Numeric { precision, scale, .. })) => {
+            Ok(ReturnsRef::One(SqlMappingRef::Numeric { precision, scale, array_brackets: true }))
+        }
+        Ok(ReturnsRef::One(SqlMappingRef::Composite { .. })) => {
+            Ok(ReturnsRef::One(SqlMappingRef::Composite { array_brackets: true }))
+        }
+        Ok(ReturnsRef::One(SqlMappingRef::Skip)) => Err(ReturnsError::SkipInArray),
+        Ok(ReturnsRef::SetOf(_)) => Err(ReturnsError::SetOfInArray),
+        Ok(ReturnsRef::Table(_)) => Err(ReturnsError::TableInArray),
+        Err(err) => Err(err),
+    }
+}
+
+pub const fn setof_return_sql(
+    returns: Result<ReturnsRef, ReturnsError>,
+) -> Result<ReturnsRef, ReturnsError> {
+    match returns {
+        Ok(ReturnsRef::One(sql)) => Ok(ReturnsRef::SetOf(sql)),
+        Ok(ReturnsRef::SetOf(_)) => Err(ReturnsError::NestedSetOf),
+        Ok(ReturnsRef::Table(_)) => Err(ReturnsError::SetOfContainingTable),
+        Err(err) => Err(err),
+    }
+}
+
+pub const fn table_item_sql(
+    returns: Result<ReturnsRef, ReturnsError>,
+) -> Result<SqlMappingRef, ReturnsError> {
+    match returns {
+        Ok(ReturnsRef::One(sql)) => Ok(sql),
+        Ok(ReturnsRef::SetOf(_)) => Err(ReturnsError::TableContainingSetOf),
+        Ok(ReturnsRef::Table(_)) => Err(ReturnsError::NestedTable),
+        Err(err) => Err(err),
+    }
+}
+
 /**
 A value which can be represented in SQL
 
@@ -75,66 +200,62 @@ Nonetheless, if you are not confident the translation is valid: do not implement
     label = "non-SQL type"
 )]
 pub unsafe trait SqlTranslatable {
+    const SCHEMA_KEY: &'static str;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError>;
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError>;
+    const VARIADIC: bool = false;
+    const OPTIONAL: bool = false;
+
     fn type_name() -> &'static str {
         core::any::type_name::<Self>()
     }
-    fn argument_sql() -> Result<SqlMapping, ArgumentError>;
-    fn return_sql() -> Result<Returns, ReturnsError>;
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Self::ARGUMENT_SQL.map(Into::into)
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Self::RETURN_SQL.map(Into::into)
+    }
     fn variadic() -> bool {
-        false
+        Self::VARIADIC
     }
     fn optional() -> bool {
-        false
+        Self::OPTIONAL
     }
     fn entity() -> FunctionMetadataTypeEntity {
         FunctionMetadataTypeEntity {
-            type_name: Self::type_name(),
+            schema_key: Self::SCHEMA_KEY,
             argument_sql: Self::argument_sql(),
             return_sql: Self::return_sql(),
-            variadic: Self::variadic(),
-            optional: Self::optional(),
         }
     }
 }
 
 unsafe impl SqlTranslatable for () {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Err(ArgumentError::NotValidAsArgument("()"))
-    }
-
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("VOID")))
-    }
+    const SCHEMA_KEY: &'static str = "()";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+        Err(ArgumentError::NotValidAsArgument("()"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("VOID")));
 }
 
 unsafe impl<T> SqlTranslatable for Option<T>
 where
     T: SqlTranslatable,
 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        T::argument_sql()
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        T::return_sql()
-    }
-    fn optional() -> bool {
-        true
-    }
+    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
+    const OPTIONAL: bool = true;
 }
 
 unsafe impl<T> SqlTranslatable for *mut T
 where
     T: SqlTranslatable,
 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        T::argument_sql()
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        T::return_sql()
-    }
-    fn optional() -> bool {
-        T::optional()
-    }
+    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
+    const OPTIONAL: bool = T::OPTIONAL;
 }
 
 unsafe impl<T, E> SqlTranslatable for Result<T, E>
@@ -142,191 +263,66 @@ where
     T: SqlTranslatable,
     E: Any + Display,
 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        T::argument_sql()
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        T::return_sql()
-    }
-    fn optional() -> bool {
-        true
-    }
+    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
+    const OPTIONAL: bool = true;
 }
 
 unsafe impl<T> SqlTranslatable for Vec<T>
 where
     T: SqlTranslatable,
 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        match T::type_name() {
-            id if id == u8::type_name() => Ok(SqlMapping::As("bytea".into())),
-            _ => match T::argument_sql() {
-                Ok(SqlMapping::As(val)) => Ok(SqlMapping::As(format!("{val}[]"))),
-                Ok(SqlMapping::Composite { array_brackets: _ }) => {
-                    Ok(SqlMapping::Composite { array_brackets: true })
-                }
-                Ok(SqlMapping::Skip) => Ok(SqlMapping::Skip),
-                err @ Err(_) => err,
-            },
-        }
-    }
-
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        match T::type_name() {
-            id if id == u8::type_name() => Ok(Returns::One(SqlMapping::As("bytea".into()))),
-            _ => match T::return_sql() {
-                Ok(Returns::One(SqlMapping::As(val))) => {
-                    Ok(Returns::One(SqlMapping::As(format!("{val}[]"))))
-                }
-                Ok(Returns::One(SqlMapping::Composite { array_brackets: _ })) => {
-                    Ok(Returns::One(SqlMapping::Composite { array_brackets: true }))
-                }
-                Ok(Returns::One(SqlMapping::Skip)) => Ok(Returns::One(SqlMapping::Skip)),
-                Ok(Returns::SetOf(_)) => Err(ReturnsError::SetOfInArray),
-                Ok(Returns::Table(_)) => Err(ReturnsError::TableInArray),
-                err @ Err(_) => err,
-            },
-        }
-    }
-    fn optional() -> bool {
-        T::optional()
-    }
+    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = match T::ARGUMENT_SQL {
+        Err(ArgumentError::BareU8) => Ok(SqlMappingRef::As("bytea")),
+        other => array_argument_sql(other),
+    };
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> = match T::RETURN_SQL {
+        Err(ReturnsError::BareU8) => Ok(ReturnsRef::One(SqlMappingRef::As("bytea"))),
+        other => array_return_sql(other),
+    };
+    const OPTIONAL: bool = T::OPTIONAL;
 }
 
 unsafe impl SqlTranslatable for u8 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Err(ArgumentError::BareU8)
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Err(ReturnsError::BareU8)
-    }
+    const SCHEMA_KEY: &'static str = "u8";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::BareU8);
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> = Err(ReturnsError::BareU8);
 }
 
-unsafe impl SqlTranslatable for i32 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("INT"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("INT")))
-    }
+macro_rules! simple_sql_type {
+    ($ty:ty, $schema_key:literal, $sql:literal) => {
+        unsafe impl SqlTranslatable for $ty {
+            const SCHEMA_KEY: &'static str = $schema_key;
+            const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+                Ok(SqlMappingRef::literal($sql));
+            const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+                Ok(ReturnsRef::One(SqlMappingRef::literal($sql)));
+        }
+    };
 }
 
-unsafe impl SqlTranslatable for String {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("TEXT"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("TEXT")))
-    }
-}
+simple_sql_type!(i32, "i32", "INT");
+simple_sql_type!(String, "String", "TEXT");
 
 unsafe impl<T> SqlTranslatable for &T
 where
     T: ?Sized + SqlTranslatable,
 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        T::argument_sql()
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        T::return_sql()
-    }
+    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
 }
 
-unsafe impl SqlTranslatable for str {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("TEXT"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("TEXT")))
-    }
-}
-
-unsafe impl SqlTranslatable for [u8] {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("bytea"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("bytea")))
-    }
-}
-
-unsafe impl SqlTranslatable for i8 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::As(String::from("\"char\"")))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::As(String::from("\"char\""))))
-    }
-}
-
-unsafe impl SqlTranslatable for i16 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("smallint"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("smallint")))
-    }
-}
-
-unsafe impl SqlTranslatable for i64 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("bigint"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("bigint")))
-    }
-}
-
-unsafe impl SqlTranslatable for bool {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("bool"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("bool")))
-    }
-}
-
-unsafe impl SqlTranslatable for char {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("varchar"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("varchar")))
-    }
-}
-
-unsafe impl SqlTranslatable for f32 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("real"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("real")))
-    }
-}
-
-unsafe impl SqlTranslatable for f64 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("double precision"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("double precision")))
-    }
-}
-
-unsafe impl SqlTranslatable for CString {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("cstring"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("cstring")))
-    }
-}
-
-unsafe impl SqlTranslatable for CStr {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("cstring"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("cstring")))
-    }
-}
+simple_sql_type!(str, "str", "TEXT");
+simple_sql_type!([u8], "[u8]", "bytea");
+simple_sql_type!(i8, "i8", "\"char\"");
+simple_sql_type!(i16, "i16", "smallint");
+simple_sql_type!(i64, "i64", "bigint");
+simple_sql_type!(bool, "bool", "bool");
+simple_sql_type!(char, "char", "varchar");
+simple_sql_type!(f32, "f32", "real");
+simple_sql_type!(f64, "f64", "double precision");
+simple_sql_type!(CString, "CString", "cstring");
+simple_sql_type!(CStr, "CStr", "cstring");

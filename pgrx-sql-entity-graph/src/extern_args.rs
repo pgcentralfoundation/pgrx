@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::PositioningRef;
-use proc_macro2::{TokenStream, TokenTree};
+use proc_macro2::{Ident, Span, TokenStream, TokenTree};
 use quote::{ToTokens, TokenStreamExt, format_ident, quote};
 use std::collections::HashSet;
 
@@ -55,6 +55,128 @@ impl core::fmt::Display for ExternArgs {
             ExternArgs::Name(_) => Ok(()),
             ExternArgs::Cost(cost) => write!(f, "COST {cost}"),
             ExternArgs::Requires(_) => Ok(()),
+        }
+    }
+}
+
+impl ExternArgs {
+    pub fn section_len_tokens(&self) -> TokenStream {
+        match self {
+            ExternArgs::CreateOrReplace
+            | ExternArgs::Immutable
+            | ExternArgs::Strict
+            | ExternArgs::Stable
+            | ExternArgs::Volatile
+            | ExternArgs::Raw
+            | ExternArgs::NoGuard
+            | ExternArgs::SecurityDefiner
+            | ExternArgs::SecurityInvoker
+            | ExternArgs::ParallelSafe
+            | ExternArgs::ParallelUnsafe
+            | ExternArgs::ParallelRestricted => {
+                quote! { ::pgrx::pgrx_sql_entity_graph::section::u8_len() }
+            }
+            ExternArgs::ShouldPanic(value)
+            | ExternArgs::Schema(value)
+            | ExternArgs::Name(value)
+            | ExternArgs::Cost(value) => quote! {
+                ::pgrx::pgrx_sql_entity_graph::section::u8_len()
+                    + ::pgrx::pgrx_sql_entity_graph::section::str_len(#value)
+            },
+            ExternArgs::Support(item) => {
+                let item_len = item.section_len_tokens();
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::u8_len() + (#item_len)
+                }
+            }
+            ExternArgs::Requires(items) => {
+                let item_lens = items.iter().map(PositioningRef::section_len_tokens);
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::u8_len()
+                        + ::pgrx::pgrx_sql_entity_graph::section::list_len(&[
+                            #( #item_lens ),*
+                        ])
+                }
+            }
+        }
+    }
+
+    pub fn section_writer_tokens(&self, writer: TokenStream) -> TokenStream {
+        match self {
+            ExternArgs::CreateOrReplace => {
+                quote! { #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_CREATE_OR_REPLACE) }
+            }
+            ExternArgs::Immutable => {
+                quote! { #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_IMMUTABLE) }
+            }
+            ExternArgs::Strict => {
+                quote! { #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_STRICT) }
+            }
+            ExternArgs::Stable => {
+                quote! { #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_STABLE) }
+            }
+            ExternArgs::Volatile => {
+                quote! { #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_VOLATILE) }
+            }
+            ExternArgs::Raw => {
+                quote! { #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_RAW) }
+            }
+            ExternArgs::NoGuard => {
+                quote! { #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_NO_GUARD) }
+            }
+            ExternArgs::SecurityDefiner => quote! {
+                #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_SECURITY_DEFINER)
+            },
+            ExternArgs::SecurityInvoker => quote! {
+                #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_SECURITY_INVOKER)
+            },
+            ExternArgs::ParallelSafe => quote! {
+                #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_PARALLEL_SAFE)
+            },
+            ExternArgs::ParallelUnsafe => quote! {
+                #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_PARALLEL_UNSAFE)
+            },
+            ExternArgs::ParallelRestricted => quote! {
+                #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_PARALLEL_RESTRICTED)
+            },
+            ExternArgs::ShouldPanic(value) => quote! {
+                #writer
+                    .u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_SHOULD_PANIC)
+                    .str(#value)
+            },
+            ExternArgs::Schema(value) => quote! {
+                #writer
+                    .u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_SCHEMA)
+                    .str(#value)
+            },
+            ExternArgs::Support(item) => item.section_writer_tokens(quote! {
+                #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_SUPPORT)
+            }),
+            ExternArgs::Name(value) => quote! {
+                #writer
+                    .u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_NAME)
+                    .str(#value)
+            },
+            ExternArgs::Cost(value) => quote! {
+                #writer
+                    .u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_COST)
+                    .str(#value)
+            },
+            ExternArgs::Requires(items) => {
+                let writer_ident = Ident::new("__pgrx_schema_writer", Span::mixed_site());
+                let item_writers =
+                    items.iter().map(|item| item.section_writer_tokens(quote! { #writer_ident }));
+                let count = items.len();
+                quote! {
+                    {
+                        let #writer_ident = #writer
+                            .u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_REQUIRES)
+                            .u32(#count as u32);
+                        #( let #writer_ident = { #item_writers }; )*
+                        #writer_ident
+                    }
+                }
+            }
         }
     }
 }

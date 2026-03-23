@@ -5,7 +5,8 @@ use crate::memcx::{MemCx, OutOfMemory};
 use crate::nullable::Nullable;
 use crate::palloc::PBox;
 use crate::pgrx_sql_entity_graph::metadata::{
-    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable, array_argument_sql,
+    array_return_sql,
 };
 use crate::toast::{Toast, Toasty};
 use crate::{layout, pg_sys, varlena};
@@ -333,27 +334,9 @@ unsafe impl<T> SqlTranslatable for FlatArray<'_, T>
 where
     T: ?Sized + SqlTranslatable + Element,
 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        match T::argument_sql()? {
-            SqlMapping::As(sql) => Ok(SqlMapping::As(format!("{sql}[]"))),
-            SqlMapping::Skip => Err(ArgumentError::SkipInArray),
-            SqlMapping::Composite { .. } => Ok(SqlMapping::Composite { array_brackets: true }),
-        }
-    }
-
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        match T::return_sql()? {
-            Returns::One(SqlMapping::As(sql)) => {
-                Ok(Returns::One(SqlMapping::As(format!("{sql}[]"))))
-            }
-            Returns::One(SqlMapping::Composite { array_brackets: _ }) => {
-                Ok(Returns::One(SqlMapping::Composite { array_brackets: true }))
-            }
-            Returns::One(SqlMapping::Skip) => Err(ReturnsError::SkipInArray),
-            Returns::SetOf(_) => Err(ReturnsError::SetOfInArray),
-            Returns::Table(_) => Err(ReturnsError::TableInArray),
-        }
-    }
+    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = array_argument_sql(T::ARGUMENT_SQL);
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> = array_return_sql(T::RETURN_SQL);
 }
 
 /// Iterator for arrays

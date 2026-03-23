@@ -15,12 +15,10 @@
 > to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
-use crate::mapping::RustSqlMapping;
 use crate::pgrx_sql::PgrxSql;
 use crate::to_sql::ToSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::{SqlGraphEntity, SqlGraphIdentifier, TypeMatch};
-use std::collections::BTreeSet;
 
 /// The output of a [`PostgresEnum`](crate::postgres_enum::PostgresEnum) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd, Hash)]
@@ -30,14 +28,14 @@ pub struct PostgresEnumEntity {
     pub line: u32,
     pub full_path: &'static str,
     pub module_path: &'static str,
-    pub mappings: BTreeSet<RustSqlMapping>,
+    pub schema_key: &'static str,
     pub variants: Vec<&'static str>,
     pub to_sql_config: ToSqlConfigEntity,
 }
 
 impl TypeMatch for PostgresEnumEntity {
-    fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
-        self.mappings.iter().any(|tester| *candidate == tester.id)
+    fn schema_key(&self) -> &str {
+        self.schema_key
     }
 }
 

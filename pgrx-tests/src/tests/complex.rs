@@ -1,7 +1,7 @@
 //! Type used by various tests.
 use core::ffi::CStr;
 use pgrx::pgrx_sql_entity_graph::metadata::{
-    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
 use pgrx::prelude::*;
 use pgrx::stringinfo::StringInfo;
@@ -41,13 +41,11 @@ extension_sql!(
 );
 
 unsafe impl SqlTranslatable for Complex {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("Complex"))
-    }
-
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("Complex")))
-    }
+    const SCHEMA_KEY: &'static str = "Complex";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+        Ok(SqlMappingRef::literal("Complex"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("Complex")));
 }
 
 #[pg_extern(immutable)]

@@ -1,6 +1,11 @@
 # Forging SQL from Rust
 <!-- Written 2021-09-20 -->
 
+> Historical note: this article describes the pre-`.pgrx_schema` schema-generation pipeline that
+> used `__pgrx_internals_*` functions, `pgrx_embed`, and runtime symbol execution. Current pgrx
+> emits NDJSON SQL entities into a linker section and `cargo-pgrx` reads that section directly
+> from the compiled extension library in a single pass.
+
 PostgreSQL offers an extension interface, and it's my belief that Rust is a fantastic language to write extensions for it. [Eric Ridge](https://twitter.com/zombodb) thought so too, and started [`pgrx`](https://github.com/pgcentralfoundation/pgrx/) awhile back. I've been working with him to improve the toolkit, and wanted to share about one of our latest hacks: improving the generation of extension SQL code to interface with Rust.
 
 This post is more on the advanced side, as it assumes knowledge of both Rust and PostgreSQL. We'll approach topics like foreign functions, dynamic linking, procedural macros, and linkers.

@@ -57,7 +57,6 @@ pub(crate) fn create_crate_template(
     create_dotcargo_config_toml(path.clone(), name)?;
     create_lib_rs(path.clone(), name, is_bgworker)?;
     create_git_ignore(path.clone(), name)?;
-    create_pgrx_embed_rs(path.clone())?;
     create_setup_sql(path.clone(), name)?;
     create_setup_out(path.clone(), name)?;
 
@@ -66,7 +65,7 @@ pub(crate) fn create_crate_template(
 
 fn create_directory_structure(root: PathBuf) -> Result<(), std::io::Error> {
     std::fs::create_dir_all(root.join(".cargo"))?;
-    std::fs::create_dir_all(root.join("src").join("bin"))?;
+    std::fs::create_dir_all(root.join("src"))?;
     std::fs::create_dir_all(root.join("tests").join("pg_regress").join("expected"))?;
     std::fs::create_dir_all(root.join("tests").join("pg_regress").join("sql"))?;
     std::fs::create_dir_all(root.join("sql"))?;
@@ -128,15 +127,6 @@ fn create_git_ignore(mut filename: PathBuf, _name: &str) -> Result<(), std::io::
 
     file.write_all(include_bytes!("../templates/gitignore"))?;
 
-    Ok(())
-}
-
-fn create_pgrx_embed_rs(mut filename: PathBuf) -> Result<(), std::io::Error> {
-    filename.push("src");
-    filename.push("bin");
-    filename.push("pgrx_embed.rs");
-    let mut file = std::fs::File::create(filename)?;
-    file.write_all(include_bytes!("../templates/pgrx_embed_rs"))?;
     Ok(())
 }
 

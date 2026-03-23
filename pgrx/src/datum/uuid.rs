@@ -10,7 +10,7 @@
 use crate::{FromDatum, IntoDatum, PgMemoryContexts, pg_sys};
 use core::fmt::Write;
 use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
 use std::ops::{Deref, DerefMut};
 
@@ -131,10 +131,8 @@ impl std::fmt::UpperHex for Uuid {
 }
 
 unsafe impl SqlTranslatable for crate::datum::Uuid {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("uuid"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("uuid")))
-    }
+    const SCHEMA_KEY: &'static str = "Uuid";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("uuid"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("uuid")));
 }

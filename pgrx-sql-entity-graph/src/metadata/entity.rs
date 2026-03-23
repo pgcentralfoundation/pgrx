@@ -27,9 +27,7 @@ pub struct FunctionMetadataEntity {
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub struct FunctionMetadataTypeEntity {
-    pub type_name: &'static str,
+    pub schema_key: &'static str,
     pub argument_sql: Result<SqlMapping, ArgumentError>,
     pub return_sql: Result<Returns, ReturnsError>,
-    pub variadic: bool,
-    pub optional: bool,
 }

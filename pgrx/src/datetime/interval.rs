@@ -12,7 +12,7 @@ use super::{DateTimeParts, DateTimeTypeVisitor, Time, ToIsoString};
 use crate::datum::{FromDatum, IntoDatum};
 use crate::{direct_function_call, pg_sys};
 use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
 
 /// From the PG docs <https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-INTERVAL-INPUT>
@@ -310,10 +310,9 @@ impl<'de> serde::Deserialize<'de> for Interval {
     }
 }
 unsafe impl SqlTranslatable for Interval {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("interval"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("interval")))
-    }
+    const SCHEMA_KEY: &'static str = "Interval";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+        Ok(SqlMappingRef::literal("interval"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("interval")));
 }

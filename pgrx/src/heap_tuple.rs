@@ -21,7 +21,7 @@ use crate::{PgBox, PgMemoryContexts, PgTupleDesc, TriggerTuple, WhoAllocated};
 use pgrx_pg_sys::PgTryBuilder;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
 use std::num::NonZeroUsize;
 
@@ -711,19 +711,17 @@ macro_rules! composite_type {
 }
 
 unsafe impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByPostgres> {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::Composite { array_brackets: false })
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::Composite { array_brackets: false }))
-    }
+    const SCHEMA_KEY: &'static str = "PgHeapTuple<AllocatedByPostgres>";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+        Ok(SqlMappingRef::Composite { array_brackets: false });
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::Composite { array_brackets: false }));
 }
 
 unsafe impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByRust> {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::Composite { array_brackets: false })
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::Composite { array_brackets: false }))
-    }
+    const SCHEMA_KEY: &'static str = "PgHeapTuple<AllocatedByRust>";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+        Ok(SqlMappingRef::Composite { array_brackets: false });
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::Composite { array_brackets: false }));
 }

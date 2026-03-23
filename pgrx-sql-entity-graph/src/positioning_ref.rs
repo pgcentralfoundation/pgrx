@@ -48,6 +48,35 @@ impl Parse for PositioningRef {
     }
 }
 
+impl PositioningRef {
+    pub fn section_len_tokens(&self) -> proc_macro2::TokenStream {
+        match self {
+            PositioningRef::FullPath(item) | PositioningRef::Name(item) => quote! {
+                ::pgrx::pgrx_sql_entity_graph::section::u8_len()
+                    + ::pgrx::pgrx_sql_entity_graph::section::str_len(#item)
+            },
+        }
+    }
+
+    pub fn section_writer_tokens(
+        &self,
+        writer: proc_macro2::TokenStream,
+    ) -> proc_macro2::TokenStream {
+        match self {
+            PositioningRef::FullPath(item) => quote! {
+                #writer
+                    .u8(::pgrx::pgrx_sql_entity_graph::section::POSITIONING_REF_FULL_PATH)
+                    .str(#item)
+            },
+            PositioningRef::Name(item) => quote! {
+                #writer
+                    .u8(::pgrx::pgrx_sql_entity_graph::section::POSITIONING_REF_NAME)
+                    .str(#item)
+            },
+        }
+    }
+}
+
 impl ToTokens for PositioningRef {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let toks = match self {

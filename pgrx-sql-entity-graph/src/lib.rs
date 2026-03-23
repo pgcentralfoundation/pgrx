@@ -24,7 +24,6 @@ pub use enrich::CodeEnrichment;
 pub use extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntity};
 pub use extension_sql::{ExtensionSql, ExtensionSqlFile, SqlDeclared};
 pub use extern_args::{ExternArgs, parse_extern_attributes};
-pub use mapping::RustSqlMapping;
 pub use pg_extern::entity::{
     PgCastEntity, PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity,
     PgExternReturnEntityIteratedItem, PgOperatorEntity,
@@ -59,7 +58,6 @@ pub(crate) mod finfo;
 #[macro_use]
 pub(crate) mod fmt;
 pub mod lifetimes;
-pub(crate) mod mapping;
 pub mod metadata;
 pub(crate) mod pg_extern;
 pub(crate) mod pg_trigger;
@@ -71,6 +69,7 @@ pub(crate) mod postgres_hash;
 pub(crate) mod postgres_ord;
 pub(crate) mod postgres_type;
 pub(crate) mod schema;
+pub mod section;
 pub(crate) mod to_sql;
 pub(crate) mod used_type;
 
@@ -128,22 +127,26 @@ impl SqlGraphEntity {
         )
     }
 
-    pub fn id_or_name_matches(&self, ty_id: &::core::any::TypeId, name: &str) -> bool {
+    pub fn schema_matches(&self, schema_key: &str) -> bool {
         match self {
-            SqlGraphEntity::Enum(entity) => entity.id_matches(ty_id),
-            SqlGraphEntity::Type(entity) => entity.id_matches(ty_id),
-            SqlGraphEntity::BuiltinType(string) => string == name,
+            SqlGraphEntity::Enum(entity) => entity.matches_schema(schema_key),
+            SqlGraphEntity::Type(entity) => entity.matches_schema(schema_key),
+            SqlGraphEntity::BuiltinType(string) => string == schema_key,
             _ => false,
         }
     }
 
     pub fn type_matches(&self, arg: &dyn TypeIdentifiable) -> bool {
-        self.id_or_name_matches(arg.ty_id(), arg.ty_name())
+        self.schema_matches(arg.schema_key())
     }
 }
 
 pub trait TypeMatch {
-    fn id_matches(&self, arg: &core::any::TypeId) -> bool;
+    fn schema_key(&self) -> &str;
+
+    fn matches_schema(&self, arg: &str) -> bool {
+        self.schema_key() == arg
+    }
 }
 
 pub fn type_keyed<'a, 'b, A: TypeMatch, B>((a, b): (&'a A, &'b B)) -> (&'a dyn TypeMatch, &'b B) {
@@ -151,7 +154,7 @@ pub fn type_keyed<'a, 'b, A: TypeMatch, B>((a, b): (&'a A, &'b B)) -> (&'a dyn T
 }
 
 pub trait TypeIdentifiable {
-    fn ty_id(&self) -> &core::any::TypeId;
+    fn schema_key(&self) -> &str;
     fn ty_name(&self) -> &str;
 }
 
@@ -237,33 +240,32 @@ impl ToSql for SqlGraphEntity {
                     .neighbors_undirected(*context.externs.get(item).unwrap())
                     .any(|neighbor| {
                         let SqlGraphEntity::Type(PostgresTypeEntity {
-                            in_fn,
-                            in_fn_module_path,
-                            out_fn,
-                            out_fn_module_path,
-                            receive_fn,
-                            receive_fn_module_path,
-                            send_fn,
-                            send_fn_module_path,
+                            module_path,
+                            in_fn_path,
+                            out_fn_path,
+                            receive_fn_path,
+                            send_fn_path,
                             ..
                         }) = &context.graph[neighbor]
                         else {
                             return false;
                         };
 
-                        let is_in_fn = item.full_path.starts_with(in_fn_module_path)
-                            && item.full_path.ends_with(in_fn);
-                        let is_out_fn = item.full_path.starts_with(out_fn_module_path)
-                            && item.full_path.ends_with(out_fn);
-                        let is_receive_fn =
-                            receive_fn_module_path.as_ref().is_some_and(|receive_fn_module_path| {
-                                item.full_path.starts_with(receive_fn_module_path)
-                            }) && receive_fn
-                                .is_some_and(|receive_fn| item.full_path.ends_with(receive_fn));
-                        let is_send_fn =
-                            send_fn_module_path.as_ref().is_some_and(|send_fn_module_path| {
-                                item.full_path.starts_with(send_fn_module_path)
-                            }) && send_fn.is_some_and(|send_fn| item.full_path.ends_with(send_fn));
+                        let resolve = |path: &str| {
+                            if path.contains("::") {
+                                path.to_string()
+                            } else {
+                                format!("{module_path}::{path}")
+                            }
+                        };
+                        let is_in_fn = item.full_path == resolve(in_fn_path);
+                        let is_out_fn = item.full_path == resolve(out_fn_path);
+                        let is_receive_fn = receive_fn_path
+                            .as_ref()
+                            .is_some_and(|path| item.full_path == resolve(path));
+                        let is_send_fn = send_fn_path
+                            .as_ref()
+                            .is_some_and(|path| item.full_path == resolve(path));
                         is_in_fn || is_out_fn || is_receive_fn || is_send_fn
                     })
                 {

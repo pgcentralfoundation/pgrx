@@ -12,7 +12,7 @@ use crate::{PgMemoryContexts, pg_sys};
 use core::fmt::{Debug, Display, Formatter};
 //use std::fmt::{Debug, Error, Formatter};
 use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
@@ -459,19 +459,13 @@ impl<T, AllocatedBy: WhoAllocated> Drop for PgBox<T, AllocatedBy> {
 }
 
 unsafe impl<T: SqlTranslatable> SqlTranslatable for PgBox<T, AllocatedByPostgres> {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        T::argument_sql()
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        T::return_sql()
-    }
+    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
 }
 
 unsafe impl<T: SqlTranslatable> SqlTranslatable for PgBox<T, AllocatedByRust> {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        T::argument_sql()
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        T::return_sql()
-    }
+    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
 }

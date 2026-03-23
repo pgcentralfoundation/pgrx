@@ -62,3 +62,23 @@ impl ToTokens for PgCast {
         tokens.append_all(quoted);
     }
 }
+
+impl PgCast {
+    pub fn section_len_tokens(&self) -> TokenStream2 {
+        quote! { ::pgrx::pgrx_sql_entity_graph::section::u8_len() }
+    }
+
+    pub fn section_writer_tokens(&self, writer: TokenStream2) -> TokenStream2 {
+        match self {
+            PgCast::Default => quote! {
+                #writer.u8(::pgrx::pgrx_sql_entity_graph::section::OPERATOR_CAST_DEFAULT)
+            },
+            PgCast::Assignment => quote! {
+                #writer.u8(::pgrx::pgrx_sql_entity_graph::section::OPERATOR_CAST_ASSIGNMENT)
+            },
+            PgCast::Implicit => quote! {
+                #writer.u8(::pgrx::pgrx_sql_entity_graph::section::OPERATOR_CAST_IMPLICIT)
+            },
+        }
+    }
+}

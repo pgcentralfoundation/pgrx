@@ -7,9 +7,6 @@ publish = false
 [lib]
 crate-type = ["cdylib", "lib"]
 
-[[bin]]
-name = "pgrx_embed_subtrans_infos"
-path = "./src/bin/pgrx_embed.rs"
 
 [features]
 default = ["pg14"]

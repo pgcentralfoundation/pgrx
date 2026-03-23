@@ -24,9 +24,6 @@ include = ["src/**/*", "README.md", "!**/tests/**/*"]
 [lib]
 crate-type = ["cdylib", "lib"]
 
-[[bin]]
-name = "pgrx_embed_pgrx-tests"
-path = "./src/bin/pgrx_embed.rs"
 
 [features]
 default = ["proptest"]

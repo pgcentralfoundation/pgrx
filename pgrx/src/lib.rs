@@ -181,14 +181,6 @@ const _: () = {
 macro_rules! pg_module_magic {
     ($($key:ident $(= $value:expr)?),*) => {
         $crate::pg_magic_func!($($key $(= $value)?),*);
-
-        // A marker function which must exist in the root of the extension for proper linking by the
-        // "pgrx_embed" binary during `cargo-pgrx schema` generation.
-        #[inline(never)] /* we don't want DCE to remove this as it *could* cause the compiler to decide to not link to us */
-        #[doc(hidden)]
-        pub fn __pgrx_marker() {
-            // noop
-        }
     };
 }
 
@@ -387,23 +379,9 @@ pub(crate) enum Utf8Compat {
     Ascii,
 }
 
-/// Entry point for cargo-pgrx's schema generation so that PGRX's framework can
-/// generate SQL for its types and functions and topographically sort them into
-/// an order Postgres will accept. Typically written by the `cargo pgrx new`
-/// template, so you probably don't need to worry about this.
 #[macro_export]
-macro_rules! pgrx_embed {
-    () => {
-        mod pgrx_embed {
-            #![allow(unexpected_cfgs)]
-
-            #[cfg(not(pgrx_embed))]
-            pub fn main() {
-                panic!("PGRX_EMBED was not set.");
-            }
-            #[cfg(pgrx_embed)]
-            include!(env!("PGRX_EMBED"));
-        }
-        pub use pgrx_embed::main;
+macro_rules! pgrx_resolved_type {
+    ($ty:ty) => {
+        stringify!($ty)
     };
 }

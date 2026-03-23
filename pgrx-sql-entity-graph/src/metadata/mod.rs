@@ -25,4 +25,7 @@ mod sql_translatable;
 pub use entity::{FunctionMetadataEntity, FunctionMetadataTypeEntity};
 pub use function_metadata::FunctionMetadata;
 pub use return_variant::{Returns, ReturnsError};
-pub use sql_translatable::{ArgumentError, SqlMapping, SqlTranslatable};
+pub use sql_translatable::{
+    ArgumentError, ReturnsRef, SqlMapping, SqlMappingRef, SqlTranslatable, array_argument_sql,
+    array_return_sql, setof_return_sql, table_item_sql,
+};

@@ -10,6 +10,7 @@
 mod command;
 mod manifest;
 mod metadata;
+mod object_utils;
 
 pub(crate) mod cargo;
 

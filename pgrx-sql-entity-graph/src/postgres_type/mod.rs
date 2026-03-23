@@ -157,119 +157,110 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
 
         let in_fn = &self.in_fn;
         let out_fn = &self.out_fn;
-        let stringify_receive_fn = self
-            .receive_fn
-            .as_ref()
-            .map(|f| quote! { Some(stringify!(#f)) })
-            .unwrap_or_else(|| quote! { None });
-        let stringify_send_fn = self
-            .send_fn
-            .as_ref()
-            .map(|f| quote! { Some(stringify!(#f)) })
-            .unwrap_or_else(|| quote! { None });
-        let receive_fn_module_path = self
-            .receive_fn
-            .as_ref()
-            .map(|f| {
-                quote! {Some({
-                    let in_fn = stringify!(#f);
-                    let mut path_items: Vec<_> = in_fn.split("::").collect();
-                    let _ = path_items.pop(); // Drop the one we don't want.
-                    path_items.join("::")
-                })}
-            })
-            .unwrap_or_else(|| quote! { None });
-        let send_fn_module_path = self
-            .send_fn
-            .as_ref()
-            .map(|f| {
-                quote! {Some({
-                    let out_fn = stringify!(#f);
-                    let mut path_items: Vec<_> = out_fn.split("::").collect();
-                    let _ = path_items.pop(); // Drop the one we don't want.
-                    path_items.join("::")
-                })}
-            })
-            .unwrap_or_else(|| quote! { None });
-
-        let sql_graph_entity_fn_name = format_ident!("__pgrx_internals_type_{}", self.name);
+        let sql_graph_entity_fn_name = format_ident!("__pgrx_schema_type_{}", self.name);
 
         let to_sql_config = &self.to_sql_config;
+        let to_sql_config_len = to_sql_config.section_len_tokens();
+        let receive_fn_len = self
+            .receive_fn
+            .as_ref()
+            .map(|f| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#f))
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let receive_fn_writer = self
+            .receive_fn
+            .as_ref()
+            .map(|f| quote! { .bool(true).str(stringify!(#f)) })
+            .unwrap_or_else(|| quote! { .bool(false) });
+        let send_fn_len = self
+            .send_fn
+            .as_ref()
+            .map(|f| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#f))
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let send_fn_writer = self
+            .send_fn
+            .as_ref()
+            .map(|f| quote! { .bool(true).str(stringify!(#f)) })
+            .unwrap_or_else(|| quote! { .bool(false) });
 
-        let alignment = match &self.alignment {
-            Alignment::On => quote! { Some(::std::mem::align_of::<#name>()) },
-            Alignment::Off => quote! { None },
+        let alignment_len = match &self.alignment {
+            Alignment::On => quote! {
+                ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                    + ::pgrx::pgrx_sql_entity_graph::section::u32_len()
+            },
+            Alignment::Off => quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() },
         };
+        let alignment_writer = match &self.alignment {
+            Alignment::On => quote! { .bool(true).u32(::std::mem::align_of::<#name>() as u32) },
+            Alignment::Off => quote! { .bool(false) },
+        };
+        let schema_key = quote! { ::pgrx::pgrx_resolved_type!(#name #anon_ty_gen) };
+        let payload_len = quote! {
+            ::pgrx::pgrx_sql_entity_graph::section::u8_len()
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#name))
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(file!())
+                + ::pgrx::pgrx_sql_entity_graph::section::u32_len()
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(module_path!())
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#name #anon_ty_gen))
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(#schema_key)
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#in_fn))
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#out_fn))
+                + (#receive_fn_len)
+                + (#send_fn_len)
+                + (#to_sql_config_len)
+                + (#alignment_len)
+        };
+        let total_len = quote! {
+            ::pgrx::pgrx_sql_entity_graph::section::u32_len() + (#payload_len)
+        };
+        let writer = to_sql_config.section_writer_tokens(quote! {
+            ::pgrx::pgrx_sql_entity_graph::section::EntryWriter::<{ #total_len }>::new()
+                .u32((#payload_len) as u32)
+                .u8(::pgrx::pgrx_sql_entity_graph::section::ENTITY_TYPE)
+                .str(stringify!(#name))
+                .str(file!())
+                .u32(line!())
+                .str(module_path!())
+                .str(stringify!(#name #anon_ty_gen))
+                .str(#schema_key)
+                .str(stringify!(#in_fn))
+                .str(stringify!(#out_fn))
+                #receive_fn_writer
+                #send_fn_writer
+        });
 
         quote! {
             unsafe impl #impl_generics ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable for #name #ty_generics #where_clauses {
-                fn argument_sql() -> core::result::Result<::pgrx::pgrx_sql_entity_graph::metadata::SqlMapping, ::pgrx::pgrx_sql_entity_graph::metadata::ArgumentError> {
-                    Ok(::pgrx::pgrx_sql_entity_graph::metadata::SqlMapping::As(String::from(stringify!(#name))))
-                }
-
-                fn return_sql() -> core::result::Result<::pgrx::pgrx_sql_entity_graph::metadata::Returns, ::pgrx::pgrx_sql_entity_graph::metadata::ReturnsError> {
-                    Ok(::pgrx::pgrx_sql_entity_graph::metadata::Returns::One(::pgrx::pgrx_sql_entity_graph::metadata::SqlMapping::As(String::from(stringify!(#name)))))
-                }
+                const SCHEMA_KEY: &'static str = #schema_key;
+                const ARGUMENT_SQL: core::result::Result<
+                    ::pgrx::pgrx_sql_entity_graph::metadata::SqlMappingRef,
+                    ::pgrx::pgrx_sql_entity_graph::metadata::ArgumentError,
+                > = Ok(::pgrx::pgrx_sql_entity_graph::metadata::SqlMappingRef::As(stringify!(#name)));
+                const RETURN_SQL: core::result::Result<
+                    ::pgrx::pgrx_sql_entity_graph::metadata::ReturnsRef,
+                    ::pgrx::pgrx_sql_entity_graph::metadata::ReturnsError,
+                > = Ok(::pgrx::pgrx_sql_entity_graph::metadata::ReturnsRef::One(
+                    ::pgrx::pgrx_sql_entity_graph::metadata::SqlMappingRef::As(stringify!(#name))
+                ));
             }
 
 
-            #[unsafe(no_mangle)]
-            #[doc(hidden)]
-            #[allow(nonstandard_style, unknown_lints, clippy::no_mangle_with_rust_abi)]
-            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity {
-                extern crate alloc;
-                use alloc::vec::Vec;
-                use alloc::vec;
-                use alloc::string::{String, ToString};
-                use ::pgrx::datum::WithTypeIds;
-
-                let mut mappings = Default::default();
-                <#name #anon_ty_gen as ::pgrx::datum::WithTypeIds>::register_with_refs(
-                    &mut mappings,
-                    stringify!(#name).to_string()
-                );
-                ::pgrx::datum::WithSizedTypeIds::<#name #anon_ty_gen>::register_sized_with_refs(
-                    &mut mappings,
-                    stringify!(#name).to_string()
-                );
-                ::pgrx::datum::WithArrayTypeIds::<#name #anon_ty_gen>::register_array_with_refs(
-                    &mut mappings,
-                    stringify!(#name).to_string()
-                );
-                ::pgrx::datum::WithVarlenaTypeIds::<#name #anon_ty_gen>::register_varlena_with_refs(
-                    &mut mappings,
-                    stringify!(#name).to_string()
-                );
-                let submission = ::pgrx::pgrx_sql_entity_graph::PostgresTypeEntity {
-                    name: stringify!(#name),
-                    file: file!(),
-                    line: line!(),
-                    module_path: module_path!(),
-                    full_path: core::any::type_name::<#name #anon_ty_gen>(),
-                    mappings: mappings.into_iter().collect(),
-                    in_fn: stringify!(#in_fn),
-                    in_fn_module_path: {
-                        let in_fn = stringify!(#in_fn);
-                        let mut path_items: Vec<_> = in_fn.split("::").collect();
-                        let _ = path_items.pop(); // Drop the one we don't want.
-                        path_items.join("::")
-                    },
-                    out_fn: stringify!(#out_fn),
-                    out_fn_module_path: {
-                        let out_fn = stringify!(#out_fn);
-                        let mut path_items: Vec<_> = out_fn.split("::").collect();
-                        let _ = path_items.pop(); // Drop the one we don't want.
-                        path_items.join("::")
-                    },
-                    receive_fn: #stringify_receive_fn,
-                    receive_fn_module_path: #receive_fn_module_path,
-                    send_fn: #stringify_send_fn,
-                    send_fn_module_path: #send_fn_module_path,
-                    to_sql_config: #to_sql_config,
-                    alignment: #alignment,
-                };
-                ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity::Type(submission)
-            }
+            ::pgrx::pgrx_sql_entity_graph::__pgrx_schema_entry!(
+                #sql_graph_entity_fn_name,
+                #total_len,
+                #writer
+                    #alignment_writer
+                    .finish()
+            );
         }
     }
 }

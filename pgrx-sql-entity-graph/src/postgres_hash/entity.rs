@@ -28,7 +28,7 @@ pub struct PostgresHashEntity {
     pub line: u32,
     pub full_path: &'static str,
     pub module_path: &'static str,
-    pub id: core::any::TypeId,
+    pub schema_key: &'static str,
     pub to_sql_config: ToSqlConfigEntity,
 }
 

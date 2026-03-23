@@ -15,7 +15,6 @@
 > to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
-use crate::mapping::RustSqlMapping;
 use crate::pgrx_attribute::{ArgValue, PgrxArg, PgrxAttribute};
 use crate::pgrx_sql::PgrxSql;
 use crate::to_sql::ToSql;
@@ -24,7 +23,6 @@ use crate::{SqlGraphEntity, SqlGraphIdentifier, TypeMatch};
 use eyre::eyre;
 use proc_macro2::TokenStream;
 use quote::{ToTokens, TokenStreamExt, format_ident, quote};
-use std::collections::BTreeSet;
 use syn::spanned::Spanned;
 use syn::{AttrStyle, Attribute, Lit};
 
@@ -100,22 +98,18 @@ pub struct PostgresTypeEntity {
     pub line: u32,
     pub full_path: &'static str,
     pub module_path: &'static str,
-    pub mappings: BTreeSet<RustSqlMapping>,
-    pub in_fn: &'static str,
-    pub in_fn_module_path: String,
-    pub out_fn: &'static str,
-    pub out_fn_module_path: String,
-    pub receive_fn: Option<&'static str>,
-    pub receive_fn_module_path: Option<String>,
-    pub send_fn: Option<&'static str>,
-    pub send_fn_module_path: Option<String>,
+    pub schema_key: &'static str,
+    pub in_fn_path: &'static str,
+    pub out_fn_path: &'static str,
+    pub receive_fn_path: Option<&'static str>,
+    pub send_fn_path: Option<&'static str>,
     pub to_sql_config: ToSqlConfigEntity,
     pub alignment: Option<usize>,
 }
 
 impl TypeMatch for PostgresTypeEntity {
-    fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
-        self.mappings.iter().any(|tester| *candidate == tester.id)
+    fn schema_key(&self) -> &str {
+        self.schema_key
     }
 }
 
@@ -150,16 +144,12 @@ impl ToSql for PostgresTypeEntity {
             name,
             file,
             line,
-            in_fn_module_path,
             module_path,
             full_path,
-            out_fn,
-            out_fn_module_path,
-            in_fn,
-            receive_fn,
-            receive_fn_module_path,
-            send_fn,
-            send_fn_module_path,
+            in_fn_path,
+            out_fn_path,
+            receive_fn_path,
+            send_fn_path,
             alignment,
             ..
         }) = item_node
@@ -173,15 +163,8 @@ impl ToSql for PostgresTypeEntity {
         // - CREATE FUNCTION _out;
         // - CREATE TYPE (...);
 
-        let in_fn_module_path = if !in_fn_module_path.is_empty() {
-            in_fn_module_path.clone()
-        } else {
-            module_path.to_string() // Presume a local
-        };
-        let in_fn_path = format!(
-            "{in_fn_module_path}{maybe_colons}{in_fn}",
-            maybe_colons = if !in_fn_module_path.is_empty() { "::" } else { "" }
-        );
+        let in_fn_path = resolve_function_path(module_path, in_fn_path);
+        let in_fn = function_name(&in_fn_path);
         let (_, _index) = context
             .externs
             .iter()
@@ -196,18 +179,24 @@ impl ToSql for PostgresTypeEntity {
                 }
                 _ => None,
             })
-            .ok_or_else(|| eyre!("Could not find in_fn graph entity."))?;
+            .ok_or_else(|| {
+                let neighbors = context
+                    .graph
+                    .neighbors_undirected(self_index)
+                    .filter_map(|neighbor| match &context.graph[neighbor] {
+                        SqlGraphEntity::Function(func) => Some(func.full_path),
+                        _ => None,
+                    })
+                    .collect::<Vec<_>>();
+                eyre!(
+                    "Could not find in_fn graph entity for type `{full_path}` (`{in_fn_path}`). neighboring functions: {:?}",
+                    neighbors
+                )
+            })?;
         let in_fn_sql = in_fn_entity.to_sql(context)?;
 
-        let out_fn_module_path = if !out_fn_module_path.is_empty() {
-            out_fn_module_path.clone()
-        } else {
-            module_path.to_string() // Presume a local
-        };
-        let out_fn_path = format!(
-            "{out_fn_module_path}{maybe_colons}{out_fn}",
-            maybe_colons = if !out_fn_module_path.is_empty() { "::" } else { "" },
-        );
+        let out_fn_path = resolve_function_path(module_path, out_fn_path);
+        let out_fn = function_name(&out_fn_path);
         let (_, _index) = context
             .externs
             .iter()
@@ -222,22 +211,26 @@ impl ToSql for PostgresTypeEntity {
                 }
                 _ => None,
             })
-            .ok_or_else(|| eyre!("Could not find out_fn graph entity."))?;
+            .ok_or_else(|| {
+                let neighbors = context
+                    .graph
+                    .neighbors_undirected(self_index)
+                    .filter_map(|neighbor| match &context.graph[neighbor] {
+                        SqlGraphEntity::Function(func) => Some(func.full_path),
+                        _ => None,
+                    })
+                    .collect::<Vec<_>>();
+                eyre!(
+                    "Could not find out_fn graph entity for type `{full_path}` (`{out_fn_path}`). neighboring functions: {:?}",
+                    neighbors
+                )
+            })?;
         let out_fn_sql = out_fn_entity.to_sql(context)?;
 
-        let receive_fn_graph_index_and_receive_fn_sql = receive_fn_module_path
+        let receive_fn_graph_index_and_receive_fn_sql = receive_fn_path
             .as_ref()
-            .zip(*receive_fn)
-            .map(|(receive_fn_module_path, receive_fn)| {
-                let receive_fn_module_path = if !receive_fn_module_path.is_empty() {
-                    receive_fn_module_path.clone()
-                } else {
-                    module_path.to_string() // Presume a local
-                };
-                let receive_fn_path = format!(
-                    "{receive_fn_module_path}{maybe_colons}{receive_fn}",
-                    maybe_colons = if !receive_fn_module_path.is_empty() { "::" } else { "" }
-                );
+            .map(|receive_fn_path| {
+                let receive_fn_path = resolve_function_path(module_path, receive_fn_path);
 
                 // Find the receive function in the context
                 let (_, _index) = context
@@ -262,19 +255,10 @@ impl ToSql for PostgresTypeEntity {
             })
             .transpose()?;
 
-        let send_fn_graph_index_and_send_fn_sql = send_fn_module_path
+        let send_fn_graph_index_and_send_fn_sql = send_fn_path
             .as_ref()
-            .zip(*send_fn)
-            .map(|(send_fn_module_path, send_fn)| {
-                let send_fn_module_path = if !send_fn_module_path.is_empty() {
-                    send_fn_module_path.clone()
-                } else {
-                    module_path.to_string() // Presume a local
-                };
-                let send_fn_path = format!(
-                    "{send_fn_module_path}{maybe_colons}{send_fn}",
-                    maybe_colons = if !send_fn_module_path.is_empty() { "::" } else { "" }
-                );
+            .map(|send_fn_path| {
+                let send_fn_path = resolve_function_path(module_path, send_fn_path);
 
                 // Find the send function in the context
                 let (_, _index) = context
@@ -328,8 +312,8 @@ impl ToSql for PostgresTypeEntity {
         let (receive_send_attributes, receive_send_sql) = receive_fn_graph_index_and_receive_fn_sql
             .zip(send_fn_graph_index_and_send_fn_sql)
             .map(|((receive_fn_graph_index, receive_fn_sql, receive_fn_path), (send_fn_graph_index, send_fn_sql, send_fn_path))| {
-                let receive_fn = receive_fn.unwrap();
-                let send_fn = send_fn.unwrap();
+                let receive_fn = function_name(&receive_fn_path);
+                let send_fn = function_name(&send_fn_path);
                 (
                     format! {
                         "\
@@ -376,4 +360,12 @@ impl ToSql for PostgresTypeEntity {
 
         Ok(result)
     }
+}
+
+fn resolve_function_path(module_path: &str, path: &str) -> String {
+    if path.contains("::") { path.to_string() } else { format!("{module_path}::{path}") }
+}
+
+fn function_name(path: &str) -> &str {
+    path.rsplit("::").next().unwrap_or(path)
 }

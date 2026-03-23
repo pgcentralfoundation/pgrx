@@ -12,7 +12,7 @@ use crate::{
     FromDatum, IntoDatum, PgBox, PgTupleDesc, direct_function_call, name_data_to_str, pg_sys,
 };
 use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
 use std::ops::Deref;
 use std::os::raw::c_char;
@@ -401,10 +401,9 @@ impl Drop for PgRelation {
 }
 
 unsafe impl SqlTranslatable for PgRelation {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("regclass"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("regclass")))
-    }
+    const SCHEMA_KEY: &'static str = "PgRelation";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+        Ok(SqlMappingRef::literal("regclass"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("regclass")));
 }

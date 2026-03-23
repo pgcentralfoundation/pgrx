@@ -11,7 +11,6 @@ use pgrx::prelude::*;
 
 #[pgrx::pg_schema]
 mod test_schema {
-    use pgrx::pgrx_sql_entity_graph::{PgrxSql, SqlGraphEntity};
     use pgrx::prelude::*;
     use serde::{Deserialize, Serialize};
 
@@ -21,7 +20,9 @@ mod test_schema {
     #[pg_extern(sql = false)]
     fn func_elided_from_schema() {}
 
-    #[pg_extern(sql = generate_function)]
+    #[pg_extern(
+        sql = "CREATE FUNCTION test_schema.\"func_generated_with_custom_name\"() RETURNS void\nLANGUAGE c /* Rust */\nAS 'MODULE_PATHNAME', 'func_generated_with_custom_sql_wrapper';"
+    )]
     fn func_generated_with_custom_sql() {}
 
     #[derive(Debug, PostgresType, Serialize, Deserialize)]
@@ -35,47 +36,13 @@ mod test_schema {
 
     #[derive(Debug, PostgresType, Serialize, Deserialize)]
     #[pg_binary_protocol]
-    #[pgrx(sql = generate_type)]
+    #[pgrx(sql = "CREATE TYPE test_schema.CustomOtherType;")]
     pub struct OtherType(pub u64);
 
     #[derive(Debug, PostgresType, Serialize, Deserialize)]
     #[pg_binary_protocol]
     #[pgrx(sql = "CREATE TYPE test_schema.ManuallyRenderedType;")]
     pub struct OverriddenType(pub u64);
-
-    fn generate_function(
-        entity: &SqlGraphEntity,
-        _context: &PgrxSql,
-    ) -> Result<String, Box<dyn std::error::Error + Send + Sync + 'static>> {
-        if let SqlGraphEntity::Function(func) = entity {
-            Ok(format!(
-                "\
-                CREATE FUNCTION test_schema.\"func_generated_with_custom_name\"() RETURNS void\n\
-                LANGUAGE c /* Rust */\n\
-                AS 'MODULE_PATHNAME', '{unaliased_name}_wrapper';\
-                ",
-                unaliased_name = func.name,
-            ))
-        } else {
-            panic!("expected extern function entity, got {entity:?}");
-        }
-    }
-
-    fn generate_type(
-        entity: &SqlGraphEntity,
-        _context: &PgrxSql,
-    ) -> Result<String, Box<dyn std::error::Error + Send + Sync + 'static>> {
-        if let SqlGraphEntity::Type(ty) = entity {
-            Ok(format!(
-                "\n\
-                CREATE TYPE test_schema.Custom{name};\
-                ",
-                name = ty.name,
-            ))
-        } else {
-            panic!("expected type entity, got {entity:?}");
-        }
-    }
 }
 
 #[pg_extern(schema = "test_schema")]

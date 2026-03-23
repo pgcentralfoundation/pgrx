@@ -24,7 +24,6 @@ use crate::to_sql::ToSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::type_keyed;
 use crate::{SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity};
-use core::any::TypeId;
 use eyre::{WrapErr, eyre};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
@@ -39,7 +38,6 @@ pub struct PgAggregateEntity {
     pub module_path: &'static str,
     pub file: &'static str,
     pub line: u32,
-    pub ty_id: TypeId,
 
     pub name: &'static str,
 
@@ -283,7 +281,7 @@ impl ToSql for PgAggregateEntity {
             .iter()
             .map(type_keyed)
             .chain(context.enums.iter().map(type_keyed))
-            .find(|(ty, _)| ty.id_matches(&self.stype.used_ty.ty_id))
+            .find(|(ty, _)| ty.matches_schema(self.stype.used_ty.metadata.schema_key))
             .map(|(_, ty_index)| context.schema_prefix_for(ty_index))
             .unwrap_or_default();
 
@@ -323,7 +321,7 @@ impl ToSql for PgAggregateEntity {
                        \t{name}{variadic}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
                    ",
                     schema_prefix = context.schema_prefix_for(&graph_index),
-                    // First try to match on [`TypeId`] since it's most reliable.
+                    // The SQL spelling comes from the embedded schema metadata.
                     sql_type = match arg.used_ty.metadata.argument_sql {
                         Ok(SqlMapping::As(ref argument_sql)) => {
                             argument_sql.to_string()
@@ -373,7 +371,7 @@ impl ToSql for PgAggregateEntity {
                     \t{maybe_name}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
                    ",
                     schema_prefix = context.schema_prefix_for(&graph_index),
-                    // First try to match on [`TypeId`] since it's most reliable.
+                    // The SQL spelling comes from the embedded schema metadata.
                     sql_type = map_ty(&arg.used_ty).wrap_err("Mapping direct arg type")?,
                     maybe_name = if let Some(name) = arg.name {
                         "\"".to_string() + name + "\" "

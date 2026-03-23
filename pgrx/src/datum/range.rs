@@ -14,7 +14,7 @@ use crate::datum::{
 use crate::pg_sys;
 use core::fmt::{Display, Formatter};
 use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
 use std::ops::{Deref, DerefMut, RangeFrom, RangeInclusive, RangeTo, RangeToInclusive};
 
@@ -536,64 +536,57 @@ unsafe impl RangeSubType for TimestampWithTimeZone {
 }
 
 unsafe impl SqlTranslatable for Range<i32> {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("int4range"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("int4range")))
-    }
+    const SCHEMA_KEY: &'static str = "Range<i32>";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+        Ok(SqlMappingRef::literal("int4range"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("int4range")));
 }
 
 unsafe impl SqlTranslatable for Range<i64> {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("int8range"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("int8range")))
-    }
+    const SCHEMA_KEY: &'static str = "Range<i64>";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+        Ok(SqlMappingRef::literal("int8range"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("int8range")));
 }
 
 unsafe impl SqlTranslatable for Range<AnyNumeric> {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("numrange"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("numrange")))
-    }
+    const SCHEMA_KEY: &'static str = "Range<AnyNumeric>";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+        Ok(SqlMappingRef::literal("numrange"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("numrange")));
 }
 
 unsafe impl<const P: u32, const S: u32> SqlTranslatable for Range<Numeric<P, S>> {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("numrange"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("numrange")))
-    }
+    const SCHEMA_KEY: &'static str = "Range<Numeric>";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+        Ok(SqlMappingRef::literal("numrange"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("numrange")));
 }
 
 unsafe impl SqlTranslatable for Range<Date> {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("daterange"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("daterange")))
-    }
+    const SCHEMA_KEY: &'static str = "Range<Date>";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+        Ok(SqlMappingRef::literal("daterange"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("daterange")));
 }
 
 unsafe impl SqlTranslatable for Range<TimestampWithTimeZone> {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("tstzrange"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("tstzrange")))
-    }
+    const SCHEMA_KEY: &'static str = "Range<TimestampWithTimeZone>";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+        Ok(SqlMappingRef::literal("tstzrange"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("tstzrange")));
 }
 
 unsafe impl SqlTranslatable for Range<Timestamp> {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("tsrange"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("tsrange")))
-    }
+    const SCHEMA_KEY: &'static str = "Range<Timestamp>";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+        Ok(SqlMappingRef::literal("tsrange"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("tsrange")));
 }

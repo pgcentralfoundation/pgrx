@@ -14,7 +14,7 @@ use crate::{PgMemoryContexts, direct_function_call, direct_function_call_as_datu
 use pgrx_pg_sys::PgTryBuilder;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
 use std::panic::{RefUnwindSafe, UnwindSafe};
 
@@ -326,10 +326,9 @@ impl<'de> serde::Deserialize<'de> for TimeWithTimeZone {
 }
 
 unsafe impl SqlTranslatable for TimeWithTimeZone {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("time with time zone"))
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("time with time zone")))
-    }
+    const SCHEMA_KEY: &'static str = "TimeWithTimeZone";
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+        Ok(SqlMappingRef::literal("time with time zone"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("time with time zone")));
 }

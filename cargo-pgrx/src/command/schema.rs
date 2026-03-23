@@ -11,16 +11,15 @@ use crate::CommandExecute;
 use crate::cargo::{self, Cargo, CargoProfile};
 use crate::command::get::{find_control_file, get_property};
 use crate::manifest::{get_package_manifest, pg_config_and_version};
+use crate::object_utils::schema_section_data;
 use cargo_toml::Manifest;
-use eyre::{WrapErr, eyre};
-use object::read::macho::MachOFatFile32;
+use eyre::WrapErr;
 use owo_colors::OwoColorize;
 use pgrx_pg_config::cargo::PgrxManifestExt;
 use pgrx_pg_config::{Pgrx, get_target_dir};
-use std::io::Write;
+use pgrx_sql_entity_graph::section::decode_entities;
+use pgrx_sql_entity_graph::{ControlFile, PgrxSql, SqlGraphEntity};
 use std::path::{Path, PathBuf};
-use std::process::Stdio;
-use std::str;
 
 /// Generate extension schema files
 #[derive(clap::Args, Debug)]
@@ -170,31 +169,20 @@ pub(crate) fn generate_schema_for_cli(
 pub(crate) use generate_schema_for_cli as generate_schema;
 
 pub(crate) fn generate_schema_implicit(
-    cargo: Cargo,
+    _cargo: Cargo,
     package_manifest_path: &Path,
     profile: &CargoProfile,
-    features_arg: String,
+    _features_arg: String,
     target: Option<&str>,
     path: Option<&Path>,
     dot: Option<&Path>,
     output_tracking: &mut Vec<PathBuf>,
     manifest: cargo_toml::Manifest,
 ) -> eyre::Result<()> {
-    let (control_file, _extname) = find_control_file(package_manifest_path)?;
+    let (control_file_path, _extname) = find_control_file(package_manifest_path)?;
     let lib_name = manifest.lib_name()?;
     let lib_filename = manifest.lib_filename()?;
-
-    let symbols = find_and_compute_symbols(profile, &lib_filename, target)?;
-
-    let codegen =
-        compute_codegen(&control_file, package_manifest_path, &symbols, &lib_name, path, dot)?;
-
-    let embed = {
-        let mut embed = tempfile::NamedTempFile::new()?;
-        embed.write_all(codegen.as_bytes())?;
-        embed.flush()?;
-        embed
-    };
+    let versioned_so = get_property(package_manifest_path, "module_pathname")?.is_none();
 
     if let Some(out_path) = path {
         if let Some(parent) = out_path.parent() {
@@ -207,19 +195,37 @@ pub(crate) fn generate_schema_implicit(
         tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
     }
 
-    second_build(cargo, &features_arg, embed.path(), &manifest)?;
+    let mut entities = Vec::new();
+    entities.push(SqlGraphEntity::ExtensionRoot(ControlFile::try_from(control_file_path)?));
+    entities.extend(load_section_entities(profile, &lib_filename, target)?);
 
-    compute_sql(&manifest)?;
+    let pgrx_sql = PgrxSql::build(entities.into_iter(), lib_name.to_string(), versioned_so)
+        .expect("SQL generation error");
+
+    if let Some(path) = path {
+        eprintln!("{} SQL entities to {}", "     Writing".bold().green(), path.display());
+        pgrx_sql
+            .to_file(path)
+            .wrap_err_with(|| format!("Could not write SQL to {}", path.display()))?;
+    } else {
+        eprintln!("{} SQL entities to {}", "     Writing".bold().green(), "/dev/stdout");
+        pgrx_sql.write(&mut std::io::stdout()).wrap_err("Could not write SQL to stdout")?;
+    }
+
+    if let Some(dot) = dot {
+        pgrx_sql
+            .to_dot(dot)
+            .wrap_err_with(|| format!("Could not write Graphviz DOT to {}", dot.display()))?;
+    }
 
     Ok(())
 }
 
-fn find_and_compute_symbols(
+fn load_section_entities(
     profile: &CargoProfile,
     lib_filename: &str,
     target: Option<&str>,
-) -> eyre::Result<Vec<String>> {
-    // Inspect the symbol table for a list of `__pgrx_internals` we should have the generator call
+) -> eyre::Result<Vec<SqlGraphEntity>> {
     let mut lib_so = get_target_dir()?;
     if let Some(target) = target {
         lib_so.push(target);
@@ -228,32 +234,17 @@ fn find_and_compute_symbols(
     lib_so.push(lib_filename);
 
     let lib_so_data = std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")?;
-    let lib_so_obj_file =
-        parse_object(&lib_so_data).wrap_err("couldn't parse extension shared object")?;
-
-    // FIXME: properly parse the target tuple per https://github.com/pgcentralfoundation/pgrx/issues/2183
-    let symbol_prefix = if cfg!(target_os = "macos") { "_" } else { "" };
-    compute_symbols(&lib_so_obj_file, symbol_prefix)
+    let section = schema_section_data(&lib_so_data)?;
+    let entities = if let Some(section) = section {
+        decode_entities(section).wrap_err("couldn't decode pgrx schema section")?
+    } else {
+        Vec::new()
+    };
+    report_entity_counts(&entities);
+    Ok(entities)
 }
 
-fn compute_symbols(obj_file: &object::File<'_>, symbol_prefix: &str) -> eyre::Result<Vec<String>> {
-    use std::collections::HashSet;
-    let lib_so_exports = object::Object::exports(obj_file)
-        .wrap_err("couldn't get exports from extension shared object")?;
-    // Some users reported experiencing duplicate entries if we don't ensure `fns_to_call`
-    // has unique entries.
-    let mut fns_to_call = HashSet::new();
-    for export in lib_so_exports {
-        let name = str::from_utf8(export.name()).expect("Rust symbol names are UTF8");
-        // macOS will prefix symbols with `_` automatically, so we remove one
-        let name = name
-            .strip_prefix(symbol_prefix)
-            .ok_or(eyre!("platform symbol prefix not found on {name}"))?;
-
-        if name.starts_with("__pgrx_internals") {
-            fns_to_call.insert(name.to_owned());
-        }
-    }
+fn report_entity_counts(entities: &[SqlGraphEntity]) {
     let mut seen_schemas = Vec::new();
     let mut num_funcs = 0_usize;
     let mut num_triggers = 0_usize;
@@ -263,34 +254,25 @@ fn compute_symbols(obj_file: &object::File<'_>, symbol_prefix: &str) -> eyre::Re
     let mut num_ords = 0_usize;
     let mut num_hashes = 0_usize;
     let mut num_aggregates = 0_usize;
-    for func in &fns_to_call {
-        if func.starts_with("__pgrx_internals_schema_") {
-            let schema =
-                func.split('_').nth(5).expect("Schema extern name was not of expected format");
-            seen_schemas.push(schema);
-        } else if func.starts_with("__pgrx_internals_fn_") {
-            num_funcs += 1;
-        } else if func.starts_with("__pgrx_internals_trigger_") {
-            num_triggers += 1;
-        } else if func.starts_with("__pgrx_internals_type_") {
-            num_types += 1;
-        } else if func.starts_with("__pgrx_internals_enum_") {
-            num_enums += 1;
-        } else if func.starts_with("__pgrx_internals_sql_") {
-            num_sqls += 1;
-        } else if func.starts_with("__pgrx_internals_ord_") {
-            num_ords += 1;
-        } else if func.starts_with("__pgrx_internals_hash_") {
-            num_hashes += 1;
-        } else if func.starts_with("__pgrx_internals_aggregate_") {
-            num_aggregates += 1;
+    for entity in entities {
+        match entity {
+            SqlGraphEntity::Schema(schema) => seen_schemas.push(schema.name),
+            SqlGraphEntity::Function(_) => num_funcs += 1,
+            SqlGraphEntity::Trigger(_) => num_triggers += 1,
+            SqlGraphEntity::Type(_) => num_types += 1,
+            SqlGraphEntity::Enum(_) => num_enums += 1,
+            SqlGraphEntity::CustomSql(_) => num_sqls += 1,
+            SqlGraphEntity::Ord(_) => num_ords += 1,
+            SqlGraphEntity::Hash(_) => num_hashes += 1,
+            SqlGraphEntity::Aggregate(_) => num_aggregates += 1,
+            SqlGraphEntity::BuiltinType(_) | SqlGraphEntity::ExtensionRoot(_) => (),
         }
     }
 
     eprintln!(
         "{} {} SQL entities: {} schemas ({} unique), {} functions, {} types, {} enums, {} sqls, {} ords, {} hashes, {} aggregates, {} triggers",
         "  Discovered".bold().green(),
-        fns_to_call.len().to_string().bold().cyan(),
+        entities.len().to_string().bold().cyan(),
         seen_schemas.len().to_string().bold().cyan(),
         seen_schemas
             .iter()
@@ -308,10 +290,6 @@ fn compute_symbols(obj_file: &object::File<'_>, symbol_prefix: &str) -> eyre::Re
         num_aggregates.to_string().bold().cyan(),
         num_triggers.to_string().bold().cyan(),
     );
-
-    tracing::debug!("Collecting {} SQL entities", fns_to_call.len());
-
-    Ok(fns_to_call.into_iter().collect())
 }
 
 fn first_build(
@@ -344,199 +322,13 @@ fn first_build(
     tracing::trace!(status_code = %cargo_output.status, command = %command_str, "Finished");
 
     if !cargo_output.status.success() {
-        // We explicitly do not want to return a spantraced error here.
         std::process::exit(1)
     }
 
     Ok(())
 }
 
-fn compute_codegen(
-    control_file_path: &Path,
-    package_manifest_path: &Path,
-    symbols: &[String],
-    lib_name: &str,
-    path: Option<&Path>,
-    dot: Option<&Path>,
-) -> eyre::Result<String> {
-    use proc_macro2::{Ident, Span, TokenStream};
-    let lib_name_ident = Ident::new(lib_name, Span::call_site());
-
-    let str_from_path = |name: &str, path: &Path| {
-        path.to_str().map(|s| s.to_owned()).ok_or_else(|| {
-            let err_str = path.to_string_lossy();
-            eyre!("{name} path is not UTF8: {err_str}")
-        })
-    };
-
-    let inputs = {
-        let control_file_path = str_from_path(".control file", control_file_path)?;
-        let mut out = quote::quote! {
-            // call the marker.  Primarily this ensures that rustc will actually link to the library
-            // during the "pgrx_embed" build initiated by `cargo-pgrx schema` generation
-            #lib_name_ident::__pgrx_marker();
-
-            let mut entities = Vec::new();
-            let control_file_path = std::path::PathBuf::from(#control_file_path);
-            let control_file = ::pgrx::pgrx_sql_entity_graph::ControlFile::try_from(control_file_path).expect(".control file should properly formatted");
-            let control_file_entity = ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity::ExtensionRoot(control_file);
-
-            entities.push(control_file_entity);
-        };
-        for name in symbols.iter() {
-            let name_ident = Ident::new(name, Span::call_site());
-            out.extend(quote::quote! {
-                unsafe extern "Rust" {
-                    fn #name_ident() -> ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity;
-                }
-                let entity = unsafe { #name_ident() };
-                entities.push(entity);
-            });
-        }
-        out
-    };
-    let build = {
-        let versioned_so = get_property(package_manifest_path, "module_pathname")?.is_none();
-        quote::quote! {
-            let pgrx_sql = ::pgrx::pgrx_sql_entity_graph::PgrxSql::build(
-                entities.into_iter(),
-                #lib_name.to_string(),
-                #versioned_so,
-            )
-            .expect("SQL generation error");
-        }
-    };
-    let outputs = {
-        let mut out = TokenStream::new();
-        if let Some(path) = path {
-            let path = str_from_path("out", path)?;
-            let writing = "     Writing".bold().green().to_string();
-            out.extend(quote::quote! {
-                eprintln!("{} SQL entities to {}", #writing, #path);
-                pgrx_sql
-                    .to_file(#path)
-                    .expect(&format!("Could not write SQL to {}", #path));
-            });
-        } else {
-            let writing = "     Writing".bold().green().to_string();
-            out.extend(quote::quote! {
-                eprintln!("{} SQL entities to {}", #writing, "/dev/stdout",);
-                pgrx_sql
-                    .write(&mut std::io::stdout())
-                    .expect("Could not write SQL to stdout");
-            });
-        }
-        if let Some(dot) = dot {
-            let dot = str_from_path("dot", dot)?;
-            out.extend(quote::quote! {
-                pgrx_sql
-                    .to_dot(#dot)
-                    .expect("Could not write Graphviz DOT");
-            });
-        }
-        out
-    };
-    Ok(quote::quote! {
-        #[doc(hidden)]
-        pub fn main() {
-            #inputs
-            #build
-            #outputs
-        }
-    }
-    .to_string())
-}
-
-fn second_build(
-    cargo: Cargo,
-    features_arg: &str,
-    embed_path: &Path,
-    manifest: &Manifest,
-) -> eyre::Result<()> {
-    // We do pass cfg to the binary and do not pass cfg to dependencies to avoid recompilation
-    // The only cargo command respecting our need is `cargo rustc`
-    let mut command = cargo
-        .subcommand("rustc")
-        .flag_args("--bin", vec![pgrx_embed_name(manifest)?])
-        .into_command();
-
-    command.arg("--");
-
-    command.args(["--cfg", "pgrx_embed"]);
-
-    command.env("PGRX_EMBED", embed_path);
-
-    let command_str = format!("{command:?}");
-    eprintln!(
-        "{} {}, in debug mode, for SQL generation with features {}",
-        "  Rebuilding".bold().green(),
-        "pgrx_embed".cyan(),
-        features_arg.cyan(),
-    );
-
-    tracing::debug!(command = %command_str, "Running");
-    let cargo_output =
-        command.output().wrap_err_with(|| format!("failed to spawn cargo: {command_str}"))?;
-    tracing::trace!(status_code = %cargo_output.status, command = %command_str, "Finished");
-
-    if !cargo_output.status.success() {
-        // We explicitly do not want to return a spantraced error here.
-        std::process::exit(1)
-    }
-
-    Ok(())
-}
-
-fn compute_sql(manifest: &Manifest) -> eyre::Result<()> {
-    let mut bin = get_target_dir()?;
-    bin.push("debug"); // pgrx_embed_ is always compiled in debug mode
-    bin.push(pgrx_embed_name(manifest)?);
-
-    let mut command = std::process::Command::new(bin);
-    command.stdin(Stdio::inherit());
-    command.stdout(Stdio::inherit());
-    command.stderr(Stdio::inherit());
-
-    // pass the package version through as an environment variable
-    let cargo_pkg_version = std::env::var("CARGO_PKG_VERSION").unwrap_or_else(|_| {
-        manifest.package_version().expect("`CARGO_PKG_VERSION` should be set, and barring that, `Cargo.toml` should have a package version property")
-    });
-    command.env("CARGO_PKG_VERSION", cargo_pkg_version);
-
-    let command_str = format!("{command:?}");
-    tracing::debug!(command = %command_str, "Running");
-    let embed_output =
-        command.output().wrap_err_with(|| format!("failed to spawn pgrx_embed: {command_str}"))?;
-    tracing::trace!(status_code = %embed_output.status, command = %command_str, "Finished");
-
-    if !embed_output.status.success() {
-        // We do not want to return a spantraced error here, to
-        // (speculative:) reduce the likelihood of emitting errors twice
-        std::process::exit(1)
-    }
-
-    Ok(())
-}
-
-fn pgrx_embed_name(manifest: &Manifest) -> eyre::Result<String> {
-    fn name_from(s: &str) -> String {
-        format!("pgrx_embed_{s}")
-    }
-
-    let package_name = name_from(&manifest.package_name()?);
-    let lib_name = name_from(&manifest.lib_name()?);
-    manifest
-        .bin
-        .iter()
-        .find(|bin| {
-            // As cargo_anifest autofills lib.name if it's empty, it's impossible to
-            // check only against one name. Perhaps, cargo-util-schemas can help with that.
-            bin.name.as_ref().is_some_and(|name| name == &package_name || name == &lib_name)
-        })
-        .and_then(|bin| bin.name.to_owned())
-        .ok_or_else(|| eyre!("Failed to find a pgrx_embed binary."))
-}
-
+#[cfg(test)]
 fn parse_object(data: &[u8]) -> object::Result<object::File<'_>> {
     let kind = object::FileKind::parse(data)?;
 
@@ -556,9 +348,10 @@ fn parse_object(data: &[u8]) -> object::Result<object::File<'_>> {
     }
 }
 
+#[cfg(test)]
 fn slice_arch32<'a>(data: &'a [u8], arch: &str) -> Option<&'a [u8]> {
     use object::Architecture;
-    use object::read::macho::FatArch;
+    use object::read::macho::{FatArch, MachOFatFile32};
     let target = match arch {
         "x86" => Architecture::I386,
         "x86_64" => Architecture::X86_64,

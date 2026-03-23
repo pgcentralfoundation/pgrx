@@ -716,8 +716,6 @@ $ tree
 │           └── store_ranges.out
 ├── range.control
 └── src
-    ├── bin
-    │   └── pgrx_embed.rs
     └── lib.rs
 ```
 

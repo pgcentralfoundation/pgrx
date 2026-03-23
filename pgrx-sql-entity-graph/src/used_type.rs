@@ -18,7 +18,8 @@ Type level metadata for Rust to SQL generation.
 use crate::composite_type::{CompositeTypeMacro, handle_composite_type_macro};
 use crate::lifetimes::anonymize_lifetimes;
 
-use quote::ToTokens;
+use proc_macro2::TokenStream as TokenStream2;
+use quote::{ToTokens, quote};
 use syn::parse::{Parse, ParseStream};
 use syn::spanned::Spanned;
 use syn::{GenericArgument, Token};
@@ -274,27 +275,19 @@ impl UsedType {
         // but we want to avoid staticizing in this codebase going forward. Anonymization makes it
         // easier to name the lifetime-bounded objects without the context for those lifetimes,
         // without erasing all possible distinctions, since anon lifetimes may still be disunited.
-        // Non-static lifetimes, however, require the use of the NonStaticTypeId hack.
         anonymize_lifetimes(&mut resolved_ty);
         anonymize_lifetimes(&mut resolved_ty_inner);
         let resolved_ty_string = resolved_ty.to_token_stream().to_string();
         let composite_type = self.composite_type.clone().map(|v| v.expr);
         let composite_type_iter = composite_type.iter();
         let variadic = &self.variadic;
-        let optional = &self.optional.is_some();
+        let optional = self.optional_expr_tokens();
         let default = self.default.iter();
 
         syn::parse_quote! {
             ::pgrx::pgrx_sql_entity_graph::UsedTypeEntity {
                 ty_source: #resolved_ty_string,
-                ty_id: core::any::TypeId::of::<#resolved_ty_inner>(),
-                full_path: core::any::type_name::<#resolved_ty>(),
-                module_path: {
-                    let ty_name = core::any::type_name::<#resolved_ty>();
-                    let mut path_items: Vec<_> = ty_name.split("::").collect();
-                    let _ = path_items.pop(); // Drop the one we don't want.
-                    path_items.join("::")
-                },
+                full_path: #resolved_ty_string,
                 composite_type: None #( .unwrap_or(Some(#composite_type_iter)) )*,
                 variadic: #variadic,
                 default:  None #( .unwrap_or(Some(#default)) )*,
@@ -307,14 +300,98 @@ impl UsedType {
             }
         }
     }
+
+    pub fn section_len_tokens(&self) -> TokenStream2 {
+        let mut resolved_ty = self.resolved_ty.clone();
+        anonymize_lifetimes(&mut resolved_ty);
+        let resolved_ty_string = resolved_ty.to_token_stream().to_string();
+        let composite_type = self.composite_type.clone().map(|v| v.expr);
+        let default = self.default.clone();
+        let composite_len = composite_type
+            .map(|expr| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + ::pgrx::pgrx_sql_entity_graph::section::str_len(#expr)
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let default_len = default
+            .as_ref()
+            .map(|value| {
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                        + ::pgrx::pgrx_sql_entity_graph::section::str_len(#value)
+                }
+            })
+            .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+
+        quote! {
+            ::pgrx::pgrx_sql_entity_graph::section::str_len(#resolved_ty_string)
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(#resolved_ty_string)
+                + (#composite_len)
+                + ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                + (#default_len)
+                + ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(
+                    <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY
+                )
+                + ::pgrx::pgrx_sql_entity_graph::section::argument_sql_len(
+                    <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL
+                )
+                + ::pgrx::pgrx_sql_entity_graph::section::return_sql_len(
+                    <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::RETURN_SQL
+                )
+        }
+    }
+
+    pub fn section_writer_tokens(&self, writer: TokenStream2) -> TokenStream2 {
+        let mut resolved_ty = self.resolved_ty.clone();
+        anonymize_lifetimes(&mut resolved_ty);
+        let resolved_ty_string = resolved_ty.to_token_stream().to_string();
+        let composite_type = self.composite_type.clone().map(|v| v.expr);
+        let variadic = self.variadic;
+        let optional = self.optional_expr_tokens();
+        let default = self.default.clone();
+
+        let composite_writer = composite_type
+            .map(|expr| quote! { .bool(true).str(#expr) })
+            .unwrap_or_else(|| quote! { .bool(false) });
+        let default_writer = default
+            .as_ref()
+            .map(|value| quote! { .bool(true).str(#value) })
+            .unwrap_or_else(|| quote! { .bool(false) });
+
+        quote! {
+            #writer
+                .str(#resolved_ty_string)
+                .str(#resolved_ty_string)
+                #composite_writer
+                .bool(#variadic)
+                #default_writer
+                .bool(#optional)
+                .str(<#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY)
+                .argument_sql(<#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL)
+                .return_sql(<#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::RETURN_SQL)
+        }
+    }
+
+    fn optional_expr_tokens(&self) -> TokenStream2 {
+        if self.optional.is_some() {
+            quote! { true }
+        } else {
+            let mut resolved_ty = self.resolved_ty.clone();
+            anonymize_lifetimes(&mut resolved_ty);
+            quote! {
+                <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::OPTIONAL
+            }
+        }
+    }
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct UsedTypeEntity {
     pub ty_source: &'static str,
-    pub ty_id: core::any::TypeId,
     pub full_path: &'static str,
-    pub module_path: String,
     pub composite_type: Option<&'static str>,
     pub variadic: bool,
     pub default: Option<&'static str>,
@@ -324,8 +401,8 @@ pub struct UsedTypeEntity {
 }
 
 impl crate::TypeIdentifiable for UsedTypeEntity {
-    fn ty_id(&self) -> &core::any::TypeId {
-        &self.ty_id
+    fn schema_key(&self) -> &str {
+        self.metadata.schema_key
     }
     fn ty_name(&self) -> &str {
         self.full_path
@@ -385,6 +462,21 @@ fn resolve_vec_inner(
         }
     } else {
         Ok((syn::Type::Path(original), None))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::UsedType;
+    use quote::ToTokens;
+    use syn::parse_quote;
+
+    #[test]
+    fn internal_uses_trait_optional_flag() {
+        let used_ty = UsedType::new(parse_quote!(::pgrx::datum::Internal)).unwrap();
+        let tokens = used_ty.entity_tokens().into_token_stream().to_string();
+
+        assert!(tokens.contains("OPTIONAL"));
     }
 }
 

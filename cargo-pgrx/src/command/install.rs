@@ -12,16 +12,18 @@ use crate::cargo::CargoProfile;
 use crate::command::get::{find_control_file, get_property};
 use crate::command::sudo_install::SudoInstall;
 use crate::manifest::{PgVersionSource, display_version_info};
+use crate::object_utils::{schema_section_data, strip_macho_schema_sections};
 use cargo_metadata::Message as CargoMessage;
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{PgConfig, Pgrx, cargo::PgrxManifestExt, get_target_dir};
+use pgrx_sql_entity_graph::section::ELF_SECTION_NAME;
 use std::collections::HashMap;
 use std::fs;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
-use std::process::Stdio;
+use std::process::{Command, Stdio};
 use std::sync::{Arc, Mutex, OnceLock};
 
 /// Type used for memoizing expensive to calculate values.
@@ -57,6 +59,9 @@ pub(crate) struct Install {
     pub(crate) features: clap_cargo::Features,
     #[clap(long)]
     pub(crate) target: Option<String>,
+    /// Keep the embedded `.pgrx_schema` section in installed artifacts.
+    #[clap(long)]
+    pub(crate) no_schema_strip: bool,
     #[clap(from_global, action = ArgAction::Count)]
     pub(crate) verbose: u8,
 }
@@ -110,6 +115,7 @@ impl CommandExecute for Install {
             None,
             &self.features,
             self.target.as_deref(),
+            self.no_schema_strip,
         )?;
         Ok(())
     }
@@ -147,6 +153,7 @@ pub(crate) fn install_extension(
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    no_schema_strip: bool,
 ) -> eyre::Result<Vec<PathBuf>> {
     let mut output_tracking = Vec::new();
 
@@ -210,7 +217,7 @@ pub(crate) fn install_extension(
         };
         let filename = format!("{so_name}{so_suffix}");
 
-        let dest = pkglibdir.join(filename);
+        let dest = pkglibdir.join(&filename);
 
         // Remove the existing shared libraries if present. This is a workaround for an
         // issue highlighted by the following apple documentation:
@@ -233,6 +240,10 @@ pub(crate) fn install_extension(
             package_manifest_path,
             &mut output_tracking,
         )?;
+
+        if !no_schema_strip {
+            strip_schema_section(&pkglibdir.join(&filename))?;
+        }
     }
 
     copy_sql_files(
@@ -292,6 +303,82 @@ fn copy_file(
     }
 
     output_tracking.push(dest);
+
+    Ok(())
+}
+
+fn strip_schema_section(shared_object: &Path) -> eyre::Result<()> {
+    if !schema_section_present(shared_object)? {
+        return Ok(());
+    }
+
+    println!(
+        "{} schema section from {}",
+        "    Stripping".bold().green(),
+        format_display_path(shared_object)?.cyan()
+    );
+
+    if cfg!(target_os = "macos") {
+        strip_macho_schema_section(shared_object)
+    } else {
+        strip_non_macho_schema_section(shared_object)
+    }
+}
+
+fn schema_section_present(shared_object: &Path) -> eyre::Result<bool> {
+    let bytes = fs::read(shared_object)
+        .wrap_err_with(|| format!("failed to read `{}`", shared_object.display()))?;
+    schema_section_data(&bytes)
+        .wrap_err_with(|| format!("failed to inspect `{}`", shared_object.display()))
+        .map(|section| section.is_some())
+}
+
+fn strip_macho_schema_section(shared_object: &Path) -> eyre::Result<()> {
+    let mut bytes = fs::read(shared_object)
+        .wrap_err_with(|| format!("failed to read `{}`", shared_object.display()))?;
+    let stripped = strip_macho_schema_sections(&mut bytes)
+        .wrap_err_with(|| format!("failed to strip `{}`", shared_object.display()))?;
+    if !stripped {
+        return Ok(());
+    }
+
+    fs::write(shared_object, bytes).wrap_err_with(|| {
+        format!("failed to rewrite `{}` after stripping schema section", shared_object.display())
+    })?;
+    resign_macho_binary(shared_object)?;
+    Ok(())
+}
+
+fn resign_macho_binary(shared_object: &Path) -> eyre::Result<()> {
+    let mut command = Command::new("codesign");
+    command.args(["--force", "--sign", "-"]).arg(shared_object);
+
+    let command_str = format!("{command:?}");
+    let status =
+        command.status().wrap_err_with(|| format!("failed to run codesign: {command_str}"))?;
+    if !status.success() {
+        eyre::bail!("codesign failed while re-signing {}", shared_object.display());
+    }
+
+    Ok(())
+}
+
+fn strip_non_macho_schema_section(shared_object: &Path) -> eyre::Result<()> {
+    let objcopy = which::which("llvm-objcopy")
+        .or_else(|_| which::which("objcopy"))
+        .wrap_err(
+            "could not find `llvm-objcopy` or `objcopy`; rerun with `--no-schema-strip` to skip stripping",
+        )?;
+
+    let mut command = Command::new(objcopy);
+    command.arg("--remove-section").arg(ELF_SECTION_NAME).arg(shared_object);
+
+    let command_str = format!("{command:?}");
+    let status =
+        command.status().wrap_err_with(|| format!("failed to run objcopy: {command_str}"))?;
+    if !status.success() {
+        eyre::bail!("objcopy failed while stripping {}", shared_object.display());
+    }
 
     Ok(())
 }

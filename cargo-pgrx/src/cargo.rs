@@ -68,11 +68,6 @@ impl Cargo {
         self
     }
 
-    pub fn flag_args(mut self, flag: impl Into<String>, args: Vec<String>) -> Self {
-        self.more_args.insert(flag.into(), args);
-        self
-    }
-
     pub fn features(mut self, features: clap_cargo::Features) -> Self {
         self.features = features;
         self

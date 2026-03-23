@@ -5,7 +5,7 @@
 
 use bitvec::slice::BitSlice;
 use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
 use std::{borrow::Cow, fmt::Debug};
 
@@ -433,13 +433,8 @@ unsafe impl<T> SqlTranslatable for Nullable<T>
 where
     T: SqlTranslatable,
 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        T::argument_sql()
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        T::return_sql()
-    }
-    fn optional() -> bool {
-        true
-    }
+    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
+    const OPTIONAL: bool = true;
 }

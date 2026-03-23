@@ -17,6 +17,8 @@
 
 */
 use crate::extension_sql::SqlDeclared;
+use crate::metadata::SqlMapping;
+use crate::metadata::SqlTranslatable;
 use crate::pgrx_sql::PgrxSql;
 use crate::positioning_ref::PositioningRef;
 use crate::to_sql::ToSql;
@@ -110,17 +112,9 @@ impl ToSql for ExtensionSqlEntity {
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
 pub struct SqlDeclaredEntityData {
-    sql: String,
-    name: String,
-    option: String,
-    vec: String,
-    vec_option: String,
-    option_vec: String,
-    option_vec_option: String,
-    array: String,
-    option_array: String,
-    varlena: String,
-    pg_box: Vec<String>,
+    pub(crate) sql: String,
+    pub(crate) name: String,
+    pub(crate) schema_key: String,
 }
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
 pub enum SqlDeclaredEntity {
@@ -154,19 +148,7 @@ impl SqlDeclaredEntity {
                 .ok_or_else(|| eyre::eyre!("Did not get SQL for `{}`", name))?
                 .to_string(),
             name: name.to_string(),
-            option: format!("Option<{name}>"),
-            vec: format!("Vec<{name}>"),
-            vec_option: format!("Vec<Option<{name}>>"),
-            option_vec: format!("Option<Vec<{name}>>"),
-            option_vec_option: format!("Option<Vec<Option<{name}>>"),
-            array: format!("Array<{name}>"),
-            option_array: format!("Option<{name}>"),
-            varlena: format!("Varlena<{name}>"),
-            pg_box: vec![
-                format!("pgrx::pgbox::PgBox<{}>", name),
-                format!("pgrx::pgbox::PgBox<{}, pgrx::pgbox::AllocatedByRust>", name),
-                format!("pgrx::pgbox::PgBox<{}, pgrx::pgbox::AllocatedByPostgres>", name),
-            ],
+            schema_key: name.to_string(),
         };
         let retval = match variant {
             "Type" => Self::Type(data),
@@ -180,6 +162,39 @@ impl SqlDeclaredEntity {
         };
         Ok(retval)
     }
+
+    pub fn build_type<T: SqlTranslatable>(variant: &str, name: &str) -> eyre::Result<Self> {
+        let sql = match T::argument_sql() {
+            Ok(SqlMapping::As(sql)) => sql,
+            Ok(SqlMapping::Composite { .. }) => {
+                return Err(eyre::eyre!(
+                    "`creates = [{variant}(...)]` requires a concrete SQL type name"
+                ));
+            }
+            Ok(SqlMapping::Skip) => {
+                return Err(eyre::eyre!(
+                    "`creates = [{variant}(...)]` cannot use a skipped SQL type"
+                ));
+            }
+            Err(err) => return Err(err.into()),
+        };
+        let data = SqlDeclaredEntityData {
+            sql,
+            name: name.to_string(),
+            schema_key: T::SCHEMA_KEY.to_string(),
+        };
+        let retval = match variant {
+            "Type" => Self::Type(data),
+            "Enum" => Self::Enum(data),
+            _ => {
+                return Err(eyre::eyre!(
+                    "Can only declare `Type(Ident)` or `Enum(Ident)` with type metadata"
+                ));
+            }
+        };
+        Ok(retval)
+    }
+
     pub fn sql(&self) -> String {
         match self {
             SqlDeclaredEntity::Type(data) => data.sql.clone(),
@@ -193,26 +208,10 @@ impl SqlDeclaredEntity {
             (SqlDeclared::Type(ident_name), &SqlDeclaredEntity::Type(data))
             | (SqlDeclared::Enum(ident_name), &SqlDeclaredEntity::Enum(data))
             | (SqlDeclared::Function(ident_name), &SqlDeclaredEntity::Function(data)) => {
-                let matches = |identifier_name: &str| {
-                    identifier_name == data.name
-                        || identifier_name == data.option
-                        || identifier_name == data.vec
-                        || identifier_name == data.vec_option
-                        || identifier_name == data.option_vec
-                        || identifier_name == data.option_vec_option
-                        || identifier_name == data.array
-                        || identifier_name == data.option_array
-                        || identifier_name == data.varlena
-                };
-                if matches(ident_name) || data.pg_box.contains(ident_name) {
+                if ident_name == &data.name || ident_name == &data.schema_key {
                     return true;
                 }
-                // there are cases where the identifier is
-                // `core::option::Option<Foo>` while the data stores
-                // `Option<Foo>` check again for this
-                let Some(generics_start) = ident_name.find('<') else { return false };
-                let Some(qual_end) = ident_name[..generics_start].rfind("::") else { return false };
-                matches(&ident_name[qual_end + 2..])
+                false
             }
             _ => false,
         }

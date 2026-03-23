@@ -1,23 +1,14 @@
-error[E0261]: use of undeclared lifetime name `'a`
+error: generic parameters may not be used in const operations
   --> tests/todo/roundtrip-tests.rs:69:21
    |
-22 |             fn $fname(i: $rtype) -> $rtype {
-   |             - lifetime `'a` is missing in item created through this procedural macro
-...
 69 |         Vec<Option<&'a str>>,
-   |                     ^^ undeclared lifetime
+   |                     ^^ cannot perform const operation using `'a`
    |
-help: consider introducing lifetime `'a` here
-   |
-22 |             fn<'a> $fname(i: $rtype) -> $rtype {
-   |               ++++
+   = note: lifetime parameters may not be used in const expressions
 
 error[E0261]: use of undeclared lifetime name `'a`
   --> tests/todo/roundtrip-tests.rs:69:21
    |
-67 |         rt_array_refstr,
-   |                        - lifetime `'a` is missing in item created through this procedural macro
-68 |         test_rt_array_refstr,
 69 |         Vec<Option<&'a str>>,
    |                     ^^ undeclared lifetime
 

@@ -17,34 +17,26 @@
 */
 use crate::SqlGraphEntity;
 use crate::pgrx_sql::PgrxSql;
-use crate::to_sql::ToSqlFn;
-
 /// Represents configuration options for tuning the SQL generator.
 ///
 /// When an item that can be rendered to SQL has these options at hand, they should be
 /// respected. If an item does not have them, then it is not expected that the SQL generation
 /// for those items can be modified.
 ///
-/// The default configuration has `enabled` set to `true`, and `callback` to `None`, which indicates
-/// that the default SQL generation behavior will be used. These are intended to be mutually exclusive
-/// options, so `callback` should only be set if generation is enabled.
+/// The default configuration has `enabled` set to `true`, which indicates that the default SQL
+/// generation behavior will be used.
 ///
 /// When `enabled` is false, no SQL is generated for the item being configured.
 ///
-/// When `callback` has a value, the corresponding `ToSql` implementation should invoke the
-/// callback instead of performing their default behavior.
 #[derive(Default, Clone)]
 pub struct ToSqlConfigEntity {
     pub enabled: bool,
-    pub callback: Option<ToSqlFn>,
     pub content: Option<&'static str>,
 }
 impl ToSqlConfigEntity {
-    /// Helper used to implement traits (`Eq`, `Ord`, etc) despite `ToSqlFn` not
-    /// having an implementation for them.
     #[inline]
-    fn fields(&self) -> (bool, Option<&str>, Option<usize>) {
-        (self.enabled, self.content, self.callback.map(|f| f as usize))
+    fn fields(&self) -> (bool, Option<&str>) {
+        (self.enabled, self.content)
     }
     /// Given a SqlGraphEntity, this function converts it to SQL based on the current configuration.
     ///
@@ -60,8 +52,6 @@ impl ToSqlConfigEntity {
         entity: &SqlGraphEntity,
         context: &PgrxSql,
     ) -> Option<eyre::Result<String>> {
-        use eyre::{WrapErr, eyre};
-
         if !self.enabled {
             return Some(Ok(format!(
                 "\n\
@@ -84,29 +74,6 @@ impl ToSqlConfigEntity {
                 content = content,
                 sql_anchor_comment = entity.sql_anchor_comment()
             )));
-        }
-
-        if let Some(callback) = self.callback {
-            let content = callback(entity, context)
-                .map_err(|e| eyre!(e))
-                .wrap_err("Failed to run specified `#[pgrx(sql = path)] function`");
-            return match content {
-                Ok(content) => {
-                    let module_pathname = &context.get_module_pathname();
-
-                    let content = content.replace("@MODULE_PATHNAME@", module_pathname);
-
-                    Some(Ok(format!(
-                        "\n\
-                        {sql_anchor_comment}\n\
-                        {content}\
-                    ",
-                        content = content,
-                        sql_anchor_comment = entity.sql_anchor_comment(),
-                    )))
-                }
-                Err(e) => Some(Err(e)),
-            };
         }
 
         None
@@ -136,10 +103,9 @@ impl std::hash::Hash for ToSqlConfigEntity {
 }
 impl std::fmt::Debug for ToSqlConfigEntity {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let (enabled, content, callback) = self.fields();
+        let (enabled, content) = self.fields();
         f.debug_struct("ToSqlConfigEntity")
             .field("enabled", &enabled)
-            .field("callback", &callback)
             .field("content", &content)
             .finish()
     }

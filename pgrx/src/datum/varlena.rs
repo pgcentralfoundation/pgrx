@@ -13,7 +13,7 @@ use crate::{
     set_varsize_short, vardata_any, varsize_any, varsize_any_exhdr, void_mut_ptr,
 };
 use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
@@ -424,11 +424,7 @@ unsafe impl<T> SqlTranslatable for PgVarlena<T>
 where
     T: SqlTranslatable + Copy,
 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        T::argument_sql()
-    }
-
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        T::return_sql()
-    }
+    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
 }

@@ -1,24 +1,16 @@
-error[E0277]: cannot generate SQL schema for this function
- --> tests/compile-fail/array-as-non-mutable-args.rs:7:1
+error[E0277]: `&mut FlatArray<'_, i32>` has no representation in SQL
+ --> tests/compile-fail/array-as-non-mutable-args.rs:7:24
   |
-6 | #[pg_extern]
-  | ------------ in this procedural macro expansion
 7 | fn something<'a>(_arr: &mut FlatArray<'a, i32>) {
-  | ^^ some types in for<'b, 'a> fn(&'b mut FlatArray<'a, i32>) cannot be translated to SQL
+  |                        ^^^^^^^^^^^^^^^^^^^^^^^ non-SQL type
   |
-  = help: the trait `FunctionMetadata<_>` is not implemented for `for<'b, 'a> fn(&'b mut FlatArray<'a, i32>)`
-  = note: this error originates in the attribute macro `pg_extern` (in Nightly builds, run with -Z macro-backtrace for more info)
-
-error[E0599]: `&mut FlatArray<'_, i32>` has no representation in SQL
- --> tests/compile-fail/array-as-non-mutable-args.rs:6:1
+  = help: the trait `SqlTranslatable` is not implemented for `&mut FlatArray<'_, i32>`
+  = note: `SqlTranslatable` is implemented for `&FlatArray<'_, i32>`, but not for `&mut FlatArray<'_, i32>`
+help: consider removing the leading `&`-reference
   |
-6 | #[pg_extern]
-  | ^^^^^^^^^^^^ non-SQL type
+7 - fn something<'a>(_arr: &mut FlatArray<'a, i32>) {
+7 + fn something<'a>(_arr: FlatArray<'a, i32>) {
   |
-  = note: the following trait bounds were not satisfied:
-          `&mut FlatArray<'_, i32>: SqlTranslatable`
-          which is required by `&&mut FlatArray<'_, i32>: SqlTranslatable`
-  = note: this error originates in the attribute macro `pg_extern` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error[E0277]: `&mut FlatArray<'_, i32>` cannot be passed into a Postgres function as a Datum
  --> tests/compile-fail/array-as-non-mutable-args.rs:7:18

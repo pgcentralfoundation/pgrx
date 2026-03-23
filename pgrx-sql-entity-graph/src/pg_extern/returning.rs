@@ -18,7 +18,7 @@
 use super::LastIdent;
 use crate::UsedType;
 
-use proc_macro2::TokenStream as TokenStream2;
+use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{ToTokens, TokenStreamExt, quote};
 use syn::parse::{Parse, ParseStream};
 
@@ -338,6 +338,83 @@ impl ToTokens for Returning {
             }
         };
         tokens.append_all(quoted);
+    }
+}
+
+impl Returning {
+    pub fn section_len_tokens(&self) -> TokenStream2 {
+        match self {
+            Returning::None => quote! { ::pgrx::pgrx_sql_entity_graph::section::u8_len() },
+            Returning::Type(used_ty) => {
+                let used_ty_len = used_ty.section_len_tokens();
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::u8_len() + (#used_ty_len)
+                }
+            }
+            Returning::SetOf { ty } => {
+                let used_ty_len = ty.section_len_tokens();
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::u8_len() + (#used_ty_len)
+                }
+            }
+            Returning::Iterated { tys: items } => {
+                let item_lens = items.iter().map(|ReturningIteratedItem { used_ty, name }| {
+                    let used_ty_len = used_ty.section_len_tokens();
+                    let name_len = name
+                        .as_ref()
+                        .map(|name| {
+                            quote! {
+                                ::pgrx::pgrx_sql_entity_graph::section::bool_len()
+                                    + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#name))
+                            }
+                        })
+                        .unwrap_or_else(|| {
+                            quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() }
+                        });
+                    quote! { (#used_ty_len) + (#name_len) }
+                });
+                quote! {
+                    ::pgrx::pgrx_sql_entity_graph::section::u8_len()
+                        + ::pgrx::pgrx_sql_entity_graph::section::list_len(&[
+                            #( #item_lens ),*
+                        ])
+                }
+            }
+        }
+    }
+
+    pub fn section_writer_tokens(&self, writer: TokenStream2) -> TokenStream2 {
+        match self {
+            Returning::None => quote! {
+                #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_RET_NONE)
+            },
+            Returning::Type(used_ty) => used_ty.section_writer_tokens(quote! {
+                #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_RET_TYPE)
+            }),
+            Returning::SetOf { ty } => ty.section_writer_tokens(quote! {
+                #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_RET_SET_OF)
+            }),
+            Returning::Iterated { tys: items } => {
+                let item_count = items.len();
+                let writer_ident = Ident::new("__pgrx_schema_writer", Span::mixed_site());
+                let item_writers = items.iter().map(|ReturningIteratedItem { used_ty, name }| {
+                    let name_writer = name
+                        .as_ref()
+                        .map(|name| quote! { .bool(true).str(stringify!(#name)) })
+                        .unwrap_or_else(|| quote! { .bool(false) });
+                    used_ty.section_writer_tokens(quote! { #writer_ident #name_writer })
+                });
+                quote! {
+                    {
+                        let #writer_ident = #writer
+                            .u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_RET_ITERATED)
+                            .u32(#item_count as u32);
+                        #( let #writer_ident = { #item_writers }; )*
+                        #writer_ident
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -17,9 +17,6 @@ publish = false
 [lib]
 crate-type = ["cdylib", "lib"]
 
-[[bin]]
-name = "pgrx_embed_triggers"
-path = "./src/bin/pgrx_embed.rs"
 
 [features]
 default = ["pg13"]

@@ -6,9 +6,6 @@ edition = "2021"
 [lib]
 crate-type = ["cdylib", "lib"]
 
-[[bin]]
-name = "pgrx_embed_wal_decoder"
-path = "./src/bin/pgrx_embed.rs"
 
 [features]
 default = ["pg13"]
