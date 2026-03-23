@@ -14,7 +14,7 @@ use pgrx::prelude::*;
 
 #[pg_extern]
 fn normalize_phrase(input: &str) -> String {
-    std::thread::sleep_ms(1);
+    std::thread::sleep(std::time::Duration::from_millis(1));
     input
         .split_whitespace()
         .map(|word| word.trim_matches(|ch: char| !ch.is_alphanumeric()).to_ascii_lowercase())
