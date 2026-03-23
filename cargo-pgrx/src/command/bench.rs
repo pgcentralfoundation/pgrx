@@ -913,11 +913,10 @@ fn command_output_in_dir<'a>(
     current_dir: &Path,
 ) -> eyre::Result<String> {
     let args = args.into_iter().collect::<Vec<_>>();
-    let output = Command::new(program)
-        .args(&args)
-        .current_dir(current_dir)
-        .output()
-        .wrap_err_with(|| format!("failed to run `{}`", format_program_and_args(program, &args)))?;
+    let output =
+        Command::new(program).args(&args).current_dir(current_dir).output().wrap_err_with(
+            || format!("failed to run `{}`", format_program_and_args(program, &args)),
+        )?;
     if output.status.success() {
         Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
     } else {
@@ -950,17 +949,13 @@ fn host_name() -> eyre::Result<String> {
 
 fn collect_git_metadata(root: &Path) -> eyre::Result<GitMetadata> {
     let git_commit = command_output_in_dir("git", ["rev-parse", "HEAD"], root).ok();
-    let git_branch =
-        command_output_in_dir("git", ["rev-parse", "--abbrev-ref", "HEAD"], root).ok();
+    let git_branch = command_output_in_dir("git", ["rev-parse", "--abbrev-ref", "HEAD"], root).ok();
     let git_describe =
         command_output_in_dir("git", ["describe", "--always", "--dirty", "--tags"], root).ok();
-    let git_dirty = command_output_in_dir(
-        "git",
-        ["status", "--porcelain", "--untracked-files=no"],
-        root,
-    )
-    .map(|status| !status.is_empty())
-    .unwrap_or(false);
+    let git_dirty =
+        command_output_in_dir("git", ["status", "--porcelain", "--untracked-files=no"], root)
+            .map(|status| !status.is_empty())
+            .unwrap_or(false);
 
     Ok(GitMetadata { git_commit, git_branch, git_describe, git_dirty })
 }
