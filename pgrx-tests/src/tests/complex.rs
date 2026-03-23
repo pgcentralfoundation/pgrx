@@ -34,6 +34,8 @@ impl Complex {
     }
 }
 
+const COMPLEX_SCHEMA_KEY: &str = pgrx::pgrx_resolved_type!(Complex);
+
 extension_sql!(
     r#"CREATE TYPE complex;"#,
     name = "create_complex_shell_type",
@@ -41,7 +43,7 @@ extension_sql!(
 );
 
 unsafe impl SqlTranslatable for Complex {
-    const SCHEMA_KEY: &'static str = "Complex";
+    const SCHEMA_KEY: &'static str = COMPLEX_SCHEMA_KEY;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("Complex"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -84,3 +86,13 @@ CREATE TYPE complex (
     name = "create_complex_type",
     requires = ["create_complex_shell_type", complex_in, complex_out]
 );
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn schema_key_uses_definition_module_path() {
+        assert_eq!(<Complex as SqlTranslatable>::SCHEMA_KEY, COMPLEX_SCHEMA_KEY);
+    }
+}

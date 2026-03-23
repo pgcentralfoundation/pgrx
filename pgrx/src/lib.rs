@@ -382,6 +382,6 @@ pub(crate) enum Utf8Compat {
 #[macro_export]
 macro_rules! pgrx_resolved_type {
     ($ty:ty) => {
-        stringify!($ty)
+        concat!(module_path!(), "::", stringify!($ty))
     };
 }
