@@ -165,7 +165,7 @@ where
     const SCHEMA_KEY: &'static str = "TableIterator";
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::Table);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = match table_item_sql(C::RETURN_SQL) {
-        Ok(C) => Ok(ReturnsRef::Table(&[C])),
+        Ok(column) => Ok(ReturnsRef::Table(&[column])),
         Err(err) => Err(err),
     };
 }
@@ -353,6 +353,7 @@ where
 
 macro_rules! impl_table_iter {
     ($($C:ident),* $(,)?) => {
+        #[allow(non_snake_case)]
         unsafe impl<'iter, $($C,)*> SqlTranslatable for TableIterator<'iter, ($($C,)*)>
         where
             $($C: SqlTranslatable + 'iter,)*
@@ -374,10 +375,9 @@ macro_rules! impl_table_iter {
             };
         }
 
+        #[allow(non_snake_case)]
         impl<$($C: IntoDatum),*> IntoHeapTuple for ($($C,)*) {
             unsafe fn into_heap_tuple(self, tupdesc: pg_sys::TupleDesc) -> *mut pg_sys::HeapTupleData {
-                // shadowing the type names with these identifiers
-                #[allow(nonstandard_style)]
                 let ($($C,)*) = self;
                 let datums = [$($C.into_datum(),)*];
                 let mut nulls = datums.map(|option| option.is_none());
@@ -392,6 +392,7 @@ macro_rules! impl_table_iter {
             }
         }
 
+        #[allow(non_snake_case)]
         unsafe impl<$($C),*> RetAbi for ($($C,)*)
         where
              $($C: BoxRet,)*
