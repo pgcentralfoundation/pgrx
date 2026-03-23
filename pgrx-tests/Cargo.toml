@@ -22,7 +22,7 @@ edition.workspace = true
 include = ["src/**/*", "README.md", "!**/tests/**/*"]
 
 [lib]
-crate-type = ["cdylib", "lib"]
+crate-type = ["cdylib"]
 
 
 [features]
