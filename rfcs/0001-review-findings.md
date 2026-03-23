@@ -57,11 +57,22 @@ section format directly.
 
 ---
 
-## Finding 2: `SCHEMA_KEY` Matching Is Purely Textual With No Path Normalization
+## Finding 2: `pgrx_resolved_type!` Omits `module_path!()`, Diverging From RFC
 
 ### Problem
 
-`pgrx_resolved_type!` is defined as:
+The RFC specifies `pgrx_resolved_type!` as:
+
+```rust
+// rfcs/0001-single-pass-schema-generation.md:211-215
+macro_rules! pgrx_resolved_type {
+    ($ty:ty) => {
+        concat!(module_path!(), "::", stringify!($ty))
+    };
+}
+```
+
+But the implementation only stringifies the type name:
 
 ```rust
 // pgrx/src/lib.rs:383-387
@@ -72,8 +83,9 @@ macro_rules! pgrx_resolved_type {
 }
 ```
 
-For `#[derive(PostgresType)] struct Foo`, `SCHEMA_KEY` becomes `"Foo"`. The graph builder
-matches function arguments to type entities by string equality:
+This means `SCHEMA_KEY` for a type `Foo` in module `my_ext::types` is just `"Foo"` rather
+than the RFC-specified `"my_ext::types::Foo"`. The graph builder matches function arguments
+to type entities by string equality on this key:
 
 ```rust
 // pgrx-sql-entity-graph/src/pgrx_sql.rs:803-819
@@ -95,65 +107,87 @@ if !found {
 }
 ```
 
+Without `module_path!()`, two types with the same name in different modules would collide
+on the same `SCHEMA_KEY`. More importantly, the bare name is fragile for manual
+`SqlTranslatable` impls: the author must know to use the exact stringified form of the
+type name as it appears at the derive site, rather than a module-qualified path.
+
 When a `schema_key` does not match any registered type or enum, the code silently
-fabricates a `BuiltinType` node. No warning, no error. This is the correct behavior for
-actual builtins like `i32` or `String`, but it is also the failure mode for mismatched
-keys: the function gets a fabricated builtin instead of a dependency edge, and the
-emitted SQL will reference whatever `ARGUMENT_SQL` says rather than ordering the
-function's `CREATE FUNCTION` after the type's `CREATE TYPE`.
-
-For types used through the same trait impl (re-exports, aliases resolved by rustc to the
-same concrete type), `SCHEMA_KEY` resolves identically because the compiler selects the
-same `SqlTranslatable` impl. This is actually better than the old `TypeId` approach for
-aliases.
-
-The risk is manual `SqlTranslatable` impls where the author writes a `SCHEMA_KEY` that
-does not match the string the proc macro captured at the derive site. This produces no
-compile error — just a silently missing dependency edge.
+fabricates a `BuiltinType` node. No warning, no error. This is correct for actual builtins
+like `i32` or `String`, but it is also the silent failure mode for mismatched keys.
 
 ### Proposed Solution
 
-Add a diagnostic warning in `initialize_externs` when a `schema_key` is not a recognized
-pgrx builtin and does not match any registered type or enum. The heuristic: maintain a
-set of known builtin keys (the ones from `simple_sql_type!` invocations — `"i32"`,
-`"String"`, `"str"`, etc.). When a key is not in that set and not matched by any
-registered entity, emit a `tracing::warn!` (or `eprintln!` if tracing is not available in
-the graph builder):
+Implement the macro as the RFC specifies:
 
 ```rust
-if !found && !KNOWN_BUILTIN_KEYS.contains(schema_key) {
-    tracing::warn!(
-        "function `{}` references schema_key `{}` which is not a known \
-         builtin and does not match any registered type or enum — \
-         this may indicate a mismatched SqlTranslatable::SCHEMA_KEY",
-        item.name,
-        schema_key,
-    );
+#[macro_export]
+macro_rules! pgrx_resolved_type {
+    ($ty:ty) => {
+        concat!(module_path!(), "::", stringify!($ty))
+    };
 }
 ```
 
-This does not change behavior — the `BuiltinType` node is still created — but it gives
-the extension author a signal that something may be wrong. The warning can be suppressed
-with a `--quiet` flag or similar if it is too noisy for extensions that legitimately use
-types from dependency crates.
+This produces keys like `"my_ext::types::Foo"` instead of `"Foo"`, which:
 
-A stronger version would be to also emit this warning when writing the section data (at
-compile time via `compile_warning!` if that stabilizes, or as a note in the proc macro
-output), but that is harder to do from a proc macro that does not have access to the
-set of registered entities.
+1. **Disambiguates same-named types in different modules.** Two types named `Status` in
+   `my_ext::orders` and `my_ext::users` get distinct keys.
+
+2. **Makes manual `SqlTranslatable` impls self-locating.** When a user writes
+   `pgrx_resolved_type!(HexInt)` inside their impl block, `module_path!()` expands to
+   the module where the impl is written. As long as the derive and the manual impl are
+   in the same module (or the manual impl is at the type's definition site), the keys
+   match. This is the natural, correct placement.
+
+3. **Matches the `#[derive(PostgresType)]` and `#[derive(PostgresEnum)]` code paths.**
+   The derive macros in `postgres_type/mod.rs` and `postgres_enum/mod.rs` emit
+   `::pgrx::pgrx_resolved_type!(#name)` inside the generated `SqlTranslatable` impl.
+   Since `module_path!()` expands at the *expansion site* (the user's crate, where the
+   derive is applied), it will produce the user's module path, not pgrx's internal path.
+
+The `#[pg_extern]` side already reads `SCHEMA_KEY` through the trait
+(`<T as SqlTranslatable>::SCHEMA_KEY`), so the function argument's key automatically
+matches the type's key as long as they resolve to the same `SqlTranslatable` impl.
+Re-exports and type aliases also work because the compiler resolves to the same impl.
+
+The `simple_sql_type!` invocations for pgrx builtins (in
+`pgrx-pg-sys/src/submodules/sql_translatable.rs`) pass a literal `$schema_key` string
+rather than using the macro, so they are unaffected. These should continue to use short
+literal keys (`"i32"`, `"String"`, etc.) since their `SCHEMA_KEY` values are matched by
+`SqlTranslatable` trait resolution, not by string comparison against a derive-generated
+key.
+
+**One edge case to handle:** `extension_sql!` with `creates = [Type(Foo)]` records both
+`concat!(module_path!(), "::", "Foo")` as `data.name` and `<Foo as SqlTranslatable>::SCHEMA_KEY`
+as `data.schema_key`. With the fix, both sides now include `module_path!()`, so the
+comparison `ident_name == &data.schema_key` should still hold. Verify that the
+`section_identifier_tokens` code path in `extension_sql/mod.rs` produces the same
+`module_path!()` prefix as the type's own `SCHEMA_KEY`.
 
 ### User Impact
 
-**Derive-only users**: No impact. Their `SCHEMA_KEY` values are generated consistently
-by the same macro.
+**Derive-only users**: No impact. The derive macros call `pgrx_resolved_type!` in
+generated code at the user's definition site, so both the type entity and any function
+referencing it resolve to the same module-qualified key automatically.
 
-**Manual `SqlTranslatable` implementors**: They get a new warning if their `SCHEMA_KEY`
-does not match a registered entity. This is helpful — it catches the exact class of
-mistake that would otherwise silently produce wrong SQL ordering.
+**Manual `SqlTranslatable` implementors**: The `SCHEMA_KEY` value changes from
+`"HexInt"` to `"my_ext::HexInt"` (or whatever `module_path!()` produces at the impl
+site). This is a **breaking change** for anyone who hard-codes `SCHEMA_KEY` as a bare
+string rather than using `pgrx_resolved_type!()`. The migration is to replace:
+```rust
+const SCHEMA_KEY: &'static str = "HexInt";
+```
+with:
+```rust
+const SCHEMA_KEY: &'static str = pgrx::pgrx_resolved_type!(HexInt);
+```
+which is what the RFC's migration guide already recommends. Anyone following the
+documented migration path is unaffected.
 
-**Extensions using types from dependency crates**: May see warnings for types that are
-intentionally builtins from their perspective. The warning message should suggest
-`--quiet` or explain when this is expected.
+**`extension_sql!` with `creates = [Type(T)]`**: Works as before, since both the
+`creates` declaration and the type entity derive their keys from the same
+`SqlTranslatable` impl.
 
 ---
 
@@ -531,7 +565,7 @@ Leaving it in place has no functional consequence.
 | # | Finding | Severity | Proposed Action |
 |---|---------|----------|-----------------|
 | 1 | RFC describes NDJSON, impl uses binary | Low | Update RFC |
-| 2 | `SCHEMA_KEY` matching is textual, silent on mismatch | Medium | Add diagnostic warning |
+| 2 | `pgrx_resolved_type!` omits `module_path!()`, diverging from RFC | Medium | Add `module_path!()` per RFC spec |
 | 3 | `Vec<T>` rejects `Skip` types (behavior change) | Medium | Keep as error (intentional improvement) |
 | 4 | `SetOfIterator::ARGUMENT_SQL` lost error guard | Medium | Restore `Err(ArgumentError::SetOf)` |
 | 5 | Dead parameters in `generate_schema_implicit` | Low | Remove them |
