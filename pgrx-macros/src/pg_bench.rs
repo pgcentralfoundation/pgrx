@@ -51,12 +51,12 @@ fn expand_pg_bench(func: ItemFn, args: PgBenchArgs) -> syn::Result<proc_macro2::
         .map(|path| quote! { Some(#path as fn()) })
         .unwrap_or_else(|| quote! { None });
     let transaction_mode = match args.transaction {
-        PgBenchTransactionMode::Shared => quote! { ::pgrx_bench::TransactionMode::Shared },
+        PgBenchTransactionMode::Shared => quote! { ::pgrx_bench::pgrx::TransactionMode::Shared },
         PgBenchTransactionMode::SubtransactionPerBatch => {
-            quote! { ::pgrx_bench::TransactionMode::SubtransactionPerBatch }
+            quote! { ::pgrx_bench::pgrx::TransactionMode::SubtransactionPerBatch }
         }
         PgBenchTransactionMode::SubtransactionPerIteration => {
-            quote! { ::pgrx_bench::TransactionMode::SubtransactionPerIteration }
+            quote! { ::pgrx_bench::pgrx::TransactionMode::SubtransactionPerIteration }
         }
     };
     let sample_size = args.sample_size;
@@ -66,7 +66,7 @@ fn expand_pg_bench(func: ItemFn, args: PgBenchArgs) -> syn::Result<proc_macro2::
     let noise_threshold = args.noise_threshold;
     let significance_level = args.significance_level;
     let bench_definition = quote! {
-        ::pgrx_bench::BenchDefinition {
+        ::pgrx_bench::pgrx::BenchDefinition {
             schema_name: "benches",
             bench_name: #bench_name,
             function_name: #bench_name,
@@ -74,7 +74,7 @@ fn expand_pg_bench(func: ItemFn, args: PgBenchArgs) -> syn::Result<proc_macro2::
             transaction_mode: #transaction_mode,
             source_file: file!(),
             source_line: #source_line,
-            config: ::pgrx_bench::BenchConfig {
+            config: ::pgrx_bench::pgrx::BenchConfig {
                 sample_size: #sample_size,
                 measurement_time_ms: #measurement_time_ms,
                 warm_up_time_ms: #warm_up_time_ms,
@@ -89,7 +89,7 @@ fn expand_pg_bench(func: ItemFn, args: PgBenchArgs) -> syn::Result<proc_macro2::
         #func
 
         const _: () = {
-            if !::pgrx_bench::module_path_has_benches(module_path!()) {
+            if !::pgrx_bench::pgrx::module_path_has_benches(module_path!()) {
                 panic!("#[pg_bench] can only be used inside #[cfg(feature = \"pg_bench\")] #[pg_schema] mod benches");
             }
         };
@@ -104,7 +104,7 @@ fn expand_pg_bench(func: ItemFn, args: PgBenchArgs) -> syn::Result<proc_macro2::
 
         #[::pgrx::pgrx_macros::pg_extern(#run_wrapper_attr)]
         fn #run_wrapper_name(baseline_artifacts: Option<::pgrx::JsonB>) -> ::pgrx::JsonB {
-            ::pgrx_bench::execute_benchmark(
+            ::pgrx_bench::pgrx::execute_benchmark(
                 #bench_definition,
                 #setup_fn,
                 #func_ident,
@@ -114,7 +114,7 @@ fn expand_pg_bench(func: ItemFn, args: PgBenchArgs) -> syn::Result<proc_macro2::
 
         #[::pgrx::pgrx_macros::pg_extern(#describe_wrapper_attr)]
         fn #describe_wrapper_name() -> ::pgrx::JsonB {
-            ::pgrx_bench::describe_benchmark(#bench_definition)
+            ::pgrx_bench::pgrx::describe_benchmark(#bench_definition)
         }
     })
 }
