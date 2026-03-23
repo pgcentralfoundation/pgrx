@@ -12,13 +12,12 @@ pub mod pgrx;
 
 use criterion::{Criterion, measurement::WallTime};
 use oorandom::Rand64;
-use ::pgrx::PgTryBuilder;
-use ::pgrx::pg_sys;
 use crate::pgrx::{
     BenchArtifact, BenchComparison, BenchComparisonEstimate, BenchConfig, BenchDefinition,
     BenchEstimate, BenchResult, BenchSample, BenchStatus, BenchThroughput, CriterionBenchmark,
     TransactionMode,
 };
+use pgrx_pg_sys::pg_try::PgTryBuilder;
 use serde::Deserialize;
 use serde_json::Value;
 use std::any::Any;
@@ -28,6 +27,8 @@ use std::fs;
 use std::panic::AssertUnwindSafe;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+
+use pgrx_pg_sys as pg_sys;
 
 /// Re-export of Criterion's `black_box`, which helps keep the optimizer from removing the work
 /// you intend to measure.
@@ -545,13 +546,13 @@ fn parse_throughput(value: Value) -> Option<BenchThroughput> {
     value.as_f64().map(|value| BenchThroughput { kind: kind.to_lowercase(), value })
 }
 
-fn caught_error_message(error: ::pgrx::pg_sys::panic::CaughtError) -> String {
+fn caught_error_message(error: pgrx_pg_sys::panic::CaughtError) -> String {
     match error {
-        ::pgrx::pg_sys::panic::CaughtError::PostgresError(report)
-        | ::pgrx::pg_sys::panic::CaughtError::ErrorReport(report) => {
+        pgrx_pg_sys::panic::CaughtError::PostgresError(report)
+        | pgrx_pg_sys::panic::CaughtError::ErrorReport(report) => {
             report.message().to_string()
         }
-        ::pgrx::pg_sys::panic::CaughtError::RustPanic { ereport, .. } => {
+        pgrx_pg_sys::panic::CaughtError::RustPanic { ereport, .. } => {
             ereport.message().to_string()
         }
     }

@@ -96,7 +96,7 @@ Typical Cargo.toml shape:
 
 ```toml
 [features]
-pg16 = ["pgrx/pg16", "pgrx-tests/pg16", "pgrx-bench?/pg16"]
+pg16 = ["pgrx/pg16", "pgrx-tests/pg16"]
 pg_test = []
 pg_bench = ["dep:pgrx-bench"]
 
@@ -107,6 +107,10 @@ pgrx-bench = { version = "=0.17.0", optional = true }
 [dev-dependencies]
 pgrx-tests = "=0.17.0"
 ```
+
+Notice that `pgrx-bench` does not need its own `pg16`/`pg17`/etc. passthrough feature wiring.
+The active Postgres version is already selected on `pgrx`, and Cargo feature unification carries
+that through to `pgrx-bench`'s internal runtime dependencies automatically.
 
 Benchmark functions live under a feature-gated `#[pg_schema] mod benches`.
 

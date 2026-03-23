@@ -122,12 +122,12 @@ Current preferred Cargo shape for generated projects:
 
 ```toml
 [features]
-pg13 = ["pgrx/pg13", "pgrx-tests/pg13", "pgrx-bench?/pg13"]
-pg14 = ["pgrx/pg14", "pgrx-tests/pg14", "pgrx-bench?/pg14"]
-pg15 = ["pgrx/pg15", "pgrx-tests/pg15", "pgrx-bench?/pg15"]
-pg16 = ["pgrx/pg16", "pgrx-tests/pg16", "pgrx-bench?/pg16"]
-pg17 = ["pgrx/pg17", "pgrx-tests/pg17", "pgrx-bench?/pg17"]
-pg18 = ["pgrx/pg18", "pgrx-tests/pg18", "pgrx-bench?/pg18"]
+pg13 = ["pgrx/pg13", "pgrx-tests/pg13"]
+pg14 = ["pgrx/pg14", "pgrx-tests/pg14"]
+pg15 = ["pgrx/pg15", "pgrx-tests/pg15"]
+pg16 = ["pgrx/pg16", "pgrx-tests/pg16"]
+pg17 = ["pgrx/pg17", "pgrx-tests/pg17"]
+pg18 = ["pgrx/pg18", "pgrx-tests/pg18"]
 pg_test = []
 pg_bench = ["dep:pgrx-bench"]
 
@@ -140,7 +140,8 @@ pgrx-tests = "=..."
 ```
 
 `pgrx-bench` must be an optional normal dependency, not only a dev-dependency, because benchmark
-code is compiled into the extension shared library when benching.
+code is compiled into the extension shared library when benching. It does not need separate
+user-facing `pgXX` feature flags; the selected `pgrx` Postgres feature is unified transitively.
 
 ## CLI
 

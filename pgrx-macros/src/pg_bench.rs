@@ -114,17 +114,17 @@ fn expand_pg_bench(func: ItemFn, args: PgBenchArgs) -> syn::Result<proc_macro2::
 
         #[::pgrx::pgrx_macros::pg_extern(#run_wrapper_attr)]
         fn #run_wrapper_name(baseline_artifacts: Option<::pgrx::JsonB>) -> ::pgrx::JsonB {
-            ::pgrx_bench::pgrx::execute_benchmark(
+            ::pgrx::JsonB(::pgrx_bench::pgrx::execute_benchmark(
                 #bench_definition,
                 #setup_fn,
                 #func_ident,
-                baseline_artifacts,
-            )
+                baseline_artifacts.map(|baseline_artifacts| baseline_artifacts.0),
+            ))
         }
 
         #[::pgrx::pgrx_macros::pg_extern(#describe_wrapper_attr)]
         fn #describe_wrapper_name() -> ::pgrx::JsonB {
-            ::pgrx_bench::pgrx::describe_benchmark(#bench_definition)
+            ::pgrx::JsonB(::pgrx_bench::pgrx::describe_benchmark(#bench_definition))
         }
     })
 }

@@ -2107,7 +2107,7 @@ version = "0.17.0"
 dependencies = [
  "criterion",
  "oorandom",
- "pgrx",
+ "pgrx-pg-sys",
  "serde",
  "serde_json",
  "tempfile",

@@ -12,9 +12,12 @@
 //!
 //! Benchmark authors should use the top-level [`crate::Bencher`], [`crate::BatchSize`], and
 //! [`crate::black_box`] APIs instead of the items in this module.
+//!
+//! These helpers intentionally exchange plain `serde_json::Value` payloads with the generated
+//! wrappers so `pgrx-bench` only needs the low-level backend/runtime hooks from `pgrx-pg-sys`;
+//! the `pgrx::JsonB` boundary stays in the macro-generated SQL wrapper layer.
 
-use ::pgrx::JsonB;
-use ::pgrx::PgTryBuilder;
+use pgrx_pg_sys::pg_try::PgTryBuilder;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::panic::AssertUnwindSafe;
@@ -209,13 +212,13 @@ pub fn execute_benchmark(
     definition: BenchDefinition,
     setup_fn: Option<fn()>,
     bench_fn: fn(&mut Bencher<'_>),
-    baseline_artifacts: Option<JsonB>,
-) -> JsonB {
+    baseline_artifacts: Option<Value>,
+) -> Value {
     let definition_for_report = definition.clone();
     let result = PgTryBuilder::new(AssertUnwindSafe(|| {
         let baseline_artifacts = baseline_artifacts
             .map(|baseline_artifacts| {
-                serde_json::from_value::<Vec<BenchArtifact>>(baseline_artifacts.0).map_err(
+                serde_json::from_value::<Vec<BenchArtifact>>(baseline_artifacts).map_err(
                     |error| {
                         format!("failed to decode persisted Criterion baseline artifacts: {error}")
                     },
@@ -260,9 +263,8 @@ pub fn execute_benchmark(
     .execute();
 
     match result {
-        Ok(report) => JsonB(serde_json::to_value(report).expect("BenchResult should serialize")),
-        Err(error_text) => JsonB(
-            serde_json::to_value(BenchResult {
+        Ok(report) => serde_json::to_value(report).expect("BenchResult should serialize"),
+        Err(error_text) => serde_json::to_value(BenchResult {
                 schema_name: definition_for_report.schema_name.to_string(),
                 bench_name: definition_for_report.bench_name.to_string(),
                 function_name: definition_for_report.function_name.to_string(),
@@ -281,26 +283,23 @@ pub fn execute_benchmark(
                 artifacts: Vec::new(),
             })
             .expect("BenchResult should serialize"),
-        ),
     }
 }
 
 #[doc(hidden)]
 /// Internal entrypoint used by generated `#[pg_bench]` descriptor wrappers.
-pub fn describe_benchmark(definition: BenchDefinition) -> JsonB {
-    JsonB(
-        serde_json::to_value(BenchDescriptor {
-            schema_name: definition.schema_name.to_string(),
-            bench_name: definition.bench_name.to_string(),
-            function_name: definition.function_name.to_string(),
-            setup_function: definition.setup_function.map(str::to_string),
-            transaction_mode: definition.transaction_mode,
-            source_file: definition.source_file.to_string(),
-            source_line: definition.source_line,
-            criterion_config: definition.config,
-        })
-        .expect("BenchDescriptor should serialize"),
-    )
+pub fn describe_benchmark(definition: BenchDefinition) -> Value {
+    serde_json::to_value(BenchDescriptor {
+        schema_name: definition.schema_name.to_string(),
+        bench_name: definition.bench_name.to_string(),
+        function_name: definition.function_name.to_string(),
+        setup_function: definition.setup_function.map(str::to_string),
+        transaction_mode: definition.transaction_mode,
+        source_file: definition.source_file.to_string(),
+        source_line: definition.source_line,
+        criterion_config: definition.config,
+    })
+    .expect("BenchDescriptor should serialize")
 }
 
 #[doc(hidden)]
