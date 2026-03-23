@@ -34,10 +34,6 @@ fn expand_pg_bench(func: ItemFn, args: PgBenchArgs) -> syn::Result<proc_macro2::
     let run_wrapper_sql_name = run_wrapper_name.to_string();
     let describe_wrapper_name = format_ident!("__pgrx_bench_describe_{}", func_ident);
     let describe_wrapper_sql_name = describe_wrapper_name.to_string();
-    let typecheck_name = format_ident!("__pgrx_bench_typecheck_{}", func_ident);
-    let signature_guard_name = format_ident!("__pgrx_bench_signature_guard_{}", func_ident);
-    let caught_error_name = format_ident!("__pgrx_bench_caught_error_{}", func_ident);
-    let runtime_name = format_ident!("__pgrx_bench_runtime_{}", func_ident);
     let bench_name = func_ident.to_string();
     let source_line = func.sig.ident.span().start().line as u32;
 
@@ -101,89 +97,81 @@ fn expand_pg_bench(func: ItemFn, args: PgBenchArgs) -> syn::Result<proc_macro2::
         #func
 
         const _: () = {
+            let _signature_guard: for<'a> fn(&'a mut ::pgrx_bench::Bencher<'a>) = #func_ident;
             if !::pgrx_bench::pgrx::module_path_has_benches(module_path!()) {
                 panic!("#[pg_bench] can only be used inside #[cfg(feature = \"pg_bench\")] #[pg_schema] mod benches");
             }
         };
 
-        #[doc(hidden)]
-        fn #typecheck_name(_func: for<'a> fn(&'a mut ::pgrx_bench::Bencher<'a>)) {}
-
-        #[doc(hidden)]
-        fn #signature_guard_name() {
-            #typecheck_name(#func_ident);
-        }
-
-        #[doc(hidden)]
-        fn #caught_error_name(error: ::pgrx::pg_sys::panic::CaughtError) -> String {
-            match error {
-                ::pgrx::pg_sys::panic::CaughtError::PostgresError(report)
-                | ::pgrx::pg_sys::panic::CaughtError::ErrorReport(report) => {
-                    report.message().to_string()
-                }
-                ::pgrx::pg_sys::panic::CaughtError::RustPanic { ereport, .. } => {
-                    ereport.message().to_string()
+        #[::pgrx::pgrx_macros::pg_extern(#run_wrapper_attr)]
+        fn #run_wrapper_name(baseline_artifacts: Option<::pgrx::JsonB>) -> ::pgrx::JsonB {
+            fn caught_error(error: ::pgrx::pg_sys::panic::CaughtError) -> String {
+                match error {
+                    ::pgrx::pg_sys::panic::CaughtError::PostgresError(report)
+                    | ::pgrx::pg_sys::panic::CaughtError::ErrorReport(report) => {
+                        report.message().to_string()
+                    }
+                    ::pgrx::pg_sys::panic::CaughtError::RustPanic { ereport, .. } => {
+                        ereport.message().to_string()
+                    }
                 }
             }
-        }
 
-        #[doc(hidden)]
-        #[allow(non_camel_case_types)]
-        struct #runtime_name;
+            // Keep the wrapper-only Postgres runtime glue local to this generated function so the
+            // user's benchmark module does not gain extra top-level hidden items.
+            struct Runtime;
 
-        impl ::pgrx_bench::pgrx::Runtime for #runtime_name {
-            fn execute_guarded<F, T>(&self, f: F) -> Result<T, String>
-            where
-                F: FnOnce() -> Result<T, String>,
-            {
-                ::pgrx::PgTryBuilder::new(::std::panic::AssertUnwindSafe(f))
-                    .catch_others(|error| Err(#caught_error_name(error)))
-                    .catch_rust_panic(|error| Err(#caught_error_name(error)))
-                    .execute()
-            }
+            impl ::pgrx_bench::pgrx::Runtime for Runtime {
+                fn execute_guarded<F, T>(&self, f: F) -> Result<T, String>
+                where
+                    F: FnOnce() -> Result<T, String>,
+                {
+                    ::pgrx::PgTryBuilder::new(::std::panic::AssertUnwindSafe(f))
+                        .catch_others(|error| Err(caught_error(error)))
+                        .catch_rust_panic(|error| Err(caught_error(error)))
+                        .execute()
+                }
 
-            fn with_subtransaction<F, T>(&self, f: F) -> Result<T, String>
-            where
-                F: FnOnce() -> T,
-            {
-                let name =
-                    ::std::ffi::CString::new("pgrx_bench").expect("static string should be CString-safe");
+                fn with_subtransaction<F, T>(&self, f: F) -> Result<T, String>
+                where
+                    F: FnOnce() -> T,
+                {
+                    let name = ::std::ffi::CString::new("pgrx_bench")
+                        .expect("static string should be CString-safe");
 
-                unsafe {
-                    let old_context = ::pgrx::pg_sys::CurrentMemoryContext;
-                    let old_resource_owner = ::pgrx::pg_sys::CurrentResourceOwner;
+                    unsafe {
+                        let old_context = ::pgrx::pg_sys::CurrentMemoryContext;
+                        let old_resource_owner = ::pgrx::pg_sys::CurrentResourceOwner;
 
-                    ::pgrx::pg_sys::BeginInternalSubTransaction(name.as_ptr());
+                        ::pgrx::pg_sys::BeginInternalSubTransaction(name.as_ptr());
 
-                    let result = ::pgrx::PgTryBuilder::new(::std::panic::AssertUnwindSafe(
-                        || Ok::<T, String>(f()),
-                    ))
-                    .catch_others(|error| Err(#caught_error_name(error)))
-                    .catch_rust_panic(|error| Err(#caught_error_name(error)))
-                    .execute();
+                        let result = ::pgrx::PgTryBuilder::new(::std::panic::AssertUnwindSafe(
+                            || Ok::<T, String>(f()),
+                        ))
+                        .catch_others(|error| Err(caught_error(error)))
+                        .catch_rust_panic(|error| Err(caught_error(error)))
+                        .execute();
 
-                    match result {
-                        Ok(value) => {
-                            ::pgrx::pg_sys::ReleaseCurrentSubTransaction();
-                            ::pgrx::pg_sys::MemoryContextSwitchTo(old_context);
-                            ::pgrx::pg_sys::CurrentResourceOwner = old_resource_owner;
-                            Ok(value)
-                        }
-                        Err(error) => {
-                            ::pgrx::pg_sys::MemoryContextSwitchTo(old_context);
-                            ::pgrx::pg_sys::RollbackAndReleaseCurrentSubTransaction();
-                            ::pgrx::pg_sys::MemoryContextSwitchTo(old_context);
-                            ::pgrx::pg_sys::CurrentResourceOwner = old_resource_owner;
-                            Err(error)
+                        match result {
+                            Ok(value) => {
+                                ::pgrx::pg_sys::ReleaseCurrentSubTransaction();
+                                ::pgrx::pg_sys::MemoryContextSwitchTo(old_context);
+                                ::pgrx::pg_sys::CurrentResourceOwner = old_resource_owner;
+                                Ok(value)
+                            }
+                            Err(error) => {
+                                ::pgrx::pg_sys::MemoryContextSwitchTo(old_context);
+                                ::pgrx::pg_sys::RollbackAndReleaseCurrentSubTransaction();
+                                ::pgrx::pg_sys::MemoryContextSwitchTo(old_context);
+                                ::pgrx::pg_sys::CurrentResourceOwner = old_resource_owner;
+                                Err(error)
+                            }
                         }
                     }
                 }
             }
-        }
 
-        #[::pgrx::pgrx_macros::pg_extern(#run_wrapper_attr)]
-        fn #run_wrapper_name(baseline_artifacts: Option<::pgrx::JsonB>) -> ::pgrx::JsonB {
-            let runtime = #runtime_name;
+            let runtime = Runtime;
             ::pgrx::JsonB(::pgrx_bench::pgrx::execute_benchmark(
                 #bench_definition,
                 #setup_fn,
