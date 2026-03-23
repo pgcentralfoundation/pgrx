@@ -188,6 +188,8 @@ SELECT
     CASE
         WHEN current_result.point_estimate_ns IS NOT NULL
          AND baseline_result.point_estimate_ns IS NOT NULL
+         AND current_result.status = 'ok'
+         AND baseline_result.status = 'ok'
          AND baseline_result.point_estimate_ns <> 0
         THEN ((current_result.point_estimate_ns - baseline_result.point_estimate_ns)
               / baseline_result.point_estimate_ns) * 100.0
@@ -195,8 +197,12 @@ SELECT
     CASE
         WHEN baseline_result.case_id IS NULL THEN 'new'
         WHEN current_result.case_id IS NULL THEN 'missing'
+        -- Failed or estimate-less runs should never be silently collapsed into "unchanged",
+        -- otherwise SQL consumers can mistake a broken benchmark for a successful no-op.
+        WHEN current_result.status IS DISTINCT FROM 'ok' THEN 'failed_current'
+        WHEN baseline_result.status IS DISTINCT FROM 'ok' THEN 'failed_baseline'
         WHEN current_result.point_estimate_ns IS NULL OR baseline_result.point_estimate_ns IS NULL
-            THEN 'unchanged'
+            THEN 'unavailable'
         WHEN current_result.point_estimate_ns < baseline_result.point_estimate_ns THEN 'faster'
         WHEN current_result.point_estimate_ns > baseline_result.point_estimate_ns THEN 'slower'
         ELSE 'unchanged'
