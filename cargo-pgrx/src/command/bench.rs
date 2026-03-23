@@ -242,7 +242,7 @@ impl CommandExecute for Bench {
             ));
             if show_human_output {
                 if let Some(completed_benchmark) = summary_benchmarks.last() {
-                print_completed_benchmark(completed_benchmark);
+                    print_completed_benchmark(completed_benchmark);
                 }
             }
         }
