@@ -179,8 +179,12 @@ impl CommandExecute for Bench {
         let mut summary_benchmarks = Vec::new();
         let mut failures = 0usize;
 
+        let show_human_output = !self.json;
+
         for benchmark in &benchmarks {
-            print_running_benchmark(benchmark);
+            if show_human_output {
+                print_running_benchmark(benchmark);
+            }
             let baseline = compare_group
                 .as_ref()
                 .map(|group| {
@@ -236,8 +240,10 @@ impl CommandExecute for Bench {
                 baseline.as_ref(),
                 compare_group.as_ref().map(|group| group.group_name.as_str()),
             ));
-            if let Some(completed_benchmark) = summary_benchmarks.last() {
+            if show_human_output {
+                if let Some(completed_benchmark) = summary_benchmarks.last() {
                 print_completed_benchmark(completed_benchmark);
+                }
             }
         }
 
