@@ -125,12 +125,8 @@ pub(crate) fn warn_if_pg_bench_enabled(features: &clap_cargo::Features, command:
     }
 
     eprintln!(
-        "{}",
-        format!(
-            "WARNING: building with feature `pg_bench`\nbenchmark functions and helper dependencies will be included in this `cargo pgrx {command}` build\nthis is usually not intended for packaged releases"
-        )
-        .red()
-        .bold()
+        "{} building with feature `pg_bench`\nbenchmark functions and helper dependencies will be included in this `cargo pgrx {command}` build\nthis is usually not intended for packaged releases",
+        "WARNING:".red().bold()
     );
 }
 
