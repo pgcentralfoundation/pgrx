@@ -565,6 +565,7 @@ Key behaviors:
 - benchmark side effects are rolled back after each benchmark invocation
 - benchmark results are stored in a runner-owned `pgrx_bench` schema so history survives extension refreshes
 - the CLI records environment metadata, `pg_settings`, run groups, and comparison targets
+- the CLI prints the benchmark backend PID before benchmark execution starts
 - the CLI prints which benchmark is currently running and the effective settings for that benchmark
 
 You can list benchmarks and their settings with:
@@ -580,6 +581,16 @@ To run a single benchmark:
 ```console
 $ cargo pgrx bench pg16 bench_normalize_phrase
 ```
+
+To print the backend PID and wait before benchmark execution starts, which is handy when attaching
+`samply`, `perf`, `lldb`, or another external profiler/debugger:
+
+```console
+$ cargo pgrx bench --wait 10
+```
+
+`--wait` is measured in seconds, is honored after the backend PID is printed, and the CLI tells
+you when it has started waiting.
 
 To name the current run group and compare it against another group:
 
@@ -622,6 +633,9 @@ Options:
           List discovered benchmark wrappers and exit
       --json
           Emit the final summary as JSON
+      --wait <SECONDS>
+          Sleep for this many seconds after printing the backend PID and before starting benchmarks
+          [default: 0]
   -p, --package <PACKAGE>
           Package to build (see `cargo help pkgid`)
       --manifest-path <MANIFEST_PATH>

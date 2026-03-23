@@ -19,9 +19,11 @@ use pgrx_pg_config::{PgConfig, Pgrx, createdb, dropdb};
 use postgres::{Client, NoTls};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use std::time::SystemTime;
+use std::thread;
+use std::time::{Duration, SystemTime};
 use uuid::Uuid;
 
 const BENCH_WRAPPER_SCHEMA: &str = "benches";
@@ -54,6 +56,9 @@ pub(crate) struct Bench {
     /// Emit the final summary as JSON
     #[clap(long)]
     json: bool,
+    /// Sleep for this many seconds after printing the backend PID and before starting benchmarks
+    #[clap(long, value_name = "SECONDS", default_value_t = 0)]
+    wait: u64,
     /// Package to build (see `cargo help pkgid`)
     #[clap(long, short)]
     package: Option<String>,
@@ -175,6 +180,10 @@ impl CommandExecute for Bench {
             &git_metadata,
         )?;
         snapshot_pg_settings(&mut client, run_group_id)?;
+
+        let backend_pid = load_backend_pid(&mut client)?;
+        print_backend_pid(backend_pid);
+        wait_before_starting_benchmarks(self.wait);
 
         let mut summary_benchmarks = Vec::new();
         let mut failures = 0usize;
@@ -490,6 +499,35 @@ fn snapshot_pg_settings(client: &mut Client, group_id: Uuid) -> eyre::Result<()>
         &[&group_id],
     )?;
     Ok(())
+}
+
+fn load_backend_pid(client: &mut Client) -> eyre::Result<i32> {
+    let row = client.query_one("SELECT pg_backend_pid()", &[])?;
+    Ok(row.get(0))
+}
+
+fn print_backend_pid(backend_pid: i32) {
+    eprintln!("{} {}", "Backend PID".bold().cyan(), backend_pid.to_string().bold().white());
+    let _ = std::io::stderr().flush();
+}
+
+fn wait_before_starting_benchmarks(wait_secs: u64) {
+    if wait_secs == 0 {
+        return;
+    }
+
+    eprintln!(
+        "{} {} before starting benchmarks",
+        "     Waiting".bold().cyan(),
+        format_wait_duration(wait_secs).bold().white()
+    );
+    let _ = std::io::stderr().flush();
+    thread::sleep(Duration::from_secs(wait_secs));
+}
+
+fn format_wait_duration(wait_secs: u64) -> String {
+    let unit = if wait_secs == 1 { "second" } else { "seconds" };
+    format!("{wait_secs} {unit}")
 }
 
 fn persist_benchmark_result(
@@ -1435,6 +1473,43 @@ const PERSISTENT_SCHEMA_SQL_BYTES: &[u8] = include_bytes!("pgrx-bench.sql");
 #[cfg(test)]
 mod tests {
     use super::*;
+    use clap::{Args, Parser, Subcommand};
+
+    #[derive(Parser)]
+    #[command(name = "cargo", bin_name = "cargo")]
+    struct CargoCli {
+        #[command(subcommand)]
+        subcommand: CargoSubcommand,
+        #[arg(short = 'v', long, action = clap::ArgAction::Count, global = true)]
+        verbose: u8,
+    }
+
+    #[derive(Subcommand)]
+    enum CargoSubcommand {
+        Pgrx(PgrxCli),
+    }
+
+    #[derive(Args)]
+    struct PgrxCli {
+        #[command(subcommand)]
+        subcommand: PgrxSubcommand,
+        #[arg(from_global, action = clap::ArgAction::Count)]
+        verbose: u8,
+    }
+
+    #[derive(Subcommand)]
+    enum PgrxSubcommand {
+        Bench(Bench),
+    }
+
+    fn parse_bench(args: &[&str]) -> Bench {
+        let cli = CargoCli::try_parse_from(args).expect("bench cli should parse");
+        match cli.subcommand {
+            CargoSubcommand::Pgrx(PgrxCli { subcommand: PgrxSubcommand::Bench(bench), .. }) => {
+                bench
+            }
+        }
+    }
 
     fn estimate_with_interval(point: f64, lower: f64, upper: f64) -> EstimateDisplay {
         EstimateDisplay {
@@ -1471,5 +1546,23 @@ mod tests {
         };
 
         assert_eq!(format_throughput_interval(&throughput, &estimate), "2.5 MB/s");
+    }
+
+    #[test]
+    fn wait_defaults_to_zero() {
+        let bench = parse_bench(&["cargo", "pgrx", "bench"]);
+        assert_eq!(bench.wait, 0);
+    }
+
+    #[test]
+    fn wait_parses_from_cli() {
+        let bench = parse_bench(&["cargo", "pgrx", "bench", "--wait", "15"]);
+        assert_eq!(bench.wait, 15);
+    }
+
+    #[test]
+    fn format_wait_duration_uses_singular_and_plural_units() {
+        assert_eq!(format_wait_duration(1), "1 second");
+        assert_eq!(format_wait_duration(2), "2 seconds");
     }
 }

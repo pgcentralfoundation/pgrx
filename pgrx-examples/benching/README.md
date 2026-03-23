@@ -40,6 +40,12 @@ To compare against a named prior group:
 cargo pgrx bench --compare-group initial-run
 ```
 
+To print the backend PID and leave time to attach a profiler or debugger:
+
+```bash
+cargo pgrx bench --wait 10
+```
+
 To inspect the SQL-visible wrappers without running them:
 
 ```bash
