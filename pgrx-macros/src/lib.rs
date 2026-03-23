@@ -16,7 +16,7 @@ use std::ffi::CString;
 use proc_macro2::Ident;
 use quote::{ToTokens, format_ident, quote};
 use syn::spanned::Spanned;
-use syn::{Attribute, Data, DeriveInput, Item, ItemImpl, Token, parse_macro_input};
+use syn::{Attribute, Data, DeriveInput, Item, ItemImpl, parse_macro_input};
 
 use operators::{deriving_postgres_eq, deriving_postgres_hash, deriving_postgres_ord};
 use pgrx_sql_entity_graph as sql_gen;
