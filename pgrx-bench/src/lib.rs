@@ -10,13 +10,13 @@
 
 pub mod pgrx;
 
+use crate::pgrx::{
+    BenchArtifact, BenchComparison, BenchComparisonEstimate, BenchConfig, BenchDefinition,
+    BenchEstimate, BenchResult, BenchSample, BenchStatus, BenchThroughput, CriterionBenchmark,
+    Runtime, TransactionMode,
+};
 use criterion::{Criterion, measurement::WallTime};
 use oorandom::Rand64;
-use crate::pgrx::{
-    BenchArtifact, BenchComparison, BenchComparisonEstimate, BenchConfig, BenchDefinition, Runtime,
-    BenchEstimate, BenchResult, BenchSample, BenchStatus, BenchThroughput, CriterionBenchmark,
-    TransactionMode,
-};
 use serde::Deserialize;
 use serde_json::Value;
 use std::any::Any;
@@ -211,7 +211,8 @@ fn run_routine<R: Runtime>(
                 criterion_bencher.iter_custom(|iters| {
                     let started = Instant::now();
                     for _ in 0..iters {
-                        runtime.with_subtransaction(|| routine())
+                        runtime
+                            .with_subtransaction(|| routine())
                             .unwrap_or_else(|error| panic!("{error}"));
                     }
                     started.elapsed()
@@ -234,21 +235,23 @@ fn run_routine<R: Runtime>(
                             }
                         }
                         TransactionMode::SubtransactionPerBatch => {
-                            runtime.with_subtransaction(|| {
-                                for _ in 0..current_batch {
-                                    let input = setup();
-                                    routine(input);
-                                }
-                            })
-                            .unwrap_or_else(|error| panic!("{error}"));
+                            runtime
+                                .with_subtransaction(|| {
+                                    for _ in 0..current_batch {
+                                        let input = setup();
+                                        routine(input);
+                                    }
+                                })
+                                .unwrap_or_else(|error| panic!("{error}"));
                         }
                         TransactionMode::SubtransactionPerIteration => {
                             for _ in 0..current_batch {
-                                runtime.with_subtransaction(|| {
-                                    let input = setup();
-                                    routine(input);
-                                })
-                                .unwrap_or_else(|error| panic!("{error}"));
+                                runtime
+                                    .with_subtransaction(|| {
+                                        let input = setup();
+                                        routine(input);
+                                    })
+                                    .unwrap_or_else(|error| panic!("{error}"));
                             }
                         }
                     }

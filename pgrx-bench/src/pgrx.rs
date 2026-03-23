@@ -231,11 +231,9 @@ pub fn execute_benchmark<R: Runtime>(
     let result = runtime.execute_guarded(|| {
         let baseline_artifacts = baseline_artifacts
             .map(|baseline_artifacts| {
-                serde_json::from_value::<Vec<BenchArtifact>>(baseline_artifacts).map_err(
-                    |error| {
-                        format!("failed to decode persisted Criterion baseline artifacts: {error}")
-                    },
-                )
+                serde_json::from_value::<Vec<BenchArtifact>>(baseline_artifacts).map_err(|error| {
+                    format!("failed to decode persisted Criterion baseline artifacts: {error}")
+                })
             })
             .transpose()?;
 
@@ -255,12 +253,20 @@ pub fn execute_benchmark<R: Runtime>(
             crate::materialize_baseline_artifacts(tempdir.path(), baseline_artifacts)?;
         }
 
-        let mut criterion =
-            crate::build_criterion(&definition.config, tempdir.path(), baseline_artifacts.is_some());
+        let mut criterion = crate::build_criterion(
+            &definition.config,
+            tempdir.path(),
+            baseline_artifacts.is_some(),
+        );
         let mut routine = routine;
 
         criterion.bench_function(definition.bench_name, |criterion_bencher| {
-            crate::run_routine(criterion_bencher, &mut routine, definition.transaction_mode, runtime);
+            crate::run_routine(
+                criterion_bencher,
+                &mut routine,
+                definition.transaction_mode,
+                runtime,
+            );
         });
         criterion.final_summary();
 
@@ -275,24 +281,24 @@ pub fn execute_benchmark<R: Runtime>(
     match result {
         Ok(report) => serde_json::to_value(report).expect("BenchResult should serialize"),
         Err(error_text) => serde_json::to_value(BenchResult {
-                schema_name: definition_for_report.schema_name.to_string(),
-                bench_name: definition_for_report.bench_name.to_string(),
-                function_name: definition_for_report.function_name.to_string(),
-                setup_function: definition_for_report.setup_function.map(str::to_string),
-                transaction_mode: definition_for_report.transaction_mode,
-                source_file: definition_for_report.source_file.to_string(),
-                source_line: definition_for_report.source_line,
-                criterion_config: definition_for_report.config,
-                status: BenchStatus::Failed,
-                error_text: Some(error_text),
-                benchmark: None,
-                estimates: Vec::new(),
-                samples: Vec::new(),
-                throughput: None,
-                comparison: None,
-                artifacts: Vec::new(),
-            })
-            .expect("BenchResult should serialize"),
+            schema_name: definition_for_report.schema_name.to_string(),
+            bench_name: definition_for_report.bench_name.to_string(),
+            function_name: definition_for_report.function_name.to_string(),
+            setup_function: definition_for_report.setup_function.map(str::to_string),
+            transaction_mode: definition_for_report.transaction_mode,
+            source_file: definition_for_report.source_file.to_string(),
+            source_line: definition_for_report.source_line,
+            criterion_config: definition_for_report.config,
+            status: BenchStatus::Failed,
+            error_text: Some(error_text),
+            benchmark: None,
+            estimates: Vec::new(),
+            samples: Vec::new(),
+            throughput: None,
+            comparison: None,
+            artifacts: Vec::new(),
+        })
+        .expect("BenchResult should serialize"),
     }
 }
 
