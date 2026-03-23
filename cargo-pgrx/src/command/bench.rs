@@ -997,8 +997,14 @@ fn print_completed_benchmark(benchmark: &BenchmarkSummaryRow) {
         println!("{}time:   {}", summary_indent(), format_estimate_interval(primary_estimate));
     }
 
-    if let Some(throughput) = &benchmark.throughput {
-        println!("{}thrpt:  {}", summary_indent(), format_throughput(throughput));
+    if let (Some(throughput), Some(primary_estimate)) =
+        (&benchmark.throughput, &benchmark.primary_estimate)
+    {
+        println!(
+            "{}thrpt:  {}",
+            summary_indent(),
+            format_throughput_interval(throughput, primary_estimate)
+        );
     }
 
     if let Some(change) = &benchmark.comparison {
@@ -1111,14 +1117,22 @@ fn format_duration_ns(value_ns: f64) -> String {
 }
 
 fn format_measurement(value: f64, unit: &str) -> String {
-    let formatted = if value.abs() >= 100.0 {
+    let formatted = format_measurement_value(value);
+    if unit.is_empty() {
+        trim_trailing_zeroes(formatted)
+    } else {
+        format!("{} {}", trim_trailing_zeroes(formatted), unit)
+    }
+}
+
+fn format_measurement_value(value: f64) -> String {
+    if value.abs() >= 100.0 {
         format!("{value:.2}")
     } else if value.abs() >= 10.0 {
         format!("{value:.3}")
     } else {
         format!("{value:.4}")
-    };
-    format!("{} {}", trim_trailing_zeroes(formatted), unit)
+    }
 }
 
 fn trim_trailing_zeroes(mut value: String) -> String {
@@ -1144,11 +1158,91 @@ fn format_percent(value: f64) -> String {
     format!("{}%", trim_trailing_zeroes(formatted))
 }
 
-fn format_throughput(throughput: &BenchThroughput) -> String {
-    match throughput.kind.as_str() {
-        "bytes" => format!("{:.2} bytes/s", throughput.value),
-        "elements" => format!("{:.2} elem/s", throughput.value),
-        kind => format!("{:.2} {kind}/s", throughput.value),
+fn format_throughput_interval(throughput: &BenchThroughput, estimate: &EstimateDisplay) -> String {
+    // Criterion records throughput as the amount of work per iteration in benchmark.json and then
+    // derives the displayed rate from the chosen time estimate. Mirror that here so the CLI
+    // reports the same kind of throughput interval as Criterion instead of echoing the raw count.
+    let Some(scale) = throughput_scale(throughput, estimate.point_estimate_ns) else {
+        return "invalid throughput".to_string();
+    };
+
+    match (estimate.ci_lower_bound_ns, estimate.ci_upper_bound_ns) {
+        (Some(lower), Some(upper)) => format!(
+            "[{} {} {}]",
+            format_throughput_value(throughput, upper, scale),
+            format_throughput_value(throughput, estimate.point_estimate_ns, scale),
+            format_throughput_value(throughput, lower, scale),
+        ),
+        _ => format_throughput_value(throughput, estimate.point_estimate_ns, scale),
+    }
+}
+
+fn format_throughput_value(
+    throughput: &BenchThroughput,
+    time_ns: f64,
+    scale: (f64, &'static str),
+) -> String {
+    if time_ns <= 0.0 || !time_ns.is_finite() {
+        return "invalid throughput".to_string();
+    }
+
+    let amount = throughput.value;
+    let per_second = amount * (1e9 / time_ns);
+    let (denominator, unit) = scale;
+    let scaled = per_second / denominator;
+    format!("{} {}", format_measurement(scaled, ""), unit)
+}
+
+fn throughput_scale(
+    throughput: &BenchThroughput,
+    typical_time_ns: f64,
+) -> Option<(f64, &'static str)> {
+    if typical_time_ns <= 0.0 || !typical_time_ns.is_finite() {
+        return None;
+    }
+
+    let per_second = throughput.value * (1e9 / typical_time_ns);
+    Some(match throughput.kind.as_str() {
+        "bytes" => choose_binary_throughput_unit(per_second),
+        "bytesdecimal" => choose_decimal_throughput_unit(per_second),
+        "elements" => choose_element_throughput_unit(per_second),
+        _ => (1.0, "ops/s"),
+    })
+}
+
+fn choose_binary_throughput_unit(per_second: f64) -> (f64, &'static str) {
+    if per_second < 1024.0 {
+        (1.0, "B/s")
+    } else if per_second < 1024.0 * 1024.0 {
+        (1024.0, "KiB/s")
+    } else if per_second < 1024.0 * 1024.0 * 1024.0 {
+        (1024.0 * 1024.0, "MiB/s")
+    } else {
+        (1024.0 * 1024.0 * 1024.0, "GiB/s")
+    }
+}
+
+fn choose_decimal_throughput_unit(per_second: f64) -> (f64, &'static str) {
+    if per_second < 1000.0 {
+        (1.0, "B/s")
+    } else if per_second < 1000.0 * 1000.0 {
+        (1000.0, "KB/s")
+    } else if per_second < 1000.0 * 1000.0 * 1000.0 {
+        (1000.0 * 1000.0, "MB/s")
+    } else {
+        (1000.0 * 1000.0 * 1000.0, "GB/s")
+    }
+}
+
+fn choose_element_throughput_unit(per_second: f64) -> (f64, &'static str) {
+    if per_second < 1000.0 {
+        (1.0, "elem/s")
+    } else if per_second < 1000.0 * 1000.0 {
+        (1000.0, "Kelem/s")
+    } else if per_second < 1000.0 * 1000.0 * 1000.0 {
+        (1000.0 * 1000.0, "Melem/s")
+    } else {
+        (1000.0 * 1000.0 * 1000.0, "Gelem/s")
     }
 }
 
@@ -1337,3 +1431,45 @@ impl BenchTransactionMode {
 }
 
 const PERSISTENT_SCHEMA_SQL_BYTES: &[u8] = include_bytes!("pgrx-bench.sql");
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn estimate_with_interval(point: f64, lower: f64, upper: f64) -> EstimateDisplay {
+        EstimateDisplay {
+            estimate_kind: "mean".to_string(),
+            point_estimate_ns: point,
+            ci_lower_bound_ns: Some(lower),
+            ci_upper_bound_ns: Some(upper),
+            confidence_level: Some(0.95),
+            standard_error_ns: None,
+        }
+    }
+
+    #[test]
+    fn throughput_interval_uses_time_estimate_to_compute_rate() {
+        let throughput = BenchThroughput { kind: "bytes".to_string(), value: 1024.0 };
+        let estimate = estimate_with_interval(1_000.0, 900.0, 1_100.0);
+
+        assert_eq!(
+            format_throughput_interval(&throughput, &estimate),
+            "[887.78 MiB/s 976.56 MiB/s 1085.07 MiB/s]"
+        );
+    }
+
+    #[test]
+    fn throughput_without_interval_uses_decimal_units_when_requested() {
+        let throughput = BenchThroughput { kind: "bytesdecimal".to_string(), value: 5_000.0 };
+        let estimate = EstimateDisplay {
+            estimate_kind: "mean".to_string(),
+            point_estimate_ns: 2_000_000.0,
+            ci_lower_bound_ns: None,
+            ci_upper_bound_ns: None,
+            confidence_level: None,
+            standard_error_ns: None,
+        };
+
+        assert_eq!(format_throughput_interval(&throughput, &estimate), "2.5 MB/s");
+    }
+}
