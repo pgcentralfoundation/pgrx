@@ -414,9 +414,9 @@ fn insert_run_group(
     let id = Uuid::new_v4();
     let cargo_features = features.features.clone();
     let command_line = std::env::args().collect::<Vec<_>>().join(" ");
-    let hostname = command_output("hostname").ok();
-    let rustc_version = command_output("rustc --version").ok();
-    let cargo_version = command_output("cargo --version").ok();
+    let hostname = host_name().ok();
+    let rustc_version = command_output("rustc", ["--version"]).ok();
+    let cargo_version = command_output("cargo", ["--version"]).ok();
     let os = std::env::consts::OS.to_string();
     let arch = std::env::consts::ARCH.to_string();
     let compare_group_id = compare_group.map(|group| group.id);
@@ -887,42 +887,82 @@ fn quote_ident(value: &str) -> String {
     format!("\"{}\"", value.replace('"', "\"\""))
 }
 
-fn command_output(command: &str) -> eyre::Result<String> {
-    let output = Command::new("zsh")
-        .arg("-lc")
-        .arg(command)
+fn command_output<'a>(
+    program: &str,
+    args: impl IntoIterator<Item = &'a str>,
+) -> eyre::Result<String> {
+    let args = args.into_iter().collect::<Vec<_>>();
+    let output = Command::new(program)
+        .args(&args)
         .output()
-        .wrap_err_with(|| format!("failed to run `{command}`"))?;
+        .wrap_err_with(|| format!("failed to run `{}`", format_program_and_args(program, &args)))?;
     if output.status.success() {
         Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
     } else {
-        Err(eyre!("command `{command}` failed: {}", String::from_utf8_lossy(&output.stderr).trim()))
+        Err(eyre!(
+            "command `{}` failed: {}",
+            format_program_and_args(program, &args),
+            String::from_utf8_lossy(&output.stderr).trim()
+        ))
     }
 }
 
+fn command_output_in_dir<'a>(
+    program: &str,
+    args: impl IntoIterator<Item = &'a str>,
+    current_dir: &Path,
+) -> eyre::Result<String> {
+    let args = args.into_iter().collect::<Vec<_>>();
+    let output = Command::new(program)
+        .args(&args)
+        .current_dir(current_dir)
+        .output()
+        .wrap_err_with(|| format!("failed to run `{}`", format_program_and_args(program, &args)))?;
+    if output.status.success() {
+        Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
+    } else {
+        Err(eyre!(
+            "command `{}` failed: {}",
+            format_program_and_args(program, &args),
+            String::from_utf8_lossy(&output.stderr).trim()
+        ))
+    }
+}
+
+fn format_program_and_args(program: &str, args: &[&str]) -> String {
+    let mut parts = Vec::with_capacity(args.len() + 1);
+    parts.push(program);
+    parts.extend_from_slice(args);
+    parts.join(" ")
+}
+
+fn host_name() -> eyre::Result<String> {
+    if let Ok(hostname) = std::env::var("HOSTNAME") {
+        return Ok(hostname);
+    }
+
+    if let Ok(hostname) = std::env::var("COMPUTERNAME") {
+        return Ok(hostname);
+    }
+
+    command_output("hostname", std::iter::empty())
+}
+
 fn collect_git_metadata(root: &Path) -> eyre::Result<GitMetadata> {
-    let root = root.display().to_string();
-    let git_commit = command_output(&format!("git -C {} rev-parse HEAD", shell_escape(&root))).ok();
+    let git_commit = command_output_in_dir("git", ["rev-parse", "HEAD"], root).ok();
     let git_branch =
-        command_output(&format!("git -C {} rev-parse --abbrev-ref HEAD", shell_escape(&root))).ok();
+        command_output_in_dir("git", ["rev-parse", "--abbrev-ref", "HEAD"], root).ok();
     let git_describe =
-        command_output(&format!("git -C {} describe --always --dirty --tags", shell_escape(&root)))
-            .ok();
-    let git_dirty = command_output(&format!(
-        "git -C {} status --porcelain --untracked-files=no",
-        shell_escape(&root)
-    ))
+        command_output_in_dir("git", ["describe", "--always", "--dirty", "--tags"], root).ok();
+    let git_dirty = command_output_in_dir(
+        "git",
+        ["status", "--porcelain", "--untracked-files=no"],
+        root,
+    )
     .map(|status| !status.is_empty())
     .unwrap_or(false);
 
     Ok(GitMetadata { git_commit, git_branch, git_describe, git_dirty })
-}
-
-fn shell_escape(value: &str) -> String {
-    let mut escaped = String::from("'");
-    escaped.push_str(&value.replace('\'', "'\\''"));
-    escaped.push('\'');
-    escaped
 }
 
 fn print_summary(summary: &BenchSummary) {
