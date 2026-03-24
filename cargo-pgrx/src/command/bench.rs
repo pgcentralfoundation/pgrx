@@ -593,7 +593,7 @@ fn load_backend_pid(client: &mut Client) -> eyre::Result<i32> {
 }
 
 fn print_backend_pid(backend_pid: i32) {
-    eprintln!("{} {}", "Backend PID".bold().cyan(), backend_pid.to_string().bold().white());
+    eprintln!("backend pid={backend_pid}");
     let _ = std::io::stderr().flush();
 }
 
