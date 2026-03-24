@@ -605,6 +605,19 @@ To emit the final summary as JSON:
 $ cargo pgrx bench --json
 ```
 
+To render a read-only history report from the benchmark database, using the last 10 groups per
+benchmark and leaving the managed Postgres instance running:
+
+```console
+$ cargo pgrx bench --report
+$ cargo pgrx bench bench_normalize_phrase --report
+```
+
+`--report` starts the managed Postgres instance if needed, skips build/install/extension refresh,
+reads the persisted `pgrx_bench` history, and renders colored ASCII bars. Rows marked with `*`
+have broad drift from that benchmark's recorded baseline (for example profile, Postgres version,
+cargo features, or nondefault `pg_settings`).
+
 `cargo pgrx bench` is meant for in-process performance work on extension code. It is not a
 replacement for `cargo pgrx test` or `cargo pgrx regress`, and it is not a client-side SQL load
 testing tool.
@@ -631,6 +644,8 @@ Options:
           Use CASCADE when dropping the extension during refresh
       --list
           List discovered benchmark wrappers and exit
+      --report
+          Render a read-only history report from the benchmark database
       --json
           Emit the final summary as JSON
       --wait <SECONDS>

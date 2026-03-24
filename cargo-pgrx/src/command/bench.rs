@@ -11,7 +11,7 @@ use crate::CommandExecute;
 use crate::cargo::CargoProfile;
 use crate::command::get::get_property;
 use crate::command::run::run;
-use crate::command::start::collect_postgresql_conf_settings;
+use crate::command::start::{collect_postgresql_conf_settings, start_postgres};
 use crate::manifest::{get_package_manifest, pg_config_and_version};
 use eyre::{Context, eyre};
 use owo_colors::OwoColorize;
@@ -19,6 +19,7 @@ use pgrx_pg_config::{PgConfig, Pgrx, createdb, dropdb};
 use postgres::{Client, NoTls};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use std::collections::{BTreeMap, BTreeSet};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -27,6 +28,8 @@ use std::time::{Duration, SystemTime};
 use uuid::Uuid;
 
 const BENCH_WRAPPER_SCHEMA: &str = "benches";
+const REPORT_HISTORY_LIMIT: i64 = 10;
+const REPORT_BAR_WIDTH: usize = 28;
 
 #[derive(clap::Args, Debug, Clone)]
 #[clap(author)]
@@ -53,6 +56,9 @@ pub(crate) struct Bench {
     /// List discovered benchmark wrappers and exit
     #[clap(long)]
     list: bool,
+    /// Render a read-only history report from the benchmark database
+    #[clap(long)]
+    report: bool,
     /// Emit the final summary as JSON
     #[clap(long)]
     json: bool,
@@ -86,7 +92,6 @@ impl CommandExecute for Bench {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let (resolved_pg_version, bench_filter) = self.resolve_args()?;
-        let postgresql_conf = collect_postgresql_conf_settings(&self.postgresql_conf)?;
         let pgrx = Pgrx::from_config()?;
 
         let (package_manifest, package_manifest_path) = get_package_manifest(
@@ -94,20 +99,26 @@ impl CommandExecute for Bench {
             self.package.as_deref(),
             self.manifest_path.as_deref(),
         )?;
-        let mut features = self.features.clone();
-        ensure_feature(&mut features, "pg_bench");
+        let mut resolved_features = self.features.clone();
         let (pg_config, _) = pg_config_and_version(
             &pgrx,
             &package_manifest,
             resolved_pg_version,
-            Some(&mut features),
+            Some(&mut resolved_features),
             true,
         )?;
 
         let extname = get_property(&package_manifest_path, "extname")?
             .ok_or(eyre!("could not determine extension name"))?;
-        let extversion = crate::command::install::get_version(&package_manifest_path)?;
         let dbname = self.dbname.clone().unwrap_or_else(|| format!("{extname}_benches"));
+        if self.report {
+            return self.execute_report(&pg_config, &dbname, &extname, bench_filter.as_deref());
+        }
+
+        let postgresql_conf = collect_postgresql_conf_settings(&self.postgresql_conf)?;
+        let extversion = crate::command::install::get_version(&package_manifest_path)?;
+        let mut features = resolved_features;
+        ensure_feature(&mut features, "pg_bench");
         let profile = CargoProfile::from_flags(
             self.profile.as_deref(),
             if self.debug { CargoProfile::Dev } else { CargoProfile::Release },
@@ -301,6 +312,81 @@ impl Bench {
                 self.args.join(" ")
             )),
         }
+    }
+
+    fn validate_report_args(&self) -> eyre::Result<()> {
+        let mut incompatible = Vec::new();
+        if self.group_name.is_some() {
+            incompatible.push("--group-name");
+        }
+        if self.compare_group.is_some() {
+            incompatible.push("--compare-group");
+        }
+        if self.resetdb {
+            incompatible.push("--resetdb");
+        }
+        if self.cascade {
+            incompatible.push("--cascade");
+        }
+        if self.list {
+            incompatible.push("--list");
+        }
+        if self.json {
+            incompatible.push("--json");
+        }
+        if self.wait != 0 {
+            incompatible.push("--wait");
+        }
+        if !self.postgresql_conf.is_empty() {
+            incompatible.push("--postgresql-conf");
+        }
+
+        if incompatible.is_empty() {
+            return Ok(());
+        }
+
+        Err(eyre!("`--report` can't be combined with {}", incompatible.join(", ")))
+    }
+
+    fn execute_report(
+        &self,
+        pg_config: &PgConfig,
+        dbname: &str,
+        extname: &str,
+        bench_filter: Option<&str>,
+    ) -> eyre::Result<()> {
+        self.validate_report_args()?;
+        start_postgres(pg_config, &Default::default(), false)?;
+
+        let mut client = connect_client(pg_config, dbname)
+            .wrap_err_with(|| format!("failed to connect to benchmark database `{dbname}`"))?;
+        ensure_report_history_available(&mut client, dbname)?;
+
+        let rows = load_recent_report_runs(&mut client, extname, bench_filter)?;
+        if rows.is_empty() {
+            if let Some(bench_filter) = bench_filter {
+                eyre::bail!(
+                    "no benchmark history matching `{bench_filter}` was found in database `{dbname}`"
+                );
+            }
+            eyre::bail!("no benchmark history was found in database `{dbname}`");
+        }
+
+        let baselines = load_report_baselines(&mut client, extname, bench_filter)?;
+        let settings_by_group = load_nondefault_settings_for_groups(
+            &mut client,
+            rows.iter()
+                .map(|row| row.group.group_id)
+                .chain(baselines.values().map(|baseline| baseline.group.group_id)),
+        )?;
+
+        let report = BenchHistoryReport {
+            dbname: dbname.to_string(),
+            bench_filter: bench_filter.map(str::to_string),
+            sections: build_report_sections(rows, baselines, &settings_by_group),
+        };
+        print_history_report(&report);
+        Ok(())
     }
 }
 
@@ -755,6 +841,503 @@ fn load_missing_benchmarks(
     )?;
 
     Ok(rows.into_iter().map(|row| row.get(0)).collect())
+}
+
+fn ensure_report_history_available(client: &mut Client, dbname: &str) -> eyre::Result<()> {
+    let row = client.query_one(
+        "SELECT
+            to_regclass('pgrx_bench.run_group') IS NOT NULL
+            AND to_regclass('pgrx_bench.benchmark_case') IS NOT NULL
+            AND to_regclass('pgrx_bench.benchmark_run') IS NOT NULL
+            AND to_regclass('pgrx_bench.benchmark_estimate') IS NOT NULL
+            AND to_regclass('pgrx_bench.run_group_pg_setting') IS NOT NULL",
+        &[],
+    )?;
+    let has_history_schema: bool = row.get(0);
+    if has_history_schema {
+        return Ok(());
+    }
+
+    Err(eyre!(
+        "benchmark history schema was not found in database `{dbname}`\nrun `cargo pgrx bench` first"
+    ))
+}
+
+fn load_recent_report_runs(
+    client: &mut Client,
+    extname: &str,
+    bench_filter: Option<&str>,
+) -> eyre::Result<Vec<HistoricalBenchRun>> {
+    let bench_filter = bench_filter.map(str::to_string);
+    let rows = client.query(
+        "WITH primary_estimate AS (
+            SELECT DISTINCT ON (benchmark_run_id)
+                benchmark_run_id,
+                point_estimate_ns
+            FROM pgrx_bench.benchmark_estimate
+            ORDER BY
+                benchmark_run_id,
+                CASE
+                    WHEN estimate_kind = 'slope' THEN 0
+                    WHEN estimate_kind = 'mean' THEN 1
+                    ELSE 2
+                END,
+                estimate_kind
+        ),
+        ranked_runs AS (
+            SELECT
+                benchmark_case.bench_name,
+                benchmark_run.group_id,
+                run_group.group_name,
+                benchmark_run.status,
+                primary_estimate.point_estimate_ns,
+                run_group.profile_name,
+                run_group.pg_version_major,
+                run_group.cargo_features,
+                row_number() OVER (
+                    PARTITION BY benchmark_case.bench_name
+                    ORDER BY run_group.created_at DESC, benchmark_run.id DESC
+                ) AS recency_rank
+            FROM pgrx_bench.benchmark_run
+            JOIN pgrx_bench.benchmark_case
+                ON benchmark_case.id = benchmark_run.case_id
+            JOIN pgrx_bench.run_group
+                ON run_group.id = benchmark_run.group_id
+            LEFT JOIN primary_estimate
+                ON primary_estimate.benchmark_run_id = benchmark_run.id
+            WHERE run_group.extname = $1
+              AND ($2::text IS NULL OR benchmark_case.bench_name LIKE '%' || $2 || '%')
+        )
+        SELECT
+            bench_name,
+            group_id,
+            group_name,
+            status,
+            point_estimate_ns,
+            profile_name,
+            pg_version_major,
+            cargo_features
+        FROM ranked_runs
+        WHERE recency_rank <= $3
+        ORDER BY bench_name, recency_rank",
+        &[&extname, &bench_filter, &REPORT_HISTORY_LIMIT],
+    )?;
+
+    rows.into_iter().map(decode_historical_bench_run).collect()
+}
+
+fn load_report_baselines(
+    client: &mut Client,
+    extname: &str,
+    bench_filter: Option<&str>,
+) -> eyre::Result<BTreeMap<String, HistoricalBenchBaseline>> {
+    let bench_filter = bench_filter.map(str::to_string);
+    let rows = client.query(
+        "WITH primary_estimate AS (
+            SELECT DISTINCT ON (benchmark_run_id)
+                benchmark_run_id,
+                point_estimate_ns
+            FROM pgrx_bench.benchmark_estimate
+            ORDER BY
+                benchmark_run_id,
+                CASE
+                    WHEN estimate_kind = 'slope' THEN 0
+                    WHEN estimate_kind = 'mean' THEN 1
+                    ELSE 2
+                END,
+                estimate_kind
+        ),
+        ranked_baselines AS (
+            SELECT
+                benchmark_case.bench_name,
+                benchmark_run.group_id,
+                run_group.group_name,
+                primary_estimate.point_estimate_ns,
+                run_group.profile_name,
+                run_group.pg_version_major,
+                run_group.cargo_features,
+                row_number() OVER (
+                    PARTITION BY benchmark_case.bench_name
+                    ORDER BY run_group.created_at, benchmark_run.id
+                ) AS baseline_rank
+            FROM pgrx_bench.benchmark_run
+            JOIN pgrx_bench.benchmark_case
+                ON benchmark_case.id = benchmark_run.case_id
+            JOIN pgrx_bench.run_group
+                ON run_group.id = benchmark_run.group_id
+            JOIN primary_estimate
+                ON primary_estimate.benchmark_run_id = benchmark_run.id
+            WHERE run_group.extname = $1
+              AND benchmark_run.status = 'ok'
+              AND ($2::text IS NULL OR benchmark_case.bench_name LIKE '%' || $2 || '%')
+        )
+        SELECT
+            bench_name,
+            group_id,
+            group_name,
+            point_estimate_ns,
+            profile_name,
+            pg_version_major,
+            cargo_features
+        FROM ranked_baselines
+        WHERE baseline_rank = 1
+        ORDER BY bench_name",
+        &[&extname, &bench_filter],
+    )?;
+
+    let mut baselines = BTreeMap::new();
+    for row in rows {
+        let baseline = decode_historical_bench_baseline(row)?;
+        baselines.insert(baseline.bench_name.clone(), baseline);
+    }
+    Ok(baselines)
+}
+
+fn decode_historical_bench_run(row: postgres::Row) -> eyre::Result<HistoricalBenchRun> {
+    let status: String = row.get(3);
+    Ok(HistoricalBenchRun {
+        bench_name: row.get(0),
+        group: HistoricalGroupMetadata {
+            group_id: row.get(1),
+            group_name: row.get(2),
+            profile_name: row.get(5),
+            pg_version_major: row.get(6),
+            cargo_features: row.get(7),
+        },
+        status: parse_bench_status(&status)?,
+        point_estimate_ns: row.get(4),
+    })
+}
+
+fn decode_historical_bench_baseline(row: postgres::Row) -> eyre::Result<HistoricalBenchBaseline> {
+    let point_estimate_ns: Option<f64> = row.get(3);
+    let point_estimate_ns =
+        point_estimate_ns.ok_or_else(|| eyre!("baseline row is missing a primary estimate"))?;
+    Ok(HistoricalBenchBaseline {
+        bench_name: row.get(0),
+        group: HistoricalGroupMetadata {
+            group_id: row.get(1),
+            group_name: row.get(2),
+            profile_name: row.get(4),
+            pg_version_major: row.get(5),
+            cargo_features: row.get(6),
+        },
+        point_estimate_ns,
+    })
+}
+
+fn parse_bench_status(value: &str) -> eyre::Result<BenchStatus> {
+    match value {
+        "ok" => Ok(BenchStatus::Ok),
+        "failed" => Ok(BenchStatus::Failed),
+        other => Err(eyre!("unexpected benchmark status `{other}`")),
+    }
+}
+
+fn load_nondefault_settings_for_groups(
+    client: &mut Client,
+    group_ids: impl IntoIterator<Item = Uuid>,
+) -> eyre::Result<BTreeMap<Uuid, GroupSettingsSnapshot>> {
+    let mut settings_by_group = BTreeMap::new();
+    for group_id in group_ids {
+        if settings_by_group.contains_key(&group_id) {
+            continue;
+        }
+
+        let rows = client.query(
+            "SELECT name, setting, unit
+             FROM pgrx_bench.run_group_pg_setting
+             WHERE group_id = $1
+               AND (
+                   source IS DISTINCT FROM 'default'
+                   OR sourcefile IS NOT NULL
+                   OR setting IS DISTINCT FROM boot_val
+               )
+             ORDER BY name",
+            &[&group_id],
+        )?;
+        let mut snapshot = GroupSettingsSnapshot::new();
+        for row in rows {
+            let name: String = row.get(0);
+            snapshot.insert(name, NondefaultSettingValue { setting: row.get(1), unit: row.get(2) });
+        }
+        settings_by_group.insert(group_id, snapshot);
+    }
+
+    Ok(settings_by_group)
+}
+
+fn build_report_sections(
+    rows: Vec<HistoricalBenchRun>,
+    baselines: BTreeMap<String, HistoricalBenchBaseline>,
+    settings_by_group: &BTreeMap<Uuid, GroupSettingsSnapshot>,
+) -> Vec<BenchHistorySection> {
+    let mut grouped_rows = BTreeMap::<String, Vec<HistoricalBenchRun>>::new();
+    for row in rows {
+        grouped_rows.entry(row.bench_name.clone()).or_default().push(row);
+    }
+
+    grouped_rows
+        .into_iter()
+        .map(|(bench_name, rows)| {
+            let baseline = baselines.get(&bench_name).cloned();
+            let failed_runs_omitted =
+                rows.iter().filter(|row| row.status == BenchStatus::Failed).count();
+            let incomplete_runs_omitted = rows
+                .iter()
+                .filter(|row| row.status == BenchStatus::Ok && row.point_estimate_ns.is_none())
+                .count();
+
+            let mut drift_categories = BTreeSet::new();
+            let displayed_runs = rows
+                .into_iter()
+                .rev()
+                .filter_map(|row| {
+                    if row.status != BenchStatus::Ok {
+                        return None;
+                    }
+                    let point_estimate_ns = row.point_estimate_ns?;
+                    let categories = baseline
+                        .as_ref()
+                        .map(|baseline| drift_categories_for_run(baseline, &row, settings_by_group))
+                        .unwrap_or_default();
+                    drift_categories.extend(categories.iter().copied());
+                    Some(DisplayedHistoryRun {
+                        group_name: row.group.group_name,
+                        point_estimate_ns,
+                        delta_pct: baseline.as_ref().and_then(|baseline| {
+                            percent_change_from_baseline(
+                                point_estimate_ns,
+                                baseline.point_estimate_ns,
+                            )
+                        }),
+                        drifted: !categories.is_empty(),
+                        is_baseline: baseline
+                            .as_ref()
+                            .is_some_and(|baseline| baseline.group.group_id == row.group.group_id),
+                    })
+                })
+                .collect();
+
+            BenchHistorySection {
+                bench_name,
+                baseline,
+                displayed_runs,
+                failed_runs_omitted,
+                incomplete_runs_omitted,
+                drift_categories,
+            }
+        })
+        .collect()
+}
+
+fn drift_categories_for_run(
+    baseline: &HistoricalBenchBaseline,
+    row: &HistoricalBenchRun,
+    settings_by_group: &BTreeMap<Uuid, GroupSettingsSnapshot>,
+) -> BTreeSet<&'static str> {
+    let mut categories = BTreeSet::new();
+    if baseline.group.profile_name != row.group.profile_name {
+        categories.insert("profile");
+    }
+    if baseline.group.pg_version_major != row.group.pg_version_major {
+        categories.insert("postgres version");
+    }
+    if cargo_feature_set(&baseline.group.cargo_features)
+        != cargo_feature_set(&row.group.cargo_features)
+    {
+        categories.insert("cargo features");
+    }
+
+    let baseline_settings = settings_by_group.get(&baseline.group.group_id);
+    let row_settings = settings_by_group.get(&row.group.group_id);
+    if baseline_settings != row_settings {
+        categories.insert("pg_settings");
+    }
+
+    categories
+}
+
+fn cargo_feature_set(features: &[String]) -> BTreeSet<&str> {
+    features.iter().map(String::as_str).collect()
+}
+
+fn percent_change_from_baseline(value: f64, baseline: f64) -> Option<f64> {
+    if baseline == 0.0 {
+        return None;
+    }
+
+    Some(((value - baseline) / baseline) * 100.0)
+}
+
+fn print_history_report(report: &BenchHistoryReport) {
+    println!("{}", "Bench history report".bold().green());
+    println!("{} {}", "  Database".bold().cyan(), report.dbname.bold().white());
+    println!(
+        "{} last {} groups per benchmark",
+        "     Scope".bold().cyan(),
+        REPORT_HISTORY_LIMIT.to_string().bold().white()
+    );
+    if let Some(bench_filter) = &report.bench_filter {
+        println!("{} {}", "    Filter".bold().cyan(), bench_filter.bold().white());
+    }
+    println!();
+
+    for (index, section) in report.sections.iter().enumerate() {
+        print_history_section(section);
+        if index + 1 != report.sections.len() {
+            println!();
+        }
+    }
+}
+
+fn print_history_section(section: &BenchHistorySection) {
+    println!("{}", section.bench_name.bold());
+
+    match &section.baseline {
+        Some(baseline) => println!(
+            "  {} {} ({})",
+            "baseline:".cyan(),
+            baseline.group.group_name.bold().white(),
+            format_duration_ns(baseline.point_estimate_ns).bold()
+        ),
+        None => println!(
+            "  {}",
+            "no successful baseline has been recorded for this benchmark yet".yellow()
+        ),
+    }
+
+    if section.displayed_runs.is_empty() {
+        println!("  {}", "no successful runs to display".yellow());
+    } else {
+        let max_point_estimate =
+            section.displayed_runs.iter().map(|run| run.point_estimate_ns).fold(0.0, f64::max);
+        let label_width = history_label_width(&section.displayed_runs);
+
+        for run in &section.displayed_runs {
+            let label =
+                if run.drifted { format!("{}*", run.group_name) } else { run.group_name.clone() };
+            let label = pad_history_label(&label, label_width);
+            let bar = format_history_bar(run.point_estimate_ns, max_point_estimate);
+            let runtime = format_duration_ns(run.point_estimate_ns);
+            let delta = format_history_delta(run.delta_pct, run.is_baseline);
+
+            println!(
+                "  {} {} {} {}",
+                label.white(),
+                colorize_history_bar(&bar, run.delta_pct, run.is_baseline),
+                runtime.white(),
+                colorize_history_delta(&delta, run.delta_pct, run.is_baseline)
+            );
+        }
+    }
+
+    if !section.drift_categories.is_empty() {
+        println!(
+            "  {} {}",
+            "*".yellow(),
+            format!(
+                "broad drift vs baseline in: {}",
+                section.drift_categories.iter().copied().collect::<Vec<_>>().join(", ")
+            )
+            .yellow()
+        );
+    }
+
+    if section.failed_runs_omitted > 0 {
+        let unit = if section.failed_runs_omitted == 1 { "run" } else { "runs" };
+        println!(
+            "  {}",
+            format!(
+                "{} failed {} omitted from the last {} groups",
+                section.failed_runs_omitted, unit, REPORT_HISTORY_LIMIT
+            )
+            .yellow()
+        );
+    }
+
+    if section.incomplete_runs_omitted > 0 {
+        let unit = if section.incomplete_runs_omitted == 1 { "run" } else { "runs" };
+        println!(
+            "  {}",
+            format!(
+                "{} successful {} without a primary estimate omitted",
+                section.incomplete_runs_omitted, unit
+            )
+            .yellow()
+        );
+    }
+}
+
+fn history_label_width(runs: &[DisplayedHistoryRun]) -> usize {
+    let widest = runs
+        .iter()
+        .map(|run| run.group_name.chars().count() + usize::from(run.drifted))
+        .max()
+        .unwrap_or(0);
+    widest.clamp(12, 32)
+}
+
+fn pad_history_label(label: &str, width: usize) -> String {
+    let shortened = shorten_history_label(label, width);
+    format!("{shortened:<width$}")
+}
+
+fn shorten_history_label(label: &str, width: usize) -> String {
+    let label_len = label.chars().count();
+    if label_len <= width {
+        return label.to_string();
+    }
+    if width <= 3 {
+        return label.chars().take(width).collect();
+    }
+
+    let mut shortened = label.chars().take(width - 3).collect::<String>();
+    shortened.push_str("...");
+    shortened
+}
+
+fn format_history_bar(value: f64, max_value: f64) -> String {
+    if value <= 0.0 || max_value <= 0.0 {
+        return format!("|{}|", " ".repeat(REPORT_BAR_WIDTH));
+    }
+
+    let mut filled = ((value / max_value) * REPORT_BAR_WIDTH as f64).round() as usize;
+    filled = filled.clamp(1, REPORT_BAR_WIDTH);
+    let empty = REPORT_BAR_WIDTH.saturating_sub(filled);
+    format!("|{}{}|", "#".repeat(filled), " ".repeat(empty))
+}
+
+fn format_history_delta(delta_pct: Option<f64>, is_baseline: bool) -> String {
+    if is_baseline {
+        return "(baseline)".to_string();
+    }
+    match delta_pct {
+        Some(delta_pct) => format!("({})", format_percent(delta_pct)),
+        None => "(n/a)".to_string(),
+    }
+}
+
+fn colorize_history_bar(bar: &str, delta_pct: Option<f64>, is_baseline: bool) -> String {
+    if is_baseline {
+        return bar.cyan().to_string();
+    }
+    match delta_pct {
+        Some(delta_pct) if delta_pct < 0.0 => bar.green().to_string(),
+        Some(delta_pct) if delta_pct > 0.0 => bar.red().to_string(),
+        _ => bar.white().to_string(),
+    }
+}
+
+fn colorize_history_delta(delta: &str, delta_pct: Option<f64>, is_baseline: bool) -> String {
+    if is_baseline {
+        return delta.cyan().to_string();
+    }
+    match delta_pct {
+        Some(delta_pct) if delta_pct < 0.0 => delta.green().to_string(),
+        Some(delta_pct) if delta_pct > 0.0 => delta.red().to_string(),
+        _ => delta.white().to_string(),
+    }
 }
 
 fn resolve_compare_group(
@@ -1306,6 +1889,64 @@ struct BenchSummary {
     missing_from_current: Vec<String>,
 }
 
+#[derive(Debug)]
+struct BenchHistoryReport {
+    dbname: String,
+    bench_filter: Option<String>,
+    sections: Vec<BenchHistorySection>,
+}
+
+#[derive(Debug)]
+struct BenchHistorySection {
+    bench_name: String,
+    baseline: Option<HistoricalBenchBaseline>,
+    displayed_runs: Vec<DisplayedHistoryRun>,
+    failed_runs_omitted: usize,
+    incomplete_runs_omitted: usize,
+    drift_categories: BTreeSet<&'static str>,
+}
+
+#[derive(Debug)]
+struct DisplayedHistoryRun {
+    group_name: String,
+    point_estimate_ns: f64,
+    delta_pct: Option<f64>,
+    drifted: bool,
+    is_baseline: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct HistoricalGroupMetadata {
+    group_id: Uuid,
+    group_name: String,
+    profile_name: String,
+    pg_version_major: i32,
+    cargo_features: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+struct HistoricalBenchRun {
+    bench_name: String,
+    group: HistoricalGroupMetadata,
+    status: BenchStatus,
+    point_estimate_ns: Option<f64>,
+}
+
+#[derive(Debug, Clone)]
+struct HistoricalBenchBaseline {
+    bench_name: String,
+    group: HistoricalGroupMetadata,
+    point_estimate_ns: f64,
+}
+
+type GroupSettingsSnapshot = BTreeMap<String, NondefaultSettingValue>;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct NondefaultSettingValue {
+    setting: Option<String>,
+    unit: Option<String>,
+}
+
 #[derive(Debug, Serialize)]
 struct BenchmarkSummaryRow {
     benchmark_run_id: i64,
@@ -1558,6 +2199,103 @@ mod tests {
     fn wait_parses_from_cli() {
         let bench = parse_bench(&["cargo", "pgrx", "bench", "--wait", "15"]);
         assert_eq!(bench.wait, 15);
+    }
+
+    #[test]
+    fn report_flag_parses_from_cli() {
+        let bench = parse_bench(&["cargo", "pgrx", "bench", "--report"]);
+        assert!(bench.report);
+    }
+
+    #[test]
+    fn report_rejects_run_only_flags() {
+        let bench = parse_bench(&["cargo", "pgrx", "bench", "--report", "--wait", "5"]);
+        let error =
+            bench.validate_report_args().expect_err("wait should be rejected in report mode");
+        assert!(error.to_string().contains("--wait"));
+    }
+
+    fn history_group(
+        id: u128,
+        group_name: &str,
+        profile_name: &str,
+        pg_version_major: i32,
+        cargo_features: &[&str],
+    ) -> HistoricalGroupMetadata {
+        HistoricalGroupMetadata {
+            group_id: Uuid::from_u128(id),
+            group_name: group_name.to_string(),
+            profile_name: profile_name.to_string(),
+            pg_version_major,
+            cargo_features: cargo_features.iter().map(|feature| (*feature).to_string()).collect(),
+        }
+    }
+
+    fn successful_history_run(
+        bench_name: &str,
+        group: &HistoricalGroupMetadata,
+        point_estimate_ns: f64,
+    ) -> HistoricalBenchRun {
+        HistoricalBenchRun {
+            bench_name: bench_name.to_string(),
+            group: group.clone(),
+            status: BenchStatus::Ok,
+            point_estimate_ns: Some(point_estimate_ns),
+        }
+    }
+
+    fn failed_history_run(bench_name: &str, group: &HistoricalGroupMetadata) -> HistoricalBenchRun {
+        HistoricalBenchRun {
+            bench_name: bench_name.to_string(),
+            group: group.clone(),
+            status: BenchStatus::Failed,
+            point_estimate_ns: None,
+        }
+    }
+
+    #[test]
+    fn report_sections_omit_failed_runs_and_mark_drift() {
+        let baseline_group = history_group(1, "baseline", "release", 18, &["pg18", "pg_bench"]);
+        let drifted_group = history_group(2, "rewrite", "release", 18, &["pg18", "pg_bench"]);
+        let failed_group = history_group(3, "broken", "release", 18, &["pg18", "pg_bench"]);
+
+        let rows = vec![
+            successful_history_run("bench_parse_query", &drifted_group, 80.0),
+            failed_history_run("bench_parse_query", &failed_group),
+            successful_history_run("bench_parse_query", &baseline_group, 100.0),
+        ];
+
+        let mut baselines = BTreeMap::new();
+        baselines.insert(
+            "bench_parse_query".to_string(),
+            HistoricalBenchBaseline {
+                bench_name: "bench_parse_query".to_string(),
+                group: baseline_group.clone(),
+                point_estimate_ns: 100.0,
+            },
+        );
+
+        let mut settings_by_group = BTreeMap::new();
+        settings_by_group.insert(baseline_group.group_id, GroupSettingsSnapshot::new());
+        settings_by_group.insert(
+            drifted_group.group_id,
+            BTreeMap::from([(
+                "shared_buffers".to_string(),
+                NondefaultSettingValue { setting: Some("1GB".to_string()), unit: None },
+            )]),
+        );
+        settings_by_group.insert(failed_group.group_id, GroupSettingsSnapshot::new());
+
+        let sections = build_report_sections(rows, baselines, &settings_by_group);
+        let section = sections.first().expect("section should exist");
+
+        assert_eq!(section.failed_runs_omitted, 1);
+        assert_eq!(section.displayed_runs.len(), 2);
+        assert!(section.drift_categories.contains("pg_settings"));
+        assert!(section.displayed_runs[0].is_baseline);
+        assert_eq!(section.displayed_runs[1].group_name, "rewrite");
+        assert_eq!(section.displayed_runs[1].delta_pct, Some(-20.0));
+        assert!(section.displayed_runs[1].drifted);
     }
 
     #[test]
