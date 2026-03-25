@@ -310,7 +310,7 @@ impl<'de> serde::Deserialize<'de> for Interval {
     }
 }
 unsafe impl SqlTranslatable for Interval {
-    const SCHEMA_KEY: &'static str = "Interval";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Interval);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("interval"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =

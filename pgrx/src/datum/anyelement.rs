@@ -81,7 +81,7 @@ impl IntoDatum for AnyElement {
 }
 
 unsafe impl SqlTranslatable for AnyElement {
-    const SCHEMA_KEY: &'static str = "AnyElement";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(AnyElement);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("anyelement"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =

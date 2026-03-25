@@ -131,7 +131,7 @@ impl std::fmt::UpperHex for Uuid {
 }
 
 unsafe impl SqlTranslatable for crate::datum::Uuid {
-    const SCHEMA_KEY: &'static str = "Uuid";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Uuid);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("uuid"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("uuid")));

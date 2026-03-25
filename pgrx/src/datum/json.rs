@@ -188,14 +188,14 @@ impl Serialize for JsonString {
 }
 
 unsafe impl SqlTranslatable for Json {
-    const SCHEMA_KEY: &'static str = "Json";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Json);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("json"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("json")));
 }
 
 unsafe impl SqlTranslatable for crate::datum::JsonB {
-    const SCHEMA_KEY: &'static str = "JsonB";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(JsonB);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("jsonb"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("jsonb")));

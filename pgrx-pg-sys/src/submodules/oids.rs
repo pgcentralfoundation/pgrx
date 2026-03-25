@@ -133,7 +133,7 @@ impl From<BuiltinOid> for Oid {
 }
 
 unsafe impl SqlTranslatable for Oid {
-    const SCHEMA_KEY: &'static str = "Oid";
+    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(Oid);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("oid"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("oid")));

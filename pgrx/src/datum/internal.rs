@@ -182,7 +182,7 @@ impl IntoDatum for Internal {
 }
 
 unsafe impl SqlTranslatable for crate::datum::Internal {
-    const SCHEMA_KEY: &'static str = "Internal";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Internal);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("internal"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =

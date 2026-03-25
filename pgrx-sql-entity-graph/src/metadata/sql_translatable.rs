@@ -231,7 +231,7 @@ pub unsafe trait SqlTranslatable {
 }
 
 unsafe impl SqlTranslatable for () {
-    const SCHEMA_KEY: &'static str = "()";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(());
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Err(ArgumentError::NotValidAsArgument("()"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -286,15 +286,15 @@ where
 }
 
 unsafe impl SqlTranslatable for u8 {
-    const SCHEMA_KEY: &'static str = "u8";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(u8);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::BareU8);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = Err(ReturnsError::BareU8);
 }
 
 macro_rules! simple_sql_type {
-    ($ty:ty, $schema_key:literal, $sql:literal) => {
+    ($ty:ty, $sql:literal) => {
         unsafe impl SqlTranslatable for $ty {
-            const SCHEMA_KEY: &'static str = $schema_key;
+            const SCHEMA_KEY: &'static str = $crate::pgrx_resolved_type!($ty);
             const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
                 Ok(SqlMappingRef::literal($sql));
             const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -303,8 +303,19 @@ macro_rules! simple_sql_type {
     };
 }
 
-simple_sql_type!(i32, "i32", "INT");
-simple_sql_type!(String, "String", "TEXT");
+simple_sql_type!(i32, "INT");
+simple_sql_type!(String, "TEXT");
+simple_sql_type!(str, "TEXT");
+simple_sql_type!([u8], "bytea");
+simple_sql_type!(i8, "\"char\"");
+simple_sql_type!(i16, "smallint");
+simple_sql_type!(i64, "bigint");
+simple_sql_type!(bool, "bool");
+simple_sql_type!(char, "varchar");
+simple_sql_type!(f32, "real");
+simple_sql_type!(f64, "double precision");
+simple_sql_type!(CString, "cstring");
+simple_sql_type!(CStr, "cstring");
 
 unsafe impl<T> SqlTranslatable for &T
 where
@@ -314,15 +325,3 @@ where
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
 }
-
-simple_sql_type!(str, "str", "TEXT");
-simple_sql_type!([u8], "[u8]", "bytea");
-simple_sql_type!(i8, "i8", "\"char\"");
-simple_sql_type!(i16, "i16", "smallint");
-simple_sql_type!(i64, "i64", "bigint");
-simple_sql_type!(bool, "bool", "bool");
-simple_sql_type!(char, "char", "varchar");
-simple_sql_type!(f32, "f32", "real");
-simple_sql_type!(f64, "f64", "double precision");
-simple_sql_type!(CString, "CString", "cstring");
-simple_sql_type!(CStr, "CStr", "cstring");

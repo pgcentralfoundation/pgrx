@@ -77,7 +77,7 @@ impl IntoDatum for AnyArray {
 }
 
 unsafe impl SqlTranslatable for AnyArray {
-    const SCHEMA_KEY: &'static str = "AnyArray";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(AnyArray);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("anyarray"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =

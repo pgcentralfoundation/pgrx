@@ -711,7 +711,8 @@ macro_rules! composite_type {
 }
 
 unsafe impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByPostgres> {
-    const SCHEMA_KEY: &'static str = "PgHeapTuple<AllocatedByPostgres>";
+    const SCHEMA_KEY: &'static str =
+        crate::pgrx_resolved_type!(PgHeapTuple<'static, AllocatedByPostgres>);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::Composite { array_brackets: false });
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -719,7 +720,8 @@ unsafe impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, Allocate
 }
 
 unsafe impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByRust> {
-    const SCHEMA_KEY: &'static str = "PgHeapTuple<AllocatedByRust>";
+    const SCHEMA_KEY: &'static str =
+        crate::pgrx_resolved_type!(PgHeapTuple<'static, AllocatedByRust>);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::Composite { array_brackets: false });
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =

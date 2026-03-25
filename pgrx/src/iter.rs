@@ -162,7 +162,7 @@ unsafe impl<'iter, C> SqlTranslatable for TableIterator<'iter, (C,)>
 where
     C: SqlTranslatable + 'iter,
 {
-    const SCHEMA_KEY: &'static str = "TableIterator";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(TableIterator<'iter, (C,)>);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::Table);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = match table_item_sql(C::RETURN_SQL) {
         Ok(column) => Ok(ReturnsRef::Table(&[column])),
@@ -358,7 +358,8 @@ macro_rules! impl_table_iter {
         where
             $($C: SqlTranslatable + 'iter,)*
         {
-            const SCHEMA_KEY: &'static str = "TableIterator";
+            const SCHEMA_KEY: &'static str =
+                crate::pgrx_resolved_type!(TableIterator<'iter, ($($C,)*)>);
             const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::Table);
             const RETURN_SQL: Result<ReturnsRef, ReturnsError> = match ($(table_item_sql($C::RETURN_SQL),)*) {
                 ($(Ok($C),)*) => Ok(ReturnsRef::Table(&[$($C),*])),

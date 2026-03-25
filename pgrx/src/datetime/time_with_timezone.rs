@@ -326,7 +326,7 @@ impl<'de> serde::Deserialize<'de> for TimeWithTimeZone {
 }
 
 unsafe impl SqlTranslatable for TimeWithTimeZone {
-    const SCHEMA_KEY: &'static str = "TimeWithTimeZone";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(TimeWithTimeZone);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("time with time zone"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =

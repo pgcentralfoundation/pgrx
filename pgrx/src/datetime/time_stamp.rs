@@ -329,7 +329,7 @@ impl<'de> serde::Deserialize<'de> for Timestamp {
 }
 
 unsafe impl SqlTranslatable for crate::datum::Timestamp {
-    const SCHEMA_KEY: &'static str = "Timestamp";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Timestamp);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("timestamp"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =

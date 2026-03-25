@@ -63,7 +63,7 @@ impl From<TransactionId> for crate::Datum {
 }
 
 unsafe impl SqlTranslatable for TransactionId {
-    const SCHEMA_KEY: &'static str = "TransactionId";
+    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(TransactionId);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("xid"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("xid")));

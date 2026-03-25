@@ -282,7 +282,7 @@ impl<'de> serde::Deserialize<'de> for Date {
 }
 
 unsafe impl SqlTranslatable for Date {
-    const SCHEMA_KEY: &'static str = "Date";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Date);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("date"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("date")));

@@ -31,6 +31,7 @@ use std::sync::LazyLock as Lazy;
 // expose our various derive macros
 pub use pgrx_macros;
 pub use pgrx_macros::*;
+pub use pgrx_sql_entity_graph::pgrx_resolved_type;
 
 /// The PGRX prelude includes necessary imports to make extensions work.
 pub mod prelude;
@@ -377,11 +378,4 @@ pub(crate) enum Utf8Compat {
     Maybe,
     /// An "extended ASCII" encoding, so we're fine if we only touch ASCII
     Ascii,
-}
-
-#[macro_export]
-macro_rules! pgrx_resolved_type {
-    ($ty:ty) => {
-        concat!(module_path!(), "::", stringify!($ty))
-    };
 }

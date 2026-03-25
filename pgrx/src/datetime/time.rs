@@ -218,7 +218,7 @@ impl<'de> serde::Deserialize<'de> for Time {
 }
 
 unsafe impl SqlTranslatable for Time {
-    const SCHEMA_KEY: &'static str = "Time";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Time);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("time"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("time")));

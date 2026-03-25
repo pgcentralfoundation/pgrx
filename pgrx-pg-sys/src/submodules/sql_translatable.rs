@@ -7,78 +7,83 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use crate::{
+    BOX, CIRCLE, Datum, FdwRoutine, FunctionCallInfoBaseData, IndexAmRoutine, ItemPointerData,
+    PlannerInfo, Point, TableAmRoutine,
+};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
 
-unsafe impl SqlTranslatable for crate::FunctionCallInfoBaseData {
-    const SCHEMA_KEY: &'static str = "FunctionCallInfoBaseData";
+unsafe impl SqlTranslatable for FunctionCallInfoBaseData {
+    const SCHEMA_KEY: &'static str =
+        pgrx_sql_entity_graph::pgrx_resolved_type!(FunctionCallInfoBaseData);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::Skip);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = Ok(ReturnsRef::One(SqlMappingRef::Skip));
 }
 
-unsafe impl SqlTranslatable for crate::PlannerInfo {
-    const SCHEMA_KEY: &'static str = "PlannerInfo";
+unsafe impl SqlTranslatable for PlannerInfo {
+    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(PlannerInfo);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("internal"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("internal")));
 }
 
-unsafe impl SqlTranslatable for crate::IndexAmRoutine {
-    const SCHEMA_KEY: &'static str = "IndexAmRoutine";
+unsafe impl SqlTranslatable for IndexAmRoutine {
+    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(IndexAmRoutine);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("internal"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("internal")));
 }
 
-unsafe impl SqlTranslatable for crate::TableAmRoutine {
-    const SCHEMA_KEY: &'static str = "TableAmRoutine";
+unsafe impl SqlTranslatable for TableAmRoutine {
+    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(TableAmRoutine);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("internal"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("internal")));
 }
 
-unsafe impl SqlTranslatable for crate::FdwRoutine {
-    const SCHEMA_KEY: &'static str = "FdwRoutine";
+unsafe impl SqlTranslatable for FdwRoutine {
+    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(FdwRoutine);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("fdw_handler"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("fdw_handler")));
 }
 
-unsafe impl SqlTranslatable for crate::BOX {
-    const SCHEMA_KEY: &'static str = "BOX";
+unsafe impl SqlTranslatable for BOX {
+    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(BOX);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("box"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("box")));
 }
 
-unsafe impl SqlTranslatable for crate::CIRCLE {
-    const SCHEMA_KEY: &'static str = "CIRCLE";
+unsafe impl SqlTranslatable for CIRCLE {
+    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(CIRCLE);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("circle"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("circle")));
 }
 
-unsafe impl SqlTranslatable for crate::Point {
-    const SCHEMA_KEY: &'static str = "Point";
+unsafe impl SqlTranslatable for Point {
+    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(Point);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("point"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("point")));
 }
 
-unsafe impl SqlTranslatable for crate::ItemPointerData {
-    const SCHEMA_KEY: &'static str = "ItemPointerData";
+unsafe impl SqlTranslatable for ItemPointerData {
+    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(ItemPointerData);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("tid"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("tid")));
 }
 
-unsafe impl SqlTranslatable for crate::Datum {
-    const SCHEMA_KEY: &'static str = "Datum";
+unsafe impl SqlTranslatable for Datum {
+    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(Datum);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::Datum);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = Err(ReturnsError::Datum);
 }

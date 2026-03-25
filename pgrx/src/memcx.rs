@@ -170,7 +170,7 @@ unsafe impl<'fcx> ArgAbi<'fcx> for &MemCx<'fcx> {
 
 /// SAFETY: virtual argument
 unsafe impl<'mcx> SqlTranslatable for &MemCx<'mcx> {
-    const SCHEMA_KEY: &'static str = "MemCx";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(MemCx<'mcx>);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::Skip);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = Ok(ReturnsRef::One(SqlMappingRef::Skip));
 }

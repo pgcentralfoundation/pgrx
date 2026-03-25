@@ -22,7 +22,7 @@ const fn numeric_scale(precision: u32, scale: u32) -> Option<u32> {
 }
 
 unsafe impl<const P: u32, const S: u32> SqlTranslatable for Numeric<P, S> {
-    const SCHEMA_KEY: &'static str = "Numeric";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Numeric<P, S>);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::Numeric {
         precision: numeric_precision(P),
         scale: numeric_scale(P, S),
@@ -37,7 +37,7 @@ unsafe impl<const P: u32, const S: u32> SqlTranslatable for Numeric<P, S> {
 }
 
 unsafe impl SqlTranslatable for AnyNumeric {
-    const SCHEMA_KEY: &'static str = "AnyNumeric";
+    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(AnyNumeric);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::Numeric { precision: None, scale: None, array_brackets: false });
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
