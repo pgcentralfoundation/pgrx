@@ -97,7 +97,7 @@ impl ToSql for PgExternEntity {
         let mut strict_upgrade = !extern_attrs.iter().any(|i| i == &ExternArgs::Strict);
         if strict_upgrade {
             // It may be possible to infer a `STRICT` marker though.
-            // But we can only do that if the user hasn't used `Option<T>` or `pgrx::Internal`
+            // But we can only do that if the user hasn't used a nullable argument wrapper.
             for arg in &self.fn_args {
                 if arg.used_ty.optional {
                     strict_upgrade = false;

@@ -172,7 +172,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
             SqlGraphEntity::CustomSql(item) => item.dot_identifier(),
             SqlGraphEntity::Function(item) => item.dot_identifier(),
             SqlGraphEntity::Type(item) => item.dot_identifier(),
-            SqlGraphEntity::BuiltinType(item) => format!("preexisting type {item}"),
+            SqlGraphEntity::BuiltinType(item) => format!("builtin type {item}"),
             SqlGraphEntity::Enum(item) => item.dot_identifier(),
             SqlGraphEntity::Ord(item) => item.dot_identifier(),
             SqlGraphEntity::Hash(item) => item.dot_identifier(),

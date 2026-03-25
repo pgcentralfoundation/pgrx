@@ -8,6 +8,21 @@ Five commits, 155 files changed (+5107/-2630). The implementation is thorough an
 old two-stage pipeline removal is complete with zero dangling references. This document
 catalogs the issues found during review, proposes solutions, and analyzes user impact.
 
+## Status On Current Branch
+
+This is a review artifact, not the current branch status.
+
+On `wip-one-compile-please` as it exists now:
+
+- the RFC has been updated to the binary section format
+- `pgrx_resolved_type!()` includes `module_path!()`
+- missing `.pgrx_schema` is a hard error
+- `SetOfIterator` rejects argument position again
+- the section result tags use named constants
+- the install-time schema-stripping dependency is obsolete on this branch
+- unresolved `SCHEMA_KEY` fallback is now handled through explicit declared-type
+  resolution and `TYPE_ORIGIN`
+
 ---
 
 ## Finding 1: RFC Describes NDJSON but Implementation Uses Binary Encoding

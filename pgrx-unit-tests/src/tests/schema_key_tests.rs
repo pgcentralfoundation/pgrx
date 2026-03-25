@@ -4,7 +4,7 @@ use std::error::Error as StdError;
 use pgrx::array::FlatArray;
 use pgrx::nullable::Nullable;
 use pgrx::pgrx_sql_entity_graph::metadata::{
-    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
+    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable, TypeOrigin,
 };
 use pgrx::prelude::*;
 use pgrx::{AnyArray, AnyElement, AnyNumeric, Inet, Internal, Json, JsonB, PgRelation, Uuid};
@@ -141,6 +141,27 @@ fn wrapper_types_forward_to_their_inner_schema_key() {
 
     assert_same_schema_key::<Option<ManualSchemaKeyType>, ManualSchemaKeyType>();
     assert_same_schema_key::<Result<ManualSchemaKeyType, Box<dyn StdError>>, ManualSchemaKeyType>();
+}
+
+#[test]
+fn wrapper_types_forward_type_origin() {
+    assert_eq!(<ManualSchemaKeyType as SqlTranslatable>::TYPE_ORIGIN, TypeOrigin::ThisExtension);
+    assert_eq!(
+        <Option<ManualSchemaKeyType> as SqlTranslatable>::TYPE_ORIGIN,
+        TypeOrigin::ThisExtension
+    );
+    assert_eq!(
+        <Result<ManualSchemaKeyType, Box<dyn StdError>> as SqlTranslatable>::TYPE_ORIGIN,
+        TypeOrigin::ThisExtension
+    );
+
+    assert_eq!(<Uuid as SqlTranslatable>::TYPE_ORIGIN, TypeOrigin::External);
+    assert_eq!(<Nullable<Uuid> as SqlTranslatable>::TYPE_ORIGIN, TypeOrigin::External);
+    assert_eq!(<Array<'static, Uuid> as SqlTranslatable>::TYPE_ORIGIN, TypeOrigin::External);
+    assert_eq!(
+        <VariadicArray<'static, Uuid> as SqlTranslatable>::TYPE_ORIGIN,
+        TypeOrigin::External
+    );
 }
 
 #[test]

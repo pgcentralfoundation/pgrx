@@ -21,7 +21,7 @@ use std::fmt::Display;
 use thiserror::Error;
 
 use super::return_variant::ReturnsError;
-use super::{FunctionMetadataTypeEntity, Returns};
+use super::{FunctionMetadataTypeEntity, Returns, TypeOrigin};
 
 #[derive(Clone, Copy, Debug, Hash, Ord, PartialOrd, PartialEq, Eq, Error)]
 pub enum ArgumentError {
@@ -201,10 +201,9 @@ Nonetheless, if you are not confident the translation is valid: do not implement
 )]
 pub unsafe trait SqlTranslatable {
     const SCHEMA_KEY: &'static str;
+    const TYPE_ORIGIN: TypeOrigin = TypeOrigin::ThisExtension;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError>;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError>;
-    const VARIADIC: bool = false;
-    const OPTIONAL: bool = false;
 
     fn type_name() -> &'static str {
         core::any::type_name::<Self>()
@@ -215,15 +214,10 @@ pub unsafe trait SqlTranslatable {
     fn return_sql() -> Result<Returns, ReturnsError> {
         Self::RETURN_SQL.map(Into::into)
     }
-    fn variadic() -> bool {
-        Self::VARIADIC
-    }
-    fn optional() -> bool {
-        Self::OPTIONAL
-    }
     fn entity() -> FunctionMetadataTypeEntity {
         FunctionMetadataTypeEntity {
             schema_key: Self::SCHEMA_KEY,
+            type_origin: Self::TYPE_ORIGIN,
             argument_sql: Self::argument_sql(),
             return_sql: Self::return_sql(),
         }
@@ -232,6 +226,7 @@ pub unsafe trait SqlTranslatable {
 
 unsafe impl SqlTranslatable for () {
     const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(());
+    const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Err(ArgumentError::NotValidAsArgument("()"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -243,9 +238,9 @@ where
     T: SqlTranslatable,
 {
     const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_ORIGIN: TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
-    const OPTIONAL: bool = true;
 }
 
 unsafe impl<T> SqlTranslatable for *mut T
@@ -253,9 +248,9 @@ where
     T: SqlTranslatable,
 {
     const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_ORIGIN: TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
-    const OPTIONAL: bool = T::OPTIONAL;
 }
 
 unsafe impl<T, E> SqlTranslatable for Result<T, E>
@@ -264,9 +259,9 @@ where
     E: Any + Display,
 {
     const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_ORIGIN: TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
-    const OPTIONAL: bool = true;
 }
 
 unsafe impl<T> SqlTranslatable for Vec<T>
@@ -274,6 +269,7 @@ where
     T: SqlTranslatable,
 {
     const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_ORIGIN: TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = match T::ARGUMENT_SQL {
         Err(ArgumentError::BareU8) => Ok(SqlMappingRef::As("bytea")),
         other => array_argument_sql(other),
@@ -282,11 +278,11 @@ where
         Err(ReturnsError::BareU8) => Ok(ReturnsRef::One(SqlMappingRef::As("bytea"))),
         other => array_return_sql(other),
     };
-    const OPTIONAL: bool = T::OPTIONAL;
 }
 
 unsafe impl SqlTranslatable for u8 {
     const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(u8);
+    const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::BareU8);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = Err(ReturnsError::BareU8);
 }
@@ -295,6 +291,7 @@ macro_rules! simple_sql_type {
     ($ty:ty, $sql:literal) => {
         unsafe impl SqlTranslatable for $ty {
             const SCHEMA_KEY: &'static str = $crate::pgrx_resolved_type!($ty);
+            const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
             const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
                 Ok(SqlMappingRef::literal($sql));
             const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -322,6 +319,7 @@ where
     T: ?Sized + SqlTranslatable,
 {
     const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_ORIGIN: TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
 }

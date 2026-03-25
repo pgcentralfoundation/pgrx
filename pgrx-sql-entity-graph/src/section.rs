@@ -13,7 +13,7 @@ use crate::aggregate::{FinalizeModify, ParallelOption};
 use crate::extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntity, SqlDeclaredEntityData};
 use crate::extern_args::ExternArgs;
 use crate::metadata::{
-    ArgumentError, FunctionMetadataTypeEntity, ReturnsError, ReturnsRef, SqlMappingRef,
+    ArgumentError, FunctionMetadataTypeEntity, ReturnsError, ReturnsRef, SqlMappingRef, TypeOrigin,
 };
 use crate::pg_extern::entity::{
     PgCastEntity, PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity,
@@ -70,6 +70,9 @@ pub const ARG_ERROR_DATUM: u8 = 5;
 pub const ARG_ERROR_NOT_VALID: u8 = 6;
 pub const RESULT_OK: u8 = 1;
 pub const RESULT_ERR: u8 = 2;
+
+pub const TYPE_ORIGIN_THIS_EXTENSION: u8 = 1;
+pub const TYPE_ORIGIN_EXTERNAL: u8 = 2;
 
 pub const RETURNS_ERROR_NESTED_SET_OF: u8 = 1;
 pub const RETURNS_ERROR_NESTED_TABLE: u8 = 2;
@@ -529,9 +532,18 @@ impl<'a> EntryReader<'a> {
     pub fn read_function_metadata_type(&mut self) -> Result<FunctionMetadataTypeEntity> {
         Ok(FunctionMetadataTypeEntity {
             schema_key: leak_string(self.read_string()?),
+            type_origin: self.read_type_origin()?,
             argument_sql: self.read_argument_sql()?.map(Into::into),
             return_sql: self.read_return_sql()?.map(Into::into),
         })
+    }
+
+    pub fn read_type_origin(&mut self) -> Result<TypeOrigin> {
+        match self.read_u8()? {
+            TYPE_ORIGIN_THIS_EXTENSION => Ok(TypeOrigin::ThisExtension),
+            TYPE_ORIGIN_EXTERNAL => Ok(TypeOrigin::External),
+            value => Err(eyre!("Unknown type origin discriminator `{value}`")),
+        }
     }
 
     pub fn read_used_type(&mut self) -> Result<UsedTypeEntity> {
@@ -1044,5 +1056,36 @@ mod tests {
         assert!(is_schema_section_name(MACHO_SECTION_PATH));
         assert!(is_schema_section_name(ELF_SECTION_NAME));
         assert!(!is_schema_section_name("__TEXT,__text"));
+    }
+
+    #[test]
+    fn round_trip_function_metadata_type_preserves_type_origin() {
+        const SCHEMA_KEY: &str = "tests::FancyText";
+        const SQL: &str = "TEXT";
+        const PAYLOAD_LEN: usize = str_len(SCHEMA_KEY)
+            + u8_len()
+            + argument_sql_len(Ok(SqlMappingRef::literal(SQL)))
+            + return_sql_len(Ok(ReturnsRef::One(SqlMappingRef::literal(SQL))));
+        const TOTAL_LEN: usize = u32_len() + PAYLOAD_LEN;
+        const ENTRY: [u8; TOTAL_LEN] = EntryWriter::<TOTAL_LEN>::new()
+            .u32(PAYLOAD_LEN as u32)
+            .str(SCHEMA_KEY)
+            .u8(TYPE_ORIGIN_EXTERNAL)
+            .argument_sql(Ok(SqlMappingRef::literal(SQL)))
+            .return_sql(Ok(ReturnsRef::One(SqlMappingRef::literal(SQL))))
+            .finish();
+
+        let payloads = entry_payloads(&ENTRY).unwrap();
+        let mut reader = EntryReader::new(payloads[0]);
+        let metadata = reader.read_function_metadata_type().unwrap();
+
+        assert_eq!(metadata.schema_key, SCHEMA_KEY);
+        assert_eq!(metadata.type_origin, TypeOrigin::External);
+        assert_eq!(metadata.argument_sql, Ok(crate::metadata::SqlMapping::literal(SQL)));
+        assert_eq!(
+            metadata.return_sql,
+            Ok(crate::metadata::Returns::One(crate::metadata::SqlMapping::literal(SQL)))
+        );
+        assert!(reader.is_empty());
     }
 }

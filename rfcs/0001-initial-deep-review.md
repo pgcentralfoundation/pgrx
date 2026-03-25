@@ -20,6 +20,18 @@ The biggest live issue is that `cargo pgrx schema` still silently succeeds with 
 schema when `.pgrx_schema` cannot be found. That violates the RFC's fail-fast story and is
 the only P0 I found.
 
+## Status On Current Branch
+
+This document is a historical snapshot. On the current `wip-one-compile-please`
+branch:
+
+- missing `.pgrx_schema` is fixed
+- `SetOfIterator` argument rejection is fixed
+- the named result tags are in place
+- schema stripping is no longer part of the install path
+- unresolved `SCHEMA_KEY` fallback is fixed through explicit declared-type
+  resolution and `TYPE_ORIGIN`
+
 ## Executive Summary
 
 - The branch successfully implements the main architectural move from runtime symbol
@@ -101,7 +113,7 @@ Production hotspots reviewed in detail:
 
 Key signature and interface changes:
 
-- Added `SqlTranslatable::{SCHEMA_KEY, ARGUMENT_SQL, RETURN_SQL, VARIADIC, OPTIONAL}` as the
+- Added `SqlTranslatable::{SCHEMA_KEY, TYPE_ORIGIN, ARGUMENT_SQL, RETURN_SQL}` as the
   new source of truth for schema metadata.
 - Added const-friendly metadata types:
   - `SqlMappingRef`

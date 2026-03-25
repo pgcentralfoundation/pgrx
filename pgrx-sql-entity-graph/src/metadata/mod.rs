@@ -22,7 +22,7 @@ mod function_metadata;
 mod return_variant;
 mod sql_translatable;
 
-pub use entity::{FunctionMetadataEntity, FunctionMetadataTypeEntity};
+pub use entity::{FunctionMetadataEntity, FunctionMetadataTypeEntity, TypeOrigin};
 pub use function_metadata::FunctionMetadata;
 pub use return_variant::{Returns, ReturnsError};
 pub use sql_translatable::{

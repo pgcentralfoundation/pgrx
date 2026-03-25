@@ -18,6 +18,17 @@ Function and type level metadata entities for Rust to SQL translation
 */
 use super::{ArgumentError, Returns, ReturnsError, SqlMapping};
 
+/// Describes whether a SQL type reference should resolve to schema emitted by this
+/// extension or be treated as an external SQL type.
+#[derive(Clone, Copy, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
+pub enum TypeOrigin {
+    /// The extension being built is responsible for emitting this type into the
+    /// schema graph.
+    ThisExtension,
+    /// The type already exists outside this extension's schema graph.
+    External,
+}
+
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub struct FunctionMetadataEntity {
     pub arguments: Vec<FunctionMetadataTypeEntity>,
@@ -28,6 +39,7 @@ pub struct FunctionMetadataEntity {
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub struct FunctionMetadataTypeEntity {
     pub schema_key: &'static str,
+    pub type_origin: TypeOrigin,
     pub argument_sql: Result<SqlMapping, ArgumentError>,
     pub return_sql: Result<Returns, ReturnsError>,
 }

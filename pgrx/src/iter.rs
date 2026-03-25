@@ -85,6 +85,7 @@ where
     T: SqlTranslatable,
 {
     const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::SetOf);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = setof_return_sql(T::RETURN_SQL);
 }
@@ -163,6 +164,7 @@ where
     C: SqlTranslatable + 'iter,
 {
     const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(TableIterator<'iter, (C,)>);
+    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin = C::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::Table);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = match table_item_sql(C::RETURN_SQL) {
         Ok(column) => Ok(ReturnsRef::Table(&[column])),

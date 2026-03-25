@@ -1035,6 +1035,7 @@ where
     T: SqlTranslatable,
 {
     const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = array_argument_sql(T::ARGUMENT_SQL);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = array_return_sql(T::RETURN_SQL);
 }
@@ -1044,7 +1045,7 @@ where
     T: SqlTranslatable,
 {
     const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = array_argument_sql(T::ARGUMENT_SQL);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = array_return_sql(T::RETURN_SQL);
-    const VARIADIC: bool = true;
 }

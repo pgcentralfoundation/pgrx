@@ -37,8 +37,8 @@ pub struct UsedType {
     /// Set via `VariadicArray` or `variadic!()`
     pub variadic: bool,
     pub default: Option<String>,
-    /// Set via the type being an `Option` or a `Result<Option<T>>`.
-    pub optional: Option<syn::Type>,
+    /// Set via nullable argument wrappers such as `Option<T>`, `Nullable<T>`, or `Internal`.
+    pub optional: bool,
     /// Set via the type being a `Result<T>`
     pub result: bool,
 }
@@ -158,25 +158,22 @@ impl UsedType {
                                     )?;
                                     let ident_string = last_segment.ident.to_string();
                                     match ident_string.as_str() {
-                                        "VariadicArray" => (
-                                            syn::Type::Path(type_path.clone()),
-                                            true,
-                                            Some(inner_ty.clone()),
-                                            false,
-                                        ),
-                                        "Option" => (
-                                            syn::Type::Path(type_path.clone()),
-                                            false,
-                                            Some(inner_ty.clone()),
-                                            true,
-                                        ),
+                                        "VariadicArray" => {
+                                            (syn::Type::Path(type_path.clone()), true, true, false)
+                                        }
+                                        "Option" => {
+                                            (syn::Type::Path(type_path.clone()), false, true, true)
+                                        }
+                                        "Nullable" | "Internal" => {
+                                            (syn::Type::Path(type_path.clone()), false, true, false)
+                                        }
                                         _ => {
-                                            (syn::Type::Path(type_path.clone()), false, None, true)
+                                            (syn::Type::Path(type_path.clone()), false, false, true)
                                         }
                                     }
                                 }
                                 // Result<T>
-                                _ => (syn::Type::Path(type_path.clone()), false, None, true),
+                                _ => (syn::Type::Path(type_path.clone()), false, false, true),
                             }
                         } else {
                             return Err(syn::Error::new(
@@ -206,27 +203,16 @@ impl UsedType {
                                     let ident_string = last_segment.ident.to_string();
                                     match ident_string.as_str() {
                                         // Option<VariadicArray<T>>
-                                        "VariadicArray" => (
-                                            syn::Type::Path(type_path.clone()),
-                                            true,
-                                            Some(inner_ty.clone()),
-                                            false,
-                                        ),
-                                        _ => (
-                                            syn::Type::Path(type_path.clone()),
-                                            false,
-                                            Some(inner_ty.clone()),
-                                            false,
-                                        ),
+                                        "VariadicArray" => {
+                                            (syn::Type::Path(type_path.clone()), true, true, false)
+                                        }
+                                        _ => {
+                                            (syn::Type::Path(type_path.clone()), false, true, false)
+                                        }
                                     }
                                 }
                                 // Option<T>
-                                _ => (
-                                    syn::Type::Path(type_path.clone()),
-                                    false,
-                                    Some(inner_ty.clone()),
-                                    false,
-                                ),
+                                _ => (syn::Type::Path(type_path.clone()), false, true, false),
                             }
                         } else {
                             // Option<T>
@@ -237,12 +223,13 @@ impl UsedType {
                         }
                     }
                     // VariadicArray<T>
-                    "VariadicArray" => (syn::Type::Path(type_path), true, None, false),
+                    "VariadicArray" => (syn::Type::Path(type_path), true, false, false),
+                    "Nullable" | "Internal" => (syn::Type::Path(type_path), false, true, false),
                     // T
-                    _ => (syn::Type::Path(type_path), false, None, false),
+                    _ => (syn::Type::Path(type_path), false, false, false),
                 }
             }
-            original => (original, false, None, false),
+            original => (original, false, false, false),
         };
 
         // if the Type is like `Result<T, E>`, this finds the `T`
@@ -281,7 +268,7 @@ impl UsedType {
         let composite_type = self.composite_type.clone().map(|v| v.expr);
         let composite_type_iter = composite_type.iter();
         let variadic = &self.variadic;
-        let optional = self.optional_expr_tokens();
+        let optional = self.optional;
         let default = self.default.iter();
 
         syn::parse_quote! {
@@ -335,6 +322,7 @@ impl UsedType {
                 + ::pgrx::pgrx_sql_entity_graph::section::str_len(
                     <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY
                 )
+                + ::pgrx::pgrx_sql_entity_graph::section::u8_len()
                 + ::pgrx::pgrx_sql_entity_graph::section::argument_sql_len(
                     <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL
                 )
@@ -350,7 +338,7 @@ impl UsedType {
         let resolved_ty_string = resolved_ty.to_token_stream().to_string();
         let composite_type = self.composite_type.clone().map(|v| v.expr);
         let variadic = self.variadic;
-        let optional = self.optional_expr_tokens();
+        let optional = self.optional;
         let default = self.default.clone();
 
         let composite_writer = composite_type
@@ -370,20 +358,16 @@ impl UsedType {
                 #default_writer
                 .bool(#optional)
                 .str(<#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY)
+                .u8(
+                    match <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::TYPE_ORIGIN {
+                        ::pgrx::pgrx_sql_entity_graph::metadata::TypeOrigin::ThisExtension =>
+                            ::pgrx::pgrx_sql_entity_graph::section::TYPE_ORIGIN_THIS_EXTENSION,
+                        ::pgrx::pgrx_sql_entity_graph::metadata::TypeOrigin::External =>
+                            ::pgrx::pgrx_sql_entity_graph::section::TYPE_ORIGIN_EXTERNAL,
+                    }
+                )
                 .argument_sql(<#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL)
                 .return_sql(<#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::RETURN_SQL)
-        }
-    }
-
-    fn optional_expr_tokens(&self) -> TokenStream2 {
-        if self.optional.is_some() {
-            quote! { true }
-        } else {
-            let mut resolved_ty = self.resolved_ty.clone();
-            anonymize_lifetimes(&mut resolved_ty);
-            quote! {
-                <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::OPTIONAL
-            }
         }
     }
 }
@@ -472,11 +456,19 @@ mod tests {
     use syn::parse_quote;
 
     #[test]
-    fn internal_uses_trait_optional_flag() {
+    fn internal_is_marked_optional() {
         let used_ty = UsedType::new(parse_quote!(::pgrx::datum::Internal)).unwrap();
         let tokens = used_ty.entity_tokens().into_token_stream().to_string();
 
-        assert!(tokens.contains("OPTIONAL"));
+        assert!(tokens.contains("optional : true"));
+    }
+
+    #[test]
+    fn nullable_is_marked_optional() {
+        let used_ty = UsedType::new(parse_quote!(::pgrx::nullable::Nullable<i32>)).unwrap();
+        let tokens = used_ty.entity_tokens().into_token_stream().to_string();
+
+        assert!(tokens.contains("optional : true"));
     }
 }
 

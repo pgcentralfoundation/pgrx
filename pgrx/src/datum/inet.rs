@@ -125,6 +125,8 @@ impl From<String> for Inet {
 
 unsafe impl SqlTranslatable for Inet {
     const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Inet);
+    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
+        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("inet"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("inet")));

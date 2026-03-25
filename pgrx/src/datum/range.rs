@@ -537,6 +537,8 @@ unsafe impl RangeSubType for TimestampWithTimeZone {
 
 unsafe impl SqlTranslatable for Range<i32> {
     const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Range<i32>);
+    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
+        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("int4range"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -545,6 +547,8 @@ unsafe impl SqlTranslatable for Range<i32> {
 
 unsafe impl SqlTranslatable for Range<i64> {
     const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Range<i64>);
+    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
+        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("int8range"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -553,6 +557,8 @@ unsafe impl SqlTranslatable for Range<i64> {
 
 unsafe impl SqlTranslatable for Range<AnyNumeric> {
     const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Range<AnyNumeric>);
+    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
+        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("numrange"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -561,6 +567,8 @@ unsafe impl SqlTranslatable for Range<AnyNumeric> {
 
 unsafe impl<const P: u32, const S: u32> SqlTranslatable for Range<Numeric<P, S>> {
     const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Range<Numeric<P, S>>);
+    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
+        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("numrange"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -569,6 +577,8 @@ unsafe impl<const P: u32, const S: u32> SqlTranslatable for Range<Numeric<P, S>>
 
 unsafe impl SqlTranslatable for Range<Date> {
     const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Range<Date>);
+    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
+        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("daterange"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -577,6 +587,8 @@ unsafe impl SqlTranslatable for Range<Date> {
 
 unsafe impl SqlTranslatable for Range<TimestampWithTimeZone> {
     const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Range<TimestampWithTimeZone>);
+    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
+        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("tstzrange"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -585,6 +597,8 @@ unsafe impl SqlTranslatable for Range<TimestampWithTimeZone> {
 
 unsafe impl SqlTranslatable for Range<Timestamp> {
     const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Range<Timestamp>);
+    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
+        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("tsrange"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
