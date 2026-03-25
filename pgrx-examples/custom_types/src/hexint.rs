@@ -11,7 +11,7 @@ use pgrx::callconv::{ArgAbi, BoxRet};
 use pgrx::datum::Datum;
 use pgrx::pg_sys::Oid;
 use pgrx::pgrx_sql_entity_graph::metadata::{
-    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+    ArgumentError, Returns, ReturnsError, ReturnsRef, SqlMapping, SqlMappingRef, SqlTranslatable,
 };
 use pgrx::prelude::*;
 use pgrx::{rust_regtypein, StringInfo};
@@ -61,6 +61,11 @@ impl Display for HexInt {
 }
 
 unsafe impl SqlTranslatable for HexInt {
+    const SCHEMA_KEY: &'static str = pgrx::pgrx_resolved_type!(HexInt);
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("hexint"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("hexint")));
+
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         // this is what the SQL type is called when used in a function argument position
         Ok(SqlMapping::As("hexint".into()))

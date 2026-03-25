@@ -18,18 +18,10 @@ pg18 = ["pgrx/pg18", "pgrx-tests/pg18"]
 pg_test = []
 
 [dependencies]
-pgrx = { path = "../../pgrx", default-features = false }
+pgrx = { path = "../../pgrx" }
 serde = "1.0.219"
 serde_json = "1.0.140"
 
 [dev-dependencies]
-pgrx-tests = { path = "../../pgrx-tests" }
+pgrx-tests = { path = "../../pgrx-tests", default-features = false }
 
-[profile.dev]
-panic = "unwind"
-
-[profile.release]
-panic = "unwind"
-opt-level = 3
-lto = "fat"
-codegen-units = 1

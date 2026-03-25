@@ -30,18 +30,8 @@ pg_test = []
 
 [dependencies]
 heapless = "0.8"
-pgrx = { path = "../../pgrx", default-features = false }
+pgrx = { path = "../../pgrx" }
 serde = { version = "1.0", features = ["derive"] }
 
 [dev-dependencies]
-pgrx-tests = { path = "../../pgrx-tests" }
-
-# uncomment these if compiling outside of 'pgrx'
-# [profile.dev]
-# panic = "unwind"
-
-# [profile.release]
-# panic = "unwind"
-# opt-level = 3
-# lto = "fat"
-# codegen-units = 1
+pgrx-tests = { path = "../../pgrx-tests", default-features = false }

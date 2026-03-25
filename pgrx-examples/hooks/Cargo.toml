@@ -29,17 +29,7 @@ pg18 = ["pgrx/pg18", "pgrx-tests/pg18" ]
 pg_test = []
 
 [dependencies]
-pgrx = { path = "../../pgrx", default-features = false }
+pgrx = { path = "../../pgrx" }
 
 [dev-dependencies]
-pgrx-tests = { path = "../../pgrx-tests" }
-
-# uncomment these if compiling outside of 'pgrx'
-# [profile.dev]
-# panic = "unwind"
-
-# [profile.release]
-# panic = "unwind"
-# opt-level = 3
-# lto = "fat"
-# codegen-units = 1
+pgrx-tests = { path = "../../pgrx-tests", default-features = false }

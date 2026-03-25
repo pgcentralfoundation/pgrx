@@ -37,7 +37,6 @@ fn only_superusers_can_truncate(pstmt: PgBox<pg_sys::PlannedStmt>) {
 }
 
 unsafe fn register_hooks() {
-
     //
     // Client Authentication hook
     //

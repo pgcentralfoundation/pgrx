@@ -235,15 +235,11 @@ jobs:
       - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
         run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
 
-      - name: Run base-level tests
+      - name: Run workspace tests
         run: |
-          cargo test \
+          CARGO_TARGET_DIR="$(pwd)/target" cargo test --all \
             --features "pg$PG_VER" \
-            --package cargo-pgrx \
-            --package pgrx \
-            --package pgrx-macros \
-            --package pgrx-pg-sys \
-            --package pgrx-sql-entity-graph
+            --no-default-features
 
       - name: Check that cross-compiled pgrx-tests can build
         run: |
@@ -270,14 +266,6 @@ jobs:
           cargo test \
             --features "pg$PG_VER proptest" \
             --package pgrx-tests --test ui
-
-
-      - name: Run all example tests
-        run: |
-          for example in $(find pgrx-examples -name Cargo.toml | cut -d/ -f2 | sort); do
-            echo "Running tests for $example"
-            CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/$example/Cargo.toml  --features "pg$PG_VER" --no-default-features
-          done
 
       - name: Smoke test cargo pgrx bench against the benching example
         if: ${{ matrix.postgres == 16 && matrix.rust == null }}

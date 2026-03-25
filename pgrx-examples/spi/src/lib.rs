@@ -90,7 +90,7 @@ fn spi_insert_title(title: &str) -> Result<Option<i64>, spi::Error> {
 #[pg_extern]
 fn spi_insert_title2(
     title: &str,
-) -> TableIterator<(name!(id, Option<i64>), name!(title, Option<String>))> {
+) -> TableIterator<'_, (name!(id, Option<i64>), name!(title, Option<String>))> {
     let tuple = Spi::get_two_with_args(
         "INSERT INTO spi.spi_example(title) VALUES ($1) RETURNING id, title",
         &[title.into()],

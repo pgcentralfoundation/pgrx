@@ -1,17 +1,17 @@
-use pgrx::prelude::*;
+use pgrx::datum::Timestamp;
 use pgrx::iter::TableIterator;
 use pgrx::pg_sys;
-use pgrx::datum::Timestamp;
+use pgrx::prelude::*;
 
 ::pgrx::pg_module_magic!(name, version);
 
 type TransactionId = pg_sys::TransactionId;
 
 /// RAII wrapper for PostgreSQL LWLock to ensure proper release
-/// 
+///
 /// This guard automatically acquires a PostgreSQL LWLock on creation and releases it on drop,
 /// ensuring that locks are properly managed even in the presence of errors or early returns.
-/// 
+///
 /// # Important Note on Error Handling
 /// PostgreSQL's LWLock implementation has specific requirements during error unwinding.
 /// We only release the lock if InterruptHoldoffCount > 0 to avoid assertion failures
@@ -22,7 +22,7 @@ struct PgLwLockGuard {
 
 impl PgLwLockGuard {
     /// Acquire a PostgreSQL LWLock in shared mode with RAII cleanup
-    /// 
+    ///
     /// # Safety
     /// The caller must ensure that:
     /// - `lock` is a valid, non-null pointer to an initialized LWLock
@@ -32,7 +32,7 @@ impl PgLwLockGuard {
         if lock.is_null() {
             panic!("Attempted to acquire null LWLock");
         }
-        
+
         pg_sys::LWLockAcquire(lock, pg_sys::LWLockMode::LW_SHARED);
         Self { lock }
     }
@@ -46,7 +46,7 @@ impl Drop for PgLwLockGuard {
     }
 }
 
-// XactTruncation is at index 44 in MainLWLockArray according to lwlocklist.h, From PostgreSQL source: PG_LWLOCK(44, XactTruncation) 
+// XactTruncation is at index 44 in MainLWLockArray according to lwlocklist.h, From PostgreSQL source: PG_LWLOCK(44, XactTruncation)
 const XACT_TRUNCATION_LOCK_INDEX: usize = 44;
 
 // Transaction status constants to avoid duplication
@@ -90,23 +90,25 @@ unsafe fn get_top_parent_xid(xid: TransactionId) -> (Option<TransactionId>, Opti
     // Traverse the subtransaction hierarchy
     while is_valid_transaction_id(parent_xid) {
         previous_xid = parent_xid;
-        
+
         // Safety check: don't call SubTransGetParent on transactions older than TransactionXmin
         if pg_sys::TransactionIdPrecedes(parent_xid, pg_sys::TransactionXmin) {
             break;
         }
-        
+
         parent_xid = pg_sys::SubTransGetParent(parent_xid);
         sub_level += 1;
-        
+
         if !is_valid_transaction_id(parent_xid) {
             break;
         }
-        
+
         // Safety check: parent xid should always precede child xid to avoid infinite loops
         if !transaction_id_precedes(parent_xid, previous_xid) {
-            error!("pg_subtrans contains invalid entry: xid {} points to parent xid {}", 
-                   previous_xid, parent_xid);
+            error!(
+                "pg_subtrans contains invalid entry: xid {} points to parent xid {}",
+                previous_xid, parent_xid
+            );
         }
     }
 
@@ -122,24 +124,26 @@ unsafe fn get_top_parent_xid(xid: TransactionId) -> (Option<TransactionId>, Opti
 /// This implements the complete logic from the original C implementation with proper locking
 /// Returns (extracted_xid, is_accessible) where is_accessible indicates if the transaction
 /// data is still available in the CLOG/SLRU cache
-/// 
+///
 /// This is a direct Rust translation of the PostgreSQL C function `TransactionIdInRecentPast`
 /// from the subtrans_infos extension, adapted for PostgreSQL 14+ with FullTransactionId support.
-unsafe fn transaction_id_in_recent_past(xid_with_epoch: u64) -> Result<TransactionId, &'static str> {
+unsafe fn transaction_id_in_recent_past(
+    xid_with_epoch: u64,
+) -> Result<TransactionId, &'static str> {
     // For PostgreSQL 14+, use FullTransactionId APIs for proper epoch handling
     let xid_epoch = (xid_with_epoch >> 32) as u32;
     let xid = TransactionId::from(xid_with_epoch as u32);
-    
+
     // Basic validation - invalid transaction IDs are not accessible
     if xid == pg_sys::InvalidTransactionId {
         return Err("invalid transaction ID");
     }
-    
+
     // Special transaction IDs (bootstrap, frozen) are always accessible but don't need CLOG
     if !pg_sys::TransactionIdIsNormal(xid) {
         return Ok(xid);
     }
-    
+
     // Get current full transaction ID for comparison
     let now_fullxid = pg_sys::ReadNextFullTransactionId();
     let now_epoch_next_xid = (now_fullxid.value as u32).into();
@@ -151,29 +155,30 @@ unsafe fn transaction_id_in_recent_past(xid_with_epoch: u64) -> Result<Transacti
         }
         #[cfg(not(any(feature = "pg17", feature = "pg18")))]
         {
-            (*pg_sys::ShmemVariableCache).oldestClogXid 
+            (*pg_sys::ShmemVariableCache).oldestClogXid
         }
     };
-    
+
     // Create a FullTransactionId from the input for proper comparison
     let input_full_xid_value = ((xid_epoch as u64) << 32) | (xid.into_inner() as u64);
-    
+
     // Check if the transaction ID is in the future - this is an error
     // For PostgreSQL 14+, we can compare FullTransactionId values directly
     if input_full_xid_value >= now_fullxid.value {
         return Err("transaction ID is in the future");
     }
-    
+
     // Check if the transaction has wrapped around too far - older than we can determine
     // A transaction that's more than one full epoch older is definitely too old
     // This implements the wraparound detection logic from the original C code
-    if (xid_epoch + 1) < now_epoch 
-        || ((xid_epoch + 1) == now_epoch && pg_sys::TransactionIdPrecedes(xid, now_epoch_next_xid)) 
+    if (xid_epoch + 1) < now_epoch
+        || ((xid_epoch + 1) == now_epoch && pg_sys::TransactionIdPrecedes(xid, now_epoch_next_xid))
         // If the XID is older than what's available in CLOG, it's not accessible
-        || pg_sys::TransactionIdPrecedes(xid, oldest_clog_xid) {
+        || pg_sys::TransactionIdPrecedes(xid, oldest_clog_xid)
+    {
         return Err("transaction ID is too old and CLOG data is unavailable");
     }
-    
+
     // The transaction ID is recent enough and CLOG data is still available
     Ok(xid)
 }
@@ -184,7 +189,7 @@ unsafe fn transaction_id_in_recent_past(xid_with_epoch: u64) -> Result<Transacti
 unsafe fn get_transaction_status(xid: TransactionId) -> (String, Option<Timestamp>) {
     let mut commit_timestamp = None::<Timestamp>;
     let snapshot = pg_sys::GetActiveSnapshot();
-    
+
     let status = if pg_sys::TransactionIdIsCurrentTransactionId(xid) {
         STATUS_IN_PROGRESS
     } else if pg_sys::TransactionIdDidCommit(xid) {
@@ -196,13 +201,14 @@ unsafe fn get_transaction_status(xid: TransactionId) -> (String, Option<Timestam
             }
         }
         STATUS_COMMITTED
-    } else if pg_sys::TransactionIdDidAbort(xid) ||
-             (!snapshot.is_null() && pg_sys::TransactionIdPrecedes(xid, (*snapshot).xmin)) {
+    } else if pg_sys::TransactionIdDidAbort(xid)
+        || (!snapshot.is_null() && pg_sys::TransactionIdPrecedes(xid, (*snapshot).xmin))
+    {
         STATUS_ABORTED
     } else {
         STATUS_IN_PROGRESS
     };
-    
+
     (status.to_string(), commit_timestamp)
 }
 
@@ -210,22 +216,24 @@ unsafe fn get_transaction_status(xid: TransactionId) -> (String, Option<Timestam
 #[pg_extern]
 unsafe fn subtrans_infos(
     xid_input: i64,
-    _fcinfo: pg_sys::FunctionCallInfo
-) -> TableIterator<'static, (
-    name!(xid, i32),
-    name!(status, String),
-    name!(parent_xid, Option<i32>),
-    name!(top_parent_xid, Option<i32>),
-    name!(sub_level, Option<i32>),
-    name!(commit_timestamp, Option<Timestamp>),
-)> {
-    
+    _fcinfo: pg_sys::FunctionCallInfo,
+) -> TableIterator<
+    'static,
+    (
+        name!(xid, i32),
+        name!(status, String),
+        name!(parent_xid, Option<i32>),
+        name!(top_parent_xid, Option<i32>),
+        name!(sub_level, Option<i32>),
+        name!(commit_timestamp, Option<Timestamp>),
+    ),
+> {
     let xid_input = xid_input as u64;
-    
+
     // CRITICAL: Acquire the XactTruncationLock FIRST, just like in the original C implementation, This protects against concurrent SLRU cache truncation operations
     let lock = &mut (*pg_sys::MainLWLockArray.wrapping_add(XACT_TRUNCATION_LOCK_INDEX)).lock;
     let _lock_guard = PgLwLockGuard::new_shared(lock);
-    
+
     // Check if the transaction is accessible and get the extracted XID
     let xid = match transaction_id_in_recent_past(xid_input) {
         Ok(xid) => xid,
@@ -238,13 +246,13 @@ unsafe fn subtrans_infos(
     if !pg_sys::TransactionIdFollowsOrEquals(xid, pg_sys::TransactionXmin) {
         // Transaction is too old and subtrans data is not available
         let (status, commit_timestamp) = get_transaction_status(xid);
-        
+
         return TableIterator::once((
             transaction_id_to_i32(xid),
             status,
-            None, // parent_xid is null - subtrans data not available
-            None, // top_parent_xid is null - subtrans data not available
-            None, // sub_level is null - subtrans data not available
+            None,             // parent_xid is null - subtrans data not available
+            None,             // top_parent_xid is null - subtrans data not available
+            None,             // sub_level is null - subtrans data not available
             commit_timestamp, // commit_timestamp may be null for old transactions
         ));
     }
@@ -252,7 +260,7 @@ unsafe fn subtrans_infos(
     // Safe to access subtrans data - transaction is recent enough
     let parent_xid = pg_sys::SubTransGetParent(xid);
     let (top_parent_xid, sub_level) = get_top_parent_xid(xid);
-    
+
     // Determine transaction status using the centralized helper function
     let (status, commit_timestamp) = get_transaction_status(xid);
 
@@ -263,7 +271,7 @@ unsafe fn subtrans_infos(
     };
 
     let top_parent_xid_result = top_parent_xid.map(|x| transaction_id_to_i32(x));
-    
+
     TableIterator::once((
         transaction_id_to_i32(xid),
         status,
@@ -293,7 +301,7 @@ pub mod pg_test {
 #[cfg(test)]
 mod unit_tests {
     use super::*;
-    
+
     #[test]
     fn test_transaction_id_to_i32() {
         // Test normal transaction ID conversion
@@ -301,36 +309,36 @@ mod unit_tests {
         unsafe {
             assert_eq!(transaction_id_to_i32(xid), 12345i32);
         }
-        
+
         // Test maximum safe positive value
         let max_safe_xid = pg_sys::TransactionId::from(i32::MAX as u32);
         unsafe {
             assert_eq!(transaction_id_to_i32(max_safe_xid), i32::MAX);
         }
-        
+
         // Test wrap-around case (values above i32::MAX)
         let wrap_xid = pg_sys::TransactionId::from(i32::MAX as u32 + 1);
         unsafe {
             assert_eq!(transaction_id_to_i32(wrap_xid), i32::MIN);
         }
     }
-    
-    #[test] 
+
+    #[test]
     fn test_is_valid_transaction_id() {
         unsafe {
             // Test invalid transaction ID
             let invalid_xid = pg_sys::InvalidTransactionId;
             assert!(!is_valid_transaction_id(invalid_xid));
-            
+
             // Test valid transaction IDs
             let valid_xid = pg_sys::TransactionId::from(1u32);
             assert!(is_valid_transaction_id(valid_xid));
-            
+
             let another_valid_xid = pg_sys::TransactionId::from(12345u32);
             assert!(is_valid_transaction_id(another_valid_xid));
         }
     }
-    
+
     #[test]
     fn test_status_constants() {
         // Ensure status constants are correctly defined
@@ -338,7 +346,7 @@ mod unit_tests {
         assert_eq!(STATUS_COMMITTED, "committed");
         assert_eq!(STATUS_ABORTED, "aborted");
     }
-    
+
     #[test]
     fn test_lock_index_constant() {
         // Verify the XactTruncationLock index is within reasonable bounds
@@ -351,7 +359,7 @@ mod unit_tests {
 #[pgrx::pg_schema]
 mod tests {
     use pgrx::prelude::*;
-    use pgrx::{info, Spi};
+    use pgrx::Spi;
 
     /// Test basic functionality with current transaction ID
     #[pg_test]
@@ -359,15 +367,16 @@ mod tests {
         Spi::connect(|client| {
             let current_xid = unsafe { pg_sys::GetCurrentTransactionId() };
             let query = format!("SELECT * FROM subtrans_infos({})", current_xid.into_inner());
-            
+
             let mut count = 0;
             for _row in client.select(&query, None, &[])? {
                 count += 1;
             }
-            
+
             assert!(count > 0, "Function should return at least one row");
             Ok(Some(())) as Result<Option<()>, pgrx::spi::SpiError>
-        }).unwrap();
+        })
+        .unwrap();
     }
 
     /// Test with Bootstrap transaction ID
@@ -380,7 +389,8 @@ mod tests {
             }
             assert_eq!(count, 1, "Bootstrap XID should return exactly one row");
             Ok(Some(())) as Result<Option<()>, pgrx::spi::SpiError>
-        }).unwrap();
+        })
+        .unwrap();
     }
 
     /// Test with Frozen transaction ID
@@ -393,14 +403,15 @@ mod tests {
             }
             assert_eq!(count, 1, "Frozen XID should return exactly one row");
             Ok(Some(())) as Result<Option<()>, pgrx::spi::SpiError>
-        }).unwrap();
+        })
+        .unwrap();
     }
 
     /// Test multiple calls for consistency
     #[pg_test]
     fn test_consistency() {
         let current_xid = unsafe { pg_sys::GetCurrentTransactionId() };
-        
+
         for _i in 0..3 {
             Spi::connect(|client| {
                 let query = format!("SELECT * FROM subtrans_infos({})", current_xid.into_inner());
@@ -410,7 +421,8 @@ mod tests {
                 }
                 assert!(count > 0, "Iteration should return at least one row");
                 Ok(Some(())) as Result<Option<()>, pgrx::spi::SpiError>
-            }).unwrap();
+            })
+            .unwrap();
         }
     }
 
@@ -421,15 +433,16 @@ mod tests {
             let current_xid = unsafe { pg_sys::GetCurrentTransactionId() };
             let xid_with_epoch = current_xid.into_inner() as u64;
             let query = format!("SELECT * FROM subtrans_infos({})", xid_with_epoch);
-            
+
             let mut count = 0;
             for _row in client.select(&query, None, &[])? {
                 count += 1;
             }
-            
+
             assert!(count > 0, "Function should handle transaction IDs correctly");
             Ok(Some(())) as Result<Option<()>, pgrx::spi::SpiError>
-        }).unwrap();
+        })
+        .unwrap();
     }
 
     /// Test error recovery
@@ -445,6 +458,7 @@ mod tests {
             }
             assert!(count > 0, "Function should work reliably");
             Ok(Some(())) as Result<Option<()>, pgrx::spi::SpiError>
-        }).unwrap();
+        })
+        .unwrap();
     }
 }

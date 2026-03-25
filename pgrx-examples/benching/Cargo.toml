@@ -30,8 +30,8 @@ pg_test = []
 pg_bench = ["dep:pgrx-bench"]
 
 [dependencies]
-pgrx = { path = "../../pgrx", default-features = false }
+pgrx = { path = "../../pgrx" }
 pgrx-bench = { path = "../../pgrx-bench", optional = true }
 
 [dev-dependencies]
-pgrx-tests = { path = "../../pgrx-tests" }
+pgrx-tests = { path = "../../pgrx-tests", default-features = false }

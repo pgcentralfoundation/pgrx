@@ -111,20 +111,18 @@ fn div_interval(i: Interval, v: f64) -> Interval {
 
 #[pg_extern(parallel_safe)]
 fn random_time() -> Result<Time, DateTimeConversionError> {
-    Time::new(
-        rand::thread_rng().gen_range(0..23),
-        rand::thread_rng().gen_range(0..59),
-        rand::thread_rng().gen_range(0..59) as f64,
-    )
+    let mut rng = rand::rng();
+    Time::new(rng.random_range(0..23), rng.random_range(0..59), rng.random_range(0..59) as f64)
 }
 
 #[pg_extern(parallel_safe)]
 fn random_date() -> Date {
-    let year = rand::thread_rng().gen_range(1978..2023);
-    let month = rand::thread_rng().gen_range(1..12);
+    let mut rng = rand::rng();
+    let year = rng.random_range(1978..2023);
+    let month = rng.random_range(1..12);
 
     loop {
-        let day = rand::thread_rng().gen_range(0..31);
+        let day = rng.random_range(0..31);
         match Date::new(year, month, day) {
             // everything is good
             Ok(date) => return date,
