@@ -34,4 +34,4 @@ pgrx = { path = "../../pgrx" }
 rand = "0.8.5"
 
 [dev-dependencies]
-pgrx-tests = { path = "../../pgrx-tests", default-features = false }
+pgrx-tests = { path = "../../pgrx-tests" }

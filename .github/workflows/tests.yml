@@ -209,14 +209,14 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-          key: pgrx-tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+          key: pgrx-unit-tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
       - name: Cache sccache directory
         uses: actions/cache@v4
         continue-on-error: false
         with:
           path: /home/runner/.cache/sccache
-          key: pgrx-tests-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+          key: pgrx-unit-tests-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
       - name: Start sccache server
         run: sccache --start-server
@@ -241,31 +241,31 @@ jobs:
             --features "pg$PG_VER" \
             --no-default-features
 
-      - name: Check that cross-compiled pgrx-tests can build
+      - name: Check that cross-compiled pgrx-unit-tests can build
         run: |
           cargo build --tests \
             --features "pg$PG_VER" \
-            --package pgrx-tests \
+            --package pgrx-unit-tests \
             --target aarch64-unknown-linux-gnu
 
-      - name: Run pgrx-tests with cshim enabled
+      - name: Run pgrx-unit-tests with cshim enabled
         run: |
           cargo test \
             --features "pg$PG_VER cshim proptest" \
-            --package pgrx-tests --lib
+            --package pgrx-unit-tests --lib
 
-      - name: Run pgrx-tests with cshim disabled
+      - name: Run pgrx-unit-tests with cshim disabled
         run: |
           cargo test \
             --features "pg$PG_VER proptest" \
-            --package pgrx-tests --lib
+            --package pgrx-unit-tests --lib
 
       - name: Run UI tests
         if: ${{ matrix.rust == null }}
         run: |
           cargo test \
             --features "pg$PG_VER proptest" \
-            --package pgrx-tests --test ui
+            --package pgrx-unit-tests --test ui
 
       - name: Smoke test cargo pgrx bench against the benching example
         if: ${{ matrix.postgres == 16 && matrix.rust == null }}

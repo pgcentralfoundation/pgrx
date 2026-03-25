@@ -19,14 +19,10 @@ repository.workspace = true
 documentation = "https://docs.rs/pgrx-tests"
 readme = "README.md"
 edition.workspace = true
-include = ["src/**/*", "README.md", "!**/tests/**/*"]
-
-[lib]
-crate-type = ["cdylib", "lib"]
-
+include = ["src/**/*", "README.md"]
 
 [features]
-default = ["proptest"]
+default = []
 pg13 = ["pgrx/pg13"]
 pg14 = ["pgrx/pg14"]
 pg15 = ["pgrx/pg15"]
@@ -59,12 +55,9 @@ eyre.workspace = true
 libc.workspace = true
 owo-colors.workspace = true
 regex.workspace = true
-serde.workspace = true
-serde_json.workspace = true
 shlex.workspace = true
 thiserror.workspace = true
 
-paste = "1"
 postgres = "0.19.10"
 proptest = { version = "1", optional = true }
 tempfile = "3.19.1"
@@ -85,10 +78,6 @@ winapi = { version = "0.3.9", features = [
     "winerror",
     "winnt",
 ] }
-
-[dev-dependencies]
-eyre.workspace = true # testing functions that return `eyre::Result`
-trybuild = "1"
 
 [lints.rust]
 unused-lifetimes = "deny"

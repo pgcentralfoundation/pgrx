@@ -35,4 +35,4 @@ maplit = "1.0.2"
 serde = "1.0"
 
 [dev-dependencies]
-pgrx-tests = { path = "../../pgrx-tests", default-features = false }
+pgrx-tests = { path = "../../pgrx-tests" }

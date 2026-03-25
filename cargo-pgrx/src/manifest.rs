@@ -135,8 +135,7 @@ pub(crate) fn modify_features_for_version(
             );
         }
 
-        // if we know we're running from the `pgrx-tests/src/framework.rs`, remove any user-specified features
-        // that aren't valid for the manifest
+        // when the pgrx test harness is driving the build, drop feature flags the target manifest doesn't define
         if test {
             features.features.retain(|flag| {
                 if manifest.features.contains_key(flag) || flag == "pgrx/cshim" {

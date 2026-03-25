@@ -25,4 +25,4 @@ testing = ["pg_test"]
 pgrx = { path = "../../pgrx" }
 
 [dev-dependencies]
-pgrx-tests = { path = "../../pgrx-tests", default-features = false }
+pgrx-tests = { path = "../../pgrx-tests" }

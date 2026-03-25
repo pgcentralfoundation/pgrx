@@ -882,11 +882,11 @@ fn get_pid_file() -> eyre::Result<PathBuf> {
 }
 
 #[inline]
-pub(crate) fn get_pg_dbname() -> &'static str {
+pub fn get_pg_dbname() -> &'static str {
     "pgrx_tests"
 }
 
-pub(crate) fn get_pg_user() -> String {
+pub fn get_pg_user() -> String {
     #[cfg(target_family = "unix")]
     let varname = "USER";
     #[cfg(target_os = "windows")]

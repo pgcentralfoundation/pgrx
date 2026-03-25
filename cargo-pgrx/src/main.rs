@@ -83,6 +83,7 @@ fn main() -> color_eyre::Result<()> {
                 .add_directive(format!("pgrx={log_level}").parse()?)
                 .add_directive(format!("pgrx_macros={log_level}").parse()?)
                 .add_directive(format!("pgrx_tests={log_level}").parse()?)
+                .add_directive(format!("pgrx_unit_tests={log_level}").parse()?)
                 .add_directive(format!("pgrx_pg_sys={log_level}").parse()?)
                 .add_directive(format!("pgrx_utils={log_level}").parse()?)
         }

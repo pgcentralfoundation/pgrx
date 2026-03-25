@@ -33,4 +33,4 @@ pgrx = { path = "../../pgrx" }
 libflate = "2.1.0"
 
 [dev-dependencies]
-pgrx-tests = { path = "../../pgrx-tests", default-features = false }
+pgrx-tests = { path = "../../pgrx-tests" }

@@ -27,7 +27,6 @@ optional = true
 [dev-dependencies]
 [dev-dependencies.pgrx-tests]
 version = "=0.17.0"
-default-features = false
 
 [profile.dev]
 panic = "unwind"

@@ -34,4 +34,4 @@ rand = "0.9.0"
 ureq = "3.0.10"
 
 [dev-dependencies]
-pgrx-tests = { path = "../../pgrx-tests", default-features = false }
+pgrx-tests = { path = "../../pgrx-tests" }

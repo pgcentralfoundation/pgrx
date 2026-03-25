@@ -19,6 +19,7 @@ members = [
     "pgrx-pg-sys",
     "pgrx-sql-entity-graph",
     "pgrx-tests",
+    "pgrx-unit-tests",
     "pgrx-bindgen",
     "pgrx-examples/*",
     "tools/version-updater",
