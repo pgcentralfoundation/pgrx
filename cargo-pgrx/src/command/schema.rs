@@ -155,10 +155,8 @@ pub(crate) fn generate_schema_for_cli(
         first_build(cargo.clone(), profile, is_test, &features_arg, target)?;
     };
     generate_schema_implicit(
-        cargo,
         package_manifest_path,
         profile,
-        features_arg,
         target,
         path,
         dot,
@@ -169,10 +167,8 @@ pub(crate) fn generate_schema_for_cli(
 pub(crate) use generate_schema_for_cli as generate_schema;
 
 pub(crate) fn generate_schema_implicit(
-    _cargo: Cargo,
     package_manifest_path: &Path,
     profile: &CargoProfile,
-    _features_arg: String,
     target: Option<&str>,
     path: Option<&Path>,
     dot: Option<&Path>,
@@ -200,7 +196,7 @@ pub(crate) fn generate_schema_implicit(
     entities.extend(load_section_entities(profile, &lib_filename, target)?);
 
     let pgrx_sql = PgrxSql::build(entities.into_iter(), lib_name.to_string(), versioned_so)
-        .expect("SQL generation error");
+        .wrap_err("SQL generation error")?;
 
     if let Some(path) = path {
         eprintln!("{} SQL entities to {}", "     Writing".bold().green(), path.display());
@@ -235,13 +231,22 @@ fn load_section_entities(
 
     let lib_so_data = std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")?;
     let section = schema_section_data(&lib_so_data)?;
-    let entities = if let Some(section) = section {
-        decode_entities(section).wrap_err("couldn't decode pgrx schema section")?
-    } else {
-        Vec::new()
-    };
+    let entities = decode_section_entities(&lib_so, section)?;
     report_entity_counts(&entities);
     Ok(entities)
+}
+
+fn decode_section_entities(
+    lib_so: &Path,
+    section: Option<&[u8]>,
+) -> eyre::Result<Vec<SqlGraphEntity>> {
+    let section = section.ok_or_else(|| {
+        eyre::eyre!(
+            "no .pgrx_schema section found in `{}`; the artifact may have been built with an incompatible pgrx, stripped incorrectly, or selected from the wrong architecture slice",
+            lib_so.display()
+        )
+    })?;
+    decode_entities(section).wrap_err("couldn't decode pgrx schema section")
 }
 
 fn report_entity_counts(entities: &[SqlGraphEntity]) {
@@ -373,6 +378,7 @@ fn slice_arch32<'a>(data: &'a [u8], arch: &str) -> Option<&'a [u8]> {
 mod tests {
     use crate::command::schema::*;
     use pgrx_pg_config::{PgConfigSelector, Pgrx};
+    use std::path::Path;
 
     #[test]
     fn test_parse_managed_postmasters() {
@@ -409,5 +415,12 @@ mod tests {
         let bin = std::fs::read(fixture_path).unwrap();
 
         assert!(slice_arch32(&bin, "foo").is_none());
+    }
+
+    #[test]
+    fn test_missing_schema_section_errors() {
+        let error =
+            decode_section_entities(Path::new("broken.so"), None).expect_err("missing section");
+        assert!(error.to_string().contains("no .pgrx_schema section found"));
     }
 }

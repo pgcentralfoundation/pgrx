@@ -68,6 +68,8 @@ pub const ARG_ERROR_BARE_U8: u8 = 3;
 pub const ARG_ERROR_SKIP_IN_ARRAY: u8 = 4;
 pub const ARG_ERROR_DATUM: u8 = 5;
 pub const ARG_ERROR_NOT_VALID: u8 = 6;
+pub const RESULT_OK: u8 = 1;
+pub const RESULT_ERR: u8 = 2;
 
 pub const RETURNS_ERROR_NESTED_SET_OF: u8 = 1;
 pub const RETURNS_ERROR_NESTED_TABLE: u8 = 2;
@@ -317,8 +319,8 @@ impl<const N: usize> EntryWriter<N> {
 
     pub const fn argument_sql(self, value: Result<SqlMappingRef, ArgumentError>) -> Self {
         match value {
-            Ok(mapping) => self.u8(1).sql_mapping(mapping),
-            Err(err) => self.u8(2).argument_error(err),
+            Ok(mapping) => self.u8(RESULT_OK).sql_mapping(mapping),
+            Err(err) => self.u8(RESULT_ERR).argument_error(err),
         }
     }
 
@@ -338,8 +340,8 @@ impl<const N: usize> EntryWriter<N> {
 
     pub const fn return_sql(self, value: Result<ReturnsRef, ReturnsError>) -> Self {
         match value {
-            Ok(returns) => self.u8(1).returns(returns),
-            Err(err) => self.u8(2).returns_error(err),
+            Ok(returns) => self.u8(RESULT_OK).returns(returns),
+            Err(err) => self.u8(RESULT_ERR).returns_error(err),
         }
     }
 
@@ -480,8 +482,8 @@ impl<'a> EntryReader<'a> {
 
     pub fn read_argument_sql(&mut self) -> Result<Result<SqlMappingRef, ArgumentError>> {
         match self.read_u8()? {
-            1 => Ok(Ok(self.read_sql_mapping()?)),
-            2 => Ok(Err(self.read_argument_error()?)),
+            RESULT_OK => Ok(Ok(self.read_sql_mapping()?)),
+            RESULT_ERR => Ok(Err(self.read_argument_error()?)),
             other => Err(eyre!("invalid argument sql tag in schema entry: {other}")),
         }
     }
@@ -503,8 +505,8 @@ impl<'a> EntryReader<'a> {
 
     pub fn read_return_sql(&mut self) -> Result<Result<ReturnsRef, ReturnsError>> {
         match self.read_u8()? {
-            1 => Ok(Ok(self.read_returns()?)),
-            2 => Ok(Err(self.read_returns_error()?)),
+            RESULT_OK => Ok(Ok(self.read_returns()?)),
+            RESULT_ERR => Ok(Err(self.read_returns_error()?)),
             other => Err(eyre!("invalid return sql tag in schema entry: {other}")),
         }
     }

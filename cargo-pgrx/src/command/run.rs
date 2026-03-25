@@ -170,7 +170,6 @@ pub(crate) fn run(
         None,
         features,
         target,
-        false,
     )?;
 
     if install_only {
