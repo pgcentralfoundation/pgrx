@@ -19,6 +19,7 @@ use pgrx_pg_config::{
 use postgres::error::DbError;
 use std::collections::HashMap;
 use std::env::VarError;
+use std::env::consts::EXE_SUFFIX;
 use std::ffi::OsStr;
 use std::io::{BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
@@ -315,7 +316,7 @@ fn install_extension() -> eyre::Result<()> {
 
     features.extend(cargo_test_args.features.iter().cloned());
 
-    let mut command = cargo_pgrx();
+    let mut command = cargo_pgrx()?;
     command
         .arg("install")
         .arg("--test")
@@ -989,21 +990,78 @@ fn get_cargo_args() -> Vec<String> {
     Vec::new()
 }
 
-// TODO: this would be a good place to insert a check invoking to see if
-// `cargo-pgrx` is a crate in the local workspace, and use it instead.
-fn cargo_pgrx() -> Command {
+fn cargo_pgrx() -> eyre::Result<Command> {
     fn var_path(s: &str) -> Option<PathBuf> {
         std::env::var_os(s).map(PathBuf::from)
     }
-    // Use `CARGO_PGRX` (set by `cargo-pgrx` on first run), then fall back to
-    // `cargo-pgrx` if it is on the path, then `$CARGO pgrx`
-    let cargo_pgrx = var_path("CARGO_PGRX")
-        .or_else(|| find_on_path("cargo-pgrx"))
-        .or_else(|| var_path("CARGO"))
-        .unwrap_or_else(|| "cargo".into());
-    let mut cmd = Command::new(cargo_pgrx);
-    cmd.arg("pgrx");
-    cmd
+
+    if let Some(cargo_pgrx) = var_path("CARGO_PGRX") {
+        let mut command = Command::new(cargo_pgrx);
+        command.arg("pgrx");
+        return Ok(command);
+    }
+
+    if let Some(command) = workspace_cargo_pgrx(var_path("CARGO"))? {
+        return Ok(command);
+    }
+
+    let cargo_pgrx =
+        find_on_path("cargo-pgrx").or_else(|| var_path("CARGO")).unwrap_or_else(|| "cargo".into());
+    let mut command = Command::new(cargo_pgrx);
+    command.arg("pgrx");
+    Ok(command)
+}
+
+fn workspace_cargo_pgrx(cargo: Option<PathBuf>) -> eyre::Result<Option<Command>> {
+    let workspace_root = match Path::new(env!("CARGO_MANIFEST_DIR")).parent() {
+        Some(path) => path,
+        None => return Ok(None),
+    };
+
+    if !workspace_root.join("cargo-pgrx/Cargo.toml").is_file() {
+        return Ok(None);
+    }
+
+    let target_dir = get_target_dir()?;
+    let binary_name = format!("cargo-pgrx{EXE_SUFFIX}");
+    for profile in candidate_target_profiles() {
+        let binary = target_dir.join(profile).join(&binary_name);
+        if binary.is_file() {
+            let mut command = Command::new(binary);
+            command.arg("pgrx");
+            return Ok(Some(command));
+        }
+    }
+
+    let mut command = Command::new(cargo.unwrap_or_else(|| "cargo".into()));
+    command.current_dir(workspace_root);
+    command.args(["run", "-p", "cargo-pgrx", "--"]).arg("pgrx");
+    Ok(Some(command))
+}
+
+fn candidate_target_profiles() -> Vec<String> {
+    let mut profiles = Vec::new();
+
+    for profile in [
+        std::env::var("PGRX_BUILD_PROFILE").ok(),
+        std::env::var("PROFILE").ok(),
+        Some("debug".to_string()),
+        Some("release".to_string()),
+    ]
+    .into_iter()
+    .flatten()
+    {
+        let normalized = match profile.trim() {
+            "" | "debug" | "dev" | "test" => "debug",
+            profile => profile,
+        };
+
+        if !profiles.iter().any(|existing| existing == normalized) {
+            profiles.push(normalized.to_string());
+        }
+    }
+
+    profiles
 }
 
 fn find_on_path(program: &str) -> Option<PathBuf> {
