@@ -229,10 +229,6 @@ pub const fn argument_sql_len(value: Result<SqlMappingRef, ArgumentError>) -> us
         }
 }
 
-pub const fn type_origin_len(_value: TypeOrigin) -> usize {
-    u8_len()
-}
-
 pub const fn returns_error_len(_value: ReturnsError) -> usize {
     u8_len()
 }
@@ -283,13 +279,6 @@ impl<const N: usize> EntryWriter<N> {
 
     pub const fn str(self, value: &str) -> Self {
         self.u32(value.len() as u32).bytes(value.as_bytes())
-    }
-
-    pub const fn type_origin(self, value: TypeOrigin) -> Self {
-        match value {
-            TypeOrigin::ThisExtension => self.u8(TYPE_ORIGIN_THIS_EXTENSION),
-            TypeOrigin::External => self.u8(TYPE_ORIGIN_EXTERNAL),
-        }
     }
 
     pub const fn sql_mapping(self, value: SqlMappingRef) -> Self {
@@ -724,7 +713,6 @@ impl<'a> EntryReader<'a> {
         match kind {
             SQL_DECLARED_TYPE | SQL_DECLARED_ENUM => {
                 let schema_key = self.read_string()?;
-                let type_origin = Some(self.read_type_origin()?);
                 let sql = match self.read_argument_sql_owned()? {
                     Ok(crate::metadata::SqlMapping::As(sql)) => sql,
                     Ok(other) => {
@@ -732,7 +720,7 @@ impl<'a> EntryReader<'a> {
                     }
                     Err(err) => return Err(err.into()),
                 };
-                let data = SqlDeclaredEntityData { sql, name, schema_key, type_origin };
+                let data = SqlDeclaredEntityData { sql, name, schema_key };
                 Ok(match kind {
                     SQL_DECLARED_TYPE => SqlDeclaredEntity::Type(data),
                     SQL_DECLARED_ENUM => SqlDeclaredEntity::Enum(data),
@@ -749,7 +737,6 @@ impl<'a> EntryReader<'a> {
                     sql,
                     schema_key: name.clone(),
                     name,
-                    type_origin: None,
                 }))
             }
             other => Err(eyre!("invalid SQL declared tag in schema entry: {other}")),
@@ -1236,14 +1223,13 @@ mod tests {
     }
 
     #[test]
-    fn round_trip_sql_declared_type_preserves_type_origin() {
+    fn round_trip_sql_declared_type_preserves_schema_key_and_sql() {
         const NAME: &str = "tests::FancyText";
         const SCHEMA_KEY: &str = "tests::FancyText";
         const SQL: &str = "fancy_text";
         const PAYLOAD_LEN: usize = u8_len()
             + str_len(NAME)
             + str_len(SCHEMA_KEY)
-            + type_origin_len(TypeOrigin::ThisExtension)
             + argument_sql_len(Ok(SqlMappingRef::literal(SQL)));
         const TOTAL_LEN: usize = u32_len() + PAYLOAD_LEN;
         const ENTRY: [u8; TOTAL_LEN] = EntryWriter::<TOTAL_LEN>::new()
@@ -1251,7 +1237,6 @@ mod tests {
             .u8(SQL_DECLARED_TYPE)
             .str(NAME)
             .str(SCHEMA_KEY)
-            .type_origin(TypeOrigin::ThisExtension)
             .argument_sql(Ok(SqlMappingRef::literal(SQL)))
             .finish();
 
@@ -1260,7 +1245,6 @@ mod tests {
         let declared = reader.read_sql_declared().unwrap();
 
         assert_eq!(declared.schema_key(), Some(SCHEMA_KEY));
-        assert_eq!(declared.type_origin(), Some(TypeOrigin::ThisExtension));
         assert_eq!(declared.sql(), SQL);
         assert!(reader.is_empty());
     }

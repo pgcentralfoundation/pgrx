@@ -1851,12 +1851,11 @@ mod tests {
             bootstrap: false,
             finalize: false,
             requires: vec![],
-            creates: vec![crate::extension_sql::entity::SqlDeclaredEntity::Type(
+            creates: vec![SqlDeclaredEntity::Type(
                 SqlDeclaredEntityData {
                     sql: sql.into(),
                     name: name.into(),
                     schema_key: schema_key.into(),
-                    type_origin: Some(TypeOrigin::ThisExtension),
                 },
             )],
         }
