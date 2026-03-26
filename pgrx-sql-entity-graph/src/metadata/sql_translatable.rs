@@ -29,6 +29,8 @@ pub enum ArgumentError {
     SetOf,
     #[error("Cannot use TableIterator as an argument")]
     Table,
+    #[error("Nested arrays are not supported in arguments")]
+    NestedArray,
     #[error("Cannot use bare u8")]
     BareU8,
     #[error("SqlMapping::Skip inside Array is not valid")]
@@ -44,9 +46,8 @@ pub enum ArgumentError {
 pub enum SqlMapping {
     /// Explicit mappings provided by PGRX
     As(String),
-    Composite {
-        array_brackets: bool,
-    },
+    Composite,
+    Array(SqlArrayMapping),
     /// A type which does not actually appear in SQL
     Skip,
 }
@@ -57,20 +58,24 @@ impl SqlMapping {
     }
 }
 
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
+pub enum SqlArrayMapping {
+    /// Explicit mappings provided by PGRX
+    As(String),
+    Composite,
+}
+
 /// Const-friendly SQL mapping metadata.
 #[derive(Clone, Copy, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub enum SqlMappingRef {
     /// Explicit mappings provided by PGRX
     As(&'static str),
-    Array(&'static str),
     Numeric {
         precision: Option<u32>,
         scale: Option<u32>,
-        array_brackets: bool,
     },
-    Composite {
-        array_brackets: bool,
-    },
+    Composite,
+    Array(SqlArrayMappingRef),
     /// A type which does not actually appear in SQL
     Skip,
 }
@@ -81,23 +86,46 @@ impl SqlMappingRef {
     }
 }
 
+#[derive(Clone, Copy, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
+pub enum SqlArrayMappingRef {
+    /// Explicit mappings provided by PGRX
+    As(&'static str),
+    Numeric {
+        precision: Option<u32>,
+        scale: Option<u32>,
+    },
+    Composite,
+}
+
+pub(crate) fn numeric_sql_string(precision: Option<u32>, scale: Option<u32>) -> String {
+    match (precision, scale) {
+        (None, _) => "NUMERIC".to_string(),
+        (Some(precision), None) => format!("NUMERIC({precision})"),
+        (Some(precision), Some(scale)) => format!("NUMERIC({precision}, {scale})"),
+    }
+}
+
+impl From<SqlArrayMappingRef> for SqlArrayMapping {
+    fn from(value: SqlArrayMappingRef) -> Self {
+        match value {
+            SqlArrayMappingRef::As(value) => SqlArrayMapping::As(String::from(value)),
+            SqlArrayMappingRef::Numeric { precision, scale } => {
+                SqlArrayMapping::As(numeric_sql_string(precision, scale))
+            }
+            SqlArrayMappingRef::Composite => SqlArrayMapping::Composite,
+        }
+    }
+}
+
 impl From<SqlMappingRef> for SqlMapping {
     fn from(value: SqlMappingRef) -> Self {
         match value {
             SqlMappingRef::As(value) => SqlMapping::literal(value),
-            SqlMappingRef::Array(value) => SqlMapping::As(format!("{value}[]")),
-            SqlMappingRef::Numeric { precision, scale, array_brackets } => {
-                let mut sql = match (precision, scale) {
-                    (None, _) => "NUMERIC".to_string(),
-                    (Some(precision), None) => format!("NUMERIC({precision})"),
-                    (Some(precision), Some(scale)) => format!("NUMERIC({precision}, {scale})"),
-                };
-                if array_brackets {
-                    sql.push_str("[]");
-                }
-                SqlMapping::As(sql)
+            SqlMappingRef::Numeric { precision, scale } => {
+                SqlMapping::As(numeric_sql_string(precision, scale))
             }
-            SqlMappingRef::Composite { array_brackets } => SqlMapping::Composite { array_brackets },
+            SqlMappingRef::Composite => SqlMapping::Composite,
+            SqlMappingRef::Array(value) => SqlMapping::Array(value.into()),
             SqlMappingRef::Skip => SqlMapping::Skip,
         }
     }
@@ -127,14 +155,13 @@ pub const fn array_argument_sql(
     mapping: Result<SqlMappingRef, ArgumentError>,
 ) -> Result<SqlMappingRef, ArgumentError> {
     match mapping {
-        Ok(SqlMappingRef::As(sql)) | Ok(SqlMappingRef::Array(sql)) => Ok(SqlMappingRef::Array(sql)),
-        Ok(SqlMappingRef::Numeric { precision, scale, .. }) => {
-            Ok(SqlMappingRef::Numeric { precision, scale, array_brackets: true })
+        Ok(SqlMappingRef::As(sql)) => Ok(SqlMappingRef::Array(SqlArrayMappingRef::As(sql))),
+        Ok(SqlMappingRef::Numeric { precision, scale }) => {
+            Ok(SqlMappingRef::Array(SqlArrayMappingRef::Numeric { precision, scale }))
         }
-        Ok(SqlMappingRef::Composite { .. }) => {
-            Ok(SqlMappingRef::Composite { array_brackets: true })
-        }
+        Ok(SqlMappingRef::Composite) => Ok(SqlMappingRef::Array(SqlArrayMappingRef::Composite)),
         Ok(SqlMappingRef::Skip) => Err(ArgumentError::SkipInArray),
+        Ok(SqlMappingRef::Array(_)) => Err(ArgumentError::NestedArray),
         Err(err) => Err(err),
     }
 }
@@ -143,17 +170,20 @@ pub const fn array_return_sql(
     returns: Result<ReturnsRef, ReturnsError>,
 ) -> Result<ReturnsRef, ReturnsError> {
     match returns {
-        Ok(ReturnsRef::One(SqlMappingRef::As(sql)))
-        | Ok(ReturnsRef::One(SqlMappingRef::Array(sql))) => {
-            Ok(ReturnsRef::One(SqlMappingRef::Array(sql)))
+        Ok(ReturnsRef::One(SqlMappingRef::As(sql))) => {
+            Ok(ReturnsRef::One(SqlMappingRef::Array(SqlArrayMappingRef::As(sql))))
         }
-        Ok(ReturnsRef::One(SqlMappingRef::Numeric { precision, scale, .. })) => {
-            Ok(ReturnsRef::One(SqlMappingRef::Numeric { precision, scale, array_brackets: true }))
+        Ok(ReturnsRef::One(SqlMappingRef::Numeric { precision, scale })) => {
+            Ok(ReturnsRef::One(SqlMappingRef::Array(SqlArrayMappingRef::Numeric {
+                precision,
+                scale,
+            })))
         }
-        Ok(ReturnsRef::One(SqlMappingRef::Composite { .. })) => {
-            Ok(ReturnsRef::One(SqlMappingRef::Composite { array_brackets: true }))
+        Ok(ReturnsRef::One(SqlMappingRef::Composite)) => {
+            Ok(ReturnsRef::One(SqlMappingRef::Array(SqlArrayMappingRef::Composite)))
         }
         Ok(ReturnsRef::One(SqlMappingRef::Skip)) => Err(ReturnsError::SkipInArray),
+        Ok(ReturnsRef::One(SqlMappingRef::Array(_))) => Err(ReturnsError::NestedArray),
         Ok(ReturnsRef::SetOf(_)) => Err(ReturnsError::SetOfInArray),
         Ok(ReturnsRef::Table(_)) => Err(ReturnsError::TableInArray),
         Err(err) => Err(err),
@@ -201,7 +231,7 @@ Nonetheless, if you are not confident the translation is valid: do not implement
 )]
 pub unsafe trait SqlTranslatable {
     const SCHEMA_KEY: &'static str;
-    const TYPE_ORIGIN: TypeOrigin = TypeOrigin::ThisExtension;
+    const TYPE_ORIGIN: TypeOrigin;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError>;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError>;
 
@@ -322,4 +352,77 @@ where
     const TYPE_ORIGIN: TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn array_argument_sql_wraps_scalar_kinds() {
+        assert_eq!(
+            array_argument_sql(Ok(SqlMappingRef::literal("INT"))),
+            Ok(SqlMappingRef::Array(SqlArrayMappingRef::As("INT")))
+        );
+        assert_eq!(
+            array_argument_sql(Ok(SqlMappingRef::Numeric { precision: Some(10), scale: Some(2) })),
+            Ok(SqlMappingRef::Array(SqlArrayMappingRef::Numeric {
+                precision: Some(10),
+                scale: Some(2),
+            }))
+        );
+        assert_eq!(
+            array_argument_sql(Ok(SqlMappingRef::Composite)),
+            Ok(SqlMappingRef::Array(SqlArrayMappingRef::Composite))
+        );
+    }
+
+    #[test]
+    fn array_return_sql_wraps_scalar_kinds() {
+        assert_eq!(
+            array_return_sql(Ok(ReturnsRef::One(SqlMappingRef::literal("INT")))),
+            Ok(ReturnsRef::One(SqlMappingRef::Array(SqlArrayMappingRef::As("INT"))))
+        );
+        assert_eq!(
+            array_return_sql(Ok(ReturnsRef::One(SqlMappingRef::Numeric {
+                precision: Some(10),
+                scale: Some(2),
+            }))),
+            Ok(ReturnsRef::One(SqlMappingRef::Array(SqlArrayMappingRef::Numeric {
+                precision: Some(10),
+                scale: Some(2),
+            })))
+        );
+        assert_eq!(
+            array_return_sql(Ok(ReturnsRef::One(SqlMappingRef::Composite))),
+            Ok(ReturnsRef::One(SqlMappingRef::Array(SqlArrayMappingRef::Composite)))
+        );
+    }
+
+    #[test]
+    fn nested_vec_arrays_fail_fast() {
+        assert_eq!(
+            <Vec<Vec<i32>> as SqlTranslatable>::ARGUMENT_SQL,
+            Err(ArgumentError::NestedArray)
+        );
+        assert_eq!(<Vec<Vec<i32>> as SqlTranslatable>::RETURN_SQL, Err(ReturnsError::NestedArray));
+    }
+
+    #[test]
+    fn nested_numeric_arrays_fail_fast() {
+        let numeric = SqlMappingRef::Array(SqlArrayMappingRef::Numeric {
+            precision: Some(10),
+            scale: Some(2),
+        });
+        assert_eq!(array_argument_sql(Ok(numeric)), Err(ArgumentError::NestedArray));
+    }
+
+    #[test]
+    fn nested_composite_arrays_fail_fast() {
+        let composite = SqlMappingRef::Array(SqlArrayMappingRef::Composite);
+        assert_eq!(
+            array_return_sql(Ok(ReturnsRef::One(composite))),
+            Err(ReturnsError::NestedArray)
+        );
+    }
 }

@@ -2,7 +2,9 @@ use std::collections::BTreeMap;
 use std::error::Error as StdError;
 
 use pgrx::array::FlatArray;
+use pgrx::memcx::MemCx;
 use pgrx::nullable::Nullable;
+use pgrx::pg_sys::FunctionCallInfoBaseData;
 use pgrx::pgrx_sql_entity_graph::metadata::{
     ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable, TypeOrigin,
 };
@@ -19,6 +21,7 @@ const MANUAL_SCHEMA_KEY: &str = pgrx::pgrx_resolved_type!(ManualSchemaKeyType);
 
 unsafe impl SqlTranslatable for ManualSchemaKeyType {
     const SCHEMA_KEY: &'static str = MANUAL_SCHEMA_KEY;
+    const TYPE_ORIGIN: TypeOrigin = TypeOrigin::ThisExtension;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("manual_schema_key_type"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -35,6 +38,7 @@ mod nested_manual {
 
     unsafe impl SqlTranslatable for DefinitionSiteType {
         const SCHEMA_KEY: &'static str = DEFINITION_SITE_SCHEMA_KEY;
+        const TYPE_ORIGIN: TypeOrigin = TypeOrigin::ThisExtension;
         const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
             Ok(SqlMappingRef::literal("definition_site_type"));
         const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -98,6 +102,7 @@ fn representative_leaf_types_have_non_empty_distinct_schema_keys() {
         ("Uuid", <Uuid as SqlTranslatable>::SCHEMA_KEY),
         ("Inet", <Inet as SqlTranslatable>::SCHEMA_KEY),
         ("Internal", <Internal as SqlTranslatable>::SCHEMA_KEY),
+        ("Oid", <pg_sys::Oid as SqlTranslatable>::SCHEMA_KEY),
         ("PgRelation", <PgRelation as SqlTranslatable>::SCHEMA_KEY),
         ("Range<i32>", <Range<i32> as SqlTranslatable>::SCHEMA_KEY),
         ("Range<Date>", <Range<Date> as SqlTranslatable>::SCHEMA_KEY),
@@ -156,6 +161,7 @@ fn wrapper_types_forward_type_origin() {
     );
 
     assert_eq!(<Uuid as SqlTranslatable>::TYPE_ORIGIN, TypeOrigin::External);
+    assert_eq!(<pg_sys::Oid as SqlTranslatable>::TYPE_ORIGIN, TypeOrigin::External);
     assert_eq!(<Nullable<Uuid> as SqlTranslatable>::TYPE_ORIGIN, TypeOrigin::External);
     assert_eq!(<Array<'static, Uuid> as SqlTranslatable>::TYPE_ORIGIN, TypeOrigin::External);
     assert_eq!(
@@ -196,5 +202,18 @@ fn custom_types_use_definition_site_schema_keys() {
     assert_eq!(
         <DerivedSchemaKeyEnum as SqlTranslatable>::SCHEMA_KEY,
         pgrx::pgrx_resolved_type!(DerivedSchemaKeyEnum)
+    );
+}
+
+#[test]
+fn skipped_virtual_types_stay_skipped() {
+    assert_eq!(<&'static MemCx<'static> as SqlTranslatable>::ARGUMENT_SQL, Ok(SqlMappingRef::Skip));
+    assert_eq!(
+        <FunctionCallInfoBaseData as SqlTranslatable>::ARGUMENT_SQL,
+        Ok(SqlMappingRef::Skip)
+    );
+    assert_eq!(
+        <*mut FunctionCallInfoBaseData as SqlTranslatable>::ARGUMENT_SQL,
+        Ok(SqlMappingRef::Skip)
     );
 }

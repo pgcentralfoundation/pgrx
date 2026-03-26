@@ -13,8 +13,8 @@ use crate::aggregate::{FinalizeModify, ParallelOption};
 use crate::extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntity, SqlDeclaredEntityData};
 use crate::extern_args::ExternArgs;
 use crate::metadata::{
-    ArgumentError, FunctionMetadataTypeEntity, Returns, ReturnsError, ReturnsRef, SqlMapping,
-    SqlMappingRef, TypeOrigin,
+    ArgumentError, FunctionMetadataTypeEntity, Returns, ReturnsError, ReturnsRef, SqlArrayMapping,
+    SqlArrayMappingRef, SqlMapping, SqlMappingRef, TypeOrigin,
 };
 use crate::pg_extern::entity::{
     PgCastEntity, PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity,
@@ -65,10 +65,11 @@ pub const RETURNS_TABLE: u8 = 3;
 
 pub const ARG_ERROR_SET_OF: u8 = 1;
 pub const ARG_ERROR_TABLE: u8 = 2;
-pub const ARG_ERROR_BARE_U8: u8 = 3;
-pub const ARG_ERROR_SKIP_IN_ARRAY: u8 = 4;
-pub const ARG_ERROR_DATUM: u8 = 5;
-pub const ARG_ERROR_NOT_VALID: u8 = 6;
+pub const ARG_ERROR_NESTED_ARRAY: u8 = 3;
+pub const ARG_ERROR_BARE_U8: u8 = 4;
+pub const ARG_ERROR_SKIP_IN_ARRAY: u8 = 5;
+pub const ARG_ERROR_DATUM: u8 = 6;
+pub const ARG_ERROR_NOT_VALID: u8 = 7;
 pub const RESULT_OK: u8 = 1;
 pub const RESULT_ERR: u8 = 2;
 
@@ -77,13 +78,14 @@ pub const TYPE_ORIGIN_EXTERNAL: u8 = 2;
 
 pub const RETURNS_ERROR_NESTED_SET_OF: u8 = 1;
 pub const RETURNS_ERROR_NESTED_TABLE: u8 = 2;
-pub const RETURNS_ERROR_SET_OF_CONTAINING_TABLE: u8 = 3;
-pub const RETURNS_ERROR_TABLE_CONTAINING_SET_OF: u8 = 4;
-pub const RETURNS_ERROR_SET_OF_IN_ARRAY: u8 = 5;
-pub const RETURNS_ERROR_TABLE_IN_ARRAY: u8 = 6;
-pub const RETURNS_ERROR_BARE_U8: u8 = 7;
-pub const RETURNS_ERROR_SKIP_IN_ARRAY: u8 = 8;
-pub const RETURNS_ERROR_DATUM: u8 = 9;
+pub const RETURNS_ERROR_NESTED_ARRAY: u8 = 3;
+pub const RETURNS_ERROR_SET_OF_CONTAINING_TABLE: u8 = 4;
+pub const RETURNS_ERROR_TABLE_CONTAINING_SET_OF: u8 = 5;
+pub const RETURNS_ERROR_SET_OF_IN_ARRAY: u8 = 6;
+pub const RETURNS_ERROR_TABLE_IN_ARRAY: u8 = 7;
+pub const RETURNS_ERROR_BARE_U8: u8 = 8;
+pub const RETURNS_ERROR_SKIP_IN_ARRAY: u8 = 9;
+pub const RETURNS_ERROR_DATUM: u8 = 10;
 
 pub const EXTERN_ARG_CREATE_OR_REPLACE: u8 = 1;
 pub const EXTERN_ARG_IMMUTABLE: u8 = 2;
@@ -177,12 +179,21 @@ pub const fn list_len(items: &[usize]) -> usize {
 
 pub const fn sql_mapping_len(value: SqlMappingRef) -> usize {
     match value {
-        SqlMappingRef::As(sql) | SqlMappingRef::Array(sql) => u8_len() + str_len(sql),
-        SqlMappingRef::Numeric { .. } => {
-            u8_len() + bool_len() + u32_len() + bool_len() + u32_len() + bool_len()
-        }
-        SqlMappingRef::Composite { .. } => u8_len() + bool_len(),
+        SqlMappingRef::As(sql) => u8_len() + str_len(sql),
+        SqlMappingRef::Numeric { .. } => u8_len() + bool_len() + u32_len() + bool_len() + u32_len(),
+        SqlMappingRef::Composite => u8_len(),
+        SqlMappingRef::Array(value) => u8_len() + sql_array_mapping_len(value),
         SqlMappingRef::Skip => u8_len(),
+    }
+}
+
+pub const fn sql_array_mapping_len(value: SqlArrayMappingRef) -> usize {
+    match value {
+        SqlArrayMappingRef::As(sql) => u8_len() + str_len(sql),
+        SqlArrayMappingRef::Numeric { .. } => {
+            u8_len() + bool_len() + u32_len() + bool_len() + u32_len()
+        }
+        SqlArrayMappingRef::Composite => u8_len(),
     }
 }
 
@@ -284,8 +295,7 @@ impl<const N: usize> EntryWriter<N> {
     pub const fn sql_mapping(self, value: SqlMappingRef) -> Self {
         match value {
             SqlMappingRef::As(sql) => self.u8(SQL_MAPPING_AS).str(sql),
-            SqlMappingRef::Array(sql) => self.u8(SQL_MAPPING_ARRAY).str(sql),
-            SqlMappingRef::Numeric { precision, scale, array_brackets } => self
+            SqlMappingRef::Numeric { precision, scale } => self
                 .u8(SQL_MAPPING_NUMERIC)
                 .bool(precision.is_some())
                 .u32(match precision {
@@ -296,12 +306,29 @@ impl<const N: usize> EntryWriter<N> {
                 .u32(match scale {
                     Some(value) => value,
                     None => 0,
-                })
-                .bool(array_brackets),
-            SqlMappingRef::Composite { array_brackets } => {
-                self.u8(SQL_MAPPING_COMPOSITE).bool(array_brackets)
-            }
+                }),
+            SqlMappingRef::Composite => self.u8(SQL_MAPPING_COMPOSITE),
+            SqlMappingRef::Array(value) => self.u8(SQL_MAPPING_ARRAY).sql_array_mapping(value),
             SqlMappingRef::Skip => self.u8(SQL_MAPPING_SKIP),
+        }
+    }
+
+    pub const fn sql_array_mapping(self, value: SqlArrayMappingRef) -> Self {
+        match value {
+            SqlArrayMappingRef::As(sql) => self.u8(SQL_MAPPING_AS).str(sql),
+            SqlArrayMappingRef::Numeric { precision, scale } => self
+                .u8(SQL_MAPPING_NUMERIC)
+                .bool(precision.is_some())
+                .u32(match precision {
+                    Some(value) => value,
+                    None => 0,
+                })
+                .bool(scale.is_some())
+                .u32(match scale {
+                    Some(value) => value,
+                    None => 0,
+                }),
+            SqlArrayMappingRef::Composite => self.u8(SQL_MAPPING_COMPOSITE),
         }
     }
 
@@ -325,6 +352,7 @@ impl<const N: usize> EntryWriter<N> {
         match value {
             ArgumentError::SetOf => self.u8(ARG_ERROR_SET_OF),
             ArgumentError::Table => self.u8(ARG_ERROR_TABLE),
+            ArgumentError::NestedArray => self.u8(ARG_ERROR_NESTED_ARRAY),
             ArgumentError::BareU8 => self.u8(ARG_ERROR_BARE_U8),
             ArgumentError::SkipInArray => self.u8(ARG_ERROR_SKIP_IN_ARRAY),
             ArgumentError::Datum => self.u8(ARG_ERROR_DATUM),
@@ -343,6 +371,7 @@ impl<const N: usize> EntryWriter<N> {
         match value {
             ReturnsError::NestedSetOf => self.u8(RETURNS_ERROR_NESTED_SET_OF),
             ReturnsError::NestedTable => self.u8(RETURNS_ERROR_NESTED_TABLE),
+            ReturnsError::NestedArray => self.u8(RETURNS_ERROR_NESTED_ARRAY),
             ReturnsError::SetOfContainingTable => self.u8(RETURNS_ERROR_SET_OF_CONTAINING_TABLE),
             ReturnsError::TableContainingSetOf => self.u8(RETURNS_ERROR_TABLE_CONTAINING_SET_OF),
             ReturnsError::SetOfInArray => self.u8(RETURNS_ERROR_SET_OF_IN_ARRAY),
@@ -454,31 +483,38 @@ impl<'a> EntryReader<'a> {
     pub fn read_sql_mapping_owned(&mut self) -> Result<SqlMapping> {
         match self.read_u8()? {
             SQL_MAPPING_AS => Ok(SqlMapping::As(self.read_string()?)),
-            SQL_MAPPING_ARRAY => {
-                let s = self.read_string()?;
-                Ok(SqlMapping::As(format!("{}[]", s)))
-            }
+            SQL_MAPPING_ARRAY => Ok(SqlMapping::Array(self.read_sql_array_mapping_owned()?)),
             SQL_MAPPING_NUMERIC => {
                 let has_precision = self.read_bool()?;
                 let precision = self.read_u32()?;
                 let has_scale = self.read_bool()?;
                 let scale = self.read_u32()?;
-                let array_brackets = self.read_bool()?;
-                let mut sql = match (has_precision.then_some(precision), has_scale.then_some(scale)) {
-                    (None, _) => "NUMERIC".to_string(),
-                    (Some(p), None) => format!("NUMERIC({p})"),
-                    (Some(p), Some(s)) => format!("NUMERIC({p}, {s})"),
-                };
-                if array_brackets {
-                    sql.push_str("[]");
-                }
-                Ok(SqlMapping::As(sql))
+                Ok(SqlMapping::As(crate::metadata::numeric_sql_string(
+                    has_precision.then_some(precision),
+                    has_scale.then_some(scale),
+                )))
             }
-            SQL_MAPPING_COMPOSITE => {
-                Ok(SqlMapping::Composite { array_brackets: self.read_bool()? })
-            }
+            SQL_MAPPING_COMPOSITE => Ok(SqlMapping::Composite),
             SQL_MAPPING_SKIP => Ok(SqlMapping::Skip),
             other => Err(eyre!("invalid sql mapping tag in schema entry: {other}")),
+        }
+    }
+
+    pub fn read_sql_array_mapping_owned(&mut self) -> Result<SqlArrayMapping> {
+        match self.read_u8()? {
+            SQL_MAPPING_AS => Ok(SqlArrayMapping::As(self.read_string()?)),
+            SQL_MAPPING_NUMERIC => {
+                let has_precision = self.read_bool()?;
+                let precision = self.read_u32()?;
+                let has_scale = self.read_bool()?;
+                let scale = self.read_u32()?;
+                Ok(SqlArrayMapping::As(crate::metadata::numeric_sql_string(
+                    has_precision.then_some(precision),
+                    has_scale.then_some(scale),
+                )))
+            }
+            SQL_MAPPING_COMPOSITE => Ok(SqlArrayMapping::Composite),
+            other => Err(eyre!("invalid sql array mapping tag in schema entry: {other}")),
         }
     }
 
@@ -518,13 +554,16 @@ impl<'a> EntryReader<'a> {
         match self.read_u8()? {
             ARG_ERROR_SET_OF => Ok(ArgumentError::SetOf),
             ARG_ERROR_TABLE => Ok(ArgumentError::Table),
+            ARG_ERROR_NESTED_ARRAY => Ok(ArgumentError::NestedArray),
             ARG_ERROR_BARE_U8 => Ok(ArgumentError::BareU8),
             ARG_ERROR_SKIP_IN_ARRAY => Ok(ArgumentError::SkipInArray),
             ARG_ERROR_DATUM => Ok(ArgumentError::Datum),
             ARG_ERROR_NOT_VALID => {
                 // ArgumentError::NotValidAsArgument requires &'static str for const compatibility.
                 // This is the one remaining leak — a tiny string for a rare error variant.
-                Ok(ArgumentError::NotValidAsArgument(Box::leak(self.read_string()?.into_boxed_str())))
+                Ok(ArgumentError::NotValidAsArgument(Box::leak(
+                    self.read_string()?.into_boxed_str(),
+                )))
             }
             other => Err(eyre!("invalid argument error tag in schema entry: {other}")),
         }
@@ -534,6 +573,7 @@ impl<'a> EntryReader<'a> {
         match self.read_u8()? {
             RETURNS_ERROR_NESTED_SET_OF => Ok(ReturnsError::NestedSetOf),
             RETURNS_ERROR_NESTED_TABLE => Ok(ReturnsError::NestedTable),
+            RETURNS_ERROR_NESTED_ARRAY => Ok(ReturnsError::NestedArray),
             RETURNS_ERROR_SET_OF_CONTAINING_TABLE => Ok(ReturnsError::SetOfContainingTable),
             RETURNS_ERROR_TABLE_CONTAINING_SET_OF => Ok(ReturnsError::TableContainingSetOf),
             RETURNS_ERROR_SET_OF_IN_ARRAY => Ok(ReturnsError::SetOfInArray),
@@ -589,10 +629,7 @@ impl<'a> EntryReader<'a> {
     }
 
     pub fn read_pg_extern_argument(&mut self) -> Result<PgExternArgumentEntity<'a>> {
-        Ok(PgExternArgumentEntity {
-            pattern: self.read_str()?,
-            used_ty: self.read_used_type()?,
-        })
+        Ok(PgExternArgumentEntity { pattern: self.read_str()?, used_ty: self.read_used_type()? })
     }
 
     pub fn read_pg_extern_return(&mut self) -> Result<PgExternReturnEntity<'a>> {
@@ -720,10 +757,7 @@ impl<'a> EntryReader<'a> {
     }
 
     pub fn read_aggregate_type(&mut self) -> Result<AggregateTypeEntity<'a>> {
-        Ok(AggregateTypeEntity {
-            name: self.read_option_str()?,
-            used_ty: self.read_used_type()?,
-        })
+        Ok(AggregateTypeEntity { name: self.read_option_str()?, used_ty: self.read_used_type()? })
     }
 
     pub fn read_aggregate_type_list(&mut self) -> Result<Vec<AggregateTypeEntity<'a>>> {
@@ -1105,11 +1139,99 @@ mod tests {
 
         assert_eq!(metadata.schema_key, SCHEMA_KEY);
         assert_eq!(metadata.type_origin, TypeOrigin::External);
-        assert_eq!(metadata.argument_sql, Ok(crate::metadata::SqlMapping::literal(SQL)));
+        assert_eq!(metadata.argument_sql, Ok(SqlMapping::literal(SQL)));
+        assert_eq!(metadata.return_sql, Ok(Returns::One(SqlMapping::literal(SQL))));
+        assert!(reader.is_empty());
+    }
+
+    #[test]
+    fn round_trip_function_metadata_type_preserves_array_mappings() {
+        const SCHEMA_KEY: &str = "tests::FancyNumeric";
+        const PAYLOAD_LEN: usize = str_len(SCHEMA_KEY)
+            + u8_len()
+            + argument_sql_len(Ok(SqlMappingRef::Array(SqlArrayMappingRef::As("INT"))))
+            + return_sql_len(Ok(ReturnsRef::One(SqlMappingRef::Array(
+                SqlArrayMappingRef::Numeric { precision: Some(10), scale: Some(2) },
+            ))));
+        const TOTAL_LEN: usize = u32_len() + PAYLOAD_LEN;
+        const ENTRY: [u8; TOTAL_LEN] = EntryWriter::<TOTAL_LEN>::new()
+            .u32(PAYLOAD_LEN as u32)
+            .str(SCHEMA_KEY)
+            .u8(TYPE_ORIGIN_EXTERNAL)
+            .argument_sql(Ok(SqlMappingRef::Array(SqlArrayMappingRef::As("INT"))))
+            .return_sql(Ok(ReturnsRef::One(SqlMappingRef::Array(SqlArrayMappingRef::Numeric {
+                precision: Some(10),
+                scale: Some(2),
+            }))))
+            .finish();
+
+        let payloads = entry_payloads(&ENTRY).unwrap();
+        let mut reader = EntryReader::new(payloads[0]);
+        let metadata = reader.read_function_metadata_type().unwrap();
+
+        assert_eq!(
+            metadata.argument_sql,
+            Ok(SqlMapping::Array(SqlArrayMapping::As("INT".to_string())))
+        );
         assert_eq!(
             metadata.return_sql,
-            Ok(crate::metadata::Returns::One(crate::metadata::SqlMapping::literal(SQL)))
+            Ok(Returns::One(SqlMapping::Array(SqlArrayMapping::As("NUMERIC(10, 2)".to_string(),))))
         );
+        assert!(reader.is_empty());
+    }
+
+    #[test]
+    fn round_trip_function_metadata_type_preserves_composite_array_mappings() {
+        const SCHEMA_KEY: &str = "tests::FancyComposite";
+        const PAYLOAD_LEN: usize = str_len(SCHEMA_KEY)
+            + u8_len()
+            + argument_sql_len(Ok(SqlMappingRef::Array(SqlArrayMappingRef::Composite)))
+            + return_sql_len(Ok(ReturnsRef::One(SqlMappingRef::Array(
+                SqlArrayMappingRef::Composite,
+            ))));
+        const TOTAL_LEN: usize = u32_len() + PAYLOAD_LEN;
+        const ENTRY: [u8; TOTAL_LEN] = EntryWriter::<TOTAL_LEN>::new()
+            .u32(PAYLOAD_LEN as u32)
+            .str(SCHEMA_KEY)
+            .u8(TYPE_ORIGIN_EXTERNAL)
+            .argument_sql(Ok(SqlMappingRef::Array(SqlArrayMappingRef::Composite)))
+            .return_sql(Ok(ReturnsRef::One(SqlMappingRef::Array(SqlArrayMappingRef::Composite))))
+            .finish();
+
+        let payloads = entry_payloads(&ENTRY).unwrap();
+        let mut reader = EntryReader::new(payloads[0]);
+        let metadata = reader.read_function_metadata_type().unwrap();
+
+        assert_eq!(metadata.argument_sql, Ok(SqlMapping::Array(SqlArrayMapping::Composite)));
+        assert_eq!(
+            metadata.return_sql,
+            Ok(Returns::One(SqlMapping::Array(SqlArrayMapping::Composite)))
+        );
+        assert!(reader.is_empty());
+    }
+
+    #[test]
+    fn round_trip_function_metadata_type_preserves_nested_array_errors() {
+        const SCHEMA_KEY: &str = "tests::NestedArrayError";
+        const PAYLOAD_LEN: usize = str_len(SCHEMA_KEY)
+            + u8_len()
+            + argument_sql_len(Err(ArgumentError::NestedArray))
+            + return_sql_len(Err(ReturnsError::NestedArray));
+        const TOTAL_LEN: usize = u32_len() + PAYLOAD_LEN;
+        const ENTRY: [u8; TOTAL_LEN] = EntryWriter::<TOTAL_LEN>::new()
+            .u32(PAYLOAD_LEN as u32)
+            .str(SCHEMA_KEY)
+            .u8(TYPE_ORIGIN_EXTERNAL)
+            .argument_sql(Err(ArgumentError::NestedArray))
+            .return_sql(Err(ReturnsError::NestedArray))
+            .finish();
+
+        let payloads = entry_payloads(&ENTRY).unwrap();
+        let mut reader = EntryReader::new(payloads[0]);
+        let metadata = reader.read_function_metadata_type().unwrap();
+
+        assert_eq!(metadata.argument_sql, Err(ArgumentError::NestedArray));
+        assert_eq!(metadata.return_sql, Err(ReturnsError::NestedArray));
         assert!(reader.is_empty());
     }
 

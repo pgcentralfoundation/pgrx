@@ -353,6 +353,21 @@ where
     unsafe fn move_into_fcinfo_fcx(self, _fcinfo: pg_sys::FunctionCallInfo) {}
 }
 
+macro_rules! table_return_sql {
+    (@collect [$($items:ident),*] ;) => {
+        Ok(ReturnsRef::Table(&[$($items),*]))
+    };
+    (@collect [$($items:ident),*] ; $head:ident $(, $rest:ident)*) => {{
+        match table_item_sql($head::RETURN_SQL) {
+            Ok(item) => table_return_sql!(@collect [$($items,)* item] ; $($rest),*),
+            Err(err) => Err(err),
+        }
+    }};
+    ($($C:ident),+ $(,)?) => {
+        table_return_sql!(@collect [] ; $($C),+)
+    };
+}
+
 macro_rules! impl_table_iter {
     ($($C:ident),* $(,)?) => {
         #[allow(non_snake_case)]
@@ -362,20 +377,10 @@ macro_rules! impl_table_iter {
         {
             const SCHEMA_KEY: &'static str =
                 crate::pgrx_resolved_type!(TableIterator<'iter, ($($C,)*)>);
+            const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
+                pgrx_sql_entity_graph::metadata::TypeOrigin::ThisExtension;
             const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::Table);
-            const RETURN_SQL: Result<ReturnsRef, ReturnsError> = match ($(table_item_sql($C::RETURN_SQL),)*) {
-                ($(Ok($C),)*) => Ok(ReturnsRef::Table(&[$($C),*])),
-                _ => {
-                    $(
-                        if let Err(err) = table_item_sql($C::RETURN_SQL) {
-                            Err(err)
-                        } else
-                    )*
-                    {
-                        unreachable!()
-                    }
-                }
-            };
+            const RETURN_SQL: Result<ReturnsRef, ReturnsError> = table_return_sql!($($C),*);
         }
 
         #[allow(non_snake_case)]
@@ -511,8 +516,55 @@ impl_table_iter!(
 
 #[cfg(test)]
 mod tests {
-    use super::SetOfIterator;
-    use pgrx_sql_entity_graph::metadata::{ArgumentError, SqlTranslatable};
+    use super::{SetOfIterator, TableIterator};
+    use pgrx_sql_entity_graph::metadata::{
+        ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
+    };
+
+    struct FirstColumn;
+    struct SecondColumn;
+
+    struct ErrorFirstColumn;
+    struct ErrorSecondColumn;
+
+    unsafe impl SqlTranslatable for FirstColumn {
+        const SCHEMA_KEY: &'static str = "tests::FirstColumn";
+        const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
+            pgrx_sql_entity_graph::metadata::TypeOrigin::External;
+        const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+            Ok(SqlMappingRef::literal("INT"));
+        const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+            Ok(ReturnsRef::One(SqlMappingRef::literal("INT")));
+    }
+
+    unsafe impl SqlTranslatable for SecondColumn {
+        const SCHEMA_KEY: &'static str = "tests::SecondColumn";
+        const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
+            pgrx_sql_entity_graph::metadata::TypeOrigin::External;
+        const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+            Ok(SqlMappingRef::literal("TEXT"));
+        const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+            Ok(ReturnsRef::One(SqlMappingRef::literal("TEXT")));
+    }
+
+    unsafe impl SqlTranslatable for ErrorFirstColumn {
+        const SCHEMA_KEY: &'static str = "tests::ErrorFirstColumn";
+        const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
+            pgrx_sql_entity_graph::metadata::TypeOrigin::External;
+        const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+            Ok(SqlMappingRef::literal("INT"));
+        const RETURN_SQL: Result<ReturnsRef, ReturnsError> = Err(ReturnsError::NestedTable);
+    }
+
+    unsafe impl SqlTranslatable for ErrorSecondColumn {
+        const SCHEMA_KEY: &'static str = "tests::ErrorSecondColumn";
+        const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
+            pgrx_sql_entity_graph::metadata::TypeOrigin::External;
+        const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+            Ok(SqlMappingRef::literal("TEXT"));
+        const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+            Err(ReturnsError::TableContainingSetOf);
+    }
 
     #[test]
     fn setof_iterator_is_not_argument_sql() {
@@ -520,5 +572,21 @@ mod tests {
             <SetOfIterator<'static, i32> as SqlTranslatable>::ARGUMENT_SQL,
             Err(ArgumentError::SetOf)
         );
+    }
+
+    #[test]
+    fn table_iterator_maps_multi_column_returns() {
+        type Table = TableIterator<'static, (FirstColumn, SecondColumn)>;
+        const EXPECTED: [SqlMappingRef; 2] =
+            [SqlMappingRef::literal("INT"), SqlMappingRef::literal("TEXT")];
+
+        assert_eq!(<Table as SqlTranslatable>::RETURN_SQL, Ok(ReturnsRef::Table(&EXPECTED)));
+    }
+
+    #[test]
+    fn table_iterator_returns_first_error() {
+        type Table = TableIterator<'static, (ErrorFirstColumn, ErrorSecondColumn)>;
+
+        assert_eq!(<Table as SqlTranslatable>::RETURN_SQL, Err(ReturnsError::NestedTable));
     }
 }

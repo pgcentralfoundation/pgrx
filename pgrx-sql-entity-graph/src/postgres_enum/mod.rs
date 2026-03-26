@@ -163,6 +163,8 @@ impl ToEntityGraphTokens for PostgresEnum {
         quote! {
             unsafe impl #staticless_impl_generics ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable for #name #static_ty_generics #static_where_clauses {
                 const SCHEMA_KEY: &'static str = ::pgrx::pgrx_resolved_type!(#name #static_ty_generics);
+                const TYPE_ORIGIN: ::pgrx::pgrx_sql_entity_graph::metadata::TypeOrigin =
+                    ::pgrx::pgrx_sql_entity_graph::metadata::TypeOrigin::ThisExtension;
                 const ARGUMENT_SQL: core::result::Result<
                     ::pgrx::pgrx_sql_entity_graph::metadata::SqlMappingRef,
                     ::pgrx::pgrx_sql_entity_graph::metadata::ArgumentError,

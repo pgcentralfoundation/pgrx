@@ -710,20 +710,22 @@ macro_rules! composite_type {
     };
 }
 
-unsafe impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByPostgres> {
+unsafe impl SqlTranslatable for PgHeapTuple<'static, AllocatedByPostgres> {
     const SCHEMA_KEY: &'static str =
         crate::pgrx_resolved_type!(PgHeapTuple<'static, AllocatedByPostgres>);
-    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
-        Ok(SqlMappingRef::Composite { array_brackets: false });
+    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
+        pgrx_sql_entity_graph::metadata::TypeOrigin::ThisExtension;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::Composite);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
-        Ok(ReturnsRef::One(SqlMappingRef::Composite { array_brackets: false }));
+        Ok(ReturnsRef::One(SqlMappingRef::Composite));
 }
 
-unsafe impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByRust> {
+unsafe impl SqlTranslatable for PgHeapTuple<'static, AllocatedByRust> {
     const SCHEMA_KEY: &'static str =
         crate::pgrx_resolved_type!(PgHeapTuple<'static, AllocatedByRust>);
-    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
-        Ok(SqlMappingRef::Composite { array_brackets: false });
+    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
+        pgrx_sql_entity_graph::metadata::TypeOrigin::ThisExtension;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::Composite);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
-        Ok(ReturnsRef::One(SqlMappingRef::Composite { array_brackets: false }));
+        Ok(ReturnsRef::One(SqlMappingRef::Composite));
 }

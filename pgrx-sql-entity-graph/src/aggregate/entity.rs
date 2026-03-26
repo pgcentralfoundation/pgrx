@@ -18,7 +18,7 @@
 */
 use crate::aggregate::options::{FinalizeModify, ParallelOption};
 use crate::fmt;
-use crate::metadata::SqlMapping;
+use crate::metadata::{SqlArrayMapping, SqlMapping};
 use crate::pgrx_sql::PgrxSql;
 use crate::to_sql::ToSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
@@ -167,6 +167,23 @@ impl SqlGraphIdentifier for PgAggregateEntity<'_> {
     }
 }
 
+fn aggregate_sql_type(mapping: &SqlMapping, composite_type: Option<&str>) -> eyre::Result<String> {
+    match mapping {
+        SqlMapping::As(sql) => Ok(sql.clone()),
+        SqlMapping::Composite => composite_type
+            .map(ToString::to_string)
+            .ok_or_else(|| eyre!("Composite mapping requires composite_type")),
+        SqlMapping::Array(SqlArrayMapping::As(sql)) => Ok(fmt::with_array_brackets(sql.clone(), 1)),
+        SqlMapping::Array(SqlArrayMapping::Composite) => composite_type
+            .map(ToString::to_string)
+            .map(|sql| fmt::with_array_brackets(sql, 1))
+            .ok_or_else(|| eyre!("Composite mapping requires composite_type")),
+        SqlMapping::Skip => {
+            Err(eyre!("Cannot use skipped SQL translatable type as aggregate const type"))
+        }
+    }
+}
+
 impl ToSql for PgAggregateEntity<'_> {
     fn to_sql(&self, context: &PgrxSql) -> eyre::Result<String> {
         let self_index = context.aggregates[self];
@@ -260,30 +277,28 @@ impl ToSql for PgAggregateEntity<'_> {
 
         let map_ty = |used_ty: &UsedTypeEntity| -> eyre::Result<String> {
             match used_ty.metadata.argument_sql {
-                Ok(SqlMapping::As(ref argument_sql)) => Ok(argument_sql.to_string()),
-                Ok(SqlMapping::Composite { array_brackets }) => used_ty
-                    .composite_type
-                    .map(|v| fmt::with_array_brackets(v.into(), array_brackets))
-                    .ok_or_else(|| {
-                        eyre!("Macro expansion time suggested a composite_type!() in return")
-                    }),
-                Ok(SqlMapping::Skip) => {
-                    Err(eyre!("Cannot use skipped SQL translatable type as aggregate const type"))
-                }
+                Ok(ref mapping) => aggregate_sql_type(mapping, used_ty.composite_type),
                 Err(err) => Err(err).wrap_err("While mapping argument"),
             }
         };
 
-        let stype_sql = map_ty(&self.stype.used_ty).wrap_err("Mapping state type")?;
-        let stype_index = context
-            .find_type_dependency(&self_index, &self.stype.used_ty)
-            .ok_or_else(|| eyre!("Could not find STYPE in graph. Got: {:?}", self.stype.used_ty))?;
-        let stype_schema = context.schema_prefix_for(&stype_index);
+        let sql_type_for_slot =
+            |slot: &str, used_ty: &UsedTypeEntity| -> eyre::Result<(String, String)> {
+                let sql = map_ty(used_ty).wrap_err_with(|| format!("Mapping {slot}"))?;
+                if used_ty.has_explicit_composite_sql() {
+                    return Ok((String::new(), sql));
+                }
+                let type_index = context
+                    .find_type_dependency(&self_index, used_ty)
+                    .ok_or_else(|| eyre!("Could not find {slot} in graph. Got: {used_ty:?}"))?;
+                Ok((context.schema_prefix_for(&type_index), sql))
+            };
+        let (stype_schema, stype_sql) = sql_type_for_slot("STYPE", &self.stype.used_ty)?;
 
         if let Some(value) = &self.mstype {
-            let mstype_sql = map_ty(value).wrap_err("Mapping moving state type")?;
+            let (mstype_schema, mstype_sql) = sql_type_for_slot("MSTYPE", value)?;
             optional_attributes.push((
-                format!("\tMSTYPE = {mstype_sql}"),
+                format!("\tMSTYPE = {mstype_schema}{mstype_sql}"),
                 format!("/* {}::MovingState = {} */", self.full_path, value.full_path),
             ));
         }
@@ -303,37 +318,24 @@ impl ToSql for PgAggregateEntity<'_> {
         let args = {
             let mut args = Vec::new();
             for (idx, arg) in self.args.iter().enumerate() {
-                let graph_index =
-                    context.find_type_dependency(&self_index, &arg.used_ty).ok_or_else(|| {
-                        eyre!("Could not find arg type in graph. Got: {:?}", arg.used_ty)
-                    })?;
                 let needs_comma = idx < (self.args.len() - 1);
+                let schema_prefix = if arg.used_ty.has_explicit_composite_sql() {
+                    String::new()
+                } else {
+                    let graph_index =
+                        context.find_type_dependency(&self_index, &arg.used_ty).ok_or_else(
+                            || eyre!("Could not find arg type in graph. Got: {:?}", arg.used_ty),
+                        )?;
+                    context.schema_prefix_for(&graph_index)
+                };
                 let buf = format!(
                     "\
                        \t{name}{variadic}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
                    ",
-                    schema_prefix = context.schema_prefix_for(&graph_index),
+                    schema_prefix = schema_prefix,
                     // The SQL spelling comes from the embedded schema metadata.
                     sql_type = match arg.used_ty.metadata.argument_sql {
-                        Ok(SqlMapping::As(ref argument_sql)) => {
-                            argument_sql.to_string()
-                        }
-                        Ok(SqlMapping::Composite { array_brackets }) => {
-                            arg.used_ty
-                                    .composite_type
-                                    .map(|v| {
-                                        fmt::with_array_brackets(v.into(), array_brackets)
-                                    })
-                                    .ok_or_else(|| {
-                                        eyre!(
-                                        "Macro expansion time suggested a composite_type!() in return"
-                                    )
-                                    })?
-                        }
-                        Ok(SqlMapping::Skip) =>
-                            return Err(eyre!(
-                                "Got a skipped SQL translatable type in aggregate args, this is not permitted"
-                            )),
+                        Ok(ref mapping) => aggregate_sql_type(mapping, arg.used_ty.composite_type)?,
                         Err(err) => return Err(err).wrap_err("While mapping argument"),
                     },
                     variadic = if arg.used_ty.variadic { "VARIADIC " } else { "" },

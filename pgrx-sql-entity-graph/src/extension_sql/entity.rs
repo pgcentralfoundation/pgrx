@@ -167,7 +167,7 @@ impl SqlDeclaredEntity {
     pub fn build_type<T: SqlTranslatable>(variant: &str, name: &str) -> eyre::Result<Self> {
         let sql = match T::argument_sql() {
             Ok(SqlMapping::As(sql)) => sql,
-            Ok(SqlMapping::Composite { .. }) => {
+            Ok(SqlMapping::Composite | SqlMapping::Array(_)) => {
                 return Err(eyre::eyre!(
                     "`creates = [{variant}(...)]` requires a concrete SQL type name"
                 ));

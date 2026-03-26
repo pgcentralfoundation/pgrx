@@ -34,6 +34,7 @@ identity_signature!(schema_key_signature_timetz, TimeWithTimeZone);
 identity_signature!(schema_key_signature_interval, Interval);
 identity_signature!(schema_key_signature_anynumeric, AnyNumeric);
 identity_signature!(schema_key_signature_numeric_10_2, Numeric<10, 2>);
+identity_signature!(schema_key_signature_vec_numeric_10_2, Vec<Numeric<10, 2>>);
 identity_signature!(schema_key_signature_json, Json);
 identity_signature!(schema_key_signature_jsonb, JsonB);
 identity_signature!(schema_key_signature_uuid, Uuid);
@@ -57,6 +58,14 @@ fn schema_key_signature_setof_return() -> SetOfIterator<'static, i32> {
 #[pg_extern]
 fn schema_key_signature_table_return() -> TableIterator<'static, (name!(id, i32),)> {
     TableIterator::once((1,))
+}
+
+#[test]
+fn nested_vec_sql_translatable_metadata_fails_fast() {
+    use pgrx::pgrx_sql_entity_graph::metadata::{ArgumentError, ReturnsError, SqlTranslatable};
+
+    assert_eq!(<Vec<Vec<i32>> as SqlTranslatable>::ARGUMENT_SQL, Err(ArgumentError::NestedArray));
+    assert_eq!(<Vec<Vec<i32>> as SqlTranslatable>::RETURN_SQL, Err(ReturnsError::NestedArray));
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -110,13 +119,10 @@ mod tests {
             "timestamp with time zone",
             "timestamp with time zone",
         ),
-        (
-            "schema_key_signature_timetz",
-            "time with time zone",
-            "time with time zone",
-        ),
+        ("schema_key_signature_timetz", "time with time zone", "time with time zone"),
         ("schema_key_signature_uuid", "uuid", "uuid"),
         ("schema_key_signature_vec_i32", "integer[]", "integer[]"),
+        ("schema_key_signature_vec_numeric_10_2", "numeric[]", "numeric[]"),
     ];
 
     #[pg_test]
@@ -159,10 +165,7 @@ mod tests {
                 } else {
                     format!("value {identity_args}")
                 };
-                (
-                    (*proname).to_string(),
-                    (identity_args, (*result).to_string()),
-                )
+                ((*proname).to_string(), (identity_args, (*result).to_string()))
             })
             .collect::<BTreeMap<_, _>>();
 

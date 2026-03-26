@@ -24,7 +24,7 @@ use syn::parse::{Parse, ParseStream};
 use syn::spanned::Spanned;
 use syn::{GenericArgument, Token};
 
-use super::metadata::FunctionMetadataTypeEntity;
+use super::metadata::{FunctionMetadataTypeEntity, Returns, SqlMapping};
 
 /// A type, optionally with an overriding composite type name
 #[derive(Debug, Clone)]
@@ -390,6 +390,31 @@ impl crate::TypeIdentifiable for UsedTypeEntity<'_> {
     }
     fn ty_name(&self) -> &str {
         self.full_path
+    }
+}
+
+impl UsedTypeEntity<'_> {
+    pub(crate) fn has_explicit_composite_sql(&self) -> bool {
+        self.composite_type.is_some()
+            && matches!(
+                self.metadata.argument_sql,
+                Ok(SqlMapping::Composite
+                    | SqlMapping::Array(crate::metadata::SqlArrayMapping::Composite))
+            )
+            && matches!(
+                self.metadata.return_sql,
+                Ok(Returns::One(
+                    SqlMapping::Composite
+                        | SqlMapping::Array(crate::metadata::SqlArrayMapping::Composite)
+                )) | Ok(Returns::SetOf(
+                    SqlMapping::Composite
+                        | SqlMapping::Array(crate::metadata::SqlArrayMapping::Composite)
+                ))
+            )
+    }
+
+    pub(crate) fn emits_argument_sql(&self) -> bool {
+        !matches!(self.metadata.argument_sql, Ok(SqlMapping::Skip))
     }
 }
 

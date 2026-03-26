@@ -26,7 +26,7 @@ pub use operator::PgOperatorEntity;
 pub use returning::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
 use crate::fmt;
-use crate::metadata::{Returns, SqlMapping};
+use crate::metadata::{Returns, SqlArrayMapping, SqlMapping};
 use crate::pgrx_sql::PgrxSql;
 use crate::to_sql::ToSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
@@ -88,6 +88,30 @@ impl PgExternEntity<'_> {
     }
 }
 
+fn composite_sql_type(composite_type: Option<&str>) -> eyre::Result<String> {
+    composite_type
+        .map(ToString::to_string)
+        .ok_or_else(|| eyre!("Composite mapping requires composite_type"))
+}
+
+fn array_sql_type(mapping: &SqlArrayMapping, composite_type: Option<&str>) -> eyre::Result<String> {
+    Ok(match mapping {
+        SqlArrayMapping::As(sql) => fmt::with_array_brackets(sql.clone(), 1),
+        SqlArrayMapping::Composite => {
+            fmt::with_array_brackets(composite_sql_type(composite_type)?, 1)
+        }
+    })
+}
+
+fn sql_type(mapping: &SqlMapping, composite_type: Option<&str>) -> eyre::Result<String> {
+    match mapping {
+        SqlMapping::As(sql) => Ok(sql.clone()),
+        SqlMapping::Composite => composite_sql_type(composite_type),
+        SqlMapping::Array(value) => array_sql_type(value, composite_type),
+        SqlMapping::Skip => Err(eyre!("Found a skipped SQL type where SQL should be emitted")),
+    }
+}
+
 impl ToSql for PgExternEntity<'_> {
     fn to_sql(&self, context: &PgrxSql) -> eyre::Result<String> {
         let self_index = context.externs[self];
@@ -121,15 +145,16 @@ impl ToSql for PgExternEntity<'_> {
             let sql_args = self
                 .fn_args
                 .iter()
-                .filter(|arg| arg.used_ty.metadata.argument_sql != Ok(SqlMapping::Skip))
+                .filter(|arg| arg.used_ty.emits_argument_sql())
                 .collect::<Vec<_>>();
             for (idx, arg) in sql_args.iter().enumerate() {
-                let graph_index = context
-                    .find_type_dependency(&self_index, &arg.used_ty)
-                    .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
                 let needs_comma = idx < (sql_args.len().saturating_sub(1));
                 match arg.used_ty.metadata.argument_sql {
                     Ok(SqlMapping::As(ref argument_sql)) => {
+                        let graph_index =
+                            context.find_type_dependency(&self_index, &arg.used_ty).ok_or_else(
+                                || eyre!("Could not find arg type in graph. Got: {:?}", arg),
+                            )?;
                         let buf = format!(
                             "\
                                             \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
@@ -149,22 +174,14 @@ impl ToSql for PgExternEntity<'_> {
                         );
                         args.push(buf);
                     }
-                    Ok(SqlMapping::Composite { array_brackets }) => {
-                        let sql = self.fn_args[idx]
-                            .used_ty
-                            .composite_type
-                            .map(|v| fmt::with_array_brackets(v.into(), array_brackets))
-                            .ok_or_else(|| {
-                                eyre!(
-                                    "Macro expansion time suggested a composite_type!() in return"
-                                )
-                            })?;
+                    Ok(ref mapping @ (SqlMapping::Composite | SqlMapping::Array(_))) => {
+                        let sql = sql_type(mapping, arg.used_ty.composite_type)?;
                         let buf = format!(
                             "\
                             \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
                         ",
                             pattern = arg.pattern,
-                            schema_prefix = context.schema_prefix_for(&graph_index),
+                            schema_prefix = "",
                             // The SQL spelling comes from the embedded schema metadata.
                             sql_type = sql,
                             default = if let Some(def) = arg.used_ty.default {
@@ -190,13 +207,15 @@ impl ToSql for PgExternEntity<'_> {
         let returns = match &self.fn_return {
             PgExternReturnEntity::None => String::from("RETURNS void"),
             PgExternReturnEntity::Type { ty } => {
-                let graph_index = context
-                    .find_type_dependency(&self_index, ty)
-                    .ok_or_else(|| eyre!("Could not find return type in graph."))?;
-                let sql_type = match &ty.metadata.return_sql {
-                    Ok(Returns::One(SqlMapping::As(sql))) => sql.clone(),
-                    Ok(Returns::One(SqlMapping::Composite { array_brackets })) => {
-                        fmt::with_array_brackets(ty.composite_type.expect("Composite mapping requires composite_type").into(), *array_brackets)
+                let (schema_prefix, sql_type) = match &ty.metadata.return_sql {
+                    Ok(Returns::One(SqlMapping::As(sql))) => {
+                        let graph_index = context
+                            .find_type_dependency(&self_index, ty)
+                            .ok_or_else(|| eyre!("Could not find return type in graph."))?;
+                        (context.schema_prefix_for(&graph_index), sql.clone())
+                    }
+                    Ok(Returns::One(mapping @ (SqlMapping::Composite | SqlMapping::Array(_)))) => {
+                        (String::new(), sql_type(mapping, ty.composite_type)?)
                     }
                     Ok(other) => {
                         return Err(eyre!(
@@ -207,21 +226,22 @@ impl ToSql for PgExternEntity<'_> {
                 };
                 format!(
                     "RETURNS {schema_prefix}{sql_type} /* {full_path} */",
-                    schema_prefix = context.schema_prefix_for(&graph_index),
                     full_path = ty.full_path
                 )
             }
             PgExternReturnEntity::SetOf { ty, .. } => {
-                let graph_index = context
-                    .find_type_dependency(&self_index, ty)
-                    .ok_or_else(|| eyre!("Could not find return type in graph."))?;
-                let sql_type = match &ty.metadata.return_sql {
+                let (schema_prefix, sql_type) = match &ty.metadata.return_sql {
                     Ok(Returns::One(SqlMapping::As(sql)))
-                    | Ok(Returns::SetOf(SqlMapping::As(sql))) => sql.clone(),
-                    Ok(Returns::One(SqlMapping::Composite { array_brackets }))
-                    | Ok(Returns::SetOf(SqlMapping::Composite { array_brackets })) => {
-                        fmt::with_array_brackets(ty.composite_type.expect("Composite mapping requires composite_type").into(), *array_brackets)
+                    | Ok(Returns::SetOf(SqlMapping::As(sql))) => {
+                        let graph_index = context
+                            .find_type_dependency(&self_index, ty)
+                            .ok_or_else(|| eyre!("Could not find return type in graph."))?;
+                        (context.schema_prefix_for(&graph_index), sql.clone())
                     }
+                    Ok(Returns::One(mapping @ (SqlMapping::Composite | SqlMapping::Array(_))))
+                    | Ok(Returns::SetOf(
+                        mapping @ (SqlMapping::Composite | SqlMapping::Array(_)),
+                    )) => (String::new(), sql_type(mapping, ty.composite_type)?),
                     Ok(other) => {
                         return Err(eyre!(
                             "Got non-scalar mapped/composite return variant SQL in what macro-expansion thought was a setof item, got: {other:?}"
@@ -231,7 +251,6 @@ impl ToSql for PgExternEntity<'_> {
                 };
                 format!(
                     "RETURNS SETOF {schema_prefix}{sql_type} /* {full_path} */",
-                    schema_prefix = context.schema_prefix_for(&graph_index),
                     full_path = ty.full_path
                 )
             }
@@ -245,10 +264,9 @@ impl ToSql for PgExternEntity<'_> {
                     let needs_comma = idx < (table_items.len() - 1);
                     let ty_resolved = match &ty.metadata.return_sql {
                         Ok(Returns::One(SqlMapping::As(sql))) => sql.clone(),
-                        Ok(Returns::One(SqlMapping::Composite { array_brackets })) => {
-                            let composite = ty.composite_type.expect("Composite mapping requires composite_type");
-                            fmt::with_array_brackets(composite.into(), *array_brackets)
-                        }
+                        Ok(Returns::One(
+                            mapping @ (SqlMapping::Composite | SqlMapping::Array(_)),
+                        )) => sql_type(mapping, ty.composite_type)?,
                         Ok(other) => {
                             return Err(eyre!(
                                 "Got non-scalar table return item SQL in what macro-expansion thought was a table, got: {other:?}"
@@ -392,15 +410,8 @@ impl ToSql for PgExternEntity<'_> {
                 })?;
             let left_arg_sql = match left_arg.used_ty.metadata.argument_sql {
                 Ok(SqlMapping::As(ref sql)) => sql.clone(),
-                Ok(SqlMapping::Composite { array_brackets }) => {
-                    if array_brackets {
-                        let composite_type = left_arg.used_ty.composite_type
-                            .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgrx::composite_type!()`"))?;
-                        format!("{composite_type}[]")
-                    } else {
-                        left_arg.used_ty.composite_type
-                            .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgrx::composite_type!()`"))?.to_string()
-                    }
+                Ok(ref mapping @ (SqlMapping::Composite | SqlMapping::Array(_))) => {
+                    sql_type(mapping, left_arg.used_ty.composite_type)?
                 }
                 Ok(SqlMapping::Skip) => {
                     return Err(eyre!(
@@ -423,15 +434,8 @@ impl ToSql for PgExternEntity<'_> {
                 })?;
             let right_arg_sql = match right_arg.used_ty.metadata.argument_sql {
                 Ok(SqlMapping::As(ref sql)) => sql.clone(),
-                Ok(SqlMapping::Composite { array_brackets }) => {
-                    if array_brackets {
-                        let composite_type = right_arg.used_ty.composite_type
-                            .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgrx::composite_type!()`"))?;
-                        format!("{composite_type}[]")
-                    } else {
-                        right_arg.used_ty.composite_type
-                            .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgrx::composite_type!()`"))?.to_string()
-                    }
+                Ok(ref mapping @ (SqlMapping::Composite | SqlMapping::Array(_))) => {
+                    sql_type(mapping, right_arg.used_ty.composite_type)?
                 }
                 Ok(SqlMapping::Skip) => {
                     return Err(eyre!(
@@ -488,15 +492,8 @@ impl ToSql for PgExternEntity<'_> {
             };
             let target_arg_sql = match &target_ty.metadata.return_sql {
                 Ok(Returns::One(SqlMapping::As(sql))) => sql.clone(),
-                Ok(Returns::One(SqlMapping::Composite { array_brackets })) => {
-                    if *array_brackets {
-                        let composite_type = target_ty.composite_type
-                            .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgrx::composite_type!()`"))?;
-                        format!("{composite_type}[]")
-                    } else {
-                        target_ty.composite_type
-                            .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgrx::composite_type!()`"))?.to_string()
-                    }
+                Ok(Returns::One(mapping @ (SqlMapping::Composite | SqlMapping::Array(_)))) => {
+                    sql_type(mapping, target_ty.composite_type)?
                 }
                 Ok(Returns::One(SqlMapping::Skip)) => {
                     return Err(eyre!("Found an skipped SQL type in a cast, this is not valid"));
@@ -519,15 +516,8 @@ impl ToSql for PgExternEntity<'_> {
                 })?;
             let source_arg_sql = match source_arg.used_ty.metadata.argument_sql {
                 Ok(SqlMapping::As(ref sql)) => sql.clone(),
-                Ok(SqlMapping::Composite { array_brackets }) => {
-                    if array_brackets {
-                        let composite_type = source_arg.used_ty.composite_type
-                            .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgrx::composite_type!()`"))?;
-                        format!("{composite_type}[]")
-                    } else {
-                        source_arg.used_ty.composite_type
-                            .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgrx::composite_type!()`"))?.to_string()
-                    }
+                Ok(ref mapping @ (SqlMapping::Composite | SqlMapping::Array(_))) => {
+                    sql_type(mapping, source_arg.used_ty.composite_type)?
                 }
                 Ok(SqlMapping::Skip) => {
                     return Err(eyre!("Found an skipped SQL type in a cast, this is not valid"));

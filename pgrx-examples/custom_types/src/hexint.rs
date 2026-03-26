@@ -62,6 +62,8 @@ impl Display for HexInt {
 
 unsafe impl SqlTranslatable for HexInt {
     const SCHEMA_KEY: &'static str = pgrx::pgrx_resolved_type!(HexInt);
+    const TYPE_ORIGIN: pgrx::pgrx_sql_entity_graph::metadata::TypeOrigin =
+        pgrx::pgrx_sql_entity_graph::metadata::TypeOrigin::ThisExtension;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("hexint"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("hexint")));

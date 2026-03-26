@@ -236,9 +236,7 @@ fn load_section_data(
     std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")
 }
 
-fn decode_section_entities<'a>(
-    lib_so_data: &'a [u8],
-) -> eyre::Result<Vec<SqlGraphEntity<'a>>> {
+fn decode_section_entities<'a>(lib_so_data: &'a [u8]) -> eyre::Result<Vec<SqlGraphEntity<'a>>> {
     let section = schema_section_data(lib_so_data)?.ok_or_else(|| {
         eyre::eyre!(
             "no .pgrx_schema section found; the artifact may have been built with an incompatible pgrx, stripped incorrectly, or selected from the wrong architecture slice",
@@ -332,93 +330,16 @@ fn first_build(
 }
 
 #[cfg(test)]
-fn parse_object(data: &[u8]) -> object::Result<object::File<'_>> {
-    let kind = object::FileKind::parse(data)?;
-
-    match kind {
-        object::FileKind::MachOFat32 => {
-            // FIXME: properly parse the target tuple per https://github.com/pgcentralfoundation/pgrx/issues/2183
-            let arch = std::env::consts::ARCH;
-
-            match slice_arch32(data, arch) {
-                Some(slice) => parse_object(slice),
-                None => {
-                    panic!("Failed to slice architecture '{arch}' from universal binary.")
-                }
-            }
-        }
-        _ => object::File::parse(data),
-    }
-}
-
-#[cfg(test)]
-fn slice_arch32<'a>(data: &'a [u8], arch: &str) -> Option<&'a [u8]> {
-    use object::Architecture;
-    use object::read::macho::{FatArch, MachOFatFile32};
-    let target = match arch {
-        "x86" => Architecture::I386,
-        "x86_64" => Architecture::X86_64,
-        "arm" => Architecture::Arm,
-        "aarch64" => Architecture::Aarch64,
-        "mips" => Architecture::Mips,
-        "powerpc" => Architecture::PowerPc,
-        "powerpc64" => Architecture::PowerPc64,
-        _ => Architecture::Unknown,
-    };
-
-    let candidates = MachOFatFile32::parse(data).ok()?;
-    let architecture = candidates.arches().iter().find(|a| a.architecture() == target)?;
-
-    architecture.data(data).ok()
-}
-
-#[cfg(test)]
 mod tests {
-    use crate::command::schema::*;
-    use pgrx_pg_config::{PgConfigSelector, Pgrx};
-    use std::path::Path;
-
-    #[test]
-    fn test_parse_managed_postmasters() {
-        let pgrx = Pgrx::from_config().unwrap();
-        let mut results = pgrx
-            .iter(PgConfigSelector::All)
-            .map(|pg_config| {
-                let fixture_path = pg_config.unwrap().postmaster_path().unwrap();
-                let bin = std::fs::read(fixture_path).unwrap();
-
-                parse_object(&bin).is_ok()
-            })
-            .peekable();
-
-        assert!(results.peek().is_some());
-        assert!(results.all(|r| r));
-    }
-
-    #[test]
-    fn test_parse_universal_binary_slice() {
-        let root_path = env!("CARGO_MANIFEST_DIR");
-        let fixture_path = format!("{root_path}/tests/fixtures/macos-universal-binary");
-        let bin = std::fs::read(fixture_path).unwrap();
-
-        let slice = slice_arch32(&bin, "aarch64")
-            .expect("Failed to slice architecture 'aarch64' from universal binary.");
-        assert!(parse_object(slice).is_ok());
-    }
-
-    #[test]
-    fn test_slice_unknown_architecture() {
-        let root_path = env!("CARGO_MANIFEST_DIR");
-        let fixture_path = format!("{root_path}/tests/fixtures/macos-universal-binary");
-        let bin = std::fs::read(fixture_path).unwrap();
-
-        assert!(slice_arch32(&bin, "foo").is_none());
-    }
+    use super::decode_section_entities;
 
     #[test]
     fn test_missing_schema_section_errors() {
-        let error =
-            decode_section_entities(Path::new("broken.so"), None).expect_err("missing section");
+        let root_path = env!("CARGO_MANIFEST_DIR");
+        let fixture_path = format!("{root_path}/tests/fixtures/macos-universal-binary");
+        let bin = std::fs::read(fixture_path).unwrap();
+
+        let error = decode_section_entities(&bin).expect_err("missing section");
         assert!(error.to_string().contains("no .pgrx_schema section found"));
     }
 }

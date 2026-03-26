@@ -244,6 +244,46 @@ fn slice_arch64<'a>(data: &'a [u8], arch: object::Architecture) -> Option<&'a [u
 #[cfg(test)]
 mod tests {
     use super::schema_section_data;
+    use object::read::macho::{FatArch, MachOFatFile32};
+    use pgrx_pg_config::{PgConfigSelector, Pgrx};
+
+    fn parse_object(data: &[u8]) -> object::Result<object::File<'_>> {
+        let kind = object::FileKind::parse(data)?;
+
+        match kind {
+            object::FileKind::MachOFat32 => {
+                let arch = std::env::consts::ARCH;
+
+                match slice_arch32(data, arch) {
+                    Some(slice) => parse_object(slice),
+                    None => {
+                        panic!("Failed to slice architecture '{arch}' from universal binary.")
+                    }
+                }
+            }
+            _ => object::File::parse(data),
+        }
+    }
+
+    fn slice_arch32<'a>(data: &'a [u8], arch: &str) -> Option<&'a [u8]> {
+        use object::Architecture;
+
+        let target = match arch {
+            "x86" => Architecture::I386,
+            "x86_64" => Architecture::X86_64,
+            "arm" => Architecture::Arm,
+            "aarch64" => Architecture::Aarch64,
+            "mips" => Architecture::Mips,
+            "powerpc" => Architecture::PowerPc,
+            "powerpc64" => Architecture::PowerPc64,
+            _ => Architecture::Unknown,
+        };
+
+        let candidates = MachOFatFile32::parse(data).ok()?;
+        let architecture = candidates.arches().iter().find(|a| a.architecture() == target)?;
+
+        architecture.data(data).ok()
+    }
 
     fn minimal_macho64(payload: &[u8]) -> Vec<u8> {
         const HEADER_LEN: usize = 32;
@@ -297,5 +337,51 @@ mod tests {
         let bytes = minimal_macho64(PAYLOAD);
 
         assert_eq!(schema_section_data(&bytes).unwrap(), Some(PAYLOAD));
+    }
+
+    #[test]
+    fn returns_none_for_valid_binary_without_schema_section() {
+        let root_path = env!("CARGO_MANIFEST_DIR");
+        let fixture_path = format!("{root_path}/tests/fixtures/macos-universal-binary");
+        let bin = std::fs::read(fixture_path).unwrap();
+
+        assert!(schema_section_data(&bin).unwrap().is_none());
+    }
+
+    #[test]
+    fn parses_managed_postmasters() {
+        let pgrx = Pgrx::from_config().unwrap();
+        let mut results = pgrx
+            .iter(PgConfigSelector::All)
+            .map(|pg_config| {
+                let fixture_path = pg_config.unwrap().postmaster_path().unwrap();
+                let bin = std::fs::read(fixture_path).unwrap();
+
+                parse_object(&bin).is_ok()
+            })
+            .peekable();
+
+        assert!(results.peek().is_some());
+        assert!(results.all(|r| r));
+    }
+
+    #[test]
+    fn parses_universal_binary_slice() {
+        let root_path = env!("CARGO_MANIFEST_DIR");
+        let fixture_path = format!("{root_path}/tests/fixtures/macos-universal-binary");
+        let bin = std::fs::read(fixture_path).unwrap();
+
+        let slice = slice_arch32(&bin, "aarch64")
+            .expect("Failed to slice architecture 'aarch64' from universal binary.");
+        assert!(parse_object(slice).is_ok());
+    }
+
+    #[test]
+    fn slice_unknown_architecture_returns_none() {
+        let root_path = env!("CARGO_MANIFEST_DIR");
+        let fixture_path = format!("{root_path}/tests/fixtures/macos-universal-binary");
+        let bin = std::fs::read(fixture_path).unwrap();
+
+        assert!(slice_arch32(&bin, "foo").is_none());
     }
 }

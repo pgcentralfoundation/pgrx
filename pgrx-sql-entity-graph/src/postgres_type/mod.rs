@@ -241,6 +241,8 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
         quote! {
             unsafe impl #impl_generics ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable for #name #ty_generics #where_clauses {
                 const SCHEMA_KEY: &'static str = #schema_key;
+                const TYPE_ORIGIN: ::pgrx::pgrx_sql_entity_graph::metadata::TypeOrigin =
+                    ::pgrx::pgrx_sql_entity_graph::metadata::TypeOrigin::ThisExtension;
                 const ARGUMENT_SQL: core::result::Result<
                     ::pgrx::pgrx_sql_entity_graph::metadata::SqlMappingRef,
                     ::pgrx::pgrx_sql_entity_graph::metadata::ArgumentError,

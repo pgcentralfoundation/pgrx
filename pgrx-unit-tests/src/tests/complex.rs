@@ -1,7 +1,7 @@
 //! Type used by various tests.
 use core::ffi::CStr;
 use pgrx::pgrx_sql_entity_graph::metadata::{
-    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
+    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable, TypeOrigin,
 };
 use pgrx::prelude::*;
 use pgrx::stringinfo::StringInfo;
@@ -44,6 +44,7 @@ extension_sql!(
 
 unsafe impl SqlTranslatable for Complex {
     const SCHEMA_KEY: &'static str = COMPLEX_SCHEMA_KEY;
+    const TYPE_ORIGIN: TypeOrigin = TypeOrigin::ThisExtension;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("Complex"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =

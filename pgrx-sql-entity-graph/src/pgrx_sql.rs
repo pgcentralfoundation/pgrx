@@ -504,7 +504,8 @@ fn initialize_extension_sqls<'a>(
     graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     root: NodeIndex,
     extension_sqls: Vec<ExtensionSqlEntity<'a>>,
-) -> eyre::Result<(HashMap<ExtensionSqlEntity<'a>, NodeIndex>, Option<NodeIndex>, Option<NodeIndex>)> {
+) -> eyre::Result<(HashMap<ExtensionSqlEntity<'a>, NodeIndex>, Option<NodeIndex>, Option<NodeIndex>)>
+{
     let mut bootstrap = None;
     let mut finalize = None;
     let mut mapped_extension_sqls = HashMap::default();
@@ -817,6 +818,9 @@ fn initialize_externs<'a>(
         build_base_edges(graph, index, root, bootstrap, finalize);
 
         for arg in &item.fn_args {
+            if !arg.used_ty.emits_argument_sql() || arg.used_ty.has_explicit_composite_sql() {
+                continue;
+            }
             let slot = format!("argument `{}`", arg.pattern);
             initialize_resolved_type(
                 graph,
@@ -836,22 +840,27 @@ fn initialize_externs<'a>(
         match &item.fn_return {
             PgExternReturnEntity::None | PgExternReturnEntity::Trigger => (),
             PgExternReturnEntity::Type { ty, .. } | PgExternReturnEntity::SetOf { ty, .. } => {
-                initialize_resolved_type(
-                    graph,
-                    &mut mapped_builtin_types,
-                    ty.metadata.schema_key,
-                    ty.metadata.type_origin,
-                    mapped_types,
-                    mapped_enums,
-                    mapped_extension_sqls,
-                    "Function",
-                    item.full_path,
-                    "return type",
-                    ty.full_path,
-                )?;
+                if !ty.has_explicit_composite_sql() {
+                    initialize_resolved_type(
+                        graph,
+                        &mut mapped_builtin_types,
+                        ty.metadata.schema_key,
+                        ty.metadata.type_origin,
+                        mapped_types,
+                        mapped_enums,
+                        mapped_extension_sqls,
+                        "Function",
+                        item.full_path,
+                        "return type",
+                        ty.full_path,
+                    )?;
+                }
             }
             PgExternReturnEntity::Iterated { tys: iterated_returns, .. } => {
                 for PgExternReturnEntityIteratedItem { ty, .. } in iterated_returns {
+                    if ty.has_explicit_composite_sql() {
+                        continue;
+                    }
                     initialize_resolved_type(
                         graph,
                         &mut mapped_builtin_types,
@@ -955,6 +964,9 @@ fn connect_externs<'a>(
         }
 
         for arg in &item.fn_args {
+            if !arg.used_ty.emits_argument_sql() || arg.used_ty.has_explicit_composite_sql() {
+                continue;
+            }
             let slot = format!("argument `{}`", arg.pattern);
             connect_resolved_type(
                 graph,
@@ -976,24 +988,29 @@ fn connect_externs<'a>(
         match &item.fn_return {
             PgExternReturnEntity::None | PgExternReturnEntity::Trigger => (),
             PgExternReturnEntity::Type { ty, .. } | PgExternReturnEntity::SetOf { ty, .. } => {
-                connect_resolved_type(
-                    graph,
-                    index,
-                    SqlGraphRequires::ByReturn,
-                    ty.metadata.schema_key,
-                    ty.metadata.type_origin,
-                    types,
-                    enums,
-                    builtin_types,
-                    extension_sqls,
-                    "Function",
-                    item.full_path,
-                    "return type",
-                    ty.full_path,
-                )?;
+                if !ty.has_explicit_composite_sql() {
+                    connect_resolved_type(
+                        graph,
+                        index,
+                        SqlGraphRequires::ByReturn,
+                        ty.metadata.schema_key,
+                        ty.metadata.type_origin,
+                        types,
+                        enums,
+                        builtin_types,
+                        extension_sqls,
+                        "Function",
+                        item.full_path,
+                        "return type",
+                        ty.full_path,
+                    )?;
+                }
             }
             PgExternReturnEntity::Iterated { tys: iterated_returns, .. } => {
                 for PgExternReturnEntityIteratedItem { ty, .. } in iterated_returns {
+                    if ty.has_explicit_composite_sql() {
+                        continue;
+                    }
                     connect_resolved_type(
                         graph,
                         index,
@@ -1144,6 +1161,9 @@ fn initialize_aggregates<'a>(
         let index = graph.add_node(entity);
 
         for arg in &item.args {
+            if arg.used_ty.has_explicit_composite_sql() {
+                continue;
+            }
             let slot = aggregate_slot(arg.name, "argument");
             initialize_resolved_type(
                 graph,
@@ -1161,6 +1181,9 @@ fn initialize_aggregates<'a>(
         }
 
         for arg in item.direct_args.as_ref().unwrap_or(&vec![]) {
+            if arg.used_ty.has_explicit_composite_sql() {
+                continue;
+            }
             let slot = aggregate_slot(arg.name, "direct argument");
             initialize_resolved_type(
                 graph,
@@ -1177,34 +1200,38 @@ fn initialize_aggregates<'a>(
             )?;
         }
 
-        initialize_resolved_type(
-            graph,
-            mapped_builtin_types,
-            item.stype.used_ty.metadata.schema_key,
-            item.stype.used_ty.metadata.type_origin,
-            mapped_types,
-            mapped_enums,
-            mapped_extension_sqls,
-            "Aggregate",
-            item.full_path,
-            "STYPE",
-            item.stype.used_ty.full_path,
-        )?;
-
-        if let Some(arg) = &item.mstype {
+        if !item.stype.used_ty.has_explicit_composite_sql() {
             initialize_resolved_type(
                 graph,
                 mapped_builtin_types,
-                arg.metadata.schema_key,
-                arg.metadata.type_origin,
+                item.stype.used_ty.metadata.schema_key,
+                item.stype.used_ty.metadata.type_origin,
                 mapped_types,
                 mapped_enums,
                 mapped_extension_sqls,
                 "Aggregate",
                 item.full_path,
-                "MSTYPE",
-                arg.full_path,
+                "STYPE",
+                item.stype.used_ty.full_path,
             )?;
+        }
+
+        if let Some(arg) = &item.mstype {
+            if !arg.has_explicit_composite_sql() {
+                initialize_resolved_type(
+                    graph,
+                    mapped_builtin_types,
+                    arg.metadata.schema_key,
+                    arg.metadata.type_origin,
+                    mapped_types,
+                    mapped_enums,
+                    mapped_extension_sqls,
+                    "Aggregate",
+                    item.full_path,
+                    "MSTYPE",
+                    arg.full_path,
+                )?;
+            }
         }
 
         mapped_aggregates.insert(item, index);
@@ -1234,6 +1261,9 @@ fn connect_aggregate<'a>(
     );
 
     for arg in &item.args {
+        if arg.used_ty.has_explicit_composite_sql() {
+            continue;
+        }
         let slot = aggregate_slot(arg.name, "argument");
         connect_resolved_type(
             graph,
@@ -1253,6 +1283,9 @@ fn connect_aggregate<'a>(
     }
 
     for arg in item.direct_args.as_ref().unwrap_or(&vec![]) {
+        if arg.used_ty.has_explicit_composite_sql() {
+            continue;
+        }
         let slot = aggregate_slot(arg.name, "direct argument");
         connect_resolved_type(
             graph,
@@ -1272,38 +1305,42 @@ fn connect_aggregate<'a>(
     }
 
     if let Some(arg) = &item.mstype {
+        if !arg.has_explicit_composite_sql() {
+            connect_resolved_type(
+                graph,
+                index,
+                SqlGraphRequires::ByArg,
+                arg.metadata.schema_key,
+                arg.metadata.type_origin,
+                types,
+                enums,
+                builtin_types,
+                extension_sqls,
+                "Aggregate",
+                item.full_path,
+                "MSTYPE",
+                arg.full_path,
+            )?;
+        }
+    }
+
+    if !item.stype.used_ty.has_explicit_composite_sql() {
         connect_resolved_type(
             graph,
             index,
             SqlGraphRequires::ByArg,
-            arg.metadata.schema_key,
-            arg.metadata.type_origin,
+            item.stype.used_ty.metadata.schema_key,
+            item.stype.used_ty.metadata.type_origin,
             types,
             enums,
             builtin_types,
             extension_sqls,
             "Aggregate",
             item.full_path,
-            "MSTYPE",
-            arg.full_path,
+            "STYPE",
+            item.stype.used_ty.full_path,
         )?;
     }
-
-    connect_resolved_type(
-        graph,
-        index,
-        SqlGraphRequires::ByArg,
-        item.stype.used_ty.metadata.schema_key,
-        item.stype.used_ty.metadata.type_origin,
-        types,
-        enums,
-        builtin_types,
-        extension_sqls,
-        "Aggregate",
-        item.full_path,
-        "STYPE",
-        item.stype.used_ty.full_path,
-    )?;
 
     make_extern_connection(
         graph,
@@ -1677,7 +1714,7 @@ mod tests {
     use crate::UsedTypeEntity;
     use crate::aggregate::entity::{AggregateTypeEntity, PgAggregateEntity};
     use crate::extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntityData};
-    use crate::metadata::{FunctionMetadataTypeEntity, Returns, SqlMapping};
+    use crate::metadata::{FunctionMetadataTypeEntity, Returns, SqlArrayMapping, SqlMapping};
     use crate::pg_extern::entity::{PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity};
     use crate::postgres_type::entity::PostgresTypeEntity;
     use crate::schema::entity::SchemaEntity;
@@ -1875,6 +1912,57 @@ mod tests {
         assert!(sql.builtin_types.contains_key("tests::ManualText"));
     }
 
+    fn skipped_type(full_path: &'static str, schema_key: &'static str) -> UsedTypeEntity<'static> {
+        UsedTypeEntity {
+            ty_source: full_path,
+            full_path,
+            composite_type: None,
+            variadic: false,
+            default: None,
+            optional: false,
+            metadata: FunctionMetadataTypeEntity {
+                schema_key,
+                type_origin: TypeOrigin::ThisExtension,
+                argument_sql: Ok(SqlMapping::Skip),
+                return_sql: Ok(Returns::One(SqlMapping::Skip)),
+            },
+        }
+    }
+
+    fn explicit_composite_type(name: &'static str) -> UsedTypeEntity<'static> {
+        UsedTypeEntity {
+            ty_source: "pgrx::heap_tuple::PgHeapTuple<'static, AllocatedByRust>",
+            full_path: "pgrx::heap_tuple::PgHeapTuple<'static, AllocatedByRust>",
+            composite_type: Some(name),
+            variadic: false,
+            default: None,
+            optional: false,
+            metadata: FunctionMetadataTypeEntity {
+                schema_key: "pgrx::heap_tuple::PgHeapTuple<'static, AllocatedByRust>",
+                type_origin: TypeOrigin::ThisExtension,
+                argument_sql: Ok(SqlMapping::Composite),
+                return_sql: Ok(Returns::One(SqlMapping::Composite)),
+            },
+        }
+    }
+
+    fn explicit_composite_array_type(name: &'static str) -> UsedTypeEntity<'static> {
+        UsedTypeEntity {
+            ty_source: "pgrx::heap_tuple::PgHeapTuple<'static, AllocatedByRust>",
+            full_path: "pgrx::heap_tuple::PgHeapTuple<'static, AllocatedByRust>",
+            composite_type: Some(name),
+            variadic: false,
+            default: None,
+            optional: false,
+            metadata: FunctionMetadataTypeEntity {
+                schema_key: "pgrx::heap_tuple::PgHeapTuple<'static, AllocatedByRust>",
+                type_origin: TypeOrigin::ThisExtension,
+                argument_sql: Ok(SqlMapping::Array(SqlArrayMapping::Composite)),
+                return_sql: Ok(Returns::One(SqlMapping::Array(SqlArrayMapping::Composite))),
+            },
+        }
+    }
+
     #[test]
     fn extension_sql_declared_type_orders_before_function_and_aggregate() {
         let custom_type = extension_owned_type("tests::HexInt", "tests::HexInt", "hexint");
@@ -1933,7 +2021,8 @@ mod tests {
             "tests::HexInt",
             "hexint",
         );
-        let aggregate = aggregate_entity("hexint_accum", vec![], custom_type, None);
+        let aggregate =
+            aggregate_entity("hexint_accum", vec![], custom_type.clone(), Some(custom_type));
         let state_fn = state_function();
         let schema = schema_entity("tests::custom_schema", "custom_schema");
 
@@ -1954,6 +2043,102 @@ mod tests {
         .unwrap();
 
         assert!(sql.contains("STYPE = custom_schema.hexint"));
+        assert!(sql.contains("MSTYPE = custom_schema.hexint"));
+    }
+
+    #[test]
+    fn skipped_function_argument_does_not_require_schema_resolution() {
+        let function = function_entity(
+            "skipped_arg",
+            vec![PgExternArgumentEntity {
+                pattern: "virtual_arg",
+                used_ty: skipped_type("tests::VirtualArg", "tests::VirtualArg"),
+            }],
+            PgExternReturnEntity::None,
+        );
+
+        let sql = PgrxSql::build(
+            vec![SqlGraphEntity::ExtensionRoot(control_file()), SqlGraphEntity::Function(function)]
+                .into_iter(),
+            "test".into(),
+            false,
+        )
+        .unwrap()
+        .to_sql()
+        .unwrap();
+
+        assert!(sql.contains("skipped_arg"));
+        assert!(!sql.contains("virtual_arg"));
+        assert!(!sql.contains("tests::VirtualArg"));
+    }
+
+    #[test]
+    fn explicit_composite_type_does_not_require_schema_resolution() {
+        let function = function_entity(
+            "make_dog",
+            vec![],
+            PgExternReturnEntity::Type { ty: explicit_composite_type("Dog") },
+        );
+
+        let sql = PgrxSql::build(
+            vec![SqlGraphEntity::ExtensionRoot(control_file()), SqlGraphEntity::Function(function)]
+                .into_iter(),
+            "test".into(),
+            false,
+        )
+        .unwrap()
+        .to_sql()
+        .unwrap();
+
+        assert!(sql.contains("RETURNS Dog"));
+    }
+
+    #[test]
+    fn explicit_composite_array_type_does_not_require_schema_resolution() {
+        let function = function_entity(
+            "make_dog_pack",
+            vec![],
+            PgExternReturnEntity::Type { ty: explicit_composite_array_type("Dog") },
+        );
+
+        let sql = PgrxSql::build(
+            vec![SqlGraphEntity::ExtensionRoot(control_file()), SqlGraphEntity::Function(function)]
+                .into_iter(),
+            "test".into(),
+            false,
+        )
+        .unwrap()
+        .to_sql()
+        .unwrap();
+
+        assert!(sql.contains("RETURNS Dog[]"));
+    }
+
+    #[test]
+    fn explicit_composite_array_aggregate_state_does_not_require_schema_resolution() {
+        let aggregate = aggregate_entity(
+            "pack_dogs",
+            vec![],
+            explicit_composite_array_type("Dog"),
+            Some(explicit_composite_array_type("Dog")),
+        );
+
+        let sql = PgrxSql::build(
+            vec![
+                SqlGraphEntity::ExtensionRoot(control_file()),
+                SqlGraphEntity::Function(state_function()),
+                SqlGraphEntity::Aggregate(aggregate),
+            ]
+            .into_iter(),
+            "test".into(),
+            false,
+        )
+        .unwrap()
+        .to_sql()
+        .unwrap();
+
+        assert!(sql.contains("STYPE = Dog[]"));
+        assert!(sql.contains("MSTYPE = Dog[]"));
     }
 
     #[test]

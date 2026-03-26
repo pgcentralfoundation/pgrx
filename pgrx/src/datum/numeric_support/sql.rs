@@ -25,16 +25,12 @@ unsafe impl<const P: u32, const S: u32> SqlTranslatable for Numeric<P, S> {
     const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Numeric<P, S>);
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
         pgrx_sql_entity_graph::metadata::TypeOrigin::External;
-    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::Numeric {
-        precision: numeric_precision(P),
-        scale: numeric_scale(P, S),
-        array_brackets: false,
-    });
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+        Ok(SqlMappingRef::Numeric { precision: numeric_precision(P), scale: numeric_scale(P, S) });
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::Numeric {
             precision: numeric_precision(P),
             scale: numeric_scale(P, S),
-            array_brackets: false,
         }));
 }
 
@@ -43,11 +39,7 @@ unsafe impl SqlTranslatable for AnyNumeric {
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
         pgrx_sql_entity_graph::metadata::TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
-        Ok(SqlMappingRef::Numeric { precision: None, scale: None, array_brackets: false });
+        Ok(SqlMappingRef::Numeric { precision: None, scale: None });
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
-        Ok(ReturnsRef::One(SqlMappingRef::Numeric {
-            precision: None,
-            scale: None,
-            array_brackets: false,
-        }));
+        Ok(ReturnsRef::One(SqlMappingRef::Numeric { precision: None, scale: None }));
 }
