@@ -2457,6 +2457,7 @@ version = "0.1.1"
 dependencies = [
  "cargo_toml",
  "clap",
+ "glob",
  "owo-colors",
  "rustc-hash",
  "toml 0.9.7",
