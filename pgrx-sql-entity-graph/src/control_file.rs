@@ -130,7 +130,7 @@ impl ControlFile {
     }
 }
 
-impl From<ControlFile> for SqlGraphEntity {
+impl From<ControlFile> for SqlGraphEntity<'_> {
     fn from(val: ControlFile) -> Self {
         SqlGraphEntity::ExtensionRoot(val)
     }
@@ -190,7 +190,7 @@ impl SqlGraphIdentifier for ControlFile {
         "root".into()
     }
 
-    fn file(&self) -> Option<&'static str> {
+    fn file(&self) -> Option<&str> {
         None
     }
 

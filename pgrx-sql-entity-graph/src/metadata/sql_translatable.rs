@@ -214,7 +214,7 @@ pub unsafe trait SqlTranslatable {
     fn return_sql() -> Result<Returns, ReturnsError> {
         Self::RETURN_SQL.map(Into::into)
     }
-    fn entity() -> FunctionMetadataTypeEntity {
+    fn entity() -> FunctionMetadataTypeEntity<'static> {
         FunctionMetadataTypeEntity {
             schema_key: Self::SCHEMA_KEY,
             type_origin: Self::TYPE_ORIGIN,

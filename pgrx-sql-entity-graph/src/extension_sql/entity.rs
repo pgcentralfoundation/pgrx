@@ -27,32 +27,32 @@ use std::fmt::Display;
 
 /// The output of a [`ExtensionSql`](crate::ExtensionSql) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct ExtensionSqlEntity {
-    pub module_path: &'static str,
-    pub full_path: &'static str,
-    pub sql: &'static str,
-    pub file: &'static str,
+pub struct ExtensionSqlEntity<'a> {
+    pub module_path: &'a str,
+    pub full_path: &'a str,
+    pub sql: &'a str,
+    pub file: &'a str,
     pub line: u32,
-    pub name: &'static str,
+    pub name: &'a str,
     pub bootstrap: bool,
     pub finalize: bool,
     pub requires: Vec<PositioningRef>,
     pub creates: Vec<SqlDeclaredEntity>,
 }
 
-impl ExtensionSqlEntity {
+impl ExtensionSqlEntity<'_> {
     pub fn has_sql_declared_entity(&self, identifier: &SqlDeclared) -> Option<&SqlDeclaredEntity> {
         self.creates.iter().find(|created| created.has_sql_declared_entity(identifier))
     }
 }
 
-impl From<ExtensionSqlEntity> for SqlGraphEntity {
-    fn from(val: ExtensionSqlEntity) -> Self {
+impl<'a> From<ExtensionSqlEntity<'a>> for SqlGraphEntity<'a> {
+    fn from(val: ExtensionSqlEntity<'a>) -> Self {
         SqlGraphEntity::CustomSql(val)
     }
 }
 
-impl SqlGraphIdentifier for ExtensionSqlEntity {
+impl SqlGraphIdentifier for ExtensionSqlEntity<'_> {
     fn dot_identifier(&self) -> String {
         format!("sql {}", self.name)
     }
@@ -60,7 +60,7 @@ impl SqlGraphIdentifier for ExtensionSqlEntity {
         self.name.to_string()
     }
 
-    fn file(&self) -> Option<&'static str> {
+    fn file(&self) -> Option<&str> {
         Some(self.file)
     }
 
@@ -69,7 +69,7 @@ impl SqlGraphIdentifier for ExtensionSqlEntity {
     }
 }
 
-impl ToSql for ExtensionSqlEntity {
+impl ToSql for ExtensionSqlEntity<'_> {
     fn to_sql(&self, _context: &PgrxSql) -> eyre::Result<String> {
         let ExtensionSqlEntity { file, line, sql, creates, requires, .. } = self;
         let creates = if !creates.is_empty() {

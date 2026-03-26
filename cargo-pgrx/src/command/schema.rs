@@ -191,9 +191,13 @@ pub(crate) fn generate_schema_implicit(
         tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
     }
 
+    let lib_so_data = load_section_data(profile, &lib_filename, target)?;
+    let section_entities = decode_section_entities(&lib_so_data)?;
+    report_entity_counts(&section_entities);
+
     let mut entities = Vec::new();
     entities.push(SqlGraphEntity::ExtensionRoot(ControlFile::try_from(control_file_path)?));
-    entities.extend(load_section_entities(profile, &lib_filename, target)?);
+    entities.extend(section_entities);
 
     let pgrx_sql = PgrxSql::build(entities.into_iter(), lib_name.to_string(), versioned_so)
         .wrap_err("SQL generation error")?;
@@ -217,11 +221,11 @@ pub(crate) fn generate_schema_implicit(
     Ok(())
 }
 
-fn load_section_entities(
+fn load_section_data(
     profile: &CargoProfile,
     lib_filename: &str,
     target: Option<&str>,
-) -> eyre::Result<Vec<SqlGraphEntity>> {
+) -> eyre::Result<Vec<u8>> {
     let mut lib_so = get_target_dir()?;
     if let Some(target) = target {
         lib_so.push(target);
@@ -229,27 +233,21 @@ fn load_section_entities(
     lib_so.push(profile.target_subdir());
     lib_so.push(lib_filename);
 
-    let lib_so_data = std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")?;
-    let section = schema_section_data(&lib_so_data)?;
-    let entities = decode_section_entities(&lib_so, section)?;
-    report_entity_counts(&entities);
-    Ok(entities)
+    std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")
 }
 
-fn decode_section_entities(
-    lib_so: &Path,
-    section: Option<&[u8]>,
-) -> eyre::Result<Vec<SqlGraphEntity>> {
-    let section = section.ok_or_else(|| {
+fn decode_section_entities<'a>(
+    lib_so_data: &'a [u8],
+) -> eyre::Result<Vec<SqlGraphEntity<'a>>> {
+    let section = schema_section_data(lib_so_data)?.ok_or_else(|| {
         eyre::eyre!(
-            "no .pgrx_schema section found in `{}`; the artifact may have been built with an incompatible pgrx, stripped incorrectly, or selected from the wrong architecture slice",
-            lib_so.display()
+            "no .pgrx_schema section found; the artifact may have been built with an incompatible pgrx, stripped incorrectly, or selected from the wrong architecture slice",
         )
     })?;
     decode_entities(section).wrap_err("couldn't decode pgrx schema section")
 }
 
-fn report_entity_counts(entities: &[SqlGraphEntity]) {
+fn report_entity_counts(entities: &[SqlGraphEntity<'_>]) {
     let mut seen_schemas = Vec::new();
     let mut num_funcs = 0_usize;
     let mut num_triggers = 0_usize;

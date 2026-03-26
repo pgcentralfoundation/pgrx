@@ -92,34 +92,34 @@ impl Alignment {
 
 /// The output of a [`PostgresType`](crate::postgres_type::PostgresTypeDerive) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct PostgresTypeEntity {
-    pub name: &'static str,
-    pub file: &'static str,
+pub struct PostgresTypeEntity<'a> {
+    pub name: &'a str,
+    pub file: &'a str,
     pub line: u32,
-    pub full_path: &'static str,
-    pub module_path: &'static str,
-    pub schema_key: &'static str,
-    pub in_fn_path: &'static str,
-    pub out_fn_path: &'static str,
-    pub receive_fn_path: Option<&'static str>,
-    pub send_fn_path: Option<&'static str>,
-    pub to_sql_config: ToSqlConfigEntity,
+    pub full_path: &'a str,
+    pub module_path: &'a str,
+    pub schema_key: &'a str,
+    pub in_fn_path: &'a str,
+    pub out_fn_path: &'a str,
+    pub receive_fn_path: Option<&'a str>,
+    pub send_fn_path: Option<&'a str>,
+    pub to_sql_config: ToSqlConfigEntity<'a>,
     pub alignment: Option<usize>,
 }
 
-impl TypeMatch for PostgresTypeEntity {
+impl TypeMatch for PostgresTypeEntity<'_> {
     fn schema_key(&self) -> &str {
         self.schema_key
     }
 }
 
-impl From<PostgresTypeEntity> for SqlGraphEntity {
-    fn from(val: PostgresTypeEntity) -> Self {
+impl<'a> From<PostgresTypeEntity<'a>> for SqlGraphEntity<'a> {
+    fn from(val: PostgresTypeEntity<'a>) -> Self {
         SqlGraphEntity::Type(val)
     }
 }
 
-impl SqlGraphIdentifier for PostgresTypeEntity {
+impl SqlGraphIdentifier for PostgresTypeEntity<'_> {
     fn dot_identifier(&self) -> String {
         format!("type {}", self.full_path)
     }
@@ -127,7 +127,7 @@ impl SqlGraphIdentifier for PostgresTypeEntity {
         self.full_path.to_string()
     }
 
-    fn file(&self) -> Option<&'static str> {
+    fn file(&self) -> Option<&str> {
         Some(self.file)
     }
 
@@ -136,7 +136,7 @@ impl SqlGraphIdentifier for PostgresTypeEntity {
     }
 }
 
-impl ToSql for PostgresTypeEntity {
+impl ToSql for PostgresTypeEntity<'_> {
     fn to_sql(&self, context: &PgrxSql) -> eyre::Result<String> {
         let self_index = context.types[self];
         let item_node = &context.graph[self_index];

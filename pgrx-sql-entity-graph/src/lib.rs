@@ -95,7 +95,7 @@ pub trait SqlGraphIdentifier {
     /// or some combination of [`std::file`] and [`std::line`].
     fn rust_identifier(&self) -> String;
 
-    fn file(&self) -> Option<&'static str>;
+    fn file(&self) -> Option<&str>;
 
     fn line(&self) -> Option<u32>;
 }
@@ -104,21 +104,21 @@ pub use postgres_type::Alignment;
 
 /// An entity corresponding to some SQL required by the extension.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum SqlGraphEntity {
+pub enum SqlGraphEntity<'a> {
     ExtensionRoot(ControlFile),
-    Schema(SchemaEntity),
-    CustomSql(ExtensionSqlEntity),
-    Function(PgExternEntity),
-    Type(PostgresTypeEntity),
+    Schema(SchemaEntity<'a>),
+    CustomSql(ExtensionSqlEntity<'a>),
+    Function(PgExternEntity<'a>),
+    Type(PostgresTypeEntity<'a>),
     BuiltinType(String),
-    Enum(PostgresEnumEntity),
-    Ord(PostgresOrdEntity),
-    Hash(PostgresHashEntity),
-    Aggregate(PgAggregateEntity),
-    Trigger(PgTriggerEntity),
+    Enum(PostgresEnumEntity<'a>),
+    Ord(PostgresOrdEntity<'a>),
+    Hash(PostgresHashEntity<'a>),
+    Aggregate(PgAggregateEntity<'a>),
+    Trigger(PgTriggerEntity<'a>),
 }
 
-impl SqlGraphEntity {
+impl SqlGraphEntity<'_> {
     pub fn sql_anchor_comment(&self) -> String {
         let maybe_file_and_line = if let (Some(file), Some(line)) = (self.file(), self.line()) {
             format!("-- {file}:{line}\n")
@@ -168,7 +168,7 @@ pub trait TypeIdentifiable {
     fn ty_name(&self) -> &str;
 }
 
-impl SqlGraphIdentifier for SqlGraphEntity {
+impl SqlGraphIdentifier for SqlGraphEntity<'_> {
     fn dot_identifier(&self) -> String {
         match self {
             SqlGraphEntity::Schema(item) => item.dot_identifier(),
@@ -201,7 +201,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
         }
     }
 
-    fn file(&self) -> Option<&'static str> {
+    fn file(&self) -> Option<&str> {
         match self {
             SqlGraphEntity::Schema(item) => item.file(),
             SqlGraphEntity::CustomSql(item) => item.file(),
@@ -234,7 +234,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
     }
 }
 
-impl ToSql for SqlGraphEntity {
+impl ToSql for SqlGraphEntity<'_> {
     fn to_sql(&self, context: &PgrxSql) -> eyre::Result<String> {
         match self {
             SqlGraphEntity::Schema(SchemaEntity { name: "public" | "pg_catalog", .. }) => {

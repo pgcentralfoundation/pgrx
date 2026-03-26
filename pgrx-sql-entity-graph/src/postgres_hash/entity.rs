@@ -22,29 +22,29 @@ use crate::{SqlGraphEntity, SqlGraphIdentifier};
 
 /// The output of a [`PostgresHash`](crate::postgres_hash::PostgresHash) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
-pub struct PostgresHashEntity {
-    pub name: &'static str,
-    pub file: &'static str,
+pub struct PostgresHashEntity<'a> {
+    pub name: &'a str,
+    pub file: &'a str,
     pub line: u32,
-    pub full_path: &'static str,
-    pub module_path: &'static str,
-    pub schema_key: &'static str,
-    pub to_sql_config: ToSqlConfigEntity,
+    pub full_path: &'a str,
+    pub module_path: &'a str,
+    pub schema_key: &'a str,
+    pub to_sql_config: ToSqlConfigEntity<'a>,
 }
 
-impl PostgresHashEntity {
+impl PostgresHashEntity<'_> {
     pub(crate) fn fn_name(&self) -> String {
         format!("{}_hash", self.name.to_lowercase())
     }
 }
 
-impl From<PostgresHashEntity> for SqlGraphEntity {
-    fn from(val: PostgresHashEntity) -> Self {
+impl<'a> From<PostgresHashEntity<'a>> for SqlGraphEntity<'a> {
+    fn from(val: PostgresHashEntity<'a>) -> Self {
         SqlGraphEntity::Hash(val)
     }
 }
 
-impl SqlGraphIdentifier for PostgresHashEntity {
+impl SqlGraphIdentifier for PostgresHashEntity<'_> {
     fn dot_identifier(&self) -> String {
         format!("hash {}", self.full_path)
     }
@@ -52,7 +52,7 @@ impl SqlGraphIdentifier for PostgresHashEntity {
         self.full_path.to_string()
     }
 
-    fn file(&self) -> Option<&'static str> {
+    fn file(&self) -> Option<&str> {
         Some(self.file)
     }
 
@@ -61,7 +61,7 @@ impl SqlGraphIdentifier for PostgresHashEntity {
     }
 }
 
-impl ToSql for PostgresHashEntity {
+impl ToSql for PostgresHashEntity<'_> {
     fn to_sql(&self, _context: &PgrxSql) -> eyre::Result<String> {
         let sql = format!(
             "\n\

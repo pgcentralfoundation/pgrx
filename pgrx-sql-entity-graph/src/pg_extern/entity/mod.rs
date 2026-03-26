@@ -36,30 +36,30 @@ use eyre::{WrapErr, eyre};
 
 /// The output of a [`PgExtern`](crate::pg_extern::PgExtern) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct PgExternEntity {
-    pub name: &'static str,
-    pub unaliased_name: &'static str,
-    pub module_path: &'static str,
-    pub full_path: &'static str,
-    pub fn_args: Vec<PgExternArgumentEntity>,
-    pub fn_return: PgExternReturnEntity,
-    pub schema: Option<&'static str>,
-    pub file: &'static str,
+pub struct PgExternEntity<'a> {
+    pub name: &'a str,
+    pub unaliased_name: &'a str,
+    pub module_path: &'a str,
+    pub full_path: &'a str,
+    pub fn_args: Vec<PgExternArgumentEntity<'a>>,
+    pub fn_return: PgExternReturnEntity<'a>,
+    pub schema: Option<&'a str>,
+    pub file: &'a str,
     pub line: u32,
     pub extern_attrs: Vec<ExternArgs>,
-    pub search_path: Option<Vec<&'static str>>,
-    pub operator: Option<PgOperatorEntity>,
+    pub search_path: Option<Vec<&'a str>>,
+    pub operator: Option<PgOperatorEntity<'a>>,
     pub cast: Option<PgCastEntity>,
-    pub to_sql_config: ToSqlConfigEntity,
+    pub to_sql_config: ToSqlConfigEntity<'a>,
 }
 
-impl From<PgExternEntity> for SqlGraphEntity {
-    fn from(val: PgExternEntity) -> Self {
+impl<'a> From<PgExternEntity<'a>> for SqlGraphEntity<'a> {
+    fn from(val: PgExternEntity<'a>) -> Self {
         SqlGraphEntity::Function(val)
     }
 }
 
-impl SqlGraphIdentifier for PgExternEntity {
+impl SqlGraphIdentifier for PgExternEntity<'_> {
     fn dot_identifier(&self) -> String {
         format!("fn {}", self.name)
     }
@@ -67,7 +67,7 @@ impl SqlGraphIdentifier for PgExternEntity {
         self.full_path.to_string()
     }
 
-    fn file(&self) -> Option<&'static str> {
+    fn file(&self) -> Option<&str> {
         Some(self.file)
     }
 
@@ -76,7 +76,7 @@ impl SqlGraphIdentifier for PgExternEntity {
     }
 }
 
-impl PgExternEntity {
+impl PgExternEntity<'_> {
     fn sql_name(&self, context: &PgrxSql) -> String {
         let self_index = context.externs[self];
         let schema = self
@@ -88,7 +88,7 @@ impl PgExternEntity {
     }
 }
 
-impl ToSql for PgExternEntity {
+impl ToSql for PgExternEntity<'_> {
     fn to_sql(&self, context: &PgrxSql) -> eyre::Result<String> {
         let self_index = context.externs[self];
         let mut extern_attrs = self.extern_attrs.clone();

@@ -30,15 +30,15 @@ pub enum TypeOrigin {
 }
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
-pub struct FunctionMetadataEntity {
-    pub arguments: Vec<FunctionMetadataTypeEntity>,
-    pub retval: FunctionMetadataTypeEntity,
-    pub path: &'static str,
+pub struct FunctionMetadataEntity<'a> {
+    pub arguments: Vec<FunctionMetadataTypeEntity<'a>>,
+    pub retval: FunctionMetadataTypeEntity<'a>,
+    pub path: &'a str,
 }
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
-pub struct FunctionMetadataTypeEntity {
-    pub schema_key: &'static str,
+pub struct FunctionMetadataTypeEntity<'a> {
+    pub schema_key: &'a str,
     pub type_origin: TypeOrigin,
     pub argument_sql: Result<SqlMapping, ArgumentError>,
     pub return_sql: Result<Returns, ReturnsError>,

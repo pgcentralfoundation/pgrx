@@ -22,17 +22,17 @@ use crate::{SqlGraphEntity, SqlGraphIdentifier};
 
 /// The output of a [`PostgresOrd`](crate::postgres_ord::PostgresOrd) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
-pub struct PostgresOrdEntity {
-    pub name: &'static str,
-    pub file: &'static str,
+pub struct PostgresOrdEntity<'a> {
+    pub name: &'a str,
+    pub file: &'a str,
     pub line: u32,
-    pub full_path: &'static str,
-    pub module_path: &'static str,
-    pub schema_key: &'static str,
-    pub to_sql_config: ToSqlConfigEntity,
+    pub full_path: &'a str,
+    pub module_path: &'a str,
+    pub schema_key: &'a str,
+    pub to_sql_config: ToSqlConfigEntity<'a>,
 }
 
-impl PostgresOrdEntity {
+impl PostgresOrdEntity<'_> {
     pub(crate) fn cmp_fn_name(&self) -> String {
         format!("{}_cmp", self.name.to_lowercase())
     }
@@ -58,13 +58,13 @@ impl PostgresOrdEntity {
     }
 }
 
-impl From<PostgresOrdEntity> for SqlGraphEntity {
-    fn from(val: PostgresOrdEntity) -> Self {
+impl<'a> From<PostgresOrdEntity<'a>> for SqlGraphEntity<'a> {
+    fn from(val: PostgresOrdEntity<'a>) -> Self {
         SqlGraphEntity::Ord(val)
     }
 }
 
-impl SqlGraphIdentifier for PostgresOrdEntity {
+impl SqlGraphIdentifier for PostgresOrdEntity<'_> {
     fn dot_identifier(&self) -> String {
         format!("ord {}", self.full_path)
     }
@@ -72,7 +72,7 @@ impl SqlGraphIdentifier for PostgresOrdEntity {
         self.full_path.to_string()
     }
 
-    fn file(&self) -> Option<&'static str> {
+    fn file(&self) -> Option<&str> {
         Some(self.file)
     }
 
@@ -81,7 +81,7 @@ impl SqlGraphIdentifier for PostgresOrdEntity {
     }
 }
 
-impl ToSql for PostgresOrdEntity {
+impl ToSql for PostgresOrdEntity<'_> {
     fn to_sql(&self, _context: &PgrxSql) -> eyre::Result<String> {
         let PostgresOrdEntity { name, full_path, file, line, .. } = self;
         let sql = format!(

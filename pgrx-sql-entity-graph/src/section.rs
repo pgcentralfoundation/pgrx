@@ -13,7 +13,8 @@ use crate::aggregate::{FinalizeModify, ParallelOption};
 use crate::extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntity, SqlDeclaredEntityData};
 use crate::extern_args::ExternArgs;
 use crate::metadata::{
-    ArgumentError, FunctionMetadataTypeEntity, ReturnsError, ReturnsRef, SqlMappingRef, TypeOrigin,
+    ArgumentError, FunctionMetadataTypeEntity, Returns, ReturnsError, ReturnsRef, SqlMapping,
+    SqlMappingRef, TypeOrigin,
 };
 use crate::pg_extern::entity::{
     PgCastEntity, PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity,
@@ -436,47 +437,80 @@ impl<'a> EntryReader<'a> {
             .to_owned())
     }
 
+    pub fn read_str(&mut self) -> Result<&'a str> {
+        let bytes = self.read_bytes()?;
+        std::str::from_utf8(bytes)
+            .map_err(|err| eyre!("schema entry contained invalid utf8: {err}"))
+    }
+
+    pub fn read_option_str(&mut self) -> Result<Option<&'a str>> {
+        if self.read_bool()? { Ok(Some(self.read_str()?)) } else { Ok(None) }
+    }
+
     pub fn read_option_string(&mut self) -> Result<Option<String>> {
         if self.read_bool()? { Ok(Some(self.read_string()?)) } else { Ok(None) }
     }
 
-    pub fn read_sql_mapping(&mut self) -> Result<SqlMappingRef> {
+    pub fn read_sql_mapping_owned(&mut self) -> Result<SqlMapping> {
         match self.read_u8()? {
-            SQL_MAPPING_AS => Ok(SqlMappingRef::As(leak_string(self.read_string()?))),
-            SQL_MAPPING_ARRAY => Ok(SqlMappingRef::Array(leak_string(self.read_string()?))),
+            SQL_MAPPING_AS => Ok(SqlMapping::As(self.read_string()?)),
+            SQL_MAPPING_ARRAY => {
+                let s = self.read_string()?;
+                Ok(SqlMapping::As(format!("{}[]", s)))
+            }
             SQL_MAPPING_NUMERIC => {
                 let has_precision = self.read_bool()?;
                 let precision = self.read_u32()?;
                 let has_scale = self.read_bool()?;
                 let scale = self.read_u32()?;
                 let array_brackets = self.read_bool()?;
-                Ok(SqlMappingRef::Numeric {
-                    precision: has_precision.then_some(precision),
-                    scale: has_scale.then_some(scale),
-                    array_brackets,
-                })
+                let mut sql = match (has_precision.then_some(precision), has_scale.then_some(scale)) {
+                    (None, _) => "NUMERIC".to_string(),
+                    (Some(p), None) => format!("NUMERIC({p})"),
+                    (Some(p), Some(s)) => format!("NUMERIC({p}, {s})"),
+                };
+                if array_brackets {
+                    sql.push_str("[]");
+                }
+                Ok(SqlMapping::As(sql))
             }
             SQL_MAPPING_COMPOSITE => {
-                Ok(SqlMappingRef::Composite { array_brackets: self.read_bool()? })
+                Ok(SqlMapping::Composite { array_brackets: self.read_bool()? })
             }
-            SQL_MAPPING_SKIP => Ok(SqlMappingRef::Skip),
+            SQL_MAPPING_SKIP => Ok(SqlMapping::Skip),
             other => Err(eyre!("invalid sql mapping tag in schema entry: {other}")),
         }
     }
 
-    pub fn read_returns(&mut self) -> Result<ReturnsRef> {
+    pub fn read_returns_owned(&mut self) -> Result<Returns> {
         match self.read_u8()? {
-            RETURNS_ONE => Ok(ReturnsRef::One(self.read_sql_mapping()?)),
-            RETURNS_SET_OF => Ok(ReturnsRef::SetOf(self.read_sql_mapping()?)),
+            RETURNS_ONE => Ok(Returns::One(self.read_sql_mapping_owned()?)),
+            RETURNS_SET_OF => Ok(Returns::SetOf(self.read_sql_mapping_owned()?)),
             RETURNS_TABLE => {
                 let count = self.read_u32()? as usize;
                 let mut items = Vec::with_capacity(count);
                 for _ in 0..count {
-                    items.push(self.read_sql_mapping()?);
+                    items.push(self.read_sql_mapping_owned()?);
                 }
-                Ok(ReturnsRef::Table(Box::leak(items.into_boxed_slice())))
+                Ok(Returns::Table(items))
             }
             other => Err(eyre!("invalid returns tag in schema entry: {other}")),
+        }
+    }
+
+    pub fn read_argument_sql_owned(&mut self) -> Result<Result<SqlMapping, ArgumentError>> {
+        match self.read_u8()? {
+            RESULT_OK => Ok(Ok(self.read_sql_mapping_owned()?)),
+            RESULT_ERR => Ok(Err(self.read_argument_error()?)),
+            other => Err(eyre!("invalid argument sql tag in schema entry: {other}")),
+        }
+    }
+
+    pub fn read_return_sql_owned(&mut self) -> Result<Result<Returns, ReturnsError>> {
+        match self.read_u8()? {
+            RESULT_OK => Ok(Ok(self.read_returns_owned()?)),
+            RESULT_ERR => Ok(Err(self.read_returns_error()?)),
+            other => Err(eyre!("invalid return sql tag in schema entry: {other}")),
         }
     }
 
@@ -488,17 +522,11 @@ impl<'a> EntryReader<'a> {
             ARG_ERROR_SKIP_IN_ARRAY => Ok(ArgumentError::SkipInArray),
             ARG_ERROR_DATUM => Ok(ArgumentError::Datum),
             ARG_ERROR_NOT_VALID => {
-                Ok(ArgumentError::NotValidAsArgument(leak_string(self.read_string()?)))
+                // ArgumentError::NotValidAsArgument requires &'static str for const compatibility.
+                // This is the one remaining leak — a tiny string for a rare error variant.
+                Ok(ArgumentError::NotValidAsArgument(Box::leak(self.read_string()?.into_boxed_str())))
             }
             other => Err(eyre!("invalid argument error tag in schema entry: {other}")),
-        }
-    }
-
-    pub fn read_argument_sql(&mut self) -> Result<Result<SqlMappingRef, ArgumentError>> {
-        match self.read_u8()? {
-            RESULT_OK => Ok(Ok(self.read_sql_mapping()?)),
-            RESULT_ERR => Ok(Err(self.read_argument_error()?)),
-            other => Err(eyre!("invalid argument sql tag in schema entry: {other}")),
         }
     }
 
@@ -517,14 +545,6 @@ impl<'a> EntryReader<'a> {
         }
     }
 
-    pub fn read_return_sql(&mut self) -> Result<Result<ReturnsRef, ReturnsError>> {
-        match self.read_u8()? {
-            RESULT_OK => Ok(Ok(self.read_returns()?)),
-            RESULT_ERR => Ok(Err(self.read_returns_error()?)),
-            other => Err(eyre!("invalid return sql tag in schema entry: {other}")),
-        }
-    }
-
     pub fn read_positioning_ref(&mut self) -> Result<PositioningRef> {
         match self.read_u8()? {
             POSITIONING_REF_FULL_PATH => Ok(PositioningRef::FullPath(self.read_string()?)),
@@ -533,19 +553,18 @@ impl<'a> EntryReader<'a> {
         }
     }
 
-    pub fn read_to_sql_config(&mut self) -> Result<ToSqlConfigEntity> {
+    pub fn read_to_sql_config(&mut self) -> Result<ToSqlConfigEntity<'a>> {
         let enabled = self.read_bool()?;
-        let has_content = self.read_bool()?;
-        let content = if has_content { Some(leak_string(self.read_string()?)) } else { None };
+        let content = self.read_option_str()?;
         Ok(ToSqlConfigEntity { enabled, content })
     }
 
-    pub fn read_function_metadata_type(&mut self) -> Result<FunctionMetadataTypeEntity> {
+    pub fn read_function_metadata_type(&mut self) -> Result<FunctionMetadataTypeEntity<'a>> {
         Ok(FunctionMetadataTypeEntity {
-            schema_key: leak_string(self.read_string()?),
+            schema_key: self.read_str()?,
             type_origin: self.read_type_origin()?,
-            argument_sql: self.read_argument_sql()?.map(Into::into),
-            return_sql: self.read_return_sql()?.map(Into::into),
+            argument_sql: self.read_argument_sql_owned()?,
+            return_sql: self.read_return_sql_owned()?,
         })
     }
 
@@ -557,26 +576,26 @@ impl<'a> EntryReader<'a> {
         }
     }
 
-    pub fn read_used_type(&mut self) -> Result<UsedTypeEntity> {
+    pub fn read_used_type(&mut self) -> Result<UsedTypeEntity<'a>> {
         Ok(UsedTypeEntity {
-            ty_source: leak_string(self.read_string()?),
-            full_path: leak_string(self.read_string()?),
-            composite_type: leak_option_string(self.read_option_string()?),
+            ty_source: self.read_str()?,
+            full_path: self.read_str()?,
+            composite_type: self.read_option_str()?,
             variadic: self.read_bool()?,
-            default: leak_option_string(self.read_option_string()?),
+            default: self.read_option_str()?,
             optional: self.read_bool()?,
             metadata: self.read_function_metadata_type()?,
         })
     }
 
-    pub fn read_pg_extern_argument(&mut self) -> Result<PgExternArgumentEntity> {
+    pub fn read_pg_extern_argument(&mut self) -> Result<PgExternArgumentEntity<'a>> {
         Ok(PgExternArgumentEntity {
-            pattern: leak_string(self.read_string()?),
+            pattern: self.read_str()?,
             used_ty: self.read_used_type()?,
         })
     }
 
-    pub fn read_pg_extern_return(&mut self) -> Result<PgExternReturnEntity> {
+    pub fn read_pg_extern_return(&mut self) -> Result<PgExternReturnEntity<'a>> {
         match self.read_u8()? {
             EXTERN_RET_NONE => Ok(PgExternReturnEntity::None),
             EXTERN_RET_TYPE => Ok(PgExternReturnEntity::Type { ty: self.read_used_type()? }),
@@ -586,7 +605,7 @@ impl<'a> EntryReader<'a> {
                 let mut tys = Vec::with_capacity(count);
                 for _ in 0..count {
                     tys.push(PgExternReturnEntityIteratedItem {
-                        name: leak_option_string(self.read_option_string()?),
+                        name: self.read_option_str()?,
                         ty: self.read_used_type()?,
                     });
                 }
@@ -628,25 +647,25 @@ impl<'a> EntryReader<'a> {
         }
     }
 
-    pub fn read_search_path(&mut self) -> Result<Option<Vec<&'static str>>> {
+    pub fn read_search_path(&mut self) -> Result<Option<Vec<&'a str>>> {
         if !self.read_bool()? {
             return Ok(None);
         }
         let count = self.read_u32()? as usize;
         let mut values = Vec::with_capacity(count);
         for _ in 0..count {
-            values.push(leak_string(self.read_string()?));
+            values.push(self.read_str()?);
         }
         Ok(Some(values))
     }
 
-    pub fn read_operator(&mut self) -> Result<PgOperatorEntity> {
+    pub fn read_operator(&mut self) -> Result<PgOperatorEntity<'a>> {
         Ok(PgOperatorEntity {
-            opname: leak_option_string(self.read_option_string()?),
-            commutator: leak_option_string(self.read_option_string()?),
-            negator: leak_option_string(self.read_option_string()?),
-            restrict: leak_option_string(self.read_option_string()?),
-            join: leak_option_string(self.read_option_string()?),
+            opname: self.read_option_str()?,
+            commutator: self.read_option_str()?,
+            negator: self.read_option_str()?,
+            restrict: self.read_option_str()?,
+            join: self.read_option_str()?,
             hashes: self.read_bool()?,
             merges: self.read_bool()?,
         })
@@ -669,7 +688,7 @@ impl<'a> EntryReader<'a> {
             SQL_DECLARED_TYPE | SQL_DECLARED_ENUM => {
                 let schema_key = self.read_string()?;
                 let type_origin = Some(self.read_type_origin()?);
-                let sql = match self.read_argument_sql()?.map(crate::metadata::SqlMapping::from) {
+                let sql = match self.read_argument_sql_owned()? {
                     Ok(crate::metadata::SqlMapping::As(sql)) => sql,
                     Ok(other) => {
                         bail!("invalid SQL declaration mapping in schema entry: {other:?}")
@@ -700,14 +719,14 @@ impl<'a> EntryReader<'a> {
         }
     }
 
-    pub fn read_aggregate_type(&mut self) -> Result<AggregateTypeEntity> {
+    pub fn read_aggregate_type(&mut self) -> Result<AggregateTypeEntity<'a>> {
         Ok(AggregateTypeEntity {
-            name: leak_option_string(self.read_option_string()?),
+            name: self.read_option_str()?,
             used_ty: self.read_used_type()?,
         })
     }
 
-    pub fn read_aggregate_type_list(&mut self) -> Result<Vec<AggregateTypeEntity>> {
+    pub fn read_aggregate_type_list(&mut self) -> Result<Vec<AggregateTypeEntity<'a>>> {
         let count = self.read_u32()? as usize;
         let mut items = Vec::with_capacity(count);
         for _ in 0..count {
@@ -771,30 +790,22 @@ pub fn entry_payloads(section: &[u8]) -> Result<Vec<&[u8]>> {
     Ok(out)
 }
 
-pub fn leak_string(value: String) -> &'static str {
-    Box::leak(value.into_boxed_str())
-}
-
-pub fn leak_option_string(value: Option<String>) -> Option<&'static str> {
-    value.map(leak_string)
-}
-
-pub fn decode_entity(payload: &[u8]) -> Result<SqlGraphEntity> {
+pub fn decode_entity<'a>(payload: &'a [u8]) -> Result<SqlGraphEntity<'a>> {
     let mut reader = EntryReader::new(payload);
     let entity = match reader.read_u8()? {
         ENTITY_SCHEMA => SqlGraphEntity::Schema(SchemaEntity {
-            module_path: leak_string(reader.read_string()?),
-            name: leak_string(reader.read_string()?),
-            file: leak_string(reader.read_string()?),
+            module_path: reader.read_str()?,
+            name: reader.read_str()?,
+            file: reader.read_str()?,
             line: reader.read_u32()?,
         }),
         ENTITY_CUSTOM_SQL => {
-            let sql = leak_string(reader.read_string()?);
-            let module_path = leak_string(reader.read_string()?);
-            let full_path = leak_string(reader.read_string()?);
-            let file = leak_string(reader.read_string()?);
+            let sql = reader.read_str()?;
+            let module_path = reader.read_str()?;
+            let full_path = reader.read_str()?;
+            let file = reader.read_str()?;
             let line = reader.read_u32()?;
-            let name = leak_string(reader.read_string()?);
+            let name = reader.read_str()?;
             let bootstrap = reader.read_bool()?;
             let finalize = reader.read_bool()?;
 
@@ -824,10 +835,10 @@ pub fn decode_entity(payload: &[u8]) -> Result<SqlGraphEntity> {
             })
         }
         ENTITY_FUNCTION => {
-            let name = leak_string(reader.read_string()?);
-            let unaliased_name = leak_string(reader.read_string()?);
-            let module_path = leak_string(reader.read_string()?);
-            let full_path = leak_string(reader.read_string()?);
+            let name = reader.read_str()?;
+            let unaliased_name = reader.read_str()?;
+            let module_path = reader.read_str()?;
+            let full_path = reader.read_str()?;
 
             let arg_count = reader.read_u32()? as usize;
             let mut fn_args = Vec::with_capacity(arg_count);
@@ -836,8 +847,8 @@ pub fn decode_entity(payload: &[u8]) -> Result<SqlGraphEntity> {
             }
 
             let fn_return = reader.read_pg_extern_return()?;
-            let schema = leak_option_string(reader.read_option_string()?);
-            let file = leak_string(reader.read_string()?);
+            let schema = reader.read_option_str()?;
+            let file = reader.read_str()?;
             let line = reader.read_u32()?;
 
             let extern_attr_count = reader.read_u32()? as usize;
@@ -869,16 +880,16 @@ pub fn decode_entity(payload: &[u8]) -> Result<SqlGraphEntity> {
             })
         }
         ENTITY_TYPE => {
-            let name = leak_string(reader.read_string()?);
-            let file = leak_string(reader.read_string()?);
+            let name = reader.read_str()?;
+            let file = reader.read_str()?;
             let line = reader.read_u32()?;
-            let module_path = leak_string(reader.read_string()?);
-            let full_path = leak_string(reader.read_string()?);
-            let schema_key = leak_string(reader.read_string()?);
-            let in_fn_path = leak_string(reader.read_string()?);
-            let out_fn_path = leak_string(reader.read_string()?);
-            let receive_fn_path = leak_option_string(reader.read_option_string()?);
-            let send_fn_path = leak_option_string(reader.read_option_string()?);
+            let module_path = reader.read_str()?;
+            let full_path = reader.read_str()?;
+            let schema_key = reader.read_str()?;
+            let in_fn_path = reader.read_str()?;
+            let out_fn_path = reader.read_str()?;
+            let receive_fn_path = reader.read_option_str()?;
+            let send_fn_path = reader.read_option_str()?;
             let to_sql_config = reader.read_to_sql_config()?;
             let alignment =
                 if reader.read_bool()? { Some(reader.read_u32()? as usize) } else { None };
@@ -899,17 +910,17 @@ pub fn decode_entity(payload: &[u8]) -> Result<SqlGraphEntity> {
             })
         }
         ENTITY_ENUM => {
-            let name = leak_string(reader.read_string()?);
-            let file = leak_string(reader.read_string()?);
+            let name = reader.read_str()?;
+            let file = reader.read_str()?;
             let line = reader.read_u32()?;
-            let module_path = leak_string(reader.read_string()?);
-            let full_path = leak_string(reader.read_string()?);
-            let schema_key = leak_string(reader.read_string()?);
+            let module_path = reader.read_str()?;
+            let full_path = reader.read_str()?;
+            let schema_key = reader.read_str()?;
 
             let variant_count = reader.read_u32()? as usize;
             let mut variants = Vec::with_capacity(variant_count);
             for _ in 0..variant_count {
-                variants.push(leak_string(reader.read_string()?));
+                variants.push(reader.read_str()?);
             }
 
             let to_sql_config = reader.read_to_sql_config()?;
@@ -926,50 +937,50 @@ pub fn decode_entity(payload: &[u8]) -> Result<SqlGraphEntity> {
             })
         }
         ENTITY_ORD => SqlGraphEntity::Ord(PostgresOrdEntity {
-            name: leak_string(reader.read_string()?),
-            file: leak_string(reader.read_string()?),
+            name: reader.read_str()?,
+            file: reader.read_str()?,
             line: reader.read_u32()?,
-            full_path: leak_string(reader.read_string()?),
-            module_path: leak_string(reader.read_string()?),
-            schema_key: leak_string(reader.read_string()?),
+            full_path: reader.read_str()?,
+            module_path: reader.read_str()?,
+            schema_key: reader.read_str()?,
             to_sql_config: reader.read_to_sql_config()?,
         }),
         ENTITY_HASH => SqlGraphEntity::Hash(PostgresHashEntity {
-            name: leak_string(reader.read_string()?),
-            file: leak_string(reader.read_string()?),
+            name: reader.read_str()?,
+            file: reader.read_str()?,
             line: reader.read_u32()?,
-            full_path: leak_string(reader.read_string()?),
-            module_path: leak_string(reader.read_string()?),
-            schema_key: leak_string(reader.read_string()?),
+            full_path: reader.read_str()?,
+            module_path: reader.read_str()?,
+            schema_key: reader.read_str()?,
             to_sql_config: reader.read_to_sql_config()?,
         }),
         ENTITY_AGGREGATE => {
-            let full_path = leak_string(reader.read_string()?);
-            let module_path = leak_string(reader.read_string()?);
-            let file = leak_string(reader.read_string()?);
+            let full_path = reader.read_str()?;
+            let module_path = reader.read_str()?;
+            let file = reader.read_str()?;
             let line = reader.read_u32()?;
-            let name = leak_string(reader.read_string()?);
+            let name = reader.read_str()?;
             let ordered_set = reader.read_bool()?;
             let args = reader.read_aggregate_type_list()?;
             let direct_args =
                 if reader.read_bool()? { Some(reader.read_aggregate_type_list()?) } else { None };
             let stype = reader.read_aggregate_type()?;
-            let sfunc = leak_string(reader.read_string()?);
-            let finalfunc = leak_option_string(reader.read_option_string()?);
+            let sfunc = reader.read_str()?;
+            let finalfunc = reader.read_option_str()?;
             let finalfunc_modify =
                 if reader.read_bool()? { Some(reader.read_finalize_modify()?) } else { None };
-            let combinefunc = leak_option_string(reader.read_option_string()?);
-            let serialfunc = leak_option_string(reader.read_option_string()?);
-            let deserialfunc = leak_option_string(reader.read_option_string()?);
-            let initcond = leak_option_string(reader.read_option_string()?);
-            let msfunc = leak_option_string(reader.read_option_string()?);
-            let minvfunc = leak_option_string(reader.read_option_string()?);
+            let combinefunc = reader.read_option_str()?;
+            let serialfunc = reader.read_option_str()?;
+            let deserialfunc = reader.read_option_str()?;
+            let initcond = reader.read_option_str()?;
+            let msfunc = reader.read_option_str()?;
+            let minvfunc = reader.read_option_str()?;
             let mstype = if reader.read_bool()? { Some(reader.read_used_type()?) } else { None };
-            let mfinalfunc = leak_option_string(reader.read_option_string()?);
+            let mfinalfunc = reader.read_option_str()?;
             let mfinalfunc_modify =
                 if reader.read_bool()? { Some(reader.read_finalize_modify()?) } else { None };
-            let minitcond = leak_option_string(reader.read_option_string()?);
-            let sortop = leak_option_string(reader.read_option_string()?);
+            let minitcond = reader.read_option_str()?;
+            let sortop = reader.read_option_str()?;
             let parallel =
                 if reader.read_bool()? { Some(reader.read_parallel_option()?) } else { None };
             let hypothetical = reader.read_bool()?;
@@ -1005,11 +1016,11 @@ pub fn decode_entity(payload: &[u8]) -> Result<SqlGraphEntity> {
             })
         }
         ENTITY_TRIGGER => SqlGraphEntity::Trigger(PgTriggerEntity {
-            function_name: leak_string(reader.read_string()?),
-            file: leak_string(reader.read_string()?),
+            function_name: reader.read_str()?,
+            file: reader.read_str()?,
             line: reader.read_u32()?,
-            module_path: leak_string(reader.read_string()?),
-            full_path: leak_string(reader.read_string()?),
+            module_path: reader.read_str()?,
+            full_path: reader.read_str()?,
             to_sql_config: reader.read_to_sql_config()?,
         }),
         other => return Err(eyre!("invalid entity tag in schema entry: {other}")),
@@ -1019,7 +1030,7 @@ pub fn decode_entity(payload: &[u8]) -> Result<SqlGraphEntity> {
     Ok(entity)
 }
 
-pub fn decode_entities(section: &[u8]) -> Result<Vec<SqlGraphEntity>> {
+pub fn decode_entities<'a>(section: &'a [u8]) -> Result<Vec<SqlGraphEntity<'a>>> {
     entry_payloads(section)?.into_iter().map(decode_entity).collect()
 }
 

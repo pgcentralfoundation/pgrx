@@ -41,7 +41,7 @@ pub trait FunctionMetadata<A> {
     fn path() -> &'static str {
         core::any::type_name::<Self>()
     }
-    fn entity() -> FunctionMetadataEntity;
+    fn entity() -> FunctionMetadataEntity<'static>;
 }
 
 macro_rules! impl_fn {
@@ -53,7 +53,7 @@ macro_rules! impl_fn {
             R: SqlTranslatable,
             F: FnMut($($A,)*) -> R,
         {
-            fn entity() -> FunctionMetadataEntity {
+            fn entity() -> FunctionMetadataEntity<'static> {
                 FunctionMetadataEntity {
                     arguments: vec![$(<$A>::entity()),*],
                     retval: R::entity(),
@@ -68,7 +68,7 @@ macro_rules! impl_fn {
             $($A: SqlTranslatable,)*
             R: SqlTranslatable,
         {
-            fn entity() -> FunctionMetadataEntity {
+            fn entity() -> FunctionMetadataEntity<'static> {
                 FunctionMetadataEntity {
                     arguments: vec![$(<$A>::entity()),*],
                     retval: R::entity(),

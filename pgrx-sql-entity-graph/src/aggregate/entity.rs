@@ -26,19 +26,19 @@ use crate::{SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity};
 use eyre::{WrapErr, eyre};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct AggregateTypeEntity {
-    pub used_ty: UsedTypeEntity,
-    pub name: Option<&'static str>,
+pub struct AggregateTypeEntity<'a> {
+    pub used_ty: UsedTypeEntity<'a>,
+    pub name: Option<&'a str>,
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct PgAggregateEntity {
-    pub full_path: &'static str,
-    pub module_path: &'static str,
-    pub file: &'static str,
+pub struct PgAggregateEntity<'a> {
+    pub full_path: &'a str,
+    pub module_path: &'a str,
+    pub file: &'a str,
     pub line: u32,
 
-    pub name: &'static str,
+    pub name: &'a str,
 
     /// If the aggregate is an ordered set aggregate.
     ///
@@ -48,27 +48,27 @@ pub struct PgAggregateEntity {
     /// The `arg_data_type` list.
     ///
     /// Corresponds to `Args` in `pgrx::aggregate::Aggregate`.
-    pub args: Vec<AggregateTypeEntity>,
+    pub args: Vec<AggregateTypeEntity<'a>>,
 
     /// The direct argument list, appearing before `ORDER BY` in ordered set aggregates.
     ///
     /// Corresponds to `OrderBy` in `pgrx::aggregate::Aggregate`.
-    pub direct_args: Option<Vec<AggregateTypeEntity>>,
+    pub direct_args: Option<Vec<AggregateTypeEntity<'a>>>,
 
     /// The `STYPE` and `name` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// The implementor of an `pgrx::aggregate::Aggregate`.
-    pub stype: AggregateTypeEntity,
+    pub stype: AggregateTypeEntity<'a>,
 
     /// The `SFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `state` in `pgrx::aggregate::Aggregate`.
-    pub sfunc: &'static str,
+    pub sfunc: &'a str,
 
     /// The `FINALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `finalize` in `pgrx::aggregate::Aggregate`.
-    pub finalfunc: Option<&'static str>,
+    pub finalfunc: Option<&'a str>,
 
     /// The `FINALFUNC_MODIFY` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
@@ -78,46 +78,46 @@ pub struct PgAggregateEntity {
     /// The `COMBINEFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `combine` in `pgrx::aggregate::Aggregate`.
-    pub combinefunc: Option<&'static str>,
+    pub combinefunc: Option<&'a str>,
 
     /// The `SERIALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `serial` in `pgrx::aggregate::Aggregate`.
-    pub serialfunc: Option<&'static str>,
+    pub serialfunc: Option<&'a str>,
 
     /// The `DESERIALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `deserial` in `pgrx::aggregate::Aggregate`.
-    pub deserialfunc: Option<&'static str>,
+    pub deserialfunc: Option<&'a str>,
 
     /// The `INITCOND` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `INITIAL_CONDITION` in `pgrx::aggregate::Aggregate`.
-    pub initcond: Option<&'static str>,
+    pub initcond: Option<&'a str>,
 
     /// The `MSFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `moving_state` in `pgrx::aggregate::Aggregate`.
-    pub msfunc: Option<&'static str>,
+    pub msfunc: Option<&'a str>,
 
     /// The `MINVFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `moving_state_inverse` in `pgrx::aggregate::Aggregate`.
-    pub minvfunc: Option<&'static str>,
+    pub minvfunc: Option<&'a str>,
 
     /// The `MSTYPE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `MovingState` in `pgrx::aggregate::Aggregate`.
-    pub mstype: Option<UsedTypeEntity>,
+    pub mstype: Option<UsedTypeEntity<'a>>,
 
     // The `MSSPACE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     //
     // TODO: Currently unused.
-    // pub msspace: &'static str,
+    // pub msspace: &'a str,
     /// The `MFINALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `moving_state_finalize` in `pgrx::aggregate::Aggregate`.
-    pub mfinalfunc: Option<&'static str>,
+    pub mfinalfunc: Option<&'a str>,
 
     /// The `MFINALFUNC_MODIFY` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
@@ -127,12 +127,12 @@ pub struct PgAggregateEntity {
     /// The `MINITCOND` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `MOVING_INITIAL_CONDITION` in `pgrx::aggregate::Aggregate`.
-    pub minitcond: Option<&'static str>,
+    pub minitcond: Option<&'a str>,
 
     /// The `SORTOP` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `SORT_OPERATOR` in `pgrx::aggregate::Aggregate`.
-    pub sortop: Option<&'static str>,
+    pub sortop: Option<&'a str>,
 
     /// The `PARALLEL` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
@@ -143,23 +143,23 @@ pub struct PgAggregateEntity {
     ///
     /// Corresponds to `hypothetical` in `pgrx::aggregate::Aggregate`.
     pub hypothetical: bool,
-    pub to_sql_config: ToSqlConfigEntity,
+    pub to_sql_config: ToSqlConfigEntity<'a>,
 }
 
-impl From<PgAggregateEntity> for SqlGraphEntity {
-    fn from(val: PgAggregateEntity) -> Self {
+impl<'a> From<PgAggregateEntity<'a>> for SqlGraphEntity<'a> {
+    fn from(val: PgAggregateEntity<'a>) -> Self {
         SqlGraphEntity::Aggregate(val)
     }
 }
 
-impl SqlGraphIdentifier for PgAggregateEntity {
+impl SqlGraphIdentifier for PgAggregateEntity<'_> {
     fn dot_identifier(&self) -> String {
         format!("aggregate {}", self.full_path)
     }
     fn rust_identifier(&self) -> String {
         self.full_path.to_string()
     }
-    fn file(&self) -> Option<&'static str> {
+    fn file(&self) -> Option<&str> {
         Some(self.file)
     }
     fn line(&self) -> Option<u32> {
@@ -167,7 +167,7 @@ impl SqlGraphIdentifier for PgAggregateEntity {
     }
 }
 
-impl ToSql for PgAggregateEntity {
+impl ToSql for PgAggregateEntity<'_> {
     fn to_sql(&self, context: &PgrxSql) -> eyre::Result<String> {
         let self_index = context.aggregates[self];
         let mut optional_attributes = Vec::new();

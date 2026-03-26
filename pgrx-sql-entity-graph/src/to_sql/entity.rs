@@ -29,11 +29,11 @@ use crate::pgrx_sql::PgrxSql;
 /// When `enabled` is false, no SQL is generated for the item being configured.
 ///
 #[derive(Default, Clone)]
-pub struct ToSqlConfigEntity {
+pub struct ToSqlConfigEntity<'a> {
     pub enabled: bool,
-    pub content: Option<&'static str>,
+    pub content: Option<&'a str>,
 }
-impl ToSqlConfigEntity {
+impl ToSqlConfigEntity<'_> {
     #[inline]
     fn fields(&self) -> (bool, Option<&str>) {
         (self.enabled, self.content)
@@ -49,8 +49,8 @@ impl ToSqlConfigEntity {
     /// ```
     pub fn to_sql(
         &self,
-        entity: &SqlGraphEntity,
-        context: &PgrxSql,
+        entity: &SqlGraphEntity<'_>,
+        context: &PgrxSql<'_>,
     ) -> Option<eyre::Result<String>> {
         if !self.enabled {
             return Some(Ok(format!(
@@ -80,28 +80,28 @@ impl ToSqlConfigEntity {
     }
 }
 
-impl std::cmp::PartialOrd for ToSqlConfigEntity {
+impl std::cmp::PartialOrd for ToSqlConfigEntity<'_> {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.cmp(other))
     }
 }
-impl std::cmp::Ord for ToSqlConfigEntity {
+impl std::cmp::Ord for ToSqlConfigEntity<'_> {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.fields().cmp(&other.fields())
     }
 }
-impl std::cmp::PartialEq for ToSqlConfigEntity {
+impl std::cmp::PartialEq for ToSqlConfigEntity<'_> {
     fn eq(&self, other: &Self) -> bool {
         self.fields() == other.fields()
     }
 }
-impl std::cmp::Eq for ToSqlConfigEntity {}
-impl std::hash::Hash for ToSqlConfigEntity {
+impl std::cmp::Eq for ToSqlConfigEntity<'_> {}
+impl std::hash::Hash for ToSqlConfigEntity<'_> {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.fields().hash(state);
     }
 }
-impl std::fmt::Debug for ToSqlConfigEntity {
+impl std::fmt::Debug for ToSqlConfigEntity<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let (enabled, content) = self.fields();
         f.debug_struct("ToSqlConfigEntity")

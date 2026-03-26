@@ -22,30 +22,30 @@ use crate::{SqlGraphEntity, SqlGraphIdentifier, TypeMatch};
 
 /// The output of a [`PostgresEnum`](crate::postgres_enum::PostgresEnum) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd, Hash)]
-pub struct PostgresEnumEntity {
-    pub name: &'static str,
-    pub file: &'static str,
+pub struct PostgresEnumEntity<'a> {
+    pub name: &'a str,
+    pub file: &'a str,
     pub line: u32,
-    pub full_path: &'static str,
-    pub module_path: &'static str,
-    pub schema_key: &'static str,
-    pub variants: Vec<&'static str>,
-    pub to_sql_config: ToSqlConfigEntity,
+    pub full_path: &'a str,
+    pub module_path: &'a str,
+    pub schema_key: &'a str,
+    pub variants: Vec<&'a str>,
+    pub to_sql_config: ToSqlConfigEntity<'a>,
 }
 
-impl TypeMatch for PostgresEnumEntity {
+impl TypeMatch for PostgresEnumEntity<'_> {
     fn schema_key(&self) -> &str {
         self.schema_key
     }
 }
 
-impl From<PostgresEnumEntity> for SqlGraphEntity {
-    fn from(val: PostgresEnumEntity) -> Self {
+impl<'a> From<PostgresEnumEntity<'a>> for SqlGraphEntity<'a> {
+    fn from(val: PostgresEnumEntity<'a>) -> Self {
         SqlGraphEntity::Enum(val)
     }
 }
 
-impl SqlGraphIdentifier for PostgresEnumEntity {
+impl SqlGraphIdentifier for PostgresEnumEntity<'_> {
     fn dot_identifier(&self) -> String {
         format!("enum {}", self.full_path)
     }
@@ -53,7 +53,7 @@ impl SqlGraphIdentifier for PostgresEnumEntity {
         self.full_path.to_string()
     }
 
-    fn file(&self) -> Option<&'static str> {
+    fn file(&self) -> Option<&str> {
         Some(self.file)
     }
 
@@ -62,7 +62,7 @@ impl SqlGraphIdentifier for PostgresEnumEntity {
     }
 }
 
-impl ToSql for PostgresEnumEntity {
+impl ToSql for PostgresEnumEntity<'_> {
     fn to_sql(&self, context: &PgrxSql) -> eyre::Result<String> {
         let self_index = context.enums[self];
         let sql = format!(

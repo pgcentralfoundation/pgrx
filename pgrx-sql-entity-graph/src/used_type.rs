@@ -373,18 +373,18 @@ impl UsedType {
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct UsedTypeEntity {
-    pub ty_source: &'static str,
-    pub full_path: &'static str,
-    pub composite_type: Option<&'static str>,
+pub struct UsedTypeEntity<'a> {
+    pub ty_source: &'a str,
+    pub full_path: &'a str,
+    pub composite_type: Option<&'a str>,
     pub variadic: bool,
-    pub default: Option<&'static str>,
+    pub default: Option<&'a str>,
     /// Set via the type being an `Option`.
     pub optional: bool,
-    pub metadata: FunctionMetadataTypeEntity,
+    pub metadata: FunctionMetadataTypeEntity<'a>,
 }
 
-impl crate::TypeIdentifiable for UsedTypeEntity {
+impl crate::TypeIdentifiable for UsedTypeEntity<'_> {
     fn schema_key(&self) -> &str {
         self.metadata.schema_key
     }
