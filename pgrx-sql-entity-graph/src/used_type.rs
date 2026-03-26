@@ -255,7 +255,7 @@ impl UsedType {
         })
     }
 
-    pub fn entity_tokens(&self) -> syn::Expr {
+    pub fn (&self) -> syn::Expr {
         let mut resolved_ty = self.resolved_ty.clone();
         let mut resolved_ty_inner = self.resolved_ty_inner.clone().unwrap_or(resolved_ty.clone());
         // The lifetimes of these are not relevant. Previously, we solved this by staticizing them
@@ -267,9 +267,25 @@ impl UsedType {
         let resolved_ty_string = resolved_ty.to_token_stream().to_string();
         let composite_type = self.composite_type.clone().map(|v| v.expr);
         let composite_type_iter = composite_type.iter();
+        let has_explicit_composite = composite_type.is_some();
         let variadic = &self.variadic;
         let optional = self.optional;
         let default = self.default.iter();
+        let metadata: syn::Expr = if has_explicit_composite {
+            syn::parse_quote! {
+                ::pgrx::pgrx_sql_entity_graph::metadata::FunctionMetadataTypeEntity::sql_only(
+                    <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::argument_sql(),
+                    <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::return_sql(),
+                )
+            }
+        } else {
+            syn::parse_quote! {
+                {
+                    use ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable;
+                    <#resolved_ty>::entity()
+                }
+            }
+        };
 
         syn::parse_quote! {
             ::pgrx::pgrx_sql_entity_graph::UsedTypeEntity {
@@ -280,10 +296,7 @@ impl UsedType {
                 default:  None #( .unwrap_or(Some(#default)) )*,
                 /// Set via the type being an `Option`.
                 optional: #optional,
-                metadata: {
-                    use ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable;
-                    <#resolved_ty>::entity()
-                },
+                metadata: #metadata,
             }
         }
     }
@@ -293,6 +306,7 @@ impl UsedType {
         anonymize_lifetimes(&mut resolved_ty);
         let resolved_ty_string = resolved_ty.to_token_stream().to_string();
         let composite_type = self.composite_type.clone().map(|v| v.expr);
+        let has_explicit_composite = composite_type.is_some();
         let default = self.default.clone();
         let composite_len = composite_type
             .map(|expr| {
@@ -311,6 +325,25 @@ impl UsedType {
                 }
             })
             .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
+        let metadata_len = if has_explicit_composite {
+            quote! {
+                ::pgrx::pgrx_sql_entity_graph::section::function_metadata_type_len(
+                    None,
+                    <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL,
+                    <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::RETURN_SQL,
+                )
+            }
+        } else {
+            quote! {
+                ::pgrx::pgrx_sql_entity_graph::section::function_metadata_type_len(
+                    Some(
+                        <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY
+                    ),
+                    <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL,
+                    <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::RETURN_SQL,
+                )
+            }
+        };
 
         quote! {
             ::pgrx::pgrx_sql_entity_graph::section::str_len(#resolved_ty_string)
@@ -319,16 +352,7 @@ impl UsedType {
                 + ::pgrx::pgrx_sql_entity_graph::section::bool_len()
                 + (#default_len)
                 + ::pgrx::pgrx_sql_entity_graph::section::bool_len()
-                + ::pgrx::pgrx_sql_entity_graph::section::str_len(
-                    <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY
-                )
-                + ::pgrx::pgrx_sql_entity_graph::section::u8_len()
-                + ::pgrx::pgrx_sql_entity_graph::section::argument_sql_len(
-                    <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL
-                )
-                + ::pgrx::pgrx_sql_entity_graph::section::return_sql_len(
-                    <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::RETURN_SQL
-                )
+                + #metadata_len
         }
     }
 
@@ -337,6 +361,7 @@ impl UsedType {
         anonymize_lifetimes(&mut resolved_ty);
         let resolved_ty_string = resolved_ty.to_token_stream().to_string();
         let composite_type = self.composite_type.clone().map(|v| v.expr);
+        let has_explicit_composite = composite_type.is_some();
         let variadic = self.variadic;
         let optional = self.optional;
         let default = self.default.clone();
@@ -348,6 +373,26 @@ impl UsedType {
             .as_ref()
             .map(|value| quote! { .bool(true).str(#value) })
             .unwrap_or_else(|| quote! { .bool(false) });
+        let metadata_writer = if has_explicit_composite {
+            quote! {
+                .function_metadata_type(
+                    None,
+                    <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL,
+                    <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::RETURN_SQL,
+                )
+            }
+        } else {
+            quote! {
+                .function_metadata_type(
+                    Some((
+                        <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY,
+                        <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::TYPE_ORIGIN,
+                    )),
+                    <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL,
+                    <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::RETURN_SQL,
+                )
+            }
+        };
 
         quote! {
             #writer
@@ -357,17 +402,7 @@ impl UsedType {
                 .bool(#variadic)
                 #default_writer
                 .bool(#optional)
-                .str(<#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY)
-                .u8(
-                    match <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::TYPE_ORIGIN {
-                        ::pgrx::pgrx_sql_entity_graph::metadata::TypeOrigin::ThisExtension =>
-                            ::pgrx::pgrx_sql_entity_graph::section::TYPE_ORIGIN_THIS_EXTENSION,
-                        ::pgrx::pgrx_sql_entity_graph::metadata::TypeOrigin::External =>
-                            ::pgrx::pgrx_sql_entity_graph::section::TYPE_ORIGIN_EXTERNAL,
-                    }
-                )
-                .argument_sql(<#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL)
-                .return_sql(<#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::RETURN_SQL)
+                #metadata_writer
         }
     }
 }
@@ -386,7 +421,9 @@ pub struct UsedTypeEntity<'a> {
 
 impl crate::TypeIdentifiable for UsedTypeEntity<'_> {
     fn schema_key(&self) -> &str {
-        self.metadata.schema_key
+        self.metadata
+            .schema_key()
+            .expect("explicit composite SQL doesn't participate in schema-key matching")
     }
     fn ty_name(&self) -> &str {
         self.full_path
@@ -411,6 +448,17 @@ impl UsedTypeEntity<'_> {
                         | SqlMapping::Array(crate::metadata::SqlArrayMapping::Composite)
                 ))
             )
+    }
+
+    pub(crate) fn resolution(&self) -> Option<(&str, crate::metadata::TypeOrigin)> {
+        match self.metadata.resolution {
+            Some(resolution) => Some((resolution.schema_key, resolution.type_origin)),
+            None => None,
+        }
+    }
+
+    pub(crate) fn needs_type_resolution(&self) -> bool {
+        self.metadata.needs_type_resolution()
     }
 
     pub(crate) fn emits_argument_sql(&self) -> bool {

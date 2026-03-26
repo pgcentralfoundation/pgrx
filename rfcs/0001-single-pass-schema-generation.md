@@ -126,8 +126,8 @@ pub unsafe trait SqlTranslatable {
 
     /// Declares whether this SQL type is owned by this extension or external.
     ///
-    /// Leave this as `TypeOrigin::ThisExtension` for extension-owned types that resolve through
-    /// `#[derive(PostgresType)]`, `#[derive(PostgresEnum)]`, or
+    /// Set this explicitly. Use `TypeOrigin::ThisExtension` for extension-owned types that
+    /// resolve through `#[derive(PostgresType)]`, `#[derive(PostgresEnum)]`, or
     /// `extension_sql!(..., creates = [Type(T)]/[Enum(T)])`.
     const TYPE_ORIGIN: TypeOrigin;
 
@@ -580,6 +580,9 @@ Manual impls now have two supported modes:
 `extension_sql!("CREATE TYPE hexint ...", creates = [Type(HexInt)])`) keep the same
 surface syntax. Internally, `creates = [Type(HexInt)]` now records `HexInt`'s
 `SCHEMA_KEY` alongside the declaration.
+
+Declared type and enum entries stay lean: they carry `SCHEMA_KEY` plus the SQL
+mapping needed for rendering, but they do not duplicate `TYPE_ORIGIN`.
 
 This is important for manual/custom SQL-backed types:
 

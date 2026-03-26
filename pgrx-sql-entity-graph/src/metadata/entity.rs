@@ -38,8 +38,53 @@ pub struct FunctionMetadataEntity<'a> {
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub struct FunctionMetadataTypeEntity<'a> {
-    pub schema_key: &'a str,
-    pub type_origin: TypeOrigin,
+    pub resolution: Option<FunctionMetadataTypeResolutionEntity<'a>>,
     pub argument_sql: Result<SqlMapping, ArgumentError>,
     pub return_sql: Result<Returns, ReturnsError>,
+}
+
+#[derive(Clone, Copy, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
+pub struct FunctionMetadataTypeResolutionEntity<'a> {
+    pub schema_key: &'a str,
+    pub type_origin: TypeOrigin,
+}
+
+impl<'a> FunctionMetadataTypeEntity<'a> {
+    pub const fn resolved(
+        schema_key: &'a str,
+        type_origin: TypeOrigin,
+        argument_sql: Result<SqlMapping, ArgumentError>,
+        return_sql: Result<Returns, ReturnsError>,
+    ) -> Self {
+        Self {
+            resolution: Some(FunctionMetadataTypeResolutionEntity { schema_key, type_origin }),
+            argument_sql,
+            return_sql,
+        }
+    }
+
+    pub const fn sql_only(
+        argument_sql: Result<SqlMapping, ArgumentError>,
+        return_sql: Result<Returns, ReturnsError>,
+    ) -> Self {
+        Self { resolution: None, argument_sql, return_sql }
+    }
+
+    pub const fn schema_key(&self) -> Option<&'a str> {
+        match self.resolution {
+            Some(resolution) => Some(resolution.schema_key),
+            None => None,
+        }
+    }
+
+    pub const fn type_origin(&self) -> Option<TypeOrigin> {
+        match self.resolution {
+            Some(resolution) => Some(resolution.type_origin),
+            None => None,
+        }
+    }
+
+    pub const fn needs_type_resolution(&self) -> bool {
+        self.resolution.is_some()
+    }
 }

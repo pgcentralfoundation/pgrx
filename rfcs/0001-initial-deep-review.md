@@ -30,7 +30,7 @@ branch:
 - the named result tags are in place
 - schema stripping is no longer part of the install path
 - unresolved `SCHEMA_KEY` fallback is fixed through explicit declared-type
-  resolution and `TYPE_ORIGIN`
+  resolution, while `TYPE_ORIGIN` stays explicit on `SqlTranslatable`
 
 ## Executive Summary
 

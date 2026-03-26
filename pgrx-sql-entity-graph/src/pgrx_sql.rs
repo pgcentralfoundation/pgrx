@@ -818,15 +818,19 @@ fn initialize_externs<'a>(
         build_base_edges(graph, index, root, bootstrap, finalize);
 
         for arg in &item.fn_args {
-            if !arg.used_ty.emits_argument_sql() || arg.used_ty.has_explicit_composite_sql() {
+            if !arg.used_ty.emits_argument_sql() || !arg.used_ty.needs_type_resolution() {
                 continue;
             }
             let slot = format!("argument `{}`", arg.pattern);
+            let (schema_key, type_origin) = arg
+                .used_ty
+                .resolution()
+                .expect("SQL-visible extern arguments should carry resolution metadata");
             initialize_resolved_type(
                 graph,
                 &mut mapped_builtin_types,
-                arg.used_ty.metadata.schema_key,
-                arg.used_ty.metadata.type_origin,
+                schema_key,
+                type_origin,
                 mapped_types,
                 mapped_enums,
                 mapped_extension_sqls,
@@ -840,12 +844,12 @@ fn initialize_externs<'a>(
         match &item.fn_return {
             PgExternReturnEntity::None | PgExternReturnEntity::Trigger => (),
             PgExternReturnEntity::Type { ty, .. } | PgExternReturnEntity::SetOf { ty, .. } => {
-                if !ty.has_explicit_composite_sql() {
+                if let Some((schema_key, type_origin)) = ty.resolution() {
                     initialize_resolved_type(
                         graph,
                         &mut mapped_builtin_types,
-                        ty.metadata.schema_key,
-                        ty.metadata.type_origin,
+                        schema_key,
+                        type_origin,
                         mapped_types,
                         mapped_enums,
                         mapped_extension_sqls,
@@ -858,22 +862,21 @@ fn initialize_externs<'a>(
             }
             PgExternReturnEntity::Iterated { tys: iterated_returns, .. } => {
                 for PgExternReturnEntityIteratedItem { ty, .. } in iterated_returns {
-                    if ty.has_explicit_composite_sql() {
-                        continue;
+                    if let Some((schema_key, type_origin)) = ty.resolution() {
+                        initialize_resolved_type(
+                            graph,
+                            &mut mapped_builtin_types,
+                            schema_key,
+                            type_origin,
+                            mapped_types,
+                            mapped_enums,
+                            mapped_extension_sqls,
+                            "Function",
+                            item.full_path,
+                            "table return column",
+                            ty.full_path,
+                        )?;
                     }
-                    initialize_resolved_type(
-                        graph,
-                        &mut mapped_builtin_types,
-                        ty.metadata.schema_key,
-                        ty.metadata.type_origin,
-                        mapped_types,
-                        mapped_enums,
-                        mapped_extension_sqls,
-                        "Function",
-                        item.full_path,
-                        "table return column",
-                        ty.full_path,
-                    )?;
                 }
             }
         }
@@ -964,16 +967,20 @@ fn connect_externs<'a>(
         }
 
         for arg in &item.fn_args {
-            if !arg.used_ty.emits_argument_sql() || arg.used_ty.has_explicit_composite_sql() {
+            if !arg.used_ty.emits_argument_sql() || !arg.used_ty.needs_type_resolution() {
                 continue;
             }
             let slot = format!("argument `{}`", arg.pattern);
+            let (schema_key, type_origin) = arg
+                .used_ty
+                .resolution()
+                .expect("SQL-visible extern arguments should carry resolution metadata");
             connect_resolved_type(
                 graph,
                 index,
                 SqlGraphRequires::ByArg,
-                arg.used_ty.metadata.schema_key,
-                arg.used_ty.metadata.type_origin,
+                schema_key,
+                type_origin,
                 types,
                 enums,
                 builtin_types,
@@ -988,13 +995,13 @@ fn connect_externs<'a>(
         match &item.fn_return {
             PgExternReturnEntity::None | PgExternReturnEntity::Trigger => (),
             PgExternReturnEntity::Type { ty, .. } | PgExternReturnEntity::SetOf { ty, .. } => {
-                if !ty.has_explicit_composite_sql() {
+                if let Some((schema_key, type_origin)) = ty.resolution() {
                     connect_resolved_type(
                         graph,
                         index,
                         SqlGraphRequires::ByReturn,
-                        ty.metadata.schema_key,
-                        ty.metadata.type_origin,
+                        schema_key,
+                        type_origin,
                         types,
                         enums,
                         builtin_types,
@@ -1008,24 +1015,23 @@ fn connect_externs<'a>(
             }
             PgExternReturnEntity::Iterated { tys: iterated_returns, .. } => {
                 for PgExternReturnEntityIteratedItem { ty, .. } in iterated_returns {
-                    if ty.has_explicit_composite_sql() {
-                        continue;
+                    if let Some((schema_key, type_origin)) = ty.resolution() {
+                        connect_resolved_type(
+                            graph,
+                            index,
+                            SqlGraphRequires::ByReturn,
+                            schema_key,
+                            type_origin,
+                            types,
+                            enums,
+                            builtin_types,
+                            extension_sqls,
+                            "Function",
+                            item.full_path,
+                            "table return column",
+                            ty.full_path,
+                        )?;
                     }
-                    connect_resolved_type(
-                        graph,
-                        index,
-                        SqlGraphRequires::ByReturn,
-                        ty.metadata.schema_key,
-                        ty.metadata.type_origin,
-                        types,
-                        enums,
-                        builtin_types,
-                        extension_sqls,
-                        "Function",
-                        item.full_path,
-                        "table return column",
-                        ty.full_path,
-                    )?;
                 }
             }
         }
@@ -1161,15 +1167,19 @@ fn initialize_aggregates<'a>(
         let index = graph.add_node(entity);
 
         for arg in &item.args {
-            if arg.used_ty.has_explicit_composite_sql() {
+            if !arg.used_ty.needs_type_resolution() {
                 continue;
             }
             let slot = aggregate_slot(arg.name, "argument");
+            let (schema_key, type_origin) = arg
+                .used_ty
+                .resolution()
+                .expect("aggregate arguments should carry resolution metadata");
             initialize_resolved_type(
                 graph,
                 mapped_builtin_types,
-                arg.used_ty.metadata.schema_key,
-                arg.used_ty.metadata.type_origin,
+                schema_key,
+                type_origin,
                 mapped_types,
                 mapped_enums,
                 mapped_extension_sqls,
@@ -1181,15 +1191,19 @@ fn initialize_aggregates<'a>(
         }
 
         for arg in item.direct_args.as_ref().unwrap_or(&vec![]) {
-            if arg.used_ty.has_explicit_composite_sql() {
+            if !arg.used_ty.needs_type_resolution() {
                 continue;
             }
             let slot = aggregate_slot(arg.name, "direct argument");
+            let (schema_key, type_origin) = arg
+                .used_ty
+                .resolution()
+                .expect("aggregate direct arguments should carry resolution metadata");
             initialize_resolved_type(
                 graph,
                 mapped_builtin_types,
-                arg.used_ty.metadata.schema_key,
-                arg.used_ty.metadata.type_origin,
+                schema_key,
+                type_origin,
                 mapped_types,
                 mapped_enums,
                 mapped_extension_sqls,
@@ -1200,12 +1214,12 @@ fn initialize_aggregates<'a>(
             )?;
         }
 
-        if !item.stype.used_ty.has_explicit_composite_sql() {
+        if let Some((schema_key, type_origin)) = item.stype.used_ty.resolution() {
             initialize_resolved_type(
                 graph,
                 mapped_builtin_types,
-                item.stype.used_ty.metadata.schema_key,
-                item.stype.used_ty.metadata.type_origin,
+                schema_key,
+                type_origin,
                 mapped_types,
                 mapped_enums,
                 mapped_extension_sqls,
@@ -1217,12 +1231,12 @@ fn initialize_aggregates<'a>(
         }
 
         if let Some(arg) = &item.mstype {
-            if !arg.has_explicit_composite_sql() {
+            if let Some((schema_key, type_origin)) = arg.resolution() {
                 initialize_resolved_type(
                     graph,
                     mapped_builtin_types,
-                    arg.metadata.schema_key,
-                    arg.metadata.type_origin,
+                    schema_key,
+                    type_origin,
                     mapped_types,
                     mapped_enums,
                     mapped_extension_sqls,
@@ -1261,16 +1275,18 @@ fn connect_aggregate<'a>(
     );
 
     for arg in &item.args {
-        if arg.used_ty.has_explicit_composite_sql() {
+        if !arg.used_ty.needs_type_resolution() {
             continue;
         }
         let slot = aggregate_slot(arg.name, "argument");
+        let (schema_key, type_origin) =
+            arg.used_ty.resolution().expect("aggregate arguments should carry resolution metadata");
         connect_resolved_type(
             graph,
             index,
             SqlGraphRequires::ByArg,
-            arg.used_ty.metadata.schema_key,
-            arg.used_ty.metadata.type_origin,
+            schema_key,
+            type_origin,
             types,
             enums,
             builtin_types,
@@ -1283,16 +1299,20 @@ fn connect_aggregate<'a>(
     }
 
     for arg in item.direct_args.as_ref().unwrap_or(&vec![]) {
-        if arg.used_ty.has_explicit_composite_sql() {
+        if !arg.used_ty.needs_type_resolution() {
             continue;
         }
         let slot = aggregate_slot(arg.name, "direct argument");
+        let (schema_key, type_origin) = arg
+            .used_ty
+            .resolution()
+            .expect("aggregate direct arguments should carry resolution metadata");
         connect_resolved_type(
             graph,
             index,
             SqlGraphRequires::ByArg,
-            arg.used_ty.metadata.schema_key,
-            arg.used_ty.metadata.type_origin,
+            schema_key,
+            type_origin,
             types,
             enums,
             builtin_types,
@@ -1305,13 +1325,13 @@ fn connect_aggregate<'a>(
     }
 
     if let Some(arg) = &item.mstype {
-        if !arg.has_explicit_composite_sql() {
+        if let Some((schema_key, type_origin)) = arg.resolution() {
             connect_resolved_type(
                 graph,
                 index,
                 SqlGraphRequires::ByArg,
-                arg.metadata.schema_key,
-                arg.metadata.type_origin,
+                schema_key,
+                type_origin,
                 types,
                 enums,
                 builtin_types,
@@ -1324,13 +1344,13 @@ fn connect_aggregate<'a>(
         }
     }
 
-    if !item.stype.used_ty.has_explicit_composite_sql() {
+    if let Some((schema_key, type_origin)) = item.stype.used_ty.resolution() {
         connect_resolved_type(
             graph,
             index,
             SqlGraphRequires::ByArg,
-            item.stype.used_ty.metadata.schema_key,
-            item.stype.used_ty.metadata.type_origin,
+            schema_key,
+            type_origin,
             types,
             enums,
             builtin_types,
@@ -1713,7 +1733,7 @@ mod tests {
     use super::*;
     use crate::UsedTypeEntity;
     use crate::aggregate::entity::{AggregateTypeEntity, PgAggregateEntity};
-    use crate::extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntityData};
+    use crate::extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredTypeEntityData};
     use crate::metadata::{FunctionMetadataTypeEntity, Returns, SqlArrayMapping, SqlMapping};
     use crate::pg_extern::entity::{PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity};
     use crate::postgres_type::entity::PostgresTypeEntity;
@@ -1749,12 +1769,12 @@ mod tests {
             variadic: false,
             default: None,
             optional: false,
-            metadata: FunctionMetadataTypeEntity {
+            metadata: FunctionMetadataTypeEntity::resolved(
                 schema_key,
                 type_origin,
-                argument_sql: Ok(SqlMapping::literal(sql)),
-                return_sql: Ok(Returns::One(SqlMapping::literal(sql))),
-            },
+                Ok(SqlMapping::literal(sql)),
+                Ok(Returns::One(SqlMapping::literal(sql))),
+            ),
         }
     }
 
@@ -1851,7 +1871,7 @@ mod tests {
             bootstrap: false,
             finalize: false,
             requires: vec![],
-            creates: vec![SqlDeclaredEntity::Type(SqlDeclaredEntityData {
+            creates: vec![SqlDeclaredEntity::Type(SqlDeclaredTypeEntityData {
                 sql: sql.into(),
                 name: name.into(),
                 schema_key: schema_key.into(),
@@ -1917,12 +1937,12 @@ mod tests {
             variadic: false,
             default: None,
             optional: false,
-            metadata: FunctionMetadataTypeEntity {
+            metadata: FunctionMetadataTypeEntity::resolved(
                 schema_key,
-                type_origin: TypeOrigin::ThisExtension,
-                argument_sql: Ok(SqlMapping::Skip),
-                return_sql: Ok(Returns::One(SqlMapping::Skip)),
-            },
+                TypeOrigin::ThisExtension,
+                Ok(SqlMapping::Skip),
+                Ok(Returns::One(SqlMapping::Skip)),
+            ),
         }
     }
 
@@ -1934,12 +1954,10 @@ mod tests {
             variadic: false,
             default: None,
             optional: false,
-            metadata: FunctionMetadataTypeEntity {
-                schema_key: "pgrx::heap_tuple::PgHeapTuple<'static, AllocatedByRust>",
-                type_origin: TypeOrigin::ThisExtension,
-                argument_sql: Ok(SqlMapping::Composite),
-                return_sql: Ok(Returns::One(SqlMapping::Composite)),
-            },
+            metadata: FunctionMetadataTypeEntity::sql_only(
+                Ok(SqlMapping::Composite),
+                Ok(Returns::One(SqlMapping::Composite)),
+            ),
         }
     }
 
@@ -1951,12 +1969,10 @@ mod tests {
             variadic: false,
             default: None,
             optional: false,
-            metadata: FunctionMetadataTypeEntity {
-                schema_key: "pgrx::heap_tuple::PgHeapTuple<'static, AllocatedByRust>",
-                type_origin: TypeOrigin::ThisExtension,
-                argument_sql: Ok(SqlMapping::Array(SqlArrayMapping::Composite)),
-                return_sql: Ok(Returns::One(SqlMapping::Array(SqlArrayMapping::Composite))),
-            },
+            metadata: FunctionMetadataTypeEntity::sql_only(
+                Ok(SqlMapping::Array(SqlArrayMapping::Composite)),
+                Ok(Returns::One(SqlMapping::Array(SqlArrayMapping::Composite))),
+            ),
         }
     }
 
@@ -2071,11 +2087,10 @@ mod tests {
 
     #[test]
     fn explicit_composite_type_does_not_require_schema_resolution() {
-        let function = function_entity(
-            "make_dog",
-            vec![],
-            PgExternReturnEntity::Type { ty: explicit_composite_type("Dog") },
-        );
+        let dog = explicit_composite_type("Dog");
+        assert!(!dog.needs_type_resolution());
+
+        let function = function_entity("make_dog", vec![], PgExternReturnEntity::Type { ty: dog });
 
         let sql = PgrxSql::build(
             vec![SqlGraphEntity::ExtensionRoot(control_file()), SqlGraphEntity::Function(function)]
@@ -2092,11 +2107,11 @@ mod tests {
 
     #[test]
     fn explicit_composite_array_type_does_not_require_schema_resolution() {
-        let function = function_entity(
-            "make_dog_pack",
-            vec![],
-            PgExternReturnEntity::Type { ty: explicit_composite_array_type("Dog") },
-        );
+        let dog_pack = explicit_composite_array_type("Dog");
+        assert!(!dog_pack.needs_type_resolution());
+
+        let function =
+            function_entity("make_dog_pack", vec![], PgExternReturnEntity::Type { ty: dog_pack });
 
         let sql = PgrxSql::build(
             vec![SqlGraphEntity::ExtensionRoot(control_file()), SqlGraphEntity::Function(function)]
@@ -2113,12 +2128,12 @@ mod tests {
 
     #[test]
     fn explicit_composite_array_aggregate_state_does_not_require_schema_resolution() {
-        let aggregate = aggregate_entity(
-            "pack_dogs",
-            vec![],
-            explicit_composite_array_type("Dog"),
-            Some(explicit_composite_array_type("Dog")),
-        );
+        let stype = explicit_composite_array_type("Dog");
+        assert!(!stype.needs_type_resolution());
+        let mstype = explicit_composite_array_type("Dog");
+        assert!(!mstype.needs_type_resolution());
+
+        let aggregate = aggregate_entity("pack_dogs", vec![], stype, Some(mstype));
 
         let sql = PgrxSql::build(
             vec![

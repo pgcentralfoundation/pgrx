@@ -21,7 +21,7 @@ This document captured the branch state at review time. On the current
 
 - missing `.pgrx_schema` now errors with a targeted message
 - bad `SCHEMA_KEY` fallback is fixed through explicit declared-type resolution
-  and `TYPE_ORIGIN`
+  while `TYPE_ORIGIN` stays explicit on `SqlTranslatable`
 - `SetOfIterator` rejects argument position again
 - the `HexInt` example already uses the const-based `SqlTranslatable` API
 - install-time schema stripping is obsolete on this branch

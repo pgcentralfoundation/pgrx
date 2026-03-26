@@ -245,12 +245,12 @@ pub unsafe trait SqlTranslatable {
         Self::RETURN_SQL.map(Into::into)
     }
     fn entity() -> FunctionMetadataTypeEntity<'static> {
-        FunctionMetadataTypeEntity {
-            schema_key: Self::SCHEMA_KEY,
-            type_origin: Self::TYPE_ORIGIN,
-            argument_sql: Self::argument_sql(),
-            return_sql: Self::return_sql(),
-        }
+        FunctionMetadataTypeEntity::resolved(
+            Self::SCHEMA_KEY,
+            Self::TYPE_ORIGIN,
+            Self::argument_sql(),
+            Self::return_sql(),
+        )
     }
 }
 

@@ -16,8 +16,8 @@ The two blocking questions from that review are resolved on this branch:
    builtin placeholder.
 2. Whether `TYPE_ORIGIN` needs to be encoded for declared type and enum entries.
    Resolution: no. The current implementation only resolves declared entries by
-   `SCHEMA_KEY`, so declared type metadata carries `SCHEMA_KEY` plus SQL mapping,
-   while `TYPE_ORIGIN` remains on `SqlTranslatable` / `UsedType` metadata, where
+   `SCHEMA_KEY`, so declared type metadata carries just `SCHEMA_KEY` plus SQL mapping.
+   `TYPE_ORIGIN` stays explicit on `SqlTranslatable` / `UsedType` metadata, where
    unresolved-type decisions are actually made.
 
 The result is closer to the RFC model from
@@ -65,6 +65,8 @@ actually consumes:
 - SQL mapping
 - the corresponding section decoder path for those values
 
+Declared type and enum entries do not duplicate `TYPE_ORIGIN`.
+
 `TYPE_ORIGIN` still lives on `SqlTranslatable`-derived metadata for function args,
 returns, aggregates, and other used-type positions, which is where the resolver
 needs it.
@@ -95,13 +97,13 @@ Regression coverage:
 - `extension_sql_declared_type_orders_before_function_and_aggregate`
 - `extension_sql_declared_type_in_custom_schema_prefixes_aggregate_state_type`
 
-#### 2. `TYPE_ORIGIN` on declared entries
+#### 2. Declared entries do not store `TYPE_ORIGIN`
 
 Status: closed with a narrower design
 
 What changed:
 
-- `SqlDeclaredEntityData` stores `SCHEMA_KEY` plus SQL mapping
+- declared type and enum entries store `SCHEMA_KEY` plus SQL mapping
 - declared type and enum section entries encode and decode those values
 - `TYPE_ORIGIN` stays on `SqlTranslatable` / `UsedType` metadata instead of being
   duplicated on declared entries

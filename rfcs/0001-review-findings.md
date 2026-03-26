@@ -21,7 +21,7 @@ On `wip-one-compile-please` as it exists now:
 - the section result tags use named constants
 - the install-time schema-stripping dependency is obsolete on this branch
 - unresolved `SCHEMA_KEY` fallback is now handled through explicit declared-type
-  resolution and `TYPE_ORIGIN`
+  resolution, while `TYPE_ORIGIN` stays explicit on `SqlTranslatable`
 
 ---
 

@@ -10,7 +10,9 @@
 
 use crate::aggregate::entity::{AggregateTypeEntity, PgAggregateEntity};
 use crate::aggregate::{FinalizeModify, ParallelOption};
-use crate::extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntity, SqlDeclaredEntityData};
+use crate::extension_sql::entity::{
+    ExtensionSqlEntity, SqlDeclaredEntity, SqlDeclaredFunctionEntityData, SqlDeclaredTypeEntityData,
+};
 use crate::extern_args::ExternArgs;
 use crate::metadata::{
     ArgumentError, FunctionMetadataTypeEntity, Returns, ReturnsError, ReturnsRef, SqlArrayMapping,
@@ -241,6 +243,20 @@ pub const fn return_sql_len(value: Result<ReturnsRef, ReturnsError>) -> usize {
         }
 }
 
+pub const fn function_metadata_type_len(
+    resolution: Option<&str>,
+    argument_sql: Result<SqlMappingRef, ArgumentError>,
+    return_sql: Result<ReturnsRef, ReturnsError>,
+) -> usize {
+    bool_len()
+        + match resolution {
+            Some(schema_key) => str_len(schema_key) + u8_len(),
+            None => 0,
+        }
+        + argument_sql_len(argument_sql)
+        + return_sql_len(return_sql)
+}
+
 #[derive(Clone, Copy)]
 pub struct EntryWriter<const N: usize> {
     buf: [u8; N],
@@ -265,6 +281,13 @@ impl<const N: usize> EntryWriter<N> {
     pub const fn u32(self, value: u32) -> Self {
         let [b0, b1, b2, b3] = value.to_le_bytes();
         self.u8(b0).u8(b1).u8(b2).u8(b3)
+    }
+
+    pub const fn type_origin(self, value: TypeOrigin) -> Self {
+        self.u8(match value {
+            TypeOrigin::ThisExtension => TYPE_ORIGIN_THIS_EXTENSION,
+            TypeOrigin::External => TYPE_ORIGIN_EXTERNAL,
+        })
     }
 
     pub const fn bytes(mut self, value: &[u8]) -> Self {
@@ -376,6 +399,21 @@ impl<const N: usize> EntryWriter<N> {
             Ok(returns) => self.u8(RESULT_OK).returns(returns),
             Err(err) => self.u8(RESULT_ERR).returns_error(err),
         }
+    }
+
+    pub const fn function_metadata_type(
+        self,
+        resolution: Option<(&str, TypeOrigin)>,
+        argument_sql: Result<SqlMappingRef, ArgumentError>,
+        return_sql: Result<ReturnsRef, ReturnsError>,
+    ) -> Self {
+        let writer = match resolution {
+            Some((schema_key, type_origin)) => {
+                self.bool(true).str(schema_key).type_origin(type_origin)
+            }
+            None => self.bool(false),
+        };
+        writer.argument_sql(argument_sql).return_sql(return_sql)
     }
 
     pub const fn finish(self) -> [u8; N] {
@@ -589,9 +627,16 @@ impl<'a> EntryReader<'a> {
     }
 
     pub fn read_function_metadata_type(&mut self) -> Result<FunctionMetadataTypeEntity<'a>> {
+        let resolution = if self.read_bool()? {
+            Some(crate::metadata::FunctionMetadataTypeResolutionEntity {
+                schema_key: self.read_str()?,
+                type_origin: self.read_type_origin()?,
+            })
+        } else {
+            None
+        };
         Ok(FunctionMetadataTypeEntity {
-            schema_key: self.read_str()?,
-            type_origin: self.read_type_origin()?,
+            resolution,
             argument_sql: self.read_argument_sql_owned()?,
             return_sql: self.read_return_sql_owned()?,
         })
@@ -720,7 +765,7 @@ impl<'a> EntryReader<'a> {
                     }
                     Err(err) => return Err(err.into()),
                 };
-                let data = SqlDeclaredEntityData { sql, name, schema_key };
+                let data = SqlDeclaredTypeEntityData { sql, name, schema_key };
                 Ok(match kind {
                     SQL_DECLARED_TYPE => SqlDeclaredEntity::Type(data),
                     SQL_DECLARED_ENUM => SqlDeclaredEntity::Enum(data),
@@ -733,11 +778,7 @@ impl<'a> EntryReader<'a> {
                     .last()
                     .ok_or_else(|| eyre!("function declaration was missing a name"))?
                     .to_owned();
-                Ok(SqlDeclaredEntity::Function(SqlDeclaredEntityData {
-                    sql,
-                    schema_key: name.clone(),
-                    name,
-                }))
+                Ok(SqlDeclaredEntity::Function(SqlDeclaredFunctionEntityData { sql, name }))
             }
             other => Err(eyre!("invalid SQL declared tag in schema entry: {other}")),
         }
@@ -1107,25 +1148,27 @@ mod tests {
     fn round_trip_function_metadata_type_preserves_type_origin() {
         const SCHEMA_KEY: &str = "tests::FancyText";
         const SQL: &str = "TEXT";
-        const PAYLOAD_LEN: usize = str_len(SCHEMA_KEY)
-            + u8_len()
-            + argument_sql_len(Ok(SqlMappingRef::literal(SQL)))
-            + return_sql_len(Ok(ReturnsRef::One(SqlMappingRef::literal(SQL))));
+        const PAYLOAD_LEN: usize = function_metadata_type_len(
+            Some(SCHEMA_KEY),
+            Ok(SqlMappingRef::literal(SQL)),
+            Ok(ReturnsRef::One(SqlMappingRef::literal(SQL))),
+        );
         const TOTAL_LEN: usize = u32_len() + PAYLOAD_LEN;
         const ENTRY: [u8; TOTAL_LEN] = EntryWriter::<TOTAL_LEN>::new()
             .u32(PAYLOAD_LEN as u32)
-            .str(SCHEMA_KEY)
-            .u8(TYPE_ORIGIN_EXTERNAL)
-            .argument_sql(Ok(SqlMappingRef::literal(SQL)))
-            .return_sql(Ok(ReturnsRef::One(SqlMappingRef::literal(SQL))))
+            .function_metadata_type(
+                Some((SCHEMA_KEY, TypeOrigin::External)),
+                Ok(SqlMappingRef::literal(SQL)),
+                Ok(ReturnsRef::One(SqlMappingRef::literal(SQL))),
+            )
             .finish();
 
         let payloads = entry_payloads(&ENTRY).unwrap();
         let mut reader = EntryReader::new(payloads[0]);
         let metadata = reader.read_function_metadata_type().unwrap();
 
-        assert_eq!(metadata.schema_key, SCHEMA_KEY);
-        assert_eq!(metadata.type_origin, TypeOrigin::External);
+        assert_eq!(metadata.schema_key(), Some(SCHEMA_KEY));
+        assert_eq!(metadata.type_origin(), Some(TypeOrigin::External));
         assert_eq!(metadata.argument_sql, Ok(SqlMapping::literal(SQL)));
         assert_eq!(metadata.return_sql, Ok(Returns::One(SqlMapping::literal(SQL))));
         assert!(reader.is_empty());
@@ -1134,22 +1177,25 @@ mod tests {
     #[test]
     fn round_trip_function_metadata_type_preserves_array_mappings() {
         const SCHEMA_KEY: &str = "tests::FancyNumeric";
-        const PAYLOAD_LEN: usize = str_len(SCHEMA_KEY)
-            + u8_len()
-            + argument_sql_len(Ok(SqlMappingRef::Array(SqlArrayMappingRef::As("INT"))))
-            + return_sql_len(Ok(ReturnsRef::One(SqlMappingRef::Array(
-                SqlArrayMappingRef::Numeric { precision: Some(10), scale: Some(2) },
-            ))));
+        const PAYLOAD_LEN: usize = function_metadata_type_len(
+            Some(SCHEMA_KEY),
+            Ok(SqlMappingRef::Array(SqlArrayMappingRef::As("INT"))),
+            Ok(ReturnsRef::One(SqlMappingRef::Array(SqlArrayMappingRef::Numeric {
+                precision: Some(10),
+                scale: Some(2),
+            }))),
+        );
         const TOTAL_LEN: usize = u32_len() + PAYLOAD_LEN;
         const ENTRY: [u8; TOTAL_LEN] = EntryWriter::<TOTAL_LEN>::new()
             .u32(PAYLOAD_LEN as u32)
-            .str(SCHEMA_KEY)
-            .u8(TYPE_ORIGIN_EXTERNAL)
-            .argument_sql(Ok(SqlMappingRef::Array(SqlArrayMappingRef::As("INT"))))
-            .return_sql(Ok(ReturnsRef::One(SqlMappingRef::Array(SqlArrayMappingRef::Numeric {
-                precision: Some(10),
-                scale: Some(2),
-            }))))
+            .function_metadata_type(
+                Some((SCHEMA_KEY, TypeOrigin::External)),
+                Ok(SqlMappingRef::Array(SqlArrayMappingRef::As("INT"))),
+                Ok(ReturnsRef::One(SqlMappingRef::Array(SqlArrayMappingRef::Numeric {
+                    precision: Some(10),
+                    scale: Some(2),
+                }))),
+            )
             .finish();
 
         let payloads = entry_payloads(&ENTRY).unwrap();
@@ -1169,20 +1215,19 @@ mod tests {
 
     #[test]
     fn round_trip_function_metadata_type_preserves_composite_array_mappings() {
-        const SCHEMA_KEY: &str = "tests::FancyComposite";
-        const PAYLOAD_LEN: usize = str_len(SCHEMA_KEY)
-            + u8_len()
-            + argument_sql_len(Ok(SqlMappingRef::Array(SqlArrayMappingRef::Composite)))
-            + return_sql_len(Ok(ReturnsRef::One(SqlMappingRef::Array(
-                SqlArrayMappingRef::Composite,
-            ))));
+        const PAYLOAD_LEN: usize = function_metadata_type_len(
+            None,
+            Ok(SqlMappingRef::Array(SqlArrayMappingRef::Composite)),
+            Ok(ReturnsRef::One(SqlMappingRef::Array(SqlArrayMappingRef::Composite))),
+        );
         const TOTAL_LEN: usize = u32_len() + PAYLOAD_LEN;
         const ENTRY: [u8; TOTAL_LEN] = EntryWriter::<TOTAL_LEN>::new()
             .u32(PAYLOAD_LEN as u32)
-            .str(SCHEMA_KEY)
-            .u8(TYPE_ORIGIN_EXTERNAL)
-            .argument_sql(Ok(SqlMappingRef::Array(SqlArrayMappingRef::Composite)))
-            .return_sql(Ok(ReturnsRef::One(SqlMappingRef::Array(SqlArrayMappingRef::Composite))))
+            .function_metadata_type(
+                None,
+                Ok(SqlMappingRef::Array(SqlArrayMappingRef::Composite)),
+                Ok(ReturnsRef::One(SqlMappingRef::Array(SqlArrayMappingRef::Composite))),
+            )
             .finish();
 
         let payloads = entry_payloads(&ENTRY).unwrap();
@@ -1194,23 +1239,27 @@ mod tests {
             metadata.return_sql,
             Ok(Returns::One(SqlMapping::Array(SqlArrayMapping::Composite)))
         );
+        assert_eq!(metadata.schema_key(), None);
+        assert_eq!(metadata.type_origin(), None);
         assert!(reader.is_empty());
     }
 
     #[test]
     fn round_trip_function_metadata_type_preserves_nested_array_errors() {
         const SCHEMA_KEY: &str = "tests::NestedArrayError";
-        const PAYLOAD_LEN: usize = str_len(SCHEMA_KEY)
-            + u8_len()
-            + argument_sql_len(Err(ArgumentError::NestedArray))
-            + return_sql_len(Err(ReturnsError::NestedArray));
+        const PAYLOAD_LEN: usize = function_metadata_type_len(
+            Some(SCHEMA_KEY),
+            Err(ArgumentError::NestedArray),
+            Err(ReturnsError::NestedArray),
+        );
         const TOTAL_LEN: usize = u32_len() + PAYLOAD_LEN;
         const ENTRY: [u8; TOTAL_LEN] = EntryWriter::<TOTAL_LEN>::new()
             .u32(PAYLOAD_LEN as u32)
-            .str(SCHEMA_KEY)
-            .u8(TYPE_ORIGIN_EXTERNAL)
-            .argument_sql(Err(ArgumentError::NestedArray))
-            .return_sql(Err(ReturnsError::NestedArray))
+            .function_metadata_type(
+                Some((SCHEMA_KEY, TypeOrigin::External)),
+                Err(ArgumentError::NestedArray),
+                Err(ReturnsError::NestedArray),
+            )
             .finish();
 
         let payloads = entry_payloads(&ENTRY).unwrap();
@@ -1246,6 +1295,26 @@ mod tests {
 
         assert_eq!(declared.schema_key(), Some(SCHEMA_KEY));
         assert_eq!(declared.sql(), SQL);
+        assert!(reader.is_empty());
+    }
+
+    #[test]
+    fn round_trip_sql_declared_function_skips_schema_key() {
+        const NAME: &str = "tests::helper_fn";
+        const PAYLOAD_LEN: usize = u8_len() + str_len(NAME);
+        const TOTAL_LEN: usize = u32_len() + PAYLOAD_LEN;
+        const ENTRY: [u8; TOTAL_LEN] = EntryWriter::<TOTAL_LEN>::new()
+            .u32(PAYLOAD_LEN as u32)
+            .u8(SQL_DECLARED_FUNCTION)
+            .str(NAME)
+            .finish();
+
+        let payloads = entry_payloads(&ENTRY).unwrap();
+        let mut reader = EntryReader::new(payloads[0]);
+        let declared = reader.read_sql_declared().unwrap();
+
+        assert_eq!(declared.schema_key(), None);
+        assert_eq!(declared.sql(), "helper_fn");
         assert!(reader.is_empty());
     }
 }

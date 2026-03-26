@@ -110,16 +110,23 @@ impl ToSql for ExtensionSqlEntity<'_> {
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
-pub struct SqlDeclaredEntityData {
+pub struct SqlDeclaredTypeEntityData {
     pub(crate) sql: String,
     pub(crate) name: String,
     pub(crate) schema_key: String,
 }
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
+pub struct SqlDeclaredFunctionEntityData {
+    pub(crate) sql: String,
+    pub(crate) name: String,
+}
+
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
 pub enum SqlDeclaredEntity {
-    Type(SqlDeclaredEntityData),
-    Enum(SqlDeclaredEntityData),
-    Function(SqlDeclaredEntityData),
+    Type(SqlDeclaredTypeEntityData),
+    Enum(SqlDeclaredTypeEntityData),
+    Function(SqlDeclaredFunctionEntityData),
 }
 
 impl Display for SqlDeclaredEntity {
@@ -140,19 +147,25 @@ impl Display for SqlDeclaredEntity {
 
 impl SqlDeclaredEntity {
     pub fn build(variant: &str, name: &str) -> eyre::Result<Self> {
-        let data = SqlDeclaredEntityData {
-            sql: name
-                .split("::")
-                .last()
-                .ok_or_else(|| eyre::eyre!("Did not get SQL for `{}`", name))?
-                .to_string(),
-            name: name.to_string(),
-            schema_key: name.to_string(),
-        };
+        let sql = name
+            .split("::")
+            .last()
+            .ok_or_else(|| eyre::eyre!("Did not get SQL for `{}`", name))?
+            .to_string();
         let retval = match variant {
-            "Type" => Self::Type(data),
-            "Enum" => Self::Enum(data),
-            "Function" => Self::Function(data),
+            "Type" => Self::Type(SqlDeclaredTypeEntityData {
+                sql,
+                name: name.to_string(),
+                schema_key: name.to_string(),
+            }),
+            "Enum" => Self::Enum(SqlDeclaredTypeEntityData {
+                sql,
+                name: name.to_string(),
+                schema_key: name.to_string(),
+            }),
+            "Function" => {
+                Self::Function(SqlDeclaredFunctionEntityData { sql, name: name.to_string() })
+            }
             _ => {
                 return Err(eyre::eyre!(
                     "Can only declare `Type(Ident)`, `Enum(Ident)` or `Function(Ident)`"
@@ -193,7 +206,7 @@ impl SqlDeclaredEntity {
             }
             Err(err) => return Err(err.into()),
         };
-        let data = SqlDeclaredEntityData {
+        let data = SqlDeclaredTypeEntityData {
             sql,
             name: name.to_string(),
             schema_key: T::SCHEMA_KEY.to_string(),
@@ -225,12 +238,14 @@ impl SqlDeclaredEntity {
     pub fn has_sql_declared_entity(&self, identifier: &SqlDeclared) -> bool {
         match (&identifier, &self) {
             (SqlDeclared::Type(ident_name), &SqlDeclaredEntity::Type(data))
-            | (SqlDeclared::Enum(ident_name), &SqlDeclaredEntity::Enum(data))
-            | (SqlDeclared::Function(ident_name), &SqlDeclaredEntity::Function(data)) => {
+            | (SqlDeclared::Enum(ident_name), &SqlDeclaredEntity::Enum(data)) => {
                 if ident_name == &data.name || ident_name == &data.schema_key {
                     return true;
                 }
                 false
+            }
+            (SqlDeclared::Function(ident_name), &SqlDeclaredEntity::Function(data)) => {
+                ident_name == &data.name
             }
             _ => false,
         }
@@ -284,5 +299,16 @@ mod tests {
         let error = SqlDeclaredEntity::build_type::<ExternalType>("Enum", "tests::ExternalType")
             .unwrap_err();
         assert!(error.to_string().contains("only valid for extension-owned SQL types"));
+    }
+
+    #[test]
+    fn function_declarations_do_not_carry_schema_keys() {
+        let declared = SqlDeclaredEntity::build("Function", "tests::helper_fn").unwrap();
+
+        assert_eq!(declared.schema_key(), None);
+        assert_eq!(declared.sql(), "helper_fn");
+        assert!(
+            declared.has_sql_declared_entity(&SqlDeclared::Function("tests::helper_fn".into()))
+        );
     }
 }
