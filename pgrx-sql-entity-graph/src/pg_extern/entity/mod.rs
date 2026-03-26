@@ -149,18 +149,19 @@ impl ToSql for PgExternEntity<'_> {
                 .collect::<Vec<_>>();
             for (idx, arg) in sql_args.iter().enumerate() {
                 let needs_comma = idx < (sql_args.len().saturating_sub(1));
+                let schema_prefix = context.schema_prefix_for_used_type(
+                    &self_index,
+                    &format!("argument `{}`", arg.pattern),
+                    &arg.used_ty,
+                )?;
                 match arg.used_ty.metadata.argument_sql {
                     Ok(SqlMapping::As(ref argument_sql)) => {
-                        let graph_index =
-                            context.find_type_dependency(&self_index, &arg.used_ty).ok_or_else(
-                                || eyre!("Could not find arg type in graph. Got: {:?}", arg),
-                            )?;
                         let buf = format!(
                             "\
                                             \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
                                         ",
                             pattern = arg.pattern,
-                            schema_prefix = context.schema_prefix_for(&graph_index),
+                            schema_prefix = schema_prefix,
                             // The SQL spelling comes from the embedded schema metadata.
                             sql_type = argument_sql,
                             default = if let Some(def) = arg.used_ty.default {
@@ -181,7 +182,7 @@ impl ToSql for PgExternEntity<'_> {
                             \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
                         ",
                             pattern = arg.pattern,
-                            schema_prefix = "",
+                            schema_prefix = schema_prefix,
                             // The SQL spelling comes from the embedded schema metadata.
                             sql_type = sql,
                             default = if let Some(def) = arg.used_ty.default {
@@ -208,15 +209,14 @@ impl ToSql for PgExternEntity<'_> {
             PgExternReturnEntity::None => String::from("RETURNS void"),
             PgExternReturnEntity::Type { ty } => {
                 let (schema_prefix, sql_type) = match &ty.metadata.return_sql {
-                    Ok(Returns::One(SqlMapping::As(sql))) => {
-                        let graph_index = context
-                            .find_type_dependency(&self_index, ty)
-                            .ok_or_else(|| eyre!("Could not find return type in graph."))?;
-                        (context.schema_prefix_for(&graph_index), sql.clone())
-                    }
-                    Ok(Returns::One(mapping @ (SqlMapping::Composite | SqlMapping::Array(_)))) => {
-                        (String::new(), sql_type(mapping, ty.composite_type)?)
-                    }
+                    Ok(Returns::One(SqlMapping::As(sql))) => (
+                        context.schema_prefix_for_used_type(&self_index, "return type", ty)?,
+                        sql.clone(),
+                    ),
+                    Ok(Returns::One(mapping @ (SqlMapping::Composite | SqlMapping::Array(_)))) => (
+                        context.schema_prefix_for_used_type(&self_index, "return type", ty)?,
+                        sql_type(mapping, ty.composite_type)?,
+                    ),
                     Ok(other) => {
                         return Err(eyre!(
                             "Got non-plain mapped/composite return variant SQL in what macro-expansion thought was a type, got: {other:?}"
@@ -232,16 +232,25 @@ impl ToSql for PgExternEntity<'_> {
             PgExternReturnEntity::SetOf { ty, .. } => {
                 let (schema_prefix, sql_type) = match &ty.metadata.return_sql {
                     Ok(Returns::One(SqlMapping::As(sql)))
-                    | Ok(Returns::SetOf(SqlMapping::As(sql))) => {
-                        let graph_index = context
-                            .find_type_dependency(&self_index, ty)
-                            .ok_or_else(|| eyre!("Could not find return type in graph."))?;
-                        (context.schema_prefix_for(&graph_index), sql.clone())
-                    }
+                    | Ok(Returns::SetOf(SqlMapping::As(sql))) => (
+                        context.schema_prefix_for_used_type(
+                            &self_index,
+                            "setof return type",
+                            ty,
+                        )?,
+                        sql.clone(),
+                    ),
                     Ok(Returns::One(mapping @ (SqlMapping::Composite | SqlMapping::Array(_))))
                     | Ok(Returns::SetOf(
                         mapping @ (SqlMapping::Composite | SqlMapping::Array(_)),
-                    )) => (String::new(), sql_type(mapping, ty.composite_type)?),
+                    )) => (
+                        context.schema_prefix_for_used_type(
+                            &self_index,
+                            "setof return type",
+                            ty,
+                        )?,
+                        sql_type(mapping, ty.composite_type)?,
+                    ),
                     Ok(other) => {
                         return Err(eyre!(
                             "Got non-scalar mapped/composite return variant SQL in what macro-expansion thought was a setof item, got: {other:?}"
@@ -256,17 +265,29 @@ impl ToSql for PgExternEntity<'_> {
             }
             PgExternReturnEntity::Iterated { tys: table_items, .. } => {
                 let mut items = String::new();
-                for (idx, returning::PgExternReturnEntityIteratedItem { ty, name: col_name }) in
+                for (idx, PgExternReturnEntityIteratedItem { ty, name: col_name }) in
                     table_items.iter().enumerate()
                 {
-                    let graph_index = context.find_type_dependency(&self_index, ty);
-
                     let needs_comma = idx < (table_items.len() - 1);
-                    let ty_resolved = match &ty.metadata.return_sql {
-                        Ok(Returns::One(SqlMapping::As(sql))) => sql.clone(),
+                    let (schema_prefix, ty_resolved) = match &ty.metadata.return_sql {
+                        Ok(Returns::One(SqlMapping::As(sql))) => (
+                            context.schema_prefix_for_used_type(
+                                &self_index,
+                                "table return column",
+                                ty,
+                            )?,
+                            sql.clone(),
+                        ),
                         Ok(Returns::One(
                             mapping @ (SqlMapping::Composite | SqlMapping::Array(_)),
-                        )) => sql_type(mapping, ty.composite_type)?,
+                        )) => (
+                            context.schema_prefix_for_used_type(
+                                &self_index,
+                                "table return column",
+                                ty,
+                            )?,
+                            sql_type(mapping, ty.composite_type)?,
+                        ),
                         Ok(other) => {
                             return Err(eyre!(
                                 "Got non-scalar table return item SQL in what macro-expansion thought was a table, got: {other:?}"
@@ -279,11 +300,7 @@ impl ToSql for PgExternEntity<'_> {
                         col_name = col_name.expect(
                             "An iterator of tuples should have `named!()` macro declarations."
                         ),
-                        schema_prefix = if let Some(graph_index) = graph_index {
-                            context.schema_prefix_for(&graph_index)
-                        } else {
-                            "".into()
-                        },
+                        schema_prefix = schema_prefix,
                         ty_resolved = ty_resolved,
                         needs_comma = if needs_comma { ", " } else { " " },
                         ty_name = ty.full_path
@@ -401,13 +418,11 @@ impl ToSql for PgExternEntity<'_> {
                 .fn_args
                 .first()
                 .ok_or_else(|| eyre!("Did not find `left_arg` for operator `{}`.", self.name))?;
-            let left_arg_graph_index = context
-                .graph
-                .neighbors_undirected(self_index)
-                .find(|neighbor| context.graph[*neighbor].type_matches(&left_arg.used_ty))
-                .ok_or_else(|| {
-                    eyre!("Could not find left arg type in graph. Got: {:?}", left_arg)
-                })?;
+            let left_arg_schema_prefix = context.schema_prefix_for_used_type(
+                &self_index,
+                "operator left argument",
+                &left_arg.used_ty,
+            )?;
             let left_arg_sql = match left_arg.used_ty.metadata.argument_sql {
                 Ok(SqlMapping::As(ref sql)) => sql.clone(),
                 Ok(ref mapping @ (SqlMapping::Composite | SqlMapping::Array(_))) => {
@@ -425,13 +440,11 @@ impl ToSql for PgExternEntity<'_> {
                 .fn_args
                 .get(1)
                 .ok_or_else(|| eyre!("Did not find `left_arg` for operator `{}`.", self.name))?;
-            let right_arg_graph_index = context
-                .graph
-                .neighbors_undirected(self_index)
-                .find(|neighbor| context.graph[*neighbor].type_matches(&right_arg.used_ty))
-                .ok_or_else(|| {
-                    eyre!("Could not find right arg type in graph. Got: {:?}", right_arg)
-                })?;
+            let right_arg_schema_prefix = context.schema_prefix_for_used_type(
+                &self_index,
+                "operator right argument",
+                &right_arg.used_ty,
+            )?;
             let right_arg_sql = match right_arg.used_ty.metadata.argument_sql {
                 Ok(SqlMapping::As(ref sql)) => sql.clone(),
                 Ok(ref mapping @ (SqlMapping::Composite | SqlMapping::Array(_))) => {
@@ -464,8 +477,8 @@ impl ToSql for PgExternEntity<'_> {
                 opname = op.opname.unwrap(),
                 left_name = left_arg.used_ty.full_path,
                 right_name = right_arg.used_ty.full_path,
-                schema_prefix_left = context.schema_prefix_for(&left_arg_graph_index),
-                schema_prefix_right = context.schema_prefix_for(&right_arg_graph_index),
+                schema_prefix_left = left_arg_schema_prefix,
+                schema_prefix_right = right_arg_schema_prefix,
                 maybe_comma = if !optionals.is_empty() { "," } else { "" },
                 optionals = if !optionals.is_empty() {
                     optionals.join(",\n") + "\n"
@@ -477,19 +490,14 @@ impl ToSql for PgExternEntity<'_> {
         };
         if let Some(cast) = &self.cast {
             let target_fn_arg = &self.fn_return;
-            let target_arg_graph_index = context
-                .graph
-                .neighbors_undirected(self_index)
-                .find(|neighbor| matches!(target_fn_arg, PgExternReturnEntity::Type { ty } if context.graph[*neighbor].type_matches(ty)))
-                .ok_or_else(|| {
-                    eyre!("Could not find source type in graph. Got: {:?}", target_fn_arg)
-                })?;
             let target_ty = match target_fn_arg {
                 PgExternReturnEntity::Type { ty } => ty,
                 other => {
                     return Err(eyre!("Casts must return a plain type, got: {other:?}"));
                 }
             };
+            let target_arg_schema_prefix =
+                context.schema_prefix_for_used_type(&self_index, "cast target type", target_ty)?;
             let target_arg_sql = match &target_ty.metadata.return_sql {
                 Ok(Returns::One(SqlMapping::As(sql))) => sql.clone(),
                 Ok(Returns::One(mapping @ (SqlMapping::Composite | SqlMapping::Array(_)))) => {
@@ -507,13 +515,11 @@ impl ToSql for PgExternEntity<'_> {
                 .fn_args
                 .first()
                 .ok_or_else(|| eyre!("Did not find source type for cast `{}`.", self.name))?;
-            let source_arg_graph_index = context
-                .graph
-                .neighbors_undirected(self_index)
-                .find(|neighbor| context.graph[*neighbor].type_matches(&source_arg.used_ty))
-                .ok_or_else(|| {
-                    eyre!("Could not find source type in graph. Got: {:?}", source_arg)
-                })?;
+            let source_arg_schema_prefix = context.schema_prefix_for_used_type(
+                &self_index,
+                "cast source type",
+                &source_arg.used_ty,
+            )?;
             let source_arg_sql = match source_arg.used_ty.metadata.argument_sql {
                 Ok(SqlMapping::As(ref sql)) => sql.clone(),
                 Ok(ref mapping @ (SqlMapping::Composite | SqlMapping::Array(_))) => {
@@ -545,9 +551,9 @@ impl ToSql for PgExternEntity<'_> {
                 line = self.line,
                 name = self.name,
                 module_path = self.module_path,
-                schema_prefix_source = context.schema_prefix_for(&source_arg_graph_index),
+                schema_prefix_source = source_arg_schema_prefix,
                 source_name = source_arg.used_ty.full_path,
-                schema_prefix_target = context.schema_prefix_for(&target_arg_graph_index),
+                schema_prefix_target = target_arg_schema_prefix,
                 target_name = target_ty.full_path,
                 function_name = self.name,
             );

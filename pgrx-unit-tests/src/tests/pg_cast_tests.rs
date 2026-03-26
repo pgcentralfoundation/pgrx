@@ -50,6 +50,16 @@ mod pg_catalog {
     ) -> TestCastType {
         i
     }
+
+    #[pg_cast]
+    fn castdog_to_castcat(
+        dog: pgrx::composite_type!("CastDog"),
+    ) -> pgrx::composite_type!("CastCat") {
+        let name: Option<String> = dog.get_by_name("name").ok().flatten();
+        let mut cat = PgHeapTuple::new_composite_type("CastCat").unwrap();
+        cat.set_by_name("name", name).unwrap();
+        cat
+    }
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -98,5 +108,18 @@ mod tests {
             "SELECT castcontext = 'i' FROM pg_cast WHERE castsource = 'TestCastType'::regtype AND casttarget = 'bool'::regtype;",
         );
         assert_eq!(is_immutable, Ok(Some(true)));
+    }
+
+    #[pg_test]
+    fn assert_composite_cast_exists() {
+        let cast_exists = Spi::get_one::<bool>(
+            "SELECT EXISTS (\
+                SELECT 1 \
+                  FROM pg_cast \
+                 WHERE castsource = 'CastDog'::regtype \
+                   AND casttarget = 'CastCat'::regtype\
+            );",
+        );
+        assert_eq!(cast_exists, Ok(Some(true)));
     }
 }

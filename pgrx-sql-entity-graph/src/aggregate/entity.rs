@@ -282,17 +282,13 @@ impl ToSql for PgAggregateEntity<'_> {
             }
         };
 
-        let sql_type_for_slot =
-            |slot: &str, used_ty: &UsedTypeEntity| -> eyre::Result<(String, String)> {
-                let sql = map_ty(used_ty).wrap_err_with(|| format!("Mapping {slot}"))?;
-                if used_ty.has_explicit_composite_sql() {
-                    return Ok((String::new(), sql));
-                }
-                let type_index = context
-                    .find_type_dependency(&self_index, used_ty)
-                    .ok_or_else(|| eyre!("Could not find {slot} in graph. Got: {used_ty:?}"))?;
-                Ok((context.schema_prefix_for(&type_index), sql))
-            };
+        let sql_type_for_slot = |slot: &str,
+                                 used_ty: &UsedTypeEntity|
+         -> eyre::Result<(String, String)> {
+            let sql = map_ty(used_ty).wrap_err_with(|| format!("Mapping {slot}"))?;
+            let schema_prefix = context.schema_prefix_for_used_type(&self_index, slot, used_ty)?;
+            Ok((schema_prefix, sql))
+        };
         let (stype_schema, stype_sql) = sql_type_for_slot("STYPE", &self.stype.used_ty)?;
 
         if let Some(value) = &self.mstype {
@@ -319,15 +315,11 @@ impl ToSql for PgAggregateEntity<'_> {
             let mut args = Vec::new();
             for (idx, arg) in self.args.iter().enumerate() {
                 let needs_comma = idx < (self.args.len() - 1);
-                let schema_prefix = if arg.used_ty.has_explicit_composite_sql() {
-                    String::new()
-                } else {
-                    let graph_index =
-                        context.find_type_dependency(&self_index, &arg.used_ty).ok_or_else(
-                            || eyre!("Could not find arg type in graph. Got: {:?}", arg.used_ty),
-                        )?;
-                    context.schema_prefix_for(&graph_index)
-                };
+                let schema_prefix = context.schema_prefix_for_used_type(
+                    &self_index,
+                    arg.name.unwrap_or("aggregate argument"),
+                    &arg.used_ty,
+                )?;
                 let buf = format!(
                     "\
                        \t{name}{variadic}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
@@ -354,15 +346,17 @@ impl ToSql for PgAggregateEntity<'_> {
         let direct_args = if let Some(direct_args) = &self.direct_args {
             let mut args = Vec::new();
             for (idx, arg) in direct_args.iter().enumerate() {
-                let graph_index = context
-                    .find_type_dependency(&self_index, &arg.used_ty)
-                    .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
+                let schema_prefix = context.schema_prefix_for_used_type(
+                    &self_index,
+                    arg.name.unwrap_or("aggregate direct argument"),
+                    &arg.used_ty,
+                )?;
                 let needs_comma = idx < (direct_args.len() - 1);
                 let buf = format!(
                     "\
                     \t{maybe_name}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
                    ",
-                    schema_prefix = context.schema_prefix_for(&graph_index),
+                    schema_prefix = schema_prefix,
                     // The SQL spelling comes from the embedded schema metadata.
                     sql_type = map_ty(&arg.used_ty).wrap_err("Mapping direct arg type")?,
                     maybe_name = if let Some(name) = arg.name {

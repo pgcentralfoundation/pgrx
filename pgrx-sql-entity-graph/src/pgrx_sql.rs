@@ -20,6 +20,7 @@ use eyre::eyre;
 use petgraph::dot::Dot;
 use petgraph::graph::NodeIndex;
 use petgraph::stable_graph::StableGraph;
+use petgraph::visit::EdgeRef;
 use std::collections::{BTreeMap, HashMap};
 use std::fmt::Debug;
 use std::path::Path;
@@ -39,7 +40,7 @@ use crate::postgres_type::entity::PostgresTypeEntity;
 use crate::schema::entity::SchemaEntity;
 use crate::to_sql::ToSql;
 use crate::type_keyed;
-use crate::{SqlGraphEntity, SqlGraphIdentifier};
+use crate::{SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity};
 
 use super::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
@@ -417,6 +418,22 @@ impl<'a> PgrxSql<'a> {
             .find(|neighbor| self.graph[*neighbor].type_matches(ty))
     }
 
+    pub fn schema_prefix_for_used_type(
+        &self,
+        owner: &NodeIndex,
+        slot: &str,
+        used_ty: &UsedTypeEntity<'_>,
+    ) -> eyre::Result<String> {
+        if !used_ty.needs_type_resolution() {
+            return Ok(String::new());
+        }
+
+        let graph_index = self
+            .find_type_dependency(owner, used_ty)
+            .ok_or_else(|| eyre!("Could not find {slot} in graph. Got: {used_ty:?}"))?;
+        Ok(self.schema_prefix_for(&graph_index))
+    }
+
     pub fn to_sql(&self) -> eyre::Result<String> {
         let mut full_sql = String::new();
 
@@ -439,8 +456,8 @@ impl<'a> PgrxSql<'a> {
         for nodes in petgraph::algo::tarjan_scc(&self.graph).iter().rev() {
             let mut inner_sql = Vec::with_capacity(nodes.len());
 
-            for node in nodes {
-                let step = &self.graph[*node];
+            for node in self.connected_component_emit_order(nodes) {
+                let step = &self.graph[node];
                 let sql = step.to_sql(self)?;
 
                 let trimmed = sql.trim();
@@ -457,6 +474,81 @@ impl<'a> PgrxSql<'a> {
         }
 
         Ok(full_sql)
+    }
+
+    fn connected_component_emit_order(&self, nodes: &[NodeIndex]) -> Vec<NodeIndex> {
+        if nodes.len() <= 1 {
+            return nodes.to_vec();
+        }
+
+        // When a connected component contains a cycle, user-authored `requires = [...]`
+        // edges are the strongest ordering signal we have. Type-resolution edges may still
+        // point back into the declaration that ultimately creates the type, such as shell-type
+        // bootstrap patterns for manual `extension_sql!()` types.
+        let mut explicit_dependents = HashMap::<NodeIndex, Vec<NodeIndex>>::new();
+        let mut remaining_explicit_dependencies = HashMap::<NodeIndex, usize>::new();
+        let mut has_explicit_edges = false;
+
+        for &node in nodes {
+            explicit_dependents.insert(node, Vec::new());
+            remaining_explicit_dependencies.insert(node, 0);
+        }
+
+        for &node in nodes {
+            for edge in self.graph.edges(node) {
+                if edge.weight() != &SqlGraphRequires::By {
+                    continue;
+                }
+
+                let dependent = edge.target();
+                if !remaining_explicit_dependencies.contains_key(&dependent) {
+                    continue;
+                }
+
+                has_explicit_edges = true;
+                explicit_dependents
+                    .get_mut(&node)
+                    .expect("component members should be initialized")
+                    .push(dependent);
+                *remaining_explicit_dependencies
+                    .get_mut(&dependent)
+                    .expect("component members should be initialized") += 1;
+            }
+        }
+
+        if !has_explicit_edges {
+            return nodes.to_vec();
+        }
+
+        let mut ready = remaining_explicit_dependencies
+            .iter()
+            .filter_map(|(node, count)| (*count == 0).then_some(*node))
+            .collect::<Vec<_>>();
+        let mut ordered = Vec::with_capacity(nodes.len());
+
+        while !ready.is_empty() {
+            ready.sort_unstable_by(|left, right| {
+                self.graph[*left]
+                    .cmp(&self.graph[*right])
+                    .then_with(|| left.index().cmp(&right.index()))
+            });
+            let next = ready.remove(0);
+            ordered.push(next);
+
+            if let Some(dependents) = explicit_dependents.get(&next) {
+                for dependent in dependents {
+                    let remaining = remaining_explicit_dependencies
+                        .get_mut(dependent)
+                        .expect("component members should be initialized");
+                    *remaining -= 1;
+                    if *remaining == 0 {
+                        ready.push(*dependent);
+                    }
+                }
+            }
+        }
+
+        if ordered.len() == nodes.len() { ordered } else { nodes.to_vec() }
     }
 
     pub fn has_sql_declared_entity(&self, identifier: &SqlDeclared) -> Option<&SqlDeclaredEntity> {
@@ -1734,6 +1826,7 @@ mod tests {
     use crate::UsedTypeEntity;
     use crate::aggregate::entity::{AggregateTypeEntity, PgAggregateEntity};
     use crate::extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredTypeEntityData};
+    use crate::extern_args::ExternArgs;
     use crate::metadata::{FunctionMetadataTypeEntity, Returns, SqlArrayMapping, SqlMapping};
     use crate::pg_extern::entity::{PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity};
     use crate::postgres_type::entity::PostgresTypeEntity;
@@ -2021,6 +2114,82 @@ mod tests {
         assert!(!sql.builtin_types.contains_key("tests::HexInt"));
         assert!(sql.graph.find_edge(declared_index, function_index).is_some());
         assert!(sql.graph.find_edge(declared_index, aggregate_index).is_some());
+    }
+
+    #[test]
+    fn declared_type_cycle_prefers_explicit_requirements_with_shell_type() {
+        let custom_type = extension_owned_type("tests::HexInt", "tests::HexInt", "hexint");
+        let text_type = external_type("alloc::string::String", "alloc::string::String", "text");
+
+        let shell_type = ExtensionSqlEntity {
+            module_path: "tests",
+            full_path: "tests::shell_type",
+            sql: "CREATE TYPE hexint;",
+            file: "test.rs",
+            line: 1,
+            name: "shell_type",
+            bootstrap: true,
+            finalize: false,
+            requires: vec![],
+            creates: vec![],
+        };
+
+        let mut hexint_in = function_entity(
+            "hexint_in",
+            vec![],
+            PgExternReturnEntity::Type { ty: custom_type.clone() },
+        );
+        hexint_in.extern_attrs =
+            vec![ExternArgs::Requires(vec![PositioningRef::Name("shell_type".into())])];
+
+        let mut hexint_out = function_entity(
+            "hexint_out",
+            vec![PgExternArgumentEntity { pattern: "value", used_ty: custom_type.clone() }],
+            PgExternReturnEntity::Type { ty: text_type },
+        );
+        hexint_out.extern_attrs =
+            vec![ExternArgs::Requires(vec![PositioningRef::Name("shell_type".into())])];
+
+        let mut declared_type = declared_type_sql(
+            "tests",
+            "tests::concrete_type",
+            "concrete_type",
+            "tests::HexInt",
+            "tests::HexInt",
+            "hexint",
+        );
+        declared_type.sql = "CREATE TYPE hexint (\n    INPUT = hexint_in,\n    OUTPUT = hexint_out,\n    LIKE = int8\n);";
+        declared_type.requires = vec![
+            PositioningRef::Name("shell_type".into()),
+            PositioningRef::FullPath("tests::hexint_in".into()),
+            PositioningRef::FullPath("tests::hexint_out".into()),
+        ];
+
+        let sql = PgrxSql::build(
+            vec![
+                SqlGraphEntity::ExtensionRoot(control_file()),
+                SqlGraphEntity::CustomSql(shell_type),
+                SqlGraphEntity::CustomSql(declared_type),
+                SqlGraphEntity::Function(hexint_in),
+                SqlGraphEntity::Function(hexint_out),
+            ]
+            .into_iter(),
+            "test".into(),
+            false,
+        )
+        .unwrap()
+        .to_sql()
+        .unwrap();
+
+        let shell = sql.find("CREATE TYPE hexint;").unwrap();
+        let input = sql.find("-- tests::hexint_in").unwrap();
+        let output = sql.find("-- tests::hexint_out").unwrap();
+        let concrete = sql.find("CREATE TYPE hexint (\n").unwrap();
+
+        assert!(shell < input);
+        assert!(shell < output);
+        assert!(input < concrete);
+        assert!(output < concrete);
     }
 
     #[test]

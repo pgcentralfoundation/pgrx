@@ -35,6 +35,18 @@ CREATE TYPE AnimalFriendshipEdge AS (
     friend_1_name TEXT,
     friend_2_name TEXT
 );
+
+CREATE TYPE OperatorDog AS (
+    name TEXT
+);
+
+CREATE TYPE CastDog AS (
+    name TEXT
+);
+
+CREATE TYPE CastCat AS (
+    name TEXT
+);
 "#,
     name = "create_composites",
     bootstrap
