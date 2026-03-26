@@ -14,3 +14,4 @@ rustup-init.sh
 .claude/
 .codex/
 .agents/
+tmp/
