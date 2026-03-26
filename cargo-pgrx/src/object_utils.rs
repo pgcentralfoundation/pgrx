@@ -246,6 +246,7 @@ mod tests {
     use super::schema_section_data;
     use object::read::macho::{FatArch, MachOFatFile32};
     use pgrx_pg_config::{PgConfigSelector, Pgrx};
+    use pgrx_sql_entity_graph::section::{MACHO_SECTION_NAME, MACHO_SEGMENT_NAME};
 
     fn parse_object(data: &[u8]) -> object::Result<object::File<'_>> {
         let kind = object::FileKind::parse(data)?;
@@ -292,6 +293,12 @@ mod tests {
         let command_len = SEGMENT_LEN + SECTION_LEN;
         let fileoff = (HEADER_LEN + command_len) as u64;
 
+        fn push_padded_name(bytes: &mut Vec<u8>, name: &str, width: usize) {
+            assert!(name.len() <= width, "name `{name}` must fit in {width} bytes");
+            bytes.extend_from_slice(name.as_bytes());
+            bytes.resize(bytes.len() + (width - name.len()), 0);
+        }
+
         let mut bytes = Vec::new();
         bytes.extend_from_slice(&[0xcf, 0xfa, 0xed, 0xfe]);
         bytes.extend_from_slice(&0u32.to_le_bytes());
@@ -304,7 +311,7 @@ mod tests {
 
         bytes.extend_from_slice(&object::macho::LC_SEGMENT_64.to_le_bytes());
         bytes.extend_from_slice(&(command_len as u32).to_le_bytes());
-        bytes.extend_from_slice(b"__DATA\0\0\0\0\0\0\0\0\0\0");
+        push_padded_name(&mut bytes, MACHO_SEGMENT_NAME, 16);
         bytes.extend_from_slice(&0u64.to_le_bytes());
         bytes.extend_from_slice(&(payload.len() as u64).to_le_bytes());
         bytes.extend_from_slice(&fileoff.to_le_bytes());
@@ -314,8 +321,8 @@ mod tests {
         bytes.extend_from_slice(&1u32.to_le_bytes());
         bytes.extend_from_slice(&0u32.to_le_bytes());
 
-        bytes.extend_from_slice(b"__pgrx_schema\0\0\0");
-        bytes.extend_from_slice(b"__DATA\0\0\0\0\0\0\0\0\0\0");
+        push_padded_name(&mut bytes, MACHO_SECTION_NAME, 16);
+        push_padded_name(&mut bytes, MACHO_SEGMENT_NAME, 16);
         bytes.extend_from_slice(&0u64.to_le_bytes());
         bytes.extend_from_slice(&(payload.len() as u64).to_le_bytes());
         bytes.extend_from_slice(&(fileoff as u32).to_le_bytes());

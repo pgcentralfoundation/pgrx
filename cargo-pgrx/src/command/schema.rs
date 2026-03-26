@@ -243,7 +243,7 @@ fn load_section_data(
 fn decode_section_entities<'a>(lib_so_data: &'a [u8]) -> eyre::Result<Vec<SqlGraphEntity<'a>>> {
     let section = schema_section_data(lib_so_data)?.ok_or_else(|| {
         eyre::eyre!(
-            "no .pgrx_schema section found; the artifact may have been built with an incompatible pgrx, stripped incorrectly, or selected from the wrong architecture slice",
+            "no embedded pgrx schema section found; expected `.pgrxsc` on ELF/PE or `__DATA,__pgrxsc` on Mach-O. the artifact may have been built with an incompatible pgrx, stripped incorrectly, or selected from the wrong architecture slice",
         )
     })?;
     decode_entities(section).wrap_err("couldn't decode pgrx schema section")
@@ -344,6 +344,6 @@ mod tests {
         let bin = std::fs::read(fixture_path).unwrap();
 
         let error = decode_section_entities(&bin).expect_err("missing section");
-        assert!(error.to_string().contains("no .pgrx_schema section found"));
+        assert!(error.to_string().contains("no embedded pgrx schema section found"));
     }
 }

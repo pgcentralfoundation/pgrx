@@ -84,10 +84,10 @@ at least somewhat. Or not.
 Together with `pgrx-sql-entity-graph`, this is responsible for turning Rust extension code into
 ordered SQL install scripts.
 
-Today, the proc macros emit serialized SQL graph entities into a linker section named
-`.pgrx_schema` in the compiled extension library. `cargo-pgrx` reads that section directly from
-the built artifact, reconstructs the entity graph, orders the SQL objects by dependency, and
-writes the extension SQL file.
+Today, the proc macros emit serialized SQL graph entities into a short linker section in the
+compiled extension library: `.pgrxsc` on ELF/PE and `__DATA,__pgrxsc` on Mach-O. `cargo-pgrx`
+reads that section directly from the built artifact, reconstructs the entity graph, orders the
+SQL objects by dependency, and writes the extension SQL file.
 
 The old `pgrx_embed` and `__pgrx_internals_*` symbol-scanning pipeline has been removed. If you
 want the background on that older design, see the historical article

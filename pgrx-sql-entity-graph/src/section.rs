@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 /*!
-Wire format support for the `.pgrx_schema` linker section.
+Wire format support for the embedded pgrx schema linker section.
 
 This module owns the bytes we embed into the extension shared object and later
 decode from `cargo-pgrx schema`. That format is intentionally compact and
@@ -66,10 +66,14 @@ use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::{SqlGraphEntity, UsedTypeEntity};
 use eyre::{Result, bail, eyre};
 
-pub const ELF_SECTION_NAME: &str = ".pgrx_schema";
+pub const ELF_SECTION_NAME: &str = ".pgrxsc";
 pub const MACHO_SEGMENT_NAME: &str = "__DATA";
-pub const MACHO_SECTION_NAME: &str = "__pgrx_schema";
-pub const MACHO_SECTION_PATH: &str = "__DATA,__pgrx_schema";
+pub const MACHO_SECTION_NAME: &str = "__pgrxsc";
+pub const MACHO_SECTION_PATH: &str = "__DATA,__pgrxsc";
+
+const LEGACY_ELF_SECTION_NAME: &str = ".pgrx_schema";
+const LEGACY_MACHO_SECTION_NAME: &str = "__pgrx_schema";
+const LEGACY_MACHO_SECTION_PATH: &str = "__DATA,__pgrx_schema";
 
 pub const ENTITY_SCHEMA: u8 = 1;
 pub const ENTITY_CUSTOM_SQL: u8 = 2;
@@ -160,7 +164,12 @@ pub const AGGREGATE_PARALLEL_RESTRICTED: u8 = 2;
 pub const AGGREGATE_PARALLEL_UNSAFE: u8 = 3;
 
 pub fn is_schema_section_name(name: &str) -> bool {
-    name == ELF_SECTION_NAME || name == MACHO_SECTION_NAME || name == MACHO_SECTION_PATH
+    name == ELF_SECTION_NAME
+        || name == MACHO_SECTION_NAME
+        || name == MACHO_SECTION_PATH
+        || name == LEGACY_ELF_SECTION_NAME
+        || name == LEGACY_MACHO_SECTION_NAME
+        || name == LEGACY_MACHO_SECTION_PATH
 }
 
 #[macro_export]
@@ -169,8 +178,8 @@ macro_rules! __pgrx_schema_entry {
         #[doc(hidden)]
         #[used]
         #[allow(non_upper_case_globals)]
-        #[cfg_attr(target_os = "macos", unsafe(link_section = "__DATA,__pgrx_schema"))]
-        #[cfg_attr(not(target_os = "macos"), unsafe(link_section = ".pgrx_schema"))]
+        #[cfg_attr(target_os = "macos", unsafe(link_section = "__DATA,__pgrxsc"))]
+        #[cfg_attr(not(target_os = "macos"), unsafe(link_section = ".pgrxsc"))]
         static $name: [u8; $len] = $payload;
     };
 }
@@ -1174,7 +1183,16 @@ mod tests {
         assert!(is_schema_section_name(MACHO_SECTION_NAME));
         assert!(is_schema_section_name(MACHO_SECTION_PATH));
         assert!(is_schema_section_name(ELF_SECTION_NAME));
+        assert!(is_schema_section_name(".pgrx_schema"));
+        assert!(is_schema_section_name("__pgrx_schema"));
+        assert!(is_schema_section_name("__DATA,__pgrx_schema"));
         assert!(!is_schema_section_name("__TEXT,__text"));
+    }
+
+    #[test]
+    fn schema_section_names_fit_windows_image_limits() {
+        assert!(ELF_SECTION_NAME.len() <= 8);
+        assert!(MACHO_SECTION_NAME.len() <= 8);
     }
 
     #[test]

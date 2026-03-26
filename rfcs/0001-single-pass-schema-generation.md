@@ -12,9 +12,9 @@ Today, building a pgrx extension requires: (1) `cargo build --lib` to produce th
 Rust source file, (4) `cargo rustc --bin pgrx_embed` to compile that source, and (5)
 executing the resulting binary to collect entity metadata and emit SQL. This RFC
 replaces all of that with proc macros that embed entity metadata as const data in a
-dedicated linker section (`.pgrx_schema`) during the single `cargo build --lib`. After
-the build, `cargo-pgrx` reads that section from the `.so`, builds the dependency
-graph, and emits SQL.
+dedicated linker section (`.pgrxsc` on ELF/PE, `__DATA,__pgrxsc` on Mach-O) during the
+single `cargo build --lib`. After the build, `cargo-pgrx` reads that section from the
+`.so`, builds the dependency graph, and emits SQL.
 
 ## Problem Statement
 
@@ -114,7 +114,7 @@ incremental compilation support — the linker always produces a complete `.so`.
 Rather than introducing a parallel schema-only trait, we extend
 `SqlTranslatable` so it can describe its SQL behavior in a const-friendly form.
 The proc macros then read that compile-time metadata directly when emitting
-`.pgrx_schema`.
+the embedded schema section.
 
 ```rust
 pub unsafe trait SqlTranslatable {
@@ -257,7 +257,7 @@ canonical identity of the underlying Rust type they are describing.
 ### How entity data is embedded in the `.so`
 
 Each proc macro generates const entity data and places its serialized bytes in the
-`.pgrx_schema` linker section. For type-bearing fields, the generated code references
+embedded schema section. For type-bearing fields, the generated code references
 the relevant `SqlTranslatable` associated consts, so the compiler resolves both the
 type identity and the SQL mapping during the single library build.
 
@@ -310,8 +310,9 @@ Key implementation details:
   nightly-only `${concat(...)}` metavar feature.
 
 - **Platform-conditional section names.** macOS Mach-O requires `"segment,section"`
-  format. The proc macro emits `cfg_attr` to use `"__DATA,.pgrx_schema"` on macOS and
-  `".pgrx_schema"` on all other platforms.
+  format. The proc macro emits `cfg_attr` to use `"__DATA,__pgrxsc"` on macOS and
+  `".pgrxsc"` on all other platforms. The short names keep the section within the
+  8-byte PE/COFF image-name limit used on Windows.
 
 - **Section reading in `cargo-pgrx`** uses the `object` crate on ELF and custom Mach-O
   readers for thin and fat binaries. The reader extracts the schema section bytes and
@@ -332,10 +333,10 @@ fn generate_schema(
     output: &Path,
     dot: Option<&Path>,
 ) -> eyre::Result<()> {
-    // 1. Read the .so and extract the .pgrx_schema section
+    // 1. Read the .so and extract the embedded schema section
     let so_data = std::fs::read(so_path)?;
     let section_data = schema_section_data(&so_data)?
-        .ok_or_else(|| eyre!("no .pgrx_schema section — is this a pgrx extension?"))?;
+        .ok_or_else(|| eyre!("no embedded pgrx schema section — is this a pgrx extension?"))?;
 
     // 2. Decode binary entity entries from the section
     let entities = decode_entities(section_data)?;
@@ -381,7 +382,8 @@ not require a second build or an executable helper binary.
   set automatically
 - All existing trait impls (`FromDatum`, `IntoDatum`, `InOutFuncs`, etc.) — unchanged
 - Input/output `#[pg_extern]` functions — unchanged
-- **A `#[link_section = ".pgrx_schema"]` const** containing the type entity metadata
+- **A `#[link_section]` const** containing the type entity metadata in the embedded
+  schema section
 
 **No longer generates:**
 - The `__pgrx_internals_type_{name}` function
@@ -391,7 +393,7 @@ not require a second build or an executable helper binary.
 #### `#[derive(PostgresEnum)]`
 
 Same pattern. The entity metadata (enum name, variants, module path) goes into the
-`.pgrx_schema` section.
+embedded schema section.
 
 #### `#[pg_extern]` (also `#[pg_operator]`, `#[pg_cast]`)
 
@@ -401,7 +403,8 @@ Same pattern. The entity metadata (enum name, variants, module path) goes into t
   return leaf type (see below)
 - Function metadata equivalent to today's `FunctionMetadataEntity`, but assembled at
   compile time from `SqlTranslatable` consts instead of by executing compiled code
-- **A `#[link_section = ".pgrx_schema"]` const** containing the function entity metadata
+- **A `#[link_section]` const** containing the function entity metadata in the embedded
+  schema section
 
 **Key detail about type resolution:** The proc macro no longer owns a hardcoded
 built-in table. Instead:
@@ -440,17 +443,18 @@ compile-time safety of `FunctionMetadata` without keeping a runtime
 
 #### `#[derive(PostgresOrd)]`, `#[derive(PostgresHash)]`
 
-Each writes a small entity entry to `.pgrx_schema` with the type name and module path.
+Each writes a small entity entry to the embedded schema section with the type name and
+module path.
 The graph builder connects them to their type entity by `SCHEMA_KEY`.
 
 #### `#[pg_aggregate]`, `#[pg_trigger]`, `#[pg_schema]`
 
-Each writes its entity data to `.pgrx_schema`.
+Each writes its entity data to the embedded schema section.
 
 #### `extension_sql!()` and `extension_sql_file!()`
 
 Each writes its entity data (SQL text, `requires` list, `creates` list,
-`bootstrap`/`finalize` flags) to `.pgrx_schema`.
+`bootstrap`/`finalize` flags) to the embedded schema section.
 
 ### Graph builder changes
 
@@ -609,18 +613,18 @@ single-pass schema model described by this RFC.
 ### `#[bikeshed_postgres_type_manually_impl_from_into_datum]`
 
 **No changes needed.** The derive macro still embeds the type entity data in
-`.pgrx_schema`. The attribute only affects which datum-conversion traits are
+the embedded schema section. The attribute only affects which datum-conversion traits are
 generated — orthogonal to schema generation.
 
 ### `PostgresEq`, `PostgresOrd`, `PostgresHash` derives
 
 **No changes needed** from the user's perspective. `PostgresOrd` and `PostgresHash`
-embed their entity data in `.pgrx_schema` and the graph builder connects them to their
+embed their entity data in the embedded schema section and the graph builder connects them to their
 type entity by `SCHEMA_KEY`.
 
 ### `#[pg_aggregate]` implementations
 
-**No changes needed.** The proc macro embeds aggregate entity data in `.pgrx_schema`.
+**No changes needed.** The proc macro embeds aggregate entity data in the embedded schema section.
 
 ### Custom `#[pg_extern]` argument types via `SqlTranslatable`
 
@@ -697,14 +701,14 @@ can be described without runtime computation.
 ### `#[cfg]`-gated entities
 
 Entities behind `#[cfg(feature = "foo")]` are only compiled when the feature is active.
-Since the const static in `.pgrx_schema` is part of the generated code, it is subject
+Since the const static in the embedded schema section is part of the generated code, it is subject
 to the same `#[cfg]` gating. This means the section only contains entities for the
 active configuration — same behavior as today with `__pgrx_internals_*` symbols.
 
 ### `extension_sql_file!()` with large SQL content
 
 `extension_sql_file!()` uses `include_str!()` to read SQL files at compile time. The
-SQL content is embedded in the `.pgrx_schema` section as a length-prefixed UTF-8 string
+SQL content is embedded in the schema section as a length-prefixed UTF-8 string
 field in the binary section format. For extensions with large bootstrap SQL, this
 increases section size proportionally. This is acceptable - even 100KB of SQL produces
 a manageable section size.
@@ -722,14 +726,15 @@ names and are marked `#[used]`, which preserves them in practice.
 ### Multi-crate workspace extensions
 
 When types are defined in a library crate and functions in the extension crate, both
-produce `.pgrx_schema` data in their respective object files. The linker concatenates
+produce schema-section data in their respective object files. The linker concatenates
 sections from all linked object files (including from `.rlib` archives) into the final
 `.so`. This is standard linker behavior for named sections — verified on both ELF and
 Mach-O.
 
 ## Section Format
 
-The `.pgrx_schema` section contains a binary stream of concatenated entity entries. Each
+The embedded schema section (`.pgrxsc` on ELF/PE, `__DATA,__pgrxsc` on Mach-O)
+contains a binary stream of concatenated entity entries. Each
 entry is encoded as:
 
 ```text
@@ -878,21 +883,21 @@ Mach-O requires `"segment,section"` format; ELF uses a plain section name. The p
 macros use `cfg_attr` to emit the correct attribute:
 
 ```rust
-#[cfg_attr(target_os = "macos", link_section = "__DATA,.pgrx_schema")]
-#[cfg_attr(not(target_os = "macos"), link_section = ".pgrx_schema")]
+#[cfg_attr(target_os = "macos", link_section = "__DATA,__pgrxsc")]
+#[cfg_attr(not(target_os = "macos"), link_section = ".pgrxsc")]
 ```
 
-- **Linux (ELF):** Section name `.pgrx_schema`
-- **macOS (Mach-O):** Segment `__DATA`, section `.pgrx_schema`
-- **Windows:** Not a primary target for pgrx; untested but `#[link_section]` works on
-  PE/COFF in principle.
+- **Linux (ELF):** Section name `.pgrxsc`
+- **macOS (Mach-O):** Segment `__DATA`, section `__pgrxsc`
+- **Windows (PE/COFF):** Section name `.pgrxsc`, which stays within the 8-byte image
+  section-name limit.
 
 ### Reading the section
 
 ```rust
 let data = std::fs::read(&so_path)?;
 let raw = schema_section_data(&data)?
-    .ok_or_else(|| eyre!("no .pgrx_schema section — is this a pgrx extension?"))?;
+    .ok_or_else(|| eyre!("no embedded pgrx schema section — is this a pgrx extension?"))?;
 ```
 
 On Mach-O, `cargo-pgrx` must handle both thin binaries and fat binaries, so the reader
