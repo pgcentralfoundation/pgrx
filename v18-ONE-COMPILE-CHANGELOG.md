@@ -287,16 +287,16 @@ implicit guesses.
 
 ## Commit Coverage
 
-This changelog covers the branch's commits in aggregate:
+This changelog covers the branch's current post-rebase commits in aggregate:
 
-- design, review, and doc trail: `ca7a757e`, `5a3cb150`, `40760b3a`, `7ade568d`, `6b9f4fca`
-- one-pass schema pipeline and artifact handling: `a85ab2c1`, `fe69f9bf`, `b4f966c4`, `3814ca95`
-- template and extension layout simplification: `20479f10`
-- type identity and graph semantics: `393d4cda`, `bc48fdc4`, `c8eb2e5b`, `0f7fdb09`,
-  `c069b92e`, `548429af`, `833bec0b`, `9af7d0ef`, `e231b19f`, `1e4e4ac9`
-- workspace, harness, and test expansion: `51b88779`, `44dd568e`, `6204511b`, `874bb8cf`
-- follow-up cleanup and polish: `77952530`, `77acd5e1`, `a4929c25`, `1b031df5`
-- merge bookkeeping: `128df5b4`
+- design, review, and doc trail: 6b7c1ff9, 226f7f9a, bd7e04d4, 6cdb7eb1, 074a3b1d
+- one-pass schema pipeline and artifact handling: e317229b, 62d16338, 2c39c1f4, bd093d6b
+- template and extension layout simplification: 7067708c
+- type identity and graph semantics: ab9d9a49, 575322c7, 116da7f0, ff140f50, d3eab0f5,
+  d023f577, 1d1ff15e, 30aec2e2, d8b55c7e, 9f665b07
+- workspace, harness, and test expansion: a5829b05, 194e986c, b4750d9a, 57fc49cd
+- follow-up cleanup and polish: dc6aee0b, e5692a63, 1e2fadab, db180e14
+- changelog addition: e1ab0658
 
 If you want the shortest possible summary of the branch, it is this: we now compile the
 extension once, read its schema metadata from the shared object, resolve SQL types by explicit
