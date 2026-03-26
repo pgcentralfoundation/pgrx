@@ -129,7 +129,7 @@ pub unsafe trait SqlTranslatable {
     /// Leave this as `TypeOrigin::ThisExtension` for extension-owned types that resolve through
     /// `#[derive(PostgresType)]`, `#[derive(PostgresEnum)]`, or
     /// `extension_sql!(..., creates = [Type(T)]/[Enum(T)])`.
-    const TYPE_ORIGIN: TypeOrigin = TypeOrigin::ThisExtension;
+    const TYPE_ORIGIN: TypeOrigin;
 
     /// Const-friendly mirror of `argument_sql()`.
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError>;
@@ -157,8 +157,9 @@ SQL spellings while making that information available during the single library
 build.
 
 This is a **breaking change**: existing manual `unsafe impl SqlTranslatable`
-blocks must provide compile-time schema metadata, not just runtime methods. The
-migration is still mechanical, but it is larger than a one-line change.
+blocks must provide compile-time schema metadata, including `TYPE_ORIGIN`, not
+just runtime methods. The migration is still mechanical, but it is larger than
+a one-line change.
 
 ### Blanket / generic `SqlTranslatable` impls
 
@@ -553,6 +554,7 @@ schema metadata in addition to (or instead of) runtime methods:
 ```rust
 unsafe impl SqlTranslatable for HexInt {
     const SCHEMA_KEY: &'static str = pgrx::pgrx_resolved_type!(HexInt);
+    const TYPE_ORIGIN: TypeOrigin = TypeOrigin::ThisExtension;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("hexint"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -567,8 +569,8 @@ longer part of the automatic schema path; users must rewrite it as static metada
 
 Manual impls now have two supported modes:
 
-- extension-owned SQL types: use `pgrx::pgrx_resolved_type!(T)` and leave
-  `TYPE_ORIGIN` at its default `TypeOrigin::ThisExtension`
+- extension-owned SQL types: use `pgrx::pgrx_resolved_type!(T)` and set
+  `TYPE_ORIGIN = TypeOrigin::ThisExtension`
 - mappings to an existing SQL type such as `TEXT` or `uuid`: set
   `TYPE_ORIGIN = TypeOrigin::External`
 
@@ -587,6 +589,10 @@ This is important for manual/custom SQL-backed types:
 
 That preserves historically supported patterns where the Rust type name and the SQL
 type name differ.
+
+`creates = [Type(T)]/[Enum(T)]` is only valid for extension-owned types. If
+`T::TYPE_ORIGIN == TypeOrigin::External`, the declaration should fail instead of
+letting raw SQL claim ownership of an external type.
 
 ### Types from dependency crates
 
@@ -627,6 +633,9 @@ scheme.
 For every normalized leaf type appearing in function args, function returns, aggregate
 state, `creates = [Type(T)]`, and similar positions, the proc macro records
 `<T as SqlTranslatable>::SCHEMA_KEY`.
+
+`creates = [Type(T)]/[Enum(T)]` is only valid when `T::TYPE_ORIGIN ==
+TypeOrigin::ThisExtension`.
 
 That becomes the primary dependency-matching key across the graph:
 
@@ -793,9 +802,11 @@ major pgrx version bump.
    `Cargo.toml`.
 
 2. **Add compile-time schema metadata to every manual `unsafe impl SqlTranslatable`
-   block.** At minimum that means `SCHEMA_KEY`, `ARGUMENT_SQL`, and `RETURN_SQL`:
+   block.** At minimum that means `SCHEMA_KEY`, `TYPE_ORIGIN`, `ARGUMENT_SQL`,
+   and `RETURN_SQL`:
    ```rust
    const SCHEMA_KEY: &'static str = pgrx::pgrx_resolved_type!(YourType);
+   const TYPE_ORIGIN: TypeOrigin = TypeOrigin::ThisExtension;
    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
        Ok(SqlMappingRef::literal("your_sql_type"));
    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -803,7 +814,7 @@ major pgrx version bump.
    ```
 
    If the Rust type maps to a SQL type your extension already declares, leave
-   `TYPE_ORIGIN` alone and make sure the type resolves through
+   `TYPE_ORIGIN = TypeOrigin::ThisExtension` and make sure the type resolves through
    `#[derive(PostgresType)]`, `#[derive(PostgresEnum)]`, or
    `extension_sql!(..., creates = [Type(T)]/[Enum(T)])`.
 
@@ -812,6 +823,8 @@ major pgrx version bump.
    ```rust
    const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
    ```
+
+   `creates = [Type(T)]/[Enum(T)]` is not valid for those external mappings.
 
 3. Types using `#[derive(PostgresType)]`, `#[derive(PostgresEnum)]`, and all other
    derive macros need **no manual changes** — the derives generate the const schema

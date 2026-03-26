@@ -1851,13 +1851,11 @@ mod tests {
             bootstrap: false,
             finalize: false,
             requires: vec![],
-            creates: vec![SqlDeclaredEntity::Type(
-                SqlDeclaredEntityData {
-                    sql: sql.into(),
-                    name: name.into(),
-                    schema_key: schema_key.into(),
-                },
-            )],
+            creates: vec![SqlDeclaredEntity::Type(SqlDeclaredEntityData {
+                sql: sql.into(),
+                name: name.into(),
+                schema_key: schema_key.into(),
+            })],
         }
     }
 

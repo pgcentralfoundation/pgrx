@@ -17,7 +17,7 @@
 
 */
 use crate::extension_sql::SqlDeclared;
-use crate::metadata::{SqlMapping, SqlTranslatable};
+use crate::metadata::{SqlMapping, SqlTranslatable, TypeOrigin};
 use crate::pgrx_sql::PgrxSql;
 use crate::positioning_ref::PositioningRef;
 use crate::to_sql::ToSql;
@@ -163,6 +163,22 @@ impl SqlDeclaredEntity {
     }
 
     pub fn build_type<T: SqlTranslatable>(variant: &str, name: &str) -> eyre::Result<Self> {
+        let make_declared = match variant {
+            "Type" => Self::Type,
+            "Enum" => Self::Enum,
+            _ => {
+                return Err(eyre::eyre!(
+                    "Can only declare `Type(Ident)` or `Enum(Ident)` with type metadata"
+                ));
+            }
+        };
+
+        if matches!(T::TYPE_ORIGIN, TypeOrigin::External) {
+            return Err(eyre::eyre!(
+                "`creates = [{variant}(...)]` is only valid for extension-owned SQL types"
+            ));
+        }
+
         let sql = match T::argument_sql() {
             Ok(SqlMapping::As(sql)) => sql,
             Ok(SqlMapping::Composite | SqlMapping::Array(_)) => {
@@ -182,16 +198,7 @@ impl SqlDeclaredEntity {
             name: name.to_string(),
             schema_key: T::SCHEMA_KEY.to_string(),
         };
-        let retval = match variant {
-            "Type" => Self::Type(data),
-            "Enum" => Self::Enum(data),
-            _ => {
-                return Err(eyre::eyre!(
-                    "Can only declare `Type(Ident)` or `Enum(Ident)` with type metadata"
-                ));
-            }
-        };
-        Ok(retval)
+        Ok(make_declared(data))
     }
 
     pub fn sql(&self) -> String {
@@ -227,5 +234,55 @@ impl SqlDeclaredEntity {
             }
             _ => false,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::metadata::{ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, TypeOrigin};
+
+    struct ExtensionOwnedType;
+    struct ExternalType;
+
+    unsafe impl SqlTranslatable for ExtensionOwnedType {
+        const SCHEMA_KEY: &'static str = "tests::ExtensionOwnedType";
+        const TYPE_ORIGIN: TypeOrigin = TypeOrigin::ThisExtension;
+        const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+            Ok(SqlMappingRef::literal("extension_owned"));
+        const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+            Ok(ReturnsRef::One(SqlMappingRef::literal("extension_owned")));
+    }
+
+    unsafe impl SqlTranslatable for ExternalType {
+        const SCHEMA_KEY: &'static str = "tests::ExternalType";
+        const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
+        const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+            Ok(SqlMappingRef::literal("text"));
+        const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+            Ok(ReturnsRef::One(SqlMappingRef::literal("text")));
+    }
+
+    #[test]
+    fn build_type_accepts_extension_owned_types() {
+        let declared = SqlDeclaredEntity::build_type::<ExtensionOwnedType>(
+            "Type",
+            "tests::ExtensionOwnedType",
+        )
+        .unwrap();
+
+        assert_eq!(declared.schema_key(), Some("tests::ExtensionOwnedType"));
+        assert_eq!(declared.sql(), "extension_owned");
+    }
+
+    #[test]
+    fn build_type_rejects_external_types() {
+        let error = SqlDeclaredEntity::build_type::<ExternalType>("Type", "tests::ExternalType")
+            .unwrap_err();
+        assert!(error.to_string().contains("only valid for extension-owned SQL types"));
+
+        let error = SqlDeclaredEntity::build_type::<ExternalType>("Enum", "tests::ExternalType")
+            .unwrap_err();
+        assert!(error.to_string().contains("only valid for extension-owned SQL types"));
     }
 }

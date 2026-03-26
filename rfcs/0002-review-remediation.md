@@ -14,14 +14,16 @@ The two blocking questions from that review are resolved on this branch:
    Resolution: declared types now resolve to the declaring `extension_sql!()` graph node.
    That preserves schema identity and lets SQL rendering use the graph instead of a
    builtin placeholder.
-2. `TYPE_ORIGIN` should be encoded for declared type and enum entries.
-   Resolution: declared type metadata now stores `TYPE_ORIGIN` in memory and in the
-   binary schema section format.
+2. Whether `TYPE_ORIGIN` needs to be encoded for declared type and enum entries.
+   Resolution: no. The current implementation only resolves declared entries by
+   `SCHEMA_KEY`, so declared type metadata carries `SCHEMA_KEY` plus SQL mapping,
+   while `TYPE_ORIGIN` remains on `SqlTranslatable` / `UsedType` metadata, where
+   unresolved-type decisions are actually made.
 
 The result is closer to the RFC model from
 `rfcs/0001-single-pass-schema-generation.md`: dependency resolution now has a single
-schema-emitting target for declared types, and the metadata needed for future
-resolution decisions is carried forward instead of being recomputed.
+schema-emitting target for declared types, and ownership metadata stays on the
+`SqlTranslatable` path that the resolver actually consumes.
 
 ## Decisions
 
@@ -50,20 +52,22 @@ Implementation effect:
 - `SqlGraphEntity::schema_matches()` recognizes declared types carried by a
   `CustomSql` node, so generic graph lookups can find them
 
-### Store `TYPE_ORIGIN` in declared type metadata
+### Keep declared type metadata lean
 
-The review correctly called out that the RFC model assumes `TYPE_ORIGIN` is available
-everywhere type resolution decisions may need it, even if the current matching logic
-does not consume it.
+The review correctly called out that `TYPE_ORIGIN` matters for unresolved-type
+decisions. The follow-up work on this branch showed those decisions only happen on the
+`SqlTranslatable` / `UsedType` path, not on declared type entries.
 
-This branch now stores `TYPE_ORIGIN` in:
+This branch keeps declared type metadata to the fields the current implementation
+actually consumes:
 
-- `SqlDeclaredEntityData`
-- the generated `.pgrx_schema` payload for declared type and enum entries
-- the corresponding section decoder path
+- `SCHEMA_KEY`
+- SQL mapping
+- the corresponding section decoder path for those values
 
-That keeps declared type metadata structurally aligned with the rest of the
-`SqlTranslatable`-derived metadata.
+`TYPE_ORIGIN` still lives on `SqlTranslatable`-derived metadata for function args,
+returns, aggregates, and other used-type positions, which is where the resolver
+needs it.
 
 ## Findings Status
 
@@ -91,18 +95,20 @@ Regression coverage:
 - `extension_sql_declared_type_orders_before_function_and_aggregate`
 - `extension_sql_declared_type_in_custom_schema_prefixes_aggregate_state_type`
 
-#### 2. `TYPE_ORIGIN` not recorded in `SqlDeclaredEntity`
+#### 2. `TYPE_ORIGIN` on declared entries
 
-Status: fixed
+Status: closed with a narrower design
 
 What changed:
 
-- `SqlDeclaredEntityData` now stores `type_origin: Option<TypeOrigin>`
-- declared type and enum section entries now encode and decode `TYPE_ORIGIN`
+- `SqlDeclaredEntityData` stores `SCHEMA_KEY` plus SQL mapping
+- declared type and enum section entries encode and decode those values
+- `TYPE_ORIGIN` stays on `SqlTranslatable` / `UsedType` metadata instead of being
+  duplicated on declared entries
 
 Regression coverage:
 
-- `round_trip_sql_declared_type_preserves_type_origin`
+- `round_trip_sql_declared_type_preserves_schema_key_and_sql`
 
 #### 3. No duplicate `SCHEMA_KEY` detection
 
@@ -183,7 +189,7 @@ New or strengthened evidence:
 - declared types no longer create builtin placeholders in the graph
 - aggregate `STYPE` picks up the schema prefix from the declaring `extension_sql!()`
   node
-- declared type metadata round-trips `TYPE_ORIGIN`
+- declared type metadata round-trips `SCHEMA_KEY` and SQL mapping
 - duplicate `SCHEMA_KEY` values fail during graph build
 
 ## Notes
