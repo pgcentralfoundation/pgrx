@@ -123,8 +123,11 @@ This normalization does a few important things:
 - peels `default!(...)`
 - resolves `variadic!()` and `VariadicArray<T>`
 - resolves `composite_type!(...)`
-- unwraps container and wrapper shapes such as `Option<T>`, `Result<T, E>`,
-  `Vec<T>`, `Array<T>`, and friends
+- inspects container and wrapper shapes such as `Option<T>`, `Result<T, E>`,
+  `Vec<T>`, `Array<T>`, and friends, and records flags such as `optional` and
+  `variadic`
+- rewrites nested `composite_type!(...)` cases just enough to preserve the
+  wrapper shape around the synthetic composite Rust type
 - anonymizes lifetime names before serializing metadata
 
 That last part matters. Local lifetime spellings like `'a` and `'mcx` are not
@@ -133,7 +136,8 @@ different letter.
 
 What survives this stage is:
 
-- a normalized Rust type that can be used in `<T as SqlTranslatable>`
+- a normalized Rust type, usually still including the wrapper shape, that can
+  be used in `<T as SqlTranslatable>`
 - flags such as `optional`, `variadic`, and `default`
 - sometimes an explicit composite SQL name
 
@@ -171,11 +175,15 @@ Today, `pgrx_resolved_type!(T)` expands to:
 concat!(module_path!(), "::", stringify!(T))
 ```
 
-That means the identity comes from the definition site, not from an alias,
-re-export, or whatever spelling happened to appear at a call site.
+That means the identity comes from the module where the impl or derive expands,
+plus the type tokens you pass to the macro.
 
-This is why a type alias and the original type should usually share the same
-`TYPE_IDENT`.
+For derive-generated impls, and for manual impls written next to the type, that
+lines up with the type's canonical module path rather than whatever alias,
+re-export, or call-site spelling showed up somewhere else.
+
+This is why a type alias and the original type usually share the same
+`TYPE_IDENT` when they resolve to the same `SqlTranslatable` impl.
 
 ### `TYPE_ORIGIN`
 
@@ -330,8 +338,9 @@ An explicit composite slot will carry:
 
 ```text
 no type resolution
-+ argument_sql = composite("Dog")
-+ return_sql = composite("Dog")
++ composite_type = "Dog"
++ argument_sql = composite
++ return_sql = composite
 ```
 
 ## Step 7: `cargo pgrx schema` Reads The Section Back
@@ -505,12 +514,12 @@ separate.
 
 ```rust
 #[pg_extern]
-fn echo_many(values: Vec<UuidWrapper>) -> Vec<UuidWrapper> {
+fn echo_many_short(values: Vec<UuidWrapper>) -> Vec<UuidWrapper> {
     values
 }
 
 #[pg_extern]
-fn echo_many(
+fn echo_many_qualified(
     values: std::vec::Vec<crate::path::to::UuidWrapper>,
 ) -> std::vec::Vec<crate::path::to::UuidWrapper> {
     values
