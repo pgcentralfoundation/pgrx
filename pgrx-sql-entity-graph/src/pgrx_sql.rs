@@ -1322,22 +1322,22 @@ fn initialize_aggregates<'a>(
             )?;
         }
 
-        if let Some(arg) = &item.mstype {
-            if let Some((type_ident, type_origin)) = arg.resolution() {
-                initialize_resolved_type(
-                    graph,
-                    mapped_builtin_types,
-                    type_ident,
-                    type_origin,
-                    mapped_types,
-                    mapped_enums,
-                    mapped_extension_sqls,
-                    "Aggregate",
-                    item.full_path,
-                    "MSTYPE",
-                    arg.full_path,
-                )?;
-            }
+        if let Some(arg) = &item.mstype
+            && let Some((type_ident, type_origin)) = arg.resolution()
+        {
+            initialize_resolved_type(
+                graph,
+                mapped_builtin_types,
+                type_ident,
+                type_origin,
+                mapped_types,
+                mapped_enums,
+                mapped_extension_sqls,
+                "Aggregate",
+                item.full_path,
+                "MSTYPE",
+                arg.full_path,
+            )?;
         }
 
         mapped_aggregates.insert(item, index);
@@ -1416,24 +1416,24 @@ fn connect_aggregate<'a>(
         )?;
     }
 
-    if let Some(arg) = &item.mstype {
-        if let Some((type_ident, type_origin)) = arg.resolution() {
-            connect_resolved_type(
-                graph,
-                index,
-                SqlGraphRequires::ByArg,
-                type_ident,
-                type_origin,
-                types,
-                enums,
-                builtin_types,
-                extension_sqls,
-                "Aggregate",
-                item.full_path,
-                "MSTYPE",
-                arg.full_path,
-            )?;
-        }
+    if let Some(arg) = &item.mstype
+        && let Some((type_ident, type_origin)) = arg.resolution()
+    {
+        connect_resolved_type(
+            graph,
+            index,
+            SqlGraphRequires::ByArg,
+            type_ident,
+            type_origin,
+            types,
+            enums,
+            builtin_types,
+            extension_sqls,
+            "Aggregate",
+            item.full_path,
+            "MSTYPE",
+            arg.full_path,
+        )?;
     }
 
     if let Some((type_ident, type_origin)) = item.stype.used_ty.resolution() {
@@ -1709,7 +1709,7 @@ fn ensure_unique_type_targets<'a>(
             .push(format!("enum `{}`", item.full_path));
     }
 
-    for (item, _) in extension_sqls {
+    for item in extension_sqls.keys() {
         for declared in &item.creates {
             if let Some(type_ident) = declared.type_ident() {
                 seen.entry(type_ident.to_string())

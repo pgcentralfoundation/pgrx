@@ -104,6 +104,7 @@ pub use postgres_type::Alignment;
 
 /// An entity corresponding to some SQL required by the extension.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[allow(clippy::large_enum_variant)]
 pub enum SqlGraphEntity<'a> {
     ExtensionRoot(ControlFile),
     Schema(SchemaEntity<'a>),
