@@ -22,7 +22,6 @@ use crate::metadata::SqlMapping;
 use crate::pgrx_sql::PgrxSql;
 use crate::to_sql::ToSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
-use crate::type_keyed;
 use crate::{SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity};
 use eyre::{WrapErr, eyre};
 
@@ -276,14 +275,10 @@ impl ToSql for PgAggregateEntity {
         };
 
         let stype_sql = map_ty(&self.stype.used_ty).wrap_err("Mapping state type")?;
-        let stype_schema = context
-            .types
-            .iter()
-            .map(type_keyed)
-            .chain(context.enums.iter().map(type_keyed))
-            .find(|(ty, _)| ty.matches_schema(self.stype.used_ty.metadata.schema_key))
-            .map(|(_, ty_index)| context.schema_prefix_for(ty_index))
-            .unwrap_or_default();
+        let stype_index = context
+            .find_type_dependency(&self_index, &self.stype.used_ty)
+            .ok_or_else(|| eyre!("Could not find STYPE in graph. Got: {:?}", self.stype.used_ty))?;
+        let stype_schema = context.schema_prefix_for(&stype_index);
 
         if let Some(value) = &self.mstype {
             let mstype_sql = map_ty(value).wrap_err("Mapping moving state type")?;
@@ -308,11 +303,8 @@ impl ToSql for PgAggregateEntity {
         let args = {
             let mut args = Vec::new();
             for (idx, arg) in self.args.iter().enumerate() {
-                let graph_index = context
-                    .graph
-                    .neighbors_undirected(self_index)
-                    .find(|neighbor| context.graph[*neighbor].type_matches(&arg.used_ty))
-                    .ok_or_else(|| {
+                let graph_index =
+                    context.find_type_dependency(&self_index, &arg.used_ty).ok_or_else(|| {
                         eyre!("Could not find arg type in graph. Got: {:?}", arg.used_ty)
                     })?;
                 let needs_comma = idx < (self.args.len() - 1);
@@ -361,9 +353,7 @@ impl ToSql for PgAggregateEntity {
             let mut args = Vec::new();
             for (idx, arg) in direct_args.iter().enumerate() {
                 let graph_index = context
-                    .graph
-                    .neighbors_undirected(self_index)
-                    .find(|neighbor| context.graph[*neighbor].type_matches(&arg.used_ty))
+                    .find_type_dependency(&self_index, &arg.used_ty)
                     .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
                 let needs_comma = idx < (direct_args.len() - 1);
                 let buf = format!(

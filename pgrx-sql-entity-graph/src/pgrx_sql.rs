@@ -20,7 +20,7 @@ use eyre::eyre;
 use petgraph::dot::Dot;
 use petgraph::graph::NodeIndex;
 use petgraph::stable_graph::StableGraph;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::fmt::Debug;
 use std::path::Path;
 
@@ -155,6 +155,7 @@ impl PgrxSql {
         let mapped_schemas = initialize_schemas(&mut graph, bootstrap, finalize, schemas)?;
         let mapped_enums = initialize_enums(&mut graph, root, bootstrap, finalize, enums)?;
         let mapped_types = initialize_types(&mut graph, root, bootstrap, finalize, types)?;
+        ensure_unique_type_targets(&mapped_types, &mapped_enums, &mapped_extension_sqls)?;
         let (mapped_externs, mut mapped_builtin_types) = initialize_externs(
             &mut graph,
             root,
@@ -404,6 +405,16 @@ impl PgrxSql {
 
     pub fn schema_prefix_for(&self, target: &NodeIndex) -> String {
         self.schema_alias_of(target).map(|v| (v + ".").to_string()).unwrap_or_default()
+    }
+
+    pub fn find_type_dependency(
+        &self,
+        owner: &NodeIndex,
+        ty: &dyn crate::TypeIdentifiable,
+    ) -> Option<NodeIndex> {
+        self.graph
+            .neighbors_undirected(*owner)
+            .find(|neighbor| self.graph[*neighbor].type_matches(ty))
     }
 
     pub fn to_sql(&self) -> eyre::Result<String> {
@@ -874,7 +885,6 @@ fn connect_externs(
 ) -> eyre::Result<()> {
     for (item, &index) in externs {
         let mut found_schema_declaration = false;
-        let mut has_explicit_requires = false;
         for extern_attr in &item.extern_attrs {
             match extern_attr {
                 crate::ExternArgs::Requires(requirements) => {
@@ -889,7 +899,6 @@ fn connect_externs(
                             triggers,
                         ) {
                             graph.add_edge(*target, index, SqlGraphRequires::By);
-                            has_explicit_requires = true;
                         } else {
                             return Err(eyre!("Could not find `requires` target: {:?}", requires));
                         }
@@ -906,7 +915,6 @@ fn connect_externs(
                         triggers,
                     ) {
                         graph.add_edge(*target, index, SqlGraphRequires::By);
-                        has_explicit_requires = true
                     }
                 }
                 crate::ExternArgs::Schema(declared_schema_name) => {
@@ -963,25 +971,6 @@ fn connect_externs(
                 &slot,
                 arg.used_ty.full_path,
             )?;
-            for (ext_item, ext_index) in extension_sqls {
-                if ext_item
-                    .has_sql_declared_entity(&SqlDeclared::Type(
-                        arg.used_ty.metadata.schema_key.to_string(),
-                    ))
-                    .is_some()
-                {
-                    if !has_explicit_requires {
-                        graph.add_edge(*ext_index, index, SqlGraphRequires::ByArg);
-                    }
-                } else if ext_item
-                    .has_sql_declared_entity(&SqlDeclared::Enum(
-                        arg.used_ty.metadata.schema_key.to_string(),
-                    ))
-                    .is_some()
-                {
-                    graph.add_edge(*ext_index, index, SqlGraphRequires::ByArg);
-                }
-            }
         }
 
         match &item.fn_return {
@@ -1002,19 +991,6 @@ fn connect_externs(
                     "return type",
                     ty.full_path,
                 )?;
-                for (ext_item, ext_index) in extension_sqls {
-                    if ext_item
-                        .has_sql_declared_entity(&SqlDeclared::Type(ty.metadata.schema_key.into()))
-                        .is_some()
-                        || ext_item
-                            .has_sql_declared_entity(&SqlDeclared::Enum(
-                                ty.metadata.schema_key.into(),
-                            ))
-                            .is_some()
-                    {
-                        graph.add_edge(*ext_index, index, SqlGraphRequires::ByArg);
-                    }
-                }
             }
             PgExternReturnEntity::Iterated { tys: iterated_returns, .. } => {
                 for PgExternReturnEntityIteratedItem { ty, .. } in iterated_returns {
@@ -1033,21 +1009,6 @@ fn connect_externs(
                         "table return column",
                         ty.full_path,
                     )?;
-                    for (ext_item, ext_index) in extension_sqls {
-                        if ext_item
-                            .has_sql_declared_entity(&SqlDeclared::Type(
-                                ty.metadata.schema_key.to_string(),
-                            ))
-                            .is_some()
-                            || ext_item
-                                .has_sql_declared_entity(&SqlDeclared::Enum(
-                                    ty.metadata.schema_key.to_string(),
-                                ))
-                                .is_some()
-                        {
-                            graph.add_edge(*ext_index, index, SqlGraphRequires::ByArg);
-                        }
-                    }
                 }
             }
         }
@@ -1305,21 +1266,6 @@ fn connect_aggregate(
             &slot,
             arg.used_ty.full_path,
         )?;
-        for (ext_item, ext_index) in extension_sqls {
-            if ext_item
-                .has_sql_declared_entity(&SqlDeclared::Type(
-                    arg.used_ty.metadata.schema_key.to_string(),
-                ))
-                .is_some()
-                || ext_item
-                    .has_sql_declared_entity(&SqlDeclared::Enum(
-                        arg.used_ty.metadata.schema_key.to_string(),
-                    ))
-                    .is_some()
-            {
-                graph.add_edge(*ext_index, index, SqlGraphRequires::ByArg);
-            }
-        }
     }
 
     for arg in item.direct_args.as_ref().unwrap_or(&vec![]) {
@@ -1339,21 +1285,6 @@ fn connect_aggregate(
             &slot,
             arg.used_ty.full_path,
         )?;
-        for (ext_item, ext_index) in extension_sqls {
-            if ext_item
-                .has_sql_declared_entity(&SqlDeclared::Type(
-                    arg.used_ty.metadata.schema_key.to_string(),
-                ))
-                .is_some()
-                || ext_item
-                    .has_sql_declared_entity(&SqlDeclared::Enum(
-                        arg.used_ty.metadata.schema_key.to_string(),
-                    ))
-                    .is_some()
-            {
-                graph.add_edge(*ext_index, index, SqlGraphRequires::ByArg);
-            }
-        }
     }
 
     if let Some(arg) = &item.mstype {
@@ -1372,19 +1303,6 @@ fn connect_aggregate(
             "MSTYPE",
             arg.full_path,
         )?;
-        for (ext_item, ext_index) in extension_sqls {
-            if ext_item
-                .has_sql_declared_entity(&SqlDeclared::Type(arg.metadata.schema_key.to_string()))
-                .is_some()
-                || ext_item
-                    .has_sql_declared_entity(&SqlDeclared::Enum(
-                        arg.metadata.schema_key.to_string(),
-                    ))
-                    .is_some()
-            {
-                graph.add_edge(*ext_index, index, SqlGraphRequires::ByArg);
-            }
-        }
     }
 
     connect_resolved_type(
@@ -1402,21 +1320,6 @@ fn connect_aggregate(
         "STYPE",
         item.stype.used_ty.full_path,
     )?;
-    for (ext_item, ext_index) in extension_sqls {
-        if ext_item
-            .has_sql_declared_entity(&SqlDeclared::Type(
-                item.stype.used_ty.metadata.schema_key.to_string(),
-            ))
-            .is_some()
-            || ext_item
-                .has_sql_declared_entity(&SqlDeclared::Enum(
-                    item.stype.used_ty.metadata.schema_key.to_string(),
-                ))
-                .is_some()
-        {
-            graph.add_edge(*ext_index, index, SqlGraphRequires::ByArg);
-        }
-    }
 
     make_extern_connection(
         graph,
@@ -1632,14 +1535,71 @@ fn find_type_or_enum(
         .map(|(_, index)| *index)
 }
 
-fn has_extension_sql_declared_type_or_enum(
+fn find_declared_type_or_enum(
     extension_sqls: &HashMap<ExtensionSqlEntity, NodeIndex>,
     schema_key: &str,
-) -> bool {
-    extension_sqls.keys().any(|item| {
-        item.has_sql_declared_entity(&SqlDeclared::Type(schema_key.to_string())).is_some()
-            || item.has_sql_declared_entity(&SqlDeclared::Enum(schema_key.to_string())).is_some()
+) -> Option<NodeIndex> {
+    extension_sqls.iter().find_map(|(item, index)| {
+        item.creates
+            .iter()
+            .any(|declared| declared.matches_schema_key(schema_key))
+            .then_some(*index)
     })
+}
+
+fn find_graph_type_target(
+    schema_key: &str,
+    types: &HashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
+    extension_sqls: &HashMap<ExtensionSqlEntity, NodeIndex>,
+) -> Option<NodeIndex> {
+    find_type_or_enum(schema_key, types, enums)
+        .or_else(|| find_declared_type_or_enum(extension_sqls, schema_key))
+}
+
+fn ensure_unique_type_targets(
+    types: &HashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
+    extension_sqls: &HashMap<ExtensionSqlEntity, NodeIndex>,
+) -> eyre::Result<()> {
+    let mut seen = BTreeMap::<String, Vec<String>>::new();
+
+    for item in types.keys() {
+        seen.entry(item.schema_key.to_string())
+            .or_default()
+            .push(format!("type `{}`", item.full_path));
+    }
+
+    for item in enums.keys() {
+        seen.entry(item.schema_key.to_string())
+            .or_default()
+            .push(format!("enum `{}`", item.full_path));
+    }
+
+    for (item, _) in extension_sqls {
+        for declared in &item.creates {
+            if let Some(schema_key) = declared.schema_key() {
+                seen.entry(schema_key.to_string())
+                    .or_default()
+                    .push(format!("extension_sql `{}` ({declared})", item.name));
+            }
+        }
+    }
+
+    for locations in seen.values_mut() {
+        locations.sort();
+    }
+
+    if let Some((schema_key, locations)) =
+        seen.into_iter().find(|(_, locations)| locations.len() > 1)
+    {
+        return Err(eyre!(
+            "schema key `{schema_key}` matched multiple SQL entities: {}",
+            locations.join(", ")
+        ));
+    }
+
+    Ok(())
 }
 
 fn unresolved_schema_key(
@@ -1667,13 +1627,11 @@ fn initialize_resolved_type(
     slot: &str,
     ty_name: &str,
 ) -> eyre::Result<()> {
-    if find_type_or_enum(schema_key, types, enums).is_some() {
+    if find_graph_type_target(schema_key, types, enums, extension_sqls).is_some() {
         return Ok(());
     }
 
-    if matches!(type_origin, TypeOrigin::External)
-        || has_extension_sql_declared_type_or_enum(extension_sqls, schema_key)
-    {
+    if matches!(type_origin, TypeOrigin::External) {
         builtin_types
             .entry(schema_key.to_string())
             .or_insert_with(|| graph.add_node(SqlGraphEntity::BuiltinType(schema_key.to_string())));
@@ -1698,7 +1656,7 @@ fn connect_resolved_type(
     slot: &str,
     ty_name: &str,
 ) -> eyre::Result<()> {
-    if let Some(ty_index) = find_type_or_enum(schema_key, types, enums) {
+    if let Some(ty_index) = find_graph_type_target(schema_key, types, enums, extension_sqls) {
         graph.add_edge(ty_index, index, requires);
         return Ok(());
     }
@@ -1708,9 +1666,7 @@ fn connect_resolved_type(
         return Ok(());
     }
 
-    if matches!(type_origin, TypeOrigin::External)
-        || has_extension_sql_declared_type_or_enum(extension_sqls, schema_key)
-    {
+    if matches!(type_origin, TypeOrigin::External) {
         return Err(eyre!(
             "missing external-type placeholder for schema key `{schema_key}` while connecting {owner_kind} `{owner_name}` {slot}"
         ));
@@ -1741,6 +1697,8 @@ mod tests {
     use crate::extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntityData};
     use crate::metadata::{FunctionMetadataTypeEntity, Returns, SqlMapping};
     use crate::pg_extern::entity::{PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity};
+    use crate::postgres_type::entity::PostgresTypeEntity;
+    use crate::schema::entity::SchemaEntity;
     use crate::to_sql::entity::ToSqlConfigEntity;
 
     fn control_file() -> ControlFile {
@@ -1857,17 +1815,20 @@ mod tests {
     }
 
     fn declared_type_sql(
+        module_path: &'static str,
+        full_path: &'static str,
+        declaration_name: &'static str,
         name: &'static str,
         schema_key: &'static str,
         sql: &'static str,
     ) -> ExtensionSqlEntity {
         ExtensionSqlEntity {
-            module_path: "tests",
-            full_path: "tests::concrete_type",
+            module_path,
+            full_path,
             sql: "CREATE TYPE custom_type;",
             file: "test.rs",
             line: 1,
-            name: "concrete_type",
+            name: declaration_name,
             bootstrap: false,
             finalize: false,
             requires: vec![],
@@ -1876,8 +1837,34 @@ mod tests {
                     sql: sql.into(),
                     name: name.into(),
                     schema_key: schema_key.into(),
+                    type_origin: Some(TypeOrigin::ThisExtension),
                 },
             )],
+        }
+    }
+
+    fn schema_entity(module_path: &'static str, name: &'static str) -> SchemaEntity {
+        SchemaEntity { module_path, name, file: "test.rs", line: 1 }
+    }
+
+    fn type_entity(
+        name: &'static str,
+        full_path: &'static str,
+        schema_key: &'static str,
+    ) -> PostgresTypeEntity {
+        PostgresTypeEntity {
+            name,
+            file: "test.rs",
+            line: 1,
+            full_path,
+            module_path: "tests",
+            schema_key,
+            in_fn_path: "in_fn",
+            out_fn_path: "out_fn",
+            receive_fn_path: None,
+            send_fn_path: None,
+            to_sql_config: to_sql_config(),
+            alignment: None,
         }
     }
 
@@ -1909,7 +1896,14 @@ mod tests {
     #[test]
     fn extension_sql_declared_type_orders_before_function_and_aggregate() {
         let custom_type = extension_owned_type("tests::HexInt", "tests::HexInt", "hexint");
-        let declared_type = declared_type_sql("tests::HexInt", "tests::HexInt", "hexint");
+        let declared_type = declared_type_sql(
+            "tests",
+            "tests::concrete_type",
+            "concrete_type",
+            "tests::HexInt",
+            "tests::HexInt",
+            "hexint",
+        );
         let function = function_entity(
             "takes_hexint",
             vec![PgExternArgumentEntity { pattern: "value", used_ty: custom_type.clone() }],
@@ -1941,8 +1935,65 @@ mod tests {
         let function_index = sql.externs[&function];
         let aggregate_index = sql.aggregates[&aggregate];
 
+        assert!(!sql.builtin_types.contains_key("tests::HexInt"));
         assert!(sql.graph.find_edge(declared_index, function_index).is_some());
         assert!(sql.graph.find_edge(declared_index, aggregate_index).is_some());
+    }
+
+    #[test]
+    fn extension_sql_declared_type_in_custom_schema_prefixes_aggregate_state_type() {
+        let custom_type = extension_owned_type("tests::HexInt", "tests::HexInt", "hexint");
+        let declared_type = declared_type_sql(
+            "tests::custom_schema",
+            "tests::custom_schema::hexint_sql",
+            "hexint_sql",
+            "tests::HexInt",
+            "tests::HexInt",
+            "hexint",
+        );
+        let aggregate = aggregate_entity("hexint_accum", vec![], custom_type, None);
+        let state_fn = state_function();
+        let schema = schema_entity("tests::custom_schema", "custom_schema");
+
+        let sql = PgrxSql::build(
+            vec![
+                SqlGraphEntity::ExtensionRoot(control_file()),
+                SqlGraphEntity::Schema(schema),
+                SqlGraphEntity::CustomSql(declared_type),
+                SqlGraphEntity::Function(state_fn),
+                SqlGraphEntity::Aggregate(aggregate),
+            ]
+            .into_iter(),
+            "test".into(),
+            false,
+        )
+        .unwrap()
+        .to_sql()
+        .unwrap();
+
+        assert!(sql.contains("STYPE = custom_schema.hexint"));
+    }
+
+    #[test]
+    fn duplicate_schema_key_errors() {
+        let left = type_entity("LeftType", "tests::LeftType", "tests::SharedType");
+        let right = type_entity("RightType", "tests::RightType", "tests::SharedType");
+
+        let error = PgrxSql::build(
+            vec![
+                SqlGraphEntity::ExtensionRoot(control_file()),
+                SqlGraphEntity::Type(left),
+                SqlGraphEntity::Type(right),
+            ]
+            .into_iter(),
+            "test".into(),
+            false,
+        )
+        .expect_err("duplicate schema keys should fail");
+
+        assert!(error.to_string().contains("tests::SharedType"));
+        assert!(error.to_string().contains("tests::LeftType"));
+        assert!(error.to_string().contains("tests::RightType"));
     }
 
     #[test]

@@ -17,8 +17,7 @@
 
 */
 use crate::extension_sql::SqlDeclared;
-use crate::metadata::SqlMapping;
-use crate::metadata::SqlTranslatable;
+use crate::metadata::{SqlMapping, SqlTranslatable, TypeOrigin};
 use crate::pgrx_sql::PgrxSql;
 use crate::positioning_ref::PositioningRef;
 use crate::to_sql::ToSql;
@@ -115,6 +114,7 @@ pub struct SqlDeclaredEntityData {
     pub(crate) sql: String,
     pub(crate) name: String,
     pub(crate) schema_key: String,
+    pub(crate) type_origin: Option<TypeOrigin>,
 }
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
 pub enum SqlDeclaredEntity {
@@ -149,6 +149,7 @@ impl SqlDeclaredEntity {
                 .to_string(),
             name: name.to_string(),
             schema_key: name.to_string(),
+            type_origin: None,
         };
         let retval = match variant {
             "Type" => Self::Type(data),
@@ -182,6 +183,7 @@ impl SqlDeclaredEntity {
             sql,
             name: name.to_string(),
             schema_key: T::SCHEMA_KEY.to_string(),
+            type_origin: Some(T::TYPE_ORIGIN),
         };
         let retval = match variant {
             "Type" => Self::Type(data),
@@ -201,6 +203,26 @@ impl SqlDeclaredEntity {
             SqlDeclaredEntity::Enum(data) => data.sql.clone(),
             SqlDeclaredEntity::Function(data) => data.sql.clone(),
         }
+    }
+
+    pub fn schema_key(&self) -> Option<&str> {
+        match self {
+            SqlDeclaredEntity::Type(data) | SqlDeclaredEntity::Enum(data) => {
+                Some(data.schema_key.as_str())
+            }
+            SqlDeclaredEntity::Function(_) => None,
+        }
+    }
+
+    pub fn type_origin(&self) -> Option<TypeOrigin> {
+        match self {
+            SqlDeclaredEntity::Type(data) | SqlDeclaredEntity::Enum(data) => data.type_origin,
+            SqlDeclaredEntity::Function(_) => None,
+        }
+    }
+
+    pub fn matches_schema_key(&self, schema_key: &str) -> bool {
+        matches!(self.schema_key(), Some(value) if value == schema_key)
     }
 
     pub fn has_sql_declared_entity(&self, identifier: &SqlDeclared) -> bool {

@@ -125,9 +125,7 @@ impl ToSql for PgExternEntity {
                 .collect::<Vec<_>>();
             for (idx, arg) in sql_args.iter().enumerate() {
                 let graph_index = context
-                    .graph
-                    .neighbors_undirected(self_index)
-                    .find(|neighbor| context.graph[*neighbor].type_matches(&arg.used_ty))
+                    .find_type_dependency(&self_index, &arg.used_ty)
                     .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
                 let needs_comma = idx < (sql_args.len().saturating_sub(1));
                 match arg.used_ty.metadata.argument_sql {
@@ -193,9 +191,7 @@ impl ToSql for PgExternEntity {
             PgExternReturnEntity::None => String::from("RETURNS void"),
             PgExternReturnEntity::Type { ty } => {
                 let graph_index = context
-                    .graph
-                    .neighbors_undirected(self_index)
-                    .find(|neighbor| context.graph[*neighbor].type_matches(ty))
+                    .find_type_dependency(&self_index, ty)
                     .ok_or_else(|| eyre!("Could not find return type in graph."))?;
                 let sql_type = match &ty.metadata.return_sql {
                     Ok(Returns::One(SqlMapping::As(sql))) => sql.clone(),
@@ -217,9 +213,7 @@ impl ToSql for PgExternEntity {
             }
             PgExternReturnEntity::SetOf { ty, .. } => {
                 let graph_index = context
-                    .graph
-                    .neighbors_undirected(self_index)
-                    .find(|neighbor| context.graph[*neighbor].type_matches(ty))
+                    .find_type_dependency(&self_index, ty)
                     .ok_or_else(|| eyre!("Could not find return type in graph."))?;
                 let sql_type = match &ty.metadata.return_sql {
                     Ok(Returns::One(SqlMapping::As(sql)))
@@ -246,10 +240,7 @@ impl ToSql for PgExternEntity {
                 for (idx, returning::PgExternReturnEntityIteratedItem { ty, name: col_name }) in
                     table_items.iter().enumerate()
                 {
-                    let graph_index = context
-                        .graph
-                        .neighbors_undirected(self_index)
-                        .find(|neighbor| context.graph[*neighbor].type_matches(ty));
+                    let graph_index = context.find_type_dependency(&self_index, ty);
 
                     let needs_comma = idx < (table_items.len() - 1);
                     let ty_resolved = match &ty.metadata.return_sql {

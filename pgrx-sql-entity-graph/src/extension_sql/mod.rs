@@ -397,6 +397,9 @@ impl SqlDeclared {
                         + ::pgrx::pgrx_sql_entity_graph::section::str_len(
                             <#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY
                         )
+                        + ::pgrx::pgrx_sql_entity_graph::section::type_origin_len(
+                            <#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::TYPE_ORIGIN
+                        )
                         + ::pgrx::pgrx_sql_entity_graph::section::argument_sql_len(
                             <#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL
                         )
@@ -420,6 +423,7 @@ impl SqlDeclared {
                         .u8(::pgrx::pgrx_sql_entity_graph::section::SQL_DECLARED_TYPE)
                         .str(#identifier_expr)
                         .str(<#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY)
+                        .type_origin(<#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::TYPE_ORIGIN)
                         .argument_sql(<#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL)
                 }
             }
@@ -431,6 +435,7 @@ impl SqlDeclared {
                         .u8(::pgrx::pgrx_sql_entity_graph::section::SQL_DECLARED_ENUM)
                         .str(#identifier_expr)
                         .str(<#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY)
+                        .type_origin(<#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::TYPE_ORIGIN)
                         .argument_sql(<#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL)
                 }
             }

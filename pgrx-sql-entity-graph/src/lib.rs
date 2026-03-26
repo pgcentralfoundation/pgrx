@@ -136,6 +136,9 @@ impl SqlGraphEntity {
 
     pub fn schema_matches(&self, schema_key: &str) -> bool {
         match self {
+            SqlGraphEntity::CustomSql(entity) => {
+                entity.creates.iter().any(|declared| declared.matches_schema_key(schema_key))
+            }
             SqlGraphEntity::Enum(entity) => entity.matches_schema(schema_key),
             SqlGraphEntity::Type(entity) => entity.matches_schema(schema_key),
             SqlGraphEntity::BuiltinType(string) => string == schema_key,
