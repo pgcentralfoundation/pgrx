@@ -196,7 +196,7 @@ impl ToSql for PgExternEntity {
                 let sql_type = match &ty.metadata.return_sql {
                     Ok(Returns::One(SqlMapping::As(sql))) => sql.clone(),
                     Ok(Returns::One(SqlMapping::Composite { array_brackets })) => {
-                        fmt::with_array_brackets(ty.composite_type.unwrap().into(), *array_brackets)
+                        fmt::with_array_brackets(ty.composite_type.expect("Composite mapping requires composite_type").into(), *array_brackets)
                     }
                     Ok(other) => {
                         return Err(eyre!(
@@ -220,7 +220,7 @@ impl ToSql for PgExternEntity {
                     | Ok(Returns::SetOf(SqlMapping::As(sql))) => sql.clone(),
                     Ok(Returns::One(SqlMapping::Composite { array_brackets }))
                     | Ok(Returns::SetOf(SqlMapping::Composite { array_brackets })) => {
-                        fmt::with_array_brackets(ty.composite_type.unwrap().into(), *array_brackets)
+                        fmt::with_array_brackets(ty.composite_type.expect("Composite mapping requires composite_type").into(), *array_brackets)
                     }
                     Ok(other) => {
                         return Err(eyre!(
@@ -246,7 +246,7 @@ impl ToSql for PgExternEntity {
                     let ty_resolved = match &ty.metadata.return_sql {
                         Ok(Returns::One(SqlMapping::As(sql))) => sql.clone(),
                         Ok(Returns::One(SqlMapping::Composite { array_brackets })) => {
-                            let composite = ty.composite_type.unwrap();
+                            let composite = ty.composite_type.expect("Composite mapping requires composite_type");
                             fmt::with_array_brackets(composite.into(), *array_brackets)
                         }
                         Ok(other) => {

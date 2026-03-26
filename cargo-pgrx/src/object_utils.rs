@@ -167,7 +167,7 @@ fn macho_schema_section_from_segment64<'a>(
 fn parse_macho_header(data: &[u8]) -> eyre::Result<(MachBits, MachEndian, usize)> {
     let magic = data.get(..4).ok_or_else(|| eyre::eyre!("Mach-O file is too small"))?;
 
-    match u32::from_be_bytes(magic.try_into().unwrap()) {
+    match u32::from_be_bytes(magic.try_into().expect("already bounds-checked to 4 bytes")) {
         object::macho::MH_CIGAM => Ok((MachBits::Bits32, MachEndian::Little, 28)),
         object::macho::MH_MAGIC => Ok((MachBits::Bits32, MachEndian::Big, 28)),
         object::macho::MH_CIGAM_64 => Ok((MachBits::Bits64, MachEndian::Little, 32)),
@@ -179,7 +179,7 @@ fn parse_macho_header(data: &[u8]) -> eyre::Result<(MachBits, MachEndian, usize)
 fn read_u32(data: &[u8], offset: usize, endian: MachEndian) -> eyre::Result<u32> {
     let bytes =
         data.get(offset..offset + 4).ok_or_else(|| eyre::eyre!("unexpected end of Mach-O data"))?;
-    let bytes: [u8; 4] = bytes.try_into().unwrap();
+    let bytes: [u8; 4] = bytes.try_into().expect("already bounds-checked to 4 bytes");
 
     Ok(match endian {
         MachEndian::Little => u32::from_le_bytes(bytes),
@@ -190,7 +190,7 @@ fn read_u32(data: &[u8], offset: usize, endian: MachEndian) -> eyre::Result<u32>
 fn read_u64(data: &[u8], offset: usize, endian: MachEndian) -> eyre::Result<u64> {
     let bytes =
         data.get(offset..offset + 8).ok_or_else(|| eyre::eyre!("unexpected end of Mach-O data"))?;
-    let bytes: [u8; 8] = bytes.try_into().unwrap();
+    let bytes: [u8; 8] = bytes.try_into().expect("already bounds-checked to 8 bytes");
 
     Ok(match endian {
         MachEndian::Little => u64::from_le_bytes(bytes),

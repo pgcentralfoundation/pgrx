@@ -107,12 +107,15 @@ the alternative is a horrible pile of bash and regexen.
 This should be run in CI for every merge.
 
 ## pgrx-tests
-This currently contains both our test support framework and the actual test suite.
+This contains the test support framework (`#[pg_test]`, test harness, Postgres lifecycle).
 
-Fortunately, the way `#[pg_test]` works is magic enough to simply happen if you run `cargo test`.
-Unfortunately, due to the way that `#[pg_test]` works, the placement of test code is extremely
-constrained in terms of where it must be in files. This is part of why we have this
-additional crate.
+## pgrx-unit-tests
+This contains the actual internal pgrx test suite. It depends on `pgrx-tests` for the harness.
+
+The way `#[pg_test]` works is magic enough to simply happen if you run `cargo test`.
+Due to the way that `#[pg_test]` works, the placement of test code is extremely
+constrained in terms of where it must be in files. This is part of why we have
+these additional crates.
 
 ## pgrx-examples
 Various example extensions one can define using pgrx.

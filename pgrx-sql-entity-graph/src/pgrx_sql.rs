@@ -1051,15 +1051,7 @@ fn connect_ords(
             schemas,
         );
 
-        make_type_or_enum_connection(
-            graph,
-            "Ord",
-            index,
-            &item.rust_identifier(),
-            item.schema_key,
-            types,
-            enums,
-        );
+        make_type_or_enum_connection(graph, index, item.schema_key, types, enums);
 
         // Make PostgresOrdEntities (which will be translated into `CREATE OPERATOR CLASS` statements) depend
         // on the operators which they will reference. For example, a pgrx-defined Postgres type `parakeet`
@@ -1125,15 +1117,7 @@ fn connect_hashes(
             schemas,
         );
 
-        make_type_or_enum_connection(
-            graph,
-            "Hash",
-            index,
-            &item.rust_identifier(),
-            item.schema_key,
-            types,
-            enums,
-        );
+        make_type_or_enum_connection(graph, index, item.schema_key, types, enums);
 
         if let Some((_, extern_index)) = externs.iter().find(|(extern_item, _)| {
             item.module_path == extern_item.module_path && extern_item.name == item.fn_name()
@@ -1677,9 +1661,7 @@ fn connect_resolved_type(
 
 fn make_type_or_enum_connection(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
-    _kind: &str,
     index: NodeIndex,
-    _rust_identifier: &str,
     schema_key: &str,
     types: &HashMap<PostgresTypeEntity, NodeIndex>,
     enums: &HashMap<PostgresEnumEntity, NodeIndex>,
