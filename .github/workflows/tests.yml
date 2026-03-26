@@ -410,6 +410,7 @@ jobs:
       - name: hack Cargo.toml
         run: |
           echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
+          echo "pgrx-bench  = { path = \"${GITHUB_WORKSPACE}/pgrx-bench\"  }" >> /tmp/sample/Cargo.toml
           echo "pgrx        = { path = \"${GITHUB_WORKSPACE}/pgrx\"        }" >> /tmp/sample/Cargo.toml
           echo "pgrx-macros = { path = \"${GITHUB_WORKSPACE}/pgrx-macros\" }" >> /tmp/sample/Cargo.toml
           echo "pgrx-tests  = { path = \"${GITHUB_WORKSPACE}/pgrx-tests\"  }" >> /tmp/sample/Cargo.toml
