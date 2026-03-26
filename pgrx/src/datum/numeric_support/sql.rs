@@ -22,7 +22,7 @@ const fn numeric_scale(precision: u32, scale: u32) -> Option<u32> {
 }
 
 unsafe impl<const P: u32, const S: u32> SqlTranslatable for Numeric<P, S> {
-    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Numeric<P, S>);
+    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(Numeric<P, S>);
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
         pgrx_sql_entity_graph::metadata::TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
@@ -35,7 +35,7 @@ unsafe impl<const P: u32, const S: u32> SqlTranslatable for Numeric<P, S> {
 }
 
 unsafe impl SqlTranslatable for AnyNumeric {
-    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(AnyNumeric);
+    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(AnyNumeric);
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
         pgrx_sql_entity_graph::metadata::TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =

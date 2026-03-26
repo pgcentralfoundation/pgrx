@@ -28,14 +28,14 @@ pub struct PostgresEnumEntity<'a> {
     pub line: u32,
     pub full_path: &'a str,
     pub module_path: &'a str,
-    pub schema_key: &'a str,
+    pub type_ident: &'a str,
     pub variants: Vec<&'a str>,
     pub to_sql_config: ToSqlConfigEntity<'a>,
 }
 
 impl TypeMatch for PostgresEnumEntity<'_> {
-    fn schema_key(&self) -> &str {
-        self.schema_key
+    fn type_ident(&self) -> &str {
+        self.type_ident
     }
 }
 

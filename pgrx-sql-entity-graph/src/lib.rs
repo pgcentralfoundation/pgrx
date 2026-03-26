@@ -134,28 +134,28 @@ impl SqlGraphEntity<'_> {
         )
     }
 
-    pub fn schema_matches(&self, schema_key: &str) -> bool {
+    pub fn type_ident_matches(&self, type_ident: &str) -> bool {
         match self {
             SqlGraphEntity::CustomSql(entity) => {
-                entity.creates.iter().any(|declared| declared.matches_schema_key(schema_key))
+                entity.creates.iter().any(|declared| declared.matches_type_ident(type_ident))
             }
-            SqlGraphEntity::Enum(entity) => entity.matches_schema(schema_key),
-            SqlGraphEntity::Type(entity) => entity.matches_schema(schema_key),
-            SqlGraphEntity::BuiltinType(string) => string == schema_key,
+            SqlGraphEntity::Enum(entity) => entity.matches_type_ident(type_ident),
+            SqlGraphEntity::Type(entity) => entity.matches_type_ident(type_ident),
+            SqlGraphEntity::BuiltinType(string) => string == type_ident,
             _ => false,
         }
     }
 
     pub fn type_matches(&self, arg: &dyn TypeIdentifiable) -> bool {
-        self.schema_matches(arg.schema_key())
+        self.type_ident_matches(arg.type_ident())
     }
 }
 
 pub trait TypeMatch {
-    fn schema_key(&self) -> &str;
+    fn type_ident(&self) -> &str;
 
-    fn matches_schema(&self, arg: &str) -> bool {
-        self.schema_key() == arg
+    fn matches_type_ident(&self, arg: &str) -> bool {
+        self.type_ident() == arg
     }
 }
 
@@ -164,7 +164,7 @@ pub fn type_keyed<'a, 'b, A: TypeMatch, B>((a, b): (&'a A, &'b B)) -> (&'a dyn T
 }
 
 pub trait TypeIdentifiable {
-    fn schema_key(&self) -> &str;
+    fn type_ident(&self) -> &str;
     fn ty_name(&self) -> &str;
 }
 

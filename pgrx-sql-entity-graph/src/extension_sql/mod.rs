@@ -395,7 +395,7 @@ impl SqlDeclared {
                     ::pgrx::pgrx_sql_entity_graph::section::u8_len()
                         + ::pgrx::pgrx_sql_entity_graph::section::str_len(#identifier_expr)
                         + ::pgrx::pgrx_sql_entity_graph::section::str_len(
-                            <#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY
+                            <#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::TYPE_IDENT
                         )
                         + ::pgrx::pgrx_sql_entity_graph::section::argument_sql_len(
                             <#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL
@@ -419,7 +419,7 @@ impl SqlDeclared {
                     #writer
                         .u8(::pgrx::pgrx_sql_entity_graph::section::SQL_DECLARED_TYPE)
                         .str(#identifier_expr)
-                        .str(<#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY)
+                        .str(<#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::TYPE_IDENT)
                         .argument_sql(<#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL)
                 }
             }
@@ -430,7 +430,7 @@ impl SqlDeclared {
                     #writer
                         .u8(::pgrx::pgrx_sql_entity_graph::section::SQL_DECLARED_ENUM)
                         .str(#identifier_expr)
-                        .str(<#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY)
+                        .str(<#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::TYPE_IDENT)
                         .argument_sql(<#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL)
                 }
             }

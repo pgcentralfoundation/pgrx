@@ -45,19 +45,19 @@ pub struct FunctionMetadataTypeEntity<'a> {
 
 #[derive(Clone, Copy, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub struct FunctionMetadataTypeResolutionEntity<'a> {
-    pub schema_key: &'a str,
+    pub type_ident: &'a str,
     pub type_origin: TypeOrigin,
 }
 
 impl<'a> FunctionMetadataTypeEntity<'a> {
     pub const fn resolved(
-        schema_key: &'a str,
+        type_ident: &'a str,
         type_origin: TypeOrigin,
         argument_sql: Result<SqlMapping, ArgumentError>,
         return_sql: Result<Returns, ReturnsError>,
     ) -> Self {
         Self {
-            resolution: Some(FunctionMetadataTypeResolutionEntity { schema_key, type_origin }),
+            resolution: Some(FunctionMetadataTypeResolutionEntity { type_ident, type_origin }),
             argument_sql,
             return_sql,
         }
@@ -70,9 +70,9 @@ impl<'a> FunctionMetadataTypeEntity<'a> {
         Self { resolution: None, argument_sql, return_sql }
     }
 
-    pub const fn schema_key(&self) -> Option<&'a str> {
+    pub const fn type_ident(&self) -> Option<&'a str> {
         match self.resolution {
-            Some(resolution) => Some(resolution.schema_key),
+            Some(resolution) => Some(resolution.type_ident),
             None => None,
         }
     }

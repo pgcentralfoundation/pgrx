@@ -20,7 +20,7 @@ This document captured the branch state at review time. On the current
 `wip-one-compile-please` branch:
 
 - missing `.pgrx_schema` now errors with a targeted message
-- bad `SCHEMA_KEY` fallback is fixed through explicit declared-type resolution
+- bad `TYPE_IDENT` fallback is fixed through explicit declared-type resolution
   while `TYPE_ORIGIN` stays explicit on `SqlTranslatable`
 - `SetOfIterator` rejects argument position again
 - the `HexInt` example already uses the const-based `SqlTranslatable` API
@@ -100,21 +100,21 @@ They should not get an empty SQL file and have to reverse-engineer why.
 
 ---
 
-## Finding 2: Bad `SCHEMA_KEY` Values Silently Degrade to `BuiltinType`
+## Finding 2: Bad `TYPE_IDENT` Values Silently Degrade to `BuiltinType`
 
 ### Problem
 
 The graph builder matches function argument and return types to registered
-types/enums by `schema_key`. If no match is found, it silently fabricates a
+types/enums by `type_ident`. If no match is found, it silently fabricates a
 `BuiltinType` node:
 
 ```rust
 if !found {
     mapped_builtin_types
-        .entry(arg.used_ty.metadata.schema_key.to_string())
+        .entry(arg.used_ty.metadata.type_ident.to_string())
         .or_insert_with(|| {
             graph.add_node(SqlGraphEntity::BuiltinType(
-                arg.used_ty.metadata.schema_key.to_string(),
+                arg.used_ty.metadata.type_ident.to_string(),
             ))
         });
 }
@@ -124,7 +124,7 @@ This is fine for real builtins like `i32` or `String`.
 
 It is not fine for migration mistakes in manual `SqlTranslatable` impls.
 
-Under the new design, manual/custom types now depend on a correct `SCHEMA_KEY`.
+Under the new design, manual/custom types now depend on a correct `TYPE_IDENT`.
 If the user:
 
 - hard-codes an old bare string
@@ -132,7 +132,7 @@ If the user:
 - writes the key at the wrong module path
 - otherwise mismatches the type's actual identity
 
-the current behavior is not "your schema key is wrong." It is "pretend this is
+the current behavior is not "your type ident is wrong." It is "pretend this is
 a builtin and keep going."
 
 That makes failures indirect and harder to debug.
@@ -144,7 +144,7 @@ This is one of the core migration surfaces for existing extensions.
 A user porting an old manual `SqlTranslatable` impl will often do three things:
 
 1. update trait methods to associated consts
-2. add `SCHEMA_KEY`
+2. add `TYPE_IDENT`
 3. keep their existing SQL spelling
 
 If step 2 is wrong, they need a precise error. Silent fallback to
@@ -160,20 +160,20 @@ If step 2 is wrong, they need a precise error. Silent fallback to
 Keep builtin fallback only for true builtins. Do not use it as a generic
 "unmatched type" escape hatch.
 
-For user-defined or derived types, an unmatched `schema_key` should become a
+For user-defined or derived types, an unmatched `type_ident` should become a
 schema-generation error that clearly says:
 
 - which type key failed to resolve
 - which function argument/return referenced it
 - that manual `SqlTranslatable` implementors should use
-  `pgrx::pgrx_resolved_type!(T)` for `SCHEMA_KEY`
+  `pgrx::pgrx_resolved_type!(T)` for `TYPE_IDENT`
 
 ### User Impact
 
 For migrating users, the practical guidance should be:
 
 - replace hand-written string keys with `pgrx::pgrx_resolved_type!(MyType)`
-- define `SCHEMA_KEY` at the type's definition site or equivalent canonical impl
+- define `TYPE_IDENT` at the type's definition site or equivalent canonical impl
   site
 - expect pgrx to error if the key does not resolve
 
@@ -257,7 +257,7 @@ unsafe impl SqlTranslatable for HexInt {
 
 But the trait now requires associated consts:
 
-- `SCHEMA_KEY`
+- `TYPE_IDENT`
 - `ARGUMENT_SQL`
 - `RETURN_SQL`
 
@@ -272,7 +272,7 @@ The biggest user-facing change in the refactor is the new const-based
 If the example is stale, users will:
 
 - copy old methods that no longer satisfy the trait
-- fail to define `SCHEMA_KEY`
+- fail to define `TYPE_IDENT`
 - miss the intended use of `pgrx::pgrx_resolved_type!(T)`
 - potentially hard-code an incorrect SQL identity
 
@@ -283,7 +283,7 @@ an unpleasant upgrade.
 
 Update the example to the new contract, including:
 
-- `const SCHEMA_KEY: &'static str = pgrx::pgrx_resolved_type!(HexInt);`
+- `const TYPE_IDENT: &'static str = pgrx::pgrx_resolved_type!(HexInt);`
 - `const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = ...`
 - `const RETURN_SQL: Result<ReturnsRef, ReturnsError> = ...`
 
@@ -299,7 +299,7 @@ For existing extension authors with manual SQL-backed types, the example should
 make the migration path obvious:
 
 1. move runtime methods to associated consts
-2. define `SCHEMA_KEY` with `pgrx_resolved_type!`
+2. define `TYPE_IDENT` with `pgrx_resolved_type!`
 3. keep SQL spelling in `ARGUMENT_SQL` / `RETURN_SQL`
 
 ---
@@ -421,7 +421,7 @@ Old-style implementations using:
 
 must be rewritten to:
 
-- `const SCHEMA_KEY`
+- `const TYPE_IDENT`
 - `const ARGUMENT_SQL`
 - `const RETURN_SQL`
 
@@ -429,13 +429,13 @@ The intended pattern is:
 
 ```rust
 unsafe impl SqlTranslatable for MyType {
-    const SCHEMA_KEY: &'static str = pgrx::pgrx_resolved_type!(MyType);
+    const TYPE_IDENT: &'static str = pgrx::pgrx_resolved_type!(MyType);
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = ...;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = ...;
 }
 ```
 
-### 2. `SCHEMA_KEY` should come from `pgrx_resolved_type!`
+### 2. `TYPE_IDENT` should come from `pgrx_resolved_type!`
 
 Users should not hand-write ad hoc string keys unless they have a very specific
 reason and fully understand the consequences.
@@ -443,7 +443,7 @@ reason and fully understand the consequences.
 The normal migration is:
 
 ```rust
-const SCHEMA_KEY: &'static str = pgrx::pgrx_resolved_type!(MyType);
+const TYPE_IDENT: &'static str = pgrx::pgrx_resolved_type!(MyType);
 ```
 
 If pgrx accepts a bad key silently, that is an implementation problem. From the
@@ -491,7 +491,7 @@ new system trustworthy under failure and humane to migrate to.
 Before calling the branch migration-ready, the implementation should:
 
 1. error when `.pgrx_schema` is missing
-2. error on unresolved non-builtin `SCHEMA_KEY` references
+2. error on unresolved non-builtin `TYPE_IDENT` references
 3. reject `SetOfIterator` in argument position at the metadata layer
 4. update the manual custom-type example to the new const-based API
 5. decide whether schema stripping belongs in the default install workflow

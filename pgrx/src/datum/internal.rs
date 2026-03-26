@@ -182,7 +182,7 @@ impl IntoDatum for Internal {
 }
 
 unsafe impl SqlTranslatable for crate::datum::Internal {
-    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Internal);
+    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(Internal);
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
         pgrx_sql_entity_graph::metadata::TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =

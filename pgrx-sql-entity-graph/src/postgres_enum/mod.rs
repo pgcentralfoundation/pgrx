@@ -139,7 +139,7 @@ impl ToEntityGraphTokens for PostgresEnum {
                 + ::pgrx::pgrx_sql_entity_graph::section::u32_len()
                 + ::pgrx::pgrx_sql_entity_graph::section::str_len(module_path!())
                 + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#name #static_ty_generics))
-                + ::pgrx::pgrx_sql_entity_graph::section::str_len(<#name #static_ty_generics as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY)
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(<#name #static_ty_generics as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::TYPE_IDENT)
                 + (#variants_len)
                 + (#to_sql_config_len)
         };
@@ -155,14 +155,14 @@ impl ToEntityGraphTokens for PostgresEnum {
                 .u32(line!())
                 .str(module_path!())
                 .str(stringify!(#name #static_ty_generics))
-                .str(<#name #static_ty_generics as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY)
+                .str(<#name #static_ty_generics as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::TYPE_IDENT)
                 .u32([ #( stringify!(#variants) ),* ].len() as u32)
                 #( .str(stringify!(#variants)) )*
         });
 
         quote! {
             unsafe impl #staticless_impl_generics ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable for #name #static_ty_generics #static_where_clauses {
-                const SCHEMA_KEY: &'static str = ::pgrx::pgrx_resolved_type!(#name #static_ty_generics);
+                const TYPE_IDENT: &'static str = ::pgrx::pgrx_resolved_type!(#name #static_ty_generics);
                 const TYPE_ORIGIN: ::pgrx::pgrx_sql_entity_graph::metadata::TypeOrigin =
                     ::pgrx::pgrx_sql_entity_graph::metadata::TypeOrigin::ThisExtension;
                 const ARGUMENT_SQL: core::result::Result<

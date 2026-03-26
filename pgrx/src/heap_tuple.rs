@@ -711,7 +711,7 @@ macro_rules! composite_type {
 }
 
 unsafe impl SqlTranslatable for PgHeapTuple<'static, AllocatedByPostgres> {
-    const SCHEMA_KEY: &'static str =
+    const TYPE_IDENT: &'static str =
         crate::pgrx_resolved_type!(PgHeapTuple<'static, AllocatedByPostgres>);
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
         pgrx_sql_entity_graph::metadata::TypeOrigin::ThisExtension;
@@ -721,7 +721,7 @@ unsafe impl SqlTranslatable for PgHeapTuple<'static, AllocatedByPostgres> {
 }
 
 unsafe impl SqlTranslatable for PgHeapTuple<'static, AllocatedByRust> {
-    const SCHEMA_KEY: &'static str =
+    const TYPE_IDENT: &'static str =
         crate::pgrx_resolved_type!(PgHeapTuple<'static, AllocatedByRust>);
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
         pgrx_sql_entity_graph::metadata::TypeOrigin::ThisExtension;

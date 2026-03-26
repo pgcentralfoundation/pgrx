@@ -20,7 +20,7 @@ On `wip-one-compile-please` as it exists now:
 - `SetOfIterator` rejects argument position again
 - the section result tags use named constants
 - the install-time schema-stripping dependency is obsolete on this branch
-- unresolved `SCHEMA_KEY` fallback is now handled through explicit declared-type
+- unresolved `TYPE_IDENT` fallback is now handled through explicit declared-type
   resolution, while `TYPE_ORIGIN` stays explicit on `SqlTranslatable`
 
 ---
@@ -98,7 +98,7 @@ macro_rules! pgrx_resolved_type {
 }
 ```
 
-This means `SCHEMA_KEY` for a type `Foo` in module `my_ext::types` is just `"Foo"` rather
+This means `TYPE_IDENT` for a type `Foo` in module `my_ext::types` is just `"Foo"` rather
 than the RFC-specified `"my_ext::types::Foo"`. The graph builder matches function arguments
 to type entities by string equality on this key:
 
@@ -106,28 +106,28 @@ to type entities by string equality on this key:
 // pgrx-sql-entity-graph/src/pgrx_sql.rs:803-819
 let found = mapped_types
     .keys()
-    .any(|ty_item| ty_item.matches_schema(arg.used_ty.metadata.schema_key))
+    .any(|ty_item| ty_item.matches_type_ident(arg.used_ty.metadata.type_ident))
     || mapped_enums
         .keys()
-        .any(|ty_item| ty_item.matches_schema(arg.used_ty.metadata.schema_key));
+        .any(|ty_item| ty_item.matches_type_ident(arg.used_ty.metadata.type_ident));
 
 if !found {
     mapped_builtin_types
-        .entry(arg.used_ty.metadata.schema_key.to_string())
+        .entry(arg.used_ty.metadata.type_ident.to_string())
         .or_insert_with(|| {
             graph.add_node(SqlGraphEntity::BuiltinType(
-                arg.used_ty.metadata.schema_key.to_string(),
+                arg.used_ty.metadata.type_ident.to_string(),
             ))
         });
 }
 ```
 
 Without `module_path!()`, two types with the same name in different modules would collide
-on the same `SCHEMA_KEY`. More importantly, the bare name is fragile for manual
+on the same `TYPE_IDENT`. More importantly, the bare name is fragile for manual
 `SqlTranslatable` impls: the author must know to use the exact stringified form of the
 type name as it appears at the derive site, rather than a module-qualified path.
 
-When a `schema_key` does not match any registered type or enum, the code silently
+When a `type_ident` does not match any registered type or enum, the code silently
 fabricates a `BuiltinType` node. No warning, no error. This is correct for actual builtins
 like `i32` or `String`, but it is also the silent failure mode for mismatched keys.
 
@@ -161,24 +161,24 @@ This produces keys like `"my_ext::types::Foo"` instead of `"Foo"`, which:
    Since `module_path!()` expands at the *expansion site* (the user's crate, where the
    derive is applied), it will produce the user's module path, not pgrx's internal path.
 
-The `#[pg_extern]` side already reads `SCHEMA_KEY` through the trait
-(`<T as SqlTranslatable>::SCHEMA_KEY`), so the function argument's key automatically
+The `#[pg_extern]` side already reads `TYPE_IDENT` through the trait
+(`<T as SqlTranslatable>::TYPE_IDENT`), so the function argument's key automatically
 matches the type's key as long as they resolve to the same `SqlTranslatable` impl.
 Re-exports and type aliases also work because the compiler resolves to the same impl.
 
 The `simple_sql_type!` invocations for pgrx builtins (in
-`pgrx-pg-sys/src/submodules/sql_translatable.rs`) pass a literal `$schema_key` string
+`pgrx-pg-sys/src/submodules/sql_translatable.rs`) pass a literal `$type_ident` string
 rather than using the macro, so they are unaffected. These should continue to use short
-literal keys (`"i32"`, `"String"`, etc.) since their `SCHEMA_KEY` values are matched by
+literal keys (`"i32"`, `"String"`, etc.) since their `TYPE_IDENT` values are matched by
 `SqlTranslatable` trait resolution, not by string comparison against a derive-generated
 key.
 
 **One edge case to handle:** `extension_sql!` with `creates = [Type(Foo)]` records both
-`concat!(module_path!(), "::", "Foo")` as `data.name` and `<Foo as SqlTranslatable>::SCHEMA_KEY`
-as `data.schema_key`. With the fix, both sides now include `module_path!()`, so the
-comparison `ident_name == &data.schema_key` should still hold. Verify that the
+`concat!(module_path!(), "::", "Foo")` as `data.name` and `<Foo as SqlTranslatable>::TYPE_IDENT`
+as `data.type_ident`. With the fix, both sides now include `module_path!()`, so the
+comparison `ident_name == &data.type_ident` should still hold. Verify that the
 `section_identifier_tokens` code path in `extension_sql/mod.rs` produces the same
-`module_path!()` prefix as the type's own `SCHEMA_KEY`.
+`module_path!()` prefix as the type's own `TYPE_IDENT`.
 
 ### User Impact
 
@@ -186,16 +186,16 @@ comparison `ident_name == &data.schema_key` should still hold. Verify that the
 generated code at the user's definition site, so both the type entity and any function
 referencing it resolve to the same module-qualified key automatically.
 
-**Manual `SqlTranslatable` implementors**: The `SCHEMA_KEY` value changes from
+**Manual `SqlTranslatable` implementors**: The `TYPE_IDENT` value changes from
 `"HexInt"` to `"my_ext::HexInt"` (or whatever `module_path!()` produces at the impl
-site). This is a **breaking change** for anyone who hard-codes `SCHEMA_KEY` as a bare
+site). This is a **breaking change** for anyone who hard-codes `TYPE_IDENT` as a bare
 string rather than using `pgrx_resolved_type!()`. The migration is to replace:
 ```rust
-const SCHEMA_KEY: &'static str = "HexInt";
+const TYPE_IDENT: &'static str = "HexInt";
 ```
 with:
 ```rust
-const SCHEMA_KEY: &'static str = pgrx::pgrx_resolved_type!(HexInt);
+const TYPE_IDENT: &'static str = pgrx::pgrx_resolved_type!(HexInt);
 ```
 which is what the RFC's migration guide already recommends. Anyone following the
 documented migration path is unaffected.
@@ -299,7 +299,7 @@ unsafe impl<T> SqlTranslatable for SetOfIterator<'_, T>
 where
     T: SqlTranslatable,
 {
-    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_IDENT: &'static str = T::TYPE_IDENT;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = setof_return_sql(T::RETURN_SQL);
 }
@@ -323,7 +323,7 @@ unsafe impl<T> SqlTranslatable for SetOfIterator<'_, T>
 where
     T: SqlTranslatable,
 {
-    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_IDENT: &'static str = T::TYPE_IDENT;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::SetOf);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = setof_return_sql(T::RETURN_SQL);
 }

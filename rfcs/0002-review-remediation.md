@@ -12,11 +12,11 @@ The two blocking questions from that review are resolved on this branch:
 1. `extension_sql!(creates = [Type(T)]/[Enum(T)])` should not flatten extension-owned
    types into `BuiltinType`.
    Resolution: declared types now resolve to the declaring `extension_sql!()` graph node.
-   That preserves schema identity and lets SQL rendering use the graph instead of a
+   That preserves type identity and lets SQL rendering use the graph instead of a
    builtin placeholder.
 2. Whether `TYPE_ORIGIN` needs to be encoded for declared type and enum entries.
    Resolution: no. The current implementation only resolves declared entries by
-   `SCHEMA_KEY`, so declared type metadata carries just `SCHEMA_KEY` plus SQL mapping.
+   `TYPE_IDENT`, so declared type metadata carries just `TYPE_IDENT` plus SQL mapping.
    `TYPE_ORIGIN` stays explicit on `SqlTranslatable` / `UsedType` metadata, where
    unresolved-type decisions are actually made.
 
@@ -49,7 +49,7 @@ Implementation effect:
 - `initialize_resolved_type()` now treats matching `extension_sql!()` declarations as
   schema-emitting graph targets, not as a reason to create a builtin placeholder
 - `connect_resolved_type()` now connects directly to that `extension_sql!()` node
-- `SqlGraphEntity::schema_matches()` recognizes declared types carried by a
+- `SqlGraphEntity::type_ident_matches()` recognizes declared types carried by a
   `CustomSql` node, so generic graph lookups can find them
 
 ### Keep declared type metadata lean
@@ -61,7 +61,7 @@ decisions. The follow-up work on this branch showed those decisions only happen 
 This branch keeps declared type metadata to the fields the current implementation
 actually consumes:
 
-- `SCHEMA_KEY`
+- `TYPE_IDENT`
 - SQL mapping
 - the corresponding section decoder path for those values
 
@@ -103,16 +103,16 @@ Status: closed with a narrower design
 
 What changed:
 
-- declared type and enum entries store `SCHEMA_KEY` plus SQL mapping
+- declared type and enum entries store `TYPE_IDENT` plus SQL mapping
 - declared type and enum section entries encode and decode those values
 - `TYPE_ORIGIN` stays on `SqlTranslatable` / `UsedType` metadata instead of being
   duplicated on declared entries
 
 Regression coverage:
 
-- `round_trip_sql_declared_type_preserves_schema_key_and_sql`
+- `round_trip_sql_declared_type_preserves_type_ident_and_sql`
 
-#### 3. No duplicate `SCHEMA_KEY` detection
+#### 3. No duplicate `TYPE_IDENT` detection
 
 Status: fixed
 
@@ -120,7 +120,7 @@ What changed:
 
 - `PgrxSql::build()` now calls `ensure_unique_type_targets()` after collecting type,
   enum, and `extension_sql!()` declarations
-- duplicate schema keys now fail fast with a message that lists the conflicting SQL
+- duplicate type idents now fail fast with a message that lists the conflicting SQL
   entities
 
 Scope:
@@ -131,7 +131,7 @@ Scope:
 
 Regression coverage:
 
-- `duplicate_schema_key_errors`
+- `duplicate_type_ident_errors`
 
 ### P2
 
@@ -183,7 +183,7 @@ No code change was needed in this remediation pass.
 Targeted verification completed:
 
 - `cargo test -p pgrx-sql-entity-graph`
-- `cargo test -p pgrx-unit-tests --features pg17 schema_key_tests --lib`
+- `cargo test -p pgrx-unit-tests --features pg17 type_ident_tests --lib`
 - `cargo fmt --all --check`
 
 New or strengthened evidence:
@@ -191,8 +191,8 @@ New or strengthened evidence:
 - declared types no longer create builtin placeholders in the graph
 - aggregate `STYPE` picks up the schema prefix from the declaring `extension_sql!()`
   node
-- declared type metadata round-trips `SCHEMA_KEY` and SQL mapping
-- duplicate `SCHEMA_KEY` values fail during graph build
+- declared type metadata round-trips `TYPE_IDENT` and SQL mapping
+- duplicate `TYPE_IDENT` values fail during graph build
 
 ## Notes
 

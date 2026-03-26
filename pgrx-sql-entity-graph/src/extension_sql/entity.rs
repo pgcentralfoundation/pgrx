@@ -113,7 +113,7 @@ impl ToSql for ExtensionSqlEntity<'_> {
 pub struct SqlDeclaredTypeEntityData {
     pub(crate) sql: String,
     pub(crate) name: String,
-    pub(crate) schema_key: String,
+    pub(crate) type_ident: String,
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
@@ -156,12 +156,12 @@ impl SqlDeclaredEntity {
             "Type" => Self::Type(SqlDeclaredTypeEntityData {
                 sql,
                 name: name.to_string(),
-                schema_key: name.to_string(),
+                type_ident: name.to_string(),
             }),
             "Enum" => Self::Enum(SqlDeclaredTypeEntityData {
                 sql,
                 name: name.to_string(),
-                schema_key: name.to_string(),
+                type_ident: name.to_string(),
             }),
             "Function" => {
                 Self::Function(SqlDeclaredFunctionEntityData { sql, name: name.to_string() })
@@ -209,7 +209,7 @@ impl SqlDeclaredEntity {
         let data = SqlDeclaredTypeEntityData {
             sql,
             name: name.to_string(),
-            schema_key: T::SCHEMA_KEY.to_string(),
+            type_ident: T::TYPE_IDENT.to_string(),
         };
         Ok(make_declared(data))
     }
@@ -222,24 +222,24 @@ impl SqlDeclaredEntity {
         }
     }
 
-    pub fn schema_key(&self) -> Option<&str> {
+    pub fn type_ident(&self) -> Option<&str> {
         match self {
             SqlDeclaredEntity::Type(data) | SqlDeclaredEntity::Enum(data) => {
-                Some(data.schema_key.as_str())
+                Some(data.type_ident.as_str())
             }
             SqlDeclaredEntity::Function(_) => None,
         }
     }
 
-    pub fn matches_schema_key(&self, schema_key: &str) -> bool {
-        matches!(self.schema_key(), Some(value) if value == schema_key)
+    pub fn matches_type_ident(&self, type_ident: &str) -> bool {
+        matches!(self.type_ident(), Some(value) if value == type_ident)
     }
 
     pub fn has_sql_declared_entity(&self, identifier: &SqlDeclared) -> bool {
         match (&identifier, &self) {
             (SqlDeclared::Type(ident_name), &SqlDeclaredEntity::Type(data))
             | (SqlDeclared::Enum(ident_name), &SqlDeclaredEntity::Enum(data)) => {
-                if ident_name == &data.name || ident_name == &data.schema_key {
+                if ident_name == &data.name || ident_name == &data.type_ident {
                     return true;
                 }
                 false
@@ -261,7 +261,7 @@ mod tests {
     struct ExternalType;
 
     unsafe impl SqlTranslatable for ExtensionOwnedType {
-        const SCHEMA_KEY: &'static str = "tests::ExtensionOwnedType";
+        const TYPE_IDENT: &'static str = "tests::ExtensionOwnedType";
         const TYPE_ORIGIN: TypeOrigin = TypeOrigin::ThisExtension;
         const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
             Ok(SqlMappingRef::literal("extension_owned"));
@@ -270,7 +270,7 @@ mod tests {
     }
 
     unsafe impl SqlTranslatable for ExternalType {
-        const SCHEMA_KEY: &'static str = "tests::ExternalType";
+        const TYPE_IDENT: &'static str = "tests::ExternalType";
         const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
         const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
             Ok(SqlMappingRef::literal("text"));
@@ -286,7 +286,7 @@ mod tests {
         )
         .unwrap();
 
-        assert_eq!(declared.schema_key(), Some("tests::ExtensionOwnedType"));
+        assert_eq!(declared.type_ident(), Some("tests::ExtensionOwnedType"));
         assert_eq!(declared.sql(), "extension_owned");
     }
 
@@ -302,10 +302,10 @@ mod tests {
     }
 
     #[test]
-    fn function_declarations_do_not_carry_schema_keys() {
+    fn function_declarations_do_not_carry_type_idents() {
         let declared = SqlDeclaredEntity::build("Function", "tests::helper_fn").unwrap();
 
-        assert_eq!(declared.schema_key(), None);
+        assert_eq!(declared.type_ident(), None);
         assert_eq!(declared.sql(), "helper_fn");
         assert!(
             declared.has_sql_declared_entity(&SqlDeclared::Function("tests::helper_fn".into()))

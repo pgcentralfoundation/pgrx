@@ -459,14 +459,14 @@ impl<T, AllocatedBy: WhoAllocated> Drop for PgBox<T, AllocatedBy> {
 }
 
 unsafe impl<T: SqlTranslatable> SqlTranslatable for PgBox<T, AllocatedByPostgres> {
-    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_IDENT: &'static str = T::TYPE_IDENT;
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
 }
 
 unsafe impl<T: SqlTranslatable> SqlTranslatable for PgBox<T, AllocatedByRust> {
-    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_IDENT: &'static str = T::TYPE_IDENT;
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;

@@ -1,7 +1,0 @@
-error[E0046]: not all trait items implemented, missing: `SCHEMA_KEY`
- --> tests/compile-fail/schema-key-manual-impl-must-define-key.rs:7:1
-  |
-7 | unsafe impl SqlTranslatable for ManualTypeWithoutSchemaKey {
-  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ missing `SCHEMA_KEY` in implementation
-  |
-  = help: implement the missing item: `const SCHEMA_KEY: &'static str = "";`

@@ -203,7 +203,7 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
             Alignment::On => quote! { .bool(true).u32(::std::mem::align_of::<#name>() as u32) },
             Alignment::Off => quote! { .bool(false) },
         };
-        let schema_key = quote! { ::pgrx::pgrx_resolved_type!(#name #anon_ty_gen) };
+        let type_ident = quote! { ::pgrx::pgrx_resolved_type!(#name #anon_ty_gen) };
         let payload_len = quote! {
             ::pgrx::pgrx_sql_entity_graph::section::u8_len()
                 + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#name))
@@ -211,7 +211,7 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
                 + ::pgrx::pgrx_sql_entity_graph::section::u32_len()
                 + ::pgrx::pgrx_sql_entity_graph::section::str_len(module_path!())
                 + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#name #anon_ty_gen))
-                + ::pgrx::pgrx_sql_entity_graph::section::str_len(#schema_key)
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(#type_ident)
                 + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#in_fn))
                 + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#out_fn))
                 + (#receive_fn_len)
@@ -231,7 +231,7 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
                 .u32(line!())
                 .str(module_path!())
                 .str(stringify!(#name #anon_ty_gen))
-                .str(#schema_key)
+                .str(#type_ident)
                 .str(stringify!(#in_fn))
                 .str(stringify!(#out_fn))
                 #receive_fn_writer
@@ -240,7 +240,7 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
 
         quote! {
             unsafe impl #impl_generics ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable for #name #ty_generics #where_clauses {
-                const SCHEMA_KEY: &'static str = #schema_key;
+                const TYPE_IDENT: &'static str = #type_ident;
                 const TYPE_ORIGIN: ::pgrx::pgrx_sql_entity_graph::metadata::TypeOrigin =
                     ::pgrx::pgrx_sql_entity_graph::metadata::TypeOrigin::ThisExtension;
                 const ARGUMENT_SQL: core::result::Result<

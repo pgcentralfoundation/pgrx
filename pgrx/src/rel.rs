@@ -401,7 +401,7 @@ impl Drop for PgRelation {
 }
 
 unsafe impl SqlTranslatable for PgRelation {
-    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(PgRelation);
+    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(PgRelation);
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
         pgrx_sql_entity_graph::metadata::TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =

@@ -57,8 +57,6 @@ mod range_tests;
 mod rel_tests;
 mod result_tests;
 mod roundtrip_tests;
-#[cfg(test)]
-mod schema_key_tests;
 mod schema_tests;
 mod shmem_tests;
 mod spi_tests;
@@ -66,6 +64,8 @@ mod sql_translatable_signature_tests;
 mod srf_tests;
 mod struct_type_tests;
 mod trigger_tests;
+#[cfg(test)]
+mod type_ident_tests;
 mod uuid_tests;
 mod variadic_tests;
 mod xact_callback_tests;

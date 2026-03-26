@@ -98,7 +98,7 @@ pub struct PostgresTypeEntity<'a> {
     pub line: u32,
     pub full_path: &'a str,
     pub module_path: &'a str,
-    pub schema_key: &'a str,
+    pub type_ident: &'a str,
     pub in_fn_path: &'a str,
     pub out_fn_path: &'a str,
     pub receive_fn_path: Option<&'a str>,
@@ -108,8 +108,8 @@ pub struct PostgresTypeEntity<'a> {
 }
 
 impl TypeMatch for PostgresTypeEntity<'_> {
-    fn schema_key(&self) -> &str {
-        self.schema_key
+    fn type_ident(&self) -> &str {
+        self.type_ident
     }
 }
 

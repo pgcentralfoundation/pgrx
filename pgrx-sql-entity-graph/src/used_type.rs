@@ -337,7 +337,7 @@ impl UsedType {
             quote! {
                 ::pgrx::pgrx_sql_entity_graph::section::function_metadata_type_len(
                     Some(
-                        <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY
+                        <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::TYPE_IDENT
                     ),
                     <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL,
                     <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::RETURN_SQL,
@@ -385,7 +385,7 @@ impl UsedType {
             quote! {
                 .function_metadata_type(
                     Some((
-                        <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY,
+                        <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::TYPE_IDENT,
                         <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::TYPE_ORIGIN,
                     )),
                     <#resolved_ty as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL,
@@ -420,10 +420,10 @@ pub struct UsedTypeEntity<'a> {
 }
 
 impl crate::TypeIdentifiable for UsedTypeEntity<'_> {
-    fn schema_key(&self) -> &str {
+    fn type_ident(&self) -> &str {
         self.metadata
-            .schema_key()
-            .expect("explicit composite SQL doesn't participate in schema-key matching")
+            .type_ident()
+            .expect("explicit composite SQL doesn't participate in type-ident matching")
     }
     fn ty_name(&self) -> &str {
         self.full_path
@@ -433,7 +433,7 @@ impl crate::TypeIdentifiable for UsedTypeEntity<'_> {
 impl UsedTypeEntity<'_> {
     pub(crate) fn resolution(&self) -> Option<(&str, crate::metadata::TypeOrigin)> {
         match self.metadata.resolution {
-            Some(resolution) => Some((resolution.schema_key, resolution.type_origin)),
+            Some(resolution) => Some((resolution.type_ident, resolution.type_origin)),
             None => None,
         }
     }

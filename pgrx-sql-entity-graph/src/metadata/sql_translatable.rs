@@ -230,7 +230,7 @@ Nonetheless, if you are not confident the translation is valid: do not implement
     label = "non-SQL type"
 )]
 pub unsafe trait SqlTranslatable {
-    const SCHEMA_KEY: &'static str;
+    const TYPE_IDENT: &'static str;
     const TYPE_ORIGIN: TypeOrigin;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError>;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError>;
@@ -246,7 +246,7 @@ pub unsafe trait SqlTranslatable {
     }
     fn entity() -> FunctionMetadataTypeEntity<'static> {
         FunctionMetadataTypeEntity::resolved(
-            Self::SCHEMA_KEY,
+            Self::TYPE_IDENT,
             Self::TYPE_ORIGIN,
             Self::argument_sql(),
             Self::return_sql(),
@@ -255,7 +255,7 @@ pub unsafe trait SqlTranslatable {
 }
 
 unsafe impl SqlTranslatable for () {
-    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(());
+    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(());
     const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Err(ArgumentError::NotValidAsArgument("()"));
@@ -267,7 +267,7 @@ unsafe impl<T> SqlTranslatable for Option<T>
 where
     T: SqlTranslatable,
 {
-    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_IDENT: &'static str = T::TYPE_IDENT;
     const TYPE_ORIGIN: TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
@@ -277,7 +277,7 @@ unsafe impl<T> SqlTranslatable for *mut T
 where
     T: SqlTranslatable,
 {
-    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_IDENT: &'static str = T::TYPE_IDENT;
     const TYPE_ORIGIN: TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
@@ -288,7 +288,7 @@ where
     T: SqlTranslatable,
     E: Any + Display,
 {
-    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_IDENT: &'static str = T::TYPE_IDENT;
     const TYPE_ORIGIN: TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
@@ -298,7 +298,7 @@ unsafe impl<T> SqlTranslatable for Vec<T>
 where
     T: SqlTranslatable,
 {
-    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_IDENT: &'static str = T::TYPE_IDENT;
     const TYPE_ORIGIN: TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = match T::ARGUMENT_SQL {
         Err(ArgumentError::BareU8) => Ok(SqlMappingRef::As("bytea")),
@@ -311,7 +311,7 @@ where
 }
 
 unsafe impl SqlTranslatable for u8 {
-    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(u8);
+    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(u8);
     const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::BareU8);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = Err(ReturnsError::BareU8);
@@ -320,7 +320,7 @@ unsafe impl SqlTranslatable for u8 {
 macro_rules! simple_sql_type {
     ($ty:ty, $sql:literal) => {
         unsafe impl SqlTranslatable for $ty {
-            const SCHEMA_KEY: &'static str = $crate::pgrx_resolved_type!($ty);
+            const TYPE_IDENT: &'static str = $crate::pgrx_resolved_type!($ty);
             const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
             const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
                 Ok(SqlMappingRef::literal($sql));
@@ -348,7 +348,7 @@ unsafe impl<T> SqlTranslatable for &T
 where
     T: ?Sized + SqlTranslatable,
 {
-    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_IDENT: &'static str = T::TYPE_IDENT;
     const TYPE_ORIGIN: TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;

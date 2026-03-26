@@ -914,14 +914,14 @@ fn initialize_externs<'a>(
                 continue;
             }
             let slot = format!("argument `{}`", arg.pattern);
-            let (schema_key, type_origin) = arg
+            let (type_ident, type_origin) = arg
                 .used_ty
                 .resolution()
                 .expect("SQL-visible extern arguments should carry resolution metadata");
             initialize_resolved_type(
                 graph,
                 &mut mapped_builtin_types,
-                schema_key,
+                type_ident,
                 type_origin,
                 mapped_types,
                 mapped_enums,
@@ -936,11 +936,11 @@ fn initialize_externs<'a>(
         match &item.fn_return {
             PgExternReturnEntity::None | PgExternReturnEntity::Trigger => (),
             PgExternReturnEntity::Type { ty, .. } | PgExternReturnEntity::SetOf { ty, .. } => {
-                if let Some((schema_key, type_origin)) = ty.resolution() {
+                if let Some((type_ident, type_origin)) = ty.resolution() {
                     initialize_resolved_type(
                         graph,
                         &mut mapped_builtin_types,
-                        schema_key,
+                        type_ident,
                         type_origin,
                         mapped_types,
                         mapped_enums,
@@ -954,11 +954,11 @@ fn initialize_externs<'a>(
             }
             PgExternReturnEntity::Iterated { tys: iterated_returns, .. } => {
                 for PgExternReturnEntityIteratedItem { ty, .. } in iterated_returns {
-                    if let Some((schema_key, type_origin)) = ty.resolution() {
+                    if let Some((type_ident, type_origin)) = ty.resolution() {
                         initialize_resolved_type(
                             graph,
                             &mut mapped_builtin_types,
-                            schema_key,
+                            type_ident,
                             type_origin,
                             mapped_types,
                             mapped_enums,
@@ -1063,7 +1063,7 @@ fn connect_externs<'a>(
                 continue;
             }
             let slot = format!("argument `{}`", arg.pattern);
-            let (schema_key, type_origin) = arg
+            let (type_ident, type_origin) = arg
                 .used_ty
                 .resolution()
                 .expect("SQL-visible extern arguments should carry resolution metadata");
@@ -1071,7 +1071,7 @@ fn connect_externs<'a>(
                 graph,
                 index,
                 SqlGraphRequires::ByArg,
-                schema_key,
+                type_ident,
                 type_origin,
                 types,
                 enums,
@@ -1087,12 +1087,12 @@ fn connect_externs<'a>(
         match &item.fn_return {
             PgExternReturnEntity::None | PgExternReturnEntity::Trigger => (),
             PgExternReturnEntity::Type { ty, .. } | PgExternReturnEntity::SetOf { ty, .. } => {
-                if let Some((schema_key, type_origin)) = ty.resolution() {
+                if let Some((type_ident, type_origin)) = ty.resolution() {
                     connect_resolved_type(
                         graph,
                         index,
                         SqlGraphRequires::ByReturn,
-                        schema_key,
+                        type_ident,
                         type_origin,
                         types,
                         enums,
@@ -1107,12 +1107,12 @@ fn connect_externs<'a>(
             }
             PgExternReturnEntity::Iterated { tys: iterated_returns, .. } => {
                 for PgExternReturnEntityIteratedItem { ty, .. } in iterated_returns {
-                    if let Some((schema_key, type_origin)) = ty.resolution() {
+                    if let Some((type_ident, type_origin)) = ty.resolution() {
                         connect_resolved_type(
                             graph,
                             index,
                             SqlGraphRequires::ByReturn,
-                            schema_key,
+                            type_ident,
                             type_origin,
                             types,
                             enums,
@@ -1166,7 +1166,7 @@ fn connect_ords<'a>(
             schemas,
         );
 
-        make_type_or_enum_connection(graph, index, item.schema_key, types, enums);
+        make_type_or_enum_connection(graph, index, item.type_ident, types, enums);
 
         // Make PostgresOrdEntities (which will be translated into `CREATE OPERATOR CLASS` statements) depend
         // on the operators which they will reference. For example, a pgrx-defined Postgres type `parakeet`
@@ -1232,7 +1232,7 @@ fn connect_hashes<'a>(
             schemas,
         );
 
-        make_type_or_enum_connection(graph, index, item.schema_key, types, enums);
+        make_type_or_enum_connection(graph, index, item.type_ident, types, enums);
 
         if let Some((_, extern_index)) = externs.iter().find(|(extern_item, _)| {
             item.module_path == extern_item.module_path && extern_item.name == item.fn_name()
@@ -1263,14 +1263,14 @@ fn initialize_aggregates<'a>(
                 continue;
             }
             let slot = aggregate_slot(arg.name, "argument");
-            let (schema_key, type_origin) = arg
+            let (type_ident, type_origin) = arg
                 .used_ty
                 .resolution()
                 .expect("aggregate arguments should carry resolution metadata");
             initialize_resolved_type(
                 graph,
                 mapped_builtin_types,
-                schema_key,
+                type_ident,
                 type_origin,
                 mapped_types,
                 mapped_enums,
@@ -1287,14 +1287,14 @@ fn initialize_aggregates<'a>(
                 continue;
             }
             let slot = aggregate_slot(arg.name, "direct argument");
-            let (schema_key, type_origin) = arg
+            let (type_ident, type_origin) = arg
                 .used_ty
                 .resolution()
                 .expect("aggregate direct arguments should carry resolution metadata");
             initialize_resolved_type(
                 graph,
                 mapped_builtin_types,
-                schema_key,
+                type_ident,
                 type_origin,
                 mapped_types,
                 mapped_enums,
@@ -1306,11 +1306,11 @@ fn initialize_aggregates<'a>(
             )?;
         }
 
-        if let Some((schema_key, type_origin)) = item.stype.used_ty.resolution() {
+        if let Some((type_ident, type_origin)) = item.stype.used_ty.resolution() {
             initialize_resolved_type(
                 graph,
                 mapped_builtin_types,
-                schema_key,
+                type_ident,
                 type_origin,
                 mapped_types,
                 mapped_enums,
@@ -1323,11 +1323,11 @@ fn initialize_aggregates<'a>(
         }
 
         if let Some(arg) = &item.mstype {
-            if let Some((schema_key, type_origin)) = arg.resolution() {
+            if let Some((type_ident, type_origin)) = arg.resolution() {
                 initialize_resolved_type(
                     graph,
                     mapped_builtin_types,
-                    schema_key,
+                    type_ident,
                     type_origin,
                     mapped_types,
                     mapped_enums,
@@ -1371,13 +1371,13 @@ fn connect_aggregate<'a>(
             continue;
         }
         let slot = aggregate_slot(arg.name, "argument");
-        let (schema_key, type_origin) =
+        let (type_ident, type_origin) =
             arg.used_ty.resolution().expect("aggregate arguments should carry resolution metadata");
         connect_resolved_type(
             graph,
             index,
             SqlGraphRequires::ByArg,
-            schema_key,
+            type_ident,
             type_origin,
             types,
             enums,
@@ -1395,7 +1395,7 @@ fn connect_aggregate<'a>(
             continue;
         }
         let slot = aggregate_slot(arg.name, "direct argument");
-        let (schema_key, type_origin) = arg
+        let (type_ident, type_origin) = arg
             .used_ty
             .resolution()
             .expect("aggregate direct arguments should carry resolution metadata");
@@ -1403,7 +1403,7 @@ fn connect_aggregate<'a>(
             graph,
             index,
             SqlGraphRequires::ByArg,
-            schema_key,
+            type_ident,
             type_origin,
             types,
             enums,
@@ -1417,12 +1417,12 @@ fn connect_aggregate<'a>(
     }
 
     if let Some(arg) = &item.mstype {
-        if let Some((schema_key, type_origin)) = arg.resolution() {
+        if let Some((type_ident, type_origin)) = arg.resolution() {
             connect_resolved_type(
                 graph,
                 index,
                 SqlGraphRequires::ByArg,
-                schema_key,
+                type_ident,
                 type_origin,
                 types,
                 enums,
@@ -1436,12 +1436,12 @@ fn connect_aggregate<'a>(
         }
     }
 
-    if let Some((schema_key, type_origin)) = item.stype.used_ty.resolution() {
+    if let Some((type_ident, type_origin)) = item.stype.used_ty.resolution() {
         connect_resolved_type(
             graph,
             index,
             SqlGraphRequires::ByArg,
-            schema_key,
+            type_ident,
             type_origin,
             types,
             enums,
@@ -1656,7 +1656,7 @@ fn aggregate_slot(name: Option<&str>, kind: &str) -> String {
 }
 
 fn find_type_or_enum<'a>(
-    schema_key: &str,
+    type_ident: &str,
     types: &HashMap<PostgresTypeEntity<'a>, NodeIndex>,
     enums: &HashMap<PostgresEnumEntity<'a>, NodeIndex>,
 ) -> Option<NodeIndex> {
@@ -1664,30 +1664,30 @@ fn find_type_or_enum<'a>(
         .iter()
         .map(type_keyed)
         .chain(enums.iter().map(type_keyed))
-        .find(|(ty, _)| ty.matches_schema(schema_key))
+        .find(|(ty, _)| ty.matches_type_ident(type_ident))
         .map(|(_, index)| *index)
 }
 
 fn find_declared_type_or_enum<'a>(
     extension_sqls: &HashMap<ExtensionSqlEntity<'a>, NodeIndex>,
-    schema_key: &str,
+    type_ident: &str,
 ) -> Option<NodeIndex> {
     extension_sqls.iter().find_map(|(item, index)| {
         item.creates
             .iter()
-            .any(|declared| declared.matches_schema_key(schema_key))
+            .any(|declared| declared.matches_type_ident(type_ident))
             .then_some(*index)
     })
 }
 
 fn find_graph_type_target<'a>(
-    schema_key: &str,
+    type_ident: &str,
     types: &HashMap<PostgresTypeEntity<'a>, NodeIndex>,
     enums: &HashMap<PostgresEnumEntity<'a>, NodeIndex>,
     extension_sqls: &HashMap<ExtensionSqlEntity<'a>, NodeIndex>,
 ) -> Option<NodeIndex> {
-    find_type_or_enum(schema_key, types, enums)
-        .or_else(|| find_declared_type_or_enum(extension_sqls, schema_key))
+    find_type_or_enum(type_ident, types, enums)
+        .or_else(|| find_declared_type_or_enum(extension_sqls, type_ident))
 }
 
 fn ensure_unique_type_targets<'a>(
@@ -1698,21 +1698,21 @@ fn ensure_unique_type_targets<'a>(
     let mut seen = BTreeMap::<String, Vec<String>>::new();
 
     for item in types.keys() {
-        seen.entry(item.schema_key.to_string())
+        seen.entry(item.type_ident.to_string())
             .or_default()
             .push(format!("type `{}`", item.full_path));
     }
 
     for item in enums.keys() {
-        seen.entry(item.schema_key.to_string())
+        seen.entry(item.type_ident.to_string())
             .or_default()
             .push(format!("enum `{}`", item.full_path));
     }
 
     for (item, _) in extension_sqls {
         for declared in &item.creates {
-            if let Some(schema_key) = declared.schema_key() {
-                seen.entry(schema_key.to_string())
+            if let Some(type_ident) = declared.type_ident() {
+                seen.entry(type_ident.to_string())
                     .or_default()
                     .push(format!("extension_sql `{}` ({declared})", item.name));
             }
@@ -1723,11 +1723,11 @@ fn ensure_unique_type_targets<'a>(
         locations.sort();
     }
 
-    if let Some((schema_key, locations)) =
+    if let Some((type_ident, locations)) =
         seen.into_iter().find(|(_, locations)| locations.len() > 1)
     {
         return Err(eyre!(
-            "schema key `{schema_key}` matched multiple SQL entities: {}",
+            "type ident `{type_ident}` matched multiple SQL entities: {}",
             locations.join(", ")
         ));
     }
@@ -1735,22 +1735,22 @@ fn ensure_unique_type_targets<'a>(
     Ok(())
 }
 
-fn unresolved_schema_key(
+fn unresolved_type_ident(
     owner_kind: &str,
     owner_name: &str,
     slot: &str,
     ty_name: &str,
-    schema_key: &str,
+    type_ident: &str,
 ) -> eyre::Report {
     eyre!(
-        "{owner_kind} `{owner_name}` uses `{ty_name}` as {slot}, but schema key `{schema_key}` did not resolve. use `pgrx::pgrx_resolved_type!(T)` together with a matching `#[derive(PostgresType)]`, `#[derive(PostgresEnum)]`, or `extension_sql!(..., creates = [Type(T)]/[Enum(T)])`. for a manual mapping to an existing SQL type, set `TYPE_ORIGIN = TypeOrigin::External`."
+        "{owner_kind} `{owner_name}` uses `{ty_name}` as {slot}, but type ident `{type_ident}` did not resolve. use `pgrx::pgrx_resolved_type!(T)` together with a matching `#[derive(PostgresType)]`, `#[derive(PostgresEnum)]`, or `extension_sql!(..., creates = [Type(T)]/[Enum(T)])`. for a manual mapping to an existing SQL type, set `TYPE_ORIGIN = TypeOrigin::External`."
     )
 }
 
 fn initialize_resolved_type<'a>(
     graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     builtin_types: &mut HashMap<String, NodeIndex>,
-    schema_key: &str,
+    type_ident: &str,
     type_origin: TypeOrigin,
     types: &HashMap<PostgresTypeEntity<'a>, NodeIndex>,
     enums: &HashMap<PostgresEnumEntity<'a>, NodeIndex>,
@@ -1760,25 +1760,25 @@ fn initialize_resolved_type<'a>(
     slot: &str,
     ty_name: &str,
 ) -> eyre::Result<()> {
-    if find_graph_type_target(schema_key, types, enums, extension_sqls).is_some() {
+    if find_graph_type_target(type_ident, types, enums, extension_sqls).is_some() {
         return Ok(());
     }
 
     if matches!(type_origin, TypeOrigin::External) {
         builtin_types
-            .entry(schema_key.to_string())
-            .or_insert_with(|| graph.add_node(SqlGraphEntity::BuiltinType(schema_key.to_string())));
+            .entry(type_ident.to_string())
+            .or_insert_with(|| graph.add_node(SqlGraphEntity::BuiltinType(type_ident.to_string())));
         return Ok(());
     }
 
-    Err(unresolved_schema_key(owner_kind, owner_name, slot, ty_name, schema_key))
+    Err(unresolved_type_ident(owner_kind, owner_name, slot, ty_name, type_ident))
 }
 
 fn connect_resolved_type<'a>(
     graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     index: NodeIndex,
     requires: SqlGraphRequires,
-    schema_key: &str,
+    type_ident: &str,
     type_origin: TypeOrigin,
     types: &HashMap<PostgresTypeEntity<'a>, NodeIndex>,
     enums: &HashMap<PostgresEnumEntity<'a>, NodeIndex>,
@@ -1789,33 +1789,33 @@ fn connect_resolved_type<'a>(
     slot: &str,
     ty_name: &str,
 ) -> eyre::Result<()> {
-    if let Some(ty_index) = find_graph_type_target(schema_key, types, enums, extension_sqls) {
+    if let Some(ty_index) = find_graph_type_target(type_ident, types, enums, extension_sqls) {
         graph.add_edge(ty_index, index, requires);
         return Ok(());
     }
 
-    if let Some(builtin_index) = builtin_types.get(schema_key) {
+    if let Some(builtin_index) = builtin_types.get(type_ident) {
         graph.add_edge(*builtin_index, index, requires);
         return Ok(());
     }
 
     if matches!(type_origin, TypeOrigin::External) {
         return Err(eyre!(
-            "missing external-type placeholder for schema key `{schema_key}` while connecting {owner_kind} `{owner_name}` {slot}"
+            "missing external-type placeholder for type ident `{type_ident}` while connecting {owner_kind} `{owner_name}` {slot}"
         ));
     }
 
-    Err(unresolved_schema_key(owner_kind, owner_name, slot, ty_name, schema_key))
+    Err(unresolved_type_ident(owner_kind, owner_name, slot, ty_name, type_ident))
 }
 
 fn make_type_or_enum_connection<'a>(
     graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     index: NodeIndex,
-    schema_key: &str,
+    type_ident: &str,
     types: &HashMap<PostgresTypeEntity<'a>, NodeIndex>,
     enums: &HashMap<PostgresEnumEntity<'a>, NodeIndex>,
 ) -> bool {
-    find_type_or_enum(schema_key, types, enums)
+    find_type_or_enum(type_ident, types, enums)
         .map(|ty_index| graph.add_edge(ty_index, index, SqlGraphRequires::By))
         .is_some()
 }
@@ -1851,7 +1851,7 @@ mod tests {
 
     fn used_type(
         full_path: &'static str,
-        schema_key: &'static str,
+        type_ident: &'static str,
         sql: &'static str,
         type_origin: TypeOrigin,
     ) -> UsedTypeEntity<'static> {
@@ -1863,7 +1863,7 @@ mod tests {
             default: None,
             optional: false,
             metadata: FunctionMetadataTypeEntity::resolved(
-                schema_key,
+                type_ident,
                 type_origin,
                 Ok(SqlMapping::literal(sql)),
                 Ok(Returns::One(SqlMapping::literal(sql))),
@@ -1873,18 +1873,18 @@ mod tests {
 
     fn external_type(
         full_path: &'static str,
-        schema_key: &'static str,
+        type_ident: &'static str,
         sql: &'static str,
     ) -> UsedTypeEntity<'static> {
-        used_type(full_path, schema_key, sql, TypeOrigin::External)
+        used_type(full_path, type_ident, sql, TypeOrigin::External)
     }
 
     fn extension_owned_type(
         full_path: &'static str,
-        schema_key: &'static str,
+        type_ident: &'static str,
         sql: &'static str,
     ) -> UsedTypeEntity<'static> {
-        used_type(full_path, schema_key, sql, TypeOrigin::ThisExtension)
+        used_type(full_path, type_ident, sql, TypeOrigin::ThisExtension)
     }
 
     fn function_entity(
@@ -1951,7 +1951,7 @@ mod tests {
         full_path: &'static str,
         declaration_name: &'static str,
         name: &'static str,
-        schema_key: &'static str,
+        type_ident: &'static str,
         sql: &'static str,
     ) -> ExtensionSqlEntity<'static> {
         ExtensionSqlEntity {
@@ -1967,7 +1967,7 @@ mod tests {
             creates: vec![SqlDeclaredEntity::Type(SqlDeclaredTypeEntityData {
                 sql: sql.into(),
                 name: name.into(),
-                schema_key: schema_key.into(),
+                type_ident: type_ident.into(),
             })],
         }
     }
@@ -1979,7 +1979,7 @@ mod tests {
     fn type_entity(
         name: &'static str,
         full_path: &'static str,
-        schema_key: &'static str,
+        type_ident: &'static str,
     ) -> PostgresTypeEntity<'static> {
         PostgresTypeEntity {
             name,
@@ -1987,7 +1987,7 @@ mod tests {
             line: 1,
             full_path,
             module_path: "tests",
-            schema_key,
+            type_ident,
             in_fn_path: "in_fn",
             out_fn_path: "out_fn",
             receive_fn_path: None,
@@ -2022,7 +2022,7 @@ mod tests {
         assert!(sql.builtin_types.contains_key("tests::ManualText"));
     }
 
-    fn skipped_type(full_path: &'static str, schema_key: &'static str) -> UsedTypeEntity<'static> {
+    fn skipped_type(full_path: &'static str, type_ident: &'static str) -> UsedTypeEntity<'static> {
         UsedTypeEntity {
             ty_source: full_path,
             full_path,
@@ -2031,7 +2031,7 @@ mod tests {
             default: None,
             optional: false,
             metadata: FunctionMetadataTypeEntity::resolved(
-                schema_key,
+                type_ident,
                 TypeOrigin::ThisExtension,
                 Ok(SqlMapping::Skip),
                 Ok(Returns::One(SqlMapping::Skip)),
@@ -2323,7 +2323,7 @@ mod tests {
     }
 
     #[test]
-    fn duplicate_schema_key_errors() {
+    fn duplicate_type_ident_errors() {
         let left = type_entity("LeftType", "tests::LeftType", "tests::SharedType");
         let right = type_entity("RightType", "tests::RightType", "tests::SharedType");
 
@@ -2337,7 +2337,7 @@ mod tests {
             "test".into(),
             false,
         )
-        .expect_err("duplicate schema keys should fail");
+        .expect_err("duplicate type idents should fail");
 
         assert!(error.to_string().contains("tests::SharedType"));
         assert!(error.to_string().contains("tests::LeftType"));
@@ -2345,7 +2345,7 @@ mod tests {
     }
 
     #[test]
-    fn unresolved_function_argument_schema_key_errors() {
+    fn unresolved_function_argument_type_ident_errors() {
         let bad_type = extension_owned_type("tests::BadArg", "tests::BadArg", "TEXT");
         let function = function_entity(
             "bad_arg",
@@ -2367,7 +2367,7 @@ mod tests {
     }
 
     #[test]
-    fn unresolved_function_return_schema_key_errors() {
+    fn unresolved_function_return_type_ident_errors() {
         let bad_type = extension_owned_type("tests::BadReturn", "tests::BadReturn", "TEXT");
         let function =
             function_entity("bad_return", vec![], PgExternReturnEntity::Type { ty: bad_type });
@@ -2386,7 +2386,7 @@ mod tests {
     }
 
     #[test]
-    fn unresolved_aggregate_argument_schema_key_errors() {
+    fn unresolved_aggregate_argument_type_ident_errors() {
         let aggregate = aggregate_entity(
             "bad_aggregate_arg",
             vec![AggregateTypeEntity {
@@ -2415,7 +2415,7 @@ mod tests {
     }
 
     #[test]
-    fn unresolved_aggregate_stype_schema_key_errors() {
+    fn unresolved_aggregate_stype_type_ident_errors() {
         let aggregate = aggregate_entity(
             "bad_aggregate_stype",
             vec![],
@@ -2441,7 +2441,7 @@ mod tests {
     }
 
     #[test]
-    fn unresolved_aggregate_mstype_schema_key_errors() {
+    fn unresolved_aggregate_mstype_type_ident_errors() {
         let aggregate = aggregate_entity(
             "bad_aggregate_mstype",
             vec![],

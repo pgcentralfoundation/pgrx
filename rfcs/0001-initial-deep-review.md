@@ -29,14 +29,14 @@ branch:
 - `SetOfIterator` argument rejection is fixed
 - the named result tags are in place
 - schema stripping is no longer part of the install path
-- unresolved `SCHEMA_KEY` fallback is fixed through explicit declared-type
+- unresolved `TYPE_IDENT` fallback is fixed through explicit declared-type
   resolution, while `TYPE_ORIGIN` stays explicit on `SqlTranslatable`
 
 ## Executive Summary
 
 - The branch successfully implements the main architectural move from runtime symbol
   execution to embedded linker-section metadata.
-- The previously reviewed `SCHEMA_KEY` bug in `pgrx_resolved_type!` is fixed and covered by
+- The previously reviewed `TYPE_IDENT` bug in `pgrx_resolved_type!` is fixed and covered by
   a regression test.
 - The old pipeline removal looks complete in production code.
 - Several findings from `rfcs/0001-review-findings.md` are still live:
@@ -69,7 +69,7 @@ Top-level areas touched by the branch:
 - `pgrx-sql-entity-graph`
   - new section encoder/decoder
   - `SqlTranslatable` const metadata conversion
-  - graph matching moved from `TypeId` to `SCHEMA_KEY`
+  - graph matching moved from `TypeId` to `TYPE_IDENT`
 - `cargo-pgrx`
   - schema generation now reads `.pgrx_schema` from the compiled shared object
   - install path strips the embedded schema section
@@ -80,7 +80,7 @@ Top-level areas touched by the branch:
   - old embed / type-id infrastructure removed
 - `pgrx-tests` and `pgrx-examples`
   - template and fixture updates to remove `pgrx_embed`
-  - regression coverage for the schema-key fix
+  - regression coverage for the type-ident fix
 
 Production hotspots reviewed in detail:
 
@@ -113,7 +113,7 @@ Production hotspots reviewed in detail:
 
 Key signature and interface changes:
 
-- Added `SqlTranslatable::{SCHEMA_KEY, TYPE_ORIGIN, ARGUMENT_SQL, RETURN_SQL}` as the
+- Added `SqlTranslatable::{TYPE_IDENT, TYPE_ORIGIN, ARGUMENT_SQL, RETURN_SQL}` as the
   new source of truth for schema metadata.
 - Added const-friendly metadata types:
   - `SqlMappingRef`
@@ -144,7 +144,7 @@ erroring, even though the RFC pseudocode explicitly errors on missing `.pgrx_sch
 
 ### Type-flow delta
 
-Type identity is now carried by `SCHEMA_KEY` instead of `TypeId`.
+Type identity is now carried by `TYPE_IDENT` instead of `TypeId`.
 
 This change is structurally sound. The important data path is:
 
@@ -152,7 +152,7 @@ This change is structurally sound. The important data path is:
 - `UsedType::section_writer_tokens()`
 - embedded `FunctionMetadataTypeEntity`
 - `decode_entities()`
-- `PgrxSql` matching by `schema_key`
+- `PgrxSql` matching by `type_ident`
 
 The branch mostly preserves that flow correctly. The notable regression is that
 `SetOfIterator<'_, T>` now forwards `ARGUMENT_SQL` from `T`, which widens the accepted
@@ -285,7 +285,7 @@ Evidence:
 
 The branch does achieve the main cleanup objective of RFC 0001.
 
-### [PRESERVED] Type identity now flows through `SCHEMA_KEY`
+### [PRESERVED] Type identity now flows through `TYPE_IDENT`
 
 Evidence:
 

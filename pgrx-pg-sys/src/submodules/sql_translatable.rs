@@ -16,7 +16,7 @@ use pgrx_sql_entity_graph::metadata::{
 };
 
 unsafe impl SqlTranslatable for FunctionCallInfoBaseData {
-    const SCHEMA_KEY: &'static str =
+    const TYPE_IDENT: &'static str =
         pgrx_sql_entity_graph::pgrx_resolved_type!(FunctionCallInfoBaseData);
     const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::Skip);
@@ -24,7 +24,7 @@ unsafe impl SqlTranslatable for FunctionCallInfoBaseData {
 }
 
 unsafe impl SqlTranslatable for PlannerInfo {
-    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(PlannerInfo);
+    const TYPE_IDENT: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(PlannerInfo);
     const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("internal"));
@@ -33,7 +33,7 @@ unsafe impl SqlTranslatable for PlannerInfo {
 }
 
 unsafe impl SqlTranslatable for IndexAmRoutine {
-    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(IndexAmRoutine);
+    const TYPE_IDENT: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(IndexAmRoutine);
     const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("internal"));
@@ -42,7 +42,7 @@ unsafe impl SqlTranslatable for IndexAmRoutine {
 }
 
 unsafe impl SqlTranslatable for TableAmRoutine {
-    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(TableAmRoutine);
+    const TYPE_IDENT: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(TableAmRoutine);
     const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("internal"));
@@ -51,7 +51,7 @@ unsafe impl SqlTranslatable for TableAmRoutine {
 }
 
 unsafe impl SqlTranslatable for FdwRoutine {
-    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(FdwRoutine);
+    const TYPE_IDENT: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(FdwRoutine);
     const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
         Ok(SqlMappingRef::literal("fdw_handler"));
@@ -60,7 +60,7 @@ unsafe impl SqlTranslatable for FdwRoutine {
 }
 
 unsafe impl SqlTranslatable for BOX {
-    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(BOX);
+    const TYPE_IDENT: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(BOX);
     const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("box"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -68,7 +68,7 @@ unsafe impl SqlTranslatable for BOX {
 }
 
 unsafe impl SqlTranslatable for CIRCLE {
-    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(CIRCLE);
+    const TYPE_IDENT: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(CIRCLE);
     const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("circle"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -76,7 +76,7 @@ unsafe impl SqlTranslatable for CIRCLE {
 }
 
 unsafe impl SqlTranslatable for Point {
-    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(Point);
+    const TYPE_IDENT: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(Point);
     const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("point"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -84,7 +84,7 @@ unsafe impl SqlTranslatable for Point {
 }
 
 unsafe impl SqlTranslatable for ItemPointerData {
-    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(ItemPointerData);
+    const TYPE_IDENT: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(ItemPointerData);
     const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("tid"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
@@ -92,7 +92,7 @@ unsafe impl SqlTranslatable for ItemPointerData {
 }
 
 unsafe impl SqlTranslatable for Datum {
-    const SCHEMA_KEY: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(Datum);
+    const TYPE_IDENT: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(Datum);
     const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::Datum);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = Err(ReturnsError::Datum);

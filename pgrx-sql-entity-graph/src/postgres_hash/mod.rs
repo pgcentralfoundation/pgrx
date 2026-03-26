@@ -109,7 +109,7 @@ impl ToEntityGraphTokens for PostgresHash {
                 + ::pgrx::pgrx_sql_entity_graph::section::u32_len()
                 + ::pgrx::pgrx_sql_entity_graph::section::str_len(stringify!(#name))
                 + ::pgrx::pgrx_sql_entity_graph::section::str_len(module_path!())
-                + ::pgrx::pgrx_sql_entity_graph::section::str_len(<#name as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY)
+                + ::pgrx::pgrx_sql_entity_graph::section::str_len(<#name as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::TYPE_IDENT)
                 + (#to_sql_config_len)
         };
         let total_len = quote! {
@@ -124,7 +124,7 @@ impl ToEntityGraphTokens for PostgresHash {
                 .u32(line!())
                 .str(stringify!(#name))
                 .str(module_path!())
-                .str(<#name as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::SCHEMA_KEY)
+                .str(<#name as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::TYPE_IDENT)
         });
         quote! {
             ::pgrx::pgrx_sql_entity_graph::__pgrx_schema_entry!(

@@ -310,7 +310,7 @@ impl<'de> serde::Deserialize<'de> for Interval {
     }
 }
 unsafe impl SqlTranslatable for Interval {
-    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(Interval);
+    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(Interval);
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
         pgrx_sql_entity_graph::metadata::TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =

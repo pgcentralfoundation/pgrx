@@ -84,7 +84,7 @@ unsafe impl<T> SqlTranslatable for SetOfIterator<'_, T>
 where
     T: SqlTranslatable,
 {
-    const SCHEMA_KEY: &'static str = T::SCHEMA_KEY;
+    const TYPE_IDENT: &'static str = T::TYPE_IDENT;
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::SetOf);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = setof_return_sql(T::RETURN_SQL);
@@ -163,7 +163,7 @@ unsafe impl<'iter, C> SqlTranslatable for TableIterator<'iter, (C,)>
 where
     C: SqlTranslatable + 'iter,
 {
-    const SCHEMA_KEY: &'static str = crate::pgrx_resolved_type!(TableIterator<'iter, (C,)>);
+    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(TableIterator<'iter, (C,)>);
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin = C::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::Table);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = match table_item_sql(C::RETURN_SQL) {
@@ -375,7 +375,7 @@ macro_rules! impl_table_iter {
         where
             $($C: SqlTranslatable + 'iter,)*
         {
-            const SCHEMA_KEY: &'static str =
+            const TYPE_IDENT: &'static str =
                 crate::pgrx_resolved_type!(TableIterator<'iter, ($($C,)*)>);
             const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
                 pgrx_sql_entity_graph::metadata::TypeOrigin::ThisExtension;
@@ -528,7 +528,7 @@ mod tests {
     struct ErrorSecondColumn;
 
     unsafe impl SqlTranslatable for FirstColumn {
-        const SCHEMA_KEY: &'static str = "tests::FirstColumn";
+        const TYPE_IDENT: &'static str = "tests::FirstColumn";
         const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
             pgrx_sql_entity_graph::metadata::TypeOrigin::External;
         const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
@@ -538,7 +538,7 @@ mod tests {
     }
 
     unsafe impl SqlTranslatable for SecondColumn {
-        const SCHEMA_KEY: &'static str = "tests::SecondColumn";
+        const TYPE_IDENT: &'static str = "tests::SecondColumn";
         const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
             pgrx_sql_entity_graph::metadata::TypeOrigin::External;
         const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
@@ -548,7 +548,7 @@ mod tests {
     }
 
     unsafe impl SqlTranslatable for ErrorFirstColumn {
-        const SCHEMA_KEY: &'static str = "tests::ErrorFirstColumn";
+        const TYPE_IDENT: &'static str = "tests::ErrorFirstColumn";
         const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
             pgrx_sql_entity_graph::metadata::TypeOrigin::External;
         const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
@@ -557,7 +557,7 @@ mod tests {
     }
 
     unsafe impl SqlTranslatable for ErrorSecondColumn {
-        const SCHEMA_KEY: &'static str = "tests::ErrorSecondColumn";
+        const TYPE_IDENT: &'static str = "tests::ErrorSecondColumn";
         const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
             pgrx_sql_entity_graph::metadata::TypeOrigin::External;
         const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =

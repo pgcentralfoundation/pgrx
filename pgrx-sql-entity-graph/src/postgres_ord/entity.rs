@@ -28,7 +28,7 @@ pub struct PostgresOrdEntity<'a> {
     pub line: u32,
     pub full_path: &'a str,
     pub module_path: &'a str,
-    pub schema_key: &'a str,
+    pub type_ident: &'a str,
     pub to_sql_config: ToSqlConfigEntity<'a>,
 }
 
