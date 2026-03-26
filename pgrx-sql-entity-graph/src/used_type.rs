@@ -255,7 +255,7 @@ impl UsedType {
         })
     }
 
-    pub fn (&self) -> syn::Expr {
+    pub fn entity_tokens(&self) -> syn::Expr {
         let mut resolved_ty = self.resolved_ty.clone();
         let mut resolved_ty_inner = self.resolved_ty_inner.clone().unwrap_or(resolved_ty.clone());
         // The lifetimes of these are not relevant. Previously, we solved this by staticizing them

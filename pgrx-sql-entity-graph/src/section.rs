@@ -8,6 +8,39 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+/*!
+Wire format support for the `.pgrx_schema` linker section.
+
+This module owns the bytes we embed into the extension shared object and later
+decode from `cargo-pgrx schema`. That format is intentionally compact and
+const-friendly because the producer side runs through macro expansion into
+`static` linker-section entries, not through a normal runtime serializer.
+
+Why this is a bespoke binary format instead of JSON:
+
+- the producer must be able to size each entry at compile time
+- the producer must emit raw bytes into a `static` item placed in a custom
+  linker section
+- the metadata we serialize is exposed to macro expansion through associated
+  consts such as `SqlTranslatable::{ARGUMENT_SQL, RETURN_SQL}`
+
+JSON would make the decode side simpler, but it would not remove the hard part.
+We would still need a handwritten const-time encoder, plus escaping logic for
+strings, SQL snippets, paths, and error payloads. That is not a clear win over
+the current length-prefixed binary layout.
+
+So the current design choice is:
+
+- keep the section format binary while the producer is const-time linker-section
+  emission
+- keep the wire format logic centralized in this module instead of spreading it
+  across macro emitters
+
+If we ever move away from linker-section bytes and toward a normal build-time
+manifest artifact, that would be the right time to re-evaluate a serde-based
+format such as JSON.
+*/
+
 use crate::aggregate::entity::{AggregateTypeEntity, PgAggregateEntity};
 use crate::aggregate::{FinalizeModify, ParallelOption};
 use crate::extension_sql::entity::{
