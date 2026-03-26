@@ -179,6 +179,7 @@ pub(crate) fn generate_schema_implicit(
     let lib_name = manifest.lib_name()?;
     let lib_filename = manifest.lib_filename()?;
     let versioned_so = get_property(package_manifest_path, "module_pathname")?.is_none();
+    let extension_version = manifest.package_version()?;
 
     if let Some(out_path) = path {
         if let Some(parent) = out_path.parent() {
@@ -196,7 +197,10 @@ pub(crate) fn generate_schema_implicit(
     report_entity_counts(&section_entities);
 
     let mut entities = Vec::new();
-    entities.push(SqlGraphEntity::ExtensionRoot(ControlFile::try_from(control_file_path)?));
+    entities.push(SqlGraphEntity::ExtensionRoot(ControlFile::from_path_with_cargo_version(
+        &control_file_path,
+        &extension_version,
+    )?));
     entities.extend(section_entities);
 
     let pgrx_sql = PgrxSql::build(entities.into_iter(), lib_name.to_string(), versioned_so)
