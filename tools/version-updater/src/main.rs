@@ -159,9 +159,7 @@ fn update_files(args: &UpdateFilesArgs) {
         .map(|package_path| {
             Ok(Manifest::from_path(package_path)?
                 .package
-                .ok_or({
-                    cargo_toml::Error::Other("expected package field in workspace member")
-                })?
+                .ok_or({ cargo_toml::Error::Other("expected package field in workspace member") })?
                 .name)
         })
         .collect::<Result<FxHashSet<String>, cargo_toml::Error>>()
