@@ -7,6 +7,12 @@ fn main() -> Result<ExitCode, Box<dyn std::error::Error>> {
     println!("cargo:rerun-if-changed=c_ext/c_ext.c");
     println!("cargo:rerun-if-changed=c_ext/Makefile");
 
+    let target = std::env::var("TARGET")?;
+    if target.contains("windows") {
+        println!("cargo:warning=skipping pgthread c_ext build on windows");
+        return Ok(ExitCode::SUCCESS);
+    }
+
     let (_, pg_config) =
         pgrx_bindgen::detect_pg_config()?.pop().unwrap_or_else(|| panic!("no pg_config detected"));
 
@@ -42,7 +48,6 @@ fn main() -> Result<ExitCode, Box<dyn std::error::Error>> {
 "#,
     )?;
 
-    let target = std::env::var("TARGET")?;
     if target.contains("apple-darwin") {
         println!("cargo:rustc-link-arg-cdylib=-Wl,-u,_start_thread");
         println!("cargo:rustc-link-arg-cdylib=-Wl,-exported_symbol,_start_thread");

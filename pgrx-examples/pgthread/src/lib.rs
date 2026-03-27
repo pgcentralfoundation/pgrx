@@ -7,6 +7,7 @@ use std::ffi::CStr;
 static mut PREV_POST_PARSE_ANALYZE_HOOK: pg_sys::post_parse_analyze_hook_type = None;
 
 // this function is in the "c_ext.c" extension which is built/linked via our "build.rs"
+#[cfg(not(target_os = "windows"))]
 extension_sql!(
     r#"
         create function start_thread() returns void language c as 'pgthread', 'start_thread';
