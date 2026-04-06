@@ -90,6 +90,10 @@ same spelled name but different module paths don't collapse onto the same graph 
 words, resolution is now keyed by a qualified Rust identity instead of a loosely inferred SQL
 name.
 
+For the common "this Rust wrapper maps to an existing SQL type" case, the branch
+also adds `impl_sql_translatable!`. That helper lives with `SqlTranslatable`,
+is re-exported by `pgrx`, and is available from `pgrx::prelude::*`.
+
 The branch also routed concrete type producers and consumers through that model consistently.
 Derived SQL entities, manual `SqlTranslatable` impls, and graph lookups all speak the same
 identity language now.
@@ -276,6 +280,7 @@ For extension authors, the branch leaves a few clear takeaways:
 - treat missing embedded schema metadata as a build problem, not something `cargo pgrx schema`
   should paper over
 - on manual `SqlTranslatable` impls, define `TYPE_IDENT`
+- for fixed external SQL mappings, prefer `impl_sql_translatable!(T, "...")`
 - don't rely on wrappers to make a non-SQL leaf type acceptable
 - use `extension_sql!(..., creates = ...)` only for extension-owned, concrete SQL types or enums
 - expect explicit `composite_type!(...)` declarations to stay SQL-only unless there is a real

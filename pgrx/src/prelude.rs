@@ -17,7 +17,7 @@ pub use crate::pg_sys;
 pub use crate::pg_module_magic;
 
 // Necessary local macros:
-pub use crate::{default, name};
+pub use crate::{default, impl_sql_translatable, name};
 
 // Needed for variant RETURNS
 pub use crate::iter::{SetOfIterator, TableIterator};
@@ -63,3 +63,31 @@ pub use crate::pg_sys::{
     FATAL, PANIC, check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport,
     ereport_domain, error, function_name, info, log, notice, warning,
 };
+
+#[cfg(test)]
+mod tests {
+    use crate::pgrx_sql_entity_graph::metadata::{
+        ReturnsRef, SqlMappingRef, SqlTranslatable, TypeOrigin,
+    };
+    use crate::prelude::*;
+
+    struct PreludeMacroType;
+    impl_sql_translatable!(PreludeMacroType, "uuid");
+
+    #[test]
+    fn prelude_reexports_impl_sql_translatable() {
+        assert_eq!(
+            <PreludeMacroType as SqlTranslatable>::TYPE_IDENT,
+            concat!(module_path!(), "::", "PreludeMacroType")
+        );
+        assert_eq!(<PreludeMacroType as SqlTranslatable>::TYPE_ORIGIN, TypeOrigin::External);
+        assert_eq!(
+            <PreludeMacroType as SqlTranslatable>::ARGUMENT_SQL,
+            Ok(SqlMappingRef::literal("uuid"))
+        );
+        assert_eq!(
+            <PreludeMacroType as SqlTranslatable>::RETURN_SQL,
+            Ok(ReturnsRef::One(SqlMappingRef::literal("uuid")))
+        );
+    }
+}
