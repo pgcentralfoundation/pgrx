@@ -31,6 +31,8 @@ use std::sync::LazyLock as Lazy;
 // expose our various derive macros
 pub use pgrx_macros;
 pub use pgrx_macros::*;
+#[doc(inline)]
+pub use pgrx_sql_entity_graph::metadata::impl_sql_translatable;
 pub use pgrx_sql_entity_graph::pgrx_resolved_type;
 
 /// The PGRX prelude includes necessary imports to make extensions work.

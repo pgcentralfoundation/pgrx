@@ -22,6 +22,7 @@ mod function_metadata;
 mod return_variant;
 mod sql_translatable;
 
+pub use crate::impl_sql_translatable;
 pub use entity::{
     FunctionMetadataEntity, FunctionMetadataTypeEntity, FunctionMetadataTypeResolutionEntity,
     TypeOrigin,

@@ -159,6 +159,13 @@ unsafe trait SqlTranslatable {
 
 This is the actual contract.
 
+For the common "fixed external SQL type" case, you usually don't need to write
+all four consts by hand. `impl_sql_translatable!(T, "uuid")`, re-exported by
+`pgrx::prelude::*`, expands to the same contract with
+`TYPE_IDENT = pgrx_resolved_type!(T)`, `TYPE_ORIGIN = TypeOrigin::External`,
+and matching argument and return SQL. The `arg_only = "..."` form keeps the
+same external identity but leaves the return mapping invalid.
+
 ### `TYPE_IDENT`
 
 `TYPE_IDENT` is the graph identity for the Rust type.
@@ -477,21 +484,11 @@ while the emitted SQL text is `complex`.
 ### Example 2: Manual wrapper for an existing SQL type
 
 ```rust
-use pgrx::pgrx_sql_entity_graph::metadata::{
-    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
-    TypeOrigin,
-};
+use pgrx::prelude::*;
 
 pub struct UuidWrapper;
 
-unsafe impl SqlTranslatable for UuidWrapper {
-    const TYPE_IDENT: &'static str = pgrx::pgrx_resolved_type!(UuidWrapper);
-    const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
-    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
-        Ok(SqlMappingRef::literal("uuid"));
-    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
-        Ok(ReturnsRef::One(SqlMappingRef::literal("uuid")));
-}
+impl_sql_translatable!(UuidWrapper, "uuid");
 
 #[pg_extern]
 fn echo_uuid(value: UuidWrapper) -> UuidWrapper {
@@ -501,7 +498,7 @@ fn echo_uuid(value: UuidWrapper) -> UuidWrapper {
 
 What happens:
 
-- the Rust identity is `my_extension::UuidWrapper`
+- the macro sets the Rust identity to `my_extension::UuidWrapper`
 - there is no requirement for a local type owner because the origin is
   `External`
 - the emitted SQL type is `uuid`

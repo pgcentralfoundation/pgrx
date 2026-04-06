@@ -212,8 +212,77 @@ pub const fn table_item_sql(
     }
 }
 
+/// Implements `SqlTranslatable` for a type with a fixed external SQL mapping.
+///
+/// This macro uses `pgrx_resolved_type!(T)` for `TYPE_IDENT`, sets
+/// `TYPE_ORIGIN` to `TypeOrigin::External`, and fills in the const SQL metadata
+/// for the common "map this Rust wrapper to an existing SQL type" case.
+///
+/// Write the `unsafe impl SqlTranslatable` by hand when the type is owned by
+/// this extension, or when argument and return SQL need different mappings.
+///
+/// This macro is re-exported by `pgrx`, and also available through
+/// `pgrx::prelude::*`.
+///
+/// # Examples
+///
+/// A wrapper that maps to the existing `uuid` type:
+///
+/// ```ignore
+/// use pgrx::prelude::*;
+///
+/// pub struct UuidWrapper(uuid::Uuid);
+///
+/// impl_sql_translatable!(UuidWrapper, "uuid");
+/// ```
+///
+/// An argument-only wrapper for a pseudo-type:
+///
+/// ```ignore
+/// use pgrx::prelude::*;
+///
+/// pub struct InternalArg(*mut core::ffi::c_void);
+///
+/// impl_sql_translatable!(InternalArg, arg_only = "internal");
+/// ```
+#[macro_export]
+macro_rules! impl_sql_translatable {
+    ($ty:ty, $sql:literal) => {
+        unsafe impl $crate::metadata::SqlTranslatable for $ty {
+            const TYPE_IDENT: &'static str = $crate::pgrx_resolved_type!($ty);
+            const TYPE_ORIGIN: $crate::metadata::TypeOrigin =
+                $crate::metadata::TypeOrigin::External;
+            const ARGUMENT_SQL: Result<
+                $crate::metadata::SqlMappingRef,
+                $crate::metadata::ArgumentError,
+            > = Ok($crate::metadata::SqlMappingRef::literal($sql));
+            const RETURN_SQL: Result<$crate::metadata::ReturnsRef, $crate::metadata::ReturnsError> =
+                Ok($crate::metadata::ReturnsRef::One($crate::metadata::SqlMappingRef::literal(
+                    $sql,
+                )));
+        }
+    };
+    ($ty:ty, arg_only = $sql:literal) => {
+        unsafe impl $crate::metadata::SqlTranslatable for $ty {
+            const TYPE_IDENT: &'static str = $crate::pgrx_resolved_type!($ty);
+            const TYPE_ORIGIN: $crate::metadata::TypeOrigin =
+                $crate::metadata::TypeOrigin::External;
+            const ARGUMENT_SQL: Result<
+                $crate::metadata::SqlMappingRef,
+                $crate::metadata::ArgumentError,
+            > = Ok($crate::metadata::SqlMappingRef::literal($sql));
+            const RETURN_SQL: Result<$crate::metadata::ReturnsRef, $crate::metadata::ReturnsError> =
+                Err($crate::metadata::ReturnsError::Datum);
+        }
+    };
+}
+
 /**
 A value which can be represented in SQL
+
+If you need the common "fixed external SQL type" case, prefer
+`impl_sql_translatable!`. Write the trait impl by hand when the type is owned
+by this extension, or when argument and return SQL differ.
 
 # Safety
 
@@ -357,6 +426,43 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    struct MacroExternalType;
+    impl_sql_translatable!(MacroExternalType, "uuid");
+
+    struct MacroArgOnlyType;
+    impl_sql_translatable!(MacroArgOnlyType, arg_only = "internal");
+
+    #[test]
+    fn impl_sql_translatable_sets_external_defaults() {
+        assert_eq!(
+            <MacroExternalType as SqlTranslatable>::TYPE_IDENT,
+            concat!(module_path!(), "::", "MacroExternalType")
+        );
+        assert_eq!(<MacroExternalType as SqlTranslatable>::TYPE_ORIGIN, TypeOrigin::External);
+        assert_eq!(
+            <MacroExternalType as SqlTranslatable>::ARGUMENT_SQL,
+            Ok(SqlMappingRef::literal("uuid"))
+        );
+        assert_eq!(
+            <MacroExternalType as SqlTranslatable>::RETURN_SQL,
+            Ok(ReturnsRef::One(SqlMappingRef::literal("uuid")))
+        );
+    }
+
+    #[test]
+    fn impl_sql_translatable_supports_arg_only_types() {
+        assert_eq!(
+            <MacroArgOnlyType as SqlTranslatable>::TYPE_IDENT,
+            concat!(module_path!(), "::", "MacroArgOnlyType")
+        );
+        assert_eq!(<MacroArgOnlyType as SqlTranslatable>::TYPE_ORIGIN, TypeOrigin::External);
+        assert_eq!(
+            <MacroArgOnlyType as SqlTranslatable>::ARGUMENT_SQL,
+            Ok(SqlMappingRef::literal("internal"))
+        );
+        assert_eq!(<MacroArgOnlyType as SqlTranslatable>::RETURN_SQL, Err(ReturnsError::Datum));
+    }
 
     #[test]
     fn array_argument_sql_wraps_scalar_kinds() {
