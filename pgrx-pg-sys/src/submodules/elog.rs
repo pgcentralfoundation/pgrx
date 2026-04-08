@@ -96,195 +96,293 @@ impl From<i32> for PgLogLevel {
     }
 }
 
+// Checks whether a string literal contains `{` or `}` characters, indicating it may need
+// processing by `format!()`. Used by the elog macros to decide at compile time whether a
+// literal can be passed directly to `ereport!` (avoiding a heap allocation) or needs to go
+// through `format!()` first.
+//
+// This intentionally matches escaped braces (`{{`, `}}`) too, since `format!()` is still
+// needed to resolve those to single braces.
+//
+// This is a `const fn` so it can be evaluated inside `const { }` blocks in macros.
+#[doc(hidden)]
+pub const fn literal_has_format_args(s: &str) -> bool {
+    // `str::contains` is not const, so we scan bytes manually.
+    let bytes = s.as_bytes();
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'{' || bytes[i] == b'}' {
+            return true;
+        }
+        i += 1;
+    }
+    false
+}
+
 /// Log to Postgres' `debug5` log level.
 ///
-/// This macro accepts arguments like the [`println`] and [`format`] macros.
+/// Besides string literals, this macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
 ///
 /// The output these logs goes to the PostgreSQL log file at `DEBUG5` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! debug5 {
-    ($($arg:tt)*) => (
-        {
-            extern crate alloc;
-            $crate::ereport!($crate::elog::PgLogLevel::DEBUG5, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+    ($msg:literal) => {{
+        extern crate alloc;
+        if const { $crate::elog::literal_has_format_args($msg) } {
+            $crate::ereport!($crate::elog::PgLogLevel::DEBUG5, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($msg).as_str());
+        } else {
+            $crate::ereport!($crate::elog::PgLogLevel::DEBUG5, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, $msg);
         }
-    )
+    }};
+    ($($arg:tt)*) => {{
+        extern crate alloc;
+        $crate::ereport!($crate::elog::PgLogLevel::DEBUG5, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+    }};
 }
 
 /// Log to Postgres' `debug4` log level.
 ///
-/// This macro accepts arguments like the [`println`] and [`format`] macros.
+/// Besides string literals, this macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
 ///
 /// The output these logs goes to the PostgreSQL log file at `DEBUG4` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! debug4 {
-    ($($arg:tt)*) => (
-        {
-            extern crate alloc;
-            $crate::ereport!($crate::elog::PgLogLevel::DEBUG4, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+    ($msg:literal) => {{
+        extern crate alloc;
+        if const { $crate::elog::literal_has_format_args($msg) } {
+            $crate::ereport!($crate::elog::PgLogLevel::DEBUG4, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($msg).as_str());
+        } else {
+            $crate::ereport!($crate::elog::PgLogLevel::DEBUG4, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, $msg);
         }
-    )
+    }};
+    ($($arg:tt)*) => {{
+        extern crate alloc;
+        $crate::ereport!($crate::elog::PgLogLevel::DEBUG4, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+    }};
 }
 
 /// Log to Postgres' `debug3` log level.
 ///
-/// This macro accepts arguments like the [`println`] and [`format`] macros.
+/// Besides string literals, this macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
 ///
 /// The output these logs goes to the PostgreSQL log file at `DEBUG3` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! debug3 {
-    ($($arg:tt)*) => (
-        {
-            extern crate alloc;
-            $crate::ereport!($crate::elog::PgLogLevel::DEBUG3, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+    ($msg:literal) => {{
+        extern crate alloc;
+        if const { $crate::elog::literal_has_format_args($msg) } {
+            $crate::ereport!($crate::elog::PgLogLevel::DEBUG3, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($msg).as_str());
+        } else {
+            $crate::ereport!($crate::elog::PgLogLevel::DEBUG3, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, $msg);
         }
-    )
+    }};
+    ($($arg:tt)*) => {{
+        extern crate alloc;
+        $crate::ereport!($crate::elog::PgLogLevel::DEBUG3, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+    }};
 }
 
 /// Log to Postgres' `debug2` log level.
 ///
-/// This macro accepts arguments like the [`println`] and [`format`] macros.
+/// Besides string literals, this macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
 ///
 /// The output these logs goes to the PostgreSQL log file at `DEBUG2` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! debug2 {
-    ($($arg:tt)*) => (
-        {
-            extern crate alloc;
-            $crate::ereport!($crate::elog::PgLogLevel::DEBUG2, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+    ($msg:literal) => {{
+        extern crate alloc;
+        if const { $crate::elog::literal_has_format_args($msg) } {
+            $crate::ereport!($crate::elog::PgLogLevel::DEBUG2, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($msg).as_str());
+        } else {
+            $crate::ereport!($crate::elog::PgLogLevel::DEBUG2, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, $msg);
         }
-    )
+    }};
+    ($($arg:tt)*) => {{
+        extern crate alloc;
+        $crate::ereport!($crate::elog::PgLogLevel::DEBUG2, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+    }};
 }
 
 /// Log to Postgres' `debug1` log level.
 ///
-/// This macro accepts arguments like the [`println`] and [`format`] macros.
+/// Besides string literals, this macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
 ///
 /// The output these logs goes to the PostgreSQL log file at `DEBUG1` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! debug1 {
-    ($($arg:tt)*) => (
-        {
-            extern crate alloc;
-            $crate::ereport!($crate::elog::PgLogLevel::DEBUG1, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+    ($msg:literal) => {{
+        extern crate alloc;
+        if const { $crate::elog::literal_has_format_args($msg) } {
+            $crate::ereport!($crate::elog::PgLogLevel::DEBUG1, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($msg).as_str());
+        } else {
+            $crate::ereport!($crate::elog::PgLogLevel::DEBUG1, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, $msg);
         }
-    )
+    }};
+    ($($arg:tt)*) => {{
+        extern crate alloc;
+        $crate::ereport!($crate::elog::PgLogLevel::DEBUG1, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+    }};
 }
 
 /// Log to Postgres' `log` log level.
 ///
-/// This macro accepts arguments like the [`println`] and [`format`] macros.
+/// Besides string literals, this macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
 ///
 /// The output these logs goes to the PostgreSQL log file at `LOG` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! log {
-    ($($arg:tt)*) => (
-        {
-            extern crate alloc;
-            $crate::ereport!($crate::elog::PgLogLevel::LOG, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+    ($msg:literal) => {{
+        extern crate alloc;
+        if const { $crate::elog::literal_has_format_args($msg) } {
+            $crate::ereport!($crate::elog::PgLogLevel::LOG, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($msg).as_str());
+        } else {
+            $crate::ereport!($crate::elog::PgLogLevel::LOG, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, $msg);
         }
-    )
+    }};
+    ($($arg:tt)*) => {{
+        extern crate alloc;
+        $crate::ereport!($crate::elog::PgLogLevel::LOG, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+    }};
 }
 
 /// Log to Postgres' `info` log level.
 ///
-/// This macro accepts arguments like the [`println`] and [`format`] macros.
+/// Besides string literals, this macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
 #[macro_export]
 macro_rules! info {
-    ($($arg:tt)*) => (
-        {
-            extern crate alloc;
-            $crate::ereport!($crate::elog::PgLogLevel::INFO, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+    ($msg:literal) => {{
+        extern crate alloc;
+        if const { $crate::elog::literal_has_format_args($msg) } {
+            $crate::ereport!($crate::elog::PgLogLevel::INFO, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($msg).as_str());
+        } else {
+            $crate::ereport!($crate::elog::PgLogLevel::INFO, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, $msg);
         }
-    )
+    }};
+    ($($arg:tt)*) => {{
+        extern crate alloc;
+        $crate::ereport!($crate::elog::PgLogLevel::INFO, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+    }};
 }
 
 /// Log to Postgres' `notice` log level.
 ///
-/// This macro accepts arguments like the [`println`] and [`format`] macros.
+/// Besides string literals, this macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
 #[macro_export]
 macro_rules! notice {
-    ($($arg:tt)*) => (
-        {
-            extern crate alloc;
-            $crate::ereport!($crate::elog::PgLogLevel::NOTICE, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+    ($msg:literal) => {{
+        extern crate alloc;
+        if const { $crate::elog::literal_has_format_args($msg) } {
+            $crate::ereport!($crate::elog::PgLogLevel::NOTICE, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($msg).as_str());
+        } else {
+            $crate::ereport!($crate::elog::PgLogLevel::NOTICE, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, $msg);
         }
-    )
+    }};
+    ($($arg:tt)*) => {{
+        extern crate alloc;
+        $crate::ereport!($crate::elog::PgLogLevel::NOTICE, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+    }};
 }
 
 /// Log to Postgres' `warning` log level.
 ///
-/// This macro accepts arguments like the [`println`] and [`format`] macros.
+/// Besides string literals, this macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
 #[macro_export]
 macro_rules! warning {
-    ($($arg:tt)*) => (
-        {
-            extern crate alloc;
-            $crate::ereport!($crate::elog::PgLogLevel::WARNING, $crate::errcodes::PgSqlErrorCode::ERRCODE_WARNING, alloc::format!($($arg)*).as_str());
+    ($msg:literal) => {{
+        extern crate alloc;
+        if const { $crate::elog::literal_has_format_args($msg) } {
+            $crate::ereport!($crate::elog::PgLogLevel::WARNING, $crate::errcodes::PgSqlErrorCode::ERRCODE_WARNING, alloc::format!($msg).as_str());
+        } else {
+            $crate::ereport!($crate::elog::PgLogLevel::WARNING, $crate::errcodes::PgSqlErrorCode::ERRCODE_WARNING, $msg);
         }
-    )
+    }};
+    ($($arg:tt)*) => {{
+        extern crate alloc;
+        $crate::ereport!($crate::elog::PgLogLevel::WARNING, $crate::errcodes::PgSqlErrorCode::ERRCODE_WARNING, alloc::format!($($arg)*).as_str());
+    }};
 }
 
 /// Log to Postgres' `error` log level.  This will abort the current Postgres transaction.
 ///
-/// This macro accepts arguments like the [`println`] and [`format`] macros.
+/// Besides string literals, this macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
 #[macro_export]
 macro_rules! error {
-    ($($arg:tt)*) => (
-        {
-            extern crate alloc;
-            $crate::ereport!($crate::elog::PgLogLevel::ERROR, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($($arg)*).as_str());
-            unreachable!()
+    ($msg:literal) => {{
+        extern crate alloc;
+        if const { $crate::elog::literal_has_format_args($msg) } {
+            $crate::ereport!($crate::elog::PgLogLevel::ERROR, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($msg).as_str());
+        } else {
+            $crate::ereport!($crate::elog::PgLogLevel::ERROR, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, $msg);
         }
-    );
+        unreachable!()
+    }};
+    ($($arg:tt)*) => {{
+        extern crate alloc;
+        $crate::ereport!($crate::elog::PgLogLevel::ERROR, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($($arg)*).as_str());
+        unreachable!()
+    }};
 }
 
 /// Log to Postgres' `fatal` log level.  This will abort the current Postgres backend connection process.
 ///
-/// This macro accepts arguments like the [`println`] and [`format`] macros.
+/// Besides string literals, this macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
 #[allow(non_snake_case)]
 #[macro_export]
 macro_rules! FATAL {
-    ($($arg:tt)*) => (
-        {
-            extern crate alloc;
-            $crate::ereport!($crate::elog::PgLogLevel::FATAL, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($($arg)*).as_str());
-            unreachable!()
+    ($msg:literal) => {{
+        extern crate alloc;
+        if const { $crate::elog::literal_has_format_args($msg) } {
+            $crate::ereport!($crate::elog::PgLogLevel::FATAL, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($msg).as_str());
+        } else {
+            $crate::ereport!($crate::elog::PgLogLevel::FATAL, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, $msg);
         }
-    )
+        unreachable!()
+    }};
+    ($($arg:tt)*) => {{
+        extern crate alloc;
+        $crate::ereport!($crate::elog::PgLogLevel::FATAL, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($($arg)*).as_str());
+        unreachable!()
+    }};
 }
 
 /// Log to Postgres' `panic` log level.  This will cause the entire Postgres cluster to crash.
 ///
-/// This macro accepts arguments like the [`println`] and [`format`] macros.
+/// Besides string literals, this macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
 #[allow(non_snake_case)]
 #[macro_export]
 macro_rules! PANIC {
-    ($($arg:tt)*) => (
-        {
-            extern crate alloc;
-            $crate::ereport!($crate::elog::PgLogLevel::PANIC, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($($arg)*).as_str());
-            unreachable!()
+    ($msg:literal) => {{
+        extern crate alloc;
+        if const { $crate::elog::literal_has_format_args($msg) } {
+            $crate::ereport!($crate::elog::PgLogLevel::PANIC, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($msg).as_str());
+        } else {
+            $crate::ereport!($crate::elog::PgLogLevel::PANIC, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, $msg);
         }
-    )
+        unreachable!()
+    }};
+    ($($arg:tt)*) => {{
+        extern crate alloc;
+        $crate::ereport!($crate::elog::PgLogLevel::PANIC, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($($arg)*).as_str());
+        unreachable!()
+    }};
 }
 
 // shamelessly borrowed from https://docs.rs/stdext/0.2.1/src/stdext/macros.rs.html#61-72
