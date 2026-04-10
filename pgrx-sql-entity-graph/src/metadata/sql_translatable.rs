@@ -221,7 +221,7 @@ pub const fn table_item_sql(
 /// Spell out the `unsafe impl SqlTranslatable` instead when (1) the type is owned by
 /// this extension or (2) when its argument and return SQL need different mappings.
 ///
-/// This macro is re-exported by `pgrx`, and also available through
+/// This macro is re-exported by `pgrx` and is also available through
 /// `pgrx::prelude::*`.
 ///
 /// # Examples
