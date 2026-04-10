@@ -218,8 +218,8 @@ pub const fn table_item_sql(
 /// `TYPE_ORIGIN` to `TypeOrigin::External`, and fills in the const SQL metadata
 /// for the common "map this Rust wrapper to an existing SQL type" case.
 ///
-/// Write the `unsafe impl SqlTranslatable` by hand when the type is owned by
-/// this extension, or when argument and return SQL need different mappings.
+/// Spell out the `unsafe impl SqlTranslatable` instead when (1) the type is owned by
+/// this extension or (2) when its argument and return SQL need different mappings.
 ///
 /// This macro is re-exported by `pgrx`, and also available through
 /// `pgrx::prelude::*`.
