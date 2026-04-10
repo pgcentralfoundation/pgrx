@@ -281,8 +281,8 @@ macro_rules! impl_sql_translatable {
 A value which can be represented in SQL
 
 If you need the common "fixed external SQL type" case, prefer
-`impl_sql_translatable!`. Write the trait impl by hand when the type is owned
-by this extension, or when argument and return SQL differ.
+`impl_sql_translatable!`. Spell out this trait impl when (1) the type is owned
+by this extension or (2) when the argument or return SQL is unusual.
 
 # Safety
 
