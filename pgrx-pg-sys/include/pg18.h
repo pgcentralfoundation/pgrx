@@ -101,6 +101,7 @@
 #include "foreign/foreign.h"
 #include "jit/jit.h"
 #include "lib/stringinfo.h"
+#include "libpq/oauth.h"
 #include "libpq/pqformat.h"
 #include "mb/pg_wchar.h"
 #include "nodes/execnodes.h"
