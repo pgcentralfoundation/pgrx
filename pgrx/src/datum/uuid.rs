@@ -130,7 +130,7 @@ impl std::fmt::UpperHex for Uuid {
     }
 }
 
-unsafe impl SqlTranslatable for crate::datum::Uuid {
+unsafe impl SqlTranslatable for Uuid {
     const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(Uuid);
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
         pgrx_sql_entity_graph::metadata::TypeOrigin::External;

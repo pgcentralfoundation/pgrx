@@ -310,8 +310,8 @@ extension_sql!(
 
 pgrx records two things:
 
-- the concrete SQL spelling, taken from `T::argument_sql()`
-- the owning `TYPE_IDENT`, taken from `T::TYPE_IDENT`
+- the concrete SQL spelling, taken from `<Complex as SqlTranslatable>::ARGUMENT_SQL`
+- the owning `TYPE_IDENT`, taken from `<Complex as SqlTranslatable>::TYPE_IDENT`
 
 That is what lets a later `#[pg_extern] fn f(x: Complex)` resolve to the SQL
 type created by that `extension_sql!()` block.

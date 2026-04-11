@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft
+Accepted
 
 ## Summary
 
@@ -137,7 +137,8 @@ pub unsafe trait SqlTranslatable {
     /// Const-friendly mirror of `return_sql()`.
     const RETURN_SQL: Result<ReturnsRef, ReturnsError>;
 
-    // Runtime methods remain as compatibility shims over the const metadata.
+    // Runtime methods remain as source-compatibility shims over the const metadata.
+    // Automatic schema generation reads the associated consts directly.
     fn type_name() -> &'static str { core::any::type_name::<Self>() }
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Self::ARGUMENT_SQL.into_runtime()
@@ -175,8 +176,8 @@ For example:
 unsafe impl<T: SqlTranslatable> SqlTranslatable for Option<T> {
     const TYPE_IDENT: &'static str = T::TYPE_IDENT;
     const TYPE_ORIGIN: TypeOrigin = T::TYPE_ORIGIN;
-    const ARGUMENT_SQL: SqlMappingRef = T::ARGUMENT_SQL;
-    const RETURN_SQL: ReturnsRef = T::RETURN_SQL;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
 }
 
 unsafe impl<T, E> SqlTranslatable for Result<T, E>
@@ -185,8 +186,8 @@ where
 {
     const TYPE_IDENT: &'static str = T::TYPE_IDENT;
     const TYPE_ORIGIN: TypeOrigin = T::TYPE_ORIGIN;
-    const ARGUMENT_SQL: SqlMappingRef = T::ARGUMENT_SQL;
-    const RETURN_SQL: ReturnsRef = T::RETURN_SQL;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
 }
 ```
 
@@ -209,8 +210,10 @@ A convenience macro is provided so users don't have to hand-write the
 /// ```rust
 /// unsafe impl SqlTranslatable for HexInt {
 ///     const TYPE_IDENT: &'static str = pgrx::pgrx_resolved_type!(HexInt);
-///     const ARGUMENT_SQL: SqlMappingRef = SqlMappingRef::literal("hexint");
-///     const RETURN_SQL: ReturnsRef = ReturnsRef::one(SqlMappingRef::literal("hexint"));
+///     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+///         Ok(SqlMappingRef::literal("hexint"));
+///     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+///         Ok(ReturnsRef::One(SqlMappingRef::literal("hexint")));
 /// }
 /// ```
 #[macro_export]
@@ -363,10 +366,13 @@ symbol-table scanning, codegen, second build, and binary execution are all delet
 #### Stripping the section from installed artifacts
 
 This RFC does not require automatic stripping as part of `cargo pgrx install`. The
-embedded schema section is inert at runtime, and install/package-time artifact trimming
-can be layered on later if it proves worthwhile. The important behavior for this RFC is
-that schema generation reads the section from the freshly built shared object and does
-not require a second build or an executable helper binary.
+embedded schema section is inert at runtime. Keeping it does make installed and packaged
+artifacts slightly larger, by the size of the embedded payload plus normal alignment
+overhead, but that is an acceptable tradeoff for the single-pass design described here.
+If install/package-time artifact trimming proves worthwhile later, it can be layered on
+afterward. The important behavior for this RFC is that schema generation reads the
+section from the freshly built shared object and does not require a second build or an
+executable helper binary.
 
 ### How proc macros change
 

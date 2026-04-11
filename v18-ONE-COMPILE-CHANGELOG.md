@@ -47,6 +47,10 @@ That changes a few important details:
 - Installed artifacts retain the embedded schema section. The branch ended in a state where
   schema metadata is treated as inert runtime data that should stay attached to the shared
   object, not something `cargo-pgrx` strips away after generation.
+  That does make unstripped artifacts a little larger, by the size of the embedded metadata
+  payload plus normal section-alignment overhead. On this branch that tradeoff is intentional:
+  the freshly built shared object, the installed artifact, and the packaged artifact all keep
+  the same schema section attached.
 - Versioned shared-object SQL generation now keys off the extension crate version, so the
   generated SQL stays aligned with the actual versioned library name.
 

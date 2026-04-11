@@ -71,6 +71,8 @@ pub const MACHO_SEGMENT_NAME: &str = "__DATA";
 pub const MACHO_SECTION_NAME: &str = "__pgrxsc";
 pub const MACHO_SECTION_PATH: &str = "__DATA,__pgrxsc";
 
+// PE/COFF section names are capped at 8 bytes, which is why the cross-platform
+// names here are the shortened `pgrxsc` forms instead of `.pgrx_schema`.
 const LEGACY_ELF_SECTION_NAME: &str = ".pgrx_schema";
 const LEGACY_MACHO_SECTION_NAME: &str = "__pgrx_schema";
 const LEGACY_MACHO_SECTION_PATH: &str = "__DATA,__pgrx_schema";

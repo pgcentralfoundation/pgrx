@@ -196,7 +196,7 @@ unsafe impl SqlTranslatable for Json {
         Ok(ReturnsRef::One(SqlMappingRef::literal("json")));
 }
 
-unsafe impl SqlTranslatable for crate::datum::JsonB {
+unsafe impl SqlTranslatable for JsonB {
     const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(JsonB);
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
         pgrx_sql_entity_graph::metadata::TypeOrigin::External;
