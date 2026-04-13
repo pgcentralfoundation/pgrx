@@ -255,7 +255,7 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
                 level,
                 inner: ErrorReport {
                     sqlerrcode,
-                    message,
+                    message: message.into(),
                     detail,
                     hint,
                     domain,

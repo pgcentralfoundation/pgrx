@@ -12,6 +12,7 @@
 
 use core::ffi::CStr;
 use std::any::Any;
+use std::borrow::Cow;
 use std::cell::Cell;
 use std::fmt::{Display, Formatter};
 use std::hint::unreachable_unchecked;
@@ -50,7 +51,7 @@ where
                 any.downcast::<ErrorReport>().unwrap().report(PgLogLevel::ERROR);
                 unreachable!();
             } else {
-                ereport!(ERROR, PgSqlErrorCode::ERRCODE_DATA_EXCEPTION, &format!("{e}"));
+                ereport!(ERROR, PgSqlErrorCode::ERRCODE_DATA_EXCEPTION, format!("{e}"));
             }
         })
     }
@@ -123,7 +124,7 @@ impl From<&PanicHookInfo<'_>> for ErrorReportLocation {
 #[derive(Debug)]
 pub struct ErrorReport {
     pub(crate) sqlerrcode: PgSqlErrorCode,
-    pub(crate) message: String,
+    pub(crate) message: Cow<'static, str>,
     pub(crate) hint: Option<String>,
     pub(crate) detail: Option<String>,
     pub(crate) domain: Option<String>,
@@ -245,7 +246,7 @@ impl ErrorReport {
     ///
     /// Embedded "file:line:col" location information is taken from the caller's location
     #[track_caller]
-    pub fn new<S: Into<String>>(
+    pub fn new<S: Into<Cow<'static, str>>>(
         sqlerrcode: PgSqlErrorCode,
         message: S,
         funcname: &'static str,
@@ -267,7 +268,7 @@ impl ErrorReport {
     /// a specific Postgres "ereport()` level via [ErrorReport::unwrap_or_report(self, PgLogLevel)].
     ///
     /// For internal use only
-    fn with_location<S: Into<String>>(
+    fn with_location<S: Into<Cow<'static, str>>>(
         sqlerrcode: PgSqlErrorCode,
         message: S,
         location: ErrorReportLocation,
@@ -493,7 +494,7 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
                 level: PgLogLevel::ERROR,
                 inner: ErrorReport::with_location(
                     PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
-                    *message,
+                    message.to_string(),
                     take_panic_location(),
                 ),
             },
@@ -506,7 +507,7 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
                 level: PgLogLevel::ERROR,
                 inner: ErrorReport::with_location(
                     PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
-                    message,
+                    message.clone(),
                     take_panic_location(),
                 ),
             },

@@ -13,6 +13,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_unit_tests;
     use pgrx::prelude::*;
+    use std::sync::atomic::{AtomicBool, Ordering};
 
     #[pg_test]
     fn test_info() {
@@ -113,5 +114,40 @@ mod tests {
     #[pg_test(error = "panic message")]
     fn test_panic() {
         panic!("panic message")
+    }
+
+    static FORMAT_ARG_EVALUATED: AtomicBool = AtomicBool::new(false);
+
+    fn evaluate_format_arg() -> &'static str {
+        FORMAT_ARG_EVALUATED.store(true, Ordering::SeqCst);
+        "evaluated"
+    }
+
+    // With default settings (log_min_messages=WARNING, client_min_messages=NOTICE),
+    // DEBUG-level messages are not interesting, so we shouldn't be evaluating format arguments
+    // eagerly.
+    #[pg_test]
+    fn test_debug_skips_arg_evaluation() {
+        FORMAT_ARG_EVALUATED.store(false, Ordering::SeqCst);
+        debug5!("{}", evaluate_format_arg());
+        debug4!("{}", evaluate_format_arg());
+        debug3!("{}", evaluate_format_arg());
+        debug2!("{}", evaluate_format_arg());
+        debug1!("{}", evaluate_format_arg());
+        assert!(
+            !FORMAT_ARG_EVALUATED.load(Ordering::SeqCst),
+            "DEBUG-level messages should not evaluate format arguments eagerly at default log level"
+        );
+    }
+
+    #[pg_test]
+    fn test_warning_evaluates_args() {
+        // WARNING is interesting at default settings (log_min_messages=WARNING)
+        FORMAT_ARG_EVALUATED.store(false, Ordering::SeqCst);
+        warning!("{}", evaluate_format_arg());
+        assert!(
+            FORMAT_ARG_EVALUATED.load(Ordering::SeqCst),
+            "warning! should evaluate format arguments at default log level"
+        );
     }
 }
