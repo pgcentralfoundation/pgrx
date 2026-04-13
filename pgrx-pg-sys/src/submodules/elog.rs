@@ -456,63 +456,83 @@ macro_rules! ereport {
     };
 
     (WARNING, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::WARNING)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::WARNING as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::WARNING)
+        }
     };
 
     (NOTICE, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::NOTICE)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::NOTICE as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::NOTICE)
+        }
     };
 
     (INFO, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::INFO)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::INFO as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::INFO)
+        }
     };
 
     (LOG, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::LOG)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::LOG as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::LOG)
+        }
     };
 
     (DEBUG5, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::DEBUG5)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::DEBUG5 as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::DEBUG5)
+        }
     };
 
     (DEBUG4, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::DEBUG4)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::DEBUG4 as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::DEBUG4)
+        }
     };
 
     (DEBUG3, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::DEBUG3)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::DEBUG3 as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::DEBUG3)
+        }
     };
 
     (DEBUG2, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::DEBUG2)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::DEBUG2 as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::DEBUG2)
+        }
     };
 
     (DEBUG1, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::DEBUG1)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::DEBUG1 as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::DEBUG1)
+        }
     };
 
     ($loglevel:expr, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            $(.set_detail($detail))?
-            .report($loglevel);
+        if unsafe { $crate::message_level_is_interesting($loglevel as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                $(.set_detail($detail))?
+                .report($loglevel);
+        }
     };
 }
 
@@ -573,73 +593,93 @@ macro_rules! ereport_domain {
     };
 
     (WARNING, $domain:expr, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            .set_domain($domain)
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::WARNING)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::WARNING as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                .set_domain($domain)
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::WARNING)
+        }
     };
 
     (NOTICE, $domain:expr, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            .set_domain($domain)
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::NOTICE)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::NOTICE as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                .set_domain($domain)
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::NOTICE)
+        }
     };
 
     (INFO, $domain:expr, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            .set_domain($domain)
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::INFO)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::INFO as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                .set_domain($domain)
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::INFO)
+        }
     };
 
     (LOG, $domain:expr, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            .set_domain($domain)
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::LOG)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::LOG as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                .set_domain($domain)
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::LOG)
+        }
     };
 
     (DEBUG5, $domain:expr, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            .set_domain($domain)
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::DEBUG5)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::DEBUG5 as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                .set_domain($domain)
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::DEBUG5)
+        }
     };
 
     (DEBUG4, $domain:expr, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            .set_domain($domain)
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::DEBUG4)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::DEBUG4 as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                .set_domain($domain)
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::DEBUG4)
+        }
     };
 
     (DEBUG3, $domain:expr, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            .set_domain($domain)
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::DEBUG3)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::DEBUG3 as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                .set_domain($domain)
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::DEBUG3)
+        }
     };
 
     (DEBUG2, $domain:expr, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            .set_domain($domain)
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::DEBUG2)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::DEBUG2 as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                .set_domain($domain)
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::DEBUG2)
+        }
     };
 
     (DEBUG1, $domain:expr, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            .set_domain($domain)
-            $(.set_detail($detail))?
-            .report($crate::elog::PgLogLevel::DEBUG1)
+        if unsafe { $crate::message_level_is_interesting($crate::elog::PgLogLevel::DEBUG1 as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                .set_domain($domain)
+                $(.set_detail($detail))?
+                .report($crate::elog::PgLogLevel::DEBUG1)
+        }
     };
 
     ($loglevel:expr, $domain:expr, $errcode:expr, $message:expr $(, $detail:expr)? $(,)?) => {
-        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            .set_domain($domain)
-            $(.set_detail($detail))?
-            .report($loglevel);
+        if unsafe { $crate::message_level_is_interesting($loglevel as _) } {
+            $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+                .set_domain($domain)
+                $(.set_detail($detail))?
+                .report($loglevel);
+        }
     };
 }
 
