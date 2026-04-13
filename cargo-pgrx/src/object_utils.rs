@@ -246,7 +246,9 @@ mod tests {
     use super::schema_section_data;
     use object::read::macho::{FatArch, MachOFatFile32};
     use pgrx_pg_config::{PgConfigSelector, Pgrx};
-    use pgrx_sql_entity_graph::section::{MACHO_SECTION_NAME, MACHO_SEGMENT_NAME};
+    use pgrx_sql_entity_graph::section::{
+        MACHO_SECTION_NAME, MACHO_SEGMENT_NAME, schema_section_sentinel_entry,
+    };
 
     fn parse_object(data: &[u8]) -> object::Result<object::File<'_>> {
         let kind = object::FileKind::parse(data)?;
@@ -344,6 +346,14 @@ mod tests {
         let bytes = minimal_macho64(PAYLOAD);
 
         assert_eq!(schema_section_data(&bytes).unwrap(), Some(PAYLOAD));
+    }
+
+    #[test]
+    fn reads_sentinel_schema_section_from_minimal_macho64() {
+        let payload = schema_section_sentinel_entry();
+        let bytes = minimal_macho64(&payload);
+
+        assert_eq!(schema_section_data(&bytes).unwrap(), Some(payload.as_slice()));
     }
 
     #[test]

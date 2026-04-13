@@ -77,6 +77,7 @@ const LEGACY_ELF_SECTION_NAME: &str = ".pgrx_schema";
 const LEGACY_MACHO_SECTION_NAME: &str = "__pgrx_schema";
 const LEGACY_MACHO_SECTION_PATH: &str = "__DATA,__pgrx_schema";
 
+pub const ENTITY_SENTINEL: u8 = 0;
 pub const ENTITY_SCHEMA: u8 = 1;
 pub const ENTITY_CUSTOM_SQL: u8 = 2;
 pub const ENTITY_FUNCTION: u8 = 3;
@@ -164,6 +165,15 @@ pub const AGGREGATE_FINALIZE_READ_WRITE: u8 = 3;
 pub const AGGREGATE_PARALLEL_SAFE: u8 = 1;
 pub const AGGREGATE_PARALLEL_RESTRICTED: u8 = 2;
 pub const AGGREGATE_PARALLEL_UNSAFE: u8 = 3;
+
+pub const SECTION_SENTINEL_MAGIC: &str = "pgrx";
+pub const SECTION_SENTINEL_PAYLOAD_LEN: usize = u8_len() + str_len(SECTION_SENTINEL_MAGIC);
+pub const SECTION_SENTINEL_ENTRY_LEN: usize = u32_len() + SECTION_SENTINEL_PAYLOAD_LEN;
+pub const SECTION_SENTINEL_PAYLOAD: [u8; SECTION_SENTINEL_PAYLOAD_LEN] =
+    EntryWriter::<SECTION_SENTINEL_PAYLOAD_LEN>::new()
+        .u8(ENTITY_SENTINEL)
+        .str(SECTION_SENTINEL_MAGIC)
+        .finish();
 
 pub fn is_schema_section_name(name: &str) -> bool {
     name == ELF_SECTION_NAME
@@ -472,6 +482,13 @@ impl<const N: usize> Default for EntryWriter<N> {
     fn default() -> Self {
         Self::new()
     }
+}
+
+pub const fn schema_section_sentinel_entry() -> [u8; SECTION_SENTINEL_ENTRY_LEN] {
+    EntryWriter::<SECTION_SENTINEL_ENTRY_LEN>::new()
+        .u32(SECTION_SENTINEL_PAYLOAD_LEN as u32)
+        .bytes(&SECTION_SENTINEL_PAYLOAD)
+        .finish()
 }
 
 pub struct EntryReader<'a> {
@@ -1137,7 +1154,11 @@ pub fn decode_entity<'a>(payload: &'a [u8]) -> Result<SqlGraphEntity<'a>> {
 }
 
 pub fn decode_entities<'a>(section: &'a [u8]) -> Result<Vec<SqlGraphEntity<'a>>> {
-    entry_payloads(section)?.into_iter().map(decode_entity).collect()
+    entry_payloads(section)?
+        .into_iter()
+        .filter(|payload| **payload != SECTION_SENTINEL_PAYLOAD)
+        .map(decode_entity)
+        .collect()
 }
 
 #[cfg(test)]
@@ -1178,6 +1199,16 @@ mod tests {
         let payloads = entry_payloads(&section).unwrap();
         assert_eq!(payloads.len(), 1);
         assert_eq!(payloads[0], &[ENTITY_SCHEMA]);
+    }
+
+    #[test]
+    fn zero_filled_section_decodes_as_empty() {
+        assert!(decode_entities(&[0]).unwrap().is_empty());
+    }
+
+    #[test]
+    fn sentinel_entry_decodes_as_empty() {
+        assert!(decode_entities(&schema_section_sentinel_entry()).unwrap().is_empty());
     }
 
     #[test]

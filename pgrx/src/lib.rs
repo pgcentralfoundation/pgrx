@@ -222,6 +222,12 @@ macro_rules! pg_module_magic {
 #[macro_export]
 macro_rules! pg_magic_func {
     ($($key:ident $(= $value: expr)?),*) => {
+        ::pgrx::pgrx_sql_entity_graph::__pgrx_schema_entry!(
+            __PGRX_SCHEMA_SECTION_SENTINEL,
+            ::pgrx::pgrx_sql_entity_graph::section::SECTION_SENTINEL_ENTRY_LEN,
+            ::pgrx::pgrx_sql_entity_graph::section::schema_section_sentinel_entry()
+        );
+
         #[unsafe(no_mangle)]
         #[allow(non_snake_case, unexpected_cfgs)]
         #[doc(hidden)]
