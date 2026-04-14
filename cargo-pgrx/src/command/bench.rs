@@ -31,6 +31,7 @@ const BENCH_WRAPPER_SCHEMA: &str = "benches";
 const REPORT_HISTORY_LIMIT: i64 = 10;
 const REPORT_BAR_WIDTH: usize = 28;
 
+/// Run in-process benchmarks using `#[pg_bench]` functions
 #[derive(clap::Args, Debug, Clone)]
 #[clap(author)]
 pub(crate) struct Bench {
