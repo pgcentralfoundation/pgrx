@@ -39,6 +39,7 @@ mod json_tests;
 mod lifetime_tests;
 mod list_tests;
 mod log_tests;
+mod long_name_tests;
 mod memcxt_tests;
 mod name_tests;
 mod numeric_tests;

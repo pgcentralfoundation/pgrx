@@ -84,6 +84,11 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
 
             func.attrs = non_test_attributes;
 
+            // Save the original ident -- the Rust #[test] function keeps the full
+            // name (Rust has no identifier length limit) so test output is readable.
+            let original_ident = func.sig.ident.clone();
+            maybe_shorten_pg_test_ident(&mut func.sig.ident);
+
             stream.extend(proc_macro2::TokenStream::from(pg_extern(
                 attr,
                 Item::Fn(func.clone()).to_token_stream().into(),
@@ -95,7 +100,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
             };
 
             let sql_funcname = func.sig.ident.to_string();
-            let test_func_name = format_ident!("pg_{}", func.sig.ident);
+            let test_func_name = format_ident!("pg_{}", original_ident);
 
             let attributes = func.attrs;
             let mut att_stream = proc_macro2::TokenStream::new();
@@ -135,6 +140,34 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 
     stream.into()
+}
+
+/// If `ident` is too long for PostgreSQL's NAMEDATALEN (64 bytes, so 63 usable characters),
+/// replace it with a shortened form: `t{N}_{truncated_original}` where N is a monotonic
+/// counter that guarantees uniqueness within a compilation.
+fn maybe_shorten_pg_test_ident(ident: &mut syn::Ident) {
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    static COUNTER: AtomicUsize = AtomicUsize::new(0);
+
+    // Matches pgrx_sql_entity_graph::ident_is_acceptable_to_postgres
+    const POSTGRES_IDENTIFIER_MAX_LEN: usize = 64;
+
+    let original = ident.to_string();
+    if original.len() < POSTGRES_IDENTIFIER_MAX_LEN {
+        return;
+    }
+
+    let n = COUNTER.fetch_add(1, Ordering::Relaxed);
+    let prefix = format!("t{n}_");
+    let name_budget = (POSTGRES_IDENTIFIER_MAX_LEN - 1) - prefix.len();
+
+    // Truncate at a UTF-8 char boundary (idents are ASCII in practice, but be correct).
+    let mut byte_end = name_budget.min(original.len());
+    while !original.is_char_boundary(byte_end) {
+        byte_end -= 1;
+    }
+    let shortened = format!("{prefix}{}", &original[..byte_end]);
+    *ident = syn::Ident::new(&shortened, ident.span());
 }
 
 /// `#[pg_bench]` functions are in-process Criterion-driven benchmarks that run inside Postgres
@@ -1414,4 +1447,60 @@ pub fn pg_trigger(attrs: TokenStream, input: TokenStream) -> TokenStream {
     }
 
     wrapped(attrs, input).unwrap_or_else(|e| e.into_compile_error().into())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn short_name_unchanged() {
+        let mut ident = syn::Ident::new("test_foo", proc_macro2::Span::call_site());
+        let original = ident.to_string();
+        maybe_shorten_pg_test_ident(&mut ident);
+        assert_eq!(ident.to_string(), original);
+    }
+
+    #[test]
+    fn exactly_63_chars_unchanged() {
+        let name = "a".repeat(63);
+        let mut ident = syn::Ident::new(&name, proc_macro2::Span::call_site());
+        maybe_shorten_pg_test_ident(&mut ident);
+        assert_eq!(ident.to_string(), name);
+    }
+
+    #[test]
+    fn exactly_64_chars_is_shortened() {
+        let name = "a".repeat(64);
+        let mut ident = syn::Ident::new(&name, proc_macro2::Span::call_site());
+        maybe_shorten_pg_test_ident(&mut ident);
+        let result = ident.to_string();
+        assert!(result.len() <= 63, "shortened name is {len} chars: {result}", len = result.len());
+        assert!(result.starts_with('t'), "shortened name should start with 't': {result}");
+    }
+
+    #[test]
+    fn very_long_name_fits_in_63() {
+        let name = "test_that_something_really_important_works_correctly_when_given_a_very_long_input_name";
+        assert!(name.len() > 63);
+        let mut ident = syn::Ident::new(name, proc_macro2::Span::call_site());
+        maybe_shorten_pg_test_ident(&mut ident);
+        let result = ident.to_string();
+        assert_eq!(result.len(), 63, "shortened name should be exactly 63 chars: {result}");
+    }
+
+    #[test]
+    fn different_long_names_get_different_shortened_names() {
+        let name_a = format!("{}{}", "a".repeat(60), "xxxx");
+        let name_b = format!("{}{}", "a".repeat(60), "yyyy");
+        let mut id_a = syn::Ident::new(&name_a, proc_macro2::Span::call_site());
+        let mut id_b = syn::Ident::new(&name_b, proc_macro2::Span::call_site());
+        maybe_shorten_pg_test_ident(&mut id_a);
+        maybe_shorten_pg_test_ident(&mut id_b);
+        assert_ne!(
+            id_a.to_string(),
+            id_b.to_string(),
+            "names differing only in the tail should still get different shortened forms"
+        );
+    }
 }
