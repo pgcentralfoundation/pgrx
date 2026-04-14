@@ -267,6 +267,15 @@ fn update_files(args: &UpdateFilesArgs) {
             {
                 *package_version = value(args.update_version.clone());
             }
+
+            // Also bump [workspace.package].version if present (e.g. the root Cargo.toml)
+            if let Some(workspace_package_version) = doc
+                .get_mut("workspace")
+                .and_then(|w| w.get_mut("package"))
+                .and_then(|p| p.get_mut("version"))
+            {
+                *workspace_package_version = value(args.update_version.clone());
+            }
         }
 
         let update_package_version = |item: &mut Item| {

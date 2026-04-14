@@ -33,7 +33,7 @@ repository = "https://github.com/pgcentralfoundation/pgrx/"
 homepage = "https://github.com/pgcentralfoundation/pgrx/"
 # TODO: all crates should use this version rather than copy it
 #   See https://github.com/pgcentralfoundation/pgrx/pull/2100 comments
-version = "0.16.0"
+version = "0.17.0"
 
 [workspace.metadata.local-install]
 cargo-pgrx = { path = "cargo-pgrx" }
