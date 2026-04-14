@@ -84,6 +84,15 @@ impl Run {
         postgresql_conf: &HashMap<String, String>,
     ) -> eyre::Result<(PgConfig, String)> {
         let pgrx = Pgrx::from_config()?;
+
+        // If the first positional arg isn't a recognized PG version (pgXX)
+        // and no dbname was given, treat it as a dbname
+        if let Some(ref v) = self.pg_version {
+            if !pgrx.is_feature_flag(v) && self.dbname.is_none() {
+                self.dbname = self.pg_version.take();
+            }
+        }
+
         let (package_manifest, package_manifest_path) = get_package_manifest(
             &self.features,
             self.package.as_deref(),

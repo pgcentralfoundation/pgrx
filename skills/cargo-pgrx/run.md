@@ -27,6 +27,11 @@ cargo pgrx run [OPTIONS] [PG_VERSION] [DBNAME]
 | `PG_VERSION` | `pg13`..`pg18`. Defaults to first pgXX feature in Cargo.toml. Env: `PG_VERSION` |
 | `DBNAME` | Database to connect to (and create if needed). Defaults to the extension name |
 
+**Smart argument detection:** If the first positional argument is not a
+recognized Postgres version (`pgXX`), it is treated as `DBNAME` and the
+default Postgres version is used. This means `cargo pgrx run mydb` works
+as a shorthand for `cargo pgrx run pgXX mydb`.
+
 ### Flags
 
 | Flag | Short | Description |
@@ -48,6 +53,9 @@ cargo pgrx run [OPTIONS] [PG_VERSION] [DBNAME]
 ```bash
 # Build, install, and open psql against default Postgres
 cargo pgrx run
+
+# Connect to a specific database (using default PG version)
+cargo pgrx run mydb
 
 # Target a specific Postgres version and database
 cargo pgrx run pg18 mydb
