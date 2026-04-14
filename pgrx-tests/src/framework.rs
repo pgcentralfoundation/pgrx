@@ -43,17 +43,26 @@ static TEST_MUTEX: OnceLock<Mutex<SetupState>> = OnceLock::new();
 /// Set once during test framework initialization, read by every connection.
 static TEST_PORT: OnceLock<u16> = OnceLock::new();
 
-/// Bind an ephemeral port and return the listener that holds it open.
-///
-/// The caller must keep the returned `TcpListener` alive until Postgres
-/// is about to start, then drop it so Postgres can bind the same port.
-/// This prevents another process from claiming the port during the
-/// (potentially long) install + initdb window.
-fn reserve_test_port() -> eyre::Result<(std::net::TcpListener, u16)> {
-    let listener = std::net::TcpListener::bind("127.0.0.1:0")
-        .wrap_err("failed to bind to an ephemeral port for test Postgres")?;
-    let port = listener.local_addr()?.port();
-    Ok((listener, port))
+/// A reserved TCP port held open by a bound listener. Dropping the
+/// reservation releases the port so Postgres (or anything else) can
+/// bind it.
+struct PortReservation {
+    _listener: std::net::TcpListener,
+    port: u16,
+}
+
+impl PortReservation {
+    /// Bind an ephemeral port and hold it open until this value is dropped.
+    fn new() -> eyre::Result<Self> {
+        let listener = std::net::TcpListener::bind("127.0.0.1:0")
+            .wrap_err("failed to bind to an ephemeral port for test Postgres")?;
+        let port = listener.local_addr()?.port();
+        Ok(Self { _listener: listener, port })
+    }
+
+    fn port(&self) -> u16 {
+        self.port
+    }
 }
 
 // The goal of this closure is to allow "wrapping" of anything that might issue
@@ -244,15 +253,15 @@ fn initialize_test_framework(
     shutdown::register_shutdown_hook();
 
     // reserve a free port for this test binary's postgres instance.
-    // the listener holds the port open through install + initdb so
+    // the reservation holds the port open through install + initdb so
     // nothing else can claim it before postgres starts.
-    let (port_guard, port) = reserve_test_port()?;
-    TEST_PORT.set(port).expect("TEST_PORT already initialized");
+    let port_reservation = PortReservation::new()?;
+    TEST_PORT.set(port_reservation.port()).expect("TEST_PORT already initialized");
 
     install_extension()?;
     initdb(postgresql_conf)?;
 
-    let system_session_id = start_pg(state.loglines.clone(), port_guard)?;
+    let system_session_id = start_pg(state.loglines.clone(), port_reservation)?;
     let pg_config = get_pg_config()?;
     dropdb()?;
     createdb(&pg_config, get_pg_dbname(), true, false, get_runas())?;
@@ -557,7 +566,7 @@ fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) -
     Ok(())
 }
 
-fn start_pg(loglines: LogLines, port_guard: std::net::TcpListener) -> eyre::Result<String> {
+fn start_pg(loglines: LogLines, port_reservation: PortReservation) -> eyre::Result<String> {
     wait_for_pidfile()?;
 
     #[cfg(target_family = "unix")]
@@ -671,7 +680,7 @@ fn start_pg(loglines: LogLines, port_guard: std::net::TcpListener) -> eyre::Resu
     let command_str = format!("{command:?}");
 
     // release the port so postgres can bind it
-    drop(port_guard);
+    drop(port_reservation);
 
     #[cfg(target_family = "unix")]
     let (output, mut pipe) = {
