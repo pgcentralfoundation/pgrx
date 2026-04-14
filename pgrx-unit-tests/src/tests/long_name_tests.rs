@@ -16,7 +16,8 @@ mod tests {
     use pgrx::prelude::*;
 
     #[pg_test]
-    fn test_that_a_pg_test_function_with_a_very_long_name_exceeding_sixty_three_characters_still_works() {
+    fn test_that_a_pg_test_function_with_a_very_long_name_exceeding_sixty_three_characters_still_works()
+     {
         assert_eq!(1 + 1, 2);
     }
 }
