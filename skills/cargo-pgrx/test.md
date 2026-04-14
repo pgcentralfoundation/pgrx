@@ -30,6 +30,11 @@ cargo pgrx test [OPTIONS] [PG_VERSION] [TESTNAME]
 | `PG_VERSION` | `pg13`, `pg14`, `pg15`, `pg16`, `pg17`, `pg18`, or `all`. Defaults to the first pgXX feature in Cargo.toml. Env: `PG_VERSION` |
 | `TESTNAME` | If specified, only run tests whose names contain this string |
 
+**Smart argument detection:** If the first positional argument is not a
+recognized Postgres version (`pgXX` or `all`), it is treated as `TESTNAME`
+and the default Postgres version is used. This means `cargo pgrx test foo`
+works as a shorthand for `cargo pgrx test pgXX foo`.
+
 ### Flags
 
 | Flag | Short | Description |
@@ -54,7 +59,10 @@ cargo pgrx test
 # Run all tests against Postgres 18
 cargo pgrx test pg18
 
-# Run only tests whose names contain "spi"
+# Run only tests whose names contain "spi" (using default PG version)
+cargo pgrx test spi
+
+# Run only tests whose names contain "spi" against Postgres 18
 cargo pgrx test pg18 spi
 
 # Run tests in release mode
