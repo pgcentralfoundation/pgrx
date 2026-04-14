@@ -125,6 +125,7 @@ pub struct PgConfig {
     known_props: Option<BTreeMap<String, String>>,
     base_port: u16,
     base_testing_port: u16,
+    test_port_override: Option<u16>,
 }
 
 impl Display for PgConfig {
@@ -141,6 +142,7 @@ impl Default for PgConfig {
             known_props: None,
             base_port: BASE_POSTGRES_PORT_NO,
             base_testing_port: BASE_POSTGRES_TESTING_PORT_NO,
+            test_port_override: None,
         }
     }
 }
@@ -159,6 +161,7 @@ impl PgConfig {
             known_props: None,
             base_port,
             base_testing_port,
+            test_port_override: None,
         }
     }
 
@@ -169,6 +172,7 @@ impl PgConfig {
             known_props: None,
             base_port: BASE_POSTGRES_PORT_NO,
             base_testing_port: BASE_POSTGRES_TESTING_PORT_NO,
+            test_port_override: None,
         }
     }
 
@@ -202,6 +206,7 @@ impl PgConfig {
                 known_props: Some(known_props),
                 base_port: 0,
                 base_testing_port: 0,
+                test_port_override: None,
             })
         }
     }
@@ -338,7 +343,16 @@ impl PgConfig {
     }
 
     pub fn test_port(&self) -> eyre::Result<u16> {
-        Ok(self.base_testing_port + self.major_version()?)
+        match self.test_port_override {
+            Some(port) => Ok(port),
+            None => Ok(self.base_testing_port + self.major_version()?),
+        }
+    }
+
+    /// Return a clone of this config that always returns `port` from [`test_port()`].
+    pub fn with_test_port(mut self, port: u16) -> Self {
+        self.test_port_override = Some(port);
+        self
     }
 
     pub fn host(&self) -> &'static str {

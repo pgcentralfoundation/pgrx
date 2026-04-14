@@ -39,6 +39,23 @@ struct SetupState {
 
 static TEST_MUTEX: OnceLock<Mutex<SetupState>> = OnceLock::new();
 
+/// The dynamically chosen port for this test binary's Postgres instance.
+/// Set once during test framework initialization, read by every connection.
+static TEST_PORT: OnceLock<u16> = OnceLock::new();
+
+/// Bind an ephemeral port and return the listener that holds it open.
+///
+/// The caller must keep the returned `TcpListener` alive until Postgres
+/// is about to start, then drop it so Postgres can bind the same port.
+/// This prevents another process from claiming the port during the
+/// (potentially long) install + initdb window.
+fn reserve_test_port() -> eyre::Result<(std::net::TcpListener, u16)> {
+    let listener = std::net::TcpListener::bind("127.0.0.1:0")
+        .wrap_err("failed to bind to an ephemeral port for test Postgres")?;
+    let port = listener.local_addr()?.port();
+    Ok((listener, port))
+}
+
 // The goal of this closure is to allow "wrapping" of anything that might issue
 // an SQL simple_query or query using either a postgres::Client or
 // postgres::Transaction and capture the output. The use of this wrapper is
@@ -225,10 +242,17 @@ fn initialize_test_framework(
     postgresql_conf: Vec<&'static str>,
 ) -> eyre::Result<()> {
     shutdown::register_shutdown_hook();
+
+    // reserve a free port for this test binary's postgres instance.
+    // the listener holds the port open through install + initdb so
+    // nothing else can claim it before postgres starts.
+    let (port_guard, port) = reserve_test_port()?;
+    TEST_PORT.set(port).expect("TEST_PORT already initialized");
+
     install_extension()?;
     initdb(postgresql_conf)?;
 
-    let system_session_id = start_pg(state.loglines.clone())?;
+    let system_session_id = start_pg(state.loglines.clone(), port_guard)?;
     let pg_config = get_pg_config()?;
     dropdb()?;
     createdb(&pg_config, get_pg_dbname(), true, false, get_runas())?;
@@ -243,13 +267,18 @@ fn get_pg_config() -> eyre::Result<PgConfig> {
 
     let pg_version = pg_sys::get_pg_major_version_num();
 
-    let pg_config = pgrx
+    let mut pg_config = pgrx
         .get(&format!("pg{pg_version}"))
         .wrap_err_with(|| {
             format!("Error getting pg_config: {pg_version} is not a valid postgres version")
         })
         .unwrap()
         .clone();
+
+    // if a dynamic test port was chosen, override the default
+    if let Some(&port) = TEST_PORT.get() {
+        pg_config = pg_config.with_test_port(port);
+    }
 
     Ok(pg_config)
 }
@@ -528,7 +557,7 @@ fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) -
     Ok(())
 }
 
-fn start_pg(loglines: LogLines) -> eyre::Result<String> {
+fn start_pg(loglines: LogLines, port_guard: std::net::TcpListener) -> eyre::Result<String> {
     wait_for_pidfile()?;
 
     #[cfg(target_family = "unix")]
@@ -572,10 +601,17 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
         None
     };
 
+    let test_port = pg_config.test_port().expect("unable to determine test port");
+    println!(
+        "{} test Postgres on port {}",
+        "    Starting".bold().green(),
+        test_port.to_string().bold().cyan()
+    );
+
     let postmaster_args = vec![
         "-i".into(),
         "-p".into(),
-        pg_config.test_port().expect("unable to determine test port").to_string(),
+        test_port.to_string(),
         "-h".into(),
         pg_config.host().into(),
         "-c".into(),
@@ -634,6 +670,9 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
 
     let command_str = format!("{command:?}");
 
+    // release the port so postgres can bind it
+    drop(port_guard);
+
     #[cfg(target_family = "unix")]
     let (output, mut pipe) = {
         let output = command.output();
@@ -674,6 +713,8 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
     }
 
     add_shutdown_hook(|| {
+        let pgdata = get_pgdata_path().unwrap();
+
         let pg_config = get_pg_config().unwrap();
         let pg_ctl = pg_config.pg_ctl_path().unwrap();
 
@@ -689,7 +730,7 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
             .stderr(Stdio::piped())
             .arg("stop")
             .arg("-D")
-            .arg(get_pgdata_path().unwrap().to_str().unwrap())
+            .arg(pgdata.to_str().unwrap())
             .arg("-m")
             .arg("fast");
         let command_str = format!("{command:?}");
@@ -701,6 +742,9 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
                 String::from_utf8(output.stderr).unwrap()
             );
         }
+
+        // clean up the per-invocation PGDATA directory
+        let _ = std::fs::remove_dir_all(&pgdata);
     });
 
     let (sender, receiver) = std::sync::mpsc::channel();
@@ -869,8 +913,8 @@ fn get_pgdata_path() -> eyre::Result<PathBuf> {
             target_dir
         });
 
-    // append the postgres version number
-    pgdata_base.push(format!("{}", pg_sys::get_pg_major_version_num()));
+    // each invocation gets its own PGDATA so parallel test runs don't collide
+    pgdata_base.push(format!("{}-{}", pg_sys::get_pg_major_version_num(), std::process::id()));
     Ok(pgdata_base)
 }
 
