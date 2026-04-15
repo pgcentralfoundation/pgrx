@@ -10,7 +10,7 @@
 
 [package]
 name = "cargo-pgrx"
-version = "0.17.0"
+version = "0.18.0"
 authors.workspace = true
 license.workspace = true
 description = "Cargo subcommand for 'pgrx' to make Postgres extension development easy"
