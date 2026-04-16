@@ -30,7 +30,7 @@ pg_test = []
 
 [dependencies]
 pgrx = { path = "../../pgrx" }
-libflate = "2.1.0"
+libflate = "2.3.0"
 
 [dev-dependencies]
 pgrx-tests = { path = "../../pgrx-tests" }
