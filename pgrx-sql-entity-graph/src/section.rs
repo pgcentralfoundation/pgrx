@@ -1156,7 +1156,7 @@ pub fn decode_entity<'a>(payload: &'a [u8]) -> Result<SqlGraphEntity<'a>> {
 pub fn decode_entities<'a>(section: &'a [u8]) -> Result<Vec<SqlGraphEntity<'a>>> {
     entry_payloads(section)?
         .into_iter()
-        .filter(|payload| **payload != SECTION_SENTINEL_PAYLOAD)
+        .filter(|payload| *payload != SECTION_SENTINEL_PAYLOAD.as_slice())
         .map(decode_entity)
         .collect()
 }
@@ -1209,6 +1209,29 @@ mod tests {
     #[test]
     fn sentinel_entry_decodes_as_empty() {
         assert!(decode_entities(&schema_section_sentinel_entry()).unwrap().is_empty());
+    }
+
+    #[test]
+    fn sentinel_entry_is_ignored_mid_section() {
+        const PAYLOAD_LEN: usize =
+            u8_len() + str_len("module") + str_len("tests") + str_len("file.rs") + u32_len();
+        const TOTAL_LEN: usize = u32_len() + PAYLOAD_LEN;
+        const ENTRY: [u8; TOTAL_LEN] = EntryWriter::<TOTAL_LEN>::new()
+            .u32(PAYLOAD_LEN as u32)
+            .u8(ENTITY_SCHEMA)
+            .str("module")
+            .str("tests")
+            .str("file.rs")
+            .u32(42)
+            .finish();
+
+        let mut section = Vec::new();
+        section.extend_from_slice(&ENTRY);
+        section.extend_from_slice(&schema_section_sentinel_entry());
+        section.extend_from_slice(&ENTRY);
+        let entities = decode_entities(&section).unwrap();
+        assert_eq!(entities.len(), 2);
+        assert!(entities.iter().all(|entity| matches!(entity, SqlGraphEntity::Schema(_))));
     }
 
     #[test]
