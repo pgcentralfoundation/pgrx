@@ -13,7 +13,7 @@ use crate::command::run::Run;
 use crate::command::start::collect_postgresql_conf_settings;
 use crate::manifest::get_package_manifest;
 use owo_colors::OwoColorize;
-use pgrx_pg_config::{PgConfig, createdb, dropdb};
+use pgrx_pg_config::{PgConfig, createdb, dropdb, is_supported_major_version};
 use std::collections::HashSet;
 use std::env::temp_dir;
 use std::fs::{DirEntry, File};
@@ -486,38 +486,39 @@ impl Regress {
     /// - `cargo pgrx regress pg16` → pg_version = Some("pg16")
     /// - `cargo pgrx regress pg16 my_test` → pg_version = Some("pg16"), test_filter = Some("my_test")
     fn resolve_args(&mut self) {
-        fn looks_like_pg_version(s: &str) -> bool {
-            s.starts_with("pg") && s[2..].chars().all(|c| c.is_ascii_digit()) && s.len() > 2
+        match Self::parse_args(&self.args) {
+            Ok((pg_version, test_filter)) => {
+                self.pg_version = pg_version;
+                self.test_filter = test_filter;
+            }
+            Err(message) => {
+                eprintln!("{} {message}", "       ERROR".bold().red());
+                std::process::exit(1);
+            }
+        }
+    }
+
+    fn parse_args(args: &[String]) -> Result<(Option<String>, Option<String>), String> {
+        fn is_supported_pg_version_label(label: &str) -> bool {
+            label
+                .strip_prefix("pg")
+                .and_then(|major| major.parse::<u16>().ok())
+                .is_some_and(is_supported_major_version)
         }
 
-        match self.args.len() {
-            0 => {}
-            1 => {
-                if looks_like_pg_version(&self.args[0]) {
-                    self.pg_version = Some(self.args[0].clone());
-                } else {
-                    self.test_filter = Some(self.args[0].clone());
-                }
+        match args {
+            [] => Ok((None, None)),
+            [only] if is_supported_pg_version_label(only) => Ok((Some(only.clone()), None)),
+            [only] => Ok((None, Some(only.clone()))),
+            [first, second] if is_supported_pg_version_label(first) => {
+                Ok((Some(first.clone()), Some(second.clone())))
             }
-            2 => {
-                if looks_like_pg_version(&self.args[0]) {
-                    self.pg_version = Some(self.args[0].clone());
-                    self.test_filter = Some(self.args[1].clone());
-                } else {
-                    eprintln!(
-                        "{} first positional argument must be a PostgreSQL version (e.g., pg16), got `{}`",
-                        "       ERROR".bold().red(),
-                        self.args[0],
-                    );
-                    std::process::exit(1);
-                }
-            }
+            [first, _second] => Err(format!(
+                "first positional argument must be a PostgreSQL version (e.g., pg16), got `{first}`"
+            )),
             _ => {
-                eprintln!(
-                    "{} too many positional arguments. Usage: cargo pgrx regress [pgXX] [testname]",
-                    "       ERROR".bold().red(),
-                );
-                std::process::exit(1);
+                Err("too many positional arguments. Usage: cargo pgrx regress [pgXX] [testname]"
+                    .into())
             }
         }
     }
@@ -1001,4 +1002,51 @@ fn is_git_repo(git: &Path) -> bool {
         .status()
         .map(|status| status.success())
         .unwrap_or_default()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Regress;
+
+    fn strings(args: &[&str]) -> Vec<String> {
+        args.iter().map(|arg| (*arg).to_string()).collect()
+    }
+
+    #[test]
+    fn parse_args_treats_single_non_version_as_test_filter() {
+        let (pg_version, test_filter) = Regress::parse_args(&strings(&["cursor_coverage"]))
+            .expect("single test name should parse");
+
+        assert_eq!(pg_version, None);
+        assert_eq!(test_filter.as_deref(), Some("cursor_coverage"));
+    }
+
+    #[test]
+    fn parse_args_accepts_pg_version_then_test_filter() {
+        let (pg_version, test_filter) = Regress::parse_args(&strings(&["pg16", "cursor_coverage"]))
+            .expect("pg version plus test filter should parse");
+
+        assert_eq!(pg_version.as_deref(), Some("pg16"));
+        assert_eq!(test_filter.as_deref(), Some("cursor_coverage"));
+    }
+
+    #[test]
+    fn parse_args_rejects_test_filter_then_pg_version() {
+        let err = Regress::parse_args(&strings(&["cursor_coverage", "pg16"]))
+            .expect_err("reversed positional order should still fail");
+
+        assert_eq!(
+            err,
+            "first positional argument must be a PostgreSQL version (e.g., pg16), got `cursor_coverage`"
+        );
+    }
+
+    #[test]
+    fn parse_args_does_not_treat_unsupported_pg_label_as_version() {
+        let (pg_version, test_filter) = Regress::parse_args(&strings(&["pg99"]))
+            .expect("unsupported pg label should fall back to test filter");
+
+        assert_eq!(pg_version, None);
+        assert_eq!(test_filter.as_deref(), Some("pg99"));
+    }
 }
