@@ -94,10 +94,17 @@ fn install_test_extension_handles_mid_stream_schema_sentinel() {
         .arg("--pg-config")
         .arg(&pg_config_path)
         .arg("--features")
-        .arg(format!("{pg_feature} pg_test{}", if cfg!(all(
-            any(target_os = "linux", target_os = "macos"),
-            any(target_arch = "x86_64", target_arch = "aarch64")
-        )) { "" } else { " cshim" }))
+        .arg(format!(
+            "{pg_feature} pg_test{}",
+            if cfg!(all(
+                any(target_os = "linux", target_os = "macos"),
+                any(target_arch = "x86_64", target_arch = "aarch64")
+            )) {
+                ""
+            } else {
+                " cshim"
+            }
+        ))
         .arg("--no-default-features")
         .arg("--manifest-path")
         .arg(unit_tests_manifest_path())
