@@ -1156,7 +1156,7 @@ pub fn decode_entity<'a>(payload: &'a [u8]) -> Result<SqlGraphEntity<'a>> {
 pub fn decode_entities<'a>(section: &'a [u8]) -> Result<Vec<SqlGraphEntity<'a>>> {
     entry_payloads(section)?
         .into_iter()
-        .filter(|payload| payload.as_ref() != SECTION_SENTINEL_PAYLOAD.as_slice())
+        .filter(|payload| *payload != SECTION_SENTINEL_PAYLOAD.as_slice())
         .map(decode_entity)
         .collect()
 }
