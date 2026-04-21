@@ -330,8 +330,20 @@ jobs:
         run: |
           sudo apt-get update -y -qq --fix-missing
 
-          echo "----- Remove old postgres -----"
-          sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
+          echo "----- Remove old postgres / clang / llvm (best effort) -----"
+          # Each regex can legitimately match zero packages on the arm64
+          # runner image (e.g. no pre-installed `mono-llvm*`), so we treat
+          # every removal as best-effort rather than failing the whole job.
+          for pattern in \
+            '^postgres.*' \
+            '^libpq.*' \
+            '^clang.*' \
+            '^llvm.*' \
+            '^libclang.*' \
+            '^libllvm.*' \
+            '^mono-llvm.*'; do
+            sudo apt remove -y "$pattern" || true
+          done
 
           echo "----- Install system dependencies -----"
           sudo apt-get install -y \
