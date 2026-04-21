@@ -310,7 +310,16 @@ fn first_build(
         cargo.subcommand("build").flag("--lib")
     };
 
-    let cargo = cargo.profile(profile.clone()).target(target.map(|t| t.to_owned()));
+    let mut cargo = cargo.profile(profile.clone()).target(target.map(|t| t.to_owned()));
+
+    // `cargo build --lib` only ever links the cdylib, so it's safe to apply
+    // the `.pgrxsc` retention workaround. `cargo test --no-run` also links
+    // the test binary, which rustc needs `--gc-sections` to prune undefined
+    // Postgres `extern "C"` references from; applying the workaround there
+    // surfaces those as linker errors. See `pgrx_cdylib_config_args`.
+    if !is_test {
+        cargo = cargo.with_pgrx_cdylib_workaround();
+    }
 
     let mut command = cargo.into_command();
 

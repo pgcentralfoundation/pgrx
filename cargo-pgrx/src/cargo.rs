@@ -24,6 +24,10 @@ pub struct Cargo {
     profile: CargoProfile,
     // use a BTreeMap for deterministic order of iteration
     more_args: BTreeMap<String, Vec<String>>,
+    // Top-level cargo args placed before the subcommand (e.g. `--config ...`).
+    // Kept separate so callers can opt into cdylib-only tweaks without touching
+    // subcommand-specific arg ordering.
+    top_level_args: Vec<String>,
 }
 
 impl Cargo {
@@ -73,11 +77,26 @@ impl Cargo {
         self
     }
 
+    /// Apply the `.pgrxsc` retention workaround for cdylib-producing
+    /// invocations. See `pgrx_cdylib_config_args` for why this is only safe
+    /// to use when the subcommand only links a cdylib (never for `test`,
+    /// which also links a test binary that needs normal `--gc-sections` to
+    /// prune undefined Postgres `extern "C"` references).
+    pub fn with_pgrx_cdylib_workaround(mut self) -> Self {
+        self.top_level_args.extend(pgrx_cdylib_config_args());
+        self
+    }
+
     #[track_caller]
     pub fn into_command(self) -> process::Command {
         let mut cmd = cargo();
 
-        // subcommand *must* go first
+        // top-level cargo args (e.g. `--config ...`) go before the subcommand.
+        for arg in &self.top_level_args {
+            cmd.arg(arg);
+        }
+
+        // subcommand *must* go first among subcommand-relative args
         if self.subcmd != "" {
             cmd.arg(&self.subcmd);
         } else {
@@ -94,6 +113,7 @@ impl Cargo {
             package,
             subcmd: _,
             more_args,
+            top_level_args: _,
         } = self;
 
         // set most-interesting flags first, like profile, target, and manifest-path
@@ -175,15 +195,11 @@ impl Stdio {
 
 pub(crate) fn cargo() -> std::process::Command {
     let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
-    let mut cmd = std::process::Command::new(cargo);
-    for arg in pgrx_injected_config_args() {
-        cmd.arg(arg);
-    }
-    cmd
+    std::process::Command::new(cargo)
 }
 
-/// Cargo top-level `--config` arguments that cargo-pgrx injects into every
-/// cargo invocation it spawns.
+/// Cargo top-level `--config` arguments that force the linker to retain the
+/// `.pgrxsc` section when building the extension cdylib.
 ///
 /// The schema metadata that drives `cargo pgrx schema` lives in a `.pgrxsc`
 /// ELF section composed of `#[used]` statics scattered across every CGU. Rust
@@ -199,6 +215,17 @@ pub(crate) fn cargo() -> std::process::Command {
 /// whole retention contract. The cost is a few KB of unreferenced code surviving
 /// in the final cdylib, which is a trade we'll happily make.
 ///
+/// Critically, these args are only injected for cdylib-producing invocations
+/// (`cargo build --lib` inside cargo-pgrx install/package/schema paths). They
+/// MUST NOT be injected for `cargo test` invocations: rustc uses `--gc-sections`
+/// on test binaries to prune the many unreachable `extern "C"` references to
+/// Postgres symbols that pgrx-pg-sys declares. Keeping all those call sites
+/// retained makes the linker refuse to produce the test executable with a
+/// wall of "undefined symbol: CurrentMemoryContext" errors. The test-harness
+/// flow (`cargo pgrx test`) still picks up the workaround because the harness
+/// re-invokes `cargo-pgrx install` internally, and that path goes through
+/// `build_extension` which does apply the workaround.
+///
 /// This is scoped via a `cfg(...)` target predicate so it only fires when
 /// building for a GNU-ld-ish target; macOS (Mach-O, `ld64`, uses `-dead_strip`
 /// and doesn't understand this flag) and Windows (MSVC `link.exe`, doesn't
@@ -208,7 +235,7 @@ pub(crate) fn cargo() -> std::process::Command {
 /// cargo's rustflags precedence rules. Setting
 /// `CARGO_PGRX_DISABLE_GC_SECTIONS_WORKAROUND=1` in the environment also
 /// suppresses the injection entirely.
-fn pgrx_injected_config_args() -> Vec<String> {
+pub(crate) fn pgrx_cdylib_config_args() -> Vec<String> {
     if std::env::var_os("CARGO_PGRX_DISABLE_GC_SECTIONS_WORKAROUND").is_some() {
         return Vec::new();
     }
@@ -300,21 +327,21 @@ impl CargoProfile {
 
 #[cfg(test)]
 mod tests {
-    use super::pgrx_injected_config_args;
+    use super::pgrx_cdylib_config_args;
 
     #[test]
-    fn injected_config_args_carry_no_gc_sections_workaround() {
-        let args = pgrx_injected_config_args();
+    fn cdylib_config_args_carry_no_gc_sections_workaround() {
+        let args = pgrx_cdylib_config_args();
         assert_eq!(args.len(), 2, "expected `--config <value>` pair, got {args:?}");
         assert_eq!(args[0], "--config");
         assert!(
             args[1].contains("--no-gc-sections"),
-            "injected --config should disable section GC on non-macOS Unix: {}",
+            "cdylib --config should disable section GC on non-macOS Unix: {}",
             args[1]
         );
         assert!(
             args[1].contains("not(target_os = \"macos\")"),
-            "injected --config must exclude macOS: {}",
+            "cdylib --config must exclude macOS: {}",
             args[1]
         );
     }

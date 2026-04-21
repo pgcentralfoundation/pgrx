@@ -305,6 +305,13 @@ pub(crate) fn build_extension(
     let flags = std::env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
 
     let mut command = crate::cargo::cargo();
+    // These `--config` args go before the subcommand. They retain `.pgrxsc`
+    // on non-macOS Unix cdylib links so schema generation can find it; safe
+    // here because this path only ever builds the cdylib (`--lib`). See
+    // `pgrx_cdylib_config_args` for the full rationale.
+    for arg in crate::cargo::pgrx_cdylib_config_args() {
+        command.arg(arg);
+    }
     command.arg("build");
     command.arg("--lib");
 
