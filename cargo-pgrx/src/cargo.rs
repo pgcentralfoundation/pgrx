@@ -175,7 +175,48 @@ impl Stdio {
 
 pub(crate) fn cargo() -> std::process::Command {
     let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
-    std::process::Command::new(cargo)
+    let mut cmd = std::process::Command::new(cargo);
+    for arg in pgrx_injected_config_args() {
+        cmd.arg(arg);
+    }
+    cmd
+}
+
+/// Cargo top-level `--config` arguments that cargo-pgrx injects into every
+/// cargo invocation it spawns.
+///
+/// The schema metadata that drives `cargo pgrx schema` lives in a `.pgrxsc`
+/// ELF section composed of `#[used]` statics scattered across every CGU. Rust
+/// lowers `#[used]` to `@llvm.used`, which on ELF is supposed to mark the
+/// containing section with `SHF_GNU_RETAIN` so the linker's default
+/// `--gc-sections` pass leaves it alone. That contract is fragile in the wild:
+/// it depends on LLVM emitting the flag, binutils honoring it, and LTO not
+/// masking the difference. When it breaks, every `.pgrxsc` contribution is
+/// dropped and `cargo pgrx schema` fails with "no embedded pgrx schema section
+/// found" — which is exactly what we've seen on non-LTO aarch64 Linux builds.
+///
+/// Passing `-Wl,--no-gc-sections` as a link-arg on non-macOS Unix sidesteps the
+/// whole retention contract. The cost is a few KB of unreferenced code surviving
+/// in the final cdylib, which is a trade we'll happily make.
+///
+/// This is scoped via a `cfg(...)` target predicate so it only fires when
+/// building for a GNU-ld-ish target; macOS (Mach-O, `ld64`, uses `-dead_strip`
+/// and doesn't understand this flag) and Windows (MSVC `link.exe`, doesn't
+/// speak `-Wl,...`) are excluded.
+///
+/// Users who set `RUSTFLAGS` or `CARGO_ENCODED_RUSTFLAGS` override this per
+/// cargo's rustflags precedence rules. Setting
+/// `CARGO_PGRX_DISABLE_GC_SECTIONS_WORKAROUND=1` in the environment also
+/// suppresses the injection entirely.
+fn pgrx_injected_config_args() -> Vec<String> {
+    if std::env::var_os("CARGO_PGRX_DISABLE_GC_SECTIONS_WORKAROUND").is_some() {
+        return Vec::new();
+    }
+    vec![
+        "--config".to_string(),
+        r#"target.'cfg(all(target_family = "unix", not(target_os = "macos")))'.rustflags = ["-C", "link-arg=-Wl,--no-gc-sections"]"#
+            .to_string(),
+    ]
 }
 
 /// Set some environment variables for use downstream (in `pgrx-test` for
@@ -254,5 +295,27 @@ impl CargoProfile {
             Self::Release => "release",
             Self::Profile(p) => p,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::pgrx_injected_config_args;
+
+    #[test]
+    fn injected_config_args_carry_no_gc_sections_workaround() {
+        let args = pgrx_injected_config_args();
+        assert_eq!(args.len(), 2, "expected `--config <value>` pair, got {args:?}");
+        assert_eq!(args[0], "--config");
+        assert!(
+            args[1].contains("--no-gc-sections"),
+            "injected --config should disable section GC on non-macOS Unix: {}",
+            args[1]
+        );
+        assert!(
+            args[1].contains("not(target_os = \"macos\")"),
+            "injected --config must exclude macOS: {}",
+            args[1]
+        );
     }
 }
