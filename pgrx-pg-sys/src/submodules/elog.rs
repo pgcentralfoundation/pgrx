@@ -128,10 +128,10 @@ pub trait IntoMessage {
     fn into_message(self) -> std::borrow::Cow<'static, str>;
 }
 
-impl IntoMessage for &str {
+impl IntoMessage for &'static str {
     #[inline]
     fn into_message(self) -> std::borrow::Cow<'static, str> {
-        std::borrow::Cow::Owned(self.to_owned())
+        std::borrow::Cow::Borrowed(self)
     }
 }
 
