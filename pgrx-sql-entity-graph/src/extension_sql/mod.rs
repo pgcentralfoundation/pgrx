@@ -371,9 +371,7 @@ impl ToRustCodeTokens for SqlDeclared {}
 impl SqlDeclared {
     fn section_identifier_tokens(&self) -> TokenStream2 {
         let identifier = match self {
-            Self::Type(value) | Self::Enum(value) | Self::Function(value) => {
-                value
-            }
+            Self::Type(value) | Self::Enum(value) | Self::Function(value) => value,
         };
         let identifier_split = identifier.split("::").collect::<Vec<_>>();
         if identifier_split.len() == 1 {

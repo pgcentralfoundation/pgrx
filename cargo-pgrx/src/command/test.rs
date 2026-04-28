@@ -97,9 +97,12 @@ impl CommandExecute for Test {
         // If the first positional arg isn't a recognized PG version (pgXX or "all")
         // and no testname was given, treat it as a testname filter
         if let Some(ref v) = self.pg_version
-            && v != "all" && !pgrx.is_feature_flag(v) && self.testname.is_none() {
-                self.testname = self.pg_version.take();
-            }
+            && v != "all"
+            && !pgrx.is_feature_flag(v)
+            && self.testname.is_none()
+        {
+            self.testname = self.pg_version.take();
+        }
 
         if self.pg_version.as_deref() == Some("all") {
             // run the tests for **all** the Postgres versions we know about

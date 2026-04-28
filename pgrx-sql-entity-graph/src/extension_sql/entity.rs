@@ -224,9 +224,7 @@ impl SqlDeclaredEntity {
 
     pub fn type_ident(&self) -> Option<&str> {
         match self {
-            Self::Type(data) | Self::Enum(data) => {
-                Some(data.type_ident.as_str())
-            }
+            Self::Type(data) | Self::Enum(data) => Some(data.type_ident.as_str()),
             Self::Function(_) => None,
         }
     }
@@ -244,9 +242,7 @@ impl SqlDeclaredEntity {
                 }
                 false
             }
-            (SqlDeclared::Function(ident_name), &Self::Function(data)) => {
-                ident_name == &data.name
-            }
+            (SqlDeclared::Function(ident_name), &Self::Function(data)) => ident_name == &data.name,
             _ => false,
         }
     }

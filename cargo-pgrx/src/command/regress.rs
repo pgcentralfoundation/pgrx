@@ -436,8 +436,7 @@ impl CommandExecute for Regress {
 
                 // When the user explicitly filters, error if any matched test
                 // has no expected output (they should use --add first)
-                let output_names =
-                    output_files.iter().map(make_test_name).collect::<HashSet<_>>();
+                let output_names = output_files.iter().map(make_test_name).collect::<HashSet<_>>();
                 for entry in &test_files {
                     let name = make_test_name(entry);
                     if !output_names.contains(&name) {
@@ -640,9 +639,10 @@ impl Regress {
         for entry in &test_files {
             let name = make_test_name(entry);
             if let Some(ref filter) = self.test_filter
-                && !name.contains(filter) {
-                    continue;
-                }
+                && !name.contains(filter)
+            {
+                continue;
+            }
             if output_names.contains(&name) {
                 ready.push(name);
             } else {
@@ -837,10 +837,11 @@ fn print_regression_diffs(manifest_path: &Path, verbose: u8, run: u32, repeat: u
     }
 
     if verbose >= 1
-        && let Ok(content) = std::fs::read_to_string(&diffs_path) {
-            eprintln!();
-            eprintln!("{content}");
-        }
+        && let Ok(content) = std::fs::read_to_string(&diffs_path)
+    {
+        eprintln!();
+        eprintln!("{content}");
+    }
 
     // When repeating, rename to regression.<run>.diffs so each run's output is preserved
     let final_path = if repeat > 1 {

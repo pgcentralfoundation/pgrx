@@ -201,9 +201,7 @@ impl ToTokens for ExternArgs {
             Self::Support(item) => tokens.append_all(quote! { Support(#item) }),
             Self::Name(_s) => tokens.append_all(quote! { Name(String::from("#_s")) }),
             Self::Cost(_s) => tokens.append_all(quote! { Cost(String::from("#_s")) }),
-            Self::Requires(items) => {
-                tokens.append_all(quote! { Requires(vec![#(#items),*]) })
-            }
+            Self::Requires(items) => tokens.append_all(quote! { Requires(vec![#(#items),*]) }),
         }
     }
 }

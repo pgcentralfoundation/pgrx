@@ -88,9 +88,7 @@ impl PgMinorVersion {
     fn version(&self) -> Option<u16> {
         match self {
             Self::Latest => None,
-            Self::Release(v) | Self::Beta(v) | Self::Rc(v) => {
-                Some(*v)
-            }
+            Self::Release(v) | Self::Beta(v) | Self::Rc(v) => Some(*v),
         }
     }
 }
@@ -579,12 +577,8 @@ pub enum PgrxHomeError {
 impl From<PgrxHomeError> for std::io::Error {
     fn from(value: PgrxHomeError) -> Self {
         match value {
-            PgrxHomeError::NoHomeDirectory => {
-                Self::new(ErrorKind::NotFound, value.to_string())
-            }
-            PgrxHomeError::MissingPgrxHome(_) => {
-                Self::new(ErrorKind::NotFound, value.to_string())
-            }
+            PgrxHomeError::NoHomeDirectory => Self::new(ErrorKind::NotFound, value.to_string()),
+            PgrxHomeError::MissingPgrxHome(_) => Self::new(ErrorKind::NotFound, value.to_string()),
             PgrxHomeError::IoError(e) => e,
         }
     }
