@@ -28,8 +28,8 @@ pub enum PositioningRef {
 impl Display for PositioningRef {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            PositioningRef::FullPath(i) => f.write_str(i),
-            PositioningRef::Name(i) => f.write_str(i),
+            Self::FullPath(i) => f.write_str(i),
+            Self::Name(i) => f.write_str(i),
         }
     }
 }
@@ -51,7 +51,7 @@ impl Parse for PositioningRef {
 impl PositioningRef {
     pub fn section_len_tokens(&self) -> proc_macro2::TokenStream {
         match self {
-            PositioningRef::FullPath(item) | PositioningRef::Name(item) => quote! {
+            Self::FullPath(item) | Self::Name(item) => quote! {
                 ::pgrx::pgrx_sql_entity_graph::section::u8_len()
                     + ::pgrx::pgrx_sql_entity_graph::section::str_len(#item)
             },
@@ -63,12 +63,12 @@ impl PositioningRef {
         writer: proc_macro2::TokenStream,
     ) -> proc_macro2::TokenStream {
         match self {
-            PositioningRef::FullPath(item) => quote! {
+            Self::FullPath(item) => quote! {
                 #writer
                     .u8(::pgrx::pgrx_sql_entity_graph::section::POSITIONING_REF_FULL_PATH)
                     .str(#item)
             },
-            PositioningRef::Name(item) => quote! {
+            Self::Name(item) => quote! {
                 #writer
                     .u8(::pgrx::pgrx_sql_entity_graph::section::POSITIONING_REF_NAME)
                     .str(#item)
@@ -80,10 +80,10 @@ impl PositioningRef {
 impl ToTokens for PositioningRef {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let toks = match self {
-            PositioningRef::FullPath(item) => quote! {
+            Self::FullPath(item) => quote! {
                 ::pgrx::pgrx_sql_entity_graph::PositioningRef::FullPath(String::from(#item))
             },
-            PositioningRef::Name(item) => quote! {
+            Self::Name(item) => quote! {
                 ::pgrx::pgrx_sql_entity_graph::PositioningRef::Name(String::from(#item))
             },
         };

@@ -42,12 +42,12 @@ pub enum Returning {
 }
 
 impl Returning {
-    fn parse_type_macro(type_macro: &mut syn::TypeMacro) -> Result<Returning, syn::Error> {
+    fn parse_type_macro(type_macro: &mut syn::TypeMacro) -> Result<Self, syn::Error> {
         let mac = &type_macro.mac;
         let opt_archetype = mac.path.segments.last().map(|archetype| archetype.ident.to_string());
         match opt_archetype.as_deref() {
             Some("composite_type") => {
-                Ok(Returning::Type(UsedType::new(syn::Type::Macro(type_macro.clone()))?))
+                Ok(Self::Type(UsedType::new(syn::Type::Macro(type_macro.clone()))?))
             }
             _ => Err(syn::Error::new(
                 type_macro.span(),
@@ -56,7 +56,7 @@ impl Returning {
         }
     }
 
-    fn match_type(ty: &Type) -> Result<Returning, Error> {
+    fn match_type(ty: &Type) -> Result<Self, Error> {
         let mut ty = Box::new(ty.clone());
 
         match &mut *ty {
@@ -79,7 +79,7 @@ impl Returning {
                                     Some(syn::GenericArgument::Type(_)) => {
                                         let used_ty =
                                             UsedType::new(syn::Type::Path(typepath.clone()))?;
-                                        return Ok(Returning::Type(used_ty));
+                                        return Ok(Self::Type(used_ty));
                                     }
                                     other => {
                                         return Err(syn::Error::new(
@@ -167,7 +167,7 @@ impl Returning {
                                 ));
                             }
                         };
-                        Ok(Returning::SetOf { ty: used_ty })
+                        Ok(Self::SetOf { ty: used_ty })
                     } else if is_table_iter {
                         let last_path_segment = segments.last_mut().unwrap();
                         let mut iterated_items = vec![];
@@ -250,19 +250,19 @@ impl Returning {
                                 ));
                             }
                         };
-                        Ok(Returning::Iterated { tys: iterated_items })
+                        Ok(Self::Iterated { tys: iterated_items })
                     } else {
                         let used_ty = UsedType::new(syn::Type::Path(typepath.clone()))?;
-                        Ok(Returning::Type(used_ty))
+                        Ok(Self::Type(used_ty))
                     }
                 } else {
                     let used_ty = UsedType::new(syn::Type::Path(typepath.clone()))?;
-                    Ok(Returning::Type(used_ty))
+                    Ok(Self::Type(used_ty))
                 }
             }
             syn::Type::Reference(ty_ref) => {
                 let used_ty = UsedType::new(syn::Type::Reference(ty_ref.clone()))?;
-                Ok(Returning::Type(used_ty))
+                Ok(Self::Type(used_ty))
             }
             syn::Type::Macro(type_macro) => Self::parse_type_macro(type_macro),
             syn::Type::Paren(type_paren) => match &mut *type_paren.elem {
@@ -286,7 +286,7 @@ impl TryFrom<&syn::ReturnType> for Returning {
 
     fn try_from(value: &syn::ReturnType) -> Result<Self, Self::Error> {
         match &value {
-            syn::ReturnType::Default => Ok(Returning::None),
+            syn::ReturnType::Default => Ok(Self::None),
             syn::ReturnType::Type(_, ty) => Self::match_type(ty),
         }
     }
@@ -295,10 +295,10 @@ impl TryFrom<&syn::ReturnType> for Returning {
 impl ToTokens for Returning {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let quoted = match self {
-            Returning::None => quote! {
+            Self::None => quote! {
                 ::pgrx::pgrx_sql_entity_graph::PgExternReturnEntity::None
             },
-            Returning::Type(used_ty) => {
+            Self::Type(used_ty) => {
                 let used_ty_entity_tokens = used_ty.entity_tokens();
                 quote! {
                     ::pgrx::pgrx_sql_entity_graph::PgExternReturnEntity::Type {
@@ -306,7 +306,7 @@ impl ToTokens for Returning {
                     }
                 }
             }
-            Returning::SetOf { ty: used_ty } => {
+            Self::SetOf { ty: used_ty } => {
                 let used_ty_entity_tokens = used_ty.entity_tokens();
                 quote! {
                     ::pgrx::pgrx_sql_entity_graph::PgExternReturnEntity::SetOf {
@@ -314,7 +314,7 @@ impl ToTokens for Returning {
                                                                   }
                 }
             }
-            Returning::Iterated { tys: items } => {
+            Self::Iterated { tys: items } => {
                 let quoted_items = items
                     .iter()
                     .map(|ReturningIteratedItem { used_ty, name }| {
@@ -344,20 +344,20 @@ impl ToTokens for Returning {
 impl Returning {
     pub fn section_len_tokens(&self) -> TokenStream2 {
         match self {
-            Returning::None => quote! { ::pgrx::pgrx_sql_entity_graph::section::u8_len() },
-            Returning::Type(used_ty) => {
+            Self::None => quote! { ::pgrx::pgrx_sql_entity_graph::section::u8_len() },
+            Self::Type(used_ty) => {
                 let used_ty_len = used_ty.section_len_tokens();
                 quote! {
                     ::pgrx::pgrx_sql_entity_graph::section::u8_len() + (#used_ty_len)
                 }
             }
-            Returning::SetOf { ty } => {
+            Self::SetOf { ty } => {
                 let used_ty_len = ty.section_len_tokens();
                 quote! {
                     ::pgrx::pgrx_sql_entity_graph::section::u8_len() + (#used_ty_len)
                 }
             }
-            Returning::Iterated { tys: items } => {
+            Self::Iterated { tys: items } => {
                 let item_lens = items.iter().map(|ReturningIteratedItem { used_ty, name }| {
                     let used_ty_len = used_ty.section_len_tokens();
                     let name_len = name
@@ -385,16 +385,16 @@ impl Returning {
 
     pub fn section_writer_tokens(&self, writer: TokenStream2) -> TokenStream2 {
         match self {
-            Returning::None => quote! {
+            Self::None => quote! {
                 #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_RET_NONE)
             },
-            Returning::Type(used_ty) => used_ty.section_writer_tokens(quote! {
+            Self::Type(used_ty) => used_ty.section_writer_tokens(quote! {
                 #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_RET_TYPE)
             }),
-            Returning::SetOf { ty } => ty.section_writer_tokens(quote! {
+            Self::SetOf { ty } => ty.section_writer_tokens(quote! {
                 #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_RET_SET_OF)
             }),
-            Returning::Iterated { tys: items } => {
+            Self::Iterated { tys: items } => {
                 let item_count = items.len();
                 let writer_ident = Ident::new("__pgrx_schema_writer", Span::mixed_site());
                 let item_writers = items.iter().map(|ReturningIteratedItem { used_ty, name }| {

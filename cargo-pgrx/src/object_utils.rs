@@ -225,7 +225,7 @@ fn target_architecture() -> object::Architecture {
     }
 }
 
-fn slice_arch32<'a>(data: &'a [u8], arch: object::Architecture) -> Option<&'a [u8]> {
+fn slice_arch32(data: &[u8], arch: object::Architecture) -> Option<&[u8]> {
     let candidates = MachOFatFile32::parse(data).ok()?;
     let architecture =
         candidates.arches().iter().find(|candidate| candidate.architecture() == arch)?;
@@ -233,7 +233,7 @@ fn slice_arch32<'a>(data: &'a [u8], arch: object::Architecture) -> Option<&'a [u
     architecture.data(data).ok()
 }
 
-fn slice_arch64<'a>(data: &'a [u8], arch: object::Architecture) -> Option<&'a [u8]> {
+fn slice_arch64(data: &[u8], arch: object::Architecture) -> Option<&[u8]> {
     let candidates = MachOFatFile64::parse(data).ok()?;
     let architecture =
         candidates.arches().iter().find(|candidate| candidate.architecture() == arch)?;

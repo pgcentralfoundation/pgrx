@@ -37,24 +37,24 @@ pub enum ExternArgs {
 impl core::fmt::Display for ExternArgs {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
-            ExternArgs::CreateOrReplace => write!(f, "CREATE OR REPLACE"),
-            ExternArgs::Immutable => write!(f, "IMMUTABLE"),
-            ExternArgs::Strict => write!(f, "STRICT"),
-            ExternArgs::Stable => write!(f, "STABLE"),
-            ExternArgs::Volatile => write!(f, "VOLATILE"),
-            ExternArgs::Raw => Ok(()),
-            ExternArgs::ParallelSafe => write!(f, "PARALLEL SAFE"),
-            ExternArgs::ParallelUnsafe => write!(f, "PARALLEL UNSAFE"),
-            ExternArgs::SecurityDefiner => write!(f, "SECURITY DEFINER"),
-            ExternArgs::SecurityInvoker => write!(f, "SECURITY INVOKER"),
-            ExternArgs::ParallelRestricted => write!(f, "PARALLEL RESTRICTED"),
-            ExternArgs::Support(item) => write!(f, "{item}"),
-            ExternArgs::ShouldPanic(_) => Ok(()),
-            ExternArgs::NoGuard => Ok(()),
-            ExternArgs::Schema(_) => Ok(()),
-            ExternArgs::Name(_) => Ok(()),
-            ExternArgs::Cost(cost) => write!(f, "COST {cost}"),
-            ExternArgs::Requires(_) => Ok(()),
+            Self::CreateOrReplace => write!(f, "CREATE OR REPLACE"),
+            Self::Immutable => write!(f, "IMMUTABLE"),
+            Self::Strict => write!(f, "STRICT"),
+            Self::Stable => write!(f, "STABLE"),
+            Self::Volatile => write!(f, "VOLATILE"),
+            Self::Raw => Ok(()),
+            Self::ParallelSafe => write!(f, "PARALLEL SAFE"),
+            Self::ParallelUnsafe => write!(f, "PARALLEL UNSAFE"),
+            Self::SecurityDefiner => write!(f, "SECURITY DEFINER"),
+            Self::SecurityInvoker => write!(f, "SECURITY INVOKER"),
+            Self::ParallelRestricted => write!(f, "PARALLEL RESTRICTED"),
+            Self::Support(item) => write!(f, "{item}"),
+            Self::ShouldPanic(_) => Ok(()),
+            Self::NoGuard => Ok(()),
+            Self::Schema(_) => Ok(()),
+            Self::Name(_) => Ok(()),
+            Self::Cost(cost) => write!(f, "COST {cost}"),
+            Self::Requires(_) => Ok(()),
         }
     }
 }
@@ -62,34 +62,34 @@ impl core::fmt::Display for ExternArgs {
 impl ExternArgs {
     pub fn section_len_tokens(&self) -> TokenStream {
         match self {
-            ExternArgs::CreateOrReplace
-            | ExternArgs::Immutable
-            | ExternArgs::Strict
-            | ExternArgs::Stable
-            | ExternArgs::Volatile
-            | ExternArgs::Raw
-            | ExternArgs::NoGuard
-            | ExternArgs::SecurityDefiner
-            | ExternArgs::SecurityInvoker
-            | ExternArgs::ParallelSafe
-            | ExternArgs::ParallelUnsafe
-            | ExternArgs::ParallelRestricted => {
+            Self::CreateOrReplace
+            | Self::Immutable
+            | Self::Strict
+            | Self::Stable
+            | Self::Volatile
+            | Self::Raw
+            | Self::NoGuard
+            | Self::SecurityDefiner
+            | Self::SecurityInvoker
+            | Self::ParallelSafe
+            | Self::ParallelUnsafe
+            | Self::ParallelRestricted => {
                 quote! { ::pgrx::pgrx_sql_entity_graph::section::u8_len() }
             }
-            ExternArgs::ShouldPanic(value)
-            | ExternArgs::Schema(value)
-            | ExternArgs::Name(value)
-            | ExternArgs::Cost(value) => quote! {
+            Self::ShouldPanic(value)
+            | Self::Schema(value)
+            | Self::Name(value)
+            | Self::Cost(value) => quote! {
                 ::pgrx::pgrx_sql_entity_graph::section::u8_len()
                     + ::pgrx::pgrx_sql_entity_graph::section::str_len(#value)
             },
-            ExternArgs::Support(item) => {
+            Self::Support(item) => {
                 let item_len = item.section_len_tokens();
                 quote! {
                     ::pgrx::pgrx_sql_entity_graph::section::u8_len() + (#item_len)
                 }
             }
-            ExternArgs::Requires(items) => {
+            Self::Requires(items) => {
                 let item_lens = items.iter().map(PositioningRef::section_len_tokens);
                 quote! {
                     ::pgrx::pgrx_sql_entity_graph::section::u8_len()
@@ -103,66 +103,66 @@ impl ExternArgs {
 
     pub fn section_writer_tokens(&self, writer: TokenStream) -> TokenStream {
         match self {
-            ExternArgs::CreateOrReplace => {
+            Self::CreateOrReplace => {
                 quote! { #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_CREATE_OR_REPLACE) }
             }
-            ExternArgs::Immutable => {
+            Self::Immutable => {
                 quote! { #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_IMMUTABLE) }
             }
-            ExternArgs::Strict => {
+            Self::Strict => {
                 quote! { #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_STRICT) }
             }
-            ExternArgs::Stable => {
+            Self::Stable => {
                 quote! { #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_STABLE) }
             }
-            ExternArgs::Volatile => {
+            Self::Volatile => {
                 quote! { #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_VOLATILE) }
             }
-            ExternArgs::Raw => {
+            Self::Raw => {
                 quote! { #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_RAW) }
             }
-            ExternArgs::NoGuard => {
+            Self::NoGuard => {
                 quote! { #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_NO_GUARD) }
             }
-            ExternArgs::SecurityDefiner => quote! {
+            Self::SecurityDefiner => quote! {
                 #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_SECURITY_DEFINER)
             },
-            ExternArgs::SecurityInvoker => quote! {
+            Self::SecurityInvoker => quote! {
                 #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_SECURITY_INVOKER)
             },
-            ExternArgs::ParallelSafe => quote! {
+            Self::ParallelSafe => quote! {
                 #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_PARALLEL_SAFE)
             },
-            ExternArgs::ParallelUnsafe => quote! {
+            Self::ParallelUnsafe => quote! {
                 #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_PARALLEL_UNSAFE)
             },
-            ExternArgs::ParallelRestricted => quote! {
+            Self::ParallelRestricted => quote! {
                 #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_PARALLEL_RESTRICTED)
             },
-            ExternArgs::ShouldPanic(value) => quote! {
+            Self::ShouldPanic(value) => quote! {
                 #writer
                     .u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_SHOULD_PANIC)
                     .str(#value)
             },
-            ExternArgs::Schema(value) => quote! {
+            Self::Schema(value) => quote! {
                 #writer
                     .u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_SCHEMA)
                     .str(#value)
             },
-            ExternArgs::Support(item) => item.section_writer_tokens(quote! {
+            Self::Support(item) => item.section_writer_tokens(quote! {
                 #writer.u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_SUPPORT)
             }),
-            ExternArgs::Name(value) => quote! {
+            Self::Name(value) => quote! {
                 #writer
                     .u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_NAME)
                     .str(#value)
             },
-            ExternArgs::Cost(value) => quote! {
+            Self::Cost(value) => quote! {
                 #writer
                     .u8(::pgrx::pgrx_sql_entity_graph::section::EXTERN_ARG_COST)
                     .str(#value)
             },
-            ExternArgs::Requires(items) => {
+            Self::Requires(items) => {
                 let writer_ident = Ident::new("__pgrx_schema_writer", Span::mixed_site());
                 let item_writers =
                     items.iter().map(|item| item.section_writer_tokens(quote! { #writer_ident }));
@@ -184,24 +184,24 @@ impl ExternArgs {
 impl ToTokens for ExternArgs {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         match self {
-            ExternArgs::CreateOrReplace => tokens.append(format_ident!("CreateOrReplace")),
-            ExternArgs::Immutable => tokens.append(format_ident!("Immutable")),
-            ExternArgs::Strict => tokens.append(format_ident!("Strict")),
-            ExternArgs::Stable => tokens.append(format_ident!("Stable")),
-            ExternArgs::Volatile => tokens.append(format_ident!("Volatile")),
-            ExternArgs::Raw => tokens.append(format_ident!("Raw")),
-            ExternArgs::NoGuard => tokens.append(format_ident!("NoGuard")),
-            ExternArgs::SecurityDefiner => tokens.append(format_ident!("SecurityDefiner")),
-            ExternArgs::SecurityInvoker => tokens.append(format_ident!("SecurityInvoker")),
-            ExternArgs::ParallelSafe => tokens.append(format_ident!("ParallelSafe")),
-            ExternArgs::ParallelUnsafe => tokens.append(format_ident!("ParallelUnsafe")),
-            ExternArgs::ParallelRestricted => tokens.append(format_ident!("ParallelRestricted")),
-            ExternArgs::ShouldPanic(_s) => tokens.append_all(quote! { Error(String::from("#_s")) }),
-            ExternArgs::Schema(_s) => tokens.append_all(quote! { Schema(String::from("#_s")) }),
-            ExternArgs::Support(item) => tokens.append_all(quote! { Support(#item) }),
-            ExternArgs::Name(_s) => tokens.append_all(quote! { Name(String::from("#_s")) }),
-            ExternArgs::Cost(_s) => tokens.append_all(quote! { Cost(String::from("#_s")) }),
-            ExternArgs::Requires(items) => {
+            Self::CreateOrReplace => tokens.append(format_ident!("CreateOrReplace")),
+            Self::Immutable => tokens.append(format_ident!("Immutable")),
+            Self::Strict => tokens.append(format_ident!("Strict")),
+            Self::Stable => tokens.append(format_ident!("Stable")),
+            Self::Volatile => tokens.append(format_ident!("Volatile")),
+            Self::Raw => tokens.append(format_ident!("Raw")),
+            Self::NoGuard => tokens.append(format_ident!("NoGuard")),
+            Self::SecurityDefiner => tokens.append(format_ident!("SecurityDefiner")),
+            Self::SecurityInvoker => tokens.append(format_ident!("SecurityInvoker")),
+            Self::ParallelSafe => tokens.append(format_ident!("ParallelSafe")),
+            Self::ParallelUnsafe => tokens.append(format_ident!("ParallelUnsafe")),
+            Self::ParallelRestricted => tokens.append(format_ident!("ParallelRestricted")),
+            Self::ShouldPanic(_s) => tokens.append_all(quote! { Error(String::from("#_s")) }),
+            Self::Schema(_s) => tokens.append_all(quote! { Schema(String::from("#_s")) }),
+            Self::Support(item) => tokens.append_all(quote! { Support(#item) }),
+            Self::Name(_s) => tokens.append_all(quote! { Name(String::from("#_s")) }),
+            Self::Cost(_s) => tokens.append_all(quote! { Cost(String::from("#_s")) }),
+            Self::Requires(items) => {
                 tokens.append_all(quote! { Requires(vec![#(#items),*]) })
             }
         }

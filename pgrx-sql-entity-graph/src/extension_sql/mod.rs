@@ -155,7 +155,7 @@ impl Parse for CodeEnrichment<ExtensionSqlFile> {
         let path = input.parse()?;
         let _after_sql_comma: Option<Token![,]> = input.parse()?;
         let attrs = input.parse_terminated(ExtensionSqlAttribute::parse, Token![,])?;
-        Ok(CodeEnrichment(ExtensionSqlFile { path, attrs }))
+        Ok(Self(ExtensionSqlFile { path, attrs }))
     }
 }
 
@@ -284,7 +284,7 @@ impl Parse for CodeEnrichment<ExtensionSql> {
         });
         let name =
             name.ok_or_else(|| syn::Error::new(input.span(), "expected `name` to be set"))?;
-        Ok(CodeEnrichment(ExtensionSql { sql, attrs, name }))
+        Ok(Self(ExtensionSql { sql, attrs, name }))
     }
 }
 
@@ -346,20 +346,20 @@ pub enum SqlDeclared {
 impl ToEntityGraphTokens for SqlDeclared {
     fn to_entity_graph_tokens(&self) -> TokenStream2 {
         let (variant, identifier) = match &self {
-            SqlDeclared::Type(val) => ("Type", val),
-            SqlDeclared::Enum(val) => ("Enum", val),
-            SqlDeclared::Function(val) => ("Function", val),
+            Self::Type(val) => ("Type", val),
+            Self::Enum(val) => ("Enum", val),
+            Self::Function(val) => ("Function", val),
         };
         let identifier_expr = self.section_identifier_tokens();
         match self {
-            SqlDeclared::Type(_) | SqlDeclared::Enum(_) => {
+            Self::Type(_) | Self::Enum(_) => {
                 let identifier_path: syn::Path =
                     syn::parse_str(identifier).expect("type declaration path should parse");
                 quote! {
                     ::pgrx::pgrx_sql_entity_graph::SqlDeclaredEntity::build_type::<#identifier_path>(#variant, #identifier_expr).unwrap()
                 }
             }
-            SqlDeclared::Function(_) => quote! {
+            Self::Function(_) => quote! {
                 ::pgrx::pgrx_sql_entity_graph::SqlDeclaredEntity::build(#variant, #identifier_expr).unwrap()
             },
         }
@@ -371,7 +371,7 @@ impl ToRustCodeTokens for SqlDeclared {}
 impl SqlDeclared {
     fn section_identifier_tokens(&self) -> TokenStream2 {
         let identifier = match self {
-            SqlDeclared::Type(value) | SqlDeclared::Enum(value) | SqlDeclared::Function(value) => {
+            Self::Type(value) | Self::Enum(value) | Self::Function(value) => {
                 value
             }
         };
@@ -388,7 +388,7 @@ impl SqlDeclared {
     pub fn section_len_tokens(&self) -> TokenStream2 {
         let identifier_expr = self.section_identifier_tokens();
         match self {
-            SqlDeclared::Type(identifier) | SqlDeclared::Enum(identifier) => {
+            Self::Type(identifier) | Self::Enum(identifier) => {
                 let identifier_path: syn::Path =
                     syn::parse_str(identifier).expect("type declaration path should parse");
                 quote! {
@@ -402,7 +402,7 @@ impl SqlDeclared {
                         )
                 }
             }
-            SqlDeclared::Function(_) => quote! {
+            Self::Function(_) => quote! {
                 ::pgrx::pgrx_sql_entity_graph::section::u8_len()
                     + ::pgrx::pgrx_sql_entity_graph::section::str_len(#identifier_expr)
             },
@@ -412,7 +412,7 @@ impl SqlDeclared {
     pub fn section_writer_tokens(&self, writer: TokenStream2) -> TokenStream2 {
         let identifier_expr = self.section_identifier_tokens();
         match self {
-            SqlDeclared::Type(identifier) => {
+            Self::Type(identifier) => {
                 let identifier_path: syn::Path =
                     syn::parse_str(identifier).expect("type declaration path should parse");
                 quote! {
@@ -423,7 +423,7 @@ impl SqlDeclared {
                         .argument_sql(<#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL)
                 }
             }
-            SqlDeclared::Enum(identifier) => {
+            Self::Enum(identifier) => {
                 let identifier_path: syn::Path =
                     syn::parse_str(identifier).expect("type declaration path should parse");
                 quote! {
@@ -434,7 +434,7 @@ impl SqlDeclared {
                         .argument_sql(<#identifier_path as ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable>::ARGUMENT_SQL)
                 }
             }
-            SqlDeclared::Function(_) => quote! {
+            Self::Function(_) => quote! {
                 #writer
                     .u8(::pgrx::pgrx_sql_entity_graph::section::SQL_DECLARED_FUNCTION)
                     .str(#identifier_expr)
@@ -457,9 +457,9 @@ impl Parse for SqlDeclared {
             identifier_segments.join("::")
         };
         let this = match variant.to_string().as_str() {
-            "Type" => SqlDeclared::Type(identifier_str),
-            "Enum" => SqlDeclared::Enum(identifier_str),
-            "Function" => SqlDeclared::Function(identifier_str),
+            "Type" => Self::Type(identifier_str),
+            "Enum" => Self::Enum(identifier_str),
+            "Function" => Self::Function(identifier_str),
             _ => {
                 return Err(syn::Error::new(
                     variant.span(),

@@ -49,13 +49,13 @@ impl TryFrom<Path> for PgCast {
 impl ToTokens for PgCast {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let quoted = match self {
-            PgCast::Default => quote! {
+            Self::Default => quote! {
                 ::pgrx::pgrx_sql_entity_graph::PgCastEntity::Default
             },
-            PgCast::Assignment => quote! {
+            Self::Assignment => quote! {
                 ::pgrx::pgrx_sql_entity_graph::PgCastEntity::Assignment
             },
-            PgCast::Implicit => quote! {
+            Self::Implicit => quote! {
                 ::pgrx::pgrx_sql_entity_graph::PgCastEntity::Implicit
             },
         };
@@ -70,13 +70,13 @@ impl PgCast {
 
     pub fn section_writer_tokens(&self, writer: TokenStream2) -> TokenStream2 {
         match self {
-            PgCast::Default => quote! {
+            Self::Default => quote! {
                 #writer.u8(::pgrx::pgrx_sql_entity_graph::section::OPERATOR_CAST_DEFAULT)
             },
-            PgCast::Assignment => quote! {
+            Self::Assignment => quote! {
                 #writer.u8(::pgrx::pgrx_sql_entity_graph::section::OPERATOR_CAST_ASSIGNMENT)
             },
-            PgCast::Implicit => quote! {
+            Self::Implicit => quote! {
                 #writer.u8(::pgrx::pgrx_sql_entity_graph::section::OPERATOR_CAST_IMPLICIT)
             },
         }

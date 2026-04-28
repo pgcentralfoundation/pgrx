@@ -76,10 +76,10 @@ pub enum PgMinorVersion {
 impl Display for PgMinorVersion {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            PgMinorVersion::Latest => write!(f, ".LATEST"),
-            PgMinorVersion::Release(v) => write!(f, ".{v}"),
-            PgMinorVersion::Beta(v) => write!(f, "beta{v}"),
-            PgMinorVersion::Rc(v) => write!(f, "rc{v}"),
+            Self::Latest => write!(f, ".LATEST"),
+            Self::Release(v) => write!(f, ".{v}"),
+            Self::Beta(v) => write!(f, "beta{v}"),
+            Self::Rc(v) => write!(f, "rc{v}"),
         }
     }
 }
@@ -87,8 +87,8 @@ impl Display for PgMinorVersion {
 impl PgMinorVersion {
     fn version(&self) -> Option<u16> {
         match self {
-            PgMinorVersion::Latest => None,
-            PgMinorVersion::Release(v) | PgMinorVersion::Beta(v) | PgMinorVersion::Rc(v) => {
+            Self::Latest => None,
+            Self::Release(v) | Self::Beta(v) | Self::Rc(v) => {
                 Some(*v)
             }
         }
@@ -103,8 +103,8 @@ pub struct PgVersion {
 }
 
 impl PgVersion {
-    pub const fn new(major: u16, minor: PgMinorVersion, url: Option<Url>) -> PgVersion {
-        PgVersion { major, minor, url }
+    pub const fn new(major: u16, minor: PgMinorVersion, url: Option<Url>) -> Self {
+        Self { major, minor, url }
     }
 
     pub fn minor(&self) -> Option<u16> {
@@ -136,7 +136,7 @@ impl Display for PgConfig {
 
 impl Default for PgConfig {
     fn default() -> Self {
-        PgConfig {
+        Self {
             version: None,
             pg_config: None,
             known_props: None,
@@ -149,13 +149,13 @@ impl Default for PgConfig {
 
 impl From<PgVersion> for PgConfig {
     fn from(version: PgVersion) -> Self {
-        PgConfig { version: Some(version), pg_config: None, ..Default::default() }
+        Self { version: Some(version), pg_config: None, ..Default::default() }
     }
 }
 
 impl PgConfig {
     pub fn new(pg_config: PathBuf, base_port: u16, base_testing_port: u16) -> Self {
-        PgConfig {
+        Self {
             version: None,
             pg_config: Some(pg_config),
             known_props: None,
@@ -166,7 +166,7 @@ impl PgConfig {
     }
 
     pub fn new_with_defaults(pg_config: PathBuf) -> Self {
-        PgConfig {
+        Self {
             version: None,
             pg_config: Some(pg_config),
             known_props: None,
@@ -580,10 +580,10 @@ impl From<PgrxHomeError> for std::io::Error {
     fn from(value: PgrxHomeError) -> Self {
         match value {
             PgrxHomeError::NoHomeDirectory => {
-                std::io::Error::new(ErrorKind::NotFound, value.to_string())
+                Self::new(ErrorKind::NotFound, value.to_string())
             }
             PgrxHomeError::MissingPgrxHome(_) => {
-                std::io::Error::new(ErrorKind::NotFound, value.to_string())
+                Self::new(ErrorKind::NotFound, value.to_string())
             }
             PgrxHomeError::IoError(e) => e,
         }
@@ -592,20 +592,20 @@ impl From<PgrxHomeError> for std::io::Error {
 
 impl Pgrx {
     pub fn new(base_port: u16, base_testing_port: u16) -> Self {
-        Pgrx { pg_configs: vec![], base_port, base_testing_port }
+        Self { pg_configs: vec![], base_port, base_testing_port }
     }
 
     pub fn from_config() -> eyre::Result<Self> {
         match std::env::var("PGRX_PG_CONFIG_PATH") {
             Ok(pg_config) => {
                 // we have an environment variable that tells us the pg_config to use
-                let mut pgrx = Pgrx::default();
+                let mut pgrx = Self::default();
                 pgrx.push(PgConfig::new(pg_config.into(), pgrx.base_port, pgrx.base_testing_port));
                 Ok(pgrx)
             }
             Err(_) => {
                 // we'll get what we need from cargo-pgrx' config.toml file
-                let path = Pgrx::config_toml()?;
+                let path = Self::config_toml()?;
                 if !path.try_exists()? {
                     return Err(eyre!(
                         "{} not found.  Have you run `{}` yet?",
@@ -616,7 +616,7 @@ impl Pgrx {
 
                 match toml::from_str::<ConfigToml>(&std::fs::read_to_string(&path)?) {
                     Ok(configs) => {
-                        let mut pgrx = Pgrx::new(
+                        let mut pgrx = Self::new(
                             configs.base_port.unwrap_or(BASE_POSTGRES_PORT_NO),
                             configs.base_testing_port.unwrap_or(BASE_POSTGRES_TESTING_PORT_NO),
                         );
@@ -723,7 +723,7 @@ impl Pgrx {
     }
 
     pub fn config_toml() -> Result<PathBuf, std::io::Error> {
-        let mut path = Pgrx::home()?;
+        let mut path = Self::home()?;
         path.push("config.toml");
         Ok(path)
     }

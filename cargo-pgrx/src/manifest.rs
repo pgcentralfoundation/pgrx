@@ -36,10 +36,10 @@ impl From<PgVersionSource> for String {
 impl PgVersionSource {
     fn label(&self) -> &String {
         match self {
-            PgVersionSource::CliArgument(s) => s,
-            PgVersionSource::FeatureFlag(s) => s,
-            PgVersionSource::DefaultFeature(s) => s,
-            PgVersionSource::PgConfig(s) => s,
+            Self::CliArgument(s) => s,
+            Self::FeatureFlag(s) => s,
+            Self::DefaultFeature(s) => s,
+            Self::PgConfig(s) => s,
         }
     }
 }

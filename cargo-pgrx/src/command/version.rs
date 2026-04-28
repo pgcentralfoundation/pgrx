@@ -59,10 +59,7 @@ mod rss {
             let mut buf = Vec::new();
             let _count = response.body_mut().as_reader().read_to_end(&mut buf)?;
             let body = String::from_utf8(buf)?;
-            let rss: Rss = match serde_xml_rs::from_str(&body) {
-                Ok(rss) => rss,
-                Err(e) => return Err(e.into()),
-            };
+            let rss: Rss = serde_xml_rs::from_str(&body)?;
 
             let mut versions: BTreeMap<u16, PgVersion> = BTreeMap::from_iter(
                 supported_versions.iter().map(|pgver| (pgver.major, pgver.clone())),

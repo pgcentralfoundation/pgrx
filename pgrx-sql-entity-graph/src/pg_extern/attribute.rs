@@ -50,49 +50,49 @@ pub enum Attribute {
 impl ToTokens for Attribute {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let quoted = match self {
-            Attribute::Immutable => quote! { immutable },
-            Attribute::Strict => quote! { strict },
-            Attribute::Stable => quote! { stable },
-            Attribute::Volatile => quote! { volatile },
-            Attribute::Raw => quote! { raw },
-            Attribute::NoGuard => quote! { no_guard },
-            Attribute::CreateOrReplace => quote! { create_or_replace },
-            Attribute::SecurityDefiner => {
+            Self::Immutable => quote! { immutable },
+            Self::Strict => quote! { strict },
+            Self::Stable => quote! { stable },
+            Self::Volatile => quote! { volatile },
+            Self::Raw => quote! { raw },
+            Self::NoGuard => quote! { no_guard },
+            Self::CreateOrReplace => quote! { create_or_replace },
+            Self::SecurityDefiner => {
                 quote! {security_definer}
             }
-            Attribute::SecurityInvoker => {
+            Self::SecurityInvoker => {
                 quote! {security_invoker}
             }
-            Attribute::ParallelSafe => {
+            Self::ParallelSafe => {
                 quote! { parallel_safe }
             }
-            Attribute::ParallelUnsafe => {
+            Self::ParallelUnsafe => {
                 quote! { parallel_unsafe }
             }
-            Attribute::ParallelRestricted => {
+            Self::ParallelRestricted => {
                 quote! { parallel_restricted }
             }
-            Attribute::ShouldPanic(s) => {
+            Self::ShouldPanic(s) => {
                 quote! { expected = #s }
             }
-            Attribute::Schema(s) => {
+            Self::Schema(s) => {
                 quote! { schema = #s }
             }
-            Attribute::Support(item) => {
+            Self::Support(item) => {
                 quote! { support = #item }
             }
-            Attribute::Name(s) => {
+            Self::Name(s) => {
                 quote! { name = #s }
             }
-            Attribute::Cost(s) => {
+            Self::Cost(s) => {
                 quote! { cost = #s }
             }
-            Attribute::Requires(items) => {
+            Self::Requires(items) => {
                 let items_iter = items.iter().map(|x| x.to_token_stream()).collect::<Vec<_>>();
                 quote! { requires = [#(#items_iter),*] }
             }
             // This attribute is handled separately
-            Attribute::Sql(to_sql_config) => {
+            Self::Sql(to_sql_config) => {
                 quote! { sql = #to_sql_config }
             }
         };
@@ -119,12 +119,12 @@ impl Parse for Attribute {
             "error" | "expected" => {
                 let _eq: Token![=] = input.parse()?;
                 let literal: syn::LitStr = input.parse()?;
-                Attribute::ShouldPanic(literal)
+                Self::ShouldPanic(literal)
             }
             "schema" => {
                 let _eq: Token![=] = input.parse()?;
                 let literal: syn::LitStr = input.parse()?;
-                Attribute::Schema(literal)
+                Self::Schema(literal)
             }
             "support" => {
                 let _eq: Token![=] = input.parse()?;

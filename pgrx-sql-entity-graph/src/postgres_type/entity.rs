@@ -38,8 +38,8 @@ const INVALID_ATTR_CONTENT: &str =
 impl ToTokens for Alignment {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let value = match self {
-            Alignment::On => format_ident!("On"),
-            Alignment::Off => format_ident!("Off"),
+            Self::On => format_ident!("On"),
+            Self::Off => format_ident!("Off"),
         };
         let quoted = quote! {
             ::pgrx::pgrx_sql_entity_graph::Alignment::#value

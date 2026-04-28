@@ -31,7 +31,7 @@ impl<T> ErrHarder for syn::Result<T> {
 }
 
 impl ErrHarder for syn::Error {
-    fn more_error(mut self, closerr: impl FnOnce() -> syn::Error) -> Self {
+    fn more_error(mut self, closerr: impl FnOnce() -> Self) -> Self {
         self.combine(closerr());
         self
     }

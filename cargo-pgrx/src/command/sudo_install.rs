@@ -41,7 +41,7 @@ impl From<Install> for SudoInstall {
 
 impl From<SudoInstall> for Package {
     fn from(value: SudoInstall) -> Self {
-        Package {
+        Self {
             package: value.package,
             manifest_path: value.manifest_path,
             debug: !value.release,

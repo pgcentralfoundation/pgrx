@@ -56,7 +56,7 @@ pub fn item_fn_without_rewrite(
 
     // looking for this pattern: #[pg_guard(unsafe_entry_thread)]
     let unsafe_entry_thread =
-        attr.into_iter().find(|tt| tt.to_string() == "unsafe_entry_thread").is_some();
+        attr.into_iter().any(|tt| tt.to_string() == "unsafe_entry_thread");
 
     if sig.abi.clone().and_then(|abi| abi.name).is_none_or(|name| name.value() != "C-unwind") {
         panic!("#[pg_guard] must be combined with extern \"C-unwind\"");

@@ -125,7 +125,7 @@ impl ControlFile {
 
             temp.insert(k, do_var_replacements(v.to_string(), cargo_version)?);
         }
-        let control_file = ControlFile {
+        let control_file = Self {
             comment: temp
                 .get("comment")
                 .ok_or(ControlFileError::MissingField { field: "comment" })?
@@ -203,7 +203,7 @@ impl TryFrom<PathBuf> for ControlFile {
 
     fn try_from(value: PathBuf) -> Result<Self, Self::Error> {
         let contents = std::fs::read_to_string(value)?;
-        ControlFile::try_from(contents.as_str())
+        Self::try_from(contents.as_str())
     }
 }
 

@@ -58,7 +58,7 @@ impl PgExternArgument {
 
         let used_ty = UsedType::new(*value.ty)?;
 
-        Ok(PgExternArgument { fn_arg, pat: identifier, used_ty })
+        Ok(Self { fn_arg, pat: identifier, used_ty })
     }
 
     pub fn entity_tokens(&self) -> TokenStream2 {

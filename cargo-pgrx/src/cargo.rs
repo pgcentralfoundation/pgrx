@@ -97,13 +97,13 @@ impl Cargo {
         }
 
         // subcommand *must* go first among subcommand-relative args
-        if self.subcmd != "" {
+        if !self.subcmd.is_empty() {
             cmd.arg(&self.subcmd);
         } else {
             panic!("`Cargo::into_command` requires a subcommand to be set, was: {self:?}")
         }
 
-        let Cargo {
+        let Self {
             features,
             stdio,
             manifest,
@@ -186,9 +186,9 @@ pub enum Stdio {
 impl Stdio {
     fn into_stdio(self) -> Option<process::Stdio> {
         match self {
-            Stdio::Inherit => Some(process::Stdio::inherit()),
-            Stdio::Null => Some(process::Stdio::null()),
-            Stdio::Default => None,
+            Self::Inherit => Some(process::Stdio::inherit()),
+            Self::Null => Some(process::Stdio::null()),
+            Self::Default => None,
         }
     }
 }
@@ -288,7 +288,7 @@ pub enum CargoProfile {
 }
 
 impl CargoProfile {
-    pub fn from_flags(profile: Option<&str>, default: CargoProfile) -> eyre::Result<Self> {
+    pub fn from_flags(profile: Option<&str>, default: Self) -> eyre::Result<Self> {
         match profile {
             // Cargo treats `--profile release` the same as `--release`.
             Some("release") => Ok(Self::Release),

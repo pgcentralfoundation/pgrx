@@ -212,7 +212,7 @@ pub(crate) fn generate_schema_implicit(
             .to_file(path)
             .wrap_err_with(|| format!("Could not write SQL to {}", path.display()))?;
     } else {
-        eprintln!("{} SQL entities to {}", "     Writing".bold().green(), "/dev/stdout");
+        eprintln!("{} SQL entities to /dev/stdout", "     Writing".bold().green());
         pgrx_sql.write(&mut std::io::stdout()).wrap_err("Could not write SQL to stdout")?;
     }
 

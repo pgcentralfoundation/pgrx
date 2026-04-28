@@ -65,7 +65,7 @@ impl PgTrigger {
             crate::ident_is_acceptable_to_postgres(&func.sig.ident)?;
         }
 
-        Ok(CodeEnrichment(PgTrigger { func, to_sql_config }))
+        Ok(CodeEnrichment(Self { func, to_sql_config }))
     }
 
     pub fn wrapper_tokens(&self) -> Result<ItemFn, syn::Error> {

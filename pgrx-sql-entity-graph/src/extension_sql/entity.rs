@@ -132,13 +132,13 @@ pub enum SqlDeclaredEntity {
 impl Display for SqlDeclaredEntity {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            SqlDeclaredEntity::Type(data) => {
+            Self::Type(data) => {
                 write!(f, "Type({})", data.name)
             }
-            SqlDeclaredEntity::Enum(data) => {
+            Self::Enum(data) => {
                 write!(f, "Enum({})", data.name)
             }
-            SqlDeclaredEntity::Function(data) => {
+            Self::Function(data) => {
                 write!(f, "Function({})", data.name)
             }
         }
@@ -216,18 +216,18 @@ impl SqlDeclaredEntity {
 
     pub fn sql(&self) -> String {
         match self {
-            SqlDeclaredEntity::Type(data) => data.sql.clone(),
-            SqlDeclaredEntity::Enum(data) => data.sql.clone(),
-            SqlDeclaredEntity::Function(data) => data.sql.clone(),
+            Self::Type(data) => data.sql.clone(),
+            Self::Enum(data) => data.sql.clone(),
+            Self::Function(data) => data.sql.clone(),
         }
     }
 
     pub fn type_ident(&self) -> Option<&str> {
         match self {
-            SqlDeclaredEntity::Type(data) | SqlDeclaredEntity::Enum(data) => {
+            Self::Type(data) | Self::Enum(data) => {
                 Some(data.type_ident.as_str())
             }
-            SqlDeclaredEntity::Function(_) => None,
+            Self::Function(_) => None,
         }
     }
 
@@ -237,14 +237,14 @@ impl SqlDeclaredEntity {
 
     pub fn has_sql_declared_entity(&self, identifier: &SqlDeclared) -> bool {
         match (&identifier, &self) {
-            (SqlDeclared::Type(ident_name), &SqlDeclaredEntity::Type(data))
-            | (SqlDeclared::Enum(ident_name), &SqlDeclaredEntity::Enum(data)) => {
+            (SqlDeclared::Type(ident_name), &Self::Type(data))
+            | (SqlDeclared::Enum(ident_name), &Self::Enum(data)) => {
                 if ident_name == &data.name || ident_name == &data.type_ident {
                     return true;
                 }
                 false
             }
-            (SqlDeclared::Function(ident_name), &SqlDeclaredEntity::Function(data)) => {
+            (SqlDeclared::Function(ident_name), &Self::Function(data)) => {
                 ident_name == &data.name
             }
             _ => false,

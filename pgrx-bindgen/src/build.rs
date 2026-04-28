@@ -52,7 +52,7 @@ impl BindingOverride {
     fn new_from(enum_names: InnerMut<EnumMap>) -> Self {
         // these cause duplicate definition problems on linux
         // see: https://github.com/rust-lang/rust-bindgen/issues/687
-        BindingOverride {
+        Self {
             ignore_macros: HashSet::from_iter([
                 "FP_INFINITE",
                 "FP_NAN",
@@ -599,7 +599,7 @@ struct StructGraph<'a> {
 }
 
 impl<'a> From<&'a [syn::Item]> for StructGraph<'a> {
-    fn from(items: &'a [syn::Item]) -> StructGraph<'a> {
+    fn from(items: &'a [syn::Item]) -> Self {
         let mut descriptors = Vec::new();
 
         // a table mapping struct names to their offset in `descriptors`

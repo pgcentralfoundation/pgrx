@@ -139,7 +139,7 @@ pub struct PgrxOperatorAttributeWithIdent {
 
 impl Parse for PgrxOperatorAttributeWithIdent {
     fn parse(input: &ParseBuffer) -> Result<Self, syn::Error> {
-        Ok(PgrxOperatorAttributeWithIdent { fn_name: input.parse()? })
+        Ok(Self { fn_name: input.parse()? })
     }
 }
 
@@ -161,7 +161,7 @@ pub struct PgrxOperatorOpName {
 
 impl Parse for PgrxOperatorOpName {
     fn parse(input: &ParseBuffer) -> Result<Self, syn::Error> {
-        Ok(PgrxOperatorOpName { op_name: input.parse()? })
+        Ok(Self { op_name: input.parse()? })
     }
 }
 

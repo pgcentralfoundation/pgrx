@@ -149,7 +149,7 @@ impl PgExtern {
     }
 
     /// Returns a new instance of this `PgExtern` with `cast` overwritten to `pg_cast`.
-    pub fn as_cast(&self, pg_cast: PgCast) -> PgExtern {
+    pub fn as_cast(&self, pg_cast: PgCast) -> Self {
         let mut result = self.clone();
         result.cast = Some(pg_cast);
         result
@@ -549,7 +549,7 @@ trait LastIdent {
 impl LastIdent for syn::Type {
     #[inline]
     fn filter_last_ident(&self, id: &str) -> Option<&syn::PathSegment> {
-        let syn::Type::Path(syn::TypePath { path, .. }) = self else { return None };
+        let Self::Path(syn::TypePath { path, .. }) = self else { return None };
         path.filter_last_ident(id)
     }
 }

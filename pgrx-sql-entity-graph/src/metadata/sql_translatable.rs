@@ -53,8 +53,8 @@ pub enum SqlMapping {
 }
 
 impl SqlMapping {
-    pub fn literal(s: &'static str) -> SqlMapping {
-        SqlMapping::As(String::from(s))
+    pub fn literal(s: &'static str) -> Self {
+        Self::As(String::from(s))
     }
 }
 
@@ -108,11 +108,11 @@ pub(crate) fn numeric_sql_string(precision: Option<u32>, scale: Option<u32>) -> 
 impl From<SqlArrayMappingRef> for SqlArrayMapping {
     fn from(value: SqlArrayMappingRef) -> Self {
         match value {
-            SqlArrayMappingRef::As(value) => SqlArrayMapping::As(String::from(value)),
+            SqlArrayMappingRef::As(value) => Self::As(String::from(value)),
             SqlArrayMappingRef::Numeric { precision, scale } => {
-                SqlArrayMapping::As(numeric_sql_string(precision, scale))
+                Self::As(numeric_sql_string(precision, scale))
             }
-            SqlArrayMappingRef::Composite => SqlArrayMapping::Composite,
+            SqlArrayMappingRef::Composite => Self::Composite,
         }
     }
 }
@@ -120,13 +120,13 @@ impl From<SqlArrayMappingRef> for SqlArrayMapping {
 impl From<SqlMappingRef> for SqlMapping {
     fn from(value: SqlMappingRef) -> Self {
         match value {
-            SqlMappingRef::As(value) => SqlMapping::literal(value),
+            SqlMappingRef::As(value) => Self::literal(value),
             SqlMappingRef::Numeric { precision, scale } => {
-                SqlMapping::As(numeric_sql_string(precision, scale))
+                Self::As(numeric_sql_string(precision, scale))
             }
-            SqlMappingRef::Composite => SqlMapping::Composite,
-            SqlMappingRef::Array(value) => SqlMapping::Array(value.into()),
-            SqlMappingRef::Skip => SqlMapping::Skip,
+            SqlMappingRef::Composite => Self::Composite,
+            SqlMappingRef::Array(value) => Self::Array(value.into()),
+            SqlMappingRef::Skip => Self::Skip,
         }
     }
 }
@@ -142,10 +142,10 @@ pub enum ReturnsRef {
 impl From<ReturnsRef> for Returns {
     fn from(value: ReturnsRef) -> Self {
         match value {
-            ReturnsRef::One(value) => Returns::One(value.into()),
-            ReturnsRef::SetOf(value) => Returns::SetOf(value.into()),
+            ReturnsRef::One(value) => Self::One(value.into()),
+            ReturnsRef::SetOf(value) => Self::SetOf(value.into()),
             ReturnsRef::Table(values) => {
-                Returns::Table(values.iter().copied().map(Into::into).collect())
+                Self::Table(values.iter().copied().map(Into::into).collect())
             }
         }
     }
