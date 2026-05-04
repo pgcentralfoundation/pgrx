@@ -354,6 +354,49 @@ macro_rules! pg_magic_func {
             // return the magic
             &MY_MAGIC.0
         }
+
+        // ── Test stubs ──
+        // When the test binary links, all extern "C" statics from
+        // pgrx-pg-sys become undefined symbols.  #[typetag::serde]
+        // ctors pull them into the live set, defeating --gc-sections.
+        // These stubs compile ON THE EXTENSION SIDE where #[cfg(test)]
+        // actually fires, and provide #[unsafe(no_mangle)] definitions that
+        // satisfy the linker without shadowing PG's real symbols in the .so.
+        #[cfg(test)]
+        mod __pgrx_test_stubs {
+            #[unsafe(no_mangle)]
+            pub static mut CurrentMemoryContext: $crate::pg_sys::MemoryContext = std::ptr::null_mut();
+
+            #[unsafe(no_mangle)]
+            pub static mut error_context_stack: *mut $crate::pg_sys::ErrorContextCallback = std::ptr::null_mut();
+
+            #[unsafe(no_mangle)]
+            pub static mut PG_exception_stack: *mut $crate::pg_sys::sigjmp_buf = std::ptr::null_mut();
+
+            #[unsafe(no_mangle)]
+            pub static mut emit_log_hook: $crate::pg_sys::emit_log_hook_type = None;
+
+            #[unsafe(no_mangle)]
+            pub static mut Log_error_verbosity: std::ffi::c_int = 0;
+
+            #[unsafe(no_mangle)]
+            pub static mut Log_line_prefix: *mut std::ffi::c_char = std::ptr::null_mut();
+
+            #[unsafe(no_mangle)]
+            pub static mut Log_destination: std::ffi::c_int = 0;
+
+            #[unsafe(no_mangle)]
+            pub static mut Log_destination_string: *mut std::ffi::c_char = std::ptr::null_mut();
+
+            #[unsafe(no_mangle)]
+            pub static mut syslog_sequence_numbers: bool = false;
+
+            #[unsafe(no_mangle)]
+            pub static mut syslog_split_messages: bool = false;
+
+            #[unsafe(no_mangle)]
+            pub static mut BufferBlocks: *mut std::ffi::c_void = std::ptr::null_mut();
+        }
     };
 }
 
