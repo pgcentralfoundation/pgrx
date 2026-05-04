@@ -15,3 +15,4 @@ rustup-init.sh
 .codex/
 .agents/
 tmp/
+output.log
