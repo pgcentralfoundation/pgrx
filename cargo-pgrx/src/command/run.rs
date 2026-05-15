@@ -72,7 +72,7 @@ impl From<&Regress> for Run {
             verbose: regress.verbose,
             pgcli: false,
             install_only: false,
-            valgrind: false,
+            valgrind: regress.valgrind,
         }
     }
 }

@@ -98,6 +98,10 @@ pub(crate) struct Regress {
     /// Run the test suite this many times (default: 1)
     #[clap(long, default_value_t = 1, value_name = "N")]
     pub(crate) repeat: u32,
+
+    /// Run Postgres under valgrind while executing the regression tests
+    #[clap(long)]
+    pub(crate) valgrind: bool,
 }
 
 impl Regress {
