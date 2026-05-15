@@ -88,19 +88,25 @@ pub(crate) struct Init {
     jobserver: OnceLock<jobslot::Client>,
 }
 
+impl Init {
+    /// Resolve the make job count: explicit `--jobs`, else the host's
+    /// available parallelism, else 1. Used to size the jobserver and to
+    /// pass `-jN` to `make` (without `-jN`, GNU make ignores the jobserver
+    /// auth in MAKEFLAGS and stays serial).
+    fn resolved_jobs(&self) -> usize {
+        self.jobs
+            .or_else(|| std::thread::available_parallelism().map(NonZeroUsize::get).ok())
+            .unwrap_or(1)
+    }
+}
+
 impl CommandExecute for Init {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         self.jobserver
             .set(
-                jobslot::Client::new(
-                    self.jobs
-                        .or_else(|| {
-                            std::thread::available_parallelism().map(NonZeroUsize::get).ok()
-                        })
-                        .unwrap_or(1),
-                )
-                .expect("failed to create jobserver"),
+                jobslot::Client::new(self.resolved_jobs())
+                    .expect("failed to create jobserver"),
             )
             .unwrap();
 
@@ -497,6 +503,8 @@ fn make_postgres(pg_config: &PgConfig, pgdir: &Path, init: &Init) -> eyre::Resul
     let mut command = std::process::Command::new("make");
 
     command
+        .arg("-j")
+        .arg(init.resolved_jobs().to_string())
         .arg("world-bin")
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
@@ -541,6 +549,8 @@ fn make_install_postgres(version: &PgConfig, pgdir: &Path, init: &Init) -> eyre:
     let mut command = std::process::Command::new("make");
 
     command
+        .arg("-j")
+        .arg(init.resolved_jobs().to_string())
         .arg("install-world-bin")
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
