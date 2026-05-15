@@ -90,7 +90,7 @@ jobs:
           pg_config --version
 
       - name: Install cargo pgrx
-        run: cargo +nightly install --path cargo-pgrx --debug
+        run: cargo +nightly install --path cargo-pgrx --debug --locked
 
       - name: cargo pgrx init
         run: cargo +nightly pgrx init "--pg$PG_VER=$(which pg_config)"

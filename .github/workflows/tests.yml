@@ -230,7 +230,7 @@ jobs:
           rustup component add clippy
 
       - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force
+        run: cargo install --path cargo-pgrx/ --debug --force --locked
 
       - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
         run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
@@ -390,7 +390,7 @@ jobs:
           key: pgrx-arm64-cargo-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
       - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force
+        run: cargo install --path cargo-pgrx/ --debug --force --locked
 
       - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
         run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
@@ -494,7 +494,7 @@ jobs:
           rustup component add clippy
 
       - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force
+        run: cargo install --path cargo-pgrx/ --debug --force --locked
 
       - name: Run 'cargo pgrx init'
         run: cargo pgrx init --pg$PG_VER download
@@ -621,7 +621,7 @@ jobs:
           rustup component add clippy
 
       - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force
+        run: cargo install --path cargo-pgrx/ --debug --force --locked
 
       - name: Print sccache stats
         run: sccache --show-stats
@@ -698,7 +698,7 @@ jobs:
         run: sccache --show-stats
 
       - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force
+        run: cargo install --path cargo-pgrx/ --debug --force --locked
 
       - name: Install rustfmt & clippy
         run: |
