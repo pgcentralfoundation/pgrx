@@ -104,10 +104,7 @@ impl CommandExecute for Init {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         self.jobserver
-            .set(
-                jobslot::Client::new(self.resolved_jobs())
-                    .expect("failed to create jobserver"),
-            )
+            .set(jobslot::Client::new(self.resolved_jobs()).expect("failed to create jobserver"))
             .unwrap();
 
         let mut versions = HashMap::new();
