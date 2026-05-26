@@ -1,6 +1,6 @@
 ---
 name: cargo-pgrx
-description: "cargo pgrx CLI, test discipline (#[test] vs #[pg_test]), the pg_sys linkage boundary, and command routing for pgrx extension development. Use when writing tests, choosing between #[test] and #[pg_test], running builds, or invoking any cargo pgrx subcommand."
+description: "Choose and run cargo-pgrx commands, pgrx tests, pg_test coverage, and pg_sys boundary checks."
 user-invocable: false
 ---
 

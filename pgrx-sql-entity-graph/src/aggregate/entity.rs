@@ -24,6 +24,7 @@ use crate::to_sql::ToSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::{SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity};
 use eyre::{WrapErr, eyre};
+use petgraph::graph::NodeIndex;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct AggregateTypeEntity<'a> {
@@ -181,6 +182,39 @@ fn aggregate_sql_type(mapping: &SqlMapping, composite_type: Option<&str>) -> eyr
         SqlMapping::Skip => {
             Err(eyre!("Cannot use skipped SQL translatable type as aggregate const type"))
         }
+    }
+}
+
+/// Render the positional argument-type signature for an aggregate as it
+/// would appear inside `ALTER EXTENSION … ADD AGGREGATE name(…)`. For
+/// ordered-set aggregates the rendering is `(direct ORDER BY args)`;
+/// otherwise it is `(args)`. Matches the shape produced by
+/// `PgAggregateEntity::to_sql`.
+pub(crate) fn render_aggregate_argtypes(
+    context: &PgrxSql,
+    owner: NodeIndex,
+    a: &PgAggregateEntity,
+) -> eyre::Result<String> {
+    let render_slot = |arg: &AggregateTypeEntity| -> eyre::Result<String> {
+        let slot = arg.name.unwrap_or("aggregate argument");
+        let prefix = context.schema_prefix_for_used_type(&owner, slot, &arg.used_ty)?;
+        let sql = match arg.used_ty.metadata.argument_sql {
+            Ok(ref mapping) => aggregate_sql_type(mapping, arg.used_ty.composite_type)?,
+            Err(err) => return Err(err.into()),
+        };
+        let variadic = if arg.used_ty.variadic { "VARIADIC " } else { "" };
+        Ok(format!("{variadic}{prefix}{sql}"))
+    };
+
+    let args = a.args.iter().map(render_slot).collect::<eyre::Result<Vec<_>>>()?.join(", ");
+    let direct = a.direct_args.as_deref().unwrap_or(&[]);
+
+    if a.ordered_set {
+        let direct_rendered =
+            direct.iter().map(render_slot).collect::<eyre::Result<Vec<_>>>()?.join(", ");
+        Ok(format!("({direct_rendered} ORDER BY {args})"))
+    } else {
+        Ok(format!("({args})"))
     }
 }
 
