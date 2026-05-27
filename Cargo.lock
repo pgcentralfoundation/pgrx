@@ -478,7 +478,7 @@ dependencies = [
  "url",
  "uuid",
  "which",
- "zip-extract",
+ "zip",
 ]
 
 [[package]]
@@ -4852,17 +4852,6 @@ dependencies = [
  "zeroize",
  "zopfli",
  "zstd",
-]
-
-[[package]]
-name = "zip-extract"
-version = "0.2.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "db6d94e397dd6d0273e6747e46e7aa0289bfd9736ba8772f2fe948bc4adc3f73"
-dependencies = [
- "log",
- "thiserror 2.0.16",
- "zip",
 ]
 
 [[package]]

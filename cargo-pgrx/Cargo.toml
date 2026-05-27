@@ -59,7 +59,7 @@ tar = "0.4.44"
 ureq = { version = "3.0.10", default-features = false, features = ["gzip", "platform-verifier", "rustls"] }
 url.workspace = true
 which = "7.0.3"
-zip-extract = "0.2.2"
+zip = "5.1.1"
 postgres = { version = "0.19.10", features = ["with-serde_json-1", "with-uuid-1"] }
 uuid = { version = "1.16.0", features = ["v4"] }
 

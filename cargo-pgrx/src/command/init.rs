@@ -302,7 +302,7 @@ fn untar(bytes: &[u8], pgrxdir: &Path, pg_config: &PgConfig, init: &Init) -> eyr
     {
         // it's a zip download from EDB
         use std::io::Cursor;
-        zip_extract::extract(Cursor::new(bytes), &unpackdir, false)?;
+        zip::ZipArchive::new(Cursor::new(bytes))?.extract(&unpackdir)?;
     } else {
         let mut tar_decoder = Archive::new(BzDecoder::new(bytes));
         tar_decoder.unpack(&unpackdir)?;
