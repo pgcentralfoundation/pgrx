@@ -109,7 +109,7 @@ unsafe fn register_hooks() {
     #[pg_guard]
     unsafe extern "C-unwind" fn process_utility_hook(
         pstmt: *mut pg_sys::PlannedStmt,
-        query_string: *const i8,
+        query_string: *const core::ffi::c_char,
         context: pg_sys::ProcessUtilityContext::Type,
         params: *mut pg_sys::ParamListInfoData,
         query_env: *mut pg_sys::QueryEnvironment,
@@ -144,7 +144,7 @@ unsafe fn register_hooks() {
     #[pg_guard]
     unsafe extern "C-unwind" fn process_utility_hook(
         pstmt: *mut pg_sys::PlannedStmt,
-        query_string: *const i8,
+        query_string: *const core::ffi::c_char,
         read_only_tree: bool,
         context: pg_sys::ProcessUtilityContext::Type,
         params: *mut pg_sys::ParamListInfoData,
