@@ -37,6 +37,9 @@ toml.workspace = true
 toml_edit.workspace = true
 
 clap = { version = "4.4.2", features = ["env", "suggestions", "cargo", "derive", "wrap_help"] }
+# Keep the resolver off is-terminal 0.4.7, which pulls rustix 0.37 and breaks
+# current nightly via rustc_attrs.
+is-terminal = "=0.4.17"
 jobslot = "0.2.24" # as seen in gmake -j{N}
 semver = "1.0.28" # checking pgrx versions match
 tempfile = "3.27.0"
