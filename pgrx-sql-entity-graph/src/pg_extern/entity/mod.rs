@@ -25,6 +25,7 @@ pub use cast::PgCastEntity;
 pub use operator::PgOperatorEntity;
 pub use returning::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
+use crate::UsedTypeEntity;
 use crate::fmt;
 use crate::metadata::{Returns, SqlArrayMapping, SqlMapping};
 use crate::pgrx_sql::PgrxSql;
@@ -33,6 +34,7 @@ use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::{ExternArgs, SqlGraphEntity, SqlGraphIdentifier};
 
 use eyre::{WrapErr, eyre};
+use petgraph::graph::NodeIndex;
 
 /// The output of a [`PgExtern`](crate::pg_extern::PgExtern) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
@@ -110,6 +112,84 @@ fn sql_type(mapping: &SqlMapping, composite_type: Option<&str>) -> eyre::Result<
         SqlMapping::Array(value) => array_sql_type(value, composite_type),
         SqlMapping::Skip => Err(eyre!("Found a skipped SQL type where SQL should be emitted")),
     }
+}
+
+/// Render the SQL spelling of one `UsedType`, with schema prefix applied.
+/// This is the bit that sits right after `"name" VARIADIC ` in a CREATE
+/// FUNCTION signature.
+pub(crate) fn render_used_type_sql(
+    context: &PgrxSql,
+    owner: NodeIndex,
+    slot: &str,
+    used_ty: &UsedTypeEntity,
+) -> eyre::Result<String> {
+    let schema_prefix = context.schema_prefix_for_used_type(&owner, slot, used_ty)?;
+    let body = match used_ty.metadata.argument_sql {
+        Ok(SqlMapping::As(ref sql)) => sql.clone(),
+        Ok(ref mapping @ (SqlMapping::Composite | SqlMapping::Array(_))) => {
+            sql_type(mapping, used_ty.composite_type)?
+        }
+        Ok(SqlMapping::Skip) => {
+            return Err(eyre!("Found a skipped SQL type where SQL should be emitted"));
+        }
+        Err(err) => return Err(err.into()),
+    };
+    Ok(format!("{schema_prefix}{body}"))
+}
+
+/// Render the comma-separated argument-type list for a pg_extern, matching
+/// the positional shape of CREATE FUNCTION but without names or defaults.
+/// Skipped args are filtered out; variadic args get a `VARIADIC ` prefix.
+pub(crate) fn render_function_argtypes(
+    context: &PgrxSql,
+    owner: NodeIndex,
+    f: &PgExternEntity,
+) -> eyre::Result<String> {
+    let mut pieces = Vec::new();
+    for arg in f.fn_args.iter().filter(|a| a.used_ty.emits_argument_sql()) {
+        let slot = format!("argument `{}`", arg.pattern);
+        let rendered = render_used_type_sql(context, owner, &slot, &arg.used_ty)?;
+        if arg.used_ty.variadic {
+            pieces.push(format!("VARIADIC {rendered}"));
+        } else {
+            pieces.push(rendered);
+        }
+    }
+    Ok(pieces.join(", "))
+}
+
+/// Render the return type of a pg_extern for contexts that need a plain
+/// scalar, such as CREATE CAST. Errors if the function returns a set or a
+/// table.
+pub(crate) fn render_function_return_type(
+    context: &PgrxSql,
+    owner: NodeIndex,
+    f: &PgExternEntity,
+) -> eyre::Result<String> {
+    let ty = match &f.fn_return {
+        PgExternReturnEntity::Type { ty } => ty,
+        PgExternReturnEntity::None => {
+            return Err(eyre!("Cannot render return type for a function with no return"));
+        }
+        other => {
+            return Err(eyre!("Cannot render a scalar return type for {other:?}"));
+        }
+    };
+    let schema_prefix = context.schema_prefix_for_used_type(&owner, "return type", ty)?;
+    let body = match &ty.metadata.return_sql {
+        Ok(Returns::One(SqlMapping::As(sql))) => sql.clone(),
+        Ok(Returns::One(mapping @ (SqlMapping::Composite | SqlMapping::Array(_)))) => {
+            sql_type(mapping, ty.composite_type)?
+        }
+        Ok(Returns::One(SqlMapping::Skip)) => {
+            return Err(eyre!("Return type was SqlMapping::Skip"));
+        }
+        Ok(other) => {
+            return Err(eyre!("Return type is not a scalar: {other:?}"));
+        }
+        Err(err) => return Err((*err).into()),
+    };
+    Ok(format!("{schema_prefix}{body}"))
 }
 
 impl ToSql for PgExternEntity<'_> {
@@ -418,45 +498,23 @@ impl ToSql for PgExternEntity<'_> {
                 .fn_args
                 .first()
                 .ok_or_else(|| eyre!("Did not find `left_arg` for operator `{}`.", self.name))?;
-            let left_arg_schema_prefix = context.schema_prefix_for_used_type(
-                &self_index,
+            let left_arg_sql = render_used_type_sql(
+                context,
+                self_index,
                 "operator left argument",
                 &left_arg.used_ty,
             )?;
-            let left_arg_sql = match left_arg.used_ty.metadata.argument_sql {
-                Ok(SqlMapping::As(ref sql)) => sql.clone(),
-                Ok(ref mapping @ (SqlMapping::Composite | SqlMapping::Array(_))) => {
-                    sql_type(mapping, left_arg.used_ty.composite_type)?
-                }
-                Ok(SqlMapping::Skip) => {
-                    return Err(eyre!(
-                        "Found an skipped SQL type in an operator, this is not valid"
-                    ));
-                }
-                Err(err) => return Err(err.into()),
-            };
 
             let right_arg = self
                 .fn_args
                 .get(1)
                 .ok_or_else(|| eyre!("Did not find `left_arg` for operator `{}`.", self.name))?;
-            let right_arg_schema_prefix = context.schema_prefix_for_used_type(
-                &self_index,
+            let right_arg_sql = render_used_type_sql(
+                context,
+                self_index,
                 "operator right argument",
                 &right_arg.used_ty,
             )?;
-            let right_arg_sql = match right_arg.used_ty.metadata.argument_sql {
-                Ok(SqlMapping::As(ref sql)) => sql.clone(),
-                Ok(ref mapping @ (SqlMapping::Composite | SqlMapping::Array(_))) => {
-                    sql_type(mapping, right_arg.used_ty.composite_type)?
-                }
-                Ok(SqlMapping::Skip) => {
-                    return Err(eyre!(
-                        "Found an skipped SQL type in an operator, this is not valid"
-                    ));
-                }
-                Err(err) => return Err(err.into()),
-            };
 
             let schema = self
                 .schema
@@ -469,16 +527,14 @@ impl ToSql for PgExternEntity<'_> {
                                                     -- {module_path}::{name}\n\
                                                     CREATE OPERATOR {schema}{opname} (\n\
                                                         \tPROCEDURE={schema}\"{name}\",\n\
-                                                        \tLEFTARG={schema_prefix_left}{left_arg_sql}, /* {left_name} */\n\
-                                                        \tRIGHTARG={schema_prefix_right}{right_arg_sql}{maybe_comma} /* {right_name} */\n\
+                                                        \tLEFTARG={left_arg_sql}, /* {left_name} */\n\
+                                                        \tRIGHTARG={right_arg_sql}{maybe_comma} /* {right_name} */\n\
                                                         {optionals}\
                                                     );\
                                                     ",
                 opname = op.opname.unwrap(),
                 left_name = left_arg.used_ty.full_path,
                 right_name = right_arg.used_ty.full_path,
-                schema_prefix_left = left_arg_schema_prefix,
-                schema_prefix_right = right_arg_schema_prefix,
                 maybe_comma = if !optionals.is_empty() { "," } else { "" },
                 optionals = if !optionals.is_empty() {
                     optionals.join(",\n") + "\n"
@@ -489,47 +545,19 @@ impl ToSql for PgExternEntity<'_> {
             ext_sql += &operator_sql
         };
         if let Some(cast) = &self.cast {
-            let target_fn_arg = &self.fn_return;
-            let target_ty = match target_fn_arg {
+            let target_ty = match &self.fn_return {
                 PgExternReturnEntity::Type { ty } => ty,
                 other => {
                     return Err(eyre!("Casts must return a plain type, got: {other:?}"));
                 }
             };
-            let target_arg_schema_prefix =
-                context.schema_prefix_for_used_type(&self_index, "cast target type", target_ty)?;
-            let target_arg_sql = match &target_ty.metadata.return_sql {
-                Ok(Returns::One(SqlMapping::As(sql))) => sql.clone(),
-                Ok(Returns::One(mapping @ (SqlMapping::Composite | SqlMapping::Array(_)))) => {
-                    sql_type(mapping, target_ty.composite_type)?
-                }
-                Ok(Returns::One(SqlMapping::Skip)) => {
-                    return Err(eyre!("Found an skipped SQL type in a cast, this is not valid"));
-                }
-                Err(err) => return Err((*err).into()),
-                Ok(other) => {
-                    return Err(eyre!("Casts must return a plain SQL type, got: {other:?}"));
-                }
-            };
+            let target_arg_sql = render_function_return_type(context, self_index, self)?;
             let source_arg = self
                 .fn_args
                 .first()
                 .ok_or_else(|| eyre!("Did not find source type for cast `{}`.", self.name))?;
-            let source_arg_schema_prefix = context.schema_prefix_for_used_type(
-                &self_index,
-                "cast source type",
-                &source_arg.used_ty,
-            )?;
-            let source_arg_sql = match source_arg.used_ty.metadata.argument_sql {
-                Ok(SqlMapping::As(ref sql)) => sql.clone(),
-                Ok(ref mapping @ (SqlMapping::Composite | SqlMapping::Array(_))) => {
-                    sql_type(mapping, source_arg.used_ty.composite_type)?
-                }
-                Ok(SqlMapping::Skip) => {
-                    return Err(eyre!("Found an skipped SQL type in a cast, this is not valid"));
-                }
-                Err(err) => return Err(err.into()),
-            };
+            let source_arg_sql =
+                render_used_type_sql(context, self_index, "cast source type", &source_arg.used_ty)?;
             let optional = match cast {
                 PgCastEntity::Default => String::from(""),
                 PgCastEntity::Assignment => String::from(" AS ASSIGNMENT"),
@@ -541,9 +569,9 @@ impl ToSql for PgExternEntity<'_> {
                                                     -- {file}:{line}\n\
                                                     -- {module_path}::{name}\n\
                                                     CREATE CAST (\n\
-                                                        \t{schema_prefix_source}{source_arg_sql} /* {source_name} */\n\
+                                                        \t{source_arg_sql} /* {source_name} */\n\
                                                         \tAS\n\
-                                                        \t{schema_prefix_target}{target_arg_sql} /* {target_name} */\n\
+                                                        \t{target_arg_sql} /* {target_name} */\n\
                                                     )\n\
                                                     WITH FUNCTION {function_name}{optional};\
                                                     ",
@@ -551,9 +579,7 @@ impl ToSql for PgExternEntity<'_> {
                 line = self.line,
                 name = self.name,
                 module_path = self.module_path,
-                schema_prefix_source = source_arg_schema_prefix,
                 source_name = source_arg.used_ty.full_path,
-                schema_prefix_target = target_arg_schema_prefix,
                 target_name = target_ty.full_path,
                 function_name = self.name,
             );

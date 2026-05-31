@@ -395,6 +395,10 @@ fn copy_sql_files(
             None,
             None,
             skip_build,
+            None,
+            // install scripts run inside CREATE EXTENSION and auto-attach;
+            // explicit ALTER EXTENSION would be redundant.
+            false,
             output_tracking,
         )?;
     }

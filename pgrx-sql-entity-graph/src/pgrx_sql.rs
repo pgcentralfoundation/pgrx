@@ -17,11 +17,12 @@ Rust to SQL mapping support.
 */
 
 use eyre::eyre;
+use petgraph::Direction;
 use petgraph::dot::Dot;
 use petgraph::graph::NodeIndex;
 use petgraph::stable_graph::StableGraph;
 use petgraph::visit::EdgeRef;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
 use std::fmt::Debug;
 use std::path::Path;
 
@@ -572,6 +573,411 @@ impl<'a> PgrxSql<'a> {
 
     pub fn find_matching_fn(&self, name: &str) -> Option<&PgExternEntity<'a>> {
         self.externs.keys().find(|key| key.full_path.ends_with(name))
+    }
+
+    /// Resolve a single user-supplied item name to one graph node.
+    ///
+    /// A match is any entity whose SQL-visible name, Rust path, or operator
+    /// symbol equals `name` exactly. A `::`-bearing argument is treated as a
+    /// Rust path (matched only against `full_path`). Ambiguous hits are a
+    /// hard error.
+    pub fn resolve_item(&self, name: &str) -> eyre::Result<NodeIndex> {
+        let by_path = name.contains("::");
+        let mut matches: Vec<(NodeIndex, String)> = Vec::new();
+
+        for (entity, &idx) in &self.externs {
+            let fn_hit = if by_path {
+                entity.full_path == name
+            } else {
+                entity.name == name || entity.unaliased_name == name
+            };
+            if fn_hit {
+                matches.push((idx, format!("function `{}`", entity.full_path)));
+            }
+            if !by_path
+                && let Some(op) = &entity.operator
+                && op.opname == Some(name)
+                && !matches.iter().any(|(existing, _)| *existing == idx)
+            {
+                matches.push((idx, format!("operator `{}` on `{}`", name, entity.full_path)));
+            }
+        }
+
+        for (entity, &idx) in &self.types {
+            let hit = if by_path { entity.full_path == name } else { entity.name == name };
+            if hit {
+                matches.push((idx, format!("type `{}`", entity.full_path)));
+            }
+        }
+
+        for (entity, &idx) in &self.enums {
+            let hit = if by_path { entity.full_path == name } else { entity.name == name };
+            if hit {
+                matches.push((idx, format!("enum `{}`", entity.full_path)));
+            }
+        }
+
+        for (entity, &idx) in &self.aggregates {
+            let hit = if by_path { entity.full_path == name } else { entity.name == name };
+            if hit {
+                matches.push((idx, format!("aggregate `{}`", entity.full_path)));
+            }
+        }
+
+        for (entity, &idx) in &self.triggers {
+            let hit = if by_path { entity.full_path == name } else { entity.function_name == name };
+            if hit {
+                matches.push((idx, format!("trigger `{}`", entity.full_path)));
+            }
+        }
+
+        for (entity, &idx) in &self.extension_sqls {
+            if !by_path && entity.name == name {
+                matches.push((idx, format!("extension_sql `{}`", entity.name)));
+                continue;
+            }
+            for declared in &entity.creates {
+                let declared_name = match declared {
+                    SqlDeclaredEntity::Type(data) | SqlDeclaredEntity::Enum(data) => {
+                        data.name.as_str()
+                    }
+                    SqlDeclaredEntity::Function(data) => data.name.as_str(),
+                };
+                if declared_name == name {
+                    matches.push((
+                        idx,
+                        format!("extension_sql `{}` (declares `{declared_name}`)", entity.name),
+                    ));
+                    break;
+                }
+            }
+        }
+
+        for (entity, &idx) in &self.schemas {
+            if !by_path && entity.name == name {
+                matches.push((idx, format!("schema `{}`", entity.name)));
+            }
+        }
+
+        match matches.len() {
+            0 => Err(eyre!("no SQL entity matches `{name}`")),
+            1 => Ok(matches.remove(0).0),
+            _ => {
+                let labels = matches.iter().map(|(_, l)| l.as_str()).collect::<Vec<_>>().join(", ");
+                Err(eyre!(
+                    "`{name}` is ambiguous; matched: {labels}. Disambiguate with a `::`-qualified Rust path."
+                ))
+            }
+        }
+    }
+
+    /// Emit SQL for the given item names plus all transitive dependencies, in
+    /// dependency order, and substitute `'MODULE_PATHNAME'` with
+    /// `'$libdir/<lib_name>'` so the output can be replayed directly into a
+    /// database.
+    ///
+    /// When `extension_name` is `Some(name)`, the emitted slice is wrapped in
+    /// `BEGIN;`/`COMMIT;` and each created object is followed by an
+    /// `ALTER EXTENSION "<name>" ADD …` clause so that piping the output into
+    /// a database where the extension is already installed attaches the new
+    /// objects to the extension. When `None`, the pre-feature behavior is
+    /// used (no transaction wrapping, no ADD clauses).
+    ///
+    /// Warnings (e.g. for `extension_sql!()` blocks without `creates = [...]`)
+    /// are written to stderr. Use `emit_slice_with_warnings` directly if you
+    /// need to capture them.
+    pub fn to_sql_for_items(
+        &self,
+        item_names: &[String],
+        lib_name: &str,
+        extension_name: Option<&str>,
+    ) -> eyre::Result<String> {
+        self.emit_slice_with_warnings(item_names, lib_name, extension_name, |msg| {
+            eprintln!("{msg}");
+        })
+    }
+
+    /// Core of [`Self::to_sql_for_items`]. Takes a warning sink so tests
+    /// (and future non-stderr callers) can observe the diagnostics that
+    /// would otherwise go to stderr.
+    pub(crate) fn emit_slice_with_warnings<W: FnMut(String)>(
+        &self,
+        item_names: &[String],
+        lib_name: &str,
+        extension_name: Option<&str>,
+        warn: W,
+    ) -> eyre::Result<String> {
+        let mut targets = Vec::with_capacity(item_names.len());
+        for name in item_names {
+            targets.push(self.resolve_item(name)?);
+        }
+        self.emit_slice_from_nodes(&targets, lib_name, extension_name, warn)
+    }
+
+    /// Same as [`Self::emit_slice_with_warnings`] but takes already-resolved
+    /// node indices. Used by tests that need to target entities whose
+    /// resolution is ambiguous or not supported by [`Self::resolve_item`]
+    /// (e.g. `Ord` and `Hash` derives).
+    pub(crate) fn emit_slice_from_nodes<W: FnMut(String)>(
+        &self,
+        targets: &[NodeIndex],
+        lib_name: &str,
+        extension_name: Option<&str>,
+        mut warn: W,
+    ) -> eyre::Result<String> {
+        let keep = self.collect_transitive_deps(targets);
+
+        let mut body = String::new();
+        for nodes in petgraph::algo::tarjan_scc(&self.graph).iter().rev() {
+            let ordered = self.connected_component_emit_order(nodes);
+            let mut block = Vec::new();
+
+            for node in ordered {
+                if !keep.contains(&node) {
+                    continue;
+                }
+                let ent = &self.graph[node];
+
+                // The ExtensionRoot's CREATE-phase output is a trivial comment
+                // block that reads "auto generated by pgrx". Inside a slice
+                // aimed at an already-installed extension it would be strange
+                // and confusing, so skip it.
+                if matches!(ent, SqlGraphEntity::ExtensionRoot(_)) {
+                    continue;
+                }
+
+                let create_sql = ent.to_sql(self)?;
+                let create_sql = create_sql.trim();
+
+                let mut piece = String::new();
+                if !create_sql.is_empty() {
+                    piece.push_str(create_sql);
+                    piece.push('\n');
+                }
+
+                if let Some(ext) = extension_name {
+                    match self.render_alter_extension_for_node(node, ext)? {
+                        Some(alter_sql) => {
+                            piece.push_str(&alter_sql);
+                            if !alter_sql.ends_with('\n') {
+                                piece.push('\n');
+                            }
+                        }
+                        None => {
+                            if let SqlGraphEntity::CustomSql(c) = ent
+                                && c.creates.is_empty()
+                            {
+                                warn(format!(
+                                    "warning: extension_sql block at {}:{} does not declare `creates = [...]`; its objects won't be attached to the extension automatically",
+                                    c.file, c.line,
+                                ));
+                            }
+                        }
+                    }
+                }
+
+                if !piece.is_empty() {
+                    block.push(piece);
+                }
+            }
+
+            if !block.is_empty() {
+                body.push_str("/* <begin connected objects> */\n");
+                body.push_str(&block.join("\n"));
+                body.push_str("/* </end connected objects> */\n\n");
+            }
+        }
+
+        let replacement = format!("'$libdir/{lib_name}'");
+        let body = body.replace("'MODULE_PATHNAME'", &replacement);
+
+        Ok(match extension_name {
+            Some(_) => format!("BEGIN;\n\n{body}\nCOMMIT;\n"),
+            None => body,
+        })
+    }
+
+    /// Produce the `ALTER EXTENSION "<ext>" ADD …;` clauses for `node`, or
+    /// `Ok(None)` when the node is not an extension-attachable object
+    /// (builtin type, extension root, or a free-form `extension_sql!()`
+    /// block that didn't declare `creates = [...]`).
+    fn render_alter_extension_for_node(
+        &self,
+        node: NodeIndex,
+        extension_name: &str,
+    ) -> eyre::Result<Option<String>> {
+        let ent = &self.graph[node];
+        let ext = extension_name;
+
+        match ent {
+            SqlGraphEntity::Function(f) => {
+                let schema = f
+                    .schema
+                    .map(|s| format!("{s}."))
+                    .unwrap_or_else(|| self.schema_prefix_for(&node));
+                let argtypes = crate::pg_extern::entity::render_function_argtypes(self, node, f)?;
+                let mut out = format!(
+                    "ALTER EXTENSION \"{ext}\" ADD FUNCTION {schema}\"{name}\"({argtypes});",
+                    name = f.name
+                );
+
+                if let Some(op) = &f.operator
+                    && let Some(opname) = op.opname
+                {
+                    let left = f
+                        .fn_args
+                        .first()
+                        .ok_or_else(|| eyre!("operator `{}` missing left argument", f.name))?;
+                    let right = f
+                        .fn_args
+                        .get(1)
+                        .ok_or_else(|| eyre!("operator `{}` missing right argument", f.name))?;
+                    let left_sql = crate::pg_extern::entity::render_used_type_sql(
+                        self,
+                        node,
+                        "operator left argument",
+                        &left.used_ty,
+                    )?;
+                    let right_sql = crate::pg_extern::entity::render_used_type_sql(
+                        self,
+                        node,
+                        "operator right argument",
+                        &right.used_ty,
+                    )?;
+                    out.push('\n');
+                    out.push_str(&format!(
+                        "ALTER EXTENSION \"{ext}\" ADD OPERATOR {schema}{opname}({left_sql}, {right_sql});"
+                    ));
+                }
+
+                if f.cast.is_some() {
+                    let source = f
+                        .fn_args
+                        .first()
+                        .ok_or_else(|| eyre!("cast `{}` missing source argument", f.name))?;
+                    let source_sql = crate::pg_extern::entity::render_used_type_sql(
+                        self,
+                        node,
+                        "cast source type",
+                        &source.used_ty,
+                    )?;
+                    let target_sql =
+                        crate::pg_extern::entity::render_function_return_type(self, node, f)?;
+                    out.push('\n');
+                    out.push_str(&format!(
+                        "ALTER EXTENSION \"{ext}\" ADD CAST ({source_sql} AS {target_sql});"
+                    ));
+                }
+
+                Ok(Some(out))
+            }
+            SqlGraphEntity::Type(t) => {
+                let schema = self.schema_prefix_for(&node);
+                Ok(Some(format!(
+                    "ALTER EXTENSION \"{ext}\" ADD TYPE {schema}{name};",
+                    name = t.name
+                )))
+            }
+            SqlGraphEntity::Enum(e) => {
+                let schema = self.schema_prefix_for(&node);
+                Ok(Some(format!(
+                    "ALTER EXTENSION \"{ext}\" ADD TYPE {schema}{name};",
+                    name = e.name
+                )))
+            }
+            SqlGraphEntity::Aggregate(a) => {
+                let schema = self.schema_prefix_for(&node);
+                let argtypes = crate::aggregate::entity::render_aggregate_argtypes(self, node, a)?;
+                Ok(Some(format!(
+                    "ALTER EXTENSION \"{ext}\" ADD AGGREGATE {schema}\"{name}\"{argtypes};",
+                    name = a.name
+                )))
+            }
+            SqlGraphEntity::Trigger(t) => {
+                let schema = self.schema_prefix_for(&node);
+                Ok(Some(format!(
+                    "ALTER EXTENSION \"{ext}\" ADD FUNCTION {schema}\"{name}\"();",
+                    name = t.function_name
+                )))
+            }
+            SqlGraphEntity::Ord(o) => {
+                // Unqualified names: matches `PostgresOrdEntity::to_sql`, which
+                // also emits `{name}_btree_ops` without a schema prefix.
+                Ok(Some(format!(
+                    "ALTER EXTENSION \"{ext}\" ADD OPERATOR FAMILY {name}_btree_ops USING btree;\n\
+                     ALTER EXTENSION \"{ext}\" ADD OPERATOR CLASS {name}_btree_ops USING btree;",
+                    name = o.name
+                )))
+            }
+            SqlGraphEntity::Hash(h) => {
+                // Same unqualified-name rationale as Ord.
+                Ok(Some(format!(
+                    "ALTER EXTENSION \"{ext}\" ADD OPERATOR FAMILY {name}_hash_ops USING hash;\n\
+                     ALTER EXTENSION \"{ext}\" ADD OPERATOR CLASS {name}_hash_ops USING hash;",
+                    name = h.name
+                )))
+            }
+            SqlGraphEntity::Schema(s) => {
+                if matches!(s.name, "public" | "pg_catalog") {
+                    return Ok(None);
+                }
+                Ok(Some(format!("ALTER EXTENSION \"{ext}\" ADD SCHEMA {name};", name = s.name)))
+            }
+            SqlGraphEntity::CustomSql(c) => {
+                if c.creates.is_empty() {
+                    return Ok(None);
+                }
+                let mut out = String::new();
+                for (idx, declared) in c.creates.iter().enumerate() {
+                    if idx > 0 {
+                        out.push('\n');
+                    }
+                    match declared {
+                        SqlDeclaredEntity::Type(data) => {
+                            out.push_str(&format!(
+                                "ALTER EXTENSION \"{ext}\" ADD TYPE {};",
+                                data.sql
+                            ));
+                        }
+                        SqlDeclaredEntity::Enum(data) => {
+                            out.push_str(&format!(
+                                "ALTER EXTENSION \"{ext}\" ADD TYPE {};",
+                                data.sql
+                            ));
+                        }
+                        SqlDeclaredEntity::Function(data) => {
+                            out.push_str(&format!(
+                                "ALTER EXTENSION \"{ext}\" ADD FUNCTION {};",
+                                data.sql
+                            ));
+                        }
+                    }
+                }
+                Ok(Some(out))
+            }
+            SqlGraphEntity::BuiltinType(_) | SqlGraphEntity::ExtensionRoot(_) => Ok(None),
+        }
+    }
+
+    /// Collect every node reachable from `targets` by walking edges backward
+    /// (i.e. every dependency that must exist before the targets can be
+    /// created). The returned set always contains the targets themselves.
+    fn collect_transitive_deps(&self, targets: &[NodeIndex]) -> HashSet<NodeIndex> {
+        let mut visited = HashSet::new();
+        let mut queue = VecDeque::new();
+        for &t in targets {
+            if visited.insert(t) {
+                queue.push_back(t);
+            }
+        }
+        while let Some(node) = queue.pop_front() {
+            for predecessor in self.graph.neighbors_directed(node, Direction::Incoming) {
+                if visited.insert(predecessor) {
+                    queue.push_back(predecessor);
+                }
+            }
+        }
+        visited
     }
 }
 
@@ -1825,10 +2231,18 @@ mod tests {
     use super::*;
     use crate::UsedTypeEntity;
     use crate::aggregate::entity::{AggregateTypeEntity, PgAggregateEntity};
-    use crate::extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredTypeEntityData};
+    use crate::extension_sql::entity::{
+        ExtensionSqlEntity, SqlDeclaredEntity, SqlDeclaredTypeEntityData,
+    };
     use crate::extern_args::ExternArgs;
     use crate::metadata::{FunctionMetadataTypeEntity, Returns, SqlArrayMapping, SqlMapping};
-    use crate::pg_extern::entity::{PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity};
+    use crate::pg_extern::entity::{
+        PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity, PgOperatorEntity,
+    };
+    use crate::pg_trigger::entity::PgTriggerEntity;
+    use crate::postgres_enum::entity::PostgresEnumEntity;
+    use crate::postgres_hash::entity::PostgresHashEntity;
+    use crate::postgres_ord::entity::PostgresOrdEntity;
     use crate::postgres_type::entity::PostgresTypeEntity;
     use crate::schema::entity::SchemaEntity;
     use crate::to_sql::entity::ToSqlConfigEntity;
@@ -2464,5 +2878,653 @@ mod tests {
         assert!(error.to_string().contains("Aggregate `tests::bad_aggregate_mstype`"));
         assert!(error.to_string().contains("MSTYPE"));
         assert!(error.to_string().contains("tests::BadMovingState"));
+    }
+
+    #[test]
+    fn to_sql_for_items_emits_only_targets_and_deps_with_lib_substitution() {
+        let hexint = extension_owned_type("tests::HexInt", "tests::HexInt", "hexint");
+        let declared = declared_type_sql(
+            "tests",
+            "tests::concrete_type",
+            "concrete_type",
+            "tests::HexInt",
+            "tests::HexInt",
+            "hexint",
+        );
+        let target =
+            function_entity("emit_me", vec![], PgExternReturnEntity::Type { ty: hexint.clone() });
+        let unused = function_entity(
+            "leave_me_out",
+            vec![],
+            PgExternReturnEntity::Type {
+                ty: external_type("alloc::string::String", "alloc::string::String", "text"),
+            },
+        );
+
+        let pgrx_sql = PgrxSql::build(
+            vec![
+                SqlGraphEntity::ExtensionRoot(control_file()),
+                SqlGraphEntity::CustomSql(declared),
+                SqlGraphEntity::Function(target),
+                SqlGraphEntity::Function(unused),
+            ]
+            .into_iter(),
+            "myext".into(),
+            false,
+        )
+        .unwrap();
+
+        let sliced = pgrx_sql
+            .to_sql_for_items(&["emit_me".into()], "myext", None)
+            .expect("slice emission should succeed");
+
+        assert!(sliced.contains("emit_me"), "target function missing:\n{sliced}");
+        assert!(sliced.contains("CREATE TYPE custom_type;"), "transitive dep missing:\n{sliced}");
+        assert!(!sliced.contains("leave_me_out"), "unrelated function leaked:\n{sliced}");
+        assert!(
+            sliced.contains("'$libdir/myext'"),
+            "MODULE_PATHNAME should be substituted:\n{sliced}"
+        );
+        assert!(!sliced.contains("'MODULE_PATHNAME'"), "raw placeholder remained:\n{sliced}");
+    }
+
+    #[test]
+    fn resolve_item_rejects_ambiguous_name_without_path() {
+        let dup_a = function_entity("dup_fn", vec![], PgExternReturnEntity::None);
+        let mut dup_b = function_entity("dup_fn", vec![], PgExternReturnEntity::None);
+        dup_b.module_path = "tests::other";
+        dup_b.full_path = "tests::other::dup_fn";
+
+        let pgrx_sql = PgrxSql::build(
+            vec![
+                SqlGraphEntity::ExtensionRoot(control_file()),
+                SqlGraphEntity::Function(dup_a),
+                SqlGraphEntity::Function(dup_b),
+            ]
+            .into_iter(),
+            "test".into(),
+            false,
+        )
+        .unwrap();
+
+        let err = pgrx_sql.resolve_item("dup_fn").expect_err("ambiguous name should fail");
+        let msg = err.to_string();
+        assert!(msg.contains("ambiguous"), "expected ambiguity error, got: {msg}");
+        assert!(msg.contains("tests::dup_fn"), "got: {msg}");
+        assert!(msg.contains("tests::other::dup_fn"), "got: {msg}");
+
+        let unique =
+            pgrx_sql.resolve_item("tests::other::dup_fn").expect("qualified path should resolve");
+        assert_eq!(pgrx_sql.graph[unique].rust_identifier(), "tests::other::dup_fn");
+    }
+
+    fn slice_with_warnings(
+        sql: &PgrxSql,
+        items: &[String],
+        lib_name: &str,
+        ext: Option<&str>,
+    ) -> (String, Vec<String>) {
+        let mut warnings: Vec<String> = Vec::new();
+        let out = sql
+            .emit_slice_with_warnings(items, lib_name, ext, |msg| warnings.push(msg))
+            .expect("slice emission should succeed");
+        (out, warnings)
+    }
+
+    fn slice_by_nodes(
+        sql: &PgrxSql,
+        targets: &[NodeIndex],
+        lib_name: &str,
+        ext: Option<&str>,
+    ) -> (String, Vec<String>) {
+        let mut warnings: Vec<String> = Vec::new();
+        let out = sql
+            .emit_slice_from_nodes(targets, lib_name, ext, |msg| warnings.push(msg))
+            .expect("slice emission should succeed");
+        (out, warnings)
+    }
+
+    fn trigger_entity(function_name: &'static str) -> PgTriggerEntity<'static> {
+        PgTriggerEntity {
+            function_name,
+            to_sql_config: to_sql_config(),
+            file: "test.rs",
+            line: 1,
+            module_path: "tests",
+            full_path: Box::leak(format!("tests::{function_name}").into_boxed_str()),
+        }
+    }
+
+    fn ord_entity(name: &'static str) -> PostgresOrdEntity<'static> {
+        // full_path lives under `ord_for::` to avoid colliding with the
+        // underlying type's full_path (which is `tests::{name}`). The `name`
+        // field is what appears in CREATE OPERATOR FAMILY / CLASS.
+        PostgresOrdEntity {
+            name,
+            file: "test.rs",
+            line: 1,
+            full_path: Box::leak(format!("tests::ord_for::{name}").into_boxed_str()),
+            module_path: "tests::ord_for",
+            type_ident: Box::leak(format!("tests::{name}").into_boxed_str()),
+            to_sql_config: to_sql_config(),
+        }
+    }
+
+    fn hash_entity(name: &'static str) -> PostgresHashEntity<'static> {
+        // Same disambiguation rationale as `ord_entity`.
+        PostgresHashEntity {
+            name,
+            file: "test.rs",
+            line: 1,
+            full_path: Box::leak(format!("tests::hash_for::{name}").into_boxed_str()),
+            module_path: "tests::hash_for",
+            type_ident: Box::leak(format!("tests::{name}").into_boxed_str()),
+            to_sql_config: to_sql_config(),
+        }
+    }
+
+    fn enum_entity(name: &'static str) -> PostgresEnumEntity<'static> {
+        PostgresEnumEntity {
+            name,
+            file: "test.rs",
+            line: 1,
+            full_path: Box::leak(format!("tests::{name}").into_boxed_str()),
+            module_path: "tests",
+            type_ident: Box::leak(format!("tests::{name}").into_boxed_str()),
+            variants: vec!["red", "green", "blue"],
+            to_sql_config: to_sql_config(),
+        }
+    }
+
+    #[test]
+    fn alter_extension_attaches_bare_function() {
+        let fun = function_entity("state_fn", vec![], PgExternReturnEntity::None);
+        let sql = PgrxSql::build(
+            vec![SqlGraphEntity::ExtensionRoot(control_file()), SqlGraphEntity::Function(fun)]
+                .into_iter(),
+            "myext".into(),
+            false,
+        )
+        .unwrap();
+
+        let (out, warnings) =
+            slice_with_warnings(&sql, &["state_fn".into()], "myext", Some("myext"));
+        assert!(warnings.is_empty(), "unexpected warnings: {warnings:?}");
+        assert!(out.starts_with("BEGIN;"), "missing BEGIN:\n{out}");
+        assert!(out.trim_end().ends_with("COMMIT;"), "missing COMMIT:\n{out}");
+        assert!(
+            out.contains(r#"ALTER EXTENSION "myext" ADD FUNCTION "state_fn"();"#),
+            "missing ADD FUNCTION:\n{out}"
+        );
+    }
+
+    #[test]
+    fn alter_extension_includes_argument_types() {
+        let arg_ty = external_type("alloc::string::String", "alloc::string::String", "text");
+        let fun = function_entity(
+            "takes_text",
+            vec![PgExternArgumentEntity { pattern: "value", used_ty: arg_ty }],
+            PgExternReturnEntity::None,
+        );
+        let sql = PgrxSql::build(
+            vec![SqlGraphEntity::ExtensionRoot(control_file()), SqlGraphEntity::Function(fun)]
+                .into_iter(),
+            "myext".into(),
+            false,
+        )
+        .unwrap();
+
+        let (out, _) = slice_with_warnings(&sql, &["takes_text".into()], "myext", Some("myext"));
+        assert!(
+            out.contains(r#"ALTER EXTENSION "myext" ADD FUNCTION "takes_text"(text);"#),
+            "missing argtype in ADD FUNCTION:\n{out}"
+        );
+    }
+
+    #[test]
+    fn alter_extension_attaches_operator_in_addition_to_function() {
+        let arg_ty = external_type("alloc::string::String", "alloc::string::String", "text");
+        let mut fun = function_entity(
+            "eq_ignoring_case",
+            vec![
+                PgExternArgumentEntity { pattern: "lhs", used_ty: arg_ty.clone() },
+                PgExternArgumentEntity { pattern: "rhs", used_ty: arg_ty },
+            ],
+            PgExternReturnEntity::Type { ty: external_type("bool", "bool", "bool") },
+        );
+        fun.operator = Some(PgOperatorEntity {
+            opname: Some("==="),
+            commutator: None,
+            negator: None,
+            restrict: None,
+            join: None,
+            hashes: false,
+            merges: false,
+        });
+
+        let sql = PgrxSql::build(
+            vec![SqlGraphEntity::ExtensionRoot(control_file()), SqlGraphEntity::Function(fun)]
+                .into_iter(),
+            "myext".into(),
+            false,
+        )
+        .unwrap();
+
+        let (out, _) =
+            slice_with_warnings(&sql, &["eq_ignoring_case".into()], "myext", Some("myext"));
+        assert!(
+            out.contains(r#"ALTER EXTENSION "myext" ADD FUNCTION "eq_ignoring_case"(text, text);"#),
+            "missing ADD FUNCTION:\n{out}"
+        );
+        assert!(
+            out.contains(r#"ALTER EXTENSION "myext" ADD OPERATOR ===(text, text);"#),
+            "missing ADD OPERATOR:\n{out}"
+        );
+    }
+
+    #[test]
+    fn alter_extension_attaches_type_and_its_io_functions() {
+        let ty = type_entity("MyType", "tests::MyType", "tests::MyType");
+        let in_fn = function_entity(
+            "in_fn",
+            vec![PgExternArgumentEntity {
+                pattern: "input",
+                used_ty: external_type("&core::ffi::CStr", "&core::ffi::CStr", "cstring"),
+            }],
+            PgExternReturnEntity::Type {
+                ty: used_type(
+                    "tests::MyType",
+                    "tests::MyType",
+                    "MyType",
+                    TypeOrigin::ThisExtension,
+                ),
+            },
+        );
+        let out_fn = function_entity(
+            "out_fn",
+            vec![PgExternArgumentEntity {
+                pattern: "input",
+                used_ty: used_type(
+                    "tests::MyType",
+                    "tests::MyType",
+                    "MyType",
+                    TypeOrigin::ThisExtension,
+                ),
+            }],
+            PgExternReturnEntity::Type {
+                ty: external_type("alloc::ffi::CString", "alloc::ffi::CString", "cstring"),
+            },
+        );
+
+        let sql = PgrxSql::build(
+            vec![
+                SqlGraphEntity::ExtensionRoot(control_file()),
+                SqlGraphEntity::Type(ty),
+                SqlGraphEntity::Function(in_fn),
+                SqlGraphEntity::Function(out_fn),
+            ]
+            .into_iter(),
+            "myext".into(),
+            false,
+        )
+        .unwrap();
+
+        let (out, _) = slice_with_warnings(&sql, &["tests::MyType".into()], "myext", Some("myext"));
+        assert!(
+            out.contains(r#"ALTER EXTENSION "myext" ADD TYPE MyType;"#),
+            "missing ADD TYPE:\n{out}"
+        );
+        assert!(
+            out.contains(r#"ALTER EXTENSION "myext" ADD FUNCTION "in_fn"(cstring);"#),
+            "missing ADD FUNCTION for in_fn:\n{out}"
+        );
+        assert!(
+            out.contains(r#"ALTER EXTENSION "myext" ADD FUNCTION "out_fn"(MyType);"#),
+            "missing ADD FUNCTION for out_fn:\n{out}"
+        );
+    }
+
+    #[test]
+    fn alter_extension_attaches_enum() {
+        let en = enum_entity("Color");
+        let sql = PgrxSql::build(
+            vec![SqlGraphEntity::ExtensionRoot(control_file()), SqlGraphEntity::Enum(en)]
+                .into_iter(),
+            "myext".into(),
+            false,
+        )
+        .unwrap();
+
+        let (out, _) = slice_with_warnings(&sql, &["Color".into()], "myext", Some("myext"));
+        assert!(
+            out.contains(r#"ALTER EXTENSION "myext" ADD TYPE Color;"#),
+            "missing ADD TYPE:\n{out}"
+        );
+    }
+
+    #[test]
+    fn alter_extension_attaches_aggregate_with_args() {
+        let stype = external_type("tests::State", "tests::State", "TEXT");
+        let arg_ty = external_type("i32", "i32", "integer");
+        let agg = aggregate_entity(
+            "sum_my",
+            vec![AggregateTypeEntity { used_ty: arg_ty, name: Some("value") }],
+            stype,
+            None,
+        );
+
+        let sql = PgrxSql::build(
+            vec![
+                SqlGraphEntity::ExtensionRoot(control_file()),
+                SqlGraphEntity::Function(state_function()),
+                SqlGraphEntity::Aggregate(agg),
+            ]
+            .into_iter(),
+            "myext".into(),
+            false,
+        )
+        .unwrap();
+
+        let (out, _) = slice_with_warnings(&sql, &["sum_my".into()], "myext", Some("myext"));
+        assert!(
+            out.contains(r#"ALTER EXTENSION "myext" ADD AGGREGATE "sum_my"(integer);"#),
+            "missing ADD AGGREGATE:\n{out}"
+        );
+    }
+
+    #[test]
+    fn alter_extension_attaches_trigger() {
+        let trig = trigger_entity("my_trig");
+        let sql = PgrxSql::build(
+            vec![SqlGraphEntity::ExtensionRoot(control_file()), SqlGraphEntity::Trigger(trig)]
+                .into_iter(),
+            "myext".into(),
+            false,
+        )
+        .unwrap();
+
+        let (out, _) = slice_with_warnings(&sql, &["my_trig".into()], "myext", Some("myext"));
+        assert!(
+            out.contains(r#"ALTER EXTENSION "myext" ADD FUNCTION "my_trig"();"#),
+            "missing ADD FUNCTION (trigger):\n{out}"
+        );
+    }
+
+    #[test]
+    fn alter_extension_attaches_ord_emits_family_and_class() {
+        // Build the underlying type + comparison functions so the Ord node
+        // has something to connect to. We don't assert on those; we only
+        // care that the Ord node's ALTER EXTENSION clauses come out right.
+        let mut ty = type_entity("Sortable", "tests::Sortable", "tests::Sortable");
+        ty.in_fn_path = "sortable_in";
+        ty.out_fn_path = "sortable_out";
+        let text = external_type("alloc::string::String", "alloc::string::String", "text");
+        let cstring = external_type("&core::ffi::CStr", "&core::ffi::CStr", "cstring");
+        let in_fn = function_entity(
+            "sortable_in",
+            vec![PgExternArgumentEntity { pattern: "input", used_ty: cstring }],
+            PgExternReturnEntity::Type {
+                ty: used_type(
+                    "tests::Sortable",
+                    "tests::Sortable",
+                    "Sortable",
+                    TypeOrigin::ThisExtension,
+                ),
+            },
+        );
+        let out_fn = function_entity(
+            "sortable_out",
+            vec![PgExternArgumentEntity {
+                pattern: "input",
+                used_ty: used_type(
+                    "tests::Sortable",
+                    "tests::Sortable",
+                    "Sortable",
+                    TypeOrigin::ThisExtension,
+                ),
+            }],
+            PgExternReturnEntity::Type { ty: text },
+        );
+        let ord = ord_entity("Sortable");
+
+        let sql = PgrxSql::build(
+            vec![
+                SqlGraphEntity::ExtensionRoot(control_file()),
+                SqlGraphEntity::Type(ty),
+                SqlGraphEntity::Function(in_fn),
+                SqlGraphEntity::Function(out_fn),
+                SqlGraphEntity::Ord(ord.clone()),
+            ]
+            .into_iter(),
+            "myext".into(),
+            false,
+        )
+        .unwrap();
+
+        let ord_idx = sql.ords[&ord];
+        let (out, _) = slice_by_nodes(&sql, &[ord_idx], "myext", Some("myext"));
+        assert!(
+            out.contains(
+                r#"ALTER EXTENSION "myext" ADD OPERATOR FAMILY Sortable_btree_ops USING btree;"#
+            ),
+            "missing ADD OPERATOR FAMILY:\n{out}"
+        );
+        assert!(
+            out.contains(
+                r#"ALTER EXTENSION "myext" ADD OPERATOR CLASS Sortable_btree_ops USING btree;"#
+            ),
+            "missing ADD OPERATOR CLASS:\n{out}"
+        );
+    }
+
+    #[test]
+    fn alter_extension_attaches_hash_emits_family_and_class() {
+        let mut ty = type_entity("Hashable", "tests::Hashable", "tests::Hashable");
+        ty.in_fn_path = "hashable_in";
+        ty.out_fn_path = "hashable_out";
+        let text = external_type("alloc::string::String", "alloc::string::String", "text");
+        let cstring = external_type("&core::ffi::CStr", "&core::ffi::CStr", "cstring");
+        let in_fn = function_entity(
+            "hashable_in",
+            vec![PgExternArgumentEntity { pattern: "input", used_ty: cstring }],
+            PgExternReturnEntity::Type {
+                ty: used_type(
+                    "tests::Hashable",
+                    "tests::Hashable",
+                    "Hashable",
+                    TypeOrigin::ThisExtension,
+                ),
+            },
+        );
+        let out_fn = function_entity(
+            "hashable_out",
+            vec![PgExternArgumentEntity {
+                pattern: "input",
+                used_ty: used_type(
+                    "tests::Hashable",
+                    "tests::Hashable",
+                    "Hashable",
+                    TypeOrigin::ThisExtension,
+                ),
+            }],
+            PgExternReturnEntity::Type { ty: text },
+        );
+        let hash = hash_entity("Hashable");
+
+        let sql = PgrxSql::build(
+            vec![
+                SqlGraphEntity::ExtensionRoot(control_file()),
+                SqlGraphEntity::Type(ty),
+                SqlGraphEntity::Function(in_fn),
+                SqlGraphEntity::Function(out_fn),
+                SqlGraphEntity::Hash(hash.clone()),
+            ]
+            .into_iter(),
+            "myext".into(),
+            false,
+        )
+        .unwrap();
+
+        let hash_idx = sql.hashes[&hash];
+        let (out, _) = slice_by_nodes(&sql, &[hash_idx], "myext", Some("myext"));
+        assert!(
+            out.contains(
+                r#"ALTER EXTENSION "myext" ADD OPERATOR FAMILY Hashable_hash_ops USING hash;"#
+            ),
+            "missing ADD OPERATOR FAMILY:\n{out}"
+        );
+        assert!(
+            out.contains(
+                r#"ALTER EXTENSION "myext" ADD OPERATOR CLASS Hashable_hash_ops USING hash;"#
+            ),
+            "missing ADD OPERATOR CLASS:\n{out}"
+        );
+    }
+
+    #[test]
+    fn alter_extension_attaches_schema_but_skips_public() {
+        let schema = schema_entity("tests::my_schema", "my_schema");
+        let fun_arg = external_type("i32", "i32", "integer");
+        let mut fun = function_entity(
+            "my_fn",
+            vec![PgExternArgumentEntity { pattern: "x", used_ty: fun_arg }],
+            PgExternReturnEntity::None,
+        );
+        fun.module_path = "tests::my_schema";
+        fun.full_path = "tests::my_schema::my_fn";
+
+        let sql = PgrxSql::build(
+            vec![
+                SqlGraphEntity::ExtensionRoot(control_file()),
+                SqlGraphEntity::Schema(schema),
+                SqlGraphEntity::Function(fun),
+            ]
+            .into_iter(),
+            "myext".into(),
+            false,
+        )
+        .unwrap();
+
+        let (out, _) =
+            slice_with_warnings(&sql, &["tests::my_schema::my_fn".into()], "myext", Some("myext"));
+        assert!(
+            out.contains(r#"ALTER EXTENSION "myext" ADD SCHEMA my_schema;"#),
+            "missing ADD SCHEMA:\n{out}"
+        );
+        assert!(
+            !out.contains("ADD SCHEMA public"),
+            "should not emit ADD SCHEMA for public:\n{out}"
+        );
+    }
+
+    #[test]
+    fn alter_extension_custom_sql_with_creates_emits_add_type() {
+        let hexint = extension_owned_type("tests::HexInt", "tests::HexInt", "hexint");
+        let declared = declared_type_sql(
+            "tests",
+            "tests::concrete_type",
+            "concrete_type",
+            "tests::HexInt",
+            "tests::HexInt",
+            "hexint",
+        );
+        let target =
+            function_entity("uses_hexint", vec![], PgExternReturnEntity::Type { ty: hexint });
+
+        let sql = PgrxSql::build(
+            vec![
+                SqlGraphEntity::ExtensionRoot(control_file()),
+                SqlGraphEntity::CustomSql(declared),
+                SqlGraphEntity::Function(target),
+            ]
+            .into_iter(),
+            "myext".into(),
+            false,
+        )
+        .unwrap();
+
+        let (out, warnings) =
+            slice_with_warnings(&sql, &["uses_hexint".into()], "myext", Some("myext"));
+        assert!(warnings.is_empty(), "unexpected warnings: {warnings:?}");
+        assert!(
+            out.contains(r#"ALTER EXTENSION "myext" ADD TYPE hexint;"#),
+            "missing ADD TYPE for declared type:\n{out}"
+        );
+    }
+
+    #[test]
+    fn alter_extension_custom_sql_without_creates_warns() {
+        let free_form = ExtensionSqlEntity {
+            module_path: "tests",
+            full_path: "tests::free_form_sql",
+            sql: "CREATE TABLE some_table(id INT);",
+            file: "somefile.rs",
+            line: 42,
+            name: "free_form_sql",
+            bootstrap: false,
+            finalize: false,
+            requires: vec![],
+            creates: vec![],
+        };
+
+        // Emit a function that transitively pulls the free-form block in
+        // through a `requires`. Simplest path: slice the free-form block
+        // directly by name.
+        let sql = PgrxSql::build(
+            vec![
+                SqlGraphEntity::ExtensionRoot(control_file()),
+                SqlGraphEntity::CustomSql(free_form),
+            ]
+            .into_iter(),
+            "myext".into(),
+            false,
+        )
+        .unwrap();
+
+        let (out, warnings) =
+            slice_with_warnings(&sql, &["free_form_sql".into()], "myext", Some("myext"));
+        assert!(
+            !out.contains(r#"ALTER EXTENSION "myext" ADD"#),
+            "free-form block should not emit ADD:\n{out}"
+        );
+        assert_eq!(warnings.len(), 1, "expected one warning, got: {warnings:?}");
+        assert!(warnings[0].contains("somefile.rs:42"), "warning missing file:line: {warnings:?}");
+        assert!(
+            warnings[0].contains("free-form") || warnings[0].contains("creates"),
+            "warning missing reason: {warnings:?}"
+        );
+    }
+
+    #[test]
+    fn no_alter_extension_mode_matches_pre_feature_output() {
+        let fun = function_entity("state_fn", vec![], PgExternReturnEntity::None);
+        let sql = PgrxSql::build(
+            vec![SqlGraphEntity::ExtensionRoot(control_file()), SqlGraphEntity::Function(fun)]
+                .into_iter(),
+            "myext".into(),
+            false,
+        )
+        .unwrap();
+
+        let (out, _) = slice_with_warnings(&sql, &["state_fn".into()], "myext", None);
+        assert!(!out.contains("ALTER EXTENSION"), "unexpected ALTER EXTENSION:\n{out}");
+        assert!(!out.contains("BEGIN;"), "unexpected BEGIN:\n{out}");
+        assert!(!out.contains("COMMIT;"), "unexpected COMMIT:\n{out}");
+    }
+
+    #[test]
+    fn alter_extension_substitutes_module_pathname() {
+        let fun = function_entity("state_fn", vec![], PgExternReturnEntity::None);
+        let sql = PgrxSql::build(
+            vec![SqlGraphEntity::ExtensionRoot(control_file()), SqlGraphEntity::Function(fun)]
+                .into_iter(),
+            "myext".into(),
+            false,
+        )
+        .unwrap();
+
+        let (out, _) = slice_with_warnings(&sql, &["state_fn".into()], "myext", Some("myext"));
+        assert!(out.contains("'$libdir/myext'"), "missing libdir substitution:\n{out}");
+        assert!(!out.contains("'MODULE_PATHNAME'"), "raw placeholder leaked:\n{out}");
     }
 }

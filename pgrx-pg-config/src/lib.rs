@@ -920,13 +920,13 @@ fn parse_version() {
     // Check some invalid version strings
     let _ = PgConfig::parse_version_str("10.22").expect_err("Parsed invalid version string");
     let _ =
-        PgConfig::parse_version_str("PostgresSQL 10").expect_err("Parsed invalid version string");
+        PgConfig::parse_version_str("PostgreSQL 10").expect_err("Parsed invalid version string");
     let _ =
-        PgConfig::parse_version_str("PostgresSQL 10.").expect_err("Parsed invalid version string");
+        PgConfig::parse_version_str("PostgreSQL 10.").expect_err("Parsed invalid version string");
     let _ =
-        PgConfig::parse_version_str("PostgresSQL 12.f").expect_err("Parsed invalid version string");
+        PgConfig::parse_version_str("PostgreSQL 12.f").expect_err("Parsed invalid version string");
     let _ =
-        PgConfig::parse_version_str("PostgresSQL .53").expect_err("Parsed invalid version string");
+        PgConfig::parse_version_str("PostgreSQL .53").expect_err("Parsed invalid version string");
 }
 
 #[test]
@@ -939,7 +939,7 @@ fn from_empty_env() -> eyre::Result<()> {
     unsafe {
         // but now we can
         std::env::set_var("PGRX_PG_CONFIG_AS_ENV", "true");
-        std::env::set_var("PGRX_PG_CONFIG_VERSION", "PostgresSQL 15.1");
+        std::env::set_var("PGRX_PG_CONFIG_VERSION", "PostgreSQL 15.1");
         std::env::set_var("PGRX_PG_CONFIG_INCLUDEDIR-SERVER", "/path/to/server/headers");
         std::env::set_var("PGRX_PG_CONFIG_CPPFLAGS", "some cpp flags");
     }

@@ -16,7 +16,7 @@ use cargo_toml::Manifest;
 use eyre::WrapErr;
 use owo_colors::OwoColorize;
 use pgrx_pg_config::cargo::PgrxManifestExt;
-use pgrx_pg_config::{Pgrx, get_target_dir};
+use pgrx_pg_config::{Pgrx, get_target_dir, is_supported_major_version};
 use pgrx_sql_entity_graph::section::decode_entities;
 use pgrx_sql_entity_graph::{ControlFile, PgrxSql, SqlGraphEntity};
 use std::path::{Path, PathBuf};
@@ -34,8 +34,16 @@ pub(crate) struct Schema {
     /// Build in test mode (for `cargo pgrx test`)
     #[clap(long)]
     test: bool,
-    /// Do you want to run against pg13, pg14, pg15, pg16, pg17, or pg18?
-    pg_version: Option<String>,
+    /// Positional arguments.
+    ///
+    /// The first may be a PostgreSQL version label (`pg13`..`pg18`); every
+    /// remaining value is an SQL item name to emit (functions, types,
+    /// enums, operators, aggregates, triggers, schemas, extension_sql
+    /// blocks). Only those items and their transitive dependencies are
+    /// emitted, in install order, and `'MODULE_PATHNAME'` is substituted
+    /// with `'$libdir/<lib_name>'` so the output can be replayed directly.
+    /// Names containing `::` are matched as Rust paths to disambiguate.
+    args: Vec<String>,
     /// Compile for release mode (default is debug)
     #[clap(long, short)]
     release: bool,
@@ -60,6 +68,12 @@ pub(crate) struct Schema {
     /// Skip building a fresh extension shared object.
     #[clap(long)]
     skip_build: bool,
+    /// Don't emit `ALTER EXTENSION ... ADD ...` statements when extracting
+    /// specific items. By default, item mode emits ALTER EXTENSION so the
+    /// output can be piped into a running database and attached to the
+    /// already-installed extension.
+    #[clap(long)]
+    no_alter_extension: bool,
 }
 
 impl CommandExecute for Schema {
@@ -76,6 +90,8 @@ impl CommandExecute for Schema {
             }
         };
 
+        let (pg_version, items) = split_positional_args(&self.args);
+
         let pgrx = Pgrx::from_config()?;
         let (package_manifest, package_manifest_path) = get_package_manifest(
             &self.features,
@@ -86,7 +102,7 @@ impl CommandExecute for Schema {
         let (_pg_config, _pg_version) = pg_config_and_version(
             &pgrx,
             &package_manifest,
-            self.pg_version.clone(),
+            pg_version,
             Some(&mut self.features),
             true,
         )?;
@@ -96,6 +112,7 @@ impl CommandExecute for Schema {
             if self.release { CargoProfile::Release } else { CargoProfile::Dev },
         )?;
 
+        let attach = !self.no_alter_extension;
         generate_schema(
             self.manifest_path.as_deref(),
             self.package.as_deref(),
@@ -108,9 +125,31 @@ impl CommandExecute for Schema {
             self.dot.as_deref(),
             log_level,
             self.skip_build,
+            items,
+            attach,
             &mut vec![],
         )
     }
+}
+
+/// Split the schema command's positional arguments into an optional
+/// `pgXX` version label and an optional list of SQL item names.
+///
+/// If the first argument parses as a supported PostgreSQL major version it
+/// is consumed as `pg_version`; everything after it (or everything, if
+/// there is no version) flows through as item names. `None` items means
+/// the caller supplied no names at all — as distinct from an empty slice.
+fn split_positional_args(args: &[String]) -> (Option<String>, Option<&[String]>) {
+    let (pg_version, rest) = if let Some((first, rest)) = args.split_first()
+        && let Some(major) = first.strip_prefix("pg")
+        && let Ok(major) = major.parse::<u16>()
+        && is_supported_major_version(major)
+    {
+        (Some(first.clone()), rest)
+    } else {
+        (None, args)
+    };
+    (pg_version, (!rest.is_empty()).then_some(rest))
 }
 
 #[tracing::instrument(level = "error", skip_all, fields(
@@ -132,6 +171,8 @@ pub(crate) fn generate_schema_for_cli(
     dot: Option<&Path>,
     log_level: Option<String>,
     skip_build: bool,
+    items: Option<&[String]>,
+    attach: bool,
     output_tracking: &mut Vec<PathBuf>,
 ) -> eyre::Result<()> {
     let manifest = Manifest::from_path(package_manifest_path)?;
@@ -160,6 +201,8 @@ pub(crate) fn generate_schema_for_cli(
         target,
         path,
         dot,
+        items,
+        attach,
         output_tracking,
         manifest,
     )
@@ -172,10 +215,12 @@ pub(crate) fn generate_schema_implicit(
     target: Option<&str>,
     path: Option<&Path>,
     dot: Option<&Path>,
+    items: Option<&[String]>,
+    attach: bool,
     output_tracking: &mut Vec<PathBuf>,
     manifest: cargo_toml::Manifest,
 ) -> eyre::Result<()> {
-    let (control_file_path, _extname) = find_control_file(package_manifest_path)?;
+    let (control_file_path, extname) = find_control_file(package_manifest_path)?;
     let lib_name = manifest.lib_name()?;
     let lib_filename = manifest.lib_filename()?;
     let versioned_so = get_property(package_manifest_path, "module_pathname")?.is_none();
@@ -206,7 +251,36 @@ pub(crate) fn generate_schema_implicit(
     let pgrx_sql = PgrxSql::build(entities.into_iter(), lib_name.to_string(), versioned_so)
         .wrap_err("SQL generation error")?;
 
-    if let Some(path) = path {
+    if let Some(items) = items {
+        let extension_name = attach.then_some(extname.as_str());
+        let sliced = pgrx_sql
+            .to_sql_for_items(items, &lib_name, extension_name)
+            .wrap_err("Could not generate SQL for requested items")?;
+        if let Some(path) = path {
+            eprintln!(
+                "{} SQL for {} item(s) to {}",
+                "     Writing".bold().green(),
+                items.len(),
+                path.display()
+            );
+            if let Some(parent) = path.parent() {
+                std::fs::create_dir_all(parent)?;
+            }
+            std::fs::write(path, sliced)
+                .wrap_err_with(|| format!("Could not write SQL to {}", path.display()))?;
+        } else {
+            eprintln!(
+                "{} SQL for {} item(s) to {}",
+                "     Writing".bold().green(),
+                items.len(),
+                "/dev/stdout"
+            );
+            use std::io::Write as _;
+            std::io::stdout()
+                .write_all(sliced.as_bytes())
+                .wrap_err("Could not write SQL to stdout")?;
+        }
+    } else if let Some(path) = path {
         eprintln!("{} SQL entities to {}", "     Writing".bold().green(), path.display());
         pgrx_sql
             .to_file(path)
@@ -344,7 +418,11 @@ fn first_build(
 
 #[cfg(test)]
 mod tests {
-    use super::decode_section_entities;
+    use super::{decode_section_entities, split_positional_args};
+
+    fn strs(args: &[&str]) -> Vec<String> {
+        args.iter().map(|s| (*s).to_owned()).collect()
+    }
 
     #[test]
     fn test_missing_schema_section_errors() {
@@ -354,5 +432,45 @@ mod tests {
 
         let error = decode_section_entities(&bin).expect_err("missing section");
         assert!(error.to_string().contains("no embedded pgrx schema section found"));
+    }
+
+    #[test]
+    fn empty_args_yield_no_version_and_no_items() {
+        let args = strs(&[]);
+        let (pg, items) = split_positional_args(&args);
+        assert!(pg.is_none());
+        assert!(items.is_none());
+    }
+
+    #[test]
+    fn version_alone_is_captured() {
+        let args = strs(&["pg18"]);
+        let (pg, items) = split_positional_args(&args);
+        assert_eq!(pg.as_deref(), Some("pg18"));
+        assert!(items.is_none());
+    }
+
+    #[test]
+    fn version_followed_by_items() {
+        let args = strs(&["pg18", "sum_vec", "MyType", "==="]);
+        let (pg, items) = split_positional_args(&args);
+        assert_eq!(pg.as_deref(), Some("pg18"));
+        assert_eq!(items, Some(&["sum_vec".to_owned(), "MyType".to_owned(), "===".to_owned()][..]));
+    }
+
+    #[test]
+    fn items_only_without_version() {
+        let args = strs(&["sum_vec", "MyType", "==="]);
+        let (pg, items) = split_positional_args(&args);
+        assert!(pg.is_none());
+        assert_eq!(items, Some(&["sum_vec".to_owned(), "MyType".to_owned(), "===".to_owned()][..]));
+    }
+
+    #[test]
+    fn first_arg_that_looks_like_version_but_isnt_is_an_item() {
+        let args = strs(&["pgfoo", "sum_vec"]);
+        let (pg, items) = split_positional_args(&args);
+        assert!(pg.is_none());
+        assert_eq!(items, Some(&["pgfoo".to_owned(), "sum_vec".to_owned()][..]));
     }
 }

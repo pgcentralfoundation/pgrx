@@ -887,10 +887,17 @@ If you just want to look at the full extension schema that pgrx will generate, u
 $ cargo pgrx schema --help
 Generate extension schema files
 
-Usage: cargo pgrx schema [OPTIONS] [PG_VERSION]
+Usage: cargo pgrx schema [OPTIONS] [ARGS]...
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, or pg18?
+  [ARGS]...  First arg may be a PostgreSQL version label (`pg13`..`pg18`).
+             Remaining args are SQL item names to emit (functions, types,
+             enums, operators, aggregates, triggers, schemas, extension_sql
+             blocks). When item names are given, only those items and their
+             transitive dependencies are emitted, in install order, and
+             'MODULE_PATHNAME' is substituted with '$libdir/<lib_name>' so
+             the output can be replayed directly. Names containing `::` are
+             matched as Rust paths to disambiguate.
 
 Options:
   -p, --package <PACKAGE>              Package to build (see `cargo help pkgid`)
@@ -906,9 +913,65 @@ Options:
   -o, --out <OUT>                      A path to output a produced SQL file (default is `stdout`)
   -d, --dot <DOT>                      A path to output a produced GraphViz DOT file
       --skip-build                     Skip building a fresh extension shared object
+      --no-alter-extension             Don't emit `ALTER EXTENSION ... ADD ...` statements when
+                                       extracting specific items (see "Attaching Slices" below)
   -h, --help                           Print help
   -V, --version                        Print version
 ```
+
+### Emitting a Slice of the Schema
+
+Any positional arguments after an optional `pgXX` version label are treated as SQL item
+names. The output is restricted to those items plus every dependency they need, in
+install order. Names match against each entity's SQL-visible identifier: `name` for
+functions, types, enums, aggregates, and schemas; `opname` for operators (for example
+`===`); `function_name` for triggers; and `name` for `extension_sql!` blocks. A name
+containing `::` is treated as a Rust path and matched against `full_path`, which is the
+way to disambiguate collisions (for example two functions named `dup_fn` in different
+modules).
+
+When item names are supplied, every occurrence of `'MODULE_PATHNAME'` in the generated
+SQL is substituted with `'$libdir/<lib_name>'`, so the output can be replayed directly
+into a database without relying on the extension's control file to resolve
+`MODULE_PATHNAME`.
+
+```shell
+# Emit one function and its dependencies, with MODULE_PATHNAME substituted
+cargo pgrx schema my_function
+
+# Multiple items at once
+cargo pgrx schema my_function MyType ===
+
+# Specify a Postgres version first, then the items
+cargo pgrx schema pg18 my_function MyType
+
+# Disambiguate with a Rust path when the bare name matches multiple items
+cargo pgrx schema my_crate::submodule::dup_fn
+
+# Write the slice to a file instead of stdout (combines with item selection)
+cargo pgrx schema --out /tmp/extracted_schema_objects.sql my_function MyType
+```
+
+#### Attaching Slices to an Already-Installed Extension
+
+When item names are supplied, the emitted slice is wrapped in `BEGIN;`/`COMMIT;`
+and every created object is followed by an `ALTER EXTENSION "<ext>" ADD ...`
+statement. Piping the output into a database where the extension is already
+installed makes the new objects members of the extension, verifiable via
+`pg_depend`.
+
+```shell
+# Add a new function to an already-installed extension
+cargo pgrx schema my_new_fn | cargo pgrx connect
+```
+
+Pass `--no-alter-extension` to opt out of this (for example, to generate SQL
+for hand-editing or to match the pre-feature output).
+
+`extension_sql!()` blocks that don't declare `creates = [...]` cannot be
+attached automatically; the emitter prints a warning to stderr naming the
+block's `file:line` so the user knows which objects to attach by hand.
+
 
 ## Extension Version Upgrade Scripts
 
