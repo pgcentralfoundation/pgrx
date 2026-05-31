@@ -10,7 +10,7 @@
 
 [package]
 name = "pgrx-unit-tests"
-version = "0.18.0"
+version = "0.18.1"
 authors.workspace = true
 license.workspace = true
 description = "Internal pgrx test extension"
@@ -58,11 +58,11 @@ rand = "0.10.1"
 [dependencies.pgrx]
 path = "../pgrx"
 default-features = false
-version = "=0.18.0"
+version = "=0.18.1"
 
 [dependencies.pgrx-tests]
 path = "../pgrx-tests"
-version = "=0.18.0"
+version = "=0.18.1"
 
 [dev-dependencies]
 trybuild = "1"

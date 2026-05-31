@@ -10,7 +10,7 @@
  
 [package]
 name = "pgrx-sql-entity-graph"
-version = "0.18.0"
+version = "0.18.1"
 authors.workspace = true
 license.workspace = true
 description = "Sql Entity Graph for `pgrx`"
