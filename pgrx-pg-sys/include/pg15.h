@@ -153,6 +153,7 @@
 #include "replication/syncrep.h"
 #include "replication/walsender_private.h"
 #include "rewrite/rewriteHandler.h"
+#include "rewrite/rewriteManip.h"
 #include "rewrite/rowsecurity.h"
 #include "statistics/statistics.h"
 #include "storage/block.h"
