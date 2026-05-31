@@ -1260,7 +1260,7 @@ pub mod pipe {
     impl WindowsNamedPipe {
         pub fn create() -> std::io::Result<Self> {
             let filename: String =
-                rand::thread_rng().sample_iter(Alphanumeric).map(char::from).take(6).collect();
+                rand::rng().sample_iter(Alphanumeric).map(char::from).take(6).collect();
             let path = format!(r"\\.\pipe\{filename}");
             let server = unsafe {
                 use std::os::windows::ffi::OsStrExt;
