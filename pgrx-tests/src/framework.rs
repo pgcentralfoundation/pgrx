@@ -1186,8 +1186,8 @@ mod tests {
 }
 
 pub mod pipe {
-    use rand::distr::Alphanumeric;
     use rand::RngExt;
+    use rand::distr::Alphanumeric;
     use std::fs::File;
     use std::io::Error;
     use std::path::{Path, PathBuf};
