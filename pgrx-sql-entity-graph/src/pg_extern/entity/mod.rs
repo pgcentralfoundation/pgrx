@@ -556,12 +556,8 @@ impl ToSql for PgExternEntity<'_> {
                 .fn_args
                 .first()
                 .ok_or_else(|| eyre!("Did not find source type for cast `{}`.", self.name))?;
-            let source_arg_sql = render_used_type_sql(
-                context,
-                self_index,
-                "cast source type",
-                &source_arg.used_ty,
-            )?;
+            let source_arg_sql =
+                render_used_type_sql(context, self_index, "cast source type", &source_arg.used_ty)?;
             let optional = match cast {
                 PgCastEntity::Default => String::from(""),
                 PgCastEntity::Assignment => String::from(" AS ASSIGNMENT"),

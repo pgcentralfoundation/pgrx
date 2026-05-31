@@ -17,11 +17,11 @@ Rust to SQL mapping support.
 */
 
 use eyre::eyre;
+use petgraph::Direction;
 use petgraph::dot::Dot;
 use petgraph::graph::NodeIndex;
 use petgraph::stable_graph::StableGraph;
 use petgraph::visit::EdgeRef;
-use petgraph::Direction;
 use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
 use std::fmt::Debug;
 use std::path::Path;
@@ -599,43 +599,33 @@ impl<'a> PgrxSql<'a> {
                 && op.opname == Some(name)
                 && !matches.iter().any(|(existing, _)| *existing == idx)
             {
-                matches.push((
-                    idx,
-                    format!("operator `{}` on `{}`", name, entity.full_path),
-                ));
+                matches.push((idx, format!("operator `{}` on `{}`", name, entity.full_path)));
             }
         }
 
         for (entity, &idx) in &self.types {
-            let hit =
-                if by_path { entity.full_path == name } else { entity.name == name };
+            let hit = if by_path { entity.full_path == name } else { entity.name == name };
             if hit {
                 matches.push((idx, format!("type `{}`", entity.full_path)));
             }
         }
 
         for (entity, &idx) in &self.enums {
-            let hit =
-                if by_path { entity.full_path == name } else { entity.name == name };
+            let hit = if by_path { entity.full_path == name } else { entity.name == name };
             if hit {
                 matches.push((idx, format!("enum `{}`", entity.full_path)));
             }
         }
 
         for (entity, &idx) in &self.aggregates {
-            let hit =
-                if by_path { entity.full_path == name } else { entity.name == name };
+            let hit = if by_path { entity.full_path == name } else { entity.name == name };
             if hit {
                 matches.push((idx, format!("aggregate `{}`", entity.full_path)));
             }
         }
 
         for (entity, &idx) in &self.triggers {
-            let hit = if by_path {
-                entity.full_path == name
-            } else {
-                entity.function_name == name
-            };
+            let hit = if by_path { entity.full_path == name } else { entity.function_name == name };
             if hit {
                 matches.push((idx, format!("trigger `{}`", entity.full_path)));
             }
@@ -656,10 +646,7 @@ impl<'a> PgrxSql<'a> {
                 if declared_name == name {
                     matches.push((
                         idx,
-                        format!(
-                            "extension_sql `{}` (declares `{declared_name}`)",
-                            entity.name
-                        ),
+                        format!("extension_sql `{}` (declares `{declared_name}`)", entity.name),
                     ));
                     break;
                 }
@@ -676,8 +663,7 @@ impl<'a> PgrxSql<'a> {
             0 => Err(eyre!("no SQL entity matches `{name}`")),
             1 => Ok(matches.remove(0).0),
             _ => {
-                let labels =
-                    matches.iter().map(|(_, l)| l.as_str()).collect::<Vec<_>>().join(", ");
+                let labels = matches.iter().map(|(_, l)| l.as_str()).collect::<Vec<_>>().join(", ");
                 Err(eyre!(
                     "`{name}` is ambiguous; matched: {labels}. Disambiguate with a `::`-qualified Rust path."
                 ))
@@ -830,19 +816,22 @@ impl<'a> PgrxSql<'a> {
                     .map(|s| format!("{s}."))
                     .unwrap_or_else(|| self.schema_prefix_for(&node));
                 let argtypes = crate::pg_extern::entity::render_function_argtypes(self, node, f)?;
-                let mut out =
-                    format!("ALTER EXTENSION \"{ext}\" ADD FUNCTION {schema}\"{name}\"({argtypes});",
-                        name = f.name);
+                let mut out = format!(
+                    "ALTER EXTENSION \"{ext}\" ADD FUNCTION {schema}\"{name}\"({argtypes});",
+                    name = f.name
+                );
 
                 if let Some(op) = &f.operator
                     && let Some(opname) = op.opname
                 {
-                    let left = f.fn_args.first().ok_or_else(|| {
-                        eyre!("operator `{}` missing left argument", f.name)
-                    })?;
-                    let right = f.fn_args.get(1).ok_or_else(|| {
-                        eyre!("operator `{}` missing right argument", f.name)
-                    })?;
+                    let left = f
+                        .fn_args
+                        .first()
+                        .ok_or_else(|| eyre!("operator `{}` missing left argument", f.name))?;
+                    let right = f
+                        .fn_args
+                        .get(1)
+                        .ok_or_else(|| eyre!("operator `{}` missing right argument", f.name))?;
                     let left_sql = crate::pg_extern::entity::render_used_type_sql(
                         self,
                         node,
@@ -862,9 +851,10 @@ impl<'a> PgrxSql<'a> {
                 }
 
                 if f.cast.is_some() {
-                    let source = f.fn_args.first().ok_or_else(|| {
-                        eyre!("cast `{}` missing source argument", f.name)
-                    })?;
+                    let source = f
+                        .fn_args
+                        .first()
+                        .ok_or_else(|| eyre!("cast `{}` missing source argument", f.name))?;
                     let source_sql = crate::pg_extern::entity::render_used_type_sql(
                         self,
                         node,
@@ -897,8 +887,7 @@ impl<'a> PgrxSql<'a> {
             }
             SqlGraphEntity::Aggregate(a) => {
                 let schema = self.schema_prefix_for(&node);
-                let argtypes =
-                    crate::aggregate::entity::render_aggregate_argtypes(self, node, a)?;
+                let argtypes = crate::aggregate::entity::render_aggregate_argtypes(self, node, a)?;
                 Ok(Some(format!(
                     "ALTER EXTENSION \"{ext}\" ADD AGGREGATE {schema}\"{name}\"{argtypes};",
                     name = a.name
@@ -932,10 +921,7 @@ impl<'a> PgrxSql<'a> {
                 if matches!(s.name, "public" | "pg_catalog") {
                     return Ok(None);
                 }
-                Ok(Some(format!(
-                    "ALTER EXTENSION \"{ext}\" ADD SCHEMA {name};",
-                    name = s.name
-                )))
+                Ok(Some(format!("ALTER EXTENSION \"{ext}\" ADD SCHEMA {name};", name = s.name)))
             }
             SqlGraphEntity::CustomSql(c) => {
                 if c.creates.is_empty() {
@@ -2967,9 +2953,8 @@ mod tests {
         assert!(msg.contains("tests::dup_fn"), "got: {msg}");
         assert!(msg.contains("tests::other::dup_fn"), "got: {msg}");
 
-        let unique = pgrx_sql
-            .resolve_item("tests::other::dup_fn")
-            .expect("qualified path should resolve");
+        let unique =
+            pgrx_sql.resolve_item("tests::other::dup_fn").expect("qualified path should resolve");
         assert_eq!(pgrx_sql.graph[unique].rust_identifier(), "tests::other::dup_fn");
     }
 
@@ -3105,9 +3090,7 @@ mod tests {
                 PgExternArgumentEntity { pattern: "lhs", used_ty: arg_ty.clone() },
                 PgExternArgumentEntity { pattern: "rhs", used_ty: arg_ty },
             ],
-            PgExternReturnEntity::Type {
-                ty: external_type("bool", "bool", "bool"),
-            },
+            PgExternReturnEntity::Type { ty: external_type("bool", "bool", "bool") },
         );
         fun.operator = Some(PgOperatorEntity {
             opname: Some("==="),
@@ -3149,7 +3132,12 @@ mod tests {
                 used_ty: external_type("&core::ffi::CStr", "&core::ffi::CStr", "cstring"),
             }],
             PgExternReturnEntity::Type {
-                ty: used_type("tests::MyType", "tests::MyType", "MyType", TypeOrigin::ThisExtension),
+                ty: used_type(
+                    "tests::MyType",
+                    "tests::MyType",
+                    "MyType",
+                    TypeOrigin::ThisExtension,
+                ),
             },
         );
         let out_fn = function_entity(
@@ -3181,8 +3169,7 @@ mod tests {
         )
         .unwrap();
 
-        let (out, _) =
-            slice_with_warnings(&sql, &["tests::MyType".into()], "myext", Some("myext"));
+        let (out, _) = slice_with_warnings(&sql, &["tests::MyType".into()], "myext", Some("myext"));
         assert!(
             out.contains(r#"ALTER EXTENSION "myext" ADD TYPE MyType;"#),
             "missing ADD TYPE:\n{out}"
@@ -3418,12 +3405,8 @@ mod tests {
         )
         .unwrap();
 
-        let (out, _) = slice_with_warnings(
-            &sql,
-            &["tests::my_schema::my_fn".into()],
-            "myext",
-            Some("myext"),
-        );
+        let (out, _) =
+            slice_with_warnings(&sql, &["tests::my_schema::my_fn".into()], "myext", Some("myext"));
         assert!(
             out.contains(r#"ALTER EXTENSION "myext" ADD SCHEMA my_schema;"#),
             "missing ADD SCHEMA:\n{out}"
@@ -3506,8 +3489,10 @@ mod tests {
         );
         assert_eq!(warnings.len(), 1, "expected one warning, got: {warnings:?}");
         assert!(warnings[0].contains("somefile.rs:42"), "warning missing file:line: {warnings:?}");
-        assert!(warnings[0].contains("free-form")
-            || warnings[0].contains("creates"), "warning missing reason: {warnings:?}");
+        assert!(
+            warnings[0].contains("free-form") || warnings[0].contains("creates"),
+            "warning missing reason: {warnings:?}"
+        );
     }
 
     #[test]
@@ -3538,8 +3523,7 @@ mod tests {
         )
         .unwrap();
 
-        let (out, _) =
-            slice_with_warnings(&sql, &["state_fn".into()], "myext", Some("myext"));
+        let (out, _) = slice_with_warnings(&sql, &["state_fn".into()], "myext", Some("myext"));
         assert!(out.contains("'$libdir/myext'"), "missing libdir substitution:\n{out}");
         assert!(!out.contains("'MODULE_PATHNAME'"), "raw placeholder leaked:\n{out}");
     }
