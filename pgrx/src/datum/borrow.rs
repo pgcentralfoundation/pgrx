@@ -5,7 +5,7 @@ use crate::callconv::DatumPass;
 use crate::layout::PassBy;
 use core::{ffi, mem, ptr};
 
-/// Types which can be "borrowed from" [`&Datum<'_>`] via simple cast, deref, or slicing
+/// Types which can be "borrowed from" [`&Datum<'_>`](crate::datum::Datum) via simple cast, deref, or slicing
 ///
 /// # Safety
 /// Despite its pleasant-sounding name, this implements a fairly low-level detail.

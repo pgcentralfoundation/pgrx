@@ -173,7 +173,7 @@ CREATE AGGREGATE DemoSum (
 ## Function attributes
 
 Functions inside the `impl` may use the [`#[pgrx]`](macro@crate::pgrx) attribute. It
-accepts the same parameters as [`#[pg_extern]`][macro@pgrx-macros::pg_extern].
+accepts the same parameters as [`#[pg_extern]`][macro@crate::pg_extern].
 
 ```rust
 # use pgrx::prelude::*;
