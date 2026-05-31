@@ -21,11 +21,11 @@ edition.workspace = true
 include = ["src/**/*", "README.md"]
 
 [dependencies]
-criterion = { version = "0.5.1", default-features = false }
+criterion = { version = "0.8.2", default-features = false }
 oorandom = "11.1.5"
 serde.workspace = true
 serde_json.workspace = true
-tempfile = "3.19.1"
+tempfile = "3.27.0"
 
 [lints.rust]
 unsafe-op-in-unsafe-fn = "allow"

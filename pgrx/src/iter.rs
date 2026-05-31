@@ -159,6 +159,7 @@ impl<Row> Iterator for TableIterator<'_, Row> {
     }
 }
 
+#[diagnostic::do_not_recommend]
 unsafe impl<'iter, C> SqlTranslatable for TableIterator<'iter, (C,)>
 where
     C: SqlTranslatable + 'iter,
@@ -371,6 +372,7 @@ macro_rules! table_return_sql {
 macro_rules! impl_table_iter {
     ($($C:ident),* $(,)?) => {
         #[allow(non_snake_case)]
+        #[diagnostic::do_not_recommend]
         unsafe impl<'iter, $($C,)*> SqlTranslatable for TableIterator<'iter, ($($C,)*)>
         where
             $($C: SqlTranslatable + 'iter,)*

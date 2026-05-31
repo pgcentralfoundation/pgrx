@@ -25,7 +25,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-/// Re-export of Criterion's `black_box`, which helps keep the optimizer from removing the work
+/// Re-export of `std::hint::black_box`, which helps keep the optimizer from removing the work
 /// you intend to measure.
 ///
 /// ```ignore
@@ -38,7 +38,7 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 ///     b.iter(|| crate::parse_uuid(black_box(input)));
 /// }
 /// ```
-pub use criterion::black_box;
+pub use std::hint::black_box;
 
 /// Re-export of Criterion's batching strategy enum for `Bencher::iter_batched`.
 ///

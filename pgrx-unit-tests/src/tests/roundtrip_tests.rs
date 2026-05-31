@@ -1,7 +1,7 @@
 use super::Complex;
 use pgrx::datum::Date;
-use rand::Rng;
 use rand::distr::{Alphanumeric, StandardUniform};
+use rand::RngExt;
 
 #[derive(pgrx::PostgresType, Clone, PartialEq, Eq, Debug, serde::Serialize, serde::Deserialize)]
 #[pg_binary_protocol]

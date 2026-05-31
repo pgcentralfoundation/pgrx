@@ -53,11 +53,11 @@ pgrx-sql-entity-graph.workspace = true
 thiserror.workspace = true # error handling and logging
 
 # used to internally impl things
-uuid = { version = "1.16.0", features = ["v4"] } # PgLwLock and shmem
+uuid = { version = "1.23.2", features = ["v4"] } # PgLwLock and shmem
 enum-map = "2.7.3"
 
 # exposed in public API
-bitflags = "2.9.0" # BackgroundWorker
+bitflags = "2.11.1" # BackgroundWorker
 bitvec = "1.0" # processing array nullbitmaps
 libc.workspace = true # FFI type compat
 seahash = "4.1.0" # derive(PostgresHash)

@@ -29,7 +29,7 @@ pg18 = ["pgrx/pg18", "pgrx-tests/pg18"]
 pg_test = []
 
 [dependencies]
-heapless = "0.8"
+heapless = "=0.8"
 pgrx = { path = "../../pgrx" }
 serde = { version = "1.0", features = ["derive"] }
 

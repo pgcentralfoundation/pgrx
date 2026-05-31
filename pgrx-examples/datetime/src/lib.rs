@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use pgrx::prelude::*;
-use rand::Rng;
+use rand::RngExt;
 
 pgrx::pg_module_magic!(name, version);
 
