@@ -23,10 +23,6 @@ edition.workspace = true
 [lib]
 proc-macro = true
 
-[package.metadata.docs.rs]
-# Enable `#[cfg(docsrs)]` (https://docs.rs/about/builds#cross-compiling)
-rustc-args = ["--cfg", "docsrs"]
-
 [features]
 no-schema-generation = ["pgrx-sql-entity-graph/no-schema-generation"]
 

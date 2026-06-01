@@ -147,7 +147,11 @@ impl bindgen::callbacks::ParseCallbacks for BindingOverride {
 }
 
 pub fn main() -> eyre::Result<()> {
+    println!("cargo:rustc-check-cfg=cfg(docsrs)");
+    println!("cargo:rerun-if-env-changed=DOCS_RS");
+
     if env_tracked("DOCS_RS").as_deref() == Some("1") {
+        println!("cargo:rustc-cfg=docsrs");
         return Ok(());
     }
 

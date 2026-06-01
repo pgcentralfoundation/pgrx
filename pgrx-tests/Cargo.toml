@@ -42,9 +42,6 @@ nightly = ["pgrx/nightly"]
 features = ["pg14", "proptest"]
 no-default-features = true
 targets = ["x86_64-unknown-linux-gnu"]
-# Enable `#[cfg(docsrs)]` (https://docs.rs/about/builds#cross-compiling)
-rustc-args = ["--cfg", "docsrs"]
-rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 pgrx-macros.workspace = true

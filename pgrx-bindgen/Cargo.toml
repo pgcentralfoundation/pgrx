@@ -17,7 +17,7 @@ regex.workspace = true
 syn.workspace = true
 walkdir.workspace = true
 
-bindgen = { version = "0.72.1", default-features = false, features = ["experimental", "runtime"] }
+bindgen = { version = "0.72.1", default-features = false, features = ["runtime"] }
 clang-sys = { version = "1", features = ["clang_6_0", "runtime"] }
 quote = "1.0.45"
 shlex = "2.0" # shell lexing, also used by many of our deps

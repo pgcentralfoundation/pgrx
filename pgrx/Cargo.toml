@@ -42,8 +42,6 @@ nightly = []    # For features and functionality which require nightly Rust - fo
 [package.metadata.docs.rs]
 features = ["pg14", "cshim"]
 no-default-features = true
-# Enable `#[cfg(docsrs)]` (https://docs.rs/about/builds#cross-compiling)
-rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 pgrx-macros.workspace = true
