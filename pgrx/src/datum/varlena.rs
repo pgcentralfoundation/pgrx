@@ -397,7 +397,7 @@ pub unsafe fn cbor_decode<'de, T>(input: *mut pg_sys::varlena) -> T
 where
     T: Deserialize<'de>,
 {
-    let varlena = pg_sys::pg_detoast_datum_packed(input as *mut pg_sys::varlena);
+    let varlena = pg_sys::pg_detoast_datum_packed(input);
     let len = varsize_any_exhdr(varlena);
     let data = vardata_any(varlena);
     let slice = std::slice::from_raw_parts(data as *const u8, len);
@@ -415,7 +415,7 @@ where
 {
     memory_context.switch_to(|_| {
         // this gets the varlena Datum copied into this memory context
-        let varlena = pg_sys::pg_detoast_datum_copy(input as *mut pg_sys::varlena);
+        let varlena = pg_sys::pg_detoast_datum_copy(input);
         cbor_decode(varlena)
     })
 }

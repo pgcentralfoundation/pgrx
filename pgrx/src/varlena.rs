@@ -367,8 +367,7 @@ pub unsafe fn varsize_any_exhdr(ptr: *const pg_sys::varlena) -> usize {
 #[inline]
 pub unsafe fn vardata_1b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
     let va1b = ptr as *const pg_sys::varattrib_1b;
-    (*va1b).va_data.as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize).as_ptr()
-        as *const std::os::raw::c_char
+    (*va1b).va_data.as_slice(varsize_1b(ptr)).as_ptr() as *const std::os::raw::c_char
 }
 
 /// ```c
@@ -378,8 +377,7 @@ pub unsafe fn vardata_1b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_
 #[inline]
 pub unsafe fn vardata_4b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
     let va1b = ptr as *const pg_sys::varattrib_4b__bindgen_ty_1; // 4byte
-    (*va1b).va_data.as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize).as_ptr()
-        as *const std::os::raw::c_char
+    (*va1b).va_data.as_slice(varsize_1b(ptr)).as_ptr() as *const std::os::raw::c_char
 }
 
 /// ```c
@@ -389,8 +387,7 @@ pub unsafe fn vardata_4b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_
 #[inline]
 pub unsafe fn vardata_4b_c(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
     let va1b = ptr as *const pg_sys::varattrib_4b__bindgen_ty_2; // compressed
-    (*va1b).va_data.as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize).as_ptr()
-        as *const std::os::raw::c_char
+    (*va1b).va_data.as_slice(varsize_1b(ptr)).as_ptr() as *const std::os::raw::c_char
 }
 
 /// ```c
@@ -400,8 +397,7 @@ pub unsafe fn vardata_4b_c(ptr: *const pg_sys::varlena) -> *const std::os::raw::
 #[inline]
 pub unsafe fn vardata_1b_e(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
     let va1b = ptr as *const pg_sys::varattrib_1b_e;
-    (*va1b).va_data.as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize).as_ptr()
-        as *const std::os::raw::c_char
+    (*va1b).va_data.as_slice(varsize_1b(ptr)).as_ptr() as *const std::os::raw::c_char
 }
 
 /// ```c
@@ -469,9 +465,9 @@ pub unsafe fn varlena_to_byte_slice<'a>(varlena: *const pg_sys::varlena) -> &'a 
 pub fn rust_str_to_text_p(s: &str) -> PgBox<pg_sys::varlena> {
     let bytea = rust_byte_slice_to_bytea(s.as_bytes());
 
-    // a pg_sys::bytea is a type alias for pg_sys::varlena so this cast is fine
+    // a pg_sys::bytea is a type alias for pg_sys::varlena so no cast is needed
     // SAFETY: bytea will be a valid pointer
-    unsafe { PgBox::from_pg(bytea.as_ptr() as *mut pg_sys::varlena) }
+    unsafe { PgBox::from_pg(bytea.as_ptr()) }
 }
 
 /// Convert a Rust `&[u8]` into a Postgres `bytea *` (which is really a varchar)
@@ -485,5 +481,92 @@ pub fn rust_byte_slice_to_bytea(slice: &[u8]) -> PgBox<pg_sys::bytea> {
             slice.as_ptr() as *const std::os::raw::c_char,
             slice.len() as i32,
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn encode_vlen_4b_known_values() {
+        #[cfg(target_endian = "little")]
+        {
+            assert_eq!(encode_vlen_4b(0), 0);
+            assert_eq!(encode_vlen_4b(1), 4);
+            assert_eq!(encode_vlen_4b(4), 16);
+            assert_eq!(encode_vlen_4b(255), 1020);
+        }
+        #[cfg(target_endian = "big")]
+        {
+            assert_eq!(encode_vlen_4b(0), 0);
+            assert_eq!(encode_vlen_4b(1), 1);
+            assert_eq!(encode_vlen_4b(0x3FFFFFFF), 0x3FFFFFFF);
+        }
+    }
+
+    #[test]
+    fn encode_vlen_4b_roundtrip() {
+        for len in [0, 1, 4, 8, 127, 255, 1024, 65535, 0x3FFFFFFF_i32] {
+            let encoded = encode_vlen_4b(len);
+            #[cfg(target_endian = "little")]
+            {
+                let decoded = ((encoded >> 2) & 0x3FFF_FFFF) as i32;
+                assert_eq!(decoded, len, "roundtrip failed for len={len}");
+            }
+            #[cfg(target_endian = "big")]
+            {
+                let decoded = (encoded & 0x3FFF_FFFF) as i32;
+                assert_eq!(decoded, len, "roundtrip failed for len={len}");
+            }
+        }
+    }
+
+    #[test]
+    fn encode_vlen_1b_known_values() {
+        #[cfg(target_endian = "little")]
+        {
+            assert_eq!(encode_vlen_1b(1), 0x03);
+            assert_eq!(encode_vlen_1b(2), 0x05);
+            assert_eq!(encode_vlen_1b(127), 0xFF);
+        }
+        #[cfg(target_endian = "big")]
+        {
+            assert_eq!(encode_vlen_1b(0), 0x80);
+            assert_eq!(encode_vlen_1b(1), 0x81);
+            assert_eq!(encode_vlen_1b(127), 0xFF);
+        }
+    }
+
+    #[test]
+    fn encode_vlen_1b_roundtrip() {
+        for len in 0..=127_i32 {
+            let encoded = encode_vlen_1b(len);
+            #[cfg(target_endian = "little")]
+            {
+                let decoded = ((encoded >> 1) & 0x7F) as i32;
+                assert_eq!(decoded, len, "roundtrip failed for len={len}");
+            }
+            #[cfg(target_endian = "big")]
+            {
+                let decoded = (encoded & 0x7F) as i32;
+                assert_eq!(decoded, len, "roundtrip failed for len={len}");
+            }
+        }
+    }
+
+    #[test]
+    fn encode_vlen_1b_always_sets_short_flag() {
+        for len in 0..=127_i32 {
+            let encoded = encode_vlen_1b(len);
+            #[cfg(target_endian = "little")]
+            {
+                assert_ne!(encoded & 0x01, 0, "short flag not set for len={len}");
+            }
+            #[cfg(target_endian = "big")]
+            {
+                assert_ne!(encoded & 0x80, 0, "short flag not set for len={len}");
+            }
+        }
     }
 }

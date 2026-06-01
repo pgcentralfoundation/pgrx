@@ -326,8 +326,8 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
     /// Return the boxed pointer, so that it can be passed back into a Postgres function
     #[inline]
     pub fn as_ptr(&self) -> *mut T {
-        match self.ptr.as_ref() {
-            Some(ptr) => unsafe { ptr.clone().as_mut() as *mut T },
+        match self.ptr {
+            Some(ptr) => ptr.as_ptr(),
             None => std::ptr::null_mut(),
         }
     }
@@ -470,4 +470,51 @@ unsafe impl<T: SqlTranslatable> SqlTranslatable for PgBox<T, AllocatedByRust> {
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn from_pg_null_is_null() {
+        let pgbox: PgBox<i32> = unsafe { PgBox::from_pg(std::ptr::null_mut()) };
+        assert!(pgbox.is_null());
+    }
+
+    #[test]
+    fn from_pg_null_as_ptr_returns_null() {
+        let pgbox: PgBox<i32> = unsafe { PgBox::from_pg(std::ptr::null_mut()) };
+        assert!(pgbox.as_ptr().is_null());
+    }
+
+    #[test]
+    fn from_pg_non_null_is_not_null() {
+        let mut value: i32 = 42;
+        let pgbox: PgBox<i32> = unsafe { PgBox::from_pg(&mut value as *mut i32) };
+        assert!(!pgbox.is_null());
+        assert_eq!(pgbox.as_ptr(), &mut value as *mut i32);
+    }
+
+    #[test]
+    fn from_pg_non_null_as_ptr_matches() {
+        let mut value: i32 = 99;
+        let ptr = &mut value as *mut i32;
+        let pgbox: PgBox<i32> = unsafe { PgBox::from_pg(ptr) };
+        assert_eq!(pgbox.as_ptr(), ptr);
+    }
+
+    #[test]
+    fn into_pg_null_returns_null() {
+        let pgbox: PgBox<i32> = unsafe { PgBox::from_pg(std::ptr::null_mut()) };
+        assert!(pgbox.into_pg().is_null());
+    }
+
+    #[test]
+    fn into_pg_non_null_returns_same_ptr() {
+        let mut value: i32 = 7;
+        let ptr = &mut value as *mut i32;
+        let pgbox: PgBox<i32> = unsafe { PgBox::from_pg(ptr) };
+        assert_eq!(pgbox.into_pg(), ptr);
+    }
 }

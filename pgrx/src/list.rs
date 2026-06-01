@@ -142,6 +142,11 @@ impl<'cx, T> List<'cx, T> {
     }
 
     #[inline]
+    pub fn is_empty(&self) -> bool {
+        matches!(self, List::Nil)
+    }
+
+    #[inline]
     pub fn capacity(&self) -> usize {
         match self {
             List::Nil => 0,
@@ -210,5 +215,42 @@ impl<T> ListHead<'_, T> {
     #[inline]
     pub fn len(&self) -> usize {
         unsafe { (*self.list.as_ptr()).length as usize }
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn list_nil_is_default() {
+        let list: List<'_, *mut core::ffi::c_void> = List::default();
+        assert!(matches!(list, List::Nil));
+    }
+
+    #[test]
+    fn list_nil_is_empty() {
+        let list: List<'_, *mut core::ffi::c_void> = List::Nil;
+        assert!(list.is_empty());
+        assert_eq!(list.len(), 0);
+        assert_eq!(list.capacity(), 0);
+    }
+
+    #[test]
+    fn list_nil_as_ptr_is_null() {
+        let list: List<'_, *mut core::ffi::c_void> = List::Nil;
+        assert!(list.as_ptr().is_null());
+    }
+
+    #[test]
+    fn list_nil_into_ptr_is_null() {
+        let mut list: List<'_, *mut core::ffi::c_void> = List::Nil;
+        assert!(list.as_mut_ptr().is_null());
+        assert!(list.into_ptr().is_null());
     }
 }

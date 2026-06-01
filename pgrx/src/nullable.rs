@@ -243,6 +243,11 @@ where
     /// (as in, the thing accessed by get_raw) but instead represents the
     /// length of the array including skipped nulls.
     fn len(&'mcx self) -> usize;
+
+    /// Returns `true` if the container has no elements.
+    fn is_empty(&'mcx self) -> bool {
+        self.len() == 0
+    }
 }
 
 /// Bitmap of null slots on a container.

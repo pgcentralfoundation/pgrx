@@ -478,6 +478,12 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
         self.tupdesc.len()
     }
 
+    /// Returns `true` if this [`PgHeapTuple`] has no attributes.
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.tupdesc.len() == 0
+    }
+
     /// Returns an iterator over the attributes in this [`PgHeapTuple`].
     ///
     /// The return value is `(attribute_number: NonZeroUsize, attribute_info: &pg_sys::FormData_pg_attribute)`.
