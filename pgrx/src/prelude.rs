@@ -32,7 +32,7 @@ pub use crate::pgbox::{AllocatedByPostgres, AllocatedByRust, PgBox, WhoAllocated
 pub use crate::inoutfuncs::{InOutFuncs, PgVarlenaInOutFuncs};
 pub use crate::{
     datum::{
-        AnyNumeric, Array, ArraySliceError, Date, FromDatum, Interval, IntoDatum, Numeric,
+        AnyNumeric, Array, ArraySliceError, Bytea, Date, FromDatum, Interval, IntoDatum, Numeric,
         PgVarlena, PostgresType, Range, RangeBound, RangeSubType, Time, TimeWithTimeZone,
         Timestamp, TimestampWithTimeZone, VariadicArray, datetime_support::*,
     },

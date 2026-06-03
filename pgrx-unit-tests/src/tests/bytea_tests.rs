@@ -58,4 +58,50 @@ mod tests {
         let vec = Spi::get_one::<Vec<u8>>("SELECT tests.return_vec_subvec('abcdefg'::bytea);");
         assert_eq!(vec, Ok(Some(vec![b'b', b'c', b'd'])));
     }
+
+    #[pg_extern]
+    fn return_bytea_pgbox() -> PgBox<pg_sys::bytea> {
+        pgrx::rust_byte_slice_to_bytea(b"hello pgbox")
+    }
+
+    #[pg_test]
+    fn test_return_bytea_pgbox() {
+        let result = Spi::get_one::<&[u8]>("SELECT tests.return_bytea_pgbox();");
+        assert_eq!(result, Ok(Some(b"hello pgbox".as_slice())));
+    }
+
+    #[pg_extern]
+    fn bytea_arg_length(data: pgrx::datum::Bytea<'_>) -> i32 {
+        data.len() as i32
+    }
+
+    #[pg_test]
+    fn test_bytea_arg_length() {
+        let result = Spi::get_one::<i32>("SELECT tests.bytea_arg_length('abcdef'::bytea);");
+        assert_eq!(result, Ok(Some(6)));
+    }
+
+    #[pg_extern]
+    fn bytea_roundtrip(data: pgrx::datum::Bytea<'_>) -> PgBox<pg_sys::bytea> {
+        pgrx::rust_byte_slice_to_bytea(&data)
+    }
+
+    #[pg_test]
+    fn test_bytea_roundtrip() {
+        let result = Spi::get_one::<&[u8]>("SELECT tests.bytea_roundtrip('roundtrip'::bytea);");
+        assert_eq!(result, Ok(Some(b"roundtrip".as_slice())));
+    }
+
+    #[pg_extern]
+    fn bytea_is_empty(data: pgrx::datum::Bytea<'_>) -> bool {
+        data.is_empty()
+    }
+
+    #[pg_test]
+    fn test_bytea_is_empty() {
+        let empty = Spi::get_one::<bool>("SELECT tests.bytea_is_empty(''::bytea);");
+        assert_eq!(empty, Ok(Some(true)));
+        let non_empty = Spi::get_one::<bool>("SELECT tests.bytea_is_empty('x'::bytea);");
+        assert_eq!(non_empty, Ok(Some(false)));
+    }
 }

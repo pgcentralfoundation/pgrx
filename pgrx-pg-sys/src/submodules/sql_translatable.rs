@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::{
     BOX, CIRCLE, Datum, FdwRoutine, FunctionCallInfoBaseData, IndexAmRoutine, ItemPointerData,
-    PlannerInfo, Point, TableAmRoutine,
+    PlannerInfo, Point, TableAmRoutine, varlena,
 };
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable, TypeOrigin,
@@ -96,4 +96,13 @@ unsafe impl SqlTranslatable for Datum {
     const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Err(ArgumentError::Datum);
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = Err(ReturnsError::Datum);
+}
+
+unsafe impl SqlTranslatable for varlena {
+    const TYPE_IDENT: &'static str = "bytea";
+    const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
+        Ok(SqlMappingRef::literal("bytea"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("bytea")));
 }

@@ -31,6 +31,7 @@ mod tuples;
 mod unbox;
 mod uuid;
 mod varlena;
+mod bytea_type;
 
 pub use self::uuid::*;
 pub use crate::datetime::support as datetime_support;
@@ -48,6 +49,7 @@ pub use numeric::{AnyNumeric, Numeric};
 pub use range::*;
 pub use unbox::*;
 pub use varlena::*;
+pub use bytea_type::*;
 
 use crate::memcx::MemCx;
 use crate::pg_sys;
