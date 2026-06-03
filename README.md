@@ -236,7 +236,7 @@ cargo pgrx init
 
 | Postgres Type              | Rust Type (as `Option<T>`)                              |
 |----------------------------|---------------------------------------------------------|
-| `bytea`                    | `Vec<u8>` or `&[u8]` (zero-copy)                        |
+| `bytea`                    | `Vec<u8>`, `&[u8]` (zero-copy in), or `pgrx::Bytea<'_>` (zero-copy in/out) |
 | `text`                     | `String` or `&str` (zero-copy)                          |
 | `varchar`                  | `String` or `&str` (zero-copy) or `char`                |
 | `"char"`                   | `i8`                                                    |

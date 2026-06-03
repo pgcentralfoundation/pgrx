@@ -59,15 +59,12 @@ impl AsRef<[u8]> for Bytea<'_> {
 unsafe impl<'fcx> ArgAbi<'fcx> for Bytea<'fcx> {
     unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         unsafe {
-            let datum: pg_sys::Datum = arg.unbox_arg_using_from_datum::<pg_sys::Datum>()
+            let datum: pg_sys::Datum = arg
+                .unbox_arg_using_from_datum::<pg_sys::Datum>()
                 .expect("bytea argument must not be null");
             let varlena = pg_sys::pg_detoast_datum_packed(datum.cast_mut_ptr());
-            let ptr = NonNull::new(varlena)
-                .expect("pg_detoast_datum_packed returned null");
-            Bytea {
-                ptr,
-                _lifetime: PhantomData,
-            }
+            let ptr = NonNull::new(varlena).expect("pg_detoast_datum_packed returned null");
+            Bytea { ptr, _lifetime: PhantomData }
         }
     }
 
@@ -90,8 +87,7 @@ unsafe impl SqlTranslatable for Bytea<'_> {
     const TYPE_IDENT: &'static str = "bytea";
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
         pgrx_sql_entity_graph::metadata::TypeOrigin::External;
-    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
-        Ok(SqlMappingRef::literal("bytea"));
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("bytea"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("bytea")));
 }

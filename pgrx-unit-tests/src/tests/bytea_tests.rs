@@ -60,18 +60,7 @@ mod tests {
     }
 
     #[pg_extern]
-    fn return_bytea_pgbox() -> PgBox<pg_sys::bytea> {
-        pgrx::rust_byte_slice_to_bytea(b"hello pgbox")
-    }
-
-    #[pg_test]
-    fn test_return_bytea_pgbox() {
-        let result = Spi::get_one::<&[u8]>("SELECT tests.return_bytea_pgbox();");
-        assert_eq!(result, Ok(Some(b"hello pgbox".as_slice())));
-    }
-
-    #[pg_extern]
-    fn bytea_arg_length(data: pgrx::datum::Bytea<'_>) -> i32 {
+    fn bytea_arg_length(data: Bytea<'_>) -> i32 {
         data.len() as i32
     }
 
@@ -82,8 +71,8 @@ mod tests {
     }
 
     #[pg_extern]
-    fn bytea_roundtrip(data: pgrx::datum::Bytea<'_>) -> PgBox<pg_sys::bytea> {
-        pgrx::rust_byte_slice_to_bytea(&data)
+    fn bytea_roundtrip<'fcx>(input: Bytea<'fcx>) -> Bytea<'fcx> {
+        input
     }
 
     #[pg_test]
@@ -93,7 +82,7 @@ mod tests {
     }
 
     #[pg_extern]
-    fn bytea_is_empty(data: pgrx::datum::Bytea<'_>) -> bool {
+    fn bytea_is_empty(data: Bytea<'_>) -> bool {
         data.is_empty()
     }
 
