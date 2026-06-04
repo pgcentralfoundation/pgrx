@@ -85,7 +85,6 @@ pub mod be {
         pub remote_hostname_resolv: core::ffi::c_int,
         pub remote_hostname_errcode: core::ffi::c_int,
         pub remote_port: *mut core::ffi::c_char,
-        pub canAcceptConnections: core::ffi::c_uint,
         pub database_name: *mut core::ffi::c_char,
         pub user_name: *mut core::ffi::c_char,
         pub cmdline_options: *mut core::ffi::c_char,
