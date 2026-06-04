@@ -7,11 +7,14 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use cargo_edit::{CertsSource, Dependency, IndexCache, LocalManifest, registry_url};
+use cargo_toml::{Dependency, DepsSet, Manifest};
+use crates_index::SparseIndex;
 use eyre::eyre;
-use std::path::{Path, PathBuf};
-use toml_edit::KeyMut;
-use tracing::{debug, error, info, warn};
+use std::collections::HashSet;
+use std::sync::LazyLock;
+use std::{fs, path::PathBuf};
+use toml_edit::DocumentMut;
+use tracing::info;
 
 use crate::CommandExecute;
 
@@ -47,283 +50,309 @@ pub(crate) struct Upgrade {
     pub(crate) dry_run: bool,
 }
 
-fn set_dep_source_version<A: AsRef<str>>(src: &mut cargo_edit::Source, new_version: A) {
-    match src {
-        cargo_edit::Source::Registry(reg) => reg.version = new_version.as_ref().to_string(),
-        cargo_edit::Source::Path(path) => path.version = Some(new_version.as_ref().to_string()),
-        cargo_edit::Source::Git(git) => git.version = Some(new_version.as_ref().to_string()),
-        cargo_edit::Source::Workspace(_ws) => {
-            error!(
-                "Cannot upgrade the version of \
-                a package because it is set in the \
-                workspace, please run `cargo pgrx \
-                upgrade` in the workspace directory."
-            );
-        }
-    }
-}
-fn get_dep_source_version(src: &cargo_edit::Source) -> Option<&String> {
-    match src {
-        cargo_edit::Source::Registry(reg) => Some(&reg.version),
-        cargo_edit::Source::Path(path) => path.version.as_ref(),
-        cargo_edit::Source::Git(git) => git.version.as_ref(),
-        cargo_edit::Source::Workspace(_ws) => {
-            error!(
-                "Cannot fetch the version of \
-                a package because it is set in the \
-                workspace, please run `cargo pgrx \
-                upgrade` in the workspace directory."
-            );
-            None
-        }
-    }
-}
-
-#[tracing::instrument(level = "error")]
-fn replace_version(
-    new_version: &str,
-    crate_root: &Path,
-    key: &mut toml_edit::KeyMut,
-    dep: &mut toml_edit::Item,
-    mut parsed_dep: Dependency,
-    mut source: cargo_edit::Source,
-) -> eyre::Result<()> {
-    let dep_name = key.get();
-    let ver_maybe = get_dep_source_version(&source);
-    match ver_maybe {
-        Some(v) => {
-            debug!("{dep_name} version is {v}")
-        }
-        None => return Err(eyre!("No version field for {dep_name}, cannot upgrade.")),
-    }
-    set_dep_source_version(&mut source, new_version);
-    parsed_dep = parsed_dep.set_source(source);
-
-    parsed_dep.update_toml(crate_root, key, dep);
-    Ok(())
-}
-impl Upgrade {
+impl CommandExecute for Upgrade {
     #[tracing::instrument(level = "error", skip(self))]
-    fn update_dep(
-        &self,
-        path: &PathBuf,
-        mut key: KeyMut,
-        dep: &mut toml_edit::Item,
-    ) -> eyre::Result<()> {
-        let mut index = IndexCache::new(CertsSource::Native);
-        let dep_name_string = key.get().to_string();
-        let dep_name = dep_name_string.as_str();
-        let parsed_dep: Dependency = match Dependency::from_toml(path.as_path(), dep_name, dep) {
-            Ok(dependency) => dependency,
-            Err(e) => {
-                return Err(eyre!(
-                    "Could not parse dependency \
-                entry for {dep_name} due to error: {e}"
-                ));
-            }
-        };
-        let reg_url = registry_url(path, parsed_dep.registry())
-            .map_err(|e| eyre!("Unable to fetch registry URL for path: {e}"))?;
-        let index =
-            index.index(&reg_url).map_err(|e| eyre!("Unable to get registry index: {e}"))?;
-        let target_version = match self.to {
-            Some(ref ver) => Some(ver.clone()),
-            None => {
-                let krate = index.krate(dep_name).map_err(|e| {
-                    eyre!("The crate `{dep_name}` could not be found in registry index due {e}.")
-                })?;
-                let versions = krate.as_ref().map(|k| k.versions.as_slice()).unwrap_or_default();
-                let dependency =
-                    cargo_edit::find_latest_version(versions, self.include_prereleases, None)
-                        .ok_or_else(|| {
-                            eyre!("Unable to fetch the latest version for crate {dep_name}.")
-                        })?;
+    fn execute(self) -> eyre::Result<()> {
+        let path = self.manifest_path.map_or_else(|| PathBuf::from("./Cargo.toml"), |p| p.clone());
+        let path = find_manifest_file(&path.canonicalize()?, self.package.as_ref())?;
 
-                dependency.version().map(|s| s.to_string())
-            }
-        };
-        let target_version = match target_version {
-            Some(ver) => ver,
-            None => {
-                return Err(eyre!(
-                    "Unable to update {dep_name} \
-                , no provided crate version and a latest version \
-                could not be retrieved from the registry."
-                ));
-            }
+        let version = if let Some(v) = &self.to {
+            TargetVersion::Exact(v.to_owned())
+        } else if self.include_prereleases {
+            TargetVersion::DiscoverPrerelease
+        } else {
+            TargetVersion::DiscoverReleased
         };
 
-        // As of cargo-edit version 0.12.2, dep.source will always be a Some()
-        // if the Dependency struct was instantiated via from_toml().
-        let source = match parsed_dep.source().cloned() {
-            Some(src) => src,
-            None => {
-                return Err(eyre!(
-                    "Dependency {dep_name}'s source was \
-                parsed as None by cargo-edit."
-                ));
+        let updated = process_manifest_file(&path, &version)?;
+
+        if self.dry_run {
+            Ok(println!("{}", updated.to_string()))
+        } else {
+            fs::write(&path, updated.to_string())
+                .map_err(|err| eyre!("Unable to write the updated Cargo.toml to disk: {err}"))
+        }
+    }
+}
+
+#[derive(Debug)]
+enum TargetVersion {
+    DiscoverPrerelease,
+    DiscoverReleased,
+    Exact(String),
+}
+
+/// Starting at path, search for the Cargo manifest containing package.
+#[tracing::instrument(level = "error")]
+fn find_manifest_file(path: &PathBuf, package: Option<&String>) -> eyre::Result<PathBuf> {
+    let (manifest_dirpath, manifest_filepath) = if fs::metadata(&path)?.is_dir() {
+        (path.clone(), path.join("Cargo.toml"))
+    } else {
+        (path.parent().expect("parent").to_path_buf(), path.clone())
+    };
+
+    let input = Manifest::from_path(&manifest_filepath)
+        .map_err(|e| eyre!("Error opening manifest: {e}"))?;
+
+    match (package, &input.workspace) {
+        // Without a package argument, the manifest argument is already correct.
+        (None, _) => Ok(manifest_filepath),
+
+        // With a package argument and no workspace, check the name in the manifest.
+        (Some(name), None) => {
+            if let Some(input_package) = &input.package
+                && input_package.name().to_lowercase() == name.to_lowercase()
+            {
+                Ok(manifest_filepath)
+            } else {
+                Err(eyre!("No package {name:?} in {:?}", manifest_filepath.file_name()))
             }
-        };
-        debug!(
-            "Found dependency {dep_name} with current \
-            source {source:#?}"
-        );
-        match &source {
-            cargo_edit::Source::Registry(_) => {
-                if get_dep_source_version(&source).is_some() {
-                    replace_version(
-                        target_version.as_str(),
-                        path.as_path(),
-                        &mut key,
-                        dep,
-                        parsed_dep,
-                        source,
-                    )?;
-                } else {
-                    info!("No version specified for {dep_name}, not upgrading.");
+        }
+
+        // With a package argument in a workspace, search among the workspace members.
+        // Report errors from each member when the package is not found.
+        (Some(name), Some(workspace)) => {
+            let mut errs = Vec::with_capacity(workspace.members.len());
+
+            for dir in &workspace.members {
+                match find_manifest_file(&manifest_dirpath.join(dir), package) {
+                    Ok(v) => return Ok(v),
+                    Err(e) => errs.push(format!("- {dir}: {e}")),
                 }
             }
-            cargo_edit::Source::Path(_) => {
-                warn!(
-                    "Cannot upgrade the version of \
-                        {dep_name} because it is a path (local) dependency."
-                )
-            }
-            cargo_edit::Source::Git(_) => {
-                warn!(
-                    "Cannot upgrade the version of \
-                        {dep_name} because it is a git dependency."
-                )
-            }
-            cargo_edit::Source::Workspace(_) => {
-                warn!(
-                    "Cannot upgrade the version of \
-                        {dep_name} because it is set in the \
-                        workspace, please run `cargo pgrx \
-                        upgrade` in the workspace directory."
-                )
-            }
+
+            Err(eyre!("No package {name:?} in {manifest_filepath:?}:\n{}", errs.join("\n")))
         }
-        Ok(())
+    }
+}
+
+/// Load the Cargo manifest at path and return a copy with updated dependency versions.
+#[tracing::instrument(level = "error")]
+fn process_manifest_file(path: &PathBuf, version: &TargetVersion) -> eyre::Result<DocumentMut> {
+    let input = Manifest::from_path(&path).map_err(|e| eyre!("Error opening manifest: {e}"))?;
+
+    let mut output: DocumentMut = fs::read_to_string(&path)
+        .map_err(|e| eyre!("Error opening manifest: {e}"))?
+        .parse()
+        .map_err(|e| eyre!("Error parsing manifest: {e}"))?;
+
+    update_manifest(&input, &mut output, &version)?;
+
+    Ok(output)
+}
+
+/// Update versions in the "dependencies", "dev-dependencies", and "workspace.dependencies" sections
+/// of a Cargo manifest loaded into source and sink.
+#[tracing::instrument(level = "error")]
+fn update_manifest(
+    source: &Manifest,
+    sink: &mut DocumentMut,
+    target: &TargetVersion,
+) -> eyre::Result<()> {
+    if !source.dependencies.is_empty() {
+        let section = sink["dependencies"].as_table_like_mut();
+        let section = section.expect("source and sink diverged");
+
+        update_manifest_section(section, &source.dependencies, target)?;
     }
 
-    #[allow(deprecated)] // the API changes to toml_edit are quite complex!
-    fn process_manifest(&self, path: &PathBuf, manifest: &mut LocalManifest) -> eyre::Result<()> {
-        const RELEVANT_PACKAGES: [&str; 6] = [
+    if !source.dev_dependencies.is_empty() {
+        let section = sink["dev-dependencies"].as_table_like_mut();
+        let section = section.expect("source and sink diverged");
+
+        update_manifest_section(section, &source.dev_dependencies, target)?;
+    }
+
+    if let Some(workspace) = &source.workspace
+        && !workspace.dependencies.is_empty()
+    {
+        let section = sink["workspace"]["dependencies"].as_table_like_mut();
+        let section = section.expect("source and sink diverged");
+
+        update_manifest_section(section, &workspace.dependencies, target)?;
+    }
+
+    Ok(())
+}
+
+/// Update dependency versions in a single section of a Cargo manifest.
+fn update_manifest_section<T: toml_edit::TableLike + ?Sized>(
+    section: &mut T,
+    dependencies: &DepsSet,
+    target: &TargetVersion,
+) -> eyre::Result<()> {
+    static RELEVANT_PACKAGES: LazyLock<HashSet<&str>> = LazyLock::new(|| {
+        HashSet::from([
             "pgrx",
+            "pgrx-bench",
             "pgrx-macros",
             "pgrx-pg-config",
             "pgrx-pg-sys",
             "pgrx-sql-entity-graph",
             "pgrx-tests",
-        ];
+        ])
+    });
 
-        for dep_table in manifest.get_dependency_tables_mut() {
-            for dep_name in RELEVANT_PACKAGES {
-                let decor = dep_table.key_decor(dep_name).cloned();
-                if let Some((key, dep)) = dep_table.get_key_value_mut(dep_name) {
-                    self.update_dep(path, key, dep)?;
-                    // Workaround since update_toml() doesn't preserve comments
-                    if let Some(dec) = dep_table.key_decor_mut(dep_name) {
-                        if let Some(prefix) = decor.as_ref().and_then(|val| val.prefix().cloned()) {
-                            dec.set_prefix(prefix)
-                        }
-                        if let Some(suffix) = decor.as_ref().and_then(|val| val.suffix().cloned()) {
-                            dec.set_suffix(suffix)
-                        }
-                    }
+    // Regex to capture any operators in the manifest version requirement.
+    static REQUIREMENT_REGEX: LazyLock<regex::Regex> =
+        LazyLock::new(|| regex::Regex::new(r"^([^0-9.]*)([0-9.].*)$").unwrap());
+
+    for (local_name, dependency) in dependencies {
+        let crate_name = match dependency {
+            Dependency::Inherited(_) => continue,
+            Dependency::Simple(_) => local_name,
+            Dependency::Detailed(detail) => {
+                if let Some(crate_name) = &detail.package {
+                    crate_name
                 } else {
-                    debug!(
-                        "Manifest does not contain a dependency entry for \
-                        {dep_name}"
-                    );
+                    local_name
                 }
             }
+        };
+
+        if !RELEVANT_PACKAGES.contains(crate_name.as_str()) {
+            continue;
         }
-        if !self.dry_run {
-            manifest
-                .write()
-                .map_err(|err| eyre!("Unable to write the updated Cargo.toml to disk: {err}"))?;
-        } else {
-            let generated_toml = manifest.to_string();
-            println!("{generated_toml}");
+
+        let index = match dependency {
+            Dependency::Inherited(_) => continue,
+            Dependency::Simple(_) => SparseIndex::new_cargo_default()?,
+            Dependency::Detailed(detail) => {
+                if let Some(registry) = &detail.registry {
+                    unimplemented!("custom registry {registry:?}")
+                } else {
+                    SparseIndex::new_cargo_default()?
+                }
+            }
+        };
+
+        let next_version = match target {
+            TargetVersion::Exact(specified) => specified,
+            TargetVersion::DiscoverPrerelease => {
+                let krate = index.crate_from_cache(crate_name)?;
+                let highest = krate.highest_version();
+                &(!highest.is_yanked())
+                    .then_some(highest.version())
+                    .ok_or_else(|| {
+                        eyre!("Latest version {:?} for {crate_name:?} is yanked", highest.version())
+                    })?
+                    .to_owned()
+            }
+            TargetVersion::DiscoverReleased => {
+                let krate = index.crate_from_cache(crate_name)?;
+                let highest = krate.highest_normal_version();
+                &highest
+                    .ok_or_else(|| eyre!("No released version for {crate_name:?}"))?
+                    .version()
+                    .to_owned()
+            }
+        };
+
+        match dependency {
+            Dependency::Inherited(_) => continue,
+            Dependency::Simple(requirement) => {
+                let next_requirement =
+                    REQUIREMENT_REGEX.replace(&requirement, format!("{}{}", "${1}", next_version));
+
+                section.insert(&local_name, next_requirement.into_owned().into());
+            }
+            Dependency::Detailed(detail) => {
+                let Some(requirement) = &detail.version else {
+                    info!("No version specified for {local_name}, not upgrading.");
+                    continue;
+                };
+                let next_requirement =
+                    REQUIREMENT_REGEX.replace(&requirement, format!("{}{}", "${1}", next_version));
+
+                let table = section.get_mut(&local_name).expect("source and sink diverged");
+                let table = table.as_table_like_mut().expect("source and sink diverged");
+                table.insert("version", next_requirement.into_owned().into());
+            }
         }
-        Ok(())
     }
+
+    Ok(())
 }
 
-impl CommandExecute for Upgrade {
-    #[tracing::instrument(level = "error", skip(self))]
-    fn execute(self) -> eyre::Result<()> {
-        // Canonicalize because cargo-edit does not accept relative paths.
-        let path = std::fs::canonicalize(
-            self.manifest_path.clone().unwrap_or(PathBuf::from("./Cargo.toml")),
-        )?;
+#[cfg(test)]
+mod tests {
+    use cargo_toml;
+    use goldenfile;
+    use std::fs;
 
-        let mut manifest = cargo_edit::LocalManifest::find(Some(&path))
-            .map_err(|e| eyre!("Error opening manifest: {e}"))?;
+    #[test]
+    fn find_package_manifest() {
+        let root_path = env!("CARGO_MANIFEST_DIR");
+        let fixtures_path = format!("{root_path}/tests/fixtures/package");
+        let manifest_path = format!("{fixtures_path}/expected-0.16.0.toml").into();
 
-        // Attempt to determine if this is a workspace and, if so, should we
-        // navigate to a crate contained within.
-        let parse_workspace = cargo_toml::Manifest::from_path(&path)
-            .map_err(|e| eyre!("Failed to parse workspace manifest using cargo_toml: {e}"))?;
+        let parsed = cargo_toml::Manifest::from_path(&manifest_path).expect("fixture exists");
+        assert!(parsed.package.is_some() && parsed.workspace.is_none(), "package manifest");
 
-        if let Some(package) = self.package.clone() {
-            // Equivalent to manifest.manifest.data.contains_table("workspace"); but more robust
-            let workspace = &parse_workspace.workspace;
+        let found = super::find_manifest_file(&manifest_path, None).unwrap();
+        assert_eq!(found, manifest_path);
 
-            match (parse_workspace.package.map(|pak| pak.name() == package.as_str()), workspace) {
-                // Name of the package matches the name of the root workspace
-                // crate, do not dig for a contained package.
-                (Some(true), _) => self.process_manifest(&path, &mut manifest),
-                // Contained package specified and this is a workspace,
-                // OR workspace has no root package name.
-                // find the correct manifest for the child crate.
-                (Some(false), Some(work)) | (None, Some(work)) => {
-                    // Unfortunately cargo_toml::Workspace provides the member
-                    // list as directories but not as package names, so we have
-                    // to do a little bit of finagling here.
-                    let mut child_path_maybe = None;
-                    for member in &work.members {
-                        if member == &package {
-                            // Canonicalized, should have a parent path
-                            let root_path = path.parent().ok_or(eyre!(
-                                "Failed to canonicalize path, no \
-                                parent directory found."
-                            ))?;
-                            let member_path = root_path.join(member).join("Cargo.toml");
-                            debug!("Generated child path {:#?}", &member_path);
-                            child_path_maybe = Some(member_path);
-                        }
-                    }
-                    let child_path = child_path_maybe
-                        .ok_or(eyre!("Package {package} not found in workspace {path:#?}"))?;
+        let found = super::find_manifest_file(&manifest_path, Some(&"package".to_owned())).unwrap();
+        assert_eq!(found, manifest_path);
 
-                    let mut child_manifest = LocalManifest::find(Some(&child_path))
-                        .map_err(|e| eyre!("Error opening manifest: {e}"))?;
+        let _ = super::find_manifest_file(&manifest_path, Some(&"other".to_owned())).unwrap_err();
+    }
 
-                    self.process_manifest(&child_path, &mut child_manifest)
-                }
-                // No name and this is not a workspace, why is a package name
-                // specified?
-                (None, None) => Err(eyre!(
-                    "Package argument provided but the
-                        manifest at the path {path:#?} has no name and 
-                        is not a workspace, please check Cargo.toml's 
-                        validity."
-                )),
-                // Non-workspace crate, and the name does not match.
-                (Some(false), None) => Err(eyre!(
-                    "Package argument provided but the
-                        manifest at the path {path:#?} appears to be a regular
-                        single-crate workspace, with no child crates."
-                )),
-            }
-        } else {
-            // No specified package, go right to the manifest at the
-            // specified directory.
-            self.process_manifest(&path, &mut manifest)?;
-            Ok(())
-        }
+    #[test]
+    fn find_package_manifest_in_workspace() {
+        let root_path = env!("CARGO_MANIFEST_DIR");
+        let fixtures_path = format!("{root_path}/tests/fixtures/workspace");
+        let manifest_path = format!("{fixtures_path}/Cargo.toml").into();
+
+        let parsed = cargo_toml::Manifest::from_path(&manifest_path).expect("fixture exists");
+        assert!(parsed.package.is_none() && parsed.workspace.is_some(), "workspace manifest");
+
+        let found = super::find_manifest_file(&manifest_path, None).unwrap();
+        assert_eq!(found, manifest_path);
+
+        let found = super::find_manifest_file(&manifest_path, Some(&"hello".to_owned())).unwrap();
+        assert_eq!(found, format!("{fixtures_path}/hello/Cargo.toml"));
+
+        let _ = super::find_manifest_file(&manifest_path, Some(&"other".to_owned())).unwrap_err();
+    }
+
+    #[test]
+    fn process_package_manifest() {
+        let root_path = env!("CARGO_MANIFEST_DIR");
+        let fixtures_path = format!("{root_path}/tests/fixtures/package");
+        let manifest_path = format!("{fixtures_path}/expected-0.16.0.toml");
+        let mut golden = goldenfile::Mint::new(&fixtures_path);
+
+        let parsed = cargo_toml::Manifest::from_path(&manifest_path).expect("fixture exists");
+        assert!(parsed.package.is_some() && parsed.workspace.is_none(), "package manifest");
+
+        let updated = super::process_manifest_file(
+            &manifest_path.into(),
+            &super::TargetVersion::Exact("0.16.1".into()),
+        )
+        .unwrap();
+
+        fs::write(golden.new_goldenpath("expected-0.16.1.toml").unwrap(), updated.to_string())
+            .unwrap();
+    }
+
+    #[test]
+    fn process_workspace_manifest() {
+        let root_path = env!("CARGO_MANIFEST_DIR");
+        let fixtures_path = format!("{root_path}/tests/fixtures/workspace");
+        let manifest_path = format!("{fixtures_path}/Cargo.toml");
+        let mut golden = goldenfile::Mint::new(&fixtures_path);
+
+        let parsed = cargo_toml::Manifest::from_path(&manifest_path).expect("fixture exists");
+        assert!(parsed.package.is_none() && parsed.workspace.is_some(), "workspace manifest");
+
+        let updated = super::process_manifest_file(
+            &manifest_path.into(),
+            &super::TargetVersion::Exact("0.18.1".into()),
+        )
+        .unwrap();
+
+        fs::write(golden.new_goldenpath("expected-0.18.1.toml").unwrap(), updated.to_string())
+            .unwrap();
     }
 }

@@ -28,7 +28,6 @@ pgrx-pg-config.workspace = true
 pgrx-sql-entity-graph.workspace = true
 
 cargo_metadata.workspace = true
-cargo-edit.workspace = true
 cargo_toml.workspace = true
 clap-cargo.workspace = true
 libc.workspace = true
@@ -37,6 +36,7 @@ toml.workspace = true
 toml_edit.workspace = true
 
 clap = { version = "4.4.2", features = ["env", "suggestions", "cargo", "derive", "wrap_help"] }
+crates-index = { version = "3", features = ["sparse"], default-features = false }
 # Keep the resolver off is-terminal 0.4.7, which pulls rustix 0.37 and breaks
 # current nightly via rustc_attrs.
 is-terminal = "=0.4.17"
@@ -77,6 +77,8 @@ features = [
     "coff", "elf", "macho", "pe", "xcoff", # support all object formats to allow cross-builds
 ]
 
+[dev-dependencies]
+goldenfile = "1.11"
 
 [features]
 default = ["rustls"]

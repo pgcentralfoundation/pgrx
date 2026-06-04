@@ -1,0 +1,6 @@
+comment = 'hello:  Created by pgrx'
+default_version = '@CARGO_VERSION@'
+module_pathname = 'hello'
+relocatable = false
+superuser = true
+trusted = false

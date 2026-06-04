@@ -1,0 +1,10 @@
+[workspace]
+members = ["hello"]
+
+[workspace.dependencies]
+pgrx = "=0.18.1"
+pgrx-bench = "=0.18.1"
+pgrx-macros = "=0.18.1"
+pgrx-pg-sys = "=0.18.1"
+pgrx-sql-entity-graph = { version = "=0.18.1" }
+pgrx-pg-config = { version = "=0.18.1" }

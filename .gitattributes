@@ -1,0 +1,4 @@
+# https://git-scm.com/docs/gitattributes
+
+# Preserve LF line endings in golden files during checkout.
+/cargo-pgrx/tests/fixtures/**/*.toml text eol=lf
