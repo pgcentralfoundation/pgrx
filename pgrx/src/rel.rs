@@ -313,7 +313,13 @@ impl PgRelation {
             return true;
         }
 
-        #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+        #[cfg(any(
+            feature = "pg15",
+            feature = "pg16",
+            feature = "pg17",
+            feature = "pg18",
+            feature = "pg19"
+        ))]
         if self.pgstat_enabled {
             unsafe {
                 pg_sys::pgstat_assoc_relation(self.as_ptr());

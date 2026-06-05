@@ -319,7 +319,10 @@ pub unsafe fn TransactionIdFollows(id1: super::TransactionId, id2: super::Transa
 /// Postgres 19 turned this into a `static inline`, so we implement it ourselves
 #[cfg(feature = "pg19")]
 #[inline]
-pub unsafe fn TransactionIdFollowsOrEquals(id1: super::TransactionId, id2: super::TransactionId) -> bool {
+pub unsafe fn TransactionIdFollowsOrEquals(
+    id1: super::TransactionId,
+    id2: super::TransactionId,
+) -> bool {
     if !TransactionIdIsNormal(id1) || !TransactionIdIsNormal(id2) {
         return id1 >= id2;
     }
@@ -709,7 +712,13 @@ pub const unsafe fn PageValidateSpecialPointer(page: pg_sys::Page) -> bool {
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg18", feature = "pg19"))]
+#[cfg(any(
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg18",
+    feature = "pg19"
+))]
 pub unsafe fn PageGetSpecialPointer(page: pg_sys::Page) -> *mut ::core::ffi::c_char {
     /*
     #define PageGetSpecialPointer(page) \

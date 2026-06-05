@@ -55,7 +55,13 @@ macro_rules! pg_shmem_init {
             $crate::shmem::PgSharedMemoryInitialization::on_shmem_request(&$var);
         }
 
-        #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+        #[cfg(any(
+            feature = "pg15",
+            feature = "pg16",
+            feature = "pg17",
+            feature = "pg18",
+            feature = "pg19"
+        ))]
         unsafe {
             static mut PREV_SHMEM_REQUEST_HOOK: Option<unsafe extern "C-unwind" fn()> = None;
             PREV_SHMEM_REQUEST_HOOK = pg_sys::shmem_request_hook;
