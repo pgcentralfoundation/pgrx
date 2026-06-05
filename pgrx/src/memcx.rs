@@ -88,7 +88,11 @@ where
     f(&memcx)
 }
 
-#[cfg(all(feature = "nightly", feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+// `MemoryContextAllocAligned` was introduced in Postgres 16
+#[cfg(all(
+    feature = "nightly",
+    any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19")
+))]
 mod nightly {
     use super::*;
     use std::slice;
