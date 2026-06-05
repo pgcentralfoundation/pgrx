@@ -46,23 +46,23 @@ pgrx-sql-entity-graph = { path = "./pgrx-sql-entity-graph", version = "=0.18.1" 
 pgrx-pg-config = { path = "./pgrx-pg-config", version = "=0.18.1" }
 pgrx-bindgen = { path = "./pgrx-bindgen", version = "=0.18.1" }
 
-cargo_metadata = "0.18.0"
+cargo_metadata = "0.23.1"
 cargo-edit = "=0.13.2" # format-preserving edits to cargo.toml
 cargo_toml = "0.22" # used for building projects
-clap-cargo = { version = "0.14.0", features = ["cargo_metadata"] }
+clap-cargo = { version = "0.18.3", features = ["cargo_metadata"] }
 eyre = "~0.6.8" # simplifies error-handling
 libc = "0.2" # FFI compat
 owo-colors = { version = "4.0", features = ["supports-color"] } # for output highlighting
 proc-macro2 = { version = "1.0.101", features = ["span-locations"] }
 quote = "1.0.40"
-regex = "1.7" # used for build/test
+regex = "1.12" # used for build/test
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 shlex = "2.0" # shell lexing, also used by many of our deps
 syn = { version = "2", features = ["extra-traits", "full", "parsing", "visit-mut"] }
 toml = "0.5.11" # our config files
 toml_edit = "0.22.27" # format-preserving edits to toml files, used with cargo-edit
-thiserror = "1"
+thiserror = "2"
 unescape = "0.1.0" # for escaped-character-handling
 url = "2.5.2" # the non-existent std::web
 walkdir = "2" # directory recursion

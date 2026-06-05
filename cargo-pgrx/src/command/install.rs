@@ -12,7 +12,7 @@ use crate::cargo::CargoProfile;
 use crate::command::get::{find_control_file, get_property};
 use crate::command::sudo_install::SudoInstall;
 use crate::manifest::{PgVersionSource, display_version_info};
-use cargo_metadata::Message as CargoMessage;
+use cargo_metadata::{CrateType, Message as CargoMessage};
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
@@ -463,7 +463,7 @@ pub(crate) fn find_library_file(
         // normalize being flattened and low to the ground
         .find(|artifact| {
             artifact.manifest_path == manifest_path
-                && artifact.target.crate_types.iter().any(|s| s == "cdylib")
+                && artifact.target.crate_types.iter().any(|s| *s == CrateType::CDyLib)
         })
         .and_then(|artifact| {
             artifact

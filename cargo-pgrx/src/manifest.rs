@@ -7,7 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use cargo_metadata::Metadata;
+use cargo_metadata::{CrateType, Metadata};
 use cargo_toml::Manifest;
 use clap_cargo::Features;
 use eyre::{Context, eyre};
@@ -53,7 +53,7 @@ pub(crate) fn manifest_path(
         let found = metadata
             .packages
             .iter()
-            .find(|v| v.name == *package_name)
+            .find(|v| v.name == package_name)
             .ok_or_else(|| eyre!("Could not find package `{package_name}`"))?;
         tracing::debug!(manifest_path = %found.manifest_path, "Found workspace package");
         found.manifest_path.clone().into_std_path_buf()
@@ -72,7 +72,7 @@ pub(crate) fn manifest_path(
                 let is_cdylib = pkg
                     .targets
                     .iter()
-                    .any(|target| target.crate_types.iter().any(|ct| ct == "cdylib"));
+                    .any(|target| target.crate_types.iter().any(|ct| *ct == CrateType::CDyLib));
                 has_pgrx_dep && is_cdylib
             })
             .collect();
