@@ -56,6 +56,9 @@ impl<T> PgSpinLock<T> {
 
 impl<T: PGRXSharedMemory> PgSpinLock<T> {
     /// Returns true if the spinlock is locked, and false otherwise.
+    ///
+    /// Not available on Postgres 19 or later, which removed `SpinLockFree`.
+    #[cfg(not(feature = "pg19"))]
     #[inline]
     #[doc(alias = "SpinLockFree")]
     pub fn is_locked(&self) -> bool {

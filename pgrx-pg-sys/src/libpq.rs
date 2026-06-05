@@ -18,7 +18,7 @@ pub mod be {
 
     /// #define SCRAM_MAX_KEY_LEN          PG_SHA256_DIGEST_LENGTH
     /// #define PG_SHA256_DIGEST_LENGTH    32
-    #[cfg(feature = "pg18")]
+    #[cfg(any(feature = "pg18", feature = "pg19"))]
     const SCRAM_MAX_KEY_LEN: usize = 32;
 
     /// Port for Postgres 13..=16
@@ -142,7 +142,7 @@ pub mod be {
     }
 
     /// Port for Postgres 18..
-    #[cfg(feature = "pg18")]
+    #[cfg(any(feature = "pg18", feature = "pg19"))]
     #[repr(C)]
     pub struct Port {
         pub sock: crate::pgsocket,

@@ -136,7 +136,7 @@ get a working extension.
 ### The pgXX version argument
 
 Most commands accept an optional Postgres version: `pg13`, `pg14`, `pg15`,
-`pg16`, `pg17`, `pg18`, or `all`. If omitted, the default is determined by
+`pg16`, `pg17`, `pg18`, `pg19`, or `all`. If omitted, the default is determined by
 the first `pgXX` feature in the crate's `Cargo.toml`. You rarely need to
 specify it explicitly.
 

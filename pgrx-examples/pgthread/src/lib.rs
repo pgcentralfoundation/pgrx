@@ -32,12 +32,25 @@ unsafe extern "C-unwind" fn parse_analyze_hook(
         pg_guard_ffi_boundary(|| prev_hook(pstate, query));
     }
 }
-#[cfg(not(feature = "pg13"))]
+#[cfg(not(any(feature = "pg13", feature = "pg19")))]
 #[pg_guard(unsafe_entry_thread)]
 unsafe extern "C-unwind" fn parse_analyze_hook(
     pstate: *mut pg_sys::ParseState,
     query: *mut pg_sys::Query,
     jstate: *mut pg_sys::JumbleState,
+) {
+    do_the_hook(pstate);
+    if let Some(prev_hook) = PREV_POST_PARSE_ANALYZE_HOOK {
+        pg_guard_ffi_boundary(|| prev_hook(pstate, query, jstate));
+    }
+}
+// Postgres 19 changed the `JumbleState` argument to `*const`
+#[cfg(feature = "pg19")]
+#[pg_guard(unsafe_entry_thread)]
+unsafe extern "C-unwind" fn parse_analyze_hook(
+    pstate: *mut pg_sys::ParseState,
+    query: *mut pg_sys::Query,
+    jstate: *const pg_sys::JumbleState,
 ) {
     do_the_hook(pstate);
     if let Some(prev_hook) = PREV_POST_PARSE_ANALYZE_HOOK {

@@ -52,14 +52,14 @@ fn preferred_pg_config() -> Option<(String, PathBuf)> {
         return None;
     }
 
-    // Prefer pg18 when it exists because that is the newest version currently
+    // Prefer pg19 when it exists because that is the newest version currently
     // covered by the in-tree test extension. If it is not installed locally,
     // fall back to the highest configured version so the regression still runs
     // on developer machines with a partial setup.
     configs.sort_by_key(|(major, _)| *major);
     let preferred = configs
         .iter()
-        .position(|(major, _)| *major == 18)
+        .position(|(major, _)| *major == 19)
         .map(|index| configs.swap_remove(index))
         .unwrap_or_else(|| configs.pop().expect("non-empty after is_empty check"));
 

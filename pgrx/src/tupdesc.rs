@@ -300,7 +300,7 @@ fn tupdesc_get_attr(
 }
 
 /// `attno` is 0-based
-#[cfg(feature = "pg18")]
+#[cfg(any(feature = "pg18", feature = "pg19"))]
 #[inline]
 fn tupdesc_get_attr(
     tupdesc: &PgBox<pg_sys::TupleDescData>,

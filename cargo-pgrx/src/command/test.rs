@@ -21,7 +21,7 @@ use crate::manifest::{get_package_manifest, pg_config_and_version};
 #[derive(clap::Args, Debug, Clone)]
 #[clap(author)]
 pub(crate) struct Test {
-    /// Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, or all?
+    /// Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, pg19, or all?
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
     /// If specified, only run tests containing this string in their names

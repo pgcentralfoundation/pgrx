@@ -96,6 +96,19 @@ unsafe fn register_hooks() {
             pg_guard_ffi_boundary(|| prev_hook(parse_state, query, jumble_state));
         }
     }
+    // Postgres 19 changed the `JumbleState` argument to `*const`
+    #[cfg(feature = "pg19")]
+    #[pg_guard]
+    unsafe extern "C-unwind" fn post_parse_analyze_hook(
+        parse_state: *mut pg_sys::ParseState,
+        query: *mut pg_sys::Query,
+        jumble_state: *const pg_sys::JumbleState,
+    ) {
+        delete_must_have_a_where(PgBox::from_pg(query));
+        if let Some(prev_hook) = PREV_POST_PARSE_ANALYZE_HOOK {
+            pg_guard_ffi_boundary(|| prev_hook(parse_state, query, jumble_state));
+        }
+    }
 
     //
     // Process Utility Hook
@@ -139,7 +152,8 @@ unsafe fn register_hooks() {
         feature = "pg15",
         feature = "pg16",
         feature = "pg17",
-        feature = "pg18"
+        feature = "pg18",
+        feature = "pg19"
     ))]
     #[pg_guard]
     unsafe extern "C-unwind" fn process_utility_hook(

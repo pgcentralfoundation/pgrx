@@ -763,7 +763,7 @@ fn run_bindgen(
     eprintln!("pg_target_includes = {pg_target_includes:?}");
     let (autodetect, includes) = clang::detect_include_paths_for(preferred_clang);
     let mut binder = bindgen::Builder::default();
-    binder = add_blocklists(binder);
+    binder = add_blocklists(binder, major_version);
     binder = add_allowlists(binder, pg_target_includes.iter().map(|x| x.as_str()));
     binder = add_derives(binder);
     if !autodetect {
@@ -800,7 +800,14 @@ fn run_bindgen(
     Ok(bindings.to_string())
 }
 
-fn add_blocklists(bind: bindgen::Builder) -> bindgen::Builder {
+fn add_blocklists(bind: bindgen::Builder, major_version: u16) -> bindgen::Builder {
+    let bind = if major_version >= 19 {
+        // Postgres 19 turned these into `static inline` functions, so without the cshim there's
+        // no symbol to link against.  We implement them ourselves, in Rust, in `port.rs`
+        bind.blocklist_function("TransactionId(Precedes|PrecedesOrEquals|Follows|FollowsOrEquals)")
+    } else {
+        bind
+    };
     bind.blocklist_type("Datum") // manually wrapping datum for correctness
         .blocklist_type("Oid") // "Oid" is not just any u32
         .blocklist_type("TransactionId") // "TransactionId" is not just any u32

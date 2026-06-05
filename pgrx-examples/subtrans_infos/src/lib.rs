@@ -149,11 +149,11 @@ unsafe fn transaction_id_in_recent_past(
     let now_epoch_next_xid = (now_fullxid.value as u32).into();
     let now_epoch = (now_fullxid.value >> 32) as u32;
     let oldest_clog_xid = {
-        #[cfg(any(feature = "pg17", feature = "pg18"))]
+        #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
         {
             pg_sys::FirstNormalTransactionId
         }
-        #[cfg(not(any(feature = "pg17", feature = "pg18")))]
+        #[cfg(not(any(feature = "pg17", feature = "pg18", feature = "pg19")))]
         {
             (*pg_sys::ShmemVariableCache).oldestClogXid
         }

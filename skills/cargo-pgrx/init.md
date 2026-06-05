@@ -33,6 +33,7 @@ Each Postgres version has its own flag. The value is either:
 | `--pg16 <PATH\|download>` | `PG16_PG_CONFIG` | Postgres 16 |
 | `--pg17 <PATH\|download>` | `PG17_PG_CONFIG` | Postgres 17 |
 | `--pg18 <PATH\|download>` | `PG18_PG_CONFIG` | Postgres 18 |
+| `--pg19 <PATH\|download>` | `PG19_PG_CONFIG` | Postgres 19 |
 | `--base-port <PORT>` | | Base port number for managed instances |
 | `--base-testing-port <PORT>` | | Base port for test instances |
 | `--configure-flag <FLAG>` | | Extra flags for Postgres' `./configure` |

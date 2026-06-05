@@ -202,7 +202,8 @@ pub trait HasExtractableParts: Clone + IntoDatum + seal::DateTimeType {
                 feature = "pg15",
                 feature = "pg16",
                 feature = "pg17",
-                feature = "pg18"
+                feature = "pg18",
+                feature = "pg19"
             ))]
             let field_value: Option<AnyNumeric> = direct_function_call(
                 Self::EXTRACT_FUNCTION,
@@ -263,7 +264,8 @@ pub trait ToIsoString: IntoDatum + Sized + Display + seal::DateTimeType {
         feature = "pg15",
         feature = "pg16",
         feature = "pg17",
-        feature = "pg18"
+        feature = "pg18",
+        feature = "pg19"
     ))]
     fn to_iso_string_with_timezone<Tz: AsRef<str>>(
         self,
@@ -431,7 +433,8 @@ mod pg13 {
     feature = "pg15",
     feature = "pg16",
     feature = "pg17",
-    feature = "pg18"
+    feature = "pg18",
+    feature = "pg19"
 ))]
 const DATE_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_date;
@@ -453,7 +456,8 @@ const TIME_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum
     feature = "pg15",
     feature = "pg16",
     feature = "pg17",
-    feature = "pg18"
+    feature = "pg18",
+    feature = "pg19"
 ))]
 const TIME_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_time;
@@ -476,7 +480,8 @@ const TIMETZ_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Dat
     feature = "pg15",
     feature = "pg16",
     feature = "pg17",
-    feature = "pg18"
+    feature = "pg18",
+    feature = "pg19"
 ))]
 const TIMETZ_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_timetz;
@@ -499,7 +504,8 @@ const TIMESTAMP_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::
     feature = "pg15",
     feature = "pg16",
     feature = "pg17",
-    feature = "pg18"
+    feature = "pg18",
+    feature = "pg19"
 ))]
 const TIMESTAMP_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_timestamp;
@@ -522,7 +528,8 @@ const TIMESTAMPTZ_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys
     feature = "pg15",
     feature = "pg16",
     feature = "pg17",
-    feature = "pg18"
+    feature = "pg18",
+    feature = "pg19"
 ))]
 const TIMESTAMPTZ_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_timestamptz;
@@ -545,7 +552,8 @@ const INTERVAL_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::D
     feature = "pg15",
     feature = "pg16",
     feature = "pg17",
-    feature = "pg18"
+    feature = "pg18",
+    feature = "pg19"
 ))]
 const INTERVAL_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_interval;
@@ -568,7 +576,7 @@ impl_wrappers!(
 ///
 /// ## Errors
 /// Returns a [`DateTimeConversionError`] if the specified timezone is unknown to Postgres
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, DateTimeConversionError> {
     let zone = zone.as_ref();
     PgTryBuilder::new(|| {

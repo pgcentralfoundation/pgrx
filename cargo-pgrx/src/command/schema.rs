@@ -36,7 +36,7 @@ pub(crate) struct Schema {
     test: bool,
     /// Positional arguments.
     ///
-    /// The first may be a PostgreSQL version label (`pg13`..`pg18`); every
+    /// The first may be a PostgreSQL version label (`pg13`..`pg19`); every
     /// remaining value is an SQL item name to emit (functions, types,
     /// enums, operators, aggregates, triggers, schemas, extension_sql
     /// blocks). Only those items and their transitive dependencies are

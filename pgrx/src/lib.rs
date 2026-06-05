@@ -145,7 +145,7 @@ mod seal {
 //
 // Unless the compiling user explicitly told us that they're aware of this via `--features unsafe-postgres`.
 #[cfg(all(
-    any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"),
+    any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"),
     not(feature = "unsafe-postgres")
 ))]
 const _: () = {
@@ -262,19 +262,19 @@ macro_rules! pg_magic_func {
                 };
                 let mut magic = ::pgrx::pg_sys::Pg_magic_struct {
                     len,
-                    #[cfg(not(feature = "pg18"))]
+                    #[cfg(not(any(feature = "pg18", feature = "pg19")))]
                     version,
-                    #[cfg(not(feature = "pg18"))]
+                    #[cfg(not(any(feature = "pg18", feature = "pg19")))]
                     funcmaxargs,
-                    #[cfg(not(feature = "pg18"))]
+                    #[cfg(not(any(feature = "pg18", feature = "pg19")))]
                     indexmaxkeys,
-                    #[cfg(not(feature = "pg18"))]
+                    #[cfg(not(any(feature = "pg18", feature = "pg19")))]
                     namedatalen,
-                    #[cfg(not(feature = "pg18"))]
+                    #[cfg(not(any(feature = "pg18", feature = "pg19")))]
                     float8byval,
                     #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
                     abi_extra,
-                    #[cfg(feature = "pg18")]
+                    #[cfg(any(feature = "pg18", feature = "pg19"))]
                     abi_fields: ::pgrx::pg_sys::Pg_abi_values {
                         version,
                         funcmaxargs,
@@ -283,9 +283,9 @@ macro_rules! pg_magic_func {
                         float8byval,
                         abi_extra,
                     },
-                    #[cfg(feature = "pg18")]
+                    #[cfg(any(feature = "pg18", feature = "pg19"))]
                     name: ::core::ptr::null(),
-                    #[cfg(feature = "pg18")]
+                    #[cfg(any(feature = "pg18", feature = "pg19"))]
                     version: ::core::ptr::null(),
                 };
                 #[allow(unused_macros)]
@@ -334,14 +334,14 @@ macro_rules! pg_magic_func {
                     };
                     (name = $name:expr) => {
                         let name: &'static ::core::ffi::CStr = $name;
-                        #[cfg(feature = "pg18")]
+                        #[cfg(any(feature = "pg18", feature = "pg19"))]
                         {
                             magic.name = ::core::ffi::CStr::as_ptr($name);
                         }
                     };
                     (version = $version:expr) => {
                         let version: &'static ::core::ffi::CStr = $version;
-                        #[cfg(feature = "pg18")]
+                        #[cfg(any(feature = "pg18", feature = "pg19"))]
                         {
                             magic.version = ::core::ffi::CStr::as_ptr($version);
                         }

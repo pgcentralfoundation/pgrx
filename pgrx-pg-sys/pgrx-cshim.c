@@ -14,6 +14,10 @@
 
 #include PGRX_CSHIM_STATIC
 
+// Postgres 19 turned the SpinLock macros into `static inline` functions, so bindgen
+// generates these wrappers itself (in the PGRX_CSHIM_STATIC file).  It also removed
+// `SpinLockFree` entirely.
+#if PG_VERSION_NUM < 190000
 void SpinLockInit__pgrx_cshim(volatile slock_t *lock) {
     SpinLockInit(lock);
 }
@@ -29,6 +33,7 @@ void SpinLockRelease__pgrx_cshim(volatile slock_t *lock) {
 bool SpinLockFree__pgrx_cshim(slock_t *lock) {
     return SpinLockFree(lock);
 }
+#endif
 
 int call_closure_with_sigsetjmp(int savemask, void* closure_env_ptr, int (*closure_code)(sigjmp_buf jbuf, void *env_ptr)) {
     sigjmp_buf jbuf;

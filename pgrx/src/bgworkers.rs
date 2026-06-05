@@ -77,7 +77,8 @@ impl BackgroundWorker {
             feature = "pg15",
             feature = "pg16",
             feature = "pg17",
-            feature = "pg18"
+            feature = "pg18",
+            feature = "pg19"
         ))]
         const LEN: usize = 96;
 
@@ -220,7 +221,8 @@ impl BackgroundWorker {
                 feature = "pg15",
                 feature = "pg16",
                 feature = "pg17",
-                feature = "pg18"
+                feature = "pg18",
+                feature = "pg19"
             ))]
             pg_sys::BackgroundWorkerInitializeConnection(db, user, 0);
         };
@@ -246,7 +248,8 @@ impl BackgroundWorker {
                 feature = "pg15",
                 feature = "pg16",
                 feature = "pg17",
-                feature = "pg18"
+                feature = "pg18",
+                feature = "pg19"
             ))]
             pg_sys::BackgroundWorkerInitializeConnectionByOid(dboid, useroid, 0);
         };
@@ -276,7 +279,7 @@ impl BackgroundWorker {
                     feature = "pg17"
                 ))]
                 pg_sys::pqsignal(pg_sys::SIGHUP as i32, Some(worker_spi_sighup));
-                #[cfg(feature = "pg18")]
+                #[cfg(any(feature = "pg18", feature = "pg19"))]
                 pg_sys::pqsignal_be(pg_sys::SIGHUP as i32, Some(worker_spi_sighup));
             }
             if wake.contains(SignalWakeFlags::SIGTERM) {
@@ -288,7 +291,7 @@ impl BackgroundWorker {
                     feature = "pg17"
                 ))]
                 pg_sys::pqsignal(pg_sys::SIGTERM as i32, Some(worker_spi_sigterm));
-                #[cfg(feature = "pg18")]
+                #[cfg(any(feature = "pg18", feature = "pg19"))]
                 pg_sys::pqsignal_be(pg_sys::SIGTERM as i32, Some(worker_spi_sigterm));
             }
             if wake.contains(SignalWakeFlags::SIGINT) {
@@ -300,7 +303,7 @@ impl BackgroundWorker {
                     feature = "pg17"
                 ))]
                 pg_sys::pqsignal(pg_sys::SIGINT as i32, Some(worker_spi_sigint));
-                #[cfg(feature = "pg18")]
+                #[cfg(any(feature = "pg18", feature = "pg19"))]
                 pg_sys::pqsignal_be(pg_sys::SIGINT as i32, Some(worker_spi_sigint));
             }
             if wake.contains(SignalWakeFlags::SIGCHLD) {
@@ -312,7 +315,7 @@ impl BackgroundWorker {
                     feature = "pg17"
                 ))]
                 pg_sys::pqsignal(pg_sys::SIGCHLD as i32, Some(worker_spi_sigchld));
-                #[cfg(feature = "pg18")]
+                #[cfg(any(feature = "pg18", feature = "pg19"))]
                 pg_sys::pqsignal_be(pg_sys::SIGCHLD as i32, Some(worker_spi_sigchld));
             }
             pg_sys::BackgroundWorkerUnblockSignals();
@@ -342,24 +345,40 @@ impl BackgroundWorker {
     }
 }
 
-unsafe extern "C-unwind" fn worker_spi_sighup(_signal_args: i32) {
+unsafe extern "C-unwind" fn worker_spi_sighup(
+    _signal_args: i32,
+    // Postgres 19 added a `pg_signal_info` argument to `SIGNAL_ARGS`
+    #[cfg(feature = "pg19")] _siginfo: *const pg_sys::pg_signal_info,
+) {
     GOT_SIGHUP.store(true, Ordering::SeqCst);
     (&raw mut pg_sys::ConfigReloadPending).write_volatile(1);
     pg_sys::SetLatch(pg_sys::MyLatch);
 }
 
-unsafe extern "C-unwind" fn worker_spi_sigterm(_signal_args: i32) {
+unsafe extern "C-unwind" fn worker_spi_sigterm(
+    _signal_args: i32,
+    // Postgres 19 added a `pg_signal_info` argument to `SIGNAL_ARGS`
+    #[cfg(feature = "pg19")] _siginfo: *const pg_sys::pg_signal_info,
+) {
     GOT_SIGTERM.store(true, Ordering::SeqCst);
     (&raw mut pg_sys::ShutdownRequestPending).write_volatile(1);
     pg_sys::SetLatch(pg_sys::MyLatch);
 }
 
-unsafe extern "C-unwind" fn worker_spi_sigint(_signal_args: i32) {
+unsafe extern "C-unwind" fn worker_spi_sigint(
+    _signal_args: i32,
+    // Postgres 19 added a `pg_signal_info` argument to `SIGNAL_ARGS`
+    #[cfg(feature = "pg19")] _siginfo: *const pg_sys::pg_signal_info,
+) {
     GOT_SIGINT.store(true, Ordering::SeqCst);
     pg_sys::SetLatch(pg_sys::MyLatch);
 }
 
-unsafe extern "C-unwind" fn worker_spi_sigchld(_signal_args: i32) {
+unsafe extern "C-unwind" fn worker_spi_sigchld(
+    _signal_args: i32,
+    // Postgres 19 added a `pg_signal_info` argument to `SIGNAL_ARGS`
+    #[cfg(feature = "pg19")] _siginfo: *const pg_sys::pg_signal_info,
+) {
     GOT_SIGCHLD.store(true, Ordering::SeqCst);
     pg_sys::SetLatch(pg_sys::MyLatch);
 }
@@ -726,12 +745,12 @@ impl<'a> From<&'a BackgroundWorkerBuilder> for pg_sys::BackgroundWorker {
                 Some(d) => d.as_secs() as i32,
             },
             bgw_library_name: {
-                #[cfg(not(any(feature = "pg17", feature = "pg18")))]
+                #[cfg(not(any(feature = "pg17", feature = "pg18", feature = "pg19")))]
                 {
                     RpgffiChar::from(&builder.bgw_library_name[..]).0
                 }
 
-                #[cfg(any(feature = "pg17", feature = "pg18"))]
+                #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
                 {
                     RpgffiChar1024::from(&builder.bgw_library_name[..]).0
                 }
@@ -765,7 +784,8 @@ fn wait_latch(timeout: libc::c_long, wakeup_flags: WLflags) -> i32 {
     feature = "pg15",
     feature = "pg16",
     feature = "pg17",
-    feature = "pg18"
+    feature = "pg18",
+    feature = "pg19"
 ))]
 type RpgffiChar = RpgffiChar96;
 

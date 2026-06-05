@@ -178,6 +178,10 @@ Options:
                                                to have pgrx download/compile/install it [env: PG16_PG_CONFIG=]
       --pg17 <PG17>                            If installed locally, the path to PG17's `pgconfig` tool, or `download`
                                                to have pgrx download/compile/install it [env: PG17_PG_CONFIG=]
+      --pg18 <PG18>                            If installed locally, the path to PG18's `pgconfig` tool, or `download`
+                                               to have pgrx download/compile/install it [env: PG18_PG_CONFIG=]
+      --pg19 <PG19>                            If installed locally, the path to PG19's `pgconfig` tool, or `download`
+                                               to have pgrx download/compile/install it [env: PG19_PG_CONFIG=]
       --base-port <BASE_PORT>                  Base port number
       --base-testing-port <BASE_TESTING_PORT>  Base testing port number
       --configure-flag <CONFIGURE_FLAG>        Additional flags to pass to the configure script
@@ -341,7 +345,7 @@ Compile/install extension to a pgrx-managed Postgres instance and start psql
 Usage: cargo pgrx run [OPTIONS] [PG_VERSION] [DBNAME]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, or pg18? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, or pg19? [env: PG_VERSION=]
   [DBNAME]      The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
 
 Options:
@@ -392,7 +396,7 @@ Connect, via psql, to a Postgres instance
 Usage: cargo pgrx connect [OPTIONS] [PG_VERSION] [DBNAME]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, or pg18? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, or pg19? [env: PG_VERSION=]
   [DBNAME]      The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name [env: DBNAME=]
 
 Options:
@@ -510,7 +514,7 @@ Run the test suite for this crate
 Usage: cargo pgrx test [OPTIONS] [PG_VERSION] [TESTNAME]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, or all? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, pg19, or all? [env: PG_VERSION=]
   [TESTNAME]    If specified, only run tests containing this string in their names
 
 Options:
@@ -890,7 +894,7 @@ Generate extension schema files
 Usage: cargo pgrx schema [OPTIONS] [ARGS]...
 
 Arguments:
-  [ARGS]...  First arg may be a PostgreSQL version label (`pg13`..`pg18`).
+  [ARGS]...  First arg may be a PostgreSQL version label (`pg13`..`pg19`).
              Remaining args are SQL item names to emit (functions, types,
              enums, operators, aggregates, triggers, schemas, extension_sql
              blocks). When item names are given, only those items and their

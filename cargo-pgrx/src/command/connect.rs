@@ -22,7 +22,7 @@ use std::path::PathBuf;
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Connect {
-    /// Do you want to run against pg13, pg14, pg15, pg16, pg17, or pg18?
+    /// Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, or pg19?
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
     /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name

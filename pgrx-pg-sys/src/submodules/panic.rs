@@ -636,11 +636,19 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
                 unreachable_unchecked()
             } else {
                 // if it wasn't an ERROR we need to free up the things that Postgres wouldn't have
-                if !file.is_null() {
-                    pfree(file.cast());
-                }
-                if !funcname.is_null() {
-                    pfree(funcname.cast());
+                //
+                // ... except on Postgres 19, whose `errfinish()` resets `ErrorContext` (where we
+                // allocated `file` and `funcname`) on its way out, making a `pfree()` here a
+                // use-after-free.  In the nested-error case where pg19 doesn't reset the context,
+                // these allocations just live in `ErrorContext` until it's eventually reset
+                #[cfg(not(feature = "pg19"))]
+                {
+                    if !file.is_null() {
+                        pfree(file.cast());
+                    }
+                    if !funcname.is_null() {
+                        pfree(funcname.cast());
+                    }
                 }
             }
         }

@@ -104,7 +104,7 @@ pub unsafe fn GetMemoryChunkContext(pointer: *mut std::os::raw::c_void) -> pg_sy
 
         context
     }
-    #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+    #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
     {
         #[pgrx_macros::pg_guard]
         unsafe extern "C-unwind" {
@@ -157,7 +157,7 @@ pub fn get_pg_major_version_num() -> u16 {
     u16::from_str(super::get_pg_major_version_string()).unwrap()
 }
 
-#[cfg(any(not(target_env = "msvc"), feature = "pg17", feature = "pg18"))]
+#[cfg(any(not(target_env = "msvc"), feature = "pg17", feature = "pg18", feature = "pg19"))]
 #[inline]
 pub fn get_pg_version_string() -> &'static str {
     super::PG_VERSION_STR.to_str().unwrap()
@@ -268,6 +268,63 @@ pub fn get_pg_major_minor_version_string() -> &'static str {
 #[inline]
 pub fn TransactionIdIsNormal(xid: super::TransactionId) -> bool {
     xid >= FirstNormalTransactionId
+}
+
+/// `TransactionIdPrecedes` --- is id1 logically < id2?
+///
+/// Postgres 19 turned this into a `static inline`, so we implement it ourselves
+#[cfg(feature = "pg19")]
+#[inline]
+pub unsafe fn TransactionIdPrecedes(id1: super::TransactionId, id2: super::TransactionId) -> bool {
+    // If either ID is a permanent XID then we can just do unsigned comparison.
+    // If both are normal, do a modulo-2^32 comparison.
+    if !TransactionIdIsNormal(id1) || !TransactionIdIsNormal(id2) {
+        return id1 < id2;
+    }
+
+    (id1.into_inner().wrapping_sub(id2.into_inner()) as i32) < 0
+}
+
+/// `TransactionIdPrecedesOrEquals` --- is id1 logically <= id2?
+///
+/// Postgres 19 turned this into a `static inline`, so we implement it ourselves
+#[cfg(feature = "pg19")]
+#[inline]
+pub unsafe fn TransactionIdPrecedesOrEquals(
+    id1: super::TransactionId,
+    id2: super::TransactionId,
+) -> bool {
+    if !TransactionIdIsNormal(id1) || !TransactionIdIsNormal(id2) {
+        return id1 <= id2;
+    }
+
+    (id1.into_inner().wrapping_sub(id2.into_inner()) as i32) <= 0
+}
+
+/// `TransactionIdFollows` --- is id1 logically > id2?
+///
+/// Postgres 19 turned this into a `static inline`, so we implement it ourselves
+#[cfg(feature = "pg19")]
+#[inline]
+pub unsafe fn TransactionIdFollows(id1: super::TransactionId, id2: super::TransactionId) -> bool {
+    if !TransactionIdIsNormal(id1) || !TransactionIdIsNormal(id2) {
+        return id1 > id2;
+    }
+
+    (id1.into_inner().wrapping_sub(id2.into_inner()) as i32) > 0
+}
+
+/// `TransactionIdFollowsOrEquals` --- is id1 logically >= id2?
+///
+/// Postgres 19 turned this into a `static inline`, so we implement it ourselves
+#[cfg(feature = "pg19")]
+#[inline]
+pub unsafe fn TransactionIdFollowsOrEquals(id1: super::TransactionId, id2: super::TransactionId) -> bool {
+    if !TransactionIdIsNormal(id1) || !TransactionIdIsNormal(id2) {
+        return id1 >= id2;
+    }
+
+    (id1.into_inner().wrapping_sub(id2.into_inner()) as i32) >= 0
 }
 
 /// ```c
@@ -403,7 +460,7 @@ unsafe extern "C-unwind" {
     ) -> bool;
 }
 
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub unsafe fn planstate_tree_walker(
     planstate: *mut super::PlanState,
     walker: ::core::option::Option<
@@ -414,7 +471,7 @@ pub unsafe fn planstate_tree_walker(
     crate::planstate_tree_walker_impl(planstate, walker, context)
 }
 
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub unsafe fn query_tree_walker(
     query: *mut super::Query,
     walker: ::core::option::Option<
@@ -426,7 +483,7 @@ pub unsafe fn query_tree_walker(
     crate::query_tree_walker_impl(query, walker, context, flags)
 }
 
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub unsafe fn query_or_expression_tree_walker(
     node: *mut super::Node,
     walker: ::core::option::Option<
@@ -438,7 +495,7 @@ pub unsafe fn query_or_expression_tree_walker(
     crate::query_or_expression_tree_walker_impl(node, walker, context, flags)
 }
 
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub unsafe fn expression_tree_walker(
     node: *mut crate::Node,
     walker: Option<unsafe extern "C-unwind" fn(*mut crate::Node, *mut ::core::ffi::c_void) -> bool>,
@@ -447,7 +504,7 @@ pub unsafe fn expression_tree_walker(
     crate::expression_tree_walker_impl(node, walker, context)
 }
 
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub unsafe fn range_table_entry_walker(
     rte: *mut super::RangeTblEntry,
     walker: ::core::option::Option<
@@ -459,7 +516,7 @@ pub unsafe fn range_table_entry_walker(
     crate::range_table_entry_walker_impl(rte, walker, context, flags)
 }
 
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub unsafe fn range_table_walker(
     rtable: *mut super::List,
     walker: ::core::option::Option<
@@ -471,7 +528,7 @@ pub unsafe fn range_table_walker(
     crate::range_table_walker_impl(rtable, walker, context, flags)
 }
 
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub unsafe fn raw_expression_tree_walker(
     node: *mut crate::Node,
     walker: Option<unsafe extern "C-unwind" fn(*mut crate::Node, *mut ::core::ffi::c_void) -> bool>,
@@ -480,7 +537,7 @@ pub unsafe fn raw_expression_tree_walker(
     crate::raw_expression_tree_walker_impl(node, walker, context)
 }
 
-#[cfg(feature = "pg18")]
+#[cfg(any(feature = "pg18", feature = "pg19"))]
 pub unsafe fn expression_tree_mutator(
     node: *mut crate::Node,
     mutator: crate::tree_mutator_callback,
@@ -652,7 +709,7 @@ pub const unsafe fn PageValidateSpecialPointer(page: pg_sys::Page) -> bool {
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg18"))]
+#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg18", feature = "pg19"))]
 pub unsafe fn PageGetSpecialPointer(page: pg_sys::Page) -> *mut ::core::ffi::c_char {
     /*
     #define PageGetSpecialPointer(page) \

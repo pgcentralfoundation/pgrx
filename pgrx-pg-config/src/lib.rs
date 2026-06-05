@@ -544,11 +544,14 @@ impl Default for Pgrx {
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct ConfigToml {
-    pub configs: HashMap<String, PathBuf>,
+    // scalar values must be declared (and thus serialized) before the `configs` table,
+    // otherwise `toml::to_string` fails with "values must be emitted before tables"
     #[serde(skip_serializing_if = "Option::is_none")]
     pub base_port: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub base_testing_port: Option<u16>,
+    #[serde(default)]
+    pub configs: HashMap<String, PathBuf>,
 }
 
 pub enum PgConfigSelector<'a> {
@@ -732,6 +735,16 @@ pub fn SUPPORTED_VERSIONS() -> Vec<PgVersion> {
         PgVersion::new(16, PgMinorVersion::Latest, None),
         PgVersion::new(17, PgMinorVersion::Latest, None),
         PgVersion::new(18, PgMinorVersion::Latest, None),
+        PgVersion::new(
+            19,
+            PgMinorVersion::Beta(1),
+            Some(
+                Url::parse(
+                    "https://ftp.postgresql.org/pub/source/v19beta1/postgresql-19beta1.tar.bz2",
+                )
+                .expect("malformed pg19beta1 url"),
+            ),
+        ),
     ]
 }
 

@@ -27,7 +27,7 @@ cargo pgrx test [OPTIONS] [PG_VERSION] [TESTNAME]
 
 | Argument | Description |
 |----------|-------------|
-| `PG_VERSION` | `pg13`, `pg14`, `pg15`, `pg16`, `pg17`, `pg18`, or `all`. Defaults to the first pgXX feature in Cargo.toml. Env: `PG_VERSION` |
+| `PG_VERSION` | `pg13`, `pg14`, `pg15`, `pg16`, `pg17`, `pg18`, `pg19`, or `all`. Defaults to the first pgXX feature in Cargo.toml. Env: `PG_VERSION` |
 | `TESTNAME` | If specified, only run tests whose names contain this string |
 
 **Smart argument detection:** If the first positional argument is not a

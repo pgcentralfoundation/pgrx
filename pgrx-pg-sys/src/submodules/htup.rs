@@ -219,7 +219,7 @@ unsafe fn fetchatt(A: *const crate::FormData_pg_attribute, T: *mut std::os::raw:
 ///
 /// Caller is responsible for ensuring `A` is a valid [`FormData_pg_attribute`] pointer
 #[inline(always)]
-#[cfg(feature = "pg18")]
+#[cfg(any(feature = "pg18", feature = "pg19"))]
 unsafe fn fetchatt(A: *const crate::CompactAttribute, T: *mut std::os::raw::c_char) -> Datum {
     // #define fetchatt(A,T) fetch_att(T, (A)->attbyval, (A)->attlen)
 
@@ -406,7 +406,7 @@ unsafe fn fastgetattr(
                 feature = "pg17"
             ))]
             let att = &(*tupleDesc).attrs.as_slice((*tupleDesc).natts as _)[attnum as usize - 1];
-            #[cfg(feature = "pg18")]
+            #[cfg(any(feature = "pg18", feature = "pg19"))]
             let att =
                 &(*tupleDesc).compact_attrs.as_slice((*tupleDesc).natts as _)[attnum as usize - 1];
             if att.attcacheoff >= 0 {

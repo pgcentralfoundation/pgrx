@@ -11,9 +11,9 @@
 
 #[cfg(
     // no features at all will cause problems
-    not(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))
+    not(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))
 )]
-std::compile_error!("exactly one feature must be provided (pg13, pg14, pg15, pg16, pg17, pg18)");
+std::compile_error!("exactly one feature must be provided (pg13, pg14, pg15, pg16, pg17, pg18, pg19)");
 
 mod cshim;
 mod cstr;
@@ -24,6 +24,8 @@ mod port;
 pub mod libpq;
 pub mod submodules;
 
+// on pg19, `cshim` currently has nothing to re-export, so the glob import is "unused"
+#[allow(unused_imports)]
 #[cfg(feature = "cshim")]
 pub use cshim::*;
 

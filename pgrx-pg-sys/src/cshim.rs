@@ -1,8 +1,13 @@
 #![cfg(feature = "cshim")]
 #![allow(deprecated)]
 
+#[cfg(not(feature = "pg19"))]
 use crate as pg_sys;
 
+// On Postgres 19+ the SpinLock functions are `static inline` in `storage/spin.h`, so
+// bindgen wraps them automatically and they come in through the generated bindings.
+// (`SpinLockFree` was removed from Postgres entirely in v19.)
+#[cfg(not(feature = "pg19"))]
 #[pgrx_macros::pg_guard]
 unsafe extern "C-unwind" {
     #[link_name = "SpinLockInit__pgrx_cshim"]

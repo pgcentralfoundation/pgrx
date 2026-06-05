@@ -42,6 +42,9 @@ impl Action {
         let committed = txn.commit_time;
         #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
         let committed = unsafe { txn.xact_time.commit_time };
+        // Postgres 19 made the `xact_time` union anonymous
+        #[cfg(feature = "pg19")]
+        let committed = unsafe { txn.__bindgen_anon_1.commit_time };
         Self {
             typ: "COMMIT".into(),
             // TODO: convert the commit timestamp into a human readable format ?
@@ -140,7 +143,7 @@ struct Tuple {
     rel: pgrx::PgRelation,
     #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
     data: PgBox<pg_sys::ReorderBufferTupleBuf>,
-    #[cfg(any(feature = "pg17", feature = "pg18"))]
+    #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
     data: PgBox<pg_sys::HeapTupleData>,
 }
 
@@ -169,7 +172,7 @@ impl Serialize for Tuple {
 
             #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
             let tuple = unsafe { &raw mut (*self.data.as_ptr()).tuple };
-            #[cfg(any(feature = "pg17", feature = "pg18"))]
+            #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
             let tuple = self.data.as_ptr();
 
             let datum = unsafe {

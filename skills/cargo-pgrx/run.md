@@ -24,7 +24,7 @@ cargo pgrx run [OPTIONS] [PG_VERSION] [DBNAME]
 
 | Argument | Description |
 |----------|-------------|
-| `PG_VERSION` | `pg13`..`pg18`. Defaults to first pgXX feature in Cargo.toml. Env: `PG_VERSION` |
+| `PG_VERSION` | `pg13`..`pg19`. Defaults to first pgXX feature in Cargo.toml. Env: `PG_VERSION` |
 | `DBNAME` | Database to connect to (and create if needed). Defaults to the extension name |
 
 **Smart argument detection:** If the first positional argument is not a
