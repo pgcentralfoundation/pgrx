@@ -30,6 +30,11 @@ fn cargo_toml_path(path: &Path) -> String {
     path.to_str().expect("test fixture path must be UTF-8").replace('\\', "/")
 }
 
+fn command_output_contains_path(output: &str, path: &Path) -> bool {
+    output.contains(&path.display().to_string())
+        || output.contains(&format!("{:?}", path.as_os_str()))
+}
+
 fn write_auto_detect_workspace() -> TempDir {
     let tempdir = tempfile::tempdir().expect("temporary auto-detect workspace");
     let root = tempdir.path();
@@ -140,6 +145,14 @@ fn auto_detect_answer() -> i32 {
 #[test]
 fn cargo_toml_path_uses_forward_slashes() {
     assert_eq!(cargo_toml_path(Path::new(r"D:\a\pgrx\pgrx")), "D:/a/pgrx/pgrx");
+}
+
+#[test]
+fn command_output_path_match_accepts_escaped_windows_paths() {
+    let path = Path::new(r"C:\Users\runner\AppData\Local\Temp\auto_detect_ext\Cargo.toml");
+    let output = format!(r#""cargo" "rustc" "--manifest-path" {:?}"#, path.as_os_str());
+
+    assert!(command_output_contains_path(&output, path));
 }
 
 fn preferred_pg_config() -> Option<(String, PathBuf)> {
@@ -296,7 +309,7 @@ fn install_from_virtual_workspace_auto_detects_manifest_and_preserves_rustflags(
     );
     assert!(
         stdout.contains("--manifest-path")
-            && stdout.contains(&extension_manifest.display().to_string()),
+            && command_output_contains_path(&stdout, &extension_manifest),
         "cargo-pgrx build command did not target the resolved manifest\nstdout:\n{stdout}\nstderr:\n{stderr}"
     );
     if cfg!(all(target_family = "unix", not(target_os = "macos"))) {
