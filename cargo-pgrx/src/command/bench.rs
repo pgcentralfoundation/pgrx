@@ -553,7 +553,7 @@ fn insert_run_group(
             &compare_group_id,
             &extname,
             &extversion,
-            &i32::try_from(pg_config.major_version()?)?,
+            &i32::from(pg_config.major_version()?),
             &profile.name(),
             &cargo_features,
             &command_line,

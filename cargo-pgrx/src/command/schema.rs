@@ -270,10 +270,9 @@ pub(crate) fn generate_schema_implicit(
                 .wrap_err_with(|| format!("Could not write SQL to {}", path.display()))?;
         } else {
             eprintln!(
-                "{} SQL for {} item(s) to {}",
+                "{} SQL for {} item(s) to /dev/stdout",
                 "     Writing".bold().green(),
-                items.len(),
-                "/dev/stdout"
+                items.len()
             );
             use std::io::Write as _;
             std::io::stdout()
@@ -381,19 +380,13 @@ fn first_build(
     let cargo = if is_test {
         cargo.subcommand("test").flag("--no-run")
     } else {
-        cargo.subcommand("build").flag("--lib")
+        cargo
+            .subcommand("rustc")
+            .flag("--lib")
+            .rustc_args(crate::cargo::pgrx_cdylib_rustc_args(target))
     };
 
-    let mut cargo = cargo.profile(profile.clone()).target(target.map(|t| t.to_owned()));
-
-    // `cargo build --lib` only ever links the cdylib, so it's safe to apply
-    // the `.pgrxsc` retention workaround. `cargo test --no-run` also links
-    // the test binary, which rustc needs `--gc-sections` to prune undefined
-    // Postgres `extern "C"` references from; applying the workaround there
-    // surfaces those as linker errors. See `pgrx_cdylib_config_args`.
-    if !is_test {
-        cargo = cargo.with_pgrx_cdylib_workaround();
-    }
+    let cargo = cargo.profile(profile.clone()).target(target.map(|t| t.to_owned()));
 
     let mut command = cargo.into_command();
 

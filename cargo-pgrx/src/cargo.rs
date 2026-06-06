@@ -24,10 +24,8 @@ pub struct Cargo {
     profile: CargoProfile,
     // use a BTreeMap for deterministic order of iteration
     more_args: BTreeMap<String, Vec<String>>,
-    // Top-level cargo args placed before the subcommand (e.g. `--config ...`).
-    // Kept separate so callers can opt into cdylib-only tweaks without touching
-    // subcommand-specific arg ordering.
-    top_level_args: Vec<String>,
+    // Extra arguments passed after `cargo rustc --`.
+    rustc_args: Vec<String>,
 }
 
 impl Cargo {
@@ -77,24 +75,22 @@ impl Cargo {
         self
     }
 
-    /// Apply the `.pgrxsc` retention workaround for cdylib-producing
-    /// invocations. See `pgrx_cdylib_config_args` for why this is only safe
-    /// to use when the subcommand only links a cdylib (never for `test`,
-    /// which also links a test binary that needs normal `--gc-sections` to
-    /// prune undefined Postgres `extern "C"` references).
-    pub fn with_pgrx_cdylib_workaround(mut self) -> Self {
-        self.top_level_args.extend(pgrx_cdylib_config_args());
+    pub fn rustc_args<I, S>(mut self, args: I) -> Self
+    where
+        I: IntoIterator<Item = S>,
+        S: Into<String>,
+    {
+        self.rustc_args.extend(args.into_iter().map(Into::into));
         self
     }
 
     #[track_caller]
     pub fn into_command(self) -> process::Command {
-        let mut cmd = cargo();
-
-        // top-level cargo args (e.g. `--config ...`) go before the subcommand.
-        for arg in &self.top_level_args {
-            cmd.arg(arg);
+        if !self.rustc_args.is_empty() && self.subcmd != "rustc" {
+            panic!("`Cargo::rustc_args` requires the `rustc` subcommand, was: {self:?}");
         }
+
+        let mut cmd = cargo();
 
         // subcommand *must* go first among subcommand-relative args
         if !self.subcmd.is_empty() {
@@ -113,7 +109,7 @@ impl Cargo {
             package,
             subcmd: _,
             more_args,
-            top_level_args: _,
+            rustc_args,
         } = self;
 
         // set most-interesting flags first, like profile, target, and manifest-path
@@ -171,6 +167,10 @@ impl Cargo {
             cmd.arg(flag).args(args);
         }
 
+        if !rustc_args.is_empty() {
+            cmd.arg("--").args(rustc_args);
+        }
+
         cmd
     }
 }
@@ -198,8 +198,8 @@ pub(crate) fn cargo() -> std::process::Command {
     std::process::Command::new(cargo)
 }
 
-/// Cargo top-level `--config` arguments that force the linker to retain the
-/// `.pgrxsc` section when building the extension cdylib.
+/// Extra `cargo rustc --lib -- ...` arguments that force the linker to retain
+/// the `.pgrxsc` section when building the extension cdylib.
 ///
 /// The schema metadata that drives `cargo pgrx schema` lives in a `.pgrxsc`
 /// ELF section composed of `#[used]` statics scattered across every CGU. Rust
@@ -209,14 +209,14 @@ pub(crate) fn cargo() -> std::process::Command {
 /// it depends on LLVM emitting the flag, binutils honoring it, and LTO not
 /// masking the difference. When it breaks, every `.pgrxsc` contribution is
 /// dropped and `cargo pgrx schema` fails with "no embedded pgrx schema section
-/// found" — which is exactly what we've seen on non-LTO aarch64 Linux builds.
+/// found", which is exactly what we've seen on non-LTO aarch64 Linux builds.
 ///
-/// Passing `-Wl,--no-gc-sections` as a link-arg on non-macOS Unix sidesteps the
-/// whole retention contract. The cost is a few KB of unreferenced code surviving
-/// in the final cdylib, which is a trade we'll happily make.
+/// Passing `-Wl,--no-gc-sections` as a final-crate link-arg on non-macOS Unix
+/// sidesteps the whole retention contract. The cost is a few KB of unreferenced
+/// code surviving in the final cdylib, which is a trade we'll happily make.
 ///
 /// Critically, these args are only injected for cdylib-producing invocations
-/// (`cargo build --lib` inside cargo-pgrx install/package/schema paths). They
+/// (`cargo rustc --lib` inside cargo-pgrx install/package/schema paths). They
 /// MUST NOT be injected for `cargo test` invocations: rustc uses `--gc-sections`
 /// on test binaries to prune the many unreachable `extern "C"` references to
 /// Postgres symbols that pgrx-pg-sys declares. Keeping all those call sites
@@ -226,24 +226,41 @@ pub(crate) fn cargo() -> std::process::Command {
 /// re-invokes `cargo-pgrx install` internally, and that path goes through
 /// `build_extension` which does apply the workaround.
 ///
-/// This is scoped via a `cfg(...)` target predicate so it only fires when
-/// building for a GNU-ld-ish target; macOS (Mach-O, `ld64`, uses `-dead_strip`
-/// and doesn't understand this flag) and Windows (MSVC `link.exe`, doesn't
-/// speak `-Wl,...`) are excluded.
+/// This only fires when building for a GNU-ld-ish target; macOS (Mach-O,
+/// `ld64`, uses `-dead_strip` and doesn't understand this flag) and Windows
+/// (MSVC `link.exe`, doesn't speak `-Wl,...`) are excluded.
 ///
-/// Users who set `RUSTFLAGS` or `CARGO_ENCODED_RUSTFLAGS` override this per
-/// cargo's rustflags precedence rules. Setting
-/// `CARGO_PGRX_DISABLE_GC_SECTIONS_WORKAROUND=1` in the environment also
+/// Setting `CARGO_PGRX_DISABLE_GC_SECTIONS_WORKAROUND=1` in the environment
 /// suppresses the injection entirely.
-pub(crate) fn pgrx_cdylib_config_args() -> Vec<String> {
+pub(crate) fn pgrx_cdylib_rustc_args(target: Option<&str>) -> Vec<String> {
     if std::env::var_os("CARGO_PGRX_DISABLE_GC_SECTIONS_WORKAROUND").is_some() {
         return Vec::new();
     }
-    vec![
-        "--config".to_string(),
-        r#"target.'cfg(all(target_family = "unix", not(target_os = "macos")))'.rustflags = ["-C", "link-arg=-Wl,--no-gc-sections"]"#
-            .to_string(),
-    ]
+    if !target_uses_gnuish_ld(target) {
+        return Vec::new();
+    }
+    vec!["-C".to_string(), "link-arg=-Wl,--no-gc-sections".to_string()]
+}
+
+fn target_uses_gnuish_ld(target: Option<&str>) -> bool {
+    let Some(target) = target else {
+        return cfg!(all(target_family = "unix", not(target_os = "macos")));
+    };
+
+    target.split('-').any(|part| {
+        matches!(
+            part,
+            "android"
+                | "dragonfly"
+                | "freebsd"
+                | "hurd"
+                | "illumos"
+                | "linux"
+                | "netbsd"
+                | "openbsd"
+                | "solaris"
+        )
+    })
 }
 
 /// Set some environment variables for use downstream (in `pgrx-test` for
@@ -327,22 +344,53 @@ impl CargoProfile {
 
 #[cfg(test)]
 mod tests {
-    use super::pgrx_cdylib_config_args;
+    use super::{Cargo, pgrx_cdylib_rustc_args};
 
     #[test]
-    fn cdylib_config_args_carry_no_gc_sections_workaround() {
-        let args = pgrx_cdylib_config_args();
-        assert_eq!(args.len(), 2, "expected `--config <value>` pair, got {args:?}");
-        assert_eq!(args[0], "--config");
+    fn cdylib_rustc_args_carry_no_gc_sections_workaround() {
+        if std::env::var_os("CARGO_PGRX_DISABLE_GC_SECTIONS_WORKAROUND").is_some() {
+            return;
+        }
+
+        let args = pgrx_cdylib_rustc_args(Some("x86_64-unknown-linux-gnu"));
+        assert_eq!(
+            args,
+            ["-C", "link-arg=-Wl,--no-gc-sections"],
+            "cdylib rustc args should disable section GC on GNU-ish Unix"
+        );
+    }
+
+    #[test]
+    fn cdylib_rustc_args_skip_non_gnuish_targets() {
+        assert!(pgrx_cdylib_rustc_args(Some("aarch64-apple-darwin")).is_empty());
+        assert!(pgrx_cdylib_rustc_args(Some("x86_64-pc-windows-msvc")).is_empty());
+    }
+
+    #[test]
+    fn cargo_rustc_args_are_not_cargo_config() {
+        if std::env::var_os("CARGO_PGRX_DISABLE_GC_SECTIONS_WORKAROUND").is_some() {
+            return;
+        }
+
+        let command = Cargo::default()
+            .subcommand("rustc")
+            .flag("--lib")
+            .rustc_args(pgrx_cdylib_rustc_args(Some("x86_64-unknown-linux-gnu")))
+            .into_command();
+        let args = command.get_args().map(|arg| arg.to_string_lossy()).collect::<Vec<_>>();
+
+        assert_eq!(args.first().map(|arg| arg.as_ref()), Some("rustc"));
         assert!(
-            args[1].contains("--no-gc-sections"),
-            "cdylib --config should disable section GC on non-macOS Unix: {}",
-            args[1]
+            !args.iter().any(|arg| arg.as_ref() == "--config"),
+            "the cdylib workaround must not override Cargo config rustflags: {args:?}"
         );
         assert!(
-            args[1].contains("not(target_os = \"macos\")"),
-            "cdylib --config must exclude macOS: {}",
-            args[1]
+            args.windows(3).any(|window| {
+                window[0].as_ref() == "--"
+                    && window[1].as_ref() == "-C"
+                    && window[2].as_ref() == "link-arg=-Wl,--no-gc-sections"
+            }),
+            "expected no-GC rustc args after `--`: {args:?}"
         );
     }
 }

@@ -479,13 +479,10 @@ impl PgConfig {
     }
 
     fn run(&self, arg: &str) -> eyre::Result<String> {
-        if self.known_props.is_some() {
+        if let Some(known_props) = &self.known_props {
             // we have some known properties, so use them.  We'll return an `ErrorKind::InvalidData`
             // if the caller asks for a property we don't have
-            Ok(self
-                .known_props
-                .as_ref()
-                .unwrap()
+            Ok(known_props
                 .get(arg)
                 .ok_or_else(|| {
                     std::io::Error::new(
