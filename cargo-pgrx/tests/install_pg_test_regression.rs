@@ -26,6 +26,10 @@ fn unit_tests_manifest_path() -> PathBuf {
     workspace_root().join("pgrx-unit-tests").join("Cargo.toml")
 }
 
+fn cargo_toml_path(path: &Path) -> String {
+    path.to_str().expect("test fixture path must be UTF-8").replace('\\', "/")
+}
+
 fn write_auto_detect_workspace() -> TempDir {
     let tempdir = tempfile::tempdir().expect("temporary auto-detect workspace");
     let root = tempdir.path();
@@ -49,12 +53,18 @@ members = ["auto_detect_ext"]
         r#"
 [target.'cfg(all(target_family = "unix", not(target_os = "macos")))']
 rustflags = ["--cfg", "cargo_pgrx_ci_rustflags_preserved"]
+
+[target.'cfg(target_os = "macos")']
+rustflags = [
+    "--cfg", "cargo_pgrx_ci_rustflags_preserved",
+    "-Clink-arg=-Wl,-undefined,dynamic_lookup",
+]
 "#,
     )
     .expect("workspace cargo config");
 
-    let pgrx_path = workspace_root().join("pgrx");
-    let pgrx_tests_path = workspace_root().join("pgrx-tests");
+    let pgrx_path = cargo_toml_path(&workspace_root().join("pgrx"));
+    let pgrx_tests_path = cargo_toml_path(&workspace_root().join("pgrx-tests"));
     fs::write(
         extension_dir.join("Cargo.toml"),
         format!(
@@ -84,8 +94,7 @@ pgrx = {{ path = "{}" }}
 [dev-dependencies]
 pgrx-tests = {{ path = "{}" }}
 "#,
-            pgrx_path.display(),
-            pgrx_tests_path.display()
+            pgrx_path, pgrx_tests_path
         ),
     )
     .expect("extension Cargo.toml");
@@ -109,7 +118,6 @@ superuser = false
 
 #[cfg(all(
     target_family = "unix",
-    not(target_os = "macos"),
     not(cargo_pgrx_ci_rustflags_preserved)
 ))]
 compile_error!("cargo-pgrx did not preserve workspace rustflags");
@@ -127,6 +135,11 @@ fn auto_detect_answer() -> i32 {
     .expect("extension lib.rs");
 
     tempdir
+}
+
+#[test]
+fn cargo_toml_path_uses_forward_slashes() {
+    assert_eq!(cargo_toml_path(Path::new(r"D:\a\pgrx\pgrx")), "D:/a/pgrx/pgrx");
 }
 
 fn preferred_pg_config() -> Option<(String, PathBuf)> {
