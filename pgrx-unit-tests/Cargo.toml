@@ -65,7 +65,7 @@ path = "../pgrx-tests"
 version = "=0.18.1"
 
 [dev-dependencies]
-trybuild = "1"
+trybuild = "1.0.116"
 
 [lints.rust]
 unused-lifetimes = "deny"
