@@ -57,7 +57,12 @@ impl CommandExecute for Test {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(mut self) -> eyre::Result<()> {
         #[tracing::instrument(level = "error", skip(me, package_manifest))]
-        fn perform(me: Test, pgrx: &Pgrx, package_manifest: &Manifest) -> eyre::Result<()> {
+        fn perform(
+            me: Test,
+            pgrx: &Pgrx,
+            package_manifest: &Manifest,
+            package_manifest_path: &Path,
+        ) -> eyre::Result<()> {
             let mut features = me.features.clone();
             let (pg_config, _pg_version) = pg_config_and_version(
                 pgrx,
@@ -74,8 +79,7 @@ impl CommandExecute for Test {
 
             test_extension(
                 &pg_config,
-                me.manifest_path.as_deref(),
-                me.package.as_deref(),
+                package_manifest_path,
                 &profile,
                 me.no_schema,
                 &features,
@@ -87,7 +91,7 @@ impl CommandExecute for Test {
             Ok(())
         }
 
-        let (package_manifest, _) = get_package_manifest(
+        let (package_manifest, package_manifest_path) = get_package_manifest(
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
@@ -109,13 +113,13 @@ impl CommandExecute for Test {
             for v in crate::manifest::all_pg_in_both_tomls(&package_manifest, &pgrx) {
                 let mut versioned_test = self.clone();
                 versioned_test.pg_version = Some(v?.label()?);
-                perform(versioned_test, &pgrx, &package_manifest)?;
+                perform(versioned_test, &pgrx, &package_manifest, &package_manifest_path)?;
             }
 
             Ok(())
         } else {
             // attempt to run the test for the Postgres version `run_test()` will figure out
-            perform(self, &pgrx, &package_manifest)
+            perform(self, &pgrx, &package_manifest, &package_manifest_path)
         }
     }
 }
@@ -127,8 +131,7 @@ impl CommandExecute for Test {
 ))]
 pub fn test_extension(
     pg_config: &PgConfig,
-    user_manifest_path: Option<&Path>,
-    user_package: Option<&str>,
+    package_manifest_path: &Path,
     profile: &CargoProfile,
     no_schema: bool,
     features: &clap_cargo::Features,
@@ -164,6 +167,7 @@ pub fn test_extension(
         .env("PGRX_ALL_FEATURES", if features.all_features { "true" } else { "false" })
         .env("PGRX_BUILD_PROFILE", profile.name())
         .env("PGRX_NO_SCHEMA", if no_schema { "true" } else { "false" });
+    apply_resolved_manifest_to_test_command(&mut command, package_manifest_path);
 
     if let Some(runas) = runas {
         command.env("CARGO_PGRX_TEST_RUNAS", runas);
@@ -192,16 +196,6 @@ pub fn test_extension(
 
     command.args(profile.cargo_args());
 
-    if let Some(user_manifest_path) = user_manifest_path {
-        command.arg("--manifest-path");
-        command.arg(user_manifest_path);
-    }
-
-    if let Some(user_package) = user_package {
-        command.arg("--package");
-        command.arg(user_package);
-    }
-
     if let Some(testname) = testname {
         command.arg(testname);
     }
@@ -217,4 +211,49 @@ pub fn test_extension(
     }
 
     Ok(())
+}
+
+fn apply_resolved_manifest_to_test_command(
+    command: &mut std::process::Command,
+    package_manifest_path: &Path,
+) {
+    command
+        .env("PGRX_MANIFEST_PATH", package_manifest_path)
+        .arg("--manifest-path")
+        .arg(package_manifest_path);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::apply_resolved_manifest_to_test_command;
+    use std::path::Path;
+    use std::process::Command;
+
+    #[test]
+    fn test_command_targets_resolved_manifest_for_outer_and_inner_builds() {
+        let package_manifest_path = Path::new("/workspace/postgres/Cargo.toml");
+        let mut command = Command::new("cargo");
+        command.arg("test");
+
+        apply_resolved_manifest_to_test_command(&mut command, package_manifest_path);
+
+        let args = command.get_args().map(|arg| arg.to_string_lossy()).collect::<Vec<_>>();
+        assert!(
+            args.windows(2).any(|window| {
+                window[0].as_ref() == "--manifest-path"
+                    && window[1].as_ref() == package_manifest_path.to_string_lossy()
+            }),
+            "outer cargo test should target the resolved package manifest: {args:?}"
+        );
+
+        let manifest_env = command
+            .get_envs()
+            .find_map(|(key, value)| (key == "PGRX_MANIFEST_PATH").then_some(value))
+            .flatten();
+        assert_eq!(
+            manifest_env,
+            Some(package_manifest_path.as_os_str()),
+            "inner pgrx-test install should receive the resolved package manifest"
+        );
+    }
 }

@@ -155,8 +155,10 @@ pub(crate) fn install_extension(
 
     let versioned_so = get_property(package_manifest_path, "module_pathname")?.is_none();
 
+    let build_manifest_path =
+        manifest_path_for_build(user_manifest_path, user_package, package_manifest_path);
     let build_command_output =
-        build_extension(user_manifest_path, user_package, profile, features, target)?;
+        build_extension(build_manifest_path, user_package, profile, features, target)?;
     let build_command_bytes = build_command_output.stdout;
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = CargoMessage::parse_stream(build_command_reader);
@@ -296,7 +298,7 @@ fn copy_file(
     Ok(())
 }
 pub(crate) fn build_extension(
-    user_manifest_path: Option<&Path>,
+    manifest_path: Option<&Path>,
     user_package: Option<&str>,
     profile: &CargoProfile,
     features: &clap_cargo::Features,
@@ -308,9 +310,9 @@ pub(crate) fn build_extension(
     command.arg("rustc");
     command.arg("--lib");
 
-    if let Some(user_manifest_path) = user_manifest_path {
+    if let Some(manifest_path) = manifest_path {
         command.arg("--manifest-path");
-        command.arg(user_manifest_path);
+        command.arg(manifest_path);
     }
 
     if let Some(user_package) = user_package {
@@ -361,6 +363,17 @@ pub(crate) fn build_extension(
         std::process::exit(1)
     } else {
         Ok(cargo_output)
+    }
+}
+
+fn manifest_path_for_build<'a>(
+    user_manifest_path: Option<&'a Path>,
+    user_package: Option<&str>,
+    package_manifest_path: &'a Path,
+) -> Option<&'a Path> {
+    match user_package {
+        Some(_) => user_manifest_path,
+        None => Some(package_manifest_path),
     }
 }
 
@@ -585,4 +598,34 @@ fn filter_contents(manifest_path: &Path, mut input: String) -> eyre::Result<Stri
     input = input.replace("@CARGO_VERSION@", &get_version(manifest_path)?);
 
     Ok(input)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::manifest_path_for_build;
+    use std::path::Path;
+
+    #[test]
+    fn auto_detected_package_builds_against_resolved_manifest() {
+        let workspace_manifest = Path::new("/workspace/Cargo.toml");
+        let package_manifest = Path::new("/workspace/postgres/Cargo.toml");
+
+        assert_eq!(manifest_path_for_build(None, None, package_manifest), Some(package_manifest));
+        assert_eq!(
+            manifest_path_for_build(Some(workspace_manifest), None, package_manifest),
+            Some(package_manifest)
+        );
+    }
+
+    #[test]
+    fn explicit_package_keeps_user_manifest_targeting() {
+        let workspace_manifest = Path::new("/workspace/Cargo.toml");
+        let package_manifest = Path::new("/workspace/postgres/Cargo.toml");
+
+        assert_eq!(
+            manifest_path_for_build(Some(workspace_manifest), Some("tin"), package_manifest),
+            Some(workspace_manifest)
+        );
+        assert_eq!(manifest_path_for_build(None, Some("tin"), package_manifest), None);
+    }
 }
