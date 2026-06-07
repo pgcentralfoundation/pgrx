@@ -214,6 +214,10 @@ fn update_manifest_section<T: toml_edit::TableLike + ?Sized>(
             continue;
         }
 
+        if dependency_inherits_workspace(section, local_name) {
+            continue;
+        }
+
         let index = match dependency {
             Dependency::Inherited(_) => continue,
             Dependency::Simple(_) => SparseIndex::new_cargo_default()?,
@@ -272,6 +276,18 @@ fn update_manifest_section<T: toml_edit::TableLike + ?Sized>(
     }
 
     Ok(())
+}
+
+fn dependency_inherits_workspace<T: toml_edit::TableLike + ?Sized>(
+    section: &T,
+    local_name: &str,
+) -> bool {
+    section
+        .get(local_name)
+        .and_then(|item| item.as_table_like())
+        .and_then(|table| table.get("workspace"))
+        .and_then(|workspace| workspace.as_bool())
+        .unwrap_or(false)
 }
 
 #[cfg(test)]
@@ -345,6 +361,26 @@ mod tests {
 
         let parsed = cargo_toml::Manifest::from_path(&manifest_path).expect("fixture exists");
         assert!(parsed.package.is_none() && parsed.workspace.is_some(), "workspace manifest");
+
+        let updated = super::process_manifest_file(
+            &manifest_path.into(),
+            &super::TargetVersion::Exact("0.18.1".into()),
+        )
+        .unwrap();
+
+        fs::write(golden.new_goldenpath("expected-0.18.1.toml").unwrap(), updated.to_string())
+            .unwrap();
+    }
+
+    #[test]
+    fn process_workspace_package_manifest() {
+        let root_path = env!("CARGO_MANIFEST_DIR");
+        let fixtures_path = format!("{root_path}/tests/fixtures/workspace/hello");
+        let manifest_path = format!("{fixtures_path}/Cargo.toml");
+        let mut golden = goldenfile::Mint::new(&fixtures_path);
+
+        let parsed = cargo_toml::Manifest::from_path(&manifest_path).expect("fixture exists");
+        assert!(parsed.package.is_some() && parsed.workspace.is_none(), "package manifest");
 
         let updated = super::process_manifest_file(
             &manifest_path.into(),
