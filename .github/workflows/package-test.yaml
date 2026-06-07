@@ -90,7 +90,12 @@ jobs:
           pg_config --version
 
       - name: Install cargo pgrx
-        run: cargo +nightly install --path cargo-pgrx --debug --locked
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 15
+          max_attempts: 3
+          retry_on: error
+          command: cargo +nightly install --path cargo-pgrx --debug --locked
 
       - name: cargo pgrx init
         run: cargo +nightly pgrx init "--pg$PG_VER=$(which pg_config)"

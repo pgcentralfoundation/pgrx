@@ -92,7 +92,12 @@ jobs:
           rustup component add clippy
 
       - name: Install cargo pgrx
-        run: cd cargo-pgrx && cargo install --path . --debug --locked
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 15
+          max_attempts: 3
+          retry_on: error
+          command: cargo install --path cargo-pgrx --debug --locked
 
       - name: cargo pgrx init
         run: cargo pgrx init --pg14=$(which pg_config)

@@ -83,7 +83,15 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: Run license check
-        run: cargo install cargo-deny --locked && "$TOOL_DIR"/license-check.sh
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 15
+          max_attempts: 3
+          retry_on: error
+          command: cargo install cargo-deny --locked
+
+      - name: Run license-check.sh
+        run: '"$TOOL_DIR"/license-check.sh'
 
       # We can't lint most crates because they require "cargo pgrx init" to build
       - name: Clippy -Dwarnings sql-entity-graph
@@ -230,7 +238,12 @@ jobs:
           rustup component add clippy
 
       - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force --locked
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 15
+          max_attempts: 3
+          retry_on: error
+          command: cargo install --path cargo-pgrx/ --debug --force --locked
 
       - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
         run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
@@ -390,7 +403,12 @@ jobs:
           key: pgrx-arm64-cargo-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
       - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force --locked
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 15
+          max_attempts: 3
+          retry_on: error
+          command: cargo install --path cargo-pgrx/ --debug --force --locked
 
       - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
         run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
@@ -494,10 +512,20 @@ jobs:
           rustup component add clippy
 
       - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force --locked
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 15
+          max_attempts: 3
+          retry_on: error
+          command: cargo install --path cargo-pgrx/ --debug --force --locked
 
       - name: Run 'cargo pgrx init'
-        run: cargo pgrx init --pg$PG_VER download
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 30
+          max_attempts: 3
+          retry_on: error
+          command: cargo pgrx init --pg$PG_VER download
 
       # We can't do this with other lints because we need $PGRX_HOME
       - name: Clippy -Awarnings
@@ -621,7 +649,12 @@ jobs:
           rustup component add clippy
 
       - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force --locked
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 30
+          max_attempts: 3
+          retry_on: error
+          command: cargo install --path cargo-pgrx/ --debug --force --locked
 
       - name: Print sccache stats
         run: sccache --show-stats
@@ -698,7 +731,13 @@ jobs:
         run: sccache --show-stats
 
       - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force --locked
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 30
+          max_attempts: 3
+          retry_on: error
+          shell: pwsh
+          command: cargo install --path cargo-pgrx/ --debug --force --locked
 
       - name: Install rustfmt & clippy
         run: |
@@ -709,7 +748,13 @@ jobs:
         run: sccache --show-stats
 
       - name: Run 'cargo pgrx init'
-        run: cargo pgrx init --pg$env:PG_VER=download
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 30
+          max_attempts: 3
+          retry_on: error
+          shell: pwsh
+          command: cargo pgrx init --pg$env:PG_VER=download
 
       - name: Run tests
         run: cargo test --all --no-default-features --features "pg$env:PG_VER pg_test cshim proptest" --all-targets
