@@ -124,6 +124,7 @@ pub struct PgConfig {
     base_port: u16,
     base_testing_port: u16,
     test_port_override: Option<u16>,
+    port_override: Option<u16>,
 }
 
 impl Display for PgConfig {
@@ -141,6 +142,7 @@ impl Default for PgConfig {
             base_port: BASE_POSTGRES_PORT_NO,
             base_testing_port: BASE_POSTGRES_TESTING_PORT_NO,
             test_port_override: None,
+            port_override: None,
         }
     }
 }
@@ -160,6 +162,7 @@ impl PgConfig {
             base_port,
             base_testing_port,
             test_port_override: None,
+            port_override: None,
         }
     }
 
@@ -171,6 +174,7 @@ impl PgConfig {
             base_port: BASE_POSTGRES_PORT_NO,
             base_testing_port: BASE_POSTGRES_TESTING_PORT_NO,
             test_port_override: None,
+            port_override: None,
         }
     }
 
@@ -205,6 +209,7 @@ impl PgConfig {
                 base_port: 0,
                 base_testing_port: 0,
                 test_port_override: None,
+                port_override: None,
             })
         }
     }
@@ -337,7 +342,10 @@ impl PgConfig {
     }
 
     pub fn port(&self) -> eyre::Result<u16> {
-        Ok(self.base_port + self.major_version()?)
+        match self.port_override {
+            Some(port) => Ok(port),
+            None => Ok(self.base_port + self.major_version()?),
+        }
     }
 
     pub fn test_port(&self) -> eyre::Result<u16> {
@@ -350,6 +358,12 @@ impl PgConfig {
     /// Return a clone of this config that always returns `port` from [`test_port()`].
     pub fn with_test_port(mut self, port: u16) -> Self {
         self.test_port_override = Some(port);
+        self
+    }
+
+    /// Return a clone of this config that always returns `port` from [`port()`].
+    pub fn with_port_override(mut self, port: u16) -> Self {
+        self.port_override = Some(port);
         self
     }
 
@@ -971,4 +985,30 @@ fn from_empty_env() -> eyre::Result<()> {
     // we didn't set this one in our environment
     assert!(pg_config.sharedir().is_err());
     Ok(())
+}
+
+#[test]
+fn port_returns_base_plus_major_when_no_override() {
+    let pg_config = PgConfig::from(PgVersion::new(17, PgMinorVersion::Release(0), None));
+    assert_eq!(pg_config.port().unwrap(), BASE_POSTGRES_PORT_NO + 17);
+}
+
+#[test]
+fn with_port_override_returns_overridden_port() {
+    let pg_config = PgConfig::from(PgVersion::new(17, PgMinorVersion::Release(0), None))
+        .with_port_override(5432);
+    assert_eq!(pg_config.port().unwrap(), 5432);
+}
+
+#[test]
+fn port_override_independent_from_test_port_override() {
+    let v = PgVersion::new(17, PgMinorVersion::Release(0), None);
+
+    // with_port_override does not affect test_port()
+    let pg_config = PgConfig::from(v.clone()).with_port_override(5432);
+    assert_eq!(pg_config.test_port().unwrap(), BASE_POSTGRES_TESTING_PORT_NO + 17);
+
+    // with_test_port does not affect port()
+    let pg_config = PgConfig::from(v).with_test_port(9999);
+    assert_eq!(pg_config.port().unwrap(), BASE_POSTGRES_PORT_NO + 17);
 }

@@ -40,6 +40,9 @@ pub(crate) struct Start {
     postgresql_conf: Vec<String>,
     #[clap(long)]
     valgrind: bool,
+    /// Port to listen on (overrides the default of 28800 + PG_MAJOR_VERSION)
+    #[clap(long)]
+    port: Option<u16>,
 }
 
 impl CommandExecute for Start {
@@ -58,6 +61,10 @@ impl CommandExecute for Start {
 
             let (pg_config, _) =
                 pg_config_and_version(pgrx, &package_manifest, me.pg_version, None, false)?;
+            let pg_config = match me.port {
+                Some(port) => pg_config.with_port_override(port),
+                None => pg_config,
+            };
 
             start_postgres(&pg_config, postgresql_conf, me.valgrind)
         }
@@ -214,4 +221,57 @@ fn valgrind_suppressions_path(pg_config: &PgConfig) -> Result<PathBuf, eyre::Rep
     home.push(pg_config.version()?);
     home.push("src/tools/valgrind.supp");
     Ok(home)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use clap::Parser;
+
+    #[derive(Parser, Debug)]
+    #[clap(name = "test")]
+    struct TestCli {
+        #[clap(short = 'v', long, action = clap::ArgAction::Count, global = true)]
+        verbose: u8,
+        #[clap(subcommand)]
+        cmd: TestSub,
+    }
+
+    #[derive(clap::Subcommand, Debug)]
+    enum TestSub {
+        Start(Start),
+    }
+
+    fn parse_start(args: &[&str]) -> Result<Start, clap::Error> {
+        let mut all = vec!["test", "start"];
+        all.extend_from_slice(args);
+        TestCli::try_parse_from(all).map(|c| {
+            let TestSub::Start(s) = c.cmd;
+            s
+        })
+    }
+
+    #[test]
+    fn parses_port_flag() {
+        let start = parse_start(&["--port", "5432"]).unwrap();
+        assert_eq!(start.port, Some(5432));
+    }
+
+    #[test]
+    fn port_defaults_to_none() {
+        let start = parse_start(&[]).unwrap();
+        assert_eq!(start.port, None);
+    }
+
+    #[test]
+    fn rejects_non_numeric_port() {
+        let err = parse_start(&["--port", "foo"]).unwrap_err();
+        assert!(err.to_string().contains("foo") || err.to_string().contains("port"));
+    }
+
+    #[test]
+    fn rejects_port_out_of_u16_range() {
+        let err = parse_start(&["--port", "70000"]).unwrap_err();
+        assert!(!err.to_string().is_empty());
+    }
 }
