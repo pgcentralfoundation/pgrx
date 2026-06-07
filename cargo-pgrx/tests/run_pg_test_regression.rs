@@ -8,46 +8,13 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+#![cfg(unix)]
+
 use pgrx_pg_config::{PgConfigSelector, Pgrx};
 use std::net::{TcpListener, TcpStream};
 use std::path::{Path, PathBuf};
-use std::process::{Command, Output};
+use std::process::{Command, Output, Stdio};
 use std::time::{Duration, Instant};
-
-fn run_capturing(mut cmd: Command) -> Output {
-    #[cfg(not(target_os = "windows"))]
-    {
-        cmd.output().expect("command should launch")
-    }
-    #[cfg(target_os = "windows")]
-    {
-        use std::fs::{File, OpenOptions};
-        use std::io::Read;
-        use std::process::Stdio;
-
-        let stdout_tmp = tempfile::NamedTempFile::new().expect("tempfile for stdout");
-        let stderr_tmp = tempfile::NamedTempFile::new().expect("tempfile for stderr");
-        let stdout_path = stdout_tmp.path().to_owned();
-        let stderr_path = stderr_tmp.path().to_owned();
-        let stdout_writer = OpenOptions::new()
-            .write(true)
-            .truncate(true)
-            .open(&stdout_path)
-            .expect("open stdout tempfile for writing");
-        let stderr_writer = OpenOptions::new()
-            .write(true)
-            .truncate(true)
-            .open(&stderr_path)
-            .expect("open stderr tempfile for writing");
-        cmd.stdout(Stdio::from(stdout_writer)).stderr(Stdio::from(stderr_writer));
-        let status = cmd.status().expect("command should launch");
-        let mut stdout = Vec::new();
-        let mut stderr = Vec::new();
-        let _ = File::open(&stdout_path).and_then(|mut f| f.read_to_end(&mut stdout));
-        let _ = File::open(&stderr_path).and_then(|mut f| f.read_to_end(&mut stderr));
-        Output { status, stdout, stderr }
-    }
-}
 
 fn cargo_pgrx_bin() -> &'static str {
     env!("CARGO_BIN_EXE_cargo-pgrx")
@@ -65,7 +32,7 @@ fn preferred_pg_config() -> Option<(String, u16, PathBuf)> {
     let pgrx = match Pgrx::from_config() {
         Ok(pgrx) => pgrx,
         Err(err) => {
-            eprintln!("skipping start_pg_test_regression: could not load pgrx config: {err}");
+            eprintln!("skipping run_pg_test_regression: could not load pgrx config: {err}");
             return None;
         }
     };
@@ -77,7 +44,7 @@ fn preferred_pg_config() -> Option<(String, u16, PathBuf)> {
         .collect::<Vec<_>>();
 
     if configs.is_empty() {
-        eprintln!("skipping start_pg_test_regression: no configured pg_config entries");
+        eprintln!("skipping run_pg_test_regression: no configured pg_config entries");
         return None;
     }
 
@@ -101,33 +68,37 @@ impl Drop for StopOnDrop {
     }
 }
 
-/// Wrap `cargo pgrx start <pg_feature> --manifest-path <unit-tests>` with optional extra args (e.g. `--port`). Keeps the test body readable by hiding the boilerplate that is identical for every invocation.
-fn pgrx_start(pg_feature: &str, extra_args: &[&str]) -> Output {
+/// Wrap `cargo pgrx run <pg_feature> <dbname> --manifest-path <unit-tests> [extra…]`. `run` always launches `psql` at the end (via `exec()` on unix), so we feed it an immediate EOF on stdin so psql exits cleanly the moment the connection is up. The pgrx-managed postmaster keeps running after psql exits, which is exactly what we need to assert against.
+fn pgrx_run(pg_feature: &str, dbname: &str, extra_args: &[&str]) -> Output {
     let mut cmd = Command::new(cargo_pgrx_bin());
     cmd.current_dir(workspace_root())
         .arg("pgrx")
-        .arg("start")
+        .arg("run")
         .arg(pg_feature)
+        .arg(dbname)
         .arg("--manifest-path")
         .arg(unit_tests_manifest_path());
     for a in extra_args {
         cmd.arg(a);
     }
-    run_capturing(cmd)
+    // Closed stdin → psql sees EOF immediately and exits 0.
+    cmd.stdin(Stdio::null());
+    cmd.output().expect("cargo-pgrx run should launch")
 }
 
 fn pgrx_stop(pg_feature: &str) -> Output {
-    let mut cmd = Command::new(cargo_pgrx_bin());
-    cmd.current_dir(workspace_root())
+    Command::new(cargo_pgrx_bin())
+        .current_dir(workspace_root())
         .arg("pgrx")
         .arg("stop")
         .arg(pg_feature)
         .arg("--manifest-path")
-        .arg(unit_tests_manifest_path());
-    run_capturing(cmd)
+        .arg(unit_tests_manifest_path())
+        .output()
+        .expect("cargo-pgrx stop should launch")
 }
 
-fn assert_start_ok(output: &Output, context: &str) {
+fn assert_run_ok(output: &Output, context: &str) {
     assert!(
         output.status.success(),
         "{context} failed\nstdout:\n{}\nstderr:\n{}",
@@ -136,12 +107,10 @@ fn assert_start_ok(output: &Output, context: &str) {
     );
 }
 
-/// The start banner colorizes the port with ANSI escapes, so check "on port"
-/// and the port number as independent substrings instead of one literal string.
-fn assert_banner_announces_port(stdout: &str, port: u16) {
+fn assert_banner_announces_port(combined_output: &str, port: u16) {
     assert!(
-        stdout.contains("on port") && stdout.contains(&port.to_string()),
-        "start banner did not announce port {port}\nstdout:\n{stdout}"
+        combined_output.contains("on port") && combined_output.contains(&port.to_string()),
+        "start banner did not announce port {port}\noutput:\n{combined_output}"
     );
 }
 
@@ -184,77 +153,85 @@ fn assert_tcp_closed(port: u16) {
 
 /// Single orchestrator test that walks through every `--port` scenario in strict sequence. We deliberately collapse all scenarios into one `#[test]` function because each scenario starts/stops the same pgrx-managed postgres instance — splitting them across separate `#[test]` functions would let cargo's default parallel test runner race on the datadir lock.
 ///
-/// Skips cleanly when no pg_config is configured locally, matching the existing convention so the test suite still passes on partially-initialized developer machines.
+/// Each scenario is heavier than the equivalent `start` scenario because `run` also builds and installs the extension on every invocation; that cost is intrinsic to what `run` does and is the reason this is a single orchestrator test rather than a matrix.
 #[test]
-fn start_port_e2e() {
+fn run_port_e2e() {
     let Some((pg_feature, pg_major, _)) = preferred_pg_config() else {
         return;
     };
     let default_port = 28800 + pg_major;
+    let dbname = "pgrx_unit_tests";
 
     let _ = pgrx_stop(&pg_feature);
 
     // ───────────────────────────────────────────────────────────────────────
     // Scenario 1 — default port baseline (no --port).
-    // This is the regression guard for "did --port accidentally change default behavior?" If this fails after the --port refactor, the override field is leaking through PgConfig somewhere.
+    // This is the regression guard for "did --port accidentally change default behavior?" If this fails after the --port refactor, the override field is leaking through PgConfig somewhere on the run path.
     // ───────────────────────────────────────────────────────────────────────
     {
         let guard = StopOnDrop(pg_feature.clone());
-        let out = pgrx_start(&pg_feature, &[]);
-        assert_start_ok(&out, "default-port start");
-        let stdout = String::from_utf8_lossy(&out.stdout);
-        assert_banner_announces_port(&stdout, default_port);
+        let out = pgrx_run(&pg_feature, dbname, &[]);
+        assert_run_ok(&out, "default-port run");
+        let combined = format!(
+            "{}{}",
+            String::from_utf8_lossy(&out.stdout),
+            String::from_utf8_lossy(&out.stderr)
+        );
+        assert_banner_announces_port(&combined, default_port);
         assert_tcp_open(default_port);
 
         let stop = pgrx_stop(&pg_feature);
-        assert!(stop.status.success(), "stop after default-port start failed");
+        assert!(stop.status.success(), "stop after default-port run failed");
         assert_tcp_closed(default_port);
         std::mem::forget(guard); // already stopped cleanly
     }
 
     // ───────────────────────────────────────────────────────────────────────
     // Scenario 2 — happy path: custom port via --port.
-    // The core contract of the new flag: postgres binds to the requested port (not 28800 + major) and the banner reports it.
+    // The core contract of the new flag on `run`: postgres binds to the requested port (not 28800 + major) before psql is execed.
     // ───────────────────────────────────────────────────────────────────────
     let custom_port = reserve_free_port();
     {
         let guard = StopOnDrop(pg_feature.clone());
-        let out = pgrx_start(&pg_feature, &["--port", &custom_port.to_string()]);
-        assert_start_ok(&out, &format!("start --port {custom_port}"));
-        let stdout = String::from_utf8_lossy(&out.stdout);
-        assert_banner_announces_port(&stdout, custom_port);
+        let out = pgrx_run(&pg_feature, dbname, &["--port", &custom_port.to_string()]);
+        assert_run_ok(&out, &format!("run --port {custom_port}"));
+        let combined = format!(
+            "{}{}",
+            String::from_utf8_lossy(&out.stdout),
+            String::from_utf8_lossy(&out.stderr)
+        );
+        assert_banner_announces_port(&combined, custom_port);
         assert_tcp_open(custom_port);
-        // The default port must NOT be opened by an override-port start.
+        // The default port must NOT be opened by an override-port run.
         assert_tcp_closed(default_port);
 
         let stop = pgrx_stop(&pg_feature);
-        assert!(stop.status.success(), "stop after custom-port start failed");
+        assert!(stop.status.success(), "stop after custom-port run failed");
         std::mem::forget(guard);
     }
 
     // ───────────────────────────────────────────────────────────────────────
-    // Scenario 3 — idempotency: re-invoking `start` with the same --port observes the already-running instance and returns success without attempting to re-bind. Mirrors the existing default-port idempotency contract (see `start_postgres`'s `status_postgres` early-return).
+    // Scenario 3 — idempotency: re-invoking `run` with the same --port observes the already-running instance (after the internal stop/start cycle) and still ends up listening on the same port.
     // ───────────────────────────────────────────────────────────────────────
     let idem_port = reserve_free_port();
     {
         let guard = StopOnDrop(pg_feature.clone());
 
-        let first = pgrx_start(&pg_feature, &["--port", &idem_port.to_string()]);
-        assert_start_ok(&first, &format!("first start --port {idem_port}"));
+        let first = pgrx_run(&pg_feature, dbname, &["--port", &idem_port.to_string()]);
+        assert_run_ok(&first, &format!("first run --port {idem_port}"));
         assert_tcp_open(idem_port);
 
-        let second = pgrx_start(&pg_feature, &["--port", &idem_port.to_string()]);
-        assert_start_ok(&second, &format!("second start --port {idem_port} (already-running)"));
-        // Still listening on the same port — nothing got re-bound or migrated.
+        let second = pgrx_run(&pg_feature, dbname, &["--port", &idem_port.to_string()]);
+        assert_run_ok(&second, &format!("second run --port {idem_port}"));
         assert_tcp_open(idem_port);
 
         let stop = pgrx_stop(&pg_feature);
-        assert!(stop.status.success(), "stop after idempotent start failed");
+        assert!(stop.status.success(), "stop after idempotent run failed");
         std::mem::forget(guard);
     }
 
     // ───────────────────────────────────────────────────────────────────────
-    // Scenario 4 — no state leak across restarts: stop, then re-start on a different port and confirm the new port is bound while the old port is not. This catches a regression where a port override would somehow persist beyond the invocation that set it.
+    // Scenario 4 — no state leak across restarts: run on port A, stop, then run on port B and confirm the new port is bound while the old one is not. Catches a regression where a port override would somehow persist beyond the invocation that set it.
     // ───────────────────────────────────────────────────────────────────────
     let port_a = reserve_free_port();
     let port_b = reserve_free_port();
@@ -262,17 +239,17 @@ fn start_port_e2e() {
     if port_a != port_b {
         let guard = StopOnDrop(pg_feature.clone());
 
-        let out_a = pgrx_start(&pg_feature, &["--port", &port_a.to_string()]);
-        assert_start_ok(&out_a, &format!("start on port A={port_a}"));
+        let out_a = pgrx_run(&pg_feature, dbname, &["--port", &port_a.to_string()]);
+        assert_run_ok(&out_a, &format!("run on port A={port_a}"));
         assert_tcp_open(port_a);
         let stop_a = pgrx_stop(&pg_feature);
         assert!(stop_a.status.success(), "stop after port A failed");
         assert_tcp_closed(port_a);
 
-        let out_b = pgrx_start(&pg_feature, &["--port", &port_b.to_string()]);
-        assert_start_ok(&out_b, &format!("start on port B={port_b}"));
+        let out_b = pgrx_run(&pg_feature, dbname, &["--port", &port_b.to_string()]);
+        assert_run_ok(&out_b, &format!("run on port B={port_b}"));
         assert_tcp_open(port_b);
-        // Port A must not somehow be reopened by the second start.
+        // Port A must not somehow be reopened by the second run.
         assert_tcp_closed(port_a);
 
         let stop_b = pgrx_stop(&pg_feature);
@@ -280,23 +257,5 @@ fn start_port_e2e() {
         std::mem::forget(guard);
     } else {
         eprintln!("scenario 4 skipped: OS handed out the same ephemeral port twice");
-    }
-
-    // ───────────────────────────────────────────────────────────────────────
-    // Scenario 5 — `--port` composes with `--postgresql-conf`.
-    // Edge case: ensure the new flag does not interfere with existing  postmaster-arg plumbing. We pass a benign GUC override and verify the server still starts and listens on the requested port.
-    // ───────────────────────────────────────────────────────────────────────
-    let combo_port = reserve_free_port();
-    {
-        let guard = StopOnDrop(pg_feature.clone());
-        let out = pgrx_start(
-            &pg_feature,
-            &["--port", &combo_port.to_string(), "--postgresql-conf", "log_min_messages=warning"],
-        );
-        assert_start_ok(&out, &format!("start --port {combo_port} --postgresql-conf"));
-        assert_tcp_open(combo_port);
-        let stop = pgrx_stop(&pg_feature);
-        assert!(stop.status.success(), "stop after combo start failed");
-        std::mem::forget(guard);
     }
 }

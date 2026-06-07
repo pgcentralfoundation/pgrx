@@ -56,6 +56,9 @@ pub(crate) struct Run {
     install_only: bool,
     #[clap(long)]
     valgrind: bool,
+    /// Port to listen on (overrides the default of 28800 + PG_MAJOR_VERSION)
+    #[clap(long)]
+    port: Option<u16>,
 }
 
 impl From<&Regress> for Run {
@@ -73,6 +76,7 @@ impl From<&Regress> for Run {
             pgcli: false,
             install_only: false,
             valgrind: regress.valgrind,
+            port: None,
         }
     }
 }
@@ -106,6 +110,10 @@ impl Run {
             Some(&mut self.features),
             true,
         )?;
+        let pg_config = match self.port {
+            Some(port) => pg_config.with_port_override(port),
+            None => pg_config,
+        };
 
         let dbname = match &self.dbname {
             Some(dbname) => dbname.clone(),
@@ -246,4 +254,57 @@ pub(crate) fn exec_psql(pg_config: &PgConfig, dbname: &str, pgcli: bool) -> eyre
     let output = command.output()?;
     tracing::trace!(status_code = %output.status, command = %command_str, "Finished");
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use clap::Parser;
+
+    #[derive(Parser, Debug)]
+    #[clap(name = "test")]
+    struct TestCli {
+        #[clap(short = 'v', long, action = clap::ArgAction::Count, global = true)]
+        verbose: u8,
+        #[clap(subcommand)]
+        cmd: TestSub,
+    }
+
+    #[derive(clap::Subcommand, Debug)]
+    enum TestSub {
+        Run(Run),
+    }
+
+    fn parse_run(args: &[&str]) -> Result<Run, clap::Error> {
+        let mut all = vec!["test", "run"];
+        all.extend_from_slice(args);
+        TestCli::try_parse_from(all).map(|c| {
+            let TestSub::Run(r) = c.cmd;
+            r
+        })
+    }
+
+    #[test]
+    fn parses_port_flag() {
+        let run = parse_run(&["--port", "5432"]).unwrap();
+        assert_eq!(run.port, Some(5432));
+    }
+
+    #[test]
+    fn port_defaults_to_none() {
+        let run = parse_run(&[]).unwrap();
+        assert_eq!(run.port, None);
+    }
+
+    #[test]
+    fn rejects_non_numeric_port() {
+        let err = parse_run(&["--port", "foo"]).unwrap_err();
+        assert!(err.to_string().contains("foo") || err.to_string().contains("port"));
+    }
+
+    #[test]
+    fn rejects_port_out_of_u16_range() {
+        let err = parse_run(&["--port", "70000"]).unwrap_err();
+        assert!(!err.to_string().is_empty());
+    }
 }
