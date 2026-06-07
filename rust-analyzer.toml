@@ -1,4 +1,4 @@
-cargo.allFeatures = false
+cargo.features = []
 cargo.buildScripts.overrideCommand = [
   "cargo",
   "check",
