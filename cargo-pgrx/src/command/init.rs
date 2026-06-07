@@ -25,6 +25,7 @@ use std::num::NonZeroUsize;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::sync::OnceLock;
+use std::time::Duration;
 
 #[cfg(not(target_os = "windows"))]
 static PROCESS_ENV_DENYLIST: &[&str] = &[
@@ -258,26 +259,76 @@ fn download_postgres(
         pg_config.url().expect("no url"),
     );
     let url = pg_config.url().expect("no url for pg_config").as_str();
-    tracing::debug!(url = %url, "Fetching");
     let http_client = build_agent_for_url(url)?;
-    let mut http_response = http_client.get(url).call()?;
-    let mut buf = Vec::new();
-    let _count = http_response.body_mut().as_reader().read_to_end(&mut buf)?;
-
-    let status = http_response.status();
-    tracing::trace!(status_code = %status, url = %url, "Fetched");
-    if status != 200 {
-        return Err(eyre!(
-            "Problem downloading {}:\ncode={status}\n{}",
-            pg_config.url().unwrap().to_string().yellow().bold(),
-            String::from_utf8_lossy(&buf),
-        ));
-    }
+    let buf = download_postgres_archive_with_retries(&http_client, url, &pg_config.version()?)?;
 
     let pgdir = untar(&buf, pgrx_home, pg_config, init)?;
     configure_postgres(pg_config, &pgdir, init)?;
     make_postgres(pg_config, &pgdir, init)?;
     make_install_postgres(pg_config, &pgdir, init) // returns a new PgConfig object
+}
+
+fn download_postgres_archive_with_retries(
+    http_client: &ureq::Agent,
+    url: &str,
+    pg_version: &str,
+) -> eyre::Result<Vec<u8>> {
+    let max_attempts = 4;
+    for failed_attempt in 1..=max_attempts {
+        match download_postgres_archive_once(http_client, url) {
+            Ok(buf) => return Ok(buf),
+            Err(error) => {
+                if failed_attempt == max_attempts {
+                    return Err(error);
+                }
+
+                let retry_delay = match failed_attempt {
+                    1 => Duration::from_secs(1),
+                    2 => Duration::from_secs(2),
+                    3 => Duration::from_secs(4),
+                    _ => unreachable!("final attempt returns above"),
+                };
+
+                println!(
+                    "{} Postgres v{pg_version} download attempt {failed_attempt}/{max_attempts} failed; retrying in {}s: {}",
+                    "      Warning".bold().yellow(),
+                    retry_delay.as_secs(),
+                    download_error_summary(&error),
+                );
+                std::thread::sleep(retry_delay);
+            }
+        }
+    }
+
+    unreachable!("download attempt loop should return")
+}
+
+fn download_postgres_archive_once(http_client: &ureq::Agent, url: &str) -> eyre::Result<Vec<u8>> {
+    tracing::debug!(url = %url, "Fetching");
+    let mut http_response =
+        http_client.get(url).config().http_status_as_error(false).build().call()?;
+    let mut buf = Vec::new();
+    let _count = http_response.body_mut().as_reader().read_to_end(&mut buf)?;
+
+    let status = http_response.status();
+    tracing::trace!(status_code = %status, url = %url, "Fetched");
+    if status.as_u16() != 200 {
+        return Err(download_postgres_status_error(url, status.as_u16(), &buf));
+    }
+
+    Ok(buf)
+}
+
+fn download_postgres_status_error(url: &str, status: u16, body: &[u8]) -> eyre::Report {
+    eyre!(
+        "Problem downloading {}: code={status}\n{}",
+        url.yellow().bold(),
+        String::from_utf8_lossy(body),
+    )
+}
+
+fn download_error_summary(error: &eyre::Report) -> String {
+    error.to_string().lines().next().unwrap_or("unknown download error").to_owned()
 }
 
 fn untar(bytes: &[u8], pgrxdir: &Path, pg_config: &PgConfig, init: &Init) -> eyre::Result<PathBuf> {
@@ -684,4 +735,16 @@ pub(crate) fn initdb(bindir: &Path, datadir: &Path) -> eyre::Result<()> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn download_error_summary_keeps_retry_warning_single_line() {
+        let error = eyre!("first line\nsecond line");
+
+        assert_eq!(download_error_summary(&error), "first line");
+    }
 }
