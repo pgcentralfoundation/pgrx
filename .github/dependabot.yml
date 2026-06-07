@@ -1,0 +1,24 @@
+# documentation: https://docs.github.com/code-security/dependabot/dependabot-version-updates
+# schema documentation: https://docs.github.com/code-security/dependabot/working-with-dependabot/dependabot-options-reference
+# $schema: https://json.schemastore.org/dependabot-2.0.json
+---
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/" # "/" is a special case that includes ".github/workflows"
+    registries: "*"
+    schedule:
+      interval: weekly
+      day: tuesday
+    labels:
+      - deps
+    groups:
+      # Group security updates into one pull request
+      action-vulnerabilities:
+        applies-to: security-updates
+        patterns: ["*"]
+
+      # Group version updates into one pull request
+      github-actions:
+        applies-to: version-updates
+        patterns: ["*"]
