@@ -6,6 +6,9 @@ use std::path::PathBuf;
 fn main() -> Result<ExitCode, Box<dyn std::error::Error>> {
     println!("cargo:rerun-if-changed=c_ext/c_ext.c");
     println!("cargo:rerun-if-changed=c_ext/Makefile");
+    for feature in ["PG13", "PG14", "PG15", "PG16", "PG17", "PG18"] {
+        println!("cargo:rerun-if-env-changed=CARGO_FEATURE_{feature}");
+    }
 
     let target = std::env::var("TARGET")?;
     if target.contains("windows") {
@@ -15,6 +18,14 @@ fn main() -> Result<ExitCode, Box<dyn std::error::Error>> {
 
     let (_, pg_config) =
         pgrx_bindgen::detect_pg_config()?.pop().unwrap_or_else(|| panic!("no pg_config detected"));
+
+    for artifact in ["c_ext.o", "c_ext.so", "c_ext.dylib", "c_ext.dll", "c_ext.bc"] {
+        match fs::remove_file(PathBuf::from("c_ext").join(artifact)) {
+            Ok(()) => (),
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => (),
+            Err(err) => return Err(err.into()),
+        }
+    }
 
     let child = Command::new("make")
         .current_dir("c_ext")

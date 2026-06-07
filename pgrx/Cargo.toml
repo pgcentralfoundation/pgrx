@@ -55,7 +55,7 @@ uuid = { version = "1.23.2", features = ["v4"] } # PgLwLock and shmem
 enum-map = "2.7.3"
 
 # exposed in public API
-bitflags = "2.11.1" # BackgroundWorker
+bitflags = "2.13.0" # BackgroundWorker
 bitvec = "1.0" # processing array nullbitmaps
 libc.workspace = true # FFI type compat
 seahash = "4.1.0" # derive(PostgresHash)
