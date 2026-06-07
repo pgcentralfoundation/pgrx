@@ -67,7 +67,7 @@ toml = "1" # our config files
 toml_edit = "0.25.12" # format-preserving edits to toml files
 thiserror = "2"
 unescape = "0.1.0" # for escaped-character-handling
-url = "2.5.2" # the non-existent std::web
+url = "2.5.8" # the non-existent std::web
 walkdir = "2" # directory recursion
 
 [profile.dev]
