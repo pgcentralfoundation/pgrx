@@ -62,15 +62,17 @@ impl SqlGraphIdentifier for PostgresHashEntity<'_> {
 }
 
 impl ToSql for PostgresHashEntity<'_> {
-    fn to_sql(&self, _context: &PgrxSql) -> eyre::Result<String> {
+    fn to_sql(&self, context: &PgrxSql) -> eyre::Result<String> {
+        let self_index = context.hashes[self];
+        let schema = context.schema_prefix_for(&self_index);
         let sql = format!(
             "\n\
                             -- {file}:{line}\n\
                             -- {full_path}\n\
-                            CREATE OPERATOR FAMILY {name}_hash_ops USING hash;\n\
-                            CREATE OPERATOR CLASS {name}_hash_ops DEFAULT FOR TYPE {name} USING hash FAMILY {name}_hash_ops AS\n\
-                                \tOPERATOR    1   =  ({name}, {name}),\n\
-                                \tFUNCTION    1   {fn_name}({name});\
+                            CREATE OPERATOR FAMILY {schema}{name}_hash_ops USING hash;\n\
+                            CREATE OPERATOR CLASS {schema}{name}_hash_ops DEFAULT FOR TYPE {schema}{name} USING hash FAMILY {schema}{name}_hash_ops AS\n\
+                                \tOPERATOR    1   =  ({schema}{name}, {schema}{name}),\n\
+                                \tFUNCTION    1   {schema}{fn_name}({schema}{name});\
                             ",
             name = self.name,
             full_path = self.full_path,

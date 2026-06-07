@@ -563,6 +563,7 @@ impl ToSql for PgExternEntity<'_> {
                 PgCastEntity::Assignment => String::from(" AS ASSIGNMENT"),
                 PgCastEntity::Implicit => String::from(" AS IMPLICIT"),
             };
+            let function_name = self.sql_name(context);
 
             let cast_sql = format!(
                 "\n\n\
@@ -581,7 +582,7 @@ impl ToSql for PgExternEntity<'_> {
                 module_path = self.module_path,
                 source_name = source_arg.used_ty.full_path,
                 target_name = target_ty.full_path,
-                function_name = self.name,
+                function_name = function_name,
             );
             ext_sql += &cast_sql
         };

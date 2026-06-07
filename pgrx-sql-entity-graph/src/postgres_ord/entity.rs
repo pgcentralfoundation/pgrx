@@ -82,20 +82,22 @@ impl SqlGraphIdentifier for PostgresOrdEntity<'_> {
 }
 
 impl ToSql for PostgresOrdEntity<'_> {
-    fn to_sql(&self, _context: &PgrxSql) -> eyre::Result<String> {
+    fn to_sql(&self, context: &PgrxSql) -> eyre::Result<String> {
+        let self_index = context.ords[self];
+        let schema = context.schema_prefix_for(&self_index);
         let PostgresOrdEntity { name, full_path, file, line, .. } = self;
         let sql = format!(
             "\n\
             -- {file}:{line}\n\
             -- {full_path}\n\
-            CREATE OPERATOR FAMILY {name}_btree_ops USING btree;\n\
-            CREATE OPERATOR CLASS {name}_btree_ops DEFAULT FOR TYPE {name} USING btree FAMILY {name}_btree_ops AS\n\
+            CREATE OPERATOR FAMILY {schema}{name}_btree_ops USING btree;\n\
+            CREATE OPERATOR CLASS {schema}{name}_btree_ops DEFAULT FOR TYPE {schema}{name} USING btree FAMILY {schema}{name}_btree_ops AS\n\
                     \tOPERATOR 1 <,\n\
                     \tOPERATOR 2 <=,\n\
                     \tOPERATOR 3 =,\n\
                     \tOPERATOR 4 >=,\n\
                     \tOPERATOR 5 >,\n\
-                    \tFUNCTION 1 {cmp_fn_name}({name}, {name});\
+                    \tFUNCTION 1 {schema}{cmp_fn_name}({schema}{name}, {schema}{name});\
             ",
             cmp_fn_name = self.cmp_fn_name(),
         );
