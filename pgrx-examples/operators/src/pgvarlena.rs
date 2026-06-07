@@ -7,8 +7,8 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use pgrx::prelude::*;
 use pgrx::StringInfo;
+use pgrx::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::ffi::CStr;
 use std::fmt::{Display, Formatter, Write};

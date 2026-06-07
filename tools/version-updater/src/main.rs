@@ -23,7 +23,7 @@ use std::io::{BufRead, Write};
 use std::path::Path;
 use std::process::{Command, Stdio};
 use std::{env, path::PathBuf};
-use toml_edit::{value, DocumentMut, Entry, Item};
+use toml_edit::{DocumentMut, Entry, Item, value};
 use walkdir::{DirEntry, WalkDir};
 
 #[derive(Parser)]

@@ -113,11 +113,7 @@ unsafe fn get_top_parent_xid(xid: TransactionId) -> (Option<TransactionId>, Opti
     }
 
     // Return top parent and sublevel, or None if this is a top-level transaction
-    if sub_level > 0 {
-        (Some(previous_xid), Some(sub_level))
-    } else {
-        (None, None)
-    }
+    if sub_level > 0 { (Some(previous_xid), Some(sub_level)) } else { (None, None) }
 }
 
 /// Check if transaction ID is in recent past and accessible
@@ -358,8 +354,8 @@ mod unit_tests {
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
-    use pgrx::prelude::*;
     use pgrx::Spi;
+    use pgrx::prelude::*;
 
     /// Test basic functionality with current transaction ID
     #[pg_test]

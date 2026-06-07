@@ -1,7 +1,8 @@
 [package]
 name = "subtrans_infos"
 version = "0.0.0"
-edition = "2021"
+edition.workspace = true
+rust-version.workspace = true
 publish = false
 
 [lib]
@@ -26,3 +27,6 @@ pgrx = { path = "../../pgrx" }
 
 [dev-dependencies]
 pgrx-tests = { path = "../../pgrx-tests" }
+
+[lints.rust]
+unsafe-op-in-unsafe-fn = "allow"

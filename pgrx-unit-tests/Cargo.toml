@@ -18,6 +18,7 @@ homepage.workspace = true
 repository.workspace = true
 readme = "README.md"
 edition.workspace = true
+rust-version.workspace = true
 publish = false
 
 [lib]

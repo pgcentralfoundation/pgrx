@@ -11,9 +11,9 @@
 [package]
 name = "spi_srf"
 version = "0.0.0"
-edition = "2021"
+edition.workspace = true
+rust-version.workspace = true
 publish = false
-rust-version = "1.58"
 
 [lib]
 crate-type = ["cdylib"]

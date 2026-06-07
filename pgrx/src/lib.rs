@@ -247,7 +247,7 @@ macro_rules! pg_magic_func {
                 let indexmaxkeys = ::pgrx::pg_sys::INDEX_MAX_KEYS as i32;
                 let namedatalen = ::pgrx::pg_sys::NAMEDATALEN as i32;
                 let float8byval = cfg!(target_pointer_width = "64") as i32;
-                #[cfg(not(any(feature = "pg13", feature = "pg14")))]
+                #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
                 let abi_extra = {
                     // we'll use what the bindings tell us, but if it ain't "PostgreSQL" then we'll
                     // raise a compilation error unless the `unsafe-postgres` feature is set

@@ -197,8 +197,8 @@ fn add_scritches_to_dog(
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgrx::prelude::*;
     use pgrx::AllocatedByRust;
+    use pgrx::prelude::*;
 
     #[pg_test]
     fn test_create_dog() -> Result<(), pgrx::spi::Error> {

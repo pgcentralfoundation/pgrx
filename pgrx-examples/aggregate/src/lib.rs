@@ -8,9 +8,9 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use core::ffi::CStr;
+use pgrx::StringInfo;
 use pgrx::aggregate::*;
 use pgrx::prelude::*;
-use pgrx::StringInfo;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 

@@ -22,6 +22,7 @@ keywords = ["database", "postgres", "postgresql", "extension"]
 readme = "README.md"
 exclude = ["*.png"]
 edition.workspace = true
+rust-version.workspace = true
 
 [dependencies]
 pgrx-pg-config.workspace = true

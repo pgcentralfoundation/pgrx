@@ -66,9 +66,9 @@ mod public {
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
+    use crate::MyType;
     use crate::pg_catalog::MyPgCatalogType;
     use crate::some_schema::MySomeSchemaType;
-    use crate::MyType;
     use pgrx::prelude::*;
 
     #[pg_test]

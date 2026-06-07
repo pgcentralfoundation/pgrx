@@ -19,6 +19,7 @@ repository.workspace = true
 documentation = "https://docs.rs/pgrx-macros"
 readme = "README.md"
 edition.workspace = true
+rust-version.workspace = true
 
 [lib]
 proc-macro = true

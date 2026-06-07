@@ -1,5 +1,10 @@
 [workspace]
+resolver = "3"
 members = ["hello"]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.96"
 
 [workspace.dependencies]
 pgrx = "=0.18.0"

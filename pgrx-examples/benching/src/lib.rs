@@ -27,7 +27,7 @@ fn normalize_phrase(input: &str) -> String {
 #[pg_schema]
 mod benches {
     use pgrx::prelude::*;
-    use pgrx_bench::{black_box, BatchSize, Bencher};
+    use pgrx_bench::{BatchSize, Bencher, black_box};
 
     fn prepare_spi_fixture() {
         Spi::run(

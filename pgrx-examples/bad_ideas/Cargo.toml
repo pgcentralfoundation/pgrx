@@ -11,7 +11,8 @@
 [package]
 name = "bad_ideas"
 version = "0.0.0"
-edition = "2021"
+edition.workspace = true
+rust-version.workspace = true
 publish = false
 
 [lib]
@@ -35,3 +36,6 @@ ureq = "3.3.0"
 
 [dev-dependencies]
 pgrx-tests = { path = "../../pgrx-tests" }
+
+[lints.rust]
+unsafe-op-in-unsafe-fn = "allow"

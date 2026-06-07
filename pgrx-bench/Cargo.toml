@@ -18,6 +18,7 @@ homepage.workspace = true
 repository.workspace = true
 documentation = "https://docs.rs/pgrx-bench"
 edition.workspace = true
+rust-version.workspace = true
 include = ["src/**/*", "README.md"]
 
 [dependencies]

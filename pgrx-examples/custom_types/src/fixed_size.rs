@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use core::ffi::CStr;
 use pgrx::prelude::*;
-use pgrx::{opname, pg_operator, StringInfo};
+use pgrx::{StringInfo, opname, pg_operator};
 use std::str::FromStr;
 
 #[derive(Copy, Clone, PostgresType)]

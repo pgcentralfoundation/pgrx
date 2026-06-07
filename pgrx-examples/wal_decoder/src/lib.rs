@@ -1,8 +1,8 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 use pgrx::prelude::*;
-use serde::ser::{SerializeStruct, Serializer};
 use serde::Serialize;
-use std::alloc::{alloc, dealloc, Layout};
+use serde::ser::{SerializeStruct, Serializer};
+use std::alloc::{Layout, alloc, dealloc};
 
 pgrx::pg_module_magic!(name, version);
 

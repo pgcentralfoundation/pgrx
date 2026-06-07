@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use pgrx::prelude::*;
-use pgrx::{error, info, warning, PgRelation, FATAL, PANIC};
+use pgrx::{FATAL, PANIC, PgRelation, error, info, warning};
 
 pgrx::pg_module_magic!(name, version);
 

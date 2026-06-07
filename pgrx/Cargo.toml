@@ -21,6 +21,7 @@ categories = ["database"]
 keywords = ["database", "postgres", "postgresql", "extension"]
 readme = "../README.md"
 edition.workspace = true
+rust-version.workspace = true
 include = ["src/**/*"]
 
 [lib]

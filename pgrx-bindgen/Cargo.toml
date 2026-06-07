@@ -3,6 +3,7 @@ name = "pgrx-bindgen"
 description = "additional bindgen support for pgrx"
 version = "0.18.1"
 edition.workspace = true
+rust-version.workspace = true
 license.workspace = true
 homepage = "https://github.com/pgcentralfoundation/pgrx"
 repository = "https://github.com/pgcentralfoundation/pgrx"

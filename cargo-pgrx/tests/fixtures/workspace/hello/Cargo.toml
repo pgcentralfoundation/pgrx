@@ -1,7 +1,8 @@
 [package]
 name = "hello"
 version = "0.0.0"
-edition = "2021"
+edition.workspace = true
+rust-version.workspace = true
 
 [lib]
 crate-type = ["cdylib"]

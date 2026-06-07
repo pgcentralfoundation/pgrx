@@ -39,11 +39,7 @@ fn rstore_remove(rstore: Option<RustStore>, key: String) -> Option<RustStore> {
         Some(mut rstore) => {
             rstore.0.remove(&key);
 
-            if rstore.0.is_empty() {
-                None
-            } else {
-                Some(rstore)
-            }
+            if rstore.0.is_empty() { None } else { Some(rstore) }
         }
         None => None,
     }

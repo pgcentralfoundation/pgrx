@@ -14,7 +14,7 @@ use pgrx::pgrx_sql_entity_graph::metadata::{
     ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
 use pgrx::prelude::*;
-use pgrx::{rust_regtypein, StringInfo};
+use pgrx::{StringInfo, rust_regtypein};
 use std::error::Error;
 use std::ffi::CStr;
 use std::fmt::{Display, Formatter};
@@ -74,11 +74,7 @@ impl FromDatum for HexInt {
     where
         Self: Sized,
     {
-        if is_null {
-            None
-        } else {
-            Some(HexInt { value: datum.value() as _ })
-        }
+        if is_null { None } else { Some(HexInt { value: datum.value() as _ }) }
     }
 }
 
