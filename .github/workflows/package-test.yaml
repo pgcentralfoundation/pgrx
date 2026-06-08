@@ -110,3 +110,6 @@ jobs:
                   -p pgrx-tests \
                   -p cargo-pgrx \
                   --features "pg$PG_VER"
+
+      - name: Verify docs.rs build path
+        run: ./tools/docsrs-check.sh

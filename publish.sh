@@ -13,6 +13,8 @@
 DIR=`pwd`
 set -x
 
+./tools/docsrs-check.sh || exit $?
+
 # dependency graph, from roots to facades
 #
 # pgrx-pg-config
