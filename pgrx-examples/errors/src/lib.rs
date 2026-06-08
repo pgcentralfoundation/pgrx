@@ -72,7 +72,7 @@ mod tests {
     use pgrx::prelude::*;
 
     /// Raises an error whose message contains a literal double-quote: foo "bar"
-    /// 
+    ///
     /// Used by the regression test for `#[pg_test(error = r#"..."#)]` — the old hand-rolled attribute walker corrupted raw string literals, so this exact message used to silently mismatch the `expected` value at runtime.
     #[pg_extern]
     fn raise_quoted_error() {
