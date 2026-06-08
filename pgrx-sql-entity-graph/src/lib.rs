@@ -31,6 +31,7 @@ pub use enrich::CodeEnrichment;
 pub use extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntity};
 pub use extension_sql::{ExtensionSql, ExtensionSqlFile, SqlDeclared};
 pub use extern_args::{ExternArgs, parse_extern_attributes};
+pub use pg_extern::attribute::Attribute;
 pub use pg_extern::entity::{
     PgCastEntity, PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity,
     PgExternReturnEntityIteratedItem, PgOperatorEntity,

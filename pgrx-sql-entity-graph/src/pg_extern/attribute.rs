@@ -15,6 +15,7 @@
 > to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
+use crate::extern_args::ExternArgs;
 use crate::positioning_ref::PositioningRef;
 use crate::to_sql::ToSqlConfig;
 use proc_macro2::TokenStream as TokenStream2;
@@ -100,6 +101,35 @@ impl ToTokens for Attribute {
     }
 }
 
+impl Attribute {
+    /// Convert this attribute into an [`ExternArgs`] for SQL emission.
+    ///
+    /// Returns `None` for attributes (currently only [`Attribute::Sql`]) that are handled outside the extern-args pipeline.
+    pub fn as_extern_arg(&self) -> Option<ExternArgs> {
+        Some(match self {
+            Self::CreateOrReplace => ExternArgs::CreateOrReplace,
+            Self::Immutable => ExternArgs::Immutable,
+            Self::Strict => ExternArgs::Strict,
+            Self::Stable => ExternArgs::Stable,
+            Self::Volatile => ExternArgs::Volatile,
+            Self::Raw => ExternArgs::Raw,
+            Self::NoGuard => ExternArgs::NoGuard,
+            Self::SecurityDefiner => ExternArgs::SecurityDefiner,
+            Self::SecurityInvoker => ExternArgs::SecurityInvoker,
+            Self::ParallelSafe => ExternArgs::ParallelSafe,
+            Self::ParallelUnsafe => ExternArgs::ParallelUnsafe,
+            Self::ParallelRestricted => ExternArgs::ParallelRestricted,
+            Self::ShouldPanic(v) => ExternArgs::ShouldPanic(v.value()),
+            Self::Schema(v) => ExternArgs::Schema(v.value()),
+            Self::Support(v) => ExternArgs::Support(v.clone()),
+            Self::Name(v) => ExternArgs::Name(v.value()),
+            Self::Cost(v) => ExternArgs::Cost(v.to_token_stream().to_string()),
+            Self::Requires(items) => ExternArgs::Requires(items.iter().cloned().collect()),
+            Self::Sql(_) => return None,
+        })
+    }
+}
+
 impl Parse for Attribute {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let ident: syn::Ident = input.parse()?;
@@ -179,5 +209,72 @@ impl Parse for Attribute {
             }
         };
         Ok(found)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::Attribute;
+    use std::str::FromStr;
+    use syn::parse::Parser;
+    use syn::punctuated::Punctuated;
+
+    fn parse(src: &str) -> Punctuated<Attribute, syn::Token![,]> {
+        let ts = proc_macro2::TokenStream::from_str(src).expect("tokenize");
+        Punctuated::<Attribute, syn::Token![,]>::parse_terminated.parse2(ts).expect("parse")
+    }
+
+    fn expected_value(attrs: &Punctuated<Attribute, syn::Token![,]>) -> Option<String> {
+        attrs.iter().find_map(|a| match a {
+            Attribute::ShouldPanic(lit) => Some(lit.value()),
+            _ => None,
+        })
+    }
+
+    #[test]
+    fn plain_string_expected() {
+        let attrs = parse(r#"expected = "syntax error""#);
+        assert_eq!(expected_value(&attrs).as_deref(), Some("syntax error"));
+    }
+
+    #[test]
+    fn escaped_quotes_in_plain_string() {
+        let attrs = parse(r#"expected = "syntax error at or near \"THIS\"""#);
+        assert_eq!(expected_value(&attrs).as_deref(), Some(r#"syntax error at or near "THIS""#),);
+    }
+
+    #[test]
+    fn raw_string_with_embedded_quotes() {
+        // The bug we are pinning: the old walker would have produced `#"foo "bar""#` (raw-string delimiters leaking into the value).
+        let attrs = parse(r###"expected = r#"foo "bar""#"###);
+        assert_eq!(expected_value(&attrs).as_deref(), Some(r#"foo "bar""#));
+    }
+
+    #[test]
+    fn raw_string_with_nested_hashes() {
+        let attrs = parse(r####"expected = r##"weird"#text"##"####);
+        assert_eq!(expected_value(&attrs).as_deref(), Some(r##"weird"#text"##));
+    }
+
+    #[test]
+    fn error_alias_works_like_expected() {
+        let attrs = parse(r#"error = "boom""#);
+        assert_eq!(expected_value(&attrs).as_deref(), Some("boom"));
+    }
+
+    #[test]
+    fn other_attrs_alongside_expected_do_not_interfere() {
+        let attrs = parse(r#"immutable, expected = "ok", strict"#);
+        assert_eq!(expected_value(&attrs).as_deref(), Some("ok"));
+        assert!(attrs.iter().any(|a| matches!(a, Attribute::Immutable)));
+        assert!(attrs.iter().any(|a| matches!(a, Attribute::Strict)));
+    }
+
+    #[test]
+    fn malformed_input_is_a_syn_error_not_a_panic() {
+        let ts = proc_macro2::TokenStream::from_str("expected").expect("tokenize");
+        let result = Punctuated::<Attribute, syn::Token![,]>::parse_terminated.parse2(ts);
+        assert!(result.is_err(), "expected = is required");
     }
 }

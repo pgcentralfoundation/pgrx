@@ -15,14 +15,15 @@ use std::ffi::CString;
 
 use proc_macro2::Ident;
 use quote::{ToTokens, format_ident, quote};
+use syn::parse::Parser;
 use syn::spanned::Spanned;
 use syn::{Attribute, Data, DeriveInput, Item, ItemImpl, parse_macro_input};
 
 use operators::{deriving_postgres_eq, deriving_postgres_hash, deriving_postgres_ord};
 use pgrx_sql_entity_graph as sql_gen;
 use sql_gen::{
-    CodeEnrichment, ExtensionSql, ExtensionSqlFile, ExternArgs, PgAggregate, PgCast, PgExtern,
-    PostgresEnum, Schema, parse_extern_attributes,
+    Attribute as SqlGenAttribute, CodeEnrichment, ExtensionSql, ExtensionSqlFile, PgAggregate,
+    PgCast, PgExtern, PostgresEnum, Schema,
 };
 
 mod operators;
@@ -60,13 +61,18 @@ pub fn pg_guard(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     let mut stream = proc_macro2::TokenStream::new();
-    let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
 
-    let mut expected_error = None;
-    args.into_iter().for_each(|v| {
-        if let ExternArgs::ShouldPanic(message) = v {
-            expected_error = Some(message)
-        }
+    let parsed_attrs =
+        match syn::punctuated::Punctuated::<SqlGenAttribute, syn::Token![,]>::parse_terminated
+            .parse(attr.clone())
+        {
+            Ok(p) => p,
+            Err(e) => return e.into_compile_error().into(),
+        };
+
+    let expected_error = parsed_attrs.iter().find_map(|a| match a {
+        SqlGenAttribute::ShouldPanic(lit) => Some(lit.value()),
+        _ => None,
     });
 
     let ast = parse_macro_input!(item as syn::Item);

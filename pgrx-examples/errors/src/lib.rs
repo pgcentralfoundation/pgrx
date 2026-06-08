@@ -71,6 +71,14 @@ fn throw_pg_fatal(message: &str) {
 mod tests {
     use pgrx::prelude::*;
 
+    /// Raises an error whose message contains a literal double-quote: foo "bar"
+    /// 
+    /// Used by the regression test for `#[pg_test(error = r#"..."#)]` — the old hand-rolled attribute walker corrupted raw string literals, so this exact message used to silently mismatch the `expected` value at runtime.
+    #[pg_extern]
+    fn raise_quoted_error() {
+        error!(r#"foo "bar""#);
+    }
+
     #[pg_test]
     fn test_it() {
         // do testing here.
@@ -80,6 +88,12 @@ mod tests {
         // Normal #[test] functions do not
         //
         // In either case, they all run in parallel
+    }
+
+    /// Regression test for the raw-string corruption bug in `#[pg_test]`'s attribute parser. The expected message contains embedded double-quotes expressed via a Rust raw string literal. Prior to switching `pg_test` to syn-based parsing this would have been stored as `#"foo "bar""#` and never matched the real error.
+    #[pg_test(error = r#"foo "bar""#)]
+    fn raw_string_expected_matches_quoted_error() {
+        Spi::run("SELECT tests.raise_quoted_error()").unwrap();
     }
 }
 

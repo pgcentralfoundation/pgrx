@@ -16,7 +16,7 @@
 
 */
 mod argument;
-mod attribute;
+pub mod attribute;
 mod cast;
 pub mod entity;
 mod operator;
@@ -40,7 +40,7 @@ use operator::{PgrxOperatorAttributeWithIdent, PgrxOperatorOpName};
 use search_path::SearchPathList;
 
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
-use quote::{ToTokens, quote};
+use quote::quote;
 use syn::parse::{Parse, ParseStream, Parser};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
@@ -293,7 +293,9 @@ impl PgExtern {
         };
         let sql_graph_entity_fn_name = format_ident!("__pgrx_schema_fn_{}", ident);
         let input_count = self.inputs.len();
-        let extern_attr_count = self.attrs.len();
+        let extern_args: Vec<ExternArgs> =
+            self.attrs.iter().filter_map(Attribute::as_extern_arg).collect();
+        let extern_attr_count = extern_args.len();
         let args_len = inputs.iter().map(PgExternArgument::section_len_tokens);
         let return_len = returns.section_len_tokens();
         let schema_len = schema
@@ -305,30 +307,7 @@ impl PgExtern {
                 }
             })
             .unwrap_or_else(|| quote! { ::pgrx::pgrx_sql_entity_graph::section::bool_len() });
-        let extern_attr_lens = self.attrs.iter().map(|attr| {
-            let extern_arg = match attr {
-                Attribute::CreateOrReplace => ExternArgs::CreateOrReplace,
-                Attribute::Immutable => ExternArgs::Immutable,
-                Attribute::Strict => ExternArgs::Strict,
-                Attribute::Stable => ExternArgs::Stable,
-                Attribute::Volatile => ExternArgs::Volatile,
-                Attribute::Raw => ExternArgs::Raw,
-                Attribute::NoGuard => ExternArgs::NoGuard,
-                Attribute::SecurityDefiner => ExternArgs::SecurityDefiner,
-                Attribute::SecurityInvoker => ExternArgs::SecurityInvoker,
-                Attribute::ParallelSafe => ExternArgs::ParallelSafe,
-                Attribute::ParallelUnsafe => ExternArgs::ParallelUnsafe,
-                Attribute::ParallelRestricted => ExternArgs::ParallelRestricted,
-                Attribute::ShouldPanic(value) => ExternArgs::ShouldPanic(value.value()),
-                Attribute::Schema(value) => ExternArgs::Schema(value.value()),
-                Attribute::Support(value) => ExternArgs::Support(value.clone()),
-                Attribute::Name(value) => ExternArgs::Name(value.value()),
-                Attribute::Cost(value) => ExternArgs::Cost(value.to_token_stream().to_string()),
-                Attribute::Requires(items) => ExternArgs::Requires(items.iter().cloned().collect()),
-                Attribute::Sql(_) => unreachable!("sql attributes are handled separately"),
-            };
-            extern_arg.section_len_tokens()
-        });
+        let extern_attr_lens = extern_args.iter().map(ExternArgs::section_len_tokens);
         let search_path_len = self
             .search_path
             .as_ref()
@@ -388,30 +367,9 @@ impl PgExtern {
             .as_ref()
             .map(|schema| quote! { .bool(true).str(#schema) })
             .unwrap_or_else(|| quote! { .bool(false) });
-        let extern_attr_writers = self.attrs.iter().map(|attr| {
-            let extern_arg = match attr {
-                Attribute::CreateOrReplace => ExternArgs::CreateOrReplace,
-                Attribute::Immutable => ExternArgs::Immutable,
-                Attribute::Strict => ExternArgs::Strict,
-                Attribute::Stable => ExternArgs::Stable,
-                Attribute::Volatile => ExternArgs::Volatile,
-                Attribute::Raw => ExternArgs::Raw,
-                Attribute::NoGuard => ExternArgs::NoGuard,
-                Attribute::SecurityDefiner => ExternArgs::SecurityDefiner,
-                Attribute::SecurityInvoker => ExternArgs::SecurityInvoker,
-                Attribute::ParallelSafe => ExternArgs::ParallelSafe,
-                Attribute::ParallelUnsafe => ExternArgs::ParallelUnsafe,
-                Attribute::ParallelRestricted => ExternArgs::ParallelRestricted,
-                Attribute::ShouldPanic(value) => ExternArgs::ShouldPanic(value.value()),
-                Attribute::Schema(value) => ExternArgs::Schema(value.value()),
-                Attribute::Support(value) => ExternArgs::Support(value.clone()),
-                Attribute::Name(value) => ExternArgs::Name(value.value()),
-                Attribute::Cost(value) => ExternArgs::Cost(value.to_token_stream().to_string()),
-                Attribute::Requires(items) => ExternArgs::Requires(items.iter().cloned().collect()),
-                Attribute::Sql(_) => unreachable!("sql attributes are handled separately"),
-            };
-            extern_arg.section_writer_tokens(quote! { #writer_ident })
-        });
+        let extern_attr_writers = extern_args
+            .iter()
+            .map(|extern_arg| extern_arg.section_writer_tokens(quote! { #writer_ident }));
         let search_path_writer = self
             .search_path
             .as_ref()
