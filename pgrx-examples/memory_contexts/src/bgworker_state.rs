@@ -52,10 +52,7 @@ pub extern "C-unwind" fn memory_contexts_worker_main(arg: pg_sys::Datum) {
 
     // Round-trip the value passed via set_argument() — proves the builder's arg plumbing works and shows where you'd plug in worker-specific config (a queue id, a partition number, etc.).
     let init_arg = unsafe { i32::from_polymorphic_datum(arg, false, pg_sys::INT4OID) };
-    log!(
-        "memory_contexts demo worker starting (arg={})",
-        init_arg.unwrap_or(-1)
-    );
+    log!("memory_contexts demo worker starting (arg={})", init_arg.unwrap_or(-1));
 
     // Allocate the long-lived counter under TopMemoryContext.
     let counter: *mut i64 = unsafe {
