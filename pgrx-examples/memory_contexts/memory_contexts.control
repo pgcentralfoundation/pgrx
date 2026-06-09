@@ -1,0 +1,6 @@
+comment = 'memory_contexts: PgMemoryContext lifecycle and SRF/bgworker state patterns'
+default_version = '@CARGO_VERSION@'
+module_pathname = 'memory_contexts'
+relocatable = false
+superuser = false
+trusted = false

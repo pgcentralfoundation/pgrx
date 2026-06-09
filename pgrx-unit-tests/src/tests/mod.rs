@@ -52,6 +52,7 @@ mod pg_try_tests;
 mod pgbox_tests;
 mod pgrx_module_qualification;
 mod postgres_type_tests;
+mod postgres_type_variants_smoke;
 #[cfg(feature = "proptest")]
 mod proptests;
 mod range_tests;

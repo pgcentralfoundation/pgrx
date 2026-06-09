@@ -1,0 +1,6 @@
+comment = 'postgres_type_variants: side-by-side PostgresType in/out variants'
+default_version = '@CARGO_VERSION@'
+module_pathname = 'postgres_type_variants'
+relocatable = false
+superuser = false
+trusted = false
