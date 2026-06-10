@@ -2083,6 +2083,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "page_inspect"
+version = "0.0.0"
+dependencies = [
+ "pgrx",
+ "pgrx-tests",
+]
+
+[[package]]
 name = "page_size"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

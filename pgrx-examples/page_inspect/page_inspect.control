@@ -1,0 +1,5 @@
+comment = 'page_inspect: PgBuffer demo extension'
+default_version = '@CARGO_VERSION@'
+module_pathname = '$libdir/page_inspect'
+relocatable = false
+superuser = false
