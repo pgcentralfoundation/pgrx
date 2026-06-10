@@ -425,7 +425,6 @@ impl<'b> Drop for BufferWriteGuard<'b> {
 }
 
 #[doc(hidden)]
-#[cfg(feature = "pg_test")]
 pub fn __test_only_invalid_pgbuffer() -> PgBuffer {
     PgBuffer { raw: pg_sys::InvalidBuffer as pg_sys::Buffer }
 }
