@@ -10,6 +10,7 @@
 use cargo_toml::{Dependency, DepsSet, Manifest};
 use crates_index::SparseIndex;
 use eyre::eyre;
+use semver::VersionReq;
 use std::collections::HashSet;
 use std::sync::LazyLock;
 use std::{fs, path::PathBuf};
@@ -23,10 +24,9 @@ use crate::CommandExecute;
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Upgrade {
-    /// Specify a version to upgrade to, rather than defaulting to the latest
-    /// version.
+    /// Specify a version requirement to upgrade to, rather than defaulting to the latest version. Accepts any Cargo version requirement syntax: bare versions (`0.16.1`, treated as caret), explicit operators (`^0.16`, `~0.16.1`, `=0.16.1`, `>=0.16, <0.17`), etc.
     #[clap(long)]
-    pub(crate) to: Option<String>, //TODO: semver not string
+    pub(crate) to: Option<VersionReq>,
 
     /// Path to the manifest file (usually Cargo.toml). Defaults to
     /// "./Cargo.toml" in the working directory.
@@ -56,8 +56,8 @@ impl CommandExecute for Upgrade {
         let path = self.manifest_path.map_or_else(|| PathBuf::from("./Cargo.toml"), |p| p.clone());
         let path = find_manifest_file(&path.canonicalize()?, self.package.as_ref())?;
 
-        let version = if let Some(v) = &self.to {
-            TargetVersion::Exact(v.to_owned())
+        let version = if let Some(v) = self.to {
+            TargetVersion::Match(v)
         } else if self.include_prereleases {
             TargetVersion::DiscoverPrerelease
         } else {
@@ -79,7 +79,16 @@ impl CommandExecute for Upgrade {
 enum TargetVersion {
     DiscoverPrerelease,
     DiscoverReleased,
-    Exact(String),
+    Match(VersionReq),
+}
+
+// Strategy for rewriting this dependency's version field. Encoding the two cases as a type lets each match arm own exactly one representation, instead of threading an Option<String> + tupl match across two stages.
+#[derive(Debug)]
+enum Rewrite {
+    /// Overwrite the version field with this literal string,  Used when the user supplies a full Cargo version requirement.
+    Replace(String),
+    /// Substitute only the bare version number in the existing  requirement, preserving any leading operator (`^`, `=`, `~`).
+    SwapBareVersion(String),
 }
 
 /// Starting at path, search for the Cargo manifest containing package.
@@ -230,47 +239,54 @@ fn update_manifest_section<T: toml_edit::TableLike + ?Sized>(
             }
         };
 
-        let next_version = match target {
-            TargetVersion::Exact(specified) => specified,
+        let strategy: Rewrite = match target {
+            TargetVersion::Match(req) => Rewrite::Replace(req.to_string()),
             TargetVersion::DiscoverPrerelease => {
                 let krate = index.crate_from_cache(crate_name)?;
                 let highest = krate.highest_version();
-                &(!highest.is_yanked())
+                let bare = (!highest.is_yanked())
                     .then_some(highest.version())
                     .ok_or_else(|| {
                         eyre!("Latest version {:?} for {crate_name:?} is yanked", highest.version())
                     })?
-                    .to_owned()
+                    .to_owned();
+                Rewrite::SwapBareVersion(bare)
             }
             TargetVersion::DiscoverReleased => {
                 let krate = index.crate_from_cache(crate_name)?;
                 let highest = krate.highest_normal_version();
-                &highest
+                let bare = highest
                     .ok_or_else(|| eyre!("No released version for {crate_name:?}"))?
                     .version()
-                    .to_owned()
+                    .to_owned();
+                Rewrite::SwapBareVersion(bare)
+            }
+        };
+
+        let rewrite = |existing: &str| -> String {
+            match &strategy {
+                Rewrite::Replace(s) => s.to_string(),
+                Rewrite::SwapBareVersion(v) => {
+                    REQUIREMENT_REGEX.replace(existing, format!("{}{}", "${1}", v)).into_owned()
+                }
             }
         };
 
         match dependency {
             Dependency::Inherited(_) => continue,
             Dependency::Simple(requirement) => {
-                let next_requirement =
-                    REQUIREMENT_REGEX.replace(&requirement, format!("{}{}", "${1}", next_version));
-
-                section.insert(&local_name, next_requirement.into_owned().into());
+                let next_requirement = rewrite(requirement);
+                section.insert(&local_name, next_requirement.into());
             }
             Dependency::Detailed(detail) => {
                 let Some(requirement) = &detail.version else {
                     info!("No version specified for {local_name}, not upgrading.");
                     continue;
                 };
-                let next_requirement =
-                    REQUIREMENT_REGEX.replace(&requirement, format!("{}{}", "${1}", next_version));
-
+                let next_requirement = rewrite(requirement);
                 let table = section.get_mut(&local_name).expect("source and sink diverged");
                 let table = table.as_table_like_mut().expect("source and sink diverged");
-                table.insert("version", next_requirement.into_owned().into());
+                table.insert("version", next_requirement.into());
             }
         }
     }
@@ -344,7 +360,7 @@ mod tests {
 
         let updated = super::process_manifest_file(
             &manifest_path.into(),
-            &super::TargetVersion::Exact("0.16.1".into()),
+            &super::TargetVersion::Match(semver::VersionReq::parse("=0.16.1").unwrap()),
         )
         .unwrap();
 
@@ -364,7 +380,7 @@ mod tests {
 
         let updated = super::process_manifest_file(
             &manifest_path.into(),
-            &super::TargetVersion::Exact("0.18.1".into()),
+            &super::TargetVersion::Match(semver::VersionReq::parse("=0.18.1").unwrap()),
         )
         .unwrap();
 
@@ -384,11 +400,89 @@ mod tests {
 
         let updated = super::process_manifest_file(
             &manifest_path.into(),
-            &super::TargetVersion::Exact("0.18.1".into()),
+            &super::TargetVersion::Match(semver::VersionReq::parse("=0.18.1").unwrap()),
         )
         .unwrap();
 
         fs::write(golden.new_goldenpath("expected-0.18.1.toml").unwrap(), updated.to_string())
             .unwrap();
+    }
+
+    use clap::Parser;
+    use semver::VersionReq;
+
+    #[derive(clap::Parser, Debug)]
+    struct Wrap {
+        #[clap(flatten)]
+        inner: super::Upgrade,
+    }
+
+    #[test]
+    fn parse_to_accepts_bare_version() {
+        let parsed = Wrap::try_parse_from(["pgrx", "--to", "0.16.1"]).unwrap();
+        assert_eq!(parsed.inner.to, Some(VersionReq::parse("0.16.1").unwrap()));
+    }
+
+    #[test]
+    fn parse_to_accepts_partial_version() {
+        // Cargo allows bare partial versions like `0.16`, treated as caret.
+        let parsed = Wrap::try_parse_from(["pgrx", "--to", "0.16"]).unwrap();
+        assert_eq!(parsed.inner.to, Some(VersionReq::parse("0.16").unwrap()));
+    }
+
+    #[test]
+    fn parse_to_accepts_caret() {
+        let parsed = Wrap::try_parse_from(["pgrx", "--to", "^0.16.1"]).unwrap();
+        assert_eq!(parsed.inner.to, Some(VersionReq::parse("^0.16.1").unwrap()));
+    }
+
+    #[test]
+    fn parse_to_accepts_tilde() {
+        let parsed = Wrap::try_parse_from(["pgrx", "--to", "~0.16.1"]).unwrap();
+        assert_eq!(parsed.inner.to, Some(VersionReq::parse("~0.16.1").unwrap()));
+    }
+
+    #[test]
+    fn parse_to_accepts_exact_pin() {
+        let parsed = Wrap::try_parse_from(["pgrx", "--to", "=0.16.1"]).unwrap();
+        assert_eq!(parsed.inner.to, Some(VersionReq::parse("=0.16.1").unwrap()));
+    }
+
+    #[test]
+    fn parse_to_accepts_range() {
+        let parsed = Wrap::try_parse_from(["pgrx", "--to", ">=0.16, <0.17"]).unwrap();
+        assert_eq!(parsed.inner.to, Some(VersionReq::parse(">=0.16, <0.17").unwrap()));
+    }
+
+    #[test]
+    fn parse_to_accepts_prerelease() {
+        let parsed = Wrap::try_parse_from(["pgrx", "--to", "=1.0.0-beta.1"]).unwrap();
+        assert_eq!(parsed.inner.to, Some(VersionReq::parse("=1.0.0-beta.1").unwrap()));
+    }
+
+    #[test]
+    fn parse_to_rejects_garbage() {
+        let err = Wrap::try_parse_from(["pgrx", "--to", "foo"]).unwrap_err();
+        let rendered = err.to_string();
+        assert!(
+            rendered.contains("invalid value 'foo'"),
+            "expected clap error to mention the invalid value, got: {rendered}"
+        );
+    }
+
+    #[test]
+    fn parse_to_rejects_empty() {
+        let err = Wrap::try_parse_from(["pgrx", "--to", ""]).unwrap_err();
+        let rendered = err.to_string();
+        assert!(
+            rendered.contains("invalid value ''"),
+            "expected clap error to mention the empty value, got: {rendered}"
+        );
+    }
+
+    #[test]
+    fn parse_to_defaults_to_none() {
+        let parsed = Wrap::try_parse_from(["pgrx"]).unwrap();
+        assert_eq!(parsed.inner.to, None);
     }
 }
