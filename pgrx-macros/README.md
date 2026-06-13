@@ -6,6 +6,7 @@ Provides:
 
     - #[pg_extern]
     - #[pg_guard]
+    - #[pg_guc_hook]
     - #[pg_test]
     - #[derive(PostgresType)]
     - #[derive(PostgresEnum)]

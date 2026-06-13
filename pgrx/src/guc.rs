@@ -8,7 +8,8 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Provides a safe interface into Postgres' Configuration System (GUC)
-use crate::pg_sys;
+use crate::pg_sys::{self, AsPgCStr};
+use crate::pgbox::{AllocatedByRust, PgBox};
 use core::ffi::CStr;
 pub use pgrx_macros::PostgresGucEnum;
 use std::cell::Cell;
@@ -100,6 +101,58 @@ bitflags! {
         /// `RUNTIME_COMPUTED` is intended for runtime-computed GUCs that are only available via
         /// `postgres -C` if the server is not running
         const RUNTIME_COMPUTED = pg_sys::GUC_RUNTIME_COMPUTED as i32;
+    }
+}
+
+#[derive(Default)]
+pub struct GucCheckError {
+    errcode: Option<i32>,
+    message: Option<PgBox<core::ffi::c_char, AllocatedByRust>>,
+    detail: Option<PgBox<core::ffi::c_char, AllocatedByRust>>,
+    hint: Option<PgBox<core::ffi::c_char, AllocatedByRust>>,
+}
+
+impl GucCheckError {
+    pub fn new<S: AsPgCStr>(message: S) -> Self {
+        Self {
+            message: Some(unsafe { PgBox::<_, AllocatedByRust>::from_rust(message.as_pg_cstr()) }),
+            ..Default::default()
+        }
+    }
+
+    pub fn with_detail<S: AsPgCStr>(mut self, detail: S) -> Self {
+        self.detail = Some(unsafe { PgBox::<_, AllocatedByRust>::from_rust(detail.as_pg_cstr()) });
+        self
+    }
+
+    pub fn with_hint<S: AsPgCStr>(mut self, hint: S) -> Self {
+        self.hint = Some(unsafe { PgBox::<_, AllocatedByRust>::from_rust(hint.as_pg_cstr()) });
+        self
+    }
+
+    pub fn with_errcode(mut self, errcode: i32) -> Self {
+        self.errcode = Some(errcode);
+        self
+    }
+
+    /// Set the PostgreSQL GUC check error state from this error.
+    ///
+    /// # Safety
+    ///
+    /// This should only be called from within a GUC `check_hook`.
+    pub unsafe fn apply(self) {
+        if let Some(errcode) = self.errcode {
+            unsafe { pg_sys::GUC_check_errcode(errcode) }
+        }
+        if let Some(message) = self.message {
+            unsafe { pg_sys::GUC_check_errmsg_string = message.into_pg() }
+        }
+        if let Some(detail) = self.detail {
+            unsafe { pg_sys::GUC_check_errdetail_string = detail.into_pg() }
+        }
+        if let Some(hint) = self.hint {
+            unsafe { pg_sys::GUC_check_errhint_string = hint.into_pg() }
+        }
     }
 }
 

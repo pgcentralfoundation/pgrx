@@ -79,7 +79,6 @@ mod tests {
     use crate as pgrx_unit_tests;
 
     use super::*;
-    use pgrx::prelude::*;
 
     #[cfg(not(feature = "no-schema-generation"))]
     #[pg_test]

@@ -1430,6 +1430,197 @@ pub fn pgrx(_attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 /**
+Declare a function as a GUC hook. This takes one argument: `show`, `check`, or `assign`.
+
+The first parameter of `check` and `assign` hooks must implement `pgrx::guc::GucValue`.
+
+Examples:
+```rust,ignore
+#[pg_guc_hook(show)]
+fn my_show_hook() -> String {
+    "CUSTOM_VALUE".to_string()
+}
+
+#[pg_guc_hook(check)]
+fn my_check_hook(newval: i32) -> Result<(), GucCheckError> {
+    // accept or reject newval
+}
+
+#[pg_guc_hook(assign)]
+fn my_assign_hook(newval: i32) {
+    // do more now that every change is accepted
+}
+```
+
+# Check Hooks
+
+This macro adapts check hooks of multiple forms.
+
+The simplest of these takes a single argument and returns a `bool`.
+- `true` means the value is valid, and Postgres will store that value in the GUC variable.
+- `false` means the value is invalid, and Postgres will produce an error message automatically.
+
+```rust,ignore
+#[pg_guc_hook(check)]
+fn my_check_hook(newval: i32) -> bool { newval > 0 }
+```
+
+To apply your own error message for an invalid value, return a `Result<(), GucCheckError>`.
+- `Ok` means the value is valid.
+- `Err` means the value is invalid, and `pgrx` will pass the contents of `GucCheckError` to Postgres.
+
+```rust,ignore
+#[pg_guc_hook(check)]
+fn my_check_hook(newval: i32) -> Result<(), GucCheckError> {
+    if newval > 0 {
+        Ok(())
+    } else {
+        Err(
+            GucCheckError::new("value cannot be negative")
+            .with_hint("to configure the opposite behavior, set other_param"),
+        )
+    }
+}
+```
+
+A check hook can also accept a second argument that indicates when the parameter is changing.
+Like the examples above, this can return a bool or a Result.
+
+```rust,ignore
+#[pg_guc_hook(check)]
+fn my_check_hook(newval: i32, source: pg_sys::GucSource::Type) -> bool { true }
+```
+*/
+#[proc_macro_attribute]
+pub fn pg_guc_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let hook_type = parse_macro_input!(attr as syn::Ident);
+    let mut func = parse_macro_input!(item as syn::ItemFn);
+
+    // Rename the original function and use its name.
+    let original_ident = func.sig.ident.clone();
+    let inner_ident = format_ident!("{}_INNER", original_ident);
+    func.sig.ident = inner_ident.clone();
+
+    // Remove the original visibility and use it.
+    let vis = &func.vis;
+    let mut inner_func = func.clone();
+    inner_func.vis = syn::Visibility::Inherited;
+
+    let wrapper = match hook_type.to_string().as_str() {
+        "show" => {
+            quote! {
+                #[::pgrx::pg_guard]
+                #vis unsafe extern "C-unwind" fn #original_ident() -> *const ::core::ffi::c_char {
+                    #[inline(always)]
+                    #inner_func
+
+                    let show = #inner_ident();
+                    ::pgrx::pg_sys::AsPgCStr::as_pg_cstr(&show)
+                }
+            }
+        }
+        "check" => {
+            let invoke_inner = match func.sig.inputs.len() {
+                1 => quote! { #inner_ident(value) },
+                2 => quote! { #inner_ident(value, source) },
+                _ => {
+                    return syn::Error::new(
+                        func.sig.span(),
+                        "check hook must have one or two arguments",
+                    )
+                    .into_compile_error()
+                    .into();
+                }
+            };
+
+            let arg_type = match func.sig.inputs.first() {
+                Some(syn::FnArg::Typed(pat_type)) => &pat_type.ty,
+                _ => {
+                    return syn::Error::new(
+                        func.sig.span(),
+                        "check hook first argument must implement GucValue",
+                    )
+                    .into_compile_error()
+                    .into();
+                }
+            };
+
+            // The original function may return bool or Result. Pass bool through directly and apply
+            // any details present in GucCheckError.
+            let invoke_to_bool = if let syn::ReturnType::Type(_, return_type) = &func.sig.output
+                && let syn::Type::Path(type_path) = &**return_type
+                && type_path.path.segments.last().map_or(false, |seg| seg.ident == "bool")
+            {
+                quote! { #invoke_inner }
+            } else {
+                quote! {
+                    match #invoke_inner {
+                        Ok(()) => true,
+                        Err(err) => {
+                            unsafe { ::pgrx::guc::GucCheckError::apply(err) };
+                            false
+                        }
+                    }
+                }
+            };
+
+            quote! {
+                #[::pgrx::pg_guard]
+                #vis unsafe extern "C-unwind" fn #original_ident(
+                    newval: *mut <#arg_type as ::pgrx::guc::GucValue>::Raw,
+                    extra: *mut *mut ::core::ffi::c_void,
+                    source: ::pgrx::pg_sys::GucSource::Type,
+                ) -> bool {
+                    #[inline(always)]
+                    #inner_func
+
+                    debug_assert!(!newval.is_null());
+                    let value = unsafe { <#arg_type as ::pgrx::guc::GucValue>::from_raw(*newval) };
+                    #invoke_to_bool
+                }
+            }
+        }
+        "assign" => {
+            let arg_type = match func.sig.inputs.first() {
+                Some(syn::FnArg::Typed(pat_type)) => &pat_type.ty,
+                _ => {
+                    return syn::Error::new(
+                        func.sig.span(),
+                        "assign hook first argument must implement GucValue",
+                    )
+                    .into_compile_error()
+                    .into();
+                }
+            };
+
+            quote! {
+                #[::pgrx::pg_guard]
+                #vis unsafe extern "C-unwind" fn #original_ident(
+                    newval: <#arg_type as ::pgrx::guc::GucValue>::Raw,
+                    extra: *mut ::core::ffi::c_void,
+                ) {
+                    #[inline(always)]
+                    #inner_func
+
+                    let value = unsafe { <#arg_type as ::pgrx::guc::GucValue>::from_raw(newval) };
+                    #inner_ident(value);
+                }
+            }
+        }
+        _ => {
+            return syn::Error::new(
+                hook_type.span(),
+                "Unknown GUC hook type. Expected 'show', 'check', or 'assign'",
+            )
+            .into_compile_error()
+            .into();
+        }
+    };
+
+    wrapper.into()
+}
+
+/**
 Create a [PostgreSQL trigger function](https://www.postgresql.org/docs/current/plpgsql-trigger.html)
 
 Review the `pgrx::trigger_support::PgTrigger` documentation for use.

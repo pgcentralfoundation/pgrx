@@ -244,10 +244,10 @@ mod tests {
             _extra: *mut *mut std::ffi::c_void,
             _source: pg_sys::GucSource::Type,
         ) -> bool {
-            if *newval {
+            if unsafe { *newval } {
                 *SIDE_EFFECT.write().unwrap() += 1;
             }
-            *newval
+            unsafe { *newval }
         }
 
         // Create and register GUC with hooks. As default is true, SIDE_EFFECT will be 1.
@@ -288,10 +288,10 @@ mod tests {
             _extra: *mut *mut std::ffi::c_void,
             _source: pg_sys::GucSource::Type,
         ) -> bool {
-            if *newval {
+            if unsafe { *newval } {
                 panic!("should panic!");
             }
-            *newval
+            unsafe { *newval }
         }
 
         static GUARDED_GUC: GucSetting<bool> = GucSetting::<bool>::new(true);
@@ -375,5 +375,218 @@ mod tests {
             let value: &str = r.first().get_one::<&str>().unwrap().unwrap();
             assert_eq!(value, "CUSTOM_SHOW_HOOK");
         });
+    }
+
+    #[pg_test]
+    fn test_pg_guc_hook_macros() {
+        static GUC: GucSetting<i32> = GucSetting::<i32>::new(100);
+        static SIDE_EFFECT: std::sync::RwLock<i32> = std::sync::RwLock::new(0);
+
+        #[pg_guc_hook(show)]
+        fn my_show_hook() -> String {
+            "SHOW_MACRO".to_owned()
+        }
+
+        #[pg_guc_hook(check)]
+        fn my_check_hook(_newval: i32) -> Result<(), GucCheckError> {
+            *SIDE_EFFECT.write().unwrap() += 1;
+            Ok(())
+        }
+
+        #[pg_guc_hook(assign)]
+        fn my_assign_hook(newval: i32) {
+            if newval > 200 {
+                *SIDE_EFFECT.write().unwrap() += newval;
+            }
+        }
+
+        unsafe {
+            GucRegistry::define_int_guc_with_hooks(
+                c"test.hook_macros",
+                c"test hook macros",
+                c"test hook macros",
+                &GUC,
+                -100,
+                2000,
+                GucContext::Userset,
+                GucFlags::default(),
+                Some(my_check_hook),
+                Some(my_assign_hook),
+                Some(my_show_hook),
+            );
+        }
+
+        // Check hook accept default
+        assert_eq!(GUC.get(), 100);
+        assert_eq!(*SIDE_EFFECT.read().unwrap(), 1);
+
+        Spi::connect_mut(|client| {
+            let r = client.update("SHOW test.hook_macros", None, &[]).expect("SPI failed");
+            let value: &str = r.first().get_one::<&str>().unwrap().unwrap();
+            assert_eq!(value, "SHOW_MACRO");
+        });
+        assert_eq!(*SIDE_EFFECT.read().unwrap(), 1);
+
+        // Check hook accept followed by assign hook
+        Spi::run("SET test.hook_macros = 500").unwrap();
+        assert_eq!(GUC.get(), 500);
+        assert_eq!(*SIDE_EFFECT.read().unwrap(), 502);
+    }
+
+    #[pg_test]
+    #[should_panic(expected = "value cannot be negative")]
+    fn test_pg_guc_hook_macro_check_message() {
+        static GUC: GucSetting<i32> = GucSetting::<i32>::new(100);
+
+        #[pg_guc_hook(check)]
+        fn my_check_hook(newval: i32) -> Result<(), GucCheckError> {
+            if newval < 0 { Err(GucCheckError::new("value cannot be negative")) } else { Ok(()) }
+        }
+
+        unsafe {
+            GucRegistry::define_int_guc_with_hooks(
+                c"test.hook_macro_check_message",
+                c"test hook macro check message",
+                c"test hook macro check message",
+                &GUC,
+                -100,
+                2000,
+                GucContext::Userset,
+                GucFlags::default(),
+                Some(my_check_hook),
+                None,
+                None,
+            );
+        }
+
+        // Check hook reject with message
+        let _ = Spi::run("SET test.hook_macro_check_message = -10");
+    }
+
+    #[pg_test]
+    #[should_panic(expected = "positive")]
+    fn test_pg_guc_hook_macro_check_hint() {
+        static GUC: GucSetting<i32> = GucSetting::<i32>::new(100);
+
+        #[pg_guc_hook(check)]
+        fn my_check_hook(newval: i32) -> Result<(), GucCheckError> {
+            if newval < 0 {
+                Err(GucCheckError::new("negative").with_hint("positive"))
+            } else {
+                Ok(())
+            }
+        }
+
+        unsafe {
+            GucRegistry::define_int_guc_with_hooks(
+                c"test.hook_macro_check_hint",
+                c"test hook macro check hint",
+                c"test hook macro check hint",
+                &GUC,
+                -100,
+                2000,
+                GucContext::Userset,
+                GucFlags::default(),
+                Some(my_check_hook),
+                None,
+                None,
+            );
+        }
+
+        // Check hook reject with hint
+        let _ = Spi::run("SET test.hook_macro_check_hint = -10");
+    }
+
+    #[pg_test]
+    fn test_pg_guc_hook_macro_check_source_argument() {
+        static GUC: GucSetting<i32> = GucSetting::<i32>::new(100);
+        static SIDE_EFFECT: std::sync::RwLock<pg_sys::GucSource::Type> =
+            std::sync::RwLock::new(100);
+
+        #[pg_guc_hook(check)]
+        fn my_check_hook(
+            _newval: i32,
+            source: pg_sys::GucSource::Type,
+        ) -> Result<(), GucCheckError> {
+            *SIDE_EFFECT.write().unwrap() = source;
+            Ok(())
+        }
+
+        unsafe {
+            GucRegistry::define_int_guc_with_hooks(
+                c"test.hook_macro_check_two_args",
+                c"test hook macro check two args",
+                c"test hook macro check two args",
+                &GUC,
+                -100,
+                2000,
+                GucContext::Userset,
+                GucFlags::default(),
+                Some(my_check_hook),
+                None,
+                None,
+            );
+        }
+
+        Spi::run("SET test.hook_macro_check_two_args = 50").unwrap();
+        assert_eq!(*SIDE_EFFECT.read().unwrap(), pg_sys::GucSource::PGC_S_SESSION);
+    }
+
+    #[pg_test]
+    fn test_pg_guc_hook_macro_check_bool_accept() {
+        static GUC: GucSetting<i32> = GucSetting::<i32>::new(100);
+
+        #[pg_guc_hook(check)]
+        fn my_check_hook(newval: i32) -> bool {
+            newval >= 0
+        }
+
+        unsafe {
+            GucRegistry::define_int_guc_with_hooks(
+                c"test.hook_macro_check_bool_accept",
+                c"test hook macro check bool accept",
+                c"test hook macro check bool accept",
+                &GUC,
+                -100,
+                2000,
+                GucContext::Userset,
+                GucFlags::default(),
+                Some(my_check_hook),
+                None,
+                None,
+            );
+        }
+
+        Spi::run("SET test.hook_macro_check_bool_accept = 50").unwrap();
+        assert_eq!(GUC.get(), 50);
+    }
+
+    #[pg_test]
+    #[should_panic(expected = "invalid value")]
+    fn test_pg_guc_hook_macro_check_bool_reject() {
+        static GUC: GucSetting<i32> = GucSetting::<i32>::new(100);
+
+        #[pg_guc_hook(check)]
+        fn my_check_hook(newval: i32) -> bool {
+            newval >= 0
+        }
+
+        unsafe {
+            GucRegistry::define_int_guc_with_hooks(
+                c"test.hook_macro_check_bool_reject",
+                c"test hook macro check bool reject",
+                c"test hook macro check bool reject",
+                &GUC,
+                -100,
+                2000,
+                GucContext::Userset,
+                GucFlags::default(),
+                Some(my_check_hook),
+                None,
+                None,
+            );
+        }
+
+        let _ = Spi::run("SET test.hook_macro_check_bool_reject = -50");
     }
 }
