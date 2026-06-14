@@ -1,0 +1,5 @@
+comment = 'json:  Created by pgrx'
+default_version = '@CARGO_VERSION@'
+module_pathname = 'json'
+relocatable = false
+superuser = false

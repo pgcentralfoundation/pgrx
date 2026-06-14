@@ -23,7 +23,7 @@ use pgrx_sql_entity_graph::metadata::{
     ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable, array_argument_sql,
     array_return_sql,
 };
-use serde::{Serialize, Serializer};
+use serde::Serializer;
 use std::iter::FusedIterator;
 
 /** An array of some type (eg. `TEXT[]`, `int[]`)
@@ -79,15 +79,81 @@ where
 
 type ChaChaSlideImpl<T> = Box<dyn casper::ChaChaSlide<T>>;
 
-impl<'mcx, T: UnboxDatum> serde::Serialize for Array<'mcx, T>
-where
-    for<'arr> <T as UnboxDatum>::As<'arr>: Serialize,
-{
+// Serde `Serialize` impls for `Array<'mcx, T>` and `VariadicArray<'mcx, T>`.
+//
+// We cannot use a single blanket `impl<T: UnboxDatum> Serialize for Array<'mcx, T>` because of the GAT bound `UnboxDatum::As<'src> where Self: 'src`: combined with a `for<'arr>` HRTB in a blanket impl it forces `'mcx: 'static`, ruling out reference element types such as `&'mcx str` (see issue #...).  Instead we generate one `Serialize` impl per concrete element type via the macros below.
+macro_rules! impl_array_serialize_owned {
+    ($($t:ty),* $(,)?) => {
+        $(
+            impl<'mcx> serde::Serialize for Array<'mcx, $t> {
+                fn serialize<S>(
+                    &self,
+                    serializer: S,
+                ) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+                where
+                    S: Serializer,
+                {
+                    serializer.collect_seq(self.iter())
+                }
+            }
+
+            impl<'mcx> serde::Serialize for VariadicArray<'mcx, $t> {
+                fn serialize<S>(
+                    &self,
+                    serializer: S,
+                ) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+                where
+                    S: Serializer,
+                {
+                    serializer.collect_seq(self.0.iter())
+                }
+            }
+        )*
+    };
+}
+
+impl_array_serialize_owned!(
+    bool, i8, i16, i32, i64, f32, f64,
+    crate::pg_sys::Oid,
+    alloc::string::String,
+    alloc::ffi::CString,
+);
+
+// Reference element types: each gets a hand-written impl whose function body resolves
+// the GAT lifetime at the call site (no HRTB at the impl boundary).
+impl<'mcx> serde::Serialize for Array<'mcx, &'mcx str> {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
         S: Serializer,
     {
         serializer.collect_seq(self.iter())
+    }
+}
+
+impl<'mcx> serde::Serialize for VariadicArray<'mcx, &'mcx str> {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_seq(self.0.iter())
+    }
+}
+
+impl<'mcx> serde::Serialize for Array<'mcx, &'mcx [u8]> {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_seq(self.iter())
+    }
+}
+
+impl<'mcx> serde::Serialize for VariadicArray<'mcx, &'mcx [u8]> {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_seq(self.0.iter())
     }
 }
 
@@ -592,18 +658,6 @@ mod casper {
 }
 
 pub struct VariadicArray<'mcx, T>(Array<'mcx, T>);
-
-impl<'mcx, T: UnboxDatum> Serialize for VariadicArray<'mcx, T>
-where
-    for<'arr> <T as UnboxDatum>::As<'arr>: Serialize,
-{
-    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
-    where
-        S: Serializer,
-    {
-        serializer.collect_seq(self.0.iter())
-    }
-}
 
 impl<'mcx, T: UnboxDatum> VariadicArray<'mcx, T> {
     pub(crate) fn wrap_array(arr: Array<'mcx, T>) -> Self {

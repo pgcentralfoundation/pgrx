@@ -1634,6 +1634,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "json"
+version = "0.0.0"
+dependencies = [
+ "pgrx",
+ "pgrx-tests",
+ "serde_json",
+]
+
+[[package]]
 name = "lazy_static"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
