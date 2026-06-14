@@ -113,10 +113,24 @@ macro_rules! impl_array_serialize_owned {
 }
 
 impl_array_serialize_owned!(
-    bool, i8, i16, i32, i64, f32, f64,
+    bool,
+    i8,
+    i16,
+    i32,
+    i64,
+    f32,
+    f64,
     crate::pg_sys::Oid,
     alloc::string::String,
     alloc::ffi::CString,
+    crate::datetime::Date,
+    crate::datetime::Time,
+    crate::datetime::Timestamp,
+    crate::datetime::TimestampWithTimeZone,
+    crate::datetime::TimeWithTimeZone,
+    crate::datetime::Interval,
+    crate::datum::Json,
+    crate::datum::JsonB,
 );
 
 // Reference element types: each gets a hand-written impl whose function body resolves
