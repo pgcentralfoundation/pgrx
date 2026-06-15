@@ -7,15 +7,16 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::CommandExecute;
 use crate::cargo::CargoProfile;
 use crate::command::get::get_property;
 use crate::command::install::{install_extension, warn_if_pg_bench_enabled};
-use crate::manifest::{PgVersionSource, display_version_info};
+use crate::manifest::{display_version_info, PgVersionSource};
+use crate::CommandExecute;
 use cargo_toml::Manifest;
-use eyre::{WrapErr, eyre};
-use pgrx_pg_config::{PgConfig, Pgrx, get_target_dir};
+use eyre::{eyre, WrapErr};
+use pgrx_pg_config::{get_target_dir, PgConfig, Pgrx};
 use std::path::{Path, PathBuf};
+use owo_colors::OwoColorize;
 
 /// Create an installation package directory.
 #[derive(clap::Args, Debug)]
@@ -98,6 +99,9 @@ impl Package {
             self.target.as_deref(),
         )?;
 
+        if rpm(&pg_config, &package_manifest_path, out_dir.clone())? {
+            eprintln!("{} RPM package in {out_dir:?}", "     Writing".bold().green());
+        }
         Ok((out_dir, output_files))
     }
 }
@@ -163,4 +167,71 @@ pub(crate) fn build_base_path(
     target_dir.push(profile.target_subdir());
     target_dir.push(format!("{extname}-pg{pgver}"));
     Ok(target_dir)
+}
+
+fn rpm(
+    pg_config: &PgConfig,
+    manifest_path: &Path,
+    outdir: PathBuf,
+) -> eyre::Result<bool> {
+    use rpm;
+    use cargo_toml::Manifest;
+
+
+    let major_version = pg_config.major_version()?;
+    let extname = get_property(manifest_path, "extname")?
+        .ok_or(eyre!("could not determine extension name"))?;
+    let package_name=format!("{extname}-pg{major_version}");
+
+
+    let cargo_toml = Manifest::<toml::Value>::from_path_with_metadata(&manifest_path).unwrap();
+    let package = cargo_toml.package();
+    let description = package.description().unwrap_or("");
+    let license = package.license().unwrap_or("None");
+    let version = package.version(); 
+    let homepage = package.homepage().unwrap_or("");
+
+    let Some(metadata) = package.metadata.clone() else {
+        return Ok(false);
+    };
+
+    let Some(rpm_metadata) = metadata.get("rpm") else {
+        return Ok(false);
+    };
+
+    let vendor = rpm_metadata.get("vendor")
+        .and_then(|v| v.as_str())
+        .unwrap_or("Undefined");
+
+    // this is based on the PGDG packages. 
+    let dest_pgsql_dir = format!("pgsql-{major_version}");
+    let libfile=format!("{extname}.so");
+    let src_libfile_path=outdir.clone()
+        .join(pg_config.pkglibdir()?.strip_prefix("/")?)
+        .join(&libfile);
+    let dest_libfile_path=PathBuf::new().join("/usr").join(dest_pgsql_dir).join("lib").join(&libfile);
+    let libfile_options = rpm::FileOptions::new(dest_libfile_path.display().to_string()); 
+
+    let src_extdir_path=outdir.clone()
+        .join(pg_config.sharedir()?.strip_prefix("/")?)
+        .join("extension");
+    let dest_extdir_path=format!("/usr/pgsql-{major_version}/share/extension");
+    
+    let build_config = rpm::BuildConfig::default()
+        .compression(rpm::CompressionType::Gzip)
+        // TODO: fetch the timestamp of the last commit
+        .source_date(1_600_000_000);
+    let pkg = rpm::PackageBuilder::new(&package_name, version, license, "x86_64", description)
+        .using_config(build_config)
+        .with_file(src_libfile_path,libfile_options)?
+        .with_dir(src_extdir_path,dest_extdir_path,|o| o.config())?
+        .requires(rpm::Dependency::any(format!("postgresql${major_version}-server")))
+        .vendor(vendor)
+        .url(homepage)
+        // TODO: fetch the last commit
+        //.vcs("git:repo=example_repo:branch=example_branch:sha=example_sha")
+        .build()?;
+
+    let _ = pkg.write_to(outdir);
+    Ok(true)
 }

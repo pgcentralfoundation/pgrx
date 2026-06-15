@@ -70,6 +70,7 @@ uuid = { version = "1.23.2", features = ["v4"] }
 # SQL schema generation
 proc-macro2.workspace = true
 quote.workspace = true
+rpm = "0.25.1"
 [dependencies.object]
 version = "0.39.1"
 default-features = false
