@@ -13,7 +13,14 @@ use pgrx_sql_entity_graph::metadata::{
 use crate::callconv::{Arg, ArgAbi};
 use crate::nullable::Nullable;
 use crate::pg_sys;
+use core::alloc::Layout;
 use core::{marker::PhantomData, ptr::NonNull};
+
+/// Postgres's `MaxAllocSize` (1 GiB - 1). `bindgen` does not expose it
+/// (see `pgrx/src/array.rs:219`), so we mirror the definition here. Any
+/// `palloc` call exceeding this size requires `MCXT_ALLOC_HUGE`; without
+/// that flag, Postgres `ereport`s — which longjmps out of Rust frames.
+const MAX_ALLOC_SIZE: usize = 0x3fff_ffff;
 
 /// A borrowed memory context.
 #[repr(transparent)]
@@ -50,6 +57,83 @@ impl<'mcx> MemCx<'mcx> {
         NonNull::new(ptr.cast()).ok_or(OutOfMemory::new())
     }
 
+    /// Allocate a buffer matching `layout`.
+    ///
+    /// Sizes above Postgres's `MaxAllocSize` (1 GiB - 1) are rejected up
+    /// front with `OutOfMemory`. Without this guard, the underlying palloc
+    /// call would `ereport` and longjmp out of the Rust frame. For genuine
+    /// huge allocations, use [`MemCx::alloc_huge_layout`] instead.
+    ///
+    /// On PG >= 16 this uses `MemoryContextAllocAligned` for arbitrary power-of-two alignment. On earlier versions this falls back to size-only `MemoryContextAllocExtended`; callers requiring alignment greater than palloc's `MAXIMUM_ALIGNOF` (typically 8) must enforce that constraint at compile time at the type layer.
+    pub fn alloc_layout(&self, layout: Layout) -> Result<NonNull<u8>, OutOfMemory> {
+        if layout.size() > MAX_ALLOC_SIZE {
+            return Err(OutOfMemory::new());
+        }
+        self.alloc_layout_with_flags(layout, pg_sys::MCXT_ALLOC_NO_OOM as i32)
+    }
+
+    /// Like [`MemCx::alloc_layout`] but zeroes the allocation.
+    pub fn alloc_layout_zeroed(&self, layout: Layout) -> Result<NonNull<u8>, OutOfMemory> {
+        if layout.size() > MAX_ALLOC_SIZE {
+            return Err(OutOfMemory::new());
+        }
+        self.alloc_layout_with_flags(
+            layout,
+            (pg_sys::MCXT_ALLOC_NO_OOM | pg_sys::MCXT_ALLOC_ZERO) as i32,
+        )
+    }
+
+    /// Like [`MemCx::alloc_layout`] but permits sizes above `MaxAllocSize`
+    /// (1 GiB - 1), up to `MaxAllocHugeSize` (~half the address space).
+    ///
+    /// Use only when the allocation is genuinely known to be huge. The 1 GiB
+    /// cap on [`MemCx::alloc_layout`] is a deliberate sanity check that
+    /// catches sizing bugs early; opting into `_huge_` should be a
+    /// considered choice, not a routine workaround.
+    ///
+    /// Note: varlena values cannot exceed 1 GiB by design (the 4-byte
+    /// header encodes 30-bit size). Huge allocations are only useful for
+    /// Rust-side scratch buffers, not for values returned to Postgres.
+    pub fn alloc_huge_layout(&self, layout: Layout) -> Result<NonNull<u8>, OutOfMemory> {
+        self.alloc_layout_with_flags(
+            layout,
+            (pg_sys::MCXT_ALLOC_NO_OOM | pg_sys::MCXT_ALLOC_HUGE) as i32,
+        )
+    }
+
+    /// Like [`MemCx::alloc_huge_layout`] but zeroes the allocation.
+    pub fn alloc_huge_layout_zeroed(&self, layout: Layout) -> Result<NonNull<u8>, OutOfMemory> {
+        self.alloc_layout_with_flags(
+            layout,
+            (pg_sys::MCXT_ALLOC_NO_OOM | pg_sys::MCXT_ALLOC_HUGE | pg_sys::MCXT_ALLOC_ZERO) as i32,
+        )
+    }
+
+    #[inline]
+    fn alloc_layout_with_flags(
+        &self,
+        layout: Layout,
+        flags: i32,
+    ) -> Result<NonNull<u8>, OutOfMemory> {
+        let ptr = unsafe {
+            #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+            {
+                pg_sys::MemoryContextAllocAligned(
+                    self.ptr.as_ptr(),
+                    layout.size(),
+                    layout.align(),
+                    flags,
+                )
+            }
+            #[cfg(not(any(feature = "pg16", feature = "pg17", feature = "pg18")))]
+            {
+                let _ = layout.align();
+                pg_sys::MemoryContextAllocExtended(self.ptr.as_ptr(), layout.size(), flags)
+            }
+        };
+        NonNull::new(ptr.cast()).ok_or_else(OutOfMemory::new)
+    }
+
     /// Stores the current memory context, switches to *this* memory context,
     /// and executes the closure `f`.
     /// Once `f` completes, the previous current memory context is restored.
@@ -65,6 +149,42 @@ impl<'mcx> MemCx<'mcx> {
         let res = f();
         pg_sys::MemoryContextSwitchTo(remembered);
         res
+    }
+
+    /// Allocate a varlena with a valid 4-byte header and `payload_len` zeroed payload bytes. The returned [`VarlenaBuf`] maintains the header as a type invariant.
+    ///
+    /// [`VarlenaBuf`]: crate::datum::varlena_buf::VarlenaBuf
+    pub fn alloc_varlena(
+        &self,
+        payload_len: usize,
+    ) -> Result<crate::datum::varlena_buf::VarlenaBuf<'mcx>, OutOfMemory> {
+        let total = (pg_sys::VARHDRSZ).checked_add(payload_len).ok_or_else(OutOfMemory::new)?;
+        let layout = core::alloc::Layout::from_size_align(total, core::mem::align_of::<u32>())
+            .map_err(|_| OutOfMemory::new())?;
+        let raw = self.alloc_layout_zeroed(layout)?;
+        // Set the 4-byte header. The total_size encoded in the header is `total` (header bytes + payload bytes), per Postgres convention for 4-byte headers.
+        // SAFETY: `raw` points at `total` zeroed bytes, large enough for a 4-byte header.
+        unsafe {
+            crate::varlena::set_varsize_4b(raw.as_ptr() as *mut pg_sys::varlena, total as i32);
+        }
+        // SAFETY: `raw` is non-null, sized at `total`, header is now valid.
+        Ok(unsafe { crate::datum::varlena_buf::VarlenaBuf::from_raw(raw, total, self) })
+    }
+
+    /// Inspect an existing varlena pointer as a `&RawVarlena`.
+    ///
+    /// # Safety
+    /// - `ptr` must point to a valid, non-TOASTed varlena
+    /// - the header at `ptr` must have its size correctly set
+    /// - the returned reference must not outlive the underlying allocation
+    pub unsafe fn inspect_varlena<'a>(
+        &self,
+        ptr: *const pg_sys::varlena,
+    ) -> &'a crate::datum::varlena_buf::RawVarlena {
+        let total = crate::varlena::varsize_any(ptr);
+        let slice_ptr: *const [u8] = core::ptr::slice_from_raw_parts(ptr as *const u8, total);
+        let raw_ptr: *const crate::datum::varlena_buf::RawVarlena = slice_ptr as *const _;
+        &*raw_ptr
     }
 }
 

@@ -1,0 +1,5 @@
+comment = 'pbox_slice: demonstrates MemCx slice + varlena APIs'
+default_version = '@CARGO_VERSION@'
+module_pathname = '$libdir/pbox_slice'
+relocatable = false
+superuser = false
