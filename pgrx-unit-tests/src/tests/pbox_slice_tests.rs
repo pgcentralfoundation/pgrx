@@ -62,17 +62,18 @@ mod tests {
             let before = pg_sys::MemoryContextMemAllocated(parent, false);
 
             let child = PgMemoryContexts::new("pbox_slice_test_scope");
-            // Switch CMC and arm the restore guard (drops in LIFO before `child`).
-            let _restore = {
+            // Switch CMC and arm the restore guard. The guard is held in a
+            // named binding (NOT `let _ = ...`, which would drop immediately)
+            // so it lives until the end of the unsafe block, then drops in
+            // LIFO order before `child` — restoring CMC before the child
+            // context is deleted. `#[allow(unused_variables)]` silences the
+            // dead-binding lint since the guard's effect is in its Drop impl.
+            #[allow(unused_variables)]
+            let restore_guard = {
                 let previous = pg_sys::MemoryContextSwitchTo(child.value());
                 CxRestoreGuard { previous }
             };
             memcx::current_context(|cx| f(cx));
-            drop(_restore);
-
-            // Drop the owned child explicitly so MemoryContextDelete runs
-            // before we sample `after`.
-            drop(child);
 
             let after = pg_sys::MemoryContextMemAllocated(parent, false);
             assert_eq!(
@@ -202,8 +203,7 @@ mod tests {
             }
         }
         memcx::current_context(|cx| {
-            let r =
-                PBox::<[u32]>::from_iter_in(OverIter { i: 0, promised: 3 }, cx).expect("alloc");
+            let r = PBox::<[u32]>::from_iter_in(OverIter { i: 0, promised: 3 }, cx).expect("alloc");
             assert_eq!(&*r, &[0u32, 1, 2]);
         });
     }
@@ -351,8 +351,7 @@ mod tests {
     fn from_huge_iter_in_roundtrip() {
         memcx::current_context(|cx| {
             let v: Vec<i64> = (100..110).collect();
-            let dst: PBox<[i64]> =
-                PBox::from_huge_iter_in(v.iter().copied(), cx).expect("alloc");
+            let dst: PBox<[i64]> = PBox::from_huge_iter_in(v.iter().copied(), cx).expect("alloc");
             assert_eq!(&*dst, v.as_slice());
         });
     }

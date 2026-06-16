@@ -166,6 +166,8 @@ impl<'mcx, T> PBox<'mcx, [MaybeUninit<T>]> {
     }
 
     /// Zeroed counterpart of [`new_huge_uninit_slice_in`].
+    ///
+    /// [`new_huge_uninit_slice_in`]: PBox::new_huge_uninit_slice_in
     pub fn new_huge_zeroed_slice_in(len: usize, cx: &MemCx<'mcx>) -> Result<Self, OutOfMemory> {
         const { assert!(align_of::<T>() <= size_of::<pg_sys::Datum>()) };
         let layout = core::alloc::Layout::array::<T>(len).map_err(|_| OutOfMemory::new())?;
