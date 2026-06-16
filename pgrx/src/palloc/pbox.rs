@@ -115,6 +115,8 @@ impl<'mcx, T> PBox<'mcx, [MaybeUninit<T>]> {
     ///
     /// Mirrors [`alloc::boxed::Box::new_uninit_slice`] but the resulting slice is bound to the lifetime of `cx`.
     pub fn new_uninit_slice_in(len: usize, cx: &MemCx<'mcx>) -> Result<Self, OutOfMemory> {
+        // Match the alignment bound on `new_in`: palloc only guarantees `MAXIMUM_ALIGNOF` (= sizeof(Datum) = 8 on 64-bit), and on PG<16  `alloc_layout` falls back to size-only `MemoryContextAllocExtended` which silently drops `layout.align()`.
+        const { assert!(align_of::<T>() <= size_of::<pg_sys::Datum>()) };
         let layout = core::alloc::Layout::array::<T>(len).map_err(|_| OutOfMemory::new())?;
         let raw = cx.alloc_layout(layout)?;
         // SAFETY: `raw` is non-null, sized by `layout`; MaybeUninit<T> needs no initialization, so building the fat pointer over `len` elements is sound.
@@ -124,8 +126,9 @@ impl<'mcx, T> PBox<'mcx, [MaybeUninit<T>]> {
         Ok(PBox { ptr, _cx: PhantomData })
     }
 
-    /// Allocate a slice of `len` zero-initialized `T` (kept as `MaybeUninit<T>`) inside `cx`. Caller can transmute via [`assume_init`] when zero is a valid bit pattern for `T`.
+    /// Allocate a slice of `len` zero-initialized `T` (kept as `MaybeUninit<T>`) inside `cx`. Caller can transmute via [`PBox::assume_init`] when zero is a valid bit pattern for `T`.
     pub fn new_zeroed_slice_in(len: usize, cx: &MemCx<'mcx>) -> Result<Self, OutOfMemory> {
+        const { assert!(align_of::<T>() <= size_of::<pg_sys::Datum>()) };
         let layout = core::alloc::Layout::array::<T>(len).map_err(|_| OutOfMemory::new())?;
         let raw = cx.alloc_layout_zeroed(layout)?;
         // SAFETY: `raw` is non-null, sized by `layout`; MaybeUninit<T> needs no init.
@@ -143,7 +146,7 @@ impl<'mcx, T> PBox<'mcx, [MaybeUninit<T>]> {
         let p = self.ptr.as_ptr() as *mut [T];
         // SAFETY: caller upholds the init invariant; the data pointer was already non-null (it came from PBox::new_uninit_slice_in / new_zeroed_slice_in).
         let ptr = unsafe { NonNull::new_unchecked(p) };
-        // Avoid running any (non-existent) Drop on `self`.
+        // `PBox` has no Drop impl today (palloc memory is reclaimed by MemoryContext reset, not Drop), so `forget` is a no-op. Kept as a defensive forward-compatibility guard: if `Drop` is ever added, this prevents a double-free between `self` and the returned PBox.
         core::mem::forget(self);
         PBox { ptr, _cx: PhantomData }
     }
@@ -152,6 +155,7 @@ impl<'mcx, T> PBox<'mcx, [MaybeUninit<T>]> {
     ///
     /// [`new_uninit_slice_in`]: PBox::new_uninit_slice_in
     pub fn new_huge_uninit_slice_in(len: usize, cx: &MemCx<'mcx>) -> Result<Self, OutOfMemory> {
+        const { assert!(align_of::<T>() <= size_of::<pg_sys::Datum>()) };
         let layout = core::alloc::Layout::array::<T>(len).map_err(|_| OutOfMemory::new())?;
         let raw = cx.alloc_huge_layout(layout)?;
         // SAFETY: same as new_uninit_slice_in.
@@ -163,6 +167,7 @@ impl<'mcx, T> PBox<'mcx, [MaybeUninit<T>]> {
 
     /// Zeroed counterpart of [`new_huge_uninit_slice_in`].
     pub fn new_huge_zeroed_slice_in(len: usize, cx: &MemCx<'mcx>) -> Result<Self, OutOfMemory> {
+        const { assert!(align_of::<T>() <= size_of::<pg_sys::Datum>()) };
         let layout = core::alloc::Layout::array::<T>(len).map_err(|_| OutOfMemory::new())?;
         let raw = cx.alloc_huge_layout_zeroed(layout)?;
         // SAFETY: same as new_zeroed_slice_in.
@@ -196,75 +201,123 @@ impl<'mcx, T: Copy> PBox<'mcx, [T]> {
             Ok(uninit.assume_init())
         }
     }
+
+    /// Like [`from_slice_in`] but permits allocations above Postgres's 1 GiB `MaxAllocSize`. Use only for genuinely huge Rust-side scratch buffers; values returned to Postgres still cap at 1 GiB.
+    ///
+    /// [`from_slice_in`]: PBox::from_slice_in
+    pub fn from_huge_slice_in(src: &[T], cx: &MemCx<'mcx>) -> Result<Self, OutOfMemory> {
+        let mut uninit = PBox::<[MaybeUninit<T>]>::new_huge_uninit_slice_in(src.len(), cx)?;
+        // SAFETY: as `from_slice_in`.
+        unsafe {
+            let dst = (uninit.as_mut_ptr() as *mut MaybeUninit<T>).cast::<T>();
+            core::ptr::copy_nonoverlapping(src.as_ptr(), dst, src.len());
+            Ok(uninit.assume_init())
+        }
+    }
 }
 
-impl<'mcx, T> PBox<'mcx, [T]> {
+impl<'mcx, T: Copy> PBox<'mcx, [T]> {
     /// Allocate a slice of `iter.len()` elements in `cx` and write each element produced by `iter`. Requires `ExactSizeIterator` so the allocation size is known upfront with no resizing.
     ///
-    /// On panic during iteration, the initialized prefix is dropped exactly once. The underlying memory remains in `cx` until the context resets.
+    /// `T: Copy` is required to match [`from_slice_in`]: `PBox` is not dropped when it goes out of scope (the backing memory is reclaimed in bulk when the `MemCx` resets), so `Drop` impls on `T` would never run. Restricting to `Copy` makes that asymmetry impossible to express by mistake.
     ///
     /// # Errors
     ///
-    /// - `Err(OutOfMemory)` if the initial allocation fails.
-    /// - `Err(OutOfMemory)` if `iter` yields **fewer** items than its
-    ///   `ExactSizeIterator::len()` advertised. This is technically a contract violation by the iterator rather than a true OOM, but
-    ///   reusing `OutOfMemory` avoids introducing a new error type for an edge case `ExactSizeIterator` callers shouldn't hit. In this case the initialized prefix is dropped via the RAII guard before the error returns; the buffer itself stays in `cx`.
+    /// - [`FromIterError::OutOfMemory`] if the initial allocation fails.
+    /// - [`FromIterError::IteratorUnderYield`] if `iter` yields **fewer**
+    ///   items than its `ExactSizeIterator::len()` advertised. This is
+    ///   surfaced as a distinct variant (not folded into `OutOfMemory`)
+    ///   because it's an iterator-contract bug, not an allocator failure;
+    ///   callers logging or branching on OOM should not see this case
+    ///   masquerade as one. The partially-written buffer stays in `cx`
+    ///   until the context resets.
     ///
-    /// If `iter` yields **more** items than promised, the surplus items are dropped at the loop boundary and the function returns `Ok` with the first `len` elements.
-    pub fn from_iter_in<I>(iter: I, cx: &MemCx<'mcx>) -> Result<Self, OutOfMemory>
+    /// If `iter` yields **more** items than promised, the iterator is dropped immediately after the `len`-th element is written. The function then returns `Ok` with the first `len` elements.
+    ///
+    /// [`from_slice_in`]: PBox::from_slice_in
+    pub fn from_iter_in<I>(iter: I, cx: &MemCx<'mcx>) -> Result<Self, FromIterError>
     where
         I: IntoIterator<Item = T>,
         I::IntoIter: ExactSizeIterator,
     {
         let iter = iter.into_iter();
         let len = iter.len();
-        let mut uninit = PBox::<[MaybeUninit<T>]>::new_uninit_slice_in(len, cx)?;
+        let uninit = PBox::<[MaybeUninit<T>]>::new_uninit_slice_in(len, cx)
+            .map_err(|_| FromIterError::OutOfMemory)?;
+        Self::fill_from_iter(uninit, iter, len)
+    }
 
-        struct Guard<T> {
-            base: *mut T,
-            initialized: usize,
-        }
-        impl<T> Drop for Guard<T> {
-            fn drop(&mut self) {
-                if self.initialized > 0 {
-                    // SAFETY: the first `initialized` elements were written via ptr::write and are valid T.
-                    unsafe {
-                        let s = core::slice::from_raw_parts_mut(self.base, self.initialized);
-                        core::ptr::drop_in_place(s);
-                    }
-                }
-            }
-        }
+    /// Huge counterpart of [`from_iter_in`]. See [`from_huge_slice_in`] for
+    /// when to use the huge variants.
+    ///
+    /// [`from_iter_in`]: PBox::from_iter_in
+    /// [`from_huge_slice_in`]: PBox::from_huge_slice_in
+    pub fn from_huge_iter_in<I>(iter: I, cx: &MemCx<'mcx>) -> Result<Self, FromIterError>
+    where
+        I: IntoIterator<Item = T>,
+        I::IntoIter: ExactSizeIterator,
+    {
+        let iter = iter.into_iter();
+        let len = iter.len();
+        let uninit = PBox::<[MaybeUninit<T>]>::new_huge_uninit_slice_in(len, cx)
+            .map_err(|_| FromIterError::OutOfMemory)?;
+        Self::fill_from_iter(uninit, iter, len)
+    }
 
-        // Get a thin pointer to the first element of the uninit buffer.
+    fn fill_from_iter<I>(
+        mut uninit: PBox<'mcx, [MaybeUninit<T>]>,
+        iter: I,
+        len: usize,
+    ) -> Result<Self, FromIterError>
+    where
+        I: Iterator<Item = T>,
+    {
+        // Thin pointer to the first element of the uninit buffer.
         let base: *mut T = uninit.as_mut_ptr().cast::<T>();
-        let mut guard = Guard { base, initialized: 0 };
 
         let mut count = 0usize;
         for item in iter {
             if count >= len {
-                // Iterator over-yielded vs ExactSizeIterator promise. Stop here;
-                // we'll fail below since `count < len`.
+                // Iterator over-yielded vs ExactSizeIterator promise; stop here.
                 break;
             }
-            // SAFETY: `count < len`, so `base.add(count)` is in-bounds for the freshly allocated slice. The slot is uninit MaybeUninit<T>; writing a T is sound.
+            // SAFETY: `count < len`, so `base.add(count)` is in-bounds for the freshly allocated slice. The slot is uninit MaybeUninit<T>; writing a T is sound. On panic the buffer stays uninitialized — safe because `T: Copy` has no Drop and `PBox<[MaybeUninit<T>]>` has no Drop either; the memory is reclaimed when `cx` resets.
             unsafe { core::ptr::write(base.add(count), item) };
             count += 1;
-            guard.initialized = count;
         }
 
         if count < len {
-            // Iterator under-yielded. Drop the initialized prefix via Guard,
-            // and return an error. The buffer itself stays in `cx`.
-            return Err(OutOfMemory::new());
+            // Iterator under-yielded; the buffer stays in `cx` until reset.
+            return Err(FromIterError::IteratorUnderYield { promised: len, yielded: count });
         }
 
-        // All elements initialized successfully — disarm the guard and assume_init.
-        core::mem::forget(guard);
         // SAFETY: every slot in the slice was written above (count == len).
         Ok(unsafe { uninit.assume_init() })
     }
 }
+
+/// Error returned by [`PBox::from_iter_in`].
+#[derive(Debug)]
+pub enum FromIterError {
+    /// The initial slice allocation in the [`MemCx`] failed.
+    OutOfMemory,
+    /// The iterator yielded fewer items than its  [`ExactSizeIterator::len`] advertised. This indicates a buggy iterator implementation; the buffer was allocated but only partially initialized.
+    IteratorUnderYield { promised: usize, yielded: usize },
+}
+
+impl core::fmt::Display for FromIterError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            FromIterError::OutOfMemory => f.write_str("out of memory"),
+            FromIterError::IteratorUnderYield { promised, yielded } => write!(
+                f,
+                "ExactSizeIterator under-yielded: promised {promised} items, got {yielded}",
+            ),
+        }
+    }
+}
+
+impl std::error::Error for FromIterError {}
 
 unsafe impl<'mcx, T> BoxRet for PBox<'mcx, T>
 where
@@ -278,7 +331,12 @@ where
                 // SAFETY: Due to BorrowDatum, this type has a definite size less than a Datum, and PBox must have an initialized pointee, so a copy is sound-by-construction.
                 unsafe {
                     let size = size_of_val(&*self.ptr.as_ptr());
-                    debug_assert!(size <= size_of::<pg_sys::Datum>());
+                    // Hard assert (not debug_assert): a `?Sized` `BorrowDatum` whose dynamic size exceeds `Datum` would otherwise overrun the on-stack `Datum` slot via `copy_from_nonoverlapping`. Real PassBy::Value types are all `Sized` and ≤ 8 bytes today, but a future fat-pointee implementing `BorrowDatum` with `PASS = PassBy::Value` must crash, not corrupt the stack.
+                    assert!(
+                        size <= size_of::<pg_sys::Datum>(),
+                        "PBox::box_into: PassBy::Value pointee size {size} exceeds Datum size {}",
+                        size_of::<pg_sys::Datum>()
+                    );
                     // using `BorrowDatum::point_from` handles endianness
                     let datum_ptr = T::point_from(NonNull::from_mut(&mut datum).cast::<u8>());
                     datum_ptr.cast::<u8>().copy_from_nonoverlapping(self.ptr.cast(), size);

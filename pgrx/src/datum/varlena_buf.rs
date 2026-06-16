@@ -35,23 +35,28 @@
 //!
 //! See: `docs/superpowers/specs/2026-06-15-memcx-slice-varlena-parity-design.md`
 
+use crate::callconv::{BoxRet, FcInfo};
+use crate::datum::Datum;
 use crate::memcx::MemCx;
 use crate::palloc::PBox;
 use crate::pg_sys;
 use core::ptr::NonNull;
+use pgrx_sql_entity_graph::metadata::{
+    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
+};
 
-/// A `varlena` allocation with a valid 4-byte header, maintained as a type invariant.
+/// A `varlena` allocation with a valid in-line header (1-byte short or
+/// 4-byte uncompressed), maintained as a type invariant.
 ///
-/// `RawVarlena` is a DST whose in-memory representation is the full varlena byte
-/// sequence (header + payload). Safely obtainable only through
-/// [`MemCx::alloc_varlena`] (which sets the header) or [`MemCx::inspect_varlena`]
-/// (caller-asserted).
+/// Safely obtainable only through [`MemCx::alloc_varlena`] (always emits a
+/// 4-byte header) or [`MemCx::inspect_varlena`] (caller-asserted; rejects
+/// TOAST/compressed varlenas at runtime).
 ///
 /// # Layout
 ///
-/// `#[repr(transparent)]` over `[u8]`. The header is at byte offset 0; payload
-/// starts at offset `VARHDRSZ` (= 4). The total length matches the header's
-/// stored size.
+/// `#[repr(transparent)]` over `[u8]`. Header sits at byte offset 0; payload
+/// starts at offset 1 (short header) or 4 (full header). The total byte
+/// length matches what `varsize_any` returns for the header.
 #[repr(transparent)]
 pub struct RawVarlena {
     bytes: [u8],
@@ -60,17 +65,29 @@ pub struct RawVarlena {
 impl RawVarlena {
     /// Total size in bytes (header + payload), as recorded in the header.
     pub fn total_size(&self) -> usize {
-        // SAFETY: type invariant — header at offset 0 is a valid 4-byte varlena header.
+        // SAFETY: type invariant — header is a valid in-line varlena header(4-byte uncompressed or 1-byte short; TOAST/compressed rejected at construction).
         unsafe { crate::varlena::varsize_any(self.as_ptr()) }
+    }
+
+    /// Byte offset of the payload from the start of the allocation, derived from the header type (1 for short header, 4 for full header).
+    #[inline]
+    fn header_size(&self) -> usize {
+        // SAFETY: invariant — header is in-line; non-1B_E.
+        if unsafe { crate::varlena::varatt_is_1b(self.as_ptr()) } {
+            pg_sys::VARHDRSZ_SHORT
+        } else {
+            pg_sys::VARHDRSZ
+        }
     }
 
     /// Read-only access to the payload bytes (excludes the header).
     pub fn payload(&self) -> &[u8] {
+        let hdr = self.header_size();
         let total = self.total_size();
-        let hdr = pg_sys::VARHDRSZ;
-        let payload_len = total.checked_sub(hdr).expect("corrupt varlena: total < VARHDRSZ");
-        // SAFETY: payload starts at offset VARHDRSZ; `checked_sub` above rules out
-        // an underflowed length on a corrupt header (release-mode UB guard).
+
+        let payload_len =
+            total.checked_sub(hdr).expect("RawVarlena invariant: total_size >= header_size");
+        // SAFETY: payload starts at `hdr` bytes past the allocation start; the type invariant guarantees the allocation is at least `total` bytes.
         unsafe {
             core::slice::from_raw_parts((self as *const Self as *const u8).add(hdr), payload_len)
         }
@@ -79,12 +96,11 @@ impl RawVarlena {
     /// Mutable access to the payload bytes. Cannot be used to grow or shrink:
     /// the header (and therefore `total_size`) is unchanged.
     pub fn payload_mut(&mut self) -> &mut [u8] {
+        let hdr = self.header_size();
         let total = self.total_size();
-        let hdr = pg_sys::VARHDRSZ;
-        let payload_len = total.checked_sub(hdr).expect("corrupt varlena: total < VARHDRSZ");
-        // SAFETY: payload starts at offset VARHDRSZ; `checked_sub` above rules out
-        // an underflowed length on a corrupt header. We hold `&mut self`, so the
-        // borrow is exclusive.
+        let payload_len =
+            total.checked_sub(hdr).expect("RawVarlena invariant: total_size >= header_size");
+        // SAFETY: as `payload`; exclusive access via `&mut self`.
         unsafe {
             core::slice::from_raw_parts_mut((self as *mut Self as *mut u8).add(hdr), payload_len)
         }
@@ -158,18 +174,8 @@ impl<'mcx> VarlenaBuf<'mcx> {
 
 // --- Returning `PBox<RawVarlena>` directly from a `#[pg_extern]` -----------
 //
-// `RawVarlena` deliberately does NOT implement `BorrowDatum` (it has no
-// fixed in-Datum representation: a varlena is always pass-by-reference and
-// its size is header-driven). The blanket `BoxRet`/`SqlTranslatable` impls
-// for `PBox<T: BorrowDatum>` in `palloc/pbox.rs` therefore do not cover it,
-// and we add specific impls here.
-
-use crate::callconv::{BoxRet, FcInfo};
-use crate::datum::Datum;
-use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
-};
-
+// `RawVarlena` deliberately does NOT implement `BorrowDatum` (it has no fixed in-Datum representation: a varlena is always pass-by-reference and its size is header-driven). The blanket `BoxRet`/`SqlTranslatable` impls for `PBox<T: BorrowDatum>` in `palloc/pbox.rs` therefore do not cover it.
+///
 /// Returning a `PBox<'mcx, RawVarlena>` from a `#[pg_extern]` hands the
 /// underlying varlena pointer to Postgres unchanged. No copy: the
 /// allocation stays in the caller's `MemCx` and is reclaimed on context

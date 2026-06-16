@@ -8,9 +8,20 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! `pbox_slice` — demonstrates `MemCx::alloc_varlena` returning a
-//! `PBox<RawVarlena>` directly to Postgres (no intermediate `Vec<u8>`),
-//! plus the `PBox<[T]>` slice constructors used as in-context scratch buffers.
+//! `pbox_slice` — a *teaching* extension showing how `MemCx::alloc_varlena`
+//! and `PBox<RawVarlena>` enable zero-copy bytea outputs in real workloads.
+//!
+//! The example shape is a *minimal vector-embedding store*: pack/unpack
+//! `float[]` to a binary `bytea` representation (4 bytes per dimension,
+//! native endian — same convention as pgvector's `vector` type) and
+//! provide the distance / arithmetic primitives a small RAG or k-NN
+//! search application would actually run.
+//!
+//! For production vector workloads use [pgvector]; this crate exists to
+//! demonstrate the `MemCx` / `PBox<RawVarlena>` API surface in code that
+//! mirrors a real use case rather than a synthetic benchmark.
+//!
+//! [pgvector]: https://github.com/pgvector/pgvector
 
 use pgrx::datum::varlena_buf::{RawVarlena, VarlenaBuf};
 use pgrx::memcx::MemCx;
@@ -19,7 +30,9 @@ use pgrx::prelude::*;
 
 pgrx::pg_module_magic!(name, version);
 
-/// Build a bytea of the requested length, filled with a `(i % 256)` pattern, allocated directly in the caller's `MemCx`. Returning `PBox<RawVarlena>` hands the varlena to Postgres without an extra Rust-side `Vec<u8>`.
+const F32_BYTES: usize = core::mem::size_of::<f32>();
+
+/// Smoke-test fixture: build a bytea of the requested length filled with a `(i % 256)` byte pattern. Useful for SQL-level smoke tests that don't need a real embedding shape.
 #[pg_extern]
 fn build_bytea<'mcx>(len: i32, cx: &MemCx<'mcx>) -> PBox<'mcx, RawVarlena> {
     let n = len.max(0) as usize;
@@ -30,46 +43,234 @@ fn build_bytea<'mcx>(len: i32, cx: &MemCx<'mcx>) -> PBox<'mcx, RawVarlena> {
     buf.into_pbox()
 }
 
-/// Bytewise XOR of two byteas, truncated to the shorter length. Output is
-/// allocated once at the exact final size — no intermediate `Vec<u8>`.
+/// Pack a SQL `real[]` into a binary embedding (4 bytes per dimension, native endian). NULL elements are encoded as `0.0`.
+///
+/// The output layout matches the convention used by pgvector's `vector` type and is what an external embedder service would typically write to disk for compact storage.
 #[pg_extern]
-fn xor_bytea<'mcx>(a: &[u8], b: &[u8], cx: &MemCx<'mcx>) -> PBox<'mcx, RawVarlena> {
-    let len = a.len().min(b.len());
-    let mut buf = cx.alloc_varlena(len).expect("OOM");
+fn embedding_pack<'mcx>(coords: Array<'mcx, f32>, cx: &MemCx<'mcx>) -> PBox<'mcx, RawVarlena> {
+    let n = coords.len();
+    let mut buf = cx.alloc_varlena(n.saturating_mul(F32_BYTES)).expect("OOM");
     let dst = buf.payload_mut();
-    for i in 0..len {
-        dst[i] = a[i] ^ b[i];
+    for (i, v) in coords.iter().enumerate() {
+        let bytes = v.unwrap_or(0.0).to_ne_bytes();
+        dst[i * F32_BYTES..(i + 1) * F32_BYTES].copy_from_slice(&bytes);
     }
     buf.into_pbox()
 }
 
-/// Pack a SQL `int[]` into a little-endian binary bytea (4 bytes per element).
-/// NULLs are encoded as zero. Demonstrates exact-size varlena allocation and in-place structured writes for binary-protocol-style serialization.
+/// Number of dimensions stored in a packed embedding. Returns `-1` if the byte length is not a multiple of `sizeof(f32)`, which signals a corrupted or wrong-typed payload.
 #[pg_extern]
-fn pack_i32_array<'mcx>(arr: Array<'_, i32>, cx: &MemCx<'mcx>) -> PBox<'mcx, RawVarlena> {
-    let n = arr.len();
-    let mut buf = cx.alloc_varlena(n * 4).expect("OOM");
+fn embedding_dims(emb: &[u8]) -> i32 {
+    if emb.len() % F32_BYTES != 0 { -1 } else { (emb.len() / F32_BYTES) as i32 }
+}
+
+/// Squared L2 (Euclidean) distance. Skips the sqrt because ordering by distance only needs the monotonic transform — the standard optimization in nearest-neighbour search.
+///
+/// Returns `NaN` if the two embeddings have different dimensions.
+#[pg_extern]
+fn embedding_l2_squared(a: &[u8], b: &[u8]) -> f64 {
+    let (av, bv) = match decode_pair(a, b) {
+        Some(p) => p,
+        None => return f64::NAN,
+    };
+
+    av.iter()
+        .zip(bv.iter())
+        .map(|(&x, &y)| {
+            let d = (x - y) as f64;
+            d * d
+        })
+        .sum()
+}
+
+/// Dot product. For unit-length embeddings this equals cosine similarity.
+/// Returns `NaN` on dimension mismatch.
+#[pg_extern]
+fn embedding_dot(a: &[u8], b: &[u8]) -> f64 {
+    let (av, bv) = match decode_pair(a, b) {
+        Some(p) => p,
+        None => return f64::NAN,
+    };
+    av.iter().zip(bv.iter()).map(|(&x, &y)| x as f64 * y as f64).sum()
+}
+
+/// Cosine similarity (dot product over product of magnitudes). Returns `NaN` on dimension mismatch or when either embedding has zero norm.
+#[pg_extern]
+fn embedding_cosine(a: &[u8], b: &[u8]) -> f64 {
+    let (av, bv) = match decode_pair(a, b) {
+        Some(p) => p,
+        None => return f64::NAN,
+    };
+    let mut dot = 0.0;
+    let mut na = 0.0;
+    let mut nb = 0.0;
+    for (&x, &y) in av.iter().zip(bv.iter()) {
+        let xf = x as f64;
+        let yf = y as f64;
+        dot += xf * yf;
+        na += xf * xf;
+        nb += yf * yf;
+    }
+    if na == 0.0 || nb == 0.0 { f64::NAN } else { dot / (na.sqrt() * nb.sqrt()) }
+}
+
+/// Element-wise mean of two equal-dimension embeddings. Useful for simple ensembling, smoothing, or computing centroids without a full aggregate. Returns a zero-length bytea on dimension mismatch.
+#[pg_extern]
+fn embedding_mean<'mcx>(a: &[u8], b: &[u8], cx: &MemCx<'mcx>) -> PBox<'mcx, RawVarlena> {
+    let (av, bv) = match decode_pair(a, b) {
+        Some(p) => p,
+        None => return cx.alloc_varlena(0).expect("OOM").into_pbox(),
+    };
+    let n = av.len();
+    let mut buf = cx.alloc_varlena(n.saturating_mul(F32_BYTES)).expect("OOM");
     let dst = buf.payload_mut();
-    for (i, v) in arr.iter().enumerate() {
-        let bytes = v.unwrap_or(0).to_le_bytes();
-        dst[i * 4..(i + 1) * 4].copy_from_slice(&bytes);
+    for i in 0..n {
+        let m = (av[i] + bv[i]) * 0.5;
+        dst[i * F32_BYTES..(i + 1) * F32_BYTES].copy_from_slice(&m.to_ne_bytes());
     }
     buf.into_pbox()
 }
 
-/// Apply `rounds` of a byte-rotating transformation to `data`. Uses a `PBox<[u8]>` scratch buffer allocated in `cx` (not a Rust `Vec<u8>`), then copies the final state into a `VarlenaBuf` for return. Demonstrates pairing the slice and varlena APIs in one function.
+/// L2-normalize an embedding to unit length. Common preprocessing step that lets downstream cosine similarity be expressed as a plain dot product (faster). Returns a zero-length bytea if the input has zero norm or invalid layout.
 #[pg_extern]
-fn hash_chain<'mcx>(data: &[u8], rounds: i32, cx: &MemCx<'mcx>) -> PBox<'mcx, RawVarlena> {
-    let rounds = rounds.max(0) as u32;
-    let mut scratch: PBox<[u8]> = PBox::from_slice_in(data, cx).expect("OOM");
-    for _ in 0..rounds {
-        for b in scratch.iter_mut() {
-            *b = b.wrapping_add(1);
+fn embedding_normalize<'mcx>(emb: &[u8], cx: &MemCx<'mcx>) -> PBox<'mcx, RawVarlena> {
+    let v = match decode(emb) {
+        Some(v) => v,
+        None => return cx.alloc_varlena(0).expect("OOM").into_pbox(),
+    };
+    let norm: f32 = v.iter().map(|&x| (x as f64) * (x as f64)).sum::<f64>().sqrt() as f32;
+    if norm == 0.0 {
+        return cx.alloc_varlena(0).expect("OOM").into_pbox();
+    }
+    let mut buf = cx.alloc_varlena(v.len().saturating_mul(F32_BYTES)).expect("OOM");
+    let dst = buf.payload_mut();
+    for (i, &x) in v.iter().enumerate() {
+        let n = x / norm;
+        dst[i * F32_BYTES..(i + 1) * F32_BYTES].copy_from_slice(&n.to_ne_bytes());
+    }
+    buf.into_pbox()
+}
+
+/// Decode a packed embedding into a `Vec<f32>`, or `None` on invalid layout.
+/// Copies element-by-element via `from_ne_bytes` because the bytea payload is only 1-byte aligned, so a zero-copy `&[f32]` reinterpret would be unsound.
+fn decode(emb: &[u8]) -> Option<Vec<f32>> {
+    if emb.len() % F32_BYTES != 0 {
+        return None;
+    }
+    let n = emb.len() / F32_BYTES;
+    let mut out = Vec::with_capacity(n);
+    for i in 0..n {
+        let mut buf = [0u8; F32_BYTES];
+        buf.copy_from_slice(&emb[i * F32_BYTES..(i + 1) * F32_BYTES]);
+        out.push(f32::from_ne_bytes(buf));
+    }
+    Some(out)
+}
+
+fn decode_pair(a: &[u8], b: &[u8]) -> Option<(Vec<f32>, Vec<f32>)> {
+    let av = decode(a)?;
+    let bv = decode(b)?;
+    if av.len() != bv.len() || av.is_empty() {
+        return None;
+    }
+    Some((av, bv))
+}
+
+/// # Memory-context discipline for zero-copy varlena builders
+///
+/// 1. Final accumulator → `cx.alloc_varlena(...)` in the caller's MemCx; survives function return.
+/// 2. Per-row scratch → `from_iter_in(.., child_cx)` against a child MemCx that we delete before returning. All scratch freed in O(1).
+/// 3. The borrow checker enforces the split: the scratch `PBox<[f32]>` has lifetime `'child_mcx` (shorter than `'mcx`) and **cannot escape** into the return value. See the compile_fail block below.
+///
+/// ```compile_fail
+/// // Pseudocode — what Rust rejects when you try to leak scratch:
+/// fn cannot_leak<'mcx>(cx: &pgrx::memcx::MemCx<'mcx>)
+///     -> pgrx::palloc::PBox<'mcx, [f32]>
+/// {
+///     unsafe {
+///         let child = pgrx::PgMemoryContexts::new("scratch");
+///         let _prev = pgrx::pg_sys::MemoryContextSwitchTo(child.value());
+///         let smuggled = pgrx::memcx::current_context(|child_cx| {
+///             pgrx::palloc::PBox::from_iter_in([1.0f32].into_iter(), child_cx)
+///                 .unwrap()
+///         });
+///         pgrx::pg_sys::MemoryContextSwitchTo(_prev);
+///         smuggled  // lifetime may not live long enough
+///     }
+/// }
+/// ```
+#[pg_extern]
+fn embedding_seq_mean<'mcx>(
+    sequence: &[u8],
+    dims: i32,
+    cx: &MemCx<'mcx>,
+) -> PBox<'mcx, RawVarlena> {
+    let dims = dims.max(0) as usize;
+    let stride = dims.saturating_mul(F32_BYTES);
+    if stride == 0 || sequence.len() % stride != 0 {
+        return cx.alloc_varlena(0).expect("OOM").into_pbox();
+    }
+    let n = sequence.len() / stride;
+    if n == 0 {
+        return cx.alloc_varlena(0).expect("OOM").into_pbox();
+    }
+
+    // Final accumulator — lives in caller's MemCx, returned to PG, alloc_varlena already zeroes the payload.
+    let mut acc_buf = cx.alloc_varlena(stride).expect("OOM");
+
+    // Scratch path — child memory context, deleted before return.
+    //
+    // Panic-safety: `child` (PgMemoryContexts::Owned) deletes the underlying context in its `Drop`, and the `CxRestoreGuard` below restores the previous `CurrentMemoryContext` in its `Drop`. The guard is declared AFTER `child`, so on unwind it drops first (LIFO) — first the parent CMC is restored, then the child context is deleted. Either way (normal return or panic) `CurrentMemoryContext` is left exactly as we found it.
+    struct CxRestoreGuard {
+        previous: pg_sys::MemoryContext,
+    }
+    impl Drop for CxRestoreGuard {
+        fn drop(&mut self) {
+            // SAFETY: `previous` was the value of CurrentMemoryContext at the time we switched away; restoring it cannot fail.
+            unsafe {
+                pg_sys::MemoryContextSwitchTo(self.previous);
+            }
         }
     }
-    let mut out = cx.alloc_varlena(scratch.len()).expect("OOM");
-    out.payload_mut().copy_from_slice(&scratch);
-    out.into_pbox()
+
+    let child = pgrx::PgMemoryContexts::new("embedding_seq_mean_scratch");
+    let _restore = unsafe {
+        let previous = pg_sys::MemoryContextSwitchTo(child.value());
+        CxRestoreGuard { previous }
+    };
+
+    pgrx::memcx::current_context(|child_cx| {
+        let inv_n = 1.0f32 / (n as f32);
+        for i in 0..n {
+            let row = &sequence[i * stride..(i + 1) * stride];
+
+            // from_iter_in: build a PBox<[f32]> in child_cx straight from an ExactSizeIterator. No MaybeUninit  wrangling, no raw pointer writes.
+            // This PBox cannot outlive child_cx — borrow checker  blocks any attempt to return it from the closure.
+            let scratch: PBox<[f32]> = PBox::from_iter_in(
+                (0..dims).map(|d| {
+                    let off = d * F32_BYTES;
+                    let mut buf = [0u8; F32_BYTES];
+                    buf.copy_from_slice(&row[off..off + F32_BYTES]);
+                    f32::from_ne_bytes(buf)
+                }),
+                child_cx,
+            )
+            .expect("OOM");
+
+            // Borrow scratch (Deref<[f32]>) and accumulate into the output buffer (which lives in the OUTER cx).
+            let acc_bytes = acc_buf.payload_mut();
+            for (d, &v) in scratch.iter().enumerate() {
+                let off = d * F32_BYTES;
+                let mut buf = [0u8; F32_BYTES];
+                buf.copy_from_slice(&acc_bytes[off..off + F32_BYTES]);
+                let acc_v = f32::from_ne_bytes(buf) + v * inv_n;
+                acc_bytes[off..off + F32_BYTES].copy_from_slice(&acc_v.to_ne_bytes());
+            }
+            // `scratch` falls out of scope here; its bytes stay in the child context until the bulk delete below.
+        }
+    });
+
+    acc_buf.into_pbox()
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -84,78 +285,187 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_build_bytea_pattern() {
-        // First 4 bytes of build_bytea(4) should be 0x00, 0x01, 0x02, 0x03.
-        let r = Spi::get_one::<Vec<u8>>("SELECT build_bytea(4)::bytea");
-        assert_eq!(r, Ok(Some(vec![0u8, 1, 2, 3])));
-    }
-
-    #[pg_test]
-    fn test_build_bytea_zero_length() {
-        let r = Spi::get_one::<i32>("SELECT length(build_bytea(0))");
-        assert_eq!(r, Ok(Some(0)));
-    }
-
-    #[pg_test]
-    fn test_xor_bytea_basic() {
-        // 0xFF XOR 0x0F = 0xF0; 0xAA XOR 0x55 = 0xFF.
-        let r = Spi::get_one::<Vec<u8>>(r"SELECT xor_bytea('\xffaa'::bytea, '\x0f55'::bytea)");
-        assert_eq!(r, Ok(Some(vec![0xf0u8, 0xff])));
-    }
-
-    #[pg_test]
-    fn test_xor_bytea_truncates_to_shorter() {
-        // 3-byte input XOR 5-byte input yields 3-byte output.
+    fn test_pack_dims() {
         let r = Spi::get_one::<i32>(
-            r"SELECT length(xor_bytea('\x010203'::bytea, '\x0405060708'::bytea))",
+            "SELECT embedding_dims(embedding_pack(ARRAY[1.0, 2.0, 3.0]::real[]))",
         );
         assert_eq!(r, Ok(Some(3)));
     }
 
     #[pg_test]
-    fn test_xor_bytea_self_is_zero() {
-        let r =
-            Spi::get_one::<Vec<u8>>(r"SELECT xor_bytea('\xdeadbeef'::bytea, '\xdeadbeef'::bytea)");
-        assert_eq!(r, Ok(Some(vec![0u8, 0, 0, 0])));
+    fn test_pack_byte_length() {
+        // 3 dims × 4 bytes = 12.
+        let r = Spi::get_one::<i32>("SELECT length(embedding_pack(ARRAY[1.0, 2.0, 3.0]::real[]))");
+        assert_eq!(r, Ok(Some(12)));
     }
 
     #[pg_test]
-    fn test_pack_i32_array_length() {
-        let r = Spi::get_one::<i32>("SELECT length(pack_i32_array(ARRAY[1,2,3,4]::int[]))");
-        assert_eq!(r, Ok(Some(16))); // 4 elems * 4 bytes
+    fn test_dims_invalid_layout() {
+        // 5 bytes is not a multiple of 4 — invalid embedding.
+        let r = Spi::get_one::<i32>(r"SELECT embedding_dims('\x0102030405'::bytea)");
+        assert_eq!(r, Ok(Some(-1)));
     }
 
     #[pg_test]
-    fn test_pack_i32_array_little_endian() {
-        // 1_i32 in LE = 01 00 00 00; 256_i32 in LE = 00 01 00 00.
-        let r = Spi::get_one::<Vec<u8>>("SELECT pack_i32_array(ARRAY[1, 256]::int[])::bytea");
-        assert_eq!(r, Ok(Some(vec![1u8, 0, 0, 0, 0, 1, 0, 0])));
+    fn test_l2_self_distance_is_zero() {
+        let r = Spi::get_one::<f64>(
+            "SELECT embedding_l2_squared(
+                embedding_pack(ARRAY[1.0, 2.0, 3.0]::real[]),
+                embedding_pack(ARRAY[1.0, 2.0, 3.0]::real[]))",
+        );
+        assert_eq!(r, Ok(Some(0.0)));
     }
 
     #[pg_test]
-    fn test_pack_i32_array_null_as_zero() {
-        let r = Spi::get_one::<Vec<u8>>("SELECT pack_i32_array(ARRAY[NULL, 1]::int[])::bytea");
-        assert_eq!(r, Ok(Some(vec![0u8, 0, 0, 0, 1, 0, 0, 0])));
+    fn test_l2_known_distance() {
+        // ||(0,0) - (3,4)||^2 = 9 + 16 = 25
+        let r = Spi::get_one::<f64>(
+            "SELECT embedding_l2_squared(
+                embedding_pack(ARRAY[0.0, 0.0]::real[]),
+                embedding_pack(ARRAY[3.0, 4.0]::real[]))",
+        );
+        assert_eq!(r, Ok(Some(25.0)));
     }
 
     #[pg_test]
-    fn test_hash_chain_zero_rounds_is_identity() {
-        let r = Spi::get_one::<Vec<u8>>(r"SELECT hash_chain('\x010203'::bytea, 0)");
-        assert_eq!(r, Ok(Some(vec![1u8, 2, 3])));
+    fn test_l2_dim_mismatch_is_nan() {
+        let r = Spi::get_one::<f64>(
+            "SELECT embedding_l2_squared(
+                embedding_pack(ARRAY[1.0, 2.0]::real[]),
+                embedding_pack(ARRAY[1.0, 2.0, 3.0]::real[]))",
+        );
+        assert!(r.unwrap().unwrap().is_nan());
     }
 
     #[pg_test]
-    fn test_hash_chain_adds_rounds() {
-        // Each round increments every byte. 5 rounds on [0x00] = [0x05].
-        let r = Spi::get_one::<Vec<u8>>(r"SELECT hash_chain('\x00'::bytea, 5)");
-        assert_eq!(r, Ok(Some(vec![5u8])));
+    fn test_dot_product() {
+        // (1,2,3) · (4,5,6) = 4 + 10 + 18 = 32
+        let r = Spi::get_one::<f64>(
+            "SELECT embedding_dot(
+                embedding_pack(ARRAY[1.0, 2.0, 3.0]::real[]),
+                embedding_pack(ARRAY[4.0, 5.0, 6.0]::real[]))",
+        );
+        assert_eq!(r, Ok(Some(32.0)));
     }
 
     #[pg_test]
-    fn test_hash_chain_wraps() {
-        // 256 rounds on any byte returns the same byte (wrap_add).
-        let r = Spi::get_one::<Vec<u8>>(r"SELECT hash_chain('\xab'::bytea, 256)");
-        assert_eq!(r, Ok(Some(vec![0xabu8])));
+    fn test_cosine_orthogonal_is_zero() {
+        let r = Spi::get_one::<f64>(
+            "SELECT embedding_cosine(
+                embedding_pack(ARRAY[1.0, 0.0]::real[]),
+                embedding_pack(ARRAY[0.0, 1.0]::real[]))",
+        );
+        assert_eq!(r, Ok(Some(0.0)));
+    }
+
+    #[pg_test]
+    fn test_cosine_parallel_is_one() {
+        let r = Spi::get_one::<f64>(
+            "SELECT embedding_cosine(
+                embedding_pack(ARRAY[1.0, 2.0, 3.0]::real[]),
+                embedding_pack(ARRAY[2.0, 4.0, 6.0]::real[]))",
+        );
+        // floating point: equal direction → 1.0 within fp precision.
+        let v = r.unwrap().unwrap();
+        assert!((v - 1.0).abs() < 1e-6, "got {}", v);
+    }
+
+    #[pg_test]
+    fn test_cosine_zero_vector_is_nan() {
+        let r = Spi::get_one::<f64>(
+            "SELECT embedding_cosine(
+                embedding_pack(ARRAY[0.0, 0.0]::real[]),
+                embedding_pack(ARRAY[1.0, 2.0]::real[]))",
+        );
+        assert!(r.unwrap().unwrap().is_nan());
+    }
+
+    #[pg_test]
+    fn test_mean_simple() {
+        // mean of (1,2) and (3,4) is (2,3) → packed as 8 bytes
+        let r = Spi::get_one::<i32>(
+            "SELECT length(embedding_mean(
+                embedding_pack(ARRAY[1.0, 2.0]::real[]),
+                embedding_pack(ARRAY[3.0, 4.0]::real[])))",
+        );
+        assert_eq!(r, Ok(Some(8)));
+    }
+
+    #[pg_test]
+    fn test_mean_value_check() {
+        // L2² of mean against expected (2,3) should be 0.
+        let r = Spi::get_one::<f64>(
+            "SELECT embedding_l2_squared(
+                embedding_mean(
+                    embedding_pack(ARRAY[1.0, 2.0]::real[]),
+                    embedding_pack(ARRAY[3.0, 4.0]::real[])),
+                embedding_pack(ARRAY[2.0, 3.0]::real[]))",
+        );
+        let v = r.unwrap().unwrap();
+        assert!(v < 1e-6, "expected ~0, got {}", v);
+    }
+
+    #[pg_test]
+    fn test_normalize_unit_length() {
+        // After normalize, dot(v,v) ≈ 1.
+        let r = Spi::get_one::<f64>(
+            "SELECT embedding_dot(
+                embedding_normalize(embedding_pack(ARRAY[3.0, 4.0]::real[])),
+                embedding_normalize(embedding_pack(ARRAY[3.0, 4.0]::real[])))",
+        );
+        let v = r.unwrap().unwrap();
+        assert!((v - 1.0).abs() < 1e-5, "got {}", v);
+    }
+
+    #[pg_test]
+    fn test_normalize_zero_vector_returns_empty() {
+        let r = Spi::get_one::<i32>(
+            "SELECT length(embedding_normalize(embedding_pack(ARRAY[0.0, 0.0]::real[])))",
+        );
+        assert_eq!(r, Ok(Some(0)));
+    }
+
+    // ─── Memory-context demo tests ───────────────────────────────────────────
+
+    #[pg_test]
+    fn test_seq_mean_single_row_is_identity() {
+        // n=1: mean of one embedding equals itself.
+        let r = Spi::get_one::<f64>(
+            "SELECT embedding_l2_squared(
+                embedding_seq_mean(embedding_pack(ARRAY[1.0, 2.0, 3.0]::real[]), 3),
+                embedding_pack(ARRAY[1.0, 2.0, 3.0]::real[]))",
+        );
+        let v = r.unwrap().unwrap();
+        assert!(v < 1e-6, "expected ~0, got {}", v);
+    }
+
+    #[pg_test]
+    fn test_seq_mean_two_rows() {
+        // Concatenate (1,2) and (3,4); mean should be (2,3).
+        let r = Spi::get_one::<f64>(
+            "SELECT embedding_l2_squared(
+                embedding_seq_mean(
+                    embedding_pack(ARRAY[1.0, 2.0]::real[])
+                    || embedding_pack(ARRAY[3.0, 4.0]::real[]),
+                    2),
+                embedding_pack(ARRAY[2.0, 3.0]::real[]))",
+        );
+        let v = r.unwrap().unwrap();
+        assert!(v < 1e-6, "expected ~0, got {}", v);
+    }
+
+    #[pg_test]
+    fn test_seq_mean_invalid_dims() {
+        let r = Spi::get_one::<i32>(
+            "SELECT length(embedding_seq_mean(embedding_pack(ARRAY[1.0, 2.0]::real[]), 0))",
+        );
+        assert_eq!(r, Ok(Some(0)));
+    }
+
+    #[pg_test]
+    fn test_seq_mean_misaligned_input() {
+        let r = Spi::get_one::<i32>(r"SELECT length(embedding_seq_mean('\x010203'::bytea, 2))");
+        assert_eq!(r, Ok(Some(0)));
     }
 }
 
