@@ -1,0 +1,5 @@
+comment = 'pglz_inspect: PGLZ compression analysis for DBAs'
+default_version = '@CARGO_VERSION@'
+module_pathname = 'pglz_inspect'
+relocatable = false
+superuser = false

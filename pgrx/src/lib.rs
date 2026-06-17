@@ -69,6 +69,7 @@ pub mod nullable;
 pub mod palloc;
 pub mod pg_catalog;
 pub mod pgbox;
+pub mod pglz;
 pub mod rel;
 pub mod shmem;
 pub mod spi;

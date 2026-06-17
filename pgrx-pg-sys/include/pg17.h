@@ -93,6 +93,7 @@
 #include "commands/vacuum.h"
 #include "common/config_info.h"
 #include "common/controldata_utils.h"
+#include "common/pg_lzcompress.h"
 #include "executor/execExpr.h"
 #include "executor/executor.h"
 #include "executor/spi.h"

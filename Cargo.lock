@@ -2177,6 +2177,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "pglz_inspect"
+version = "0.0.0"
+dependencies = [
+ "pgrx",
+ "pgrx-tests",
+]
+
+[[package]]
 name = "pgrx"
 version = "0.18.1"
 dependencies = [
