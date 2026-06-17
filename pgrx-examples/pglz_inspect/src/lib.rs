@@ -8,8 +8,10 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-use pgrx::pglz::{Pglz, Strategy};
+use crate::pglz::Strategy;
 use pgrx::prelude::*;
+
+mod pglz;
 
 pgrx::pg_module_magic!(name, version);
 
@@ -57,7 +59,7 @@ fn pglz_size(
     (name!(raw_bytes, i32), name!(compressed_bytes, i32), name!(ratio, f64), name!(accepted, bool)),
 > {
     let raw = input.len() as i32;
-    let (compressed, ratio, accepted) = match Pglz::compress(input, Strategy::Default) {
+    let (compressed, ratio, accepted) = match pglz::compress(input, Strategy::Default) {
         Ok(Some(c)) => {
             let clen = c.len() as i32;
             let r = if raw == 0 { 0.0 } else { clen as f64 / raw as f64 };
@@ -111,11 +113,12 @@ fn pglz_analyze_column(
             let Some(bytes) = bytes else { continue };
             sampled += 1;
             total_raw += bytes.len() as u128;
-            let cap = Pglz::max_output(bytes.len());
-            if scratch.len() < cap {
-                scratch.resize(cap, 0);
+            let cap = pglz::max_output(bytes.len());
+            if scratch.capacity() < cap {
+                scratch.reserve_exact(cap - scratch.len());
             }
-            match Pglz::compress_into(&bytes, &mut scratch[..cap], strat) {
+            let spare = &mut scratch.spare_capacity_mut()[..cap];
+            match pglz::compress_into(&bytes, spare, strat) {
                 Ok(Some(n)) => {
                     accepted += 1;
                     total_comp += n as u128;
@@ -193,11 +196,12 @@ fn pglz_ratio_histogram(
         for row in tup {
             let bytes: Option<Vec<u8>> = row.get(1).ok().flatten();
             let Some(bytes) = bytes else { continue };
-            let cap = Pglz::max_output(bytes.len());
-            if scratch.len() < cap {
-                scratch.resize(cap, 0);
+            let cap = pglz::max_output(bytes.len());
+            if scratch.capacity() < cap {
+                scratch.reserve_exact(cap - scratch.len());
             }
-            match Pglz::compress_into(&bytes, &mut scratch[..cap], Strategy::Default) {
+            let spare = &mut scratch.spare_capacity_mut()[..cap];
+            match pglz::compress_into(&bytes, spare, Strategy::Default) {
                 Ok(Some(n)) => {
                     let ratio = if bytes.is_empty() { 1.0 } else { n as f64 / bytes.len() as f64 };
                     let idx = ((ratio * 5.0).floor() as usize).min(4);
@@ -245,11 +249,12 @@ fn pglz_recommend(
             let Some(bytes) = bytes else { continue };
             sampled += 1;
             total_raw += bytes.len() as u128;
-            let cap = Pglz::max_output(bytes.len());
-            if scratch.len() < cap {
-                scratch.resize(cap, 0);
+            let cap = pglz::max_output(bytes.len());
+            if scratch.capacity() < cap {
+                scratch.reserve_exact(cap - scratch.len());
             }
-            match Pglz::compress_into(&bytes, &mut scratch[..cap], Strategy::Default) {
+            let spare = &mut scratch.spare_capacity_mut()[..cap];
+            match pglz::compress_into(&bytes, spare, Strategy::Default) {
                 Ok(Some(n)) => {
                     accepted += 1;
                     total_comp += n as u128;
@@ -309,6 +314,7 @@ fn pglz_recommend(
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
+    use crate::pglz::{self, PglzError, Strategy};
     use pgrx::prelude::*;
 
     #[pg_test]
@@ -454,45 +460,49 @@ mod tests {
 
     #[pg_test]
     fn wrapper_roundtrip_default() {
-        use pgrx::pglz::{Pglz, Strategy};
+        use crate::pglz::{self, Strategy};
         let src = b"abcd".repeat(256); // 1024 bytes, trivially compressible
-        let c = Pglz::compress(&src, Strategy::Default)
+        let c = pglz::compress(&src, Strategy::Default)
             .expect("compress should not fail")
             .expect("input should be accepted");
         assert!(c.len() < src.len(), "expected compression to shrink input");
-        let back = Pglz::decompress(&c, src.len(), true).expect("decompress should succeed");
+        let back = pglz::decompress(&c, src.len(), true).expect("decompress should succeed");
         assert_eq!(back, src);
     }
 
     #[pg_test]
     fn wrapper_empty_input_is_rejected() {
-        use pgrx::pglz::{Pglz, Strategy};
+        use crate::pglz::{self, Strategy};
         // Empty input is below PGLZ's min_input_size → rejected with Ok(None).
-        assert!(matches!(Pglz::compress(&[], Strategy::Default), Ok(None)));
+        assert!(matches!(pglz::compress(&[], Strategy::Default), Ok(None)));
         // Decompressing an empty input asking for 0 bytes must not UB.
-        let out = Pglz::decompress(&[], 0, true).expect("0-byte decompress should not crash");
+        let out = pglz::decompress(&[], 0, true).expect("0-byte decompress should not crash");
         assert!(out.is_empty());
     }
 
     #[pg_test]
     fn wrapper_rejects_rawsize_above_i32_max() {
-        use pgrx::pglz::{Pglz, PglzError};
-        let err = Pglz::decompress(&[], usize::MAX, true).unwrap_err();
+        use crate::pglz::{self, PglzError};
+        let err = pglz::decompress(&[], usize::MAX, true).unwrap_err();
         assert_eq!(err, PglzError::InputTooLarge);
     }
 
     #[pg_test]
     fn into_roundtrip_default() {
-        use pgrx::pglz::{Pglz, Strategy};
+        use crate::pglz::{self, Strategy};
+        use std::mem::MaybeUninit;
         let src = b"hello world ".repeat(100); // 1200 bytes, very compressible
-        let mut cbuf = vec![0u8; Pglz::max_output(src.len())];
-        let n = Pglz::compress_into(&src, &mut cbuf, Strategy::Default)
+        let mut cbuf: Vec<MaybeUninit<u8>> =
+            vec![MaybeUninit::uninit(); pglz::max_output(src.len())];
+        let n = pglz::compress_into(&src, &mut cbuf, Strategy::Default)
             .expect("compress_into should not fail")
             .expect("input should be accepted");
         assert!(n < src.len());
 
+        // SAFETY: PGLZ wrote `n` bytes into the prefix of cbuf.
+        let cbytes: &[u8] = unsafe { std::slice::from_raw_parts(cbuf.as_ptr().cast::<u8>(), n) };
         let mut dbuf = vec![0u8; src.len()];
-        let m = Pglz::decompress_into(&cbuf[..n], &mut dbuf, src.len(), true)
+        let m = pglz::decompress_into(cbytes, &mut dbuf, src.len(), true)
             .expect("decompress_into should succeed");
         assert_eq!(m, src.len());
         assert_eq!(&dbuf[..m], &src[..]);
@@ -500,77 +510,91 @@ mod tests {
 
     #[pg_test]
     fn into_compress_rejects_random_short_input() {
-        use pgrx::pglz::{Pglz, Strategy};
+        use crate::pglz::{self, Strategy};
+        use std::mem::MaybeUninit;
         // 12 high-entropy bytes — below min_input_size, PGLZ should refuse.
         let src: [u8; 12] =
             [0x91, 0xa2, 0xb3, 0xc4, 0xd5, 0xe6, 0xf7, 0x08, 0x19, 0x2a, 0x3b, 0x4c];
-        let mut buf = vec![0u8; Pglz::max_output(src.len())];
-        let res = Pglz::compress_into(&src, &mut buf, Strategy::Default).unwrap();
+        let mut buf: Vec<MaybeUninit<u8>> =
+            vec![MaybeUninit::uninit(); pglz::max_output(src.len())];
+        let res = pglz::compress_into(&src, &mut buf, Strategy::Default).unwrap();
         assert!(res.is_none(), "expected PGLZ to reject random short input");
     }
 
     #[pg_test]
     fn into_decompress_rejects_corrupted_input() {
-        use pgrx::pglz::{Pglz, PglzError};
+        use crate::pglz::{self, PglzError};
         let garbage = [0xffu8; 64];
         let mut out = vec![0u8; 256];
-        let err = Pglz::decompress_into(&garbage, &mut out, 256, false).unwrap_err();
+        let err = pglz::decompress_into(&garbage, &mut out, 256, false).unwrap_err();
         assert_eq!(err, PglzError::Decompress);
     }
 
     #[pg_test]
     fn into_strategy_always_succeeds_on_input_default_might_reject() {
-        use pgrx::pglz::{Pglz, Strategy};
+        use crate::pglz::{self, Strategy};
+        use std::mem::MaybeUninit;
         // 64 bytes of repeated 'a' — sits near PGLZ's min_comp_rate threshold for Default but Always should still attempt.
         let src = vec![b'a'; 64];
-        let mut buf_a = vec![0u8; Pglz::max_output(src.len())];
-        let always = Pglz::compress_into(&src, &mut buf_a, Strategy::Always)
+        let mut buf_a: Vec<MaybeUninit<u8>> =
+            vec![MaybeUninit::uninit(); pglz::max_output(src.len())];
+        let always = pglz::compress_into(&src, &mut buf_a, Strategy::Always)
             .expect("compress_into should not fail");
         assert!(always.is_some(), "Strategy::Always should accept highly compressible input");
         // The accepted output must round-trip.
         let n = always.unwrap();
+        // SAFETY: PGLZ wrote `n` bytes into the prefix of buf_a.
+        let cbytes: &[u8] = unsafe { std::slice::from_raw_parts(buf_a.as_ptr().cast::<u8>(), n) };
         let mut back = vec![0u8; src.len()];
-        let m = Pglz::decompress_into(&buf_a[..n], &mut back, src.len(), true)
+        let m = pglz::decompress_into(cbytes, &mut back, src.len(), true)
             .expect("decompress_into should succeed for Strategy::Always output");
         assert_eq!(&back[..m], &src[..]);
     }
 
     #[pg_test]
     fn into_check_complete_flag_behaviour() {
-        use pgrx::pglz::{Pglz, PglzError, Strategy};
+        use crate::pglz::{self, PglzError, Strategy};
+        use std::mem::MaybeUninit;
         let src = b"abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd".to_vec();
-        let mut cbuf = vec![0u8; Pglz::max_output(src.len())];
-        let n = Pglz::compress_into(&src, &mut cbuf, Strategy::Default)
+        let mut cbuf: Vec<MaybeUninit<u8>> =
+            vec![MaybeUninit::uninit(); pglz::max_output(src.len())];
+        let n = pglz::compress_into(&src, &mut cbuf, Strategy::Default)
             .unwrap()
             .expect("should compress");
 
+        // SAFETY: PGLZ wrote `n` bytes into the prefix of cbuf.
+        let cbytes: &[u8] = unsafe { std::slice::from_raw_parts(cbuf.as_ptr().cast::<u8>(), n) };
         // Append a stray byte — with check_complete=true PGLZ must fail
         // (source not fully consumed).
-        let mut padded = cbuf[..n].to_vec();
+        let mut padded = cbytes.to_vec();
         padded.push(0u8);
         let mut dbuf = vec![0u8; src.len()];
-        let err = Pglz::decompress_into(&padded, &mut dbuf, src.len(), true).unwrap_err();
+        let err = pglz::decompress_into(&padded, &mut dbuf, src.len(), true).unwrap_err();
         assert_eq!(err, PglzError::Decompress, "check_complete=true should reject trailing bytes");
 
         // Same input, check_complete=false → tolerated, payload still decodes.
-        let m = Pglz::decompress_into(&padded, &mut dbuf, src.len(), false)
+        let m = pglz::decompress_into(&padded, &mut dbuf, src.len(), false)
             .expect("check_complete=false should tolerate trailing bytes");
         assert_eq!(&dbuf[..m], &src[..]);
     }
 
     #[pg_test]
     fn into_decompress_with_oversized_dest_buffer() {
-        use pgrx::pglz::{Pglz, Strategy};
+        use crate::pglz::{self, Strategy};
+        use std::mem::MaybeUninit;
 
         let src = b"xyzxyzxyzxyzxyzxyzxyzxyzxyzxyz".repeat(20); // 600 bytes
-        let mut cbuf = vec![0u8; Pglz::max_output(src.len())];
-        let n = Pglz::compress_into(&src, &mut cbuf, Strategy::Default)
+        let mut cbuf: Vec<MaybeUninit<u8>> =
+            vec![MaybeUninit::uninit(); pglz::max_output(src.len())];
+        let n = pglz::compress_into(&src, &mut cbuf, Strategy::Default)
             .unwrap()
             .expect("should compress");
 
+        // SAFETY: PGLZ wrote `n` bytes into the prefix of cbuf.
+        let cbytes: &[u8] = unsafe { std::slice::from_raw_parts(cbuf.as_ptr().cast::<u8>(), n) };
         // dest is 4 KiB but rawsize is the real 600. Pre-I1 this would have returned Err(Decompress) because rawsize was derived from dest.len().
         let mut big_scratch = vec![0u8; 4096];
-        let m = Pglz::decompress_into(&cbuf[..n], &mut big_scratch, src.len(), true)
+        let m = pglz::decompress_into(cbytes, &mut big_scratch, src.len(), true)
             .expect("oversized dest should not be rejected");
         assert_eq!(m, src.len());
         assert_eq!(&big_scratch[..m], &src[..]);
@@ -609,6 +633,46 @@ mod tests {
             )
         });
         assert!(res.is_err(), "expected unknown strategy to raise PG ERROR");
+    }
+
+    #[pg_test]
+    fn max_output_adds_four() {
+        assert_eq!(pglz::max_output(0), 4);
+        assert_eq!(pglz::max_output(1024), 1028);
+        assert_eq!(pglz::max_output(usize::MAX - 4), usize::MAX);
+    }
+
+    #[pg_test]
+    fn compress_into_rejects_undersized_buffer() {
+        use std::mem::MaybeUninit;
+        // max_output(1024) = 1028; a 1027-byte buffer must be rejected before any FFI call.
+        let src = vec![0u8; 1024];
+        let mut buf: Vec<MaybeUninit<u8>> = vec![MaybeUninit::uninit(); 1027];
+        assert_eq!(
+            pglz::compress_into(&src, &mut buf, Strategy::Default).unwrap_err(),
+            PglzError::BufferTooSmall
+        );
+    }
+
+    #[pg_test]
+    fn decompress_into_rejects_undersized_buffer() {
+        // rawsize > dest.len() must be rejected before any FFI call.
+        let mut tiny = [0u8; 4];
+        assert_eq!(
+            pglz::decompress_into(&[], &mut tiny, 16, true).unwrap_err(),
+            PglzError::BufferTooSmall
+        );
+    }
+
+    #[pg_test]
+    fn input_too_large_is_rejected() {
+        // Pure validation path — no FFI.
+        let dummy = [0u8; 4];
+        let mut out = [0u8; 4];
+        assert_eq!(
+            pglz::decompress_into(&dummy, &mut out, usize::MAX, true).unwrap_err(),
+            PglzError::InputTooLarge
+        );
     }
 }
 
