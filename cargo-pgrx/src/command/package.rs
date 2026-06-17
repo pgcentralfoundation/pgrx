@@ -7,15 +7,15 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use crate::CommandExecute;
 use crate::cargo::CargoProfile;
 use crate::command::get::get_property;
 use crate::command::install::{format_display_path, install_extension, warn_if_pg_bench_enabled};
-use crate::manifest::{display_version_info, PgVersionSource};
-use crate::CommandExecute;
+use crate::manifest::{PgVersionSource, display_version_info};
 use cargo_toml::Manifest;
-use eyre::{eyre, WrapErr};
+use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
-use pgrx_pg_config::{get_target_dir, PgConfig, Pgrx};
+use pgrx_pg_config::{PgConfig, Pgrx, get_target_dir};
 use std::path::{Path, PathBuf};
 
 /// Create an installation package directory.
