@@ -39,7 +39,30 @@ impl<'conn> SpiClient<'conn> {
         query.prepare_mut(self, args)
     }
 
-    /// Perform a SELECT statement.
+    /// Perform a `SELECT` statement in **read-only** SPI mode.
+    ///
+    /// Read-only execution is cheaper (no per-statement snapshot work) but it
+    /// inherits PostgreSQL's volatility constraints: the query cannot use a
+    /// locking clause (`FOR UPDATE`, `FOR SHARE`, `SKIP LOCKED`, `NOWAIT`),
+    /// cannot call `VOLATILE` functions that depend on a writable snapshot,
+    /// and cannot run DML (`INSERT`, `UPDATE`, `DELETE`).  Trying to do any
+    /// of those through this method will surface as an error from Postgres,
+    /// most commonly:
+    ///
+    /// > ERROR: SELECT FOR UPDATE is not allowed in a non-volatile function
+    ///
+    /// Use [`SpiClient::update`] for those cases — it switches the rest of
+    /// the transaction to writable SPI execution.
+    ///
+    /// Whether the underlying `SPI_execute*` call is invoked with
+    /// `read_only = true` is decided by [`Spi::is_xact_still_immutable`].
+    /// Once any prior statement in this transaction has been executed via
+    /// [`SpiClient::update`] (or [`Spi::mark_mutable`] has been called
+    /// directly), subsequent `select` calls in the same transaction will
+    /// *also* run with `read_only = false` — pgrx does not flip the SPI
+    /// mode back inside one transaction.  This matches the Postgres
+    /// guidance that mixing read-only and read-write SPI commands in a
+    /// single function is unwise.
     pub fn select<'mcx, Q: Query<'conn>>(
         &self,
         query: Q,
@@ -49,7 +72,22 @@ impl<'conn> SpiClient<'conn> {
         query.execute(self, limit, args)
     }
 
-    /// Perform any query (including utility statements) that modify the database in some way.
+    /// Perform any query that requires **writable** SPI execution.
+    ///
+    /// This is the right method for the obvious writers — `INSERT`,
+    /// `UPDATE`, `DELETE`, and utility statements (`CREATE`, `ALTER`,
+    /// `DROP`, …) — but it is *also* the right method for any `SELECT`
+    /// that uses a locking clause (`FOR UPDATE`, `FOR SHARE`, `SKIP
+    /// LOCKED`, `NOWAIT`) or that calls a function whose volatility
+    /// requires a writable snapshot.  The first call in a transaction
+    /// invokes [`Spi::mark_mutable`], which forces a real `TransactionId`
+    /// to be assigned; from that point forward `SPI_execute*` is invoked
+    /// with `read_only = false` and the rest of the transaction's SPI
+    /// runs writable.
+    ///
+    /// If you only need a plain `SELECT` and don't intend to write or
+    /// lock, prefer [`SpiClient::select`] — it leaves the transaction in
+    /// read-only mode and is cheaper.
     pub fn update<'mcx, Q: Query<'conn>>(
         &mut self,
         query: Q,
