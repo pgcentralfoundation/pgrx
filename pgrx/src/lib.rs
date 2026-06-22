@@ -139,6 +139,103 @@ mod seal {
     pub trait Sealed {}
 }
 
+#[doc(hidden)]
+pub mod pg_magic_func_support {
+    use core::ffi::CStr;
+
+    use crate::pg_sys;
+
+    pub const fn default_magic() -> pg_sys::Pg_magic_struct {
+        let len = ::core::mem::size_of::<pg_sys::Pg_magic_struct>() as i32;
+        let version = pg_sys::PG_VERSION_NUM as i32 / 100;
+        let funcmaxargs = pg_sys::FUNC_MAX_ARGS as i32;
+        let indexmaxkeys = pg_sys::INDEX_MAX_KEYS as i32;
+        let namedatalen = pg_sys::NAMEDATALEN as i32;
+        let float8byval = cfg!(target_pointer_width = "64") as i32;
+        #[cfg(any(
+            feature = "pg15",
+            feature = "pg16",
+            feature = "pg17",
+            feature = "pg18",
+            feature = "pg19"
+        ))]
+        let abi_extra = abi_extra();
+
+        pg_sys::Pg_magic_struct {
+            len,
+            #[cfg(not(any(feature = "pg18", feature = "pg19")))]
+            version,
+            #[cfg(not(any(feature = "pg18", feature = "pg19")))]
+            funcmaxargs,
+            #[cfg(not(any(feature = "pg18", feature = "pg19")))]
+            indexmaxkeys,
+            #[cfg(not(any(feature = "pg18", feature = "pg19")))]
+            namedatalen,
+            #[cfg(not(any(feature = "pg18", feature = "pg19")))]
+            float8byval,
+            #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+            abi_extra,
+            #[cfg(any(feature = "pg18", feature = "pg19"))]
+            abi_fields: pg_sys::Pg_abi_values {
+                version,
+                funcmaxargs,
+                indexmaxkeys,
+                namedatalen,
+                float8byval,
+                abi_extra,
+            },
+            #[cfg(any(feature = "pg18", feature = "pg19"))]
+            name: ::core::ptr::null(),
+            #[cfg(any(feature = "pg18", feature = "pg19"))]
+            version: ::core::ptr::null(),
+        }
+    }
+
+    #[cfg(any(
+        feature = "pg15",
+        feature = "pg16",
+        feature = "pg17",
+        feature = "pg18",
+        feature = "pg19"
+    ))]
+    const fn abi_extra() -> [::core::ffi::c_char; 32] {
+        // We'll use what the bindings tell us, but if it ain't "PostgreSQL" then we'll
+        // raise a compilation error unless the `unsafe-postgres` feature is set.
+        let magic = pg_sys::FMGR_ABI_EXTRA.to_bytes_with_nul();
+        let mut abi = [0 as ::core::ffi::c_char; 32];
+        let mut i = 0;
+        while i < magic.len() {
+            abi[i] = magic[i] as ::core::ffi::c_char;
+            i += 1;
+        }
+        abi
+    }
+
+    #[allow(unused_mut, unused_variables)]
+    pub const fn with_name(
+        mut magic: pg_sys::Pg_magic_struct,
+        name: &'static CStr,
+    ) -> pg_sys::Pg_magic_struct {
+        #[cfg(any(feature = "pg18", feature = "pg19"))]
+        {
+            magic.name = CStr::as_ptr(name);
+        }
+        magic
+    }
+
+    #[allow(unused_mut, unused_variables)]
+    pub const fn with_version(
+        mut magic: pg_sys::Pg_magic_struct,
+        version: &'static CStr,
+    ) -> pg_sys::Pg_magic_struct {
+        #[cfg(any(feature = "pg18", feature = "pg19"))]
+        {
+            magic.version = CStr::as_ptr(version);
+        }
+        magic
+    }
+}
+
 // Postgres v15+ has the concept of an ABI "name".  The default is `c"PostgreSQL"` and this is the
 // ABI that pgrx extensions expect to be running under.  We will refuse to compile if it is detected
 // that we're trying to be built against some other kind of "postgres" that has its own ABI name.
@@ -241,53 +338,7 @@ macro_rules! pg_magic_func {
             ::pgrx::pg_sys::panic::register_pg_guard_panic_hook();
 
             static MY_MAGIC: AssertSync<::pgrx::pg_sys::Pg_magic_struct> = {
-                let len = ::core::mem::size_of::<::pgrx::pg_sys::Pg_magic_struct>() as i32;
-                let version = ::pgrx::pg_sys::PG_VERSION_NUM as i32 / 100;
-                let funcmaxargs = ::pgrx::pg_sys::FUNC_MAX_ARGS as i32;
-                let indexmaxkeys = ::pgrx::pg_sys::INDEX_MAX_KEYS as i32;
-                let namedatalen = ::pgrx::pg_sys::NAMEDATALEN as i32;
-                let float8byval = cfg!(target_pointer_width = "64") as i32;
-                #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-                let abi_extra = {
-                    // we'll use what the bindings tell us, but if it ain't "PostgreSQL" then we'll
-                    // raise a compilation error unless the `unsafe-postgres` feature is set
-                    let magic = ::pgrx::pg_sys::FMGR_ABI_EXTRA.to_bytes_with_nul();
-                    let mut abi = [0 as ::pgrx::ffi::c_char; 32];
-                    let mut i = 0;
-                    while i < magic.len() {
-                        abi[i] = magic[i] as ::pgrx::ffi::c_char;
-                        i += 1;
-                    }
-                    abi
-                };
-                let mut magic = ::pgrx::pg_sys::Pg_magic_struct {
-                    len,
-                    #[cfg(not(any(feature = "pg18", feature = "pg19")))]
-                    version,
-                    #[cfg(not(any(feature = "pg18", feature = "pg19")))]
-                    funcmaxargs,
-                    #[cfg(not(any(feature = "pg18", feature = "pg19")))]
-                    indexmaxkeys,
-                    #[cfg(not(any(feature = "pg18", feature = "pg19")))]
-                    namedatalen,
-                    #[cfg(not(any(feature = "pg18", feature = "pg19")))]
-                    float8byval,
-                    #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-                    abi_extra,
-                    #[cfg(any(feature = "pg18", feature = "pg19"))]
-                    abi_fields: ::pgrx::pg_sys::Pg_abi_values {
-                        version,
-                        funcmaxargs,
-                        indexmaxkeys,
-                        namedatalen,
-                        float8byval,
-                        abi_extra,
-                    },
-                    #[cfg(any(feature = "pg18", feature = "pg19"))]
-                    name: ::core::ptr::null(),
-                    #[cfg(any(feature = "pg18", feature = "pg19"))]
-                    version: ::core::ptr::null(),
-                };
+                let mut magic = ::pgrx::pg_magic_func_support::default_magic();
                 #[allow(unused_macros)]
                 macro_rules! field_update {
                     (name) => {
@@ -312,7 +363,7 @@ macro_rules! pg_magic_func {
                         });
                     };
                     (version) => {
-                        field_update!(name = {
+                        field_update!(version = {
                             const RAW: &str = env!("CARGO_PKG_VERSION");
                             const BUFFER: [u8; RAW.len() + 1] = {
                                 let mut buffer = [0u8; RAW.len() + 1];
@@ -327,24 +378,18 @@ macro_rules! pg_magic_func {
                                 if let Ok(s) = ::core::ffi::CStr::from_bytes_with_nul(&BUFFER) {
                                     s
                                 } else {
-                                panic!("there are null characters in CARGO_CRATE_VERSION")
+                                panic!("there are null characters in CARGO_PKG_VERSION")
                              };
                             const { STR }
                         });
                     };
                     (name = $name:expr) => {
                         let name: &'static ::core::ffi::CStr = $name;
-                        #[cfg(any(feature = "pg18", feature = "pg19"))]
-                        {
-                            magic.name = ::core::ffi::CStr::as_ptr($name);
-                        }
+                        magic = ::pgrx::pg_magic_func_support::with_name(magic, name);
                     };
                     (version = $version:expr) => {
                         let version: &'static ::core::ffi::CStr = $version;
-                        #[cfg(any(feature = "pg18", feature = "pg19"))]
-                        {
-                            magic.version = ::core::ffi::CStr::as_ptr($version);
-                        }
+                        magic = ::pgrx::pg_magic_func_support::with_version(magic, version);
                     };
                 }
                 $(field_update!($key $(= $value)?);)*
