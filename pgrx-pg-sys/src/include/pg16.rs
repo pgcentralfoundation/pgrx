@@ -39199,8 +39199,12 @@ unsafe extern "C-unwind" {
     pub fn FreeAccessStrategy(strategy: BufferAccessStrategy);
     #[link_name = "BufferIsValid__pgrx_cshim"]
     pub fn BufferIsValid(bufnum: Buffer) -> bool;
+    #[link_name = "BufferGetBlock__pgrx_cshim"]
+    pub fn BufferGetBlock(buffer: Buffer) -> Block;
     #[link_name = "BufferGetPageSize__pgrx_cshim"]
     pub fn BufferGetPageSize(buffer: Buffer) -> Size;
+    #[link_name = "BufferGetPage__pgrx_cshim"]
+    pub fn BufferGetPage(buffer: Buffer) -> Page;
     #[link_name = "TestForOldSnapshot__pgrx_cshim"]
     pub fn TestForOldSnapshot(snapshot: Snapshot, relation: Relation, page: Page);
     pub static mut InRecovery: bool;

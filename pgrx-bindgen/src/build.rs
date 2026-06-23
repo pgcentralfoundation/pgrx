@@ -763,7 +763,7 @@ fn run_bindgen(
     eprintln!("pg_target_includes = {pg_target_includes:?}");
     let (autodetect, includes) = clang::detect_include_paths_for(preferred_clang);
     let mut binder = bindgen::Builder::default();
-    binder = add_blocklists(binder, major_version);
+    binder = add_blocklists(binder, major_version, enable_cshim);
     binder = add_allowlists(binder, pg_target_includes.iter().map(|x| x.as_str()));
     binder = add_derives(binder);
     if !autodetect {
@@ -800,11 +800,22 @@ fn run_bindgen(
     Ok(bindings.to_string())
 }
 
-fn add_blocklists(bind: bindgen::Builder, major_version: u16) -> bindgen::Builder {
+fn add_blocklists(
+    bind: bindgen::Builder,
+    major_version: u16,
+    enable_cshim: bool,
+) -> bindgen::Builder {
     let bind = if major_version >= 19 {
         // Postgres 19 turned these into `static inline` functions, so without the cshim there's
         // no symbol to link against.  We implement them ourselves, in Rust, in `port.rs`
         bind.blocklist_function("TransactionId(Precedes|PrecedesOrEquals|Follows|FollowsOrEquals)")
+    } else {
+        bind
+    };
+    let bind = if major_version < 16 || !enable_cshim {
+        // Before Postgres 16 these are macros. Without cshim, Postgres 16+ static inline
+        // functions have no symbol to link against. Use the Rust fallback in both cases.
+        bind.blocklist_function("BufferGetBlock").blocklist_function("BufferGetPage")
     } else {
         bind
     };
@@ -820,8 +831,6 @@ fn add_blocklists(bind: bindgen::Builder, major_version: u16) -> bindgen::Builde
         .blocklist_function("err(start|code|msg|detail|context_msg|hint|finish)")
         // These functions are already ported in Rust
         .blocklist_function("heap_getattr")
-        .blocklist_function("BufferGetBlock")
-        .blocklist_function("BufferGetPage")
         .blocklist_function("BufferIsLocal")
         .blocklist_function("GetMemoryChunkContext")
         .blocklist_function("GETSTRUCT")

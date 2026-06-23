@@ -340,6 +340,15 @@ pub unsafe fn type_is_array(typoid: super::Oid) -> bool {
 
 /// #define BufferGetPage(buffer) ((Page)BufferGetBlock(buffer))
 #[inline]
+#[cfg(any(
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    all(
+        not(feature = "cshim"),
+        any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19")
+    )
+))]
 pub unsafe fn BufferGetPage(buffer: crate::Buffer) -> crate::Page {
     BufferGetBlock(buffer) as crate::Page
 }
@@ -353,6 +362,15 @@ pub unsafe fn BufferGetPage(buffer: crate::Buffer) -> crate::Page {
 ///            (Block) (BufferBlocks + ((Size) ((buffer) - 1)) * BLCKSZ) \
 /// )
 #[inline]
+#[cfg(any(
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    all(
+        not(feature = "cshim"),
+        any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19")
+    )
+))]
 pub unsafe fn BufferGetBlock(buffer: crate::Buffer) -> crate::Block {
     if BufferIsLocal(buffer) {
         *crate::LocalBufferBlockPointers.offset(((-buffer) - 1) as isize)

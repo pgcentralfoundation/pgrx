@@ -39120,8 +39120,12 @@ unsafe extern "C-unwind" {
     pub fn FreeAccessStrategy(strategy: BufferAccessStrategy);
     #[link_name = "BufferIsValid__pgrx_cshim"]
     pub fn BufferIsValid(bufnum: Buffer) -> bool;
+    #[link_name = "BufferGetBlock__pgrx_cshim"]
+    pub fn BufferGetBlock(buffer: Buffer) -> Block;
     #[link_name = "BufferGetPageSize__pgrx_cshim"]
     pub fn BufferGetPageSize(buffer: Buffer) -> Size;
+    #[link_name = "BufferGetPage__pgrx_cshim"]
+    pub fn BufferGetPage(buffer: Buffer) -> Page;
     pub fn read_stream_begin_relation(
         flags: ::core::ffi::c_int,
         strategy: BufferAccessStrategy,
