@@ -1,6 +1,6 @@
 [package]
 name = "hello"
-version = "0.0.0"
+version = "0.19.0"
 edition.workspace = true
 rust-version.workspace = true
 
@@ -27,7 +27,7 @@ workspace = true
 
 [dev-dependencies]
 [dev-dependencies.pgrx-tests]
-version = "=0.18.0"
+version = "=0.19.0"
 
 [profile.dev]
 panic = "unwind"

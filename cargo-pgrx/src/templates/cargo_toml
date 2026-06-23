@@ -19,15 +19,15 @@ pg_test = []
 pg_bench = ["dep:pgrx-bench"]
 
 [dependencies]
-pgrx = "=0.18.1"
+pgrx = "=0.19.0"
 
 [dependencies.pgrx-bench]
-version = "=0.18.1"
+version = "=0.19.0"
 optional = true
 
 [dev-dependencies]
 [dev-dependencies.pgrx-tests]
-version = "=0.18.1"
+version = "=0.19.0"
 
 [profile.dev]
 panic = "unwind"
