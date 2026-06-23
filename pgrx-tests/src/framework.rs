@@ -314,21 +314,6 @@ pub fn client() -> eyre::Result<(postgres::Client, String)> {
         None => Err(eyre!("Failed to obtain a client Session ID from Postgres"))?,
     };
 
-    query_wrapper(Some("SET log_min_messages TO 'INFO';".to_string()), None, |query, _| {
-        client.simple_query(query.unwrap().as_str())
-    })
-    .wrap_err("Postgres Client setup failed to SET log_min_messages TO 'INFO'")?;
-
-    query_wrapper(Some("SET log_min_duration_statement TO 1000;".to_string()), None, |query, _| {
-        client.simple_query(query.unwrap().as_str())
-    })
-    .wrap_err("Postgres Client setup failed to SET log_min_duration_statement TO 1000;")?;
-
-    query_wrapper(Some("SET log_statement TO 'all';".to_string()), None, |query, _| {
-        client.simple_query(query.unwrap().as_str())
-    })
-    .wrap_err("Postgres Client setup failed to SET log_statement TO 'all';")?;
-
     Ok((client, session_id))
 }
 
@@ -556,17 +541,7 @@ fn modify_postgresql_conf(
     socket_dir: PathBuf,
     postgresql_conf: Vec<&'static str>,
 ) -> eyre::Result<()> {
-    let mut contents = String::new();
-
-    contents.push_str("log_line_prefix='[%m] [%p] [%c]: '\n");
-    contents.push_str(&format!(
-        "unix_socket_directories = '{}'\n",
-        socket_dir.display().to_string().replace("\\", "\\\\")
-    ));
-    for setting in postgresql_conf {
-        contents.push_str(&format!("{setting}\n"));
-    }
-
+    let contents = postgresql_conf_contents(&socket_dir, &postgresql_conf);
     let postgresql_auto_conf = pgdata.join("postgresql.auto.conf");
 
     if let Some(runas) = get_runas() {
@@ -593,6 +568,29 @@ fn modify_postgresql_conf(
     }
 
     Ok(())
+}
+
+// These are pgrx's test-cluster defaults. They are written before the
+// extension's `postgresql_conf_options()` so extension-provided settings can
+// override them in the generated Postgres configuration.
+const PGRX_POSTGRESQL_CONF_DEFAULTS: &[&str] =
+    &["log_min_messages = info", "log_min_duration_statement = 1000", "log_statement = 'all'"];
+
+fn postgresql_conf_contents(socket_dir: &Path, postgresql_conf: &[&str]) -> String {
+    let mut contents = String::new();
+
+    contents.push_str("log_line_prefix='[%m] [%p] [%c]: '\n");
+    contents.push_str(&format!(
+        "unix_socket_directories = '{}'\n",
+        socket_dir.display().to_string().replace("\\", "\\\\")
+    ));
+    // PostgreSQL applies repeated settings in file order, so put pgrx's
+    // defaults first and let extension options override them below.
+    for setting in PGRX_POSTGRESQL_CONF_DEFAULTS.iter().chain(postgresql_conf) {
+        contents.push_str(&format!("{setting}\n"));
+    }
+
+    contents
 }
 
 fn start_pg(loglines: LogLines, port_reservation: PortReservation) -> eyre::Result<String> {
@@ -1201,6 +1199,26 @@ mod tests {
 
     fn command_args(command: &Command) -> Vec<OsString> {
         command.get_args().map(|arg| arg.to_os_string()).collect()
+    }
+
+    #[test]
+    fn pgrx_postgresql_conf_defaults_precede_extension_options() {
+        let contents = postgresql_conf_contents(
+            Path::new("/tmp/pgrx-test-socket"),
+            &["log_min_messages = debug1"],
+        );
+
+        assert!(contents.contains("log_min_duration_statement = 1000\n"));
+        assert!(contents.contains("log_statement = 'all'\n"));
+
+        let pgrx_default = contents
+            .find("log_min_messages = info\n")
+            .expect("pgrx default log_min_messages setting");
+        let extension_override = contents
+            .find("log_min_messages = debug1\n")
+            .expect("extension log_min_messages setting");
+
+        assert!(pgrx_default < extension_override);
     }
 
     #[test]
