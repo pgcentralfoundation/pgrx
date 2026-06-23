@@ -2587,6 +2587,25 @@ pub const IO_DIRECT_WAL_INIT: u32 = 4;
 pub const DEFAULT_FILE_EXTEND_METHOD: u32 = 0;
 pub const PG_O_DIRECT: u32 = 16384;
 pub const DSHASH_INSERT_NO_OOM: u32 = 1;
+pub const InvalidLocalTransactionId: u32 = 0;
+pub const MAX_LOCKMODES: u32 = 10;
+pub const PGPROC_MAX_CACHED_SUBXIDS: u32 = 64;
+pub const PROC_IS_AUTOVACUUM: u32 = 1;
+pub const PROC_IN_VACUUM: u32 = 2;
+pub const PROC_IN_SAFE_IC: u32 = 4;
+pub const PROC_VACUUM_FOR_WRAPAROUND: u32 = 8;
+pub const PROC_IN_LOGICAL_DECODING: u32 = 16;
+pub const PROC_AFFECTS_ALL_HORIZONS: u32 = 32;
+pub const PROC_VACUUM_STATE_MASK: u32 = 14;
+pub const PROC_XMIN_FLAGS: u32 = 6;
+pub const FP_LOCK_GROUPS_PER_BACKEND_MAX: u32 = 1024;
+pub const FP_LOCK_SLOTS_PER_GROUP: u32 = 16;
+pub const DELAY_CHKPT_START: u32 = 1;
+pub const DELAY_CHKPT_COMPLETE: u32 = 2;
+pub const DELAY_CHKPT_IN_COMMIT: u32 = 5;
+pub const NUM_SPECIAL_WORKER_PROCS: u32 = 2;
+pub const MAX_IO_WORKERS: u32 = 32;
+pub const NUM_AUXILIARY_PROCS: u32 = 38;
 pub const XLOG_STANDBY_LOCK: u32 = 0;
 pub const XLOG_RUNNING_XACTS: u32 = 16;
 pub const XLOG_INVALIDATIONS: u32 = 32;
@@ -6228,6 +6247,9 @@ pub const SELFLAG_USED_DEFAULT: u32 = 1;
 pub const CATCACHE_MAXKEYS: u32 = 4;
 pub const CT_MAGIC: u32 = 1462113538;
 pub const CL_MAGIC: u32 = 1383485699;
+pub const TUPLESORT_NONE: u32 = 0;
+pub const TUPLESORT_RANDOMACCESS: u32 = 1;
+pub const TUPLESORT_ALLOWBOUNDED: u32 = 2;
 pub const RANGE_EMPTY_LITERAL: &::core::ffi::CStr = c"empty";
 pub const RANGE_EMPTY: u32 = 1;
 pub const RANGE_LB_INC: u32 = 2;
@@ -22397,16 +22419,6 @@ pub type ResourceReleaseCallback = ::core::option::Option<
         arg: *mut ::core::ffi::c_void,
     ),
 >;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct LOCALLOCK {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PGPROC {
-    _unused: [u8; 0],
-}
 pub type Block = *mut ::core::ffi::c_void;
 pub mod BufferAccessStrategyType {
     pub type Type = ::core::ffi::c_uint;
@@ -33805,6 +33817,344 @@ pub mod XLTW_Oper {
     pub const XLTW_RecheckExclusionConstr: Type = 8;
 }
 #[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct VirtualTransactionId {
+    pub procNumber: ProcNumber,
+    pub localTransactionId: LocalTransactionId,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LockMethodData {
+    pub numLockModes: ::core::ffi::c_int,
+    pub conflictTab: *const LOCKMASK,
+    pub lockModeNames: *const *const ::core::ffi::c_char,
+    pub trace_flag: *const bool,
+}
+impl Default for LockMethodData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type LockMethod = *const LockMethodData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LOCK {
+    pub tag: LOCKTAG,
+    pub grantMask: LOCKMASK,
+    pub waitMask: LOCKMASK,
+    pub procLocks: dlist_head,
+    pub waitProcs: dclist_head,
+    pub requested: [::core::ffi::c_int; 10usize],
+    pub nRequested: ::core::ffi::c_int,
+    pub granted: [::core::ffi::c_int; 10usize],
+    pub nGranted: ::core::ffi::c_int,
+}
+impl Default for LOCK {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PROCLOCKTAG {
+    pub myLock: *mut LOCK,
+    pub myProc: *mut PGPROC,
+}
+impl Default for PROCLOCKTAG {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PROCLOCK {
+    pub tag: PROCLOCKTAG,
+    pub groupLeader: *mut PGPROC,
+    pub holdMask: LOCKMASK,
+    pub releaseMask: LOCKMASK,
+    pub lockLink: dlist_node,
+    pub procLink: dlist_node,
+}
+impl Default for PROCLOCK {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct LOCALLOCKTAG {
+    pub lock: LOCKTAG,
+    pub mode: LOCKMODE,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LOCALLOCKOWNER {
+    pub owner: *mut ResourceOwnerData,
+    pub nLocks: int64,
+}
+impl Default for LOCALLOCKOWNER {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LOCALLOCK {
+    pub tag: LOCALLOCKTAG,
+    pub hashcode: uint32,
+    pub lock: *mut LOCK,
+    pub proclock: *mut PROCLOCK,
+    pub nLocks: int64,
+    pub numLockOwners: ::core::ffi::c_int,
+    pub maxLockOwners: ::core::ffi::c_int,
+    pub lockOwners: *mut LOCALLOCKOWNER,
+    pub holdsStrongLockCount: bool,
+    pub lockCleared: bool,
+}
+impl Default for LOCALLOCK {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct LockInstanceData {
+    pub locktag: LOCKTAG,
+    pub holdMask: LOCKMASK,
+    pub waitLockMode: LOCKMODE,
+    pub vxid: VirtualTransactionId,
+    pub waitStart: TimestampTz,
+    pub pid: ::core::ffi::c_int,
+    pub leaderPid: ::core::ffi::c_int,
+    pub fastpath: bool,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LockData {
+    pub nelements: ::core::ffi::c_int,
+    pub locks: *mut LockInstanceData,
+}
+impl Default for LockData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct BlockedProcData {
+    pub pid: ::core::ffi::c_int,
+    pub first_lock: ::core::ffi::c_int,
+    pub num_locks: ::core::ffi::c_int,
+    pub first_waiter: ::core::ffi::c_int,
+    pub num_waiters: ::core::ffi::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct BlockedProcsData {
+    pub procs: *mut BlockedProcData,
+    pub locks: *mut LockInstanceData,
+    pub waiter_pids: *mut ::core::ffi::c_int,
+    pub nprocs: ::core::ffi::c_int,
+    pub maxprocs: ::core::ffi::c_int,
+    pub nlocks: ::core::ffi::c_int,
+    pub maxlocks: ::core::ffi::c_int,
+    pub npids: ::core::ffi::c_int,
+    pub maxpids: ::core::ffi::c_int,
+}
+impl Default for BlockedProcsData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub mod LockAcquireResult {
+    pub type Type = ::core::ffi::c_uint;
+    pub const LOCKACQUIRE_NOT_AVAIL: Type = 0;
+    pub const LOCKACQUIRE_OK: Type = 1;
+    pub const LOCKACQUIRE_ALREADY_HELD: Type = 2;
+    pub const LOCKACQUIRE_ALREADY_CLEAR: Type = 3;
+}
+pub mod DeadLockState {
+    pub type Type = ::core::ffi::c_uint;
+    pub const DS_NOT_YET_CHECKED: Type = 0;
+    pub const DS_NO_DEADLOCK: Type = 1;
+    pub const DS_SOFT_DEADLOCK: Type = 2;
+    pub const DS_HARD_DEADLOCK: Type = 3;
+    pub const DS_BLOCKED_BY_AUTOVACUUM: Type = 4;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PGSemaphoreData {
+    _unused: [u8; 0],
+}
+pub type PGSemaphore = *mut PGSemaphoreData;
+pub type XidStatus = ::core::ffi::c_int;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct XidCacheStatus {
+    pub count: uint8,
+    pub overflowed: bool,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct XidCache {
+    pub xids: [TransactionId; 64usize],
+}
+impl Default for XidCache {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub mod ProcWaitStatus {
+    pub type Type = ::core::ffi::c_uint;
+    pub const PROC_WAIT_STATUS_OK: Type = 0;
+    pub const PROC_WAIT_STATUS_WAITING: Type = 1;
+    pub const PROC_WAIT_STATUS_ERROR: Type = 2;
+}
+#[repr(C)]
+#[repr(align(128))]
+#[derive(Debug, Copy, Clone)]
+pub struct PGPROC {
+    pub procgloballist: *mut dlist_head,
+    pub freeProcsLink: dlist_node,
+    #[doc = " Backend identity"]
+    pub pid: ::core::ffi::c_int,
+    pub backendType: BackendType::Type,
+    pub databaseId: Oid,
+    pub roleId: Oid,
+    pub tempNamespaceId: Oid,
+    pub pgxactoff: ::core::ffi::c_int,
+    pub statusFlags: uint8,
+    pub vxid: PGPROC__bindgen_ty_1,
+    pub xid: TransactionId,
+    pub xmin: TransactionId,
+    pub subxidStatus: XidCacheStatus,
+    pub subxids: XidCache,
+    #[doc = " Inter-process signaling"]
+    pub procLatch: Latch,
+    pub sem: PGSemaphore,
+    pub delayChkptFlags: ::core::ffi::c_int,
+    pub pendingRecoveryConflicts: pg_atomic_uint32,
+    #[doc = " LWLock waiting"]
+    pub lwWaiting: uint8,
+    pub lwWaitMode: uint8,
+    pub lwWaitLink: proclist_node,
+    pub cvWaitLink: proclist_node,
+    #[doc = " Lock manager data"]
+    pub lockGroupLeader: *mut PGPROC,
+    pub lockGroupMembers: dlist_head,
+    pub lockGroupLink: dlist_node,
+    pub waitLock: *mut LOCK,
+    pub waitLink: dlist_node,
+    pub waitProcLock: *mut PROCLOCK,
+    pub waitLockMode: LOCKMODE,
+    pub heldLocks: LOCKMASK,
+    pub waitStart: pg_atomic_uint64,
+    pub waitStatus: ProcWaitStatus::Type,
+    pub myProcLocks: [dlist_head; 16usize],
+    pub fpInfoLock: LWLock,
+    pub fpLockBits: *mut uint64,
+    pub fpRelId: *mut Oid,
+    pub fpVXIDLock: bool,
+    pub fpLocalTransactionId: LocalTransactionId,
+    pub waitLSN: XLogRecPtr,
+    pub syncRepState: ::core::ffi::c_int,
+    pub syncRepLinks: dlist_node,
+    #[doc = " Support for group XID clearing"]
+    pub procArrayGroupMember: bool,
+    pub procArrayGroupNext: pg_atomic_uint32,
+    pub procArrayGroupMemberXid: TransactionId,
+    #[doc = " Support for group transaction status update"]
+    pub clogGroupMember: bool,
+    pub clogGroupNext: pg_atomic_uint32,
+    pub clogGroupMemberXid: TransactionId,
+    pub clogGroupMemberXidStatus: XidStatus,
+    pub clogGroupMemberPage: int64,
+    pub clogGroupMemberLsn: XLogRecPtr,
+    #[doc = " Status reporting"]
+    pub wait_event_info: uint32,
+}
+#[doc = " Transactions and snapshots"]
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PGPROC__bindgen_ty_1 {
+    pub procNumber: ProcNumber,
+    pub lxid: LocalTransactionId,
+}
+impl Default for PGPROC {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PROC_HDR {
+    pub allProcs: *mut PGPROC,
+    pub xids: *mut TransactionId,
+    pub subxidStates: *mut XidCacheStatus,
+    pub statusFlags: *mut uint8,
+    pub allProcCount: uint32,
+    pub freeProcsLock: slock_t,
+    pub freeProcs: dlist_head,
+    pub autovacFreeProcs: dlist_head,
+    pub bgworkerFreeProcs: dlist_head,
+    pub walsenderFreeProcs: dlist_head,
+    pub procArrayGroupFirst: pg_atomic_uint32,
+    pub clogGroupFirst: pg_atomic_uint32,
+    pub walwriterProc: ProcNumber,
+    pub checkpointerProc: ProcNumber,
+    pub spins_per_delay: ::core::ffi::c_int,
+    pub startupBufferPinWaitBufId: ::core::ffi::c_int,
+}
+impl Default for PROC_HDR {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
 #[derive(Debug)]
 pub struct xl_standby_locks {
     pub nlocks: ::core::ffi::c_int,
@@ -33855,11 +34205,6 @@ impl Default for xl_invalidations {
             s.assume_init()
         }
     }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct VirtualTransactionId {
-    _unused: [u8; 0],
 }
 pub mod RecoveryConflictReason {
     pub type Type = ::core::ffi::c_uint;
@@ -35760,6 +36105,343 @@ impl Default for catcacheheader {
     }
 }
 pub type CatCacheHeader = catcacheheader;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SharedFileSet {
+    pub fs: FileSet,
+    pub mutex: slock_t,
+    pub refcnt: ::core::ffi::c_int,
+}
+impl Default for SharedFileSet {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LogicalTape {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct TapeShare {
+    pub firstblocknumber: int64,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct BrinTuple {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GinTuple {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Sharedsort {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SortCoordinateData {
+    pub isWorker: bool,
+    pub nParticipants: ::core::ffi::c_int,
+    pub sharedsort: *mut Sharedsort,
+}
+impl Default for SortCoordinateData {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type SortCoordinate = *mut SortCoordinateData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SortTuple {
+    pub tuple: *mut ::core::ffi::c_void,
+    pub datum1: Datum,
+    pub isnull1: bool,
+    pub curbyte: uint8,
+    pub srctape: ::core::ffi::c_int,
+}
+impl Default for SortTuple {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type SortTupleComparator = ::core::option::Option<
+    unsafe extern "C-unwind" fn(
+        a: *const SortTuple,
+        b: *const SortTuple,
+        state: *mut Tuplesortstate,
+    ) -> ::core::ffi::c_int,
+>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TuplesortPublic {
+    pub comparetup: SortTupleComparator,
+    pub comparetup_tiebreak: SortTupleComparator,
+    pub removeabbrev: ::core::option::Option<
+        unsafe extern "C-unwind" fn(
+            state: *mut Tuplesortstate,
+            stups: *mut SortTuple,
+            count: ::core::ffi::c_int,
+        ),
+    >,
+    pub writetup: ::core::option::Option<
+        unsafe extern "C-unwind" fn(
+            state: *mut Tuplesortstate,
+            tape: *mut LogicalTape,
+            stup: *mut SortTuple,
+        ),
+    >,
+    pub readtup: ::core::option::Option<
+        unsafe extern "C-unwind" fn(
+            state: *mut Tuplesortstate,
+            stup: *mut SortTuple,
+            tape: *mut LogicalTape,
+            len: ::core::ffi::c_uint,
+        ),
+    >,
+    pub freestate: ::core::option::Option<unsafe extern "C-unwind" fn(state: *mut Tuplesortstate)>,
+    pub maincontext: MemoryContext,
+    pub sortcontext: MemoryContext,
+    pub tuplecontext: MemoryContext,
+    pub haveDatum1: bool,
+    pub nKeys: ::core::ffi::c_int,
+    pub sortKeys: SortSupport,
+    pub onlyKey: SortSupport,
+    pub sortopt: ::core::ffi::c_int,
+    pub tuples: bool,
+    pub arg: *mut ::core::ffi::c_void,
+}
+impl Default for TuplesortPublic {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub mod WaitEventActivity {
+    pub type Type = ::core::ffi::c_uint;
+    pub const WAIT_EVENT_ARCHIVER_MAIN: Type = 83886080;
+    pub const WAIT_EVENT_AUTOVACUUM_MAIN: Type = 83886081;
+    pub const WAIT_EVENT_BGWRITER_HIBERNATE: Type = 83886082;
+    pub const WAIT_EVENT_BGWRITER_MAIN: Type = 83886083;
+    pub const WAIT_EVENT_CHECKPOINTER_MAIN: Type = 83886084;
+    pub const WAIT_EVENT_CHECKPOINTER_SHUTDOWN: Type = 83886085;
+    pub const WAIT_EVENT_IO_WORKER_MAIN: Type = 83886086;
+    pub const WAIT_EVENT_LOGICAL_APPLY_MAIN: Type = 83886087;
+    pub const WAIT_EVENT_LOGICAL_LAUNCHER_MAIN: Type = 83886088;
+    pub const WAIT_EVENT_LOGICAL_PARALLEL_APPLY_MAIN: Type = 83886089;
+    pub const WAIT_EVENT_RECOVERY_WAL_STREAM: Type = 83886090;
+    pub const WAIT_EVENT_REPLICATION_SLOTSYNC_MAIN: Type = 83886091;
+    pub const WAIT_EVENT_REPLICATION_SLOTSYNC_SHUTDOWN: Type = 83886092;
+    pub const WAIT_EVENT_SYSLOGGER_MAIN: Type = 83886093;
+    pub const WAIT_EVENT_WAL_RECEIVER_MAIN: Type = 83886094;
+    pub const WAIT_EVENT_WAL_SENDER_MAIN: Type = 83886095;
+    pub const WAIT_EVENT_WAL_SUMMARIZER_WAL: Type = 83886096;
+    pub const WAIT_EVENT_WAL_WRITER_MAIN: Type = 83886097;
+}
+pub mod WaitEventBuffer {
+    pub type Type = ::core::ffi::c_uint;
+    pub const WAIT_EVENT_BUFFER_CLEANUP: Type = 67108864;
+    pub const WAIT_EVENT_BUFFER_EXCLUSIVE: Type = 67108865;
+    pub const WAIT_EVENT_BUFFER_SHARED: Type = 67108866;
+    pub const WAIT_EVENT_BUFFER_SHARE_EXCLUSIVE: Type = 67108867;
+}
+pub mod WaitEventClient {
+    pub type Type = ::core::ffi::c_uint;
+    pub const WAIT_EVENT_CLIENT_READ: Type = 100663296;
+    pub const WAIT_EVENT_CLIENT_WRITE: Type = 100663297;
+    pub const WAIT_EVENT_GSS_OPEN_SERVER: Type = 100663298;
+    pub const WAIT_EVENT_LIBPQWALRECEIVER_CONNECT: Type = 100663299;
+    pub const WAIT_EVENT_LIBPQWALRECEIVER_RECEIVE: Type = 100663300;
+    pub const WAIT_EVENT_SSL_OPEN_SERVER: Type = 100663301;
+    pub const WAIT_EVENT_WAIT_FOR_STANDBY_CONFIRMATION: Type = 100663302;
+    pub const WAIT_EVENT_WAIT_FOR_WAL_FLUSH: Type = 100663303;
+    pub const WAIT_EVENT_WAIT_FOR_WAL_REPLAY: Type = 100663304;
+    pub const WAIT_EVENT_WAIT_FOR_WAL_WRITE: Type = 100663305;
+    pub const WAIT_EVENT_WAL_SENDER_WAIT_FOR_WAL: Type = 100663306;
+    pub const WAIT_EVENT_WAL_SENDER_WRITE_DATA: Type = 100663307;
+}
+pub mod WaitEventIO {
+    pub type Type = ::core::ffi::c_uint;
+    pub const WAIT_EVENT_AIO_IO_COMPLETION: Type = 167772160;
+    pub const WAIT_EVENT_AIO_IO_URING_EXECUTION: Type = 167772161;
+    pub const WAIT_EVENT_AIO_IO_URING_SUBMIT: Type = 167772162;
+    pub const WAIT_EVENT_BASEBACKUP_READ: Type = 167772163;
+    pub const WAIT_EVENT_BASEBACKUP_SYNC: Type = 167772164;
+    pub const WAIT_EVENT_BASEBACKUP_WRITE: Type = 167772165;
+    pub const WAIT_EVENT_BUFFILE_READ: Type = 167772166;
+    pub const WAIT_EVENT_BUFFILE_TRUNCATE: Type = 167772167;
+    pub const WAIT_EVENT_BUFFILE_WRITE: Type = 167772168;
+    pub const WAIT_EVENT_CONTROL_FILE_READ: Type = 167772169;
+    pub const WAIT_EVENT_CONTROL_FILE_SYNC: Type = 167772170;
+    pub const WAIT_EVENT_CONTROL_FILE_SYNC_UPDATE: Type = 167772171;
+    pub const WAIT_EVENT_CONTROL_FILE_WRITE: Type = 167772172;
+    pub const WAIT_EVENT_CONTROL_FILE_WRITE_UPDATE: Type = 167772173;
+    pub const WAIT_EVENT_COPY_FILE_COPY: Type = 167772174;
+    pub const WAIT_EVENT_COPY_FILE_READ: Type = 167772175;
+    pub const WAIT_EVENT_COPY_FILE_WRITE: Type = 167772176;
+    pub const WAIT_EVENT_COPY_FROM_READ: Type = 167772177;
+    pub const WAIT_EVENT_COPY_TO_WRITE: Type = 167772178;
+    pub const WAIT_EVENT_DATA_FILE_EXTEND: Type = 167772179;
+    pub const WAIT_EVENT_DATA_FILE_FLUSH: Type = 167772180;
+    pub const WAIT_EVENT_DATA_FILE_IMMEDIATE_SYNC: Type = 167772181;
+    pub const WAIT_EVENT_DATA_FILE_PREFETCH: Type = 167772182;
+    pub const WAIT_EVENT_DATA_FILE_READ: Type = 167772183;
+    pub const WAIT_EVENT_DATA_FILE_SYNC: Type = 167772184;
+    pub const WAIT_EVENT_DATA_FILE_TRUNCATE: Type = 167772185;
+    pub const WAIT_EVENT_DATA_FILE_WRITE: Type = 167772186;
+    pub const WAIT_EVENT_DSM_ALLOCATE: Type = 167772187;
+    pub const WAIT_EVENT_DSM_FILL_ZERO_WRITE: Type = 167772188;
+    pub const WAIT_EVENT_LOCK_FILE_ADDTODATADIR_READ: Type = 167772189;
+    pub const WAIT_EVENT_LOCK_FILE_ADDTODATADIR_SYNC: Type = 167772190;
+    pub const WAIT_EVENT_LOCK_FILE_ADDTODATADIR_WRITE: Type = 167772191;
+    pub const WAIT_EVENT_LOCK_FILE_CREATE_READ: Type = 167772192;
+    pub const WAIT_EVENT_LOCK_FILE_CREATE_SYNC: Type = 167772193;
+    pub const WAIT_EVENT_LOCK_FILE_CREATE_WRITE: Type = 167772194;
+    pub const WAIT_EVENT_LOCK_FILE_RECHECKDATADIR_READ: Type = 167772195;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_CHECKPOINT_SYNC: Type = 167772196;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_MAPPING_SYNC: Type = 167772197;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_MAPPING_WRITE: Type = 167772198;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_SYNC: Type = 167772199;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_TRUNCATE: Type = 167772200;
+    pub const WAIT_EVENT_LOGICAL_REWRITE_WRITE: Type = 167772201;
+    pub const WAIT_EVENT_RELATION_MAP_READ: Type = 167772202;
+    pub const WAIT_EVENT_RELATION_MAP_REPLACE: Type = 167772203;
+    pub const WAIT_EVENT_RELATION_MAP_WRITE: Type = 167772204;
+    pub const WAIT_EVENT_REORDER_BUFFER_READ: Type = 167772205;
+    pub const WAIT_EVENT_REORDER_BUFFER_WRITE: Type = 167772206;
+    pub const WAIT_EVENT_REORDER_LOGICAL_MAPPING_READ: Type = 167772207;
+    pub const WAIT_EVENT_REPLICATION_SLOT_READ: Type = 167772208;
+    pub const WAIT_EVENT_REPLICATION_SLOT_RESTORE_SYNC: Type = 167772209;
+    pub const WAIT_EVENT_REPLICATION_SLOT_SYNC: Type = 167772210;
+    pub const WAIT_EVENT_REPLICATION_SLOT_WRITE: Type = 167772211;
+    pub const WAIT_EVENT_SLRU_FLUSH_SYNC: Type = 167772212;
+    pub const WAIT_EVENT_SLRU_READ: Type = 167772213;
+    pub const WAIT_EVENT_SLRU_SYNC: Type = 167772214;
+    pub const WAIT_EVENT_SLRU_WRITE: Type = 167772215;
+    pub const WAIT_EVENT_SNAPBUILD_READ: Type = 167772216;
+    pub const WAIT_EVENT_SNAPBUILD_SYNC: Type = 167772217;
+    pub const WAIT_EVENT_SNAPBUILD_WRITE: Type = 167772218;
+    pub const WAIT_EVENT_TIMELINE_HISTORY_FILE_SYNC: Type = 167772219;
+    pub const WAIT_EVENT_TIMELINE_HISTORY_FILE_WRITE: Type = 167772220;
+    pub const WAIT_EVENT_TIMELINE_HISTORY_READ: Type = 167772221;
+    pub const WAIT_EVENT_TIMELINE_HISTORY_SYNC: Type = 167772222;
+    pub const WAIT_EVENT_TIMELINE_HISTORY_WRITE: Type = 167772223;
+    pub const WAIT_EVENT_TWOPHASE_FILE_READ: Type = 167772224;
+    pub const WAIT_EVENT_TWOPHASE_FILE_SYNC: Type = 167772225;
+    pub const WAIT_EVENT_TWOPHASE_FILE_WRITE: Type = 167772226;
+    pub const WAIT_EVENT_VERSION_FILE_SYNC: Type = 167772227;
+    pub const WAIT_EVENT_VERSION_FILE_WRITE: Type = 167772228;
+    pub const WAIT_EVENT_WALSENDER_TIMELINE_HISTORY_READ: Type = 167772229;
+    pub const WAIT_EVENT_WAL_BOOTSTRAP_SYNC: Type = 167772230;
+    pub const WAIT_EVENT_WAL_BOOTSTRAP_WRITE: Type = 167772231;
+    pub const WAIT_EVENT_WAL_COPY_READ: Type = 167772232;
+    pub const WAIT_EVENT_WAL_COPY_SYNC: Type = 167772233;
+    pub const WAIT_EVENT_WAL_COPY_WRITE: Type = 167772234;
+    pub const WAIT_EVENT_WAL_INIT_SYNC: Type = 167772235;
+    pub const WAIT_EVENT_WAL_INIT_WRITE: Type = 167772236;
+    pub const WAIT_EVENT_WAL_READ: Type = 167772237;
+    pub const WAIT_EVENT_WAL_SUMMARY_READ: Type = 167772238;
+    pub const WAIT_EVENT_WAL_SUMMARY_WRITE: Type = 167772239;
+    pub const WAIT_EVENT_WAL_SYNC: Type = 167772240;
+    pub const WAIT_EVENT_WAL_SYNC_METHOD_ASSIGN: Type = 167772241;
+    pub const WAIT_EVENT_WAL_WRITE: Type = 167772242;
+}
+pub mod WaitEventIPC {
+    pub type Type = ::core::ffi::c_uint;
+    pub const WAIT_EVENT_APPEND_READY: Type = 134217728;
+    pub const WAIT_EVENT_ARCHIVE_CLEANUP_COMMAND: Type = 134217729;
+    pub const WAIT_EVENT_ARCHIVE_COMMAND: Type = 134217730;
+    pub const WAIT_EVENT_BACKEND_TERMINATION: Type = 134217731;
+    pub const WAIT_EVENT_BACKUP_WAIT_WAL_ARCHIVE: Type = 134217732;
+    pub const WAIT_EVENT_BGWORKER_SHUTDOWN: Type = 134217733;
+    pub const WAIT_EVENT_BGWORKER_STARTUP: Type = 134217734;
+    pub const WAIT_EVENT_BTREE_PAGE: Type = 134217735;
+    pub const WAIT_EVENT_BUFFER_IO: Type = 134217736;
+    pub const WAIT_EVENT_CHECKPOINT_DELAY_COMPLETE: Type = 134217737;
+    pub const WAIT_EVENT_CHECKPOINT_DELAY_START: Type = 134217738;
+    pub const WAIT_EVENT_CHECKPOINT_DONE: Type = 134217739;
+    pub const WAIT_EVENT_CHECKPOINT_START: Type = 134217740;
+    pub const WAIT_EVENT_CHECKSUM_ENABLE_STARTCONDITION: Type = 134217741;
+    pub const WAIT_EVENT_CHECKSUM_ENABLE_TEMPTABLE_WAIT: Type = 134217742;
+    pub const WAIT_EVENT_EXECUTE_GATHER: Type = 134217743;
+    pub const WAIT_EVENT_HASH_BATCH_ALLOCATE: Type = 134217744;
+    pub const WAIT_EVENT_HASH_BATCH_ELECT: Type = 134217745;
+    pub const WAIT_EVENT_HASH_BATCH_LOAD: Type = 134217746;
+    pub const WAIT_EVENT_HASH_BUILD_ALLOCATE: Type = 134217747;
+    pub const WAIT_EVENT_HASH_BUILD_ELECT: Type = 134217748;
+    pub const WAIT_EVENT_HASH_BUILD_HASH_INNER: Type = 134217749;
+    pub const WAIT_EVENT_HASH_BUILD_HASH_OUTER: Type = 134217750;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_DECIDE: Type = 134217751;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_ELECT: Type = 134217752;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_FINISH: Type = 134217753;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_REALLOCATE: Type = 134217754;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_REPARTITION: Type = 134217755;
+    pub const WAIT_EVENT_HASH_GROW_BUCKETS_ELECT: Type = 134217756;
+    pub const WAIT_EVENT_HASH_GROW_BUCKETS_REALLOCATE: Type = 134217757;
+    pub const WAIT_EVENT_HASH_GROW_BUCKETS_REINSERT: Type = 134217758;
+    pub const WAIT_EVENT_LOGICAL_APPLY_SEND_DATA: Type = 134217759;
+    pub const WAIT_EVENT_LOGICAL_PARALLEL_APPLY_STATE_CHANGE: Type = 134217760;
+    pub const WAIT_EVENT_LOGICAL_SYNC_DATA: Type = 134217761;
+    pub const WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE: Type = 134217762;
+    pub const WAIT_EVENT_MESSAGE_QUEUE_INTERNAL: Type = 134217763;
+    pub const WAIT_EVENT_MESSAGE_QUEUE_PUT_MESSAGE: Type = 134217764;
+    pub const WAIT_EVENT_MESSAGE_QUEUE_RECEIVE: Type = 134217765;
+    pub const WAIT_EVENT_MESSAGE_QUEUE_SEND: Type = 134217766;
+    pub const WAIT_EVENT_MULTIXACT_CREATION: Type = 134217767;
+    pub const WAIT_EVENT_PARALLEL_BITMAP_SCAN: Type = 134217768;
+    pub const WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN: Type = 134217769;
+    pub const WAIT_EVENT_PARALLEL_FINISH: Type = 134217770;
+    pub const WAIT_EVENT_PROCARRAY_GROUP_UPDATE: Type = 134217771;
+    pub const WAIT_EVENT_PROC_SIGNAL_BARRIER: Type = 134217772;
+    pub const WAIT_EVENT_PROMOTE: Type = 134217773;
+    pub const WAIT_EVENT_RECOVERY_CONFLICT_SNAPSHOT: Type = 134217774;
+    pub const WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE: Type = 134217775;
+    pub const WAIT_EVENT_RECOVERY_END_COMMAND: Type = 134217776;
+    pub const WAIT_EVENT_RECOVERY_PAUSE: Type = 134217777;
+    pub const WAIT_EVENT_REPACK_WORKER_EXPORT: Type = 134217778;
+    pub const WAIT_EVENT_REPLICATION_ORIGIN_DROP: Type = 134217779;
+    pub const WAIT_EVENT_REPLICATION_SLOT_DROP: Type = 134217780;
+    pub const WAIT_EVENT_RESTORE_COMMAND: Type = 134217781;
+    pub const WAIT_EVENT_SAFE_SNAPSHOT: Type = 134217782;
+    pub const WAIT_EVENT_SYNC_REP: Type = 134217783;
+    pub const WAIT_EVENT_WAL_RECEIVER_EXIT: Type = 134217784;
+    pub const WAIT_EVENT_WAL_RECEIVER_WAIT_START: Type = 134217785;
+    pub const WAIT_EVENT_WAL_SUMMARY_READY: Type = 134217786;
+    pub const WAIT_EVENT_XACT_GROUP_UPDATE: Type = 134217787;
+}
+pub mod WaitEventTimeout {
+    pub type Type = ::core::ffi::c_uint;
+    pub const WAIT_EVENT_BASE_BACKUP_THROTTLE: Type = 150994944;
+    pub const WAIT_EVENT_CHECKPOINT_WRITE_DELAY: Type = 150994945;
+    pub const WAIT_EVENT_COMMIT_DELAY: Type = 150994946;
+    pub const WAIT_EVENT_PG_SLEEP: Type = 150994947;
+    pub const WAIT_EVENT_RECOVERY_APPLY_DELAY: Type = 150994948;
+    pub const WAIT_EVENT_RECOVERY_RETRIEVE_RETRY_INTERVAL: Type = 150994949;
+    pub const WAIT_EVENT_REGISTER_SYNC_REQUEST: Type = 150994950;
+    pub const WAIT_EVENT_SPIN_DELAY: Type = 150994951;
+    pub const WAIT_EVENT_VACUUM_DELAY: Type = 150994952;
+    pub const WAIT_EVENT_VACUUM_TRUNCATE: Type = 150994953;
+    pub const WAIT_EVENT_WAL_SUMMARIZER_ERROR: Type = 150994954;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct RangeType {
@@ -50643,6 +51325,148 @@ unsafe extern "C-unwind" {
     );
     pub fn DescribeLockTag(buf: StringInfo, tag: *const LOCKTAG);
     pub fn GetLockNameFromTagType(locktag_type: uint16) -> *const ::core::ffi::c_char;
+    pub static mut max_locks_per_xact: ::core::ffi::c_int;
+    pub static mut log_lock_failures: bool;
+    pub fn InitLockManagerAccess();
+    pub fn GetLocksMethodTable(lock: *const LOCK) -> LockMethod;
+    pub fn GetLockTagsMethodTable(locktag: *const LOCKTAG) -> LockMethod;
+    pub fn LockTagHashCode(locktag: *const LOCKTAG) -> uint32;
+    pub fn DoLockModesConflict(mode1: LOCKMODE, mode2: LOCKMODE) -> bool;
+    pub fn LockAcquire(
+        locktag: *const LOCKTAG,
+        lockmode: LOCKMODE,
+        sessionLock: bool,
+        dontWait: bool,
+    ) -> LockAcquireResult::Type;
+    pub fn LockAcquireExtended(
+        locktag: *const LOCKTAG,
+        lockmode: LOCKMODE,
+        sessionLock: bool,
+        dontWait: bool,
+        reportMemoryError: bool,
+        locallockp: *mut *mut LOCALLOCK,
+        logLockFailure: bool,
+    ) -> LockAcquireResult::Type;
+    pub fn AbortStrongLockAcquire();
+    pub fn MarkLockClear(locallock: *mut LOCALLOCK);
+    pub fn LockRelease(locktag: *const LOCKTAG, lockmode: LOCKMODE, sessionLock: bool) -> bool;
+    pub fn LockReleaseAll(lockmethodid: LOCKMETHODID, allLocks: bool);
+    pub fn LockReleaseSession(lockmethodid: LOCKMETHODID);
+    pub fn LockReleaseCurrentOwner(locallocks: *mut *mut LOCALLOCK, nlocks: ::core::ffi::c_int);
+    pub fn LockReassignCurrentOwner(locallocks: *mut *mut LOCALLOCK, nlocks: ::core::ffi::c_int);
+    pub fn LockHeldByMe(locktag: *const LOCKTAG, lockmode: LOCKMODE, orstronger: bool) -> bool;
+    pub fn GetLockMethodLocalHash() -> *mut HTAB;
+    pub fn LockHasWaiters(locktag: *const LOCKTAG, lockmode: LOCKMODE, sessionLock: bool) -> bool;
+    pub fn GetLockConflicts(
+        locktag: *const LOCKTAG,
+        lockmode: LOCKMODE,
+        countp: *mut ::core::ffi::c_int,
+    ) -> *mut VirtualTransactionId;
+    pub fn AtPrepare_Locks();
+    pub fn PostPrepare_Locks(fxid: FullTransactionId);
+    pub fn LockCheckConflicts(
+        lockMethodTable: LockMethod,
+        lockmode: LOCKMODE,
+        lock: *mut LOCK,
+        proclock: *mut PROCLOCK,
+    ) -> bool;
+    pub fn GrantLock(lock: *mut LOCK, proclock: *mut PROCLOCK, lockmode: LOCKMODE);
+    pub fn GrantAwaitedLock();
+    pub fn GetAwaitedLock() -> *mut LOCALLOCK;
+    pub fn ResetAwaitedLock();
+    pub fn RemoveFromWaitQueue(proc_: *mut PGPROC, hashcode: uint32);
+    pub fn GetLockStatusData() -> *mut LockData;
+    pub fn GetBlockerStatusData(blocked_pid: ::core::ffi::c_int) -> *mut BlockedProcsData;
+    pub fn GetRunningTransactionLocks(nlocks: *mut ::core::ffi::c_int) -> *mut xl_standby_lock;
+    pub fn GetLockmodeName(
+        lockmethodid: LOCKMETHODID,
+        mode: LOCKMODE,
+    ) -> *const ::core::ffi::c_char;
+    pub fn lock_twophase_recover(
+        fxid: FullTransactionId,
+        info: uint16,
+        recdata: *mut ::core::ffi::c_void,
+        len: uint32,
+    );
+    pub fn lock_twophase_postcommit(
+        fxid: FullTransactionId,
+        info: uint16,
+        recdata: *mut ::core::ffi::c_void,
+        len: uint32,
+    );
+    pub fn lock_twophase_postabort(
+        fxid: FullTransactionId,
+        info: uint16,
+        recdata: *mut ::core::ffi::c_void,
+        len: uint32,
+    );
+    pub fn lock_twophase_standby_recover(
+        fxid: FullTransactionId,
+        info: uint16,
+        recdata: *mut ::core::ffi::c_void,
+        len: uint32,
+    );
+    pub fn DeadLockCheck(proc_: *mut PGPROC) -> DeadLockState::Type;
+    pub fn GetBlockingAutoVacuumPgproc() -> *mut PGPROC;
+    pub fn DeadLockReport();
+    pub fn RememberSimpleDeadLock(
+        proc1: *mut PGPROC,
+        lockmode: LOCKMODE,
+        lock: *mut LOCK,
+        proc2: *mut PGPROC,
+    );
+    pub fn InitDeadLockChecking();
+    pub fn LockWaiterCount(locktag: *const LOCKTAG) -> ::core::ffi::c_int;
+    pub fn VirtualXactLockTableInsert(vxid: VirtualTransactionId);
+    pub fn VirtualXactLockTableCleanup();
+    pub fn VirtualXactLock(vxid: VirtualTransactionId, wait: bool) -> bool;
+    pub fn PGSemaphoreShmemRequest(maxSemas: ::core::ffi::c_int);
+    pub fn PGSemaphoreInit(maxSemas: ::core::ffi::c_int);
+    pub fn PGSemaphoreCreate() -> PGSemaphore;
+    pub fn PGSemaphoreReset(sema: PGSemaphore);
+    pub fn PGSemaphoreLock(sema: PGSemaphore);
+    pub fn PGSemaphoreUnlock(sema: PGSemaphore);
+    pub fn PGSemaphoreTryLock(sema: PGSemaphore) -> bool;
+    pub static mut FastPathLockGroupsPerBackend: ::core::ffi::c_int;
+    pub static mut MyProc: *mut PGPROC;
+    pub static mut ProcGlobal: *mut PROC_HDR;
+    pub static mut PreparedXactProcs: *mut PGPROC;
+    pub static mut DeadlockTimeout: ::core::ffi::c_int;
+    pub static mut StatementTimeout: ::core::ffi::c_int;
+    pub static mut LockTimeout: ::core::ffi::c_int;
+    pub static mut IdleInTransactionSessionTimeout: ::core::ffi::c_int;
+    pub static mut TransactionTimeout: ::core::ffi::c_int;
+    pub static mut IdleSessionTimeout: ::core::ffi::c_int;
+    pub static mut log_lock_waits: bool;
+    pub fn ProcGlobalSemas() -> ::core::ffi::c_int;
+    pub fn InitProcess();
+    pub fn InitProcessPhase2();
+    pub fn InitAuxiliaryProcess();
+    pub fn SetStartupBufferPinWaitBufId(bufid: ::core::ffi::c_int);
+    pub fn GetStartupBufferPinWaitBufId() -> ::core::ffi::c_int;
+    pub fn HaveNFreeProcs(n: ::core::ffi::c_int, nfree: *mut ::core::ffi::c_int) -> bool;
+    pub fn ProcReleaseLocks(isCommit: bool);
+    pub fn JoinWaitQueue(
+        locallock: *mut LOCALLOCK,
+        lockMethodTable: LockMethod,
+        dontWait: bool,
+    ) -> ProcWaitStatus::Type;
+    pub fn ProcSleep(locallock: *mut LOCALLOCK) -> ProcWaitStatus::Type;
+    pub fn ProcWakeup(proc_: *mut PGPROC, waitStatus: ProcWaitStatus::Type);
+    pub fn ProcLockWakeup(lockMethodTable: LockMethod, lock: *mut LOCK);
+    pub fn CheckDeadLockAlert();
+    pub fn LockErrorCleanup();
+    pub fn GetLockHoldersAndWaiters(
+        locallock: *mut LOCALLOCK,
+        lock_holders_sbuf: StringInfo,
+        lock_waiters_sbuf: StringInfo,
+        lockHoldersNum: *mut ::core::ffi::c_int,
+    );
+    pub fn ProcWaitForSignal(wait_event_info: uint32);
+    pub fn ProcSendSignal(procNumber: ProcNumber);
+    pub fn AuxiliaryPidGetProc(pid: ::core::ffi::c_int) -> *mut PGPROC;
+    pub fn BecomeLockGroupLeader();
+    pub fn BecomeLockGroupMember(leader: *mut PGPROC, pid: ::core::ffi::c_int) -> bool;
     pub fn standby_redo(record: *mut XLogReaderState);
     pub fn standby_desc(buf: StringInfo, record: *mut XLogReaderState);
     pub fn standby_identify(info: uint8) -> *const ::core::ffi::c_char;
@@ -55444,6 +56268,198 @@ unsafe extern "C-unwind" {
     pub fn RelationInvalidatesSnapshotsOnly(relid: Oid) -> bool;
     pub fn RelationHasSysCache(relid: Oid) -> bool;
     pub fn RelationSupportsSysCache(relid: Oid) -> bool;
+    pub fn SharedFileSetInit(fileset: *mut SharedFileSet, seg: *mut dsm_segment);
+    pub fn SharedFileSetAttach(fileset: *mut SharedFileSet, seg: *mut dsm_segment);
+    pub fn SharedFileSetDeleteAll(fileset: *mut SharedFileSet);
+    pub fn LogicalTapeSetCreate(
+        preallocate: bool,
+        fileset: *mut SharedFileSet,
+        worker: ::core::ffi::c_int,
+    ) -> *mut LogicalTapeSet;
+    pub fn LogicalTapeClose(lt: *mut LogicalTape);
+    pub fn LogicalTapeSetClose(lts: *mut LogicalTapeSet);
+    pub fn LogicalTapeCreate(lts: *mut LogicalTapeSet) -> *mut LogicalTape;
+    pub fn LogicalTapeImport(
+        lts: *mut LogicalTapeSet,
+        worker: ::core::ffi::c_int,
+        shared: *mut TapeShare,
+    ) -> *mut LogicalTape;
+    pub fn LogicalTapeSetForgetFreeSpace(lts: *mut LogicalTapeSet);
+    pub fn LogicalTapeRead(
+        lt: *mut LogicalTape,
+        ptr: *mut ::core::ffi::c_void,
+        size: usize,
+    ) -> usize;
+    pub fn LogicalTapeWrite(lt: *mut LogicalTape, ptr: *const ::core::ffi::c_void, size: usize);
+    pub fn LogicalTapeRewindForRead(lt: *mut LogicalTape, buffer_size: usize);
+    pub fn LogicalTapeFreeze(lt: *mut LogicalTape, share: *mut TapeShare);
+    pub fn LogicalTapeBackspace(lt: *mut LogicalTape, size: usize) -> usize;
+    pub fn LogicalTapeSeek(lt: *mut LogicalTape, blocknum: int64, offset: ::core::ffi::c_int);
+    pub fn LogicalTapeTell(
+        lt: *mut LogicalTape,
+        blocknum: *mut int64,
+        offset: *mut ::core::ffi::c_int,
+    );
+    pub fn LogicalTapeSetBlocks(lts: *mut LogicalTapeSet) -> int64;
+    pub fn tuplesort_begin_common(
+        workMem: ::core::ffi::c_int,
+        coordinate: SortCoordinate,
+        sortopt: ::core::ffi::c_int,
+    ) -> *mut Tuplesortstate;
+    pub fn tuplesort_set_bound(state: *mut Tuplesortstate, bound: int64);
+    pub fn tuplesort_used_bound(state: *mut Tuplesortstate) -> bool;
+    pub fn tuplesort_puttuple_common(
+        state: *mut Tuplesortstate,
+        tuple: *mut SortTuple,
+        useAbbrev: bool,
+        tuplen: Size,
+    );
+    pub fn tuplesort_performsort(state: *mut Tuplesortstate);
+    pub fn tuplesort_gettuple_common(
+        state: *mut Tuplesortstate,
+        forward: bool,
+        stup: *mut SortTuple,
+    ) -> bool;
+    pub fn tuplesort_skiptuples(state: *mut Tuplesortstate, ntuples: int64, forward: bool) -> bool;
+    pub fn tuplesort_end(state: *mut Tuplesortstate);
+    pub fn tuplesort_reset(state: *mut Tuplesortstate);
+    pub fn tuplesort_get_stats(state: *mut Tuplesortstate, stats: *mut TuplesortInstrumentation);
+    pub fn tuplesort_method_name(m: TuplesortMethod::Type) -> *const ::core::ffi::c_char;
+    pub fn tuplesort_space_type_name(t: TuplesortSpaceType::Type) -> *const ::core::ffi::c_char;
+    pub fn tuplesort_merge_order(allowedMem: int64) -> ::core::ffi::c_int;
+    pub fn tuplesort_estimate_shared(nWorkers: ::core::ffi::c_int) -> Size;
+    pub fn tuplesort_initialize_shared(
+        shared: *mut Sharedsort,
+        nWorkers: ::core::ffi::c_int,
+        seg: *mut dsm_segment,
+    );
+    pub fn tuplesort_attach_shared(shared: *mut Sharedsort, seg: *mut dsm_segment);
+    pub fn tuplesort_rescan(state: *mut Tuplesortstate);
+    pub fn tuplesort_markpos(state: *mut Tuplesortstate);
+    pub fn tuplesort_restorepos(state: *mut Tuplesortstate);
+    pub fn tuplesort_readtup_alloc(
+        state: *mut Tuplesortstate,
+        tuplen: Size,
+    ) -> *mut ::core::ffi::c_void;
+    pub fn tuplesort_begin_heap(
+        tupDesc: TupleDesc,
+        nkeys: ::core::ffi::c_int,
+        attNums: *mut AttrNumber,
+        sortOperators: *mut Oid,
+        sortCollations: *mut Oid,
+        nullsFirstFlags: *mut bool,
+        workMem: ::core::ffi::c_int,
+        coordinate: SortCoordinate,
+        sortopt: ::core::ffi::c_int,
+    ) -> *mut Tuplesortstate;
+    pub fn tuplesort_begin_cluster(
+        tupDesc: TupleDesc,
+        indexRel: Relation,
+        workMem: ::core::ffi::c_int,
+        coordinate: SortCoordinate,
+        sortopt: ::core::ffi::c_int,
+    ) -> *mut Tuplesortstate;
+    pub fn tuplesort_begin_index_btree(
+        heapRel: Relation,
+        indexRel: Relation,
+        enforceUnique: bool,
+        uniqueNullsNotDistinct: bool,
+        workMem: ::core::ffi::c_int,
+        coordinate: SortCoordinate,
+        sortopt: ::core::ffi::c_int,
+    ) -> *mut Tuplesortstate;
+    pub fn tuplesort_begin_index_hash(
+        heapRel: Relation,
+        indexRel: Relation,
+        high_mask: uint32,
+        low_mask: uint32,
+        max_buckets: uint32,
+        workMem: ::core::ffi::c_int,
+        coordinate: SortCoordinate,
+        sortopt: ::core::ffi::c_int,
+    ) -> *mut Tuplesortstate;
+    pub fn tuplesort_begin_index_gist(
+        heapRel: Relation,
+        indexRel: Relation,
+        workMem: ::core::ffi::c_int,
+        coordinate: SortCoordinate,
+        sortopt: ::core::ffi::c_int,
+    ) -> *mut Tuplesortstate;
+    pub fn tuplesort_begin_index_brin(
+        workMem: ::core::ffi::c_int,
+        coordinate: SortCoordinate,
+        sortopt: ::core::ffi::c_int,
+    ) -> *mut Tuplesortstate;
+    pub fn tuplesort_begin_index_gin(
+        heapRel: Relation,
+        indexRel: Relation,
+        workMem: ::core::ffi::c_int,
+        coordinate: SortCoordinate,
+        sortopt: ::core::ffi::c_int,
+    ) -> *mut Tuplesortstate;
+    pub fn tuplesort_begin_datum(
+        datumType: Oid,
+        sortOperator: Oid,
+        sortCollation: Oid,
+        nullsFirstFlag: bool,
+        workMem: ::core::ffi::c_int,
+        coordinate: SortCoordinate,
+        sortopt: ::core::ffi::c_int,
+    ) -> *mut Tuplesortstate;
+    pub fn tuplesort_puttupleslot(state: *mut Tuplesortstate, slot: *mut TupleTableSlot);
+    pub fn tuplesort_putheaptuple(state: *mut Tuplesortstate, tup: HeapTuple);
+    pub fn tuplesort_putindextuplevalues(
+        state: *mut Tuplesortstate,
+        rel: Relation,
+        self_: *const ItemPointerData,
+        values: *const Datum,
+        isnull: *const bool,
+    );
+    pub fn tuplesort_putbrintuple(state: *mut Tuplesortstate, tuple: *mut BrinTuple, size: Size);
+    pub fn tuplesort_putgintuple(state: *mut Tuplesortstate, tuple: *mut GinTuple, size: Size);
+    pub fn tuplesort_putdatum(state: *mut Tuplesortstate, val: Datum, isNull: bool);
+    pub fn tuplesort_gettupleslot(
+        state: *mut Tuplesortstate,
+        forward: bool,
+        copy: bool,
+        slot: *mut TupleTableSlot,
+        abbrev: *mut Datum,
+    ) -> bool;
+    pub fn tuplesort_getheaptuple(state: *mut Tuplesortstate, forward: bool) -> HeapTuple;
+    pub fn tuplesort_getindextuple(state: *mut Tuplesortstate, forward: bool) -> IndexTuple;
+    pub fn tuplesort_getbrintuple(
+        state: *mut Tuplesortstate,
+        len: *mut Size,
+        forward: bool,
+    ) -> *mut BrinTuple;
+    pub fn tuplesort_getgintuple(
+        state: *mut Tuplesortstate,
+        len: *mut Size,
+        forward: bool,
+    ) -> *mut GinTuple;
+    pub fn tuplesort_getdatum(
+        state: *mut Tuplesortstate,
+        forward: bool,
+        copy: bool,
+        val: *mut Datum,
+        isNull: *mut bool,
+        abbrev: *mut Datum,
+    ) -> bool;
+    pub fn pgstat_get_wait_event(wait_event_info: uint32) -> *const ::core::ffi::c_char;
+    pub fn pgstat_get_wait_event_type(wait_event_info: uint32) -> *const ::core::ffi::c_char;
+    #[link_name = "pgstat_report_wait_start__pgrx_cshim"]
+    pub fn pgstat_report_wait_start(wait_event_info: uint32);
+    #[link_name = "pgstat_report_wait_end__pgrx_cshim"]
+    pub fn pgstat_report_wait_end();
+    pub fn pgstat_set_wait_event_storage(wait_event_info: *mut uint32);
+    pub fn pgstat_reset_wait_event_storage();
+    pub static mut my_wait_event_info: *mut uint32;
+    pub fn WaitEventExtensionNew(wait_event_name: *const ::core::ffi::c_char) -> uint32;
+    pub fn WaitEventInjectionPointNew(wait_event_name: *const ::core::ffi::c_char) -> uint32;
+    pub fn GetWaitEventCustomNames(
+        classId: uint32,
+        nwaitevents: *mut ::core::ffi::c_int,
+    ) -> *mut *mut ::core::ffi::c_char;
     #[link_name = "DatumGetRangeTypeP__pgrx_cshim"]
     pub fn DatumGetRangeTypeP(X: Datum) -> *mut RangeType;
     #[link_name = "DatumGetRangeTypePCopy__pgrx_cshim"]

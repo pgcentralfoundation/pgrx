@@ -375,6 +375,18 @@ mod internal {
         /// We keep the alias so version-portable code can still say `pg_sys::bits8`.
         pub type bits8 = u8;
 
+        /// PG19 turned `BufferLockMode` into an enum; bindgen emits module-scoped constants.
+        /// Re-export at the crate root for code written against older pgrx bindings.
+        pub const BUFFER_LOCK_UNLOCK: u32 = crate::pg19::BufferLockMode::BUFFER_LOCK_UNLOCK;
+        pub const BUFFER_LOCK_SHARE: u32 = crate::pg19::BufferLockMode::BUFFER_LOCK_SHARE;
+        pub const BUFFER_LOCK_EXCLUSIVE: u32 = crate::pg19::BufferLockMode::BUFFER_LOCK_EXCLUSIVE;
+
+        /// PG19 renamed `PageSetChecksumInplace` to `PageSetChecksum`.
+        #[inline]
+        pub unsafe fn PageSetChecksumInplace(page: crate::Page, blkno: crate::BlockNumber) {
+            crate::pg19::PageSetChecksum(page, blkno);
+        }
+
         /// # Safety
         ///
         /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therefore, is
