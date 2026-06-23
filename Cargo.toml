@@ -37,18 +37,18 @@ repository = "https://github.com/pgcentralfoundation/pgrx/"
 homepage = "https://github.com/pgcentralfoundation/pgrx/"
 # TODO: all crates should use this version rather than copy it
 #   See https://github.com/pgcentralfoundation/pgrx/pull/2100 comments
-version = "0.19.0"
+version = "0.19.1"
 
 [workspace.metadata.local-install]
 cargo-pgrx = { path = "cargo-pgrx" }
 
 [workspace.dependencies]
-pgrx-bench = { path = "./pgrx-bench", version = "=0.19.0" }
-pgrx-macros = { path = "./pgrx-macros", version = "=0.19.0" }
-pgrx-pg-sys = { path = "./pgrx-pg-sys", version = "=0.19.0" }
-pgrx-sql-entity-graph = { path = "./pgrx-sql-entity-graph", version = "=0.19.0" }
-pgrx-pg-config = { path = "./pgrx-pg-config", version = "=0.19.0" }
-pgrx-bindgen = { path = "./pgrx-bindgen", version = "=0.19.0" }
+pgrx-bench = { path = "./pgrx-bench", version = "=0.19.1" }
+pgrx-macros = { path = "./pgrx-macros", version = "=0.19.1" }
+pgrx-pg-sys = { path = "./pgrx-pg-sys", version = "=0.19.1" }
+pgrx-sql-entity-graph = { path = "./pgrx-sql-entity-graph", version = "=0.19.1" }
+pgrx-pg-config = { path = "./pgrx-pg-config", version = "=0.19.1" }
+pgrx-bindgen = { path = "./pgrx-bindgen", version = "=0.19.1" }
 
 cargo_metadata = "0.23.1"
 cargo_toml = "0.22" # used for building projects

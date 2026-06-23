@@ -10,7 +10,7 @@
 
 [package]
 name = "pgrx-bench"
-version = "0.19.0"
+version = "0.19.1"
 authors.workspace = true
 license.workspace = true
 description = "Benchmark runtime support for pgrx extensions"
