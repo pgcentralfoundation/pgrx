@@ -47,6 +47,8 @@ INCLUDE_FOR_DEP_UPDATES=(
 # versions bumped at release time.
 EXCLUDE_FROM_VERSION_BUMP=(
   'cargo-pgrx/src/templates/cargo_toml'
+  'cargo-pgrx/tests/fixtures/workspace/Cargo.toml'
+  'cargo-pgrx/tests/fixtures/workspace/hello/Cargo.toml'
   'tools/version-updater/Cargo.toml'
 )
 
