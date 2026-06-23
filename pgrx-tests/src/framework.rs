@@ -108,17 +108,17 @@ where
                     .as_str(),
                 );
 
-                if let Ok(var) = std::env::var("RUST_BACKTRACE") {
-                    if var.eq("1") {
-                        let detail = dberror.detail().unwrap_or("None");
-                        let hint = dberror.hint().unwrap_or("None");
-                        let schema = dberror.hint().unwrap_or("None");
-                        let table = dberror.table().unwrap_or("None");
-                        let more_info = format!(
-                            "\ndetail: {detail}\nhint: {hint}\nschema: {schema}\ntable: {table}"
-                        );
-                        message.push_str(more_info.as_str());
-                    }
+                if let Ok(var) = std::env::var("RUST_BACKTRACE")
+                    && var.eq("1")
+                {
+                    let detail = dberror.detail().unwrap_or("None");
+                    let hint = dberror.hint().unwrap_or("None");
+                    let schema = dberror.hint().unwrap_or("None");
+                    let table = dberror.table().unwrap_or("None");
+                    let more_info = format!(
+                        "\ndetail: {detail}\nhint: {hint}\nschema: {schema}\ntable: {table}"
+                    );
+                    message.push_str(more_info.as_str());
                 }
 
                 Err(eyre!(message))
@@ -202,7 +202,7 @@ pub fn run_test(
         );
     } else if let Some(message) = expected_error {
         // we expected an ERROR, but didn't get one
-        return Err(eyre!("Expected error: {message}"));
+        Err(eyre!("Expected error: {message}"))
     } else {
         Ok(())
     }
@@ -478,8 +478,10 @@ fn maybe_make_pgdata<P: AsRef<Path>>(pgdata: P) -> eyre::Result<bool> {
 
 fn initdb(postgresql_conf: Vec<&'static str>) -> eyre::Result<()> {
     let pgdata = get_pgdata_path()?;
+    let socket_dir = get_socket_dir_path();
 
     let need_initdb = maybe_make_pgdata(&pgdata)?;
+    make_socket_dir(&socket_dir)?;
 
     if need_initdb {
         let pg_config = get_pg_config()?;
@@ -523,16 +525,43 @@ fn initdb(postgresql_conf: Vec<&'static str>) -> eyre::Result<()> {
         println!("{} initializing database", "    Finished".bold().green());
     }
 
-    modify_postgresql_conf(pgdata, postgresql_conf)
+    modify_postgresql_conf(pgdata, socket_dir, postgresql_conf)
 }
 
-fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) -> eyre::Result<()> {
+fn make_socket_dir(socket_dir: &Path) -> eyre::Result<()> {
+    if let Some(runas) = get_runas() {
+        let mut mkdir = sudo_command(&runas);
+        mkdir.arg("mkdir").arg("-p").arg(socket_dir).stdout(Stdio::piped()).stderr(Stdio::piped());
+        let command_str = format!("{mkdir:?}");
+        println!("{} {}", "     Running".bold().green(), command_str);
+
+        let output = mkdir.output()?;
+        if !output.status.success() {
+            return Err(eyre!(
+                "failed to create the Postgres socket directory at `{}`:\n{}{}",
+                socket_dir.display().yellow(),
+                String::from_utf8(output.stdout).unwrap(),
+                String::from_utf8(output.stderr).unwrap()
+            ));
+        }
+    } else {
+        std::fs::create_dir_all(socket_dir)?;
+    }
+
+    Ok(())
+}
+
+fn modify_postgresql_conf(
+    pgdata: PathBuf,
+    socket_dir: PathBuf,
+    postgresql_conf: Vec<&'static str>,
+) -> eyre::Result<()> {
     let mut contents = String::new();
 
     contents.push_str("log_line_prefix='[%m] [%p] [%c]: '\n");
     contents.push_str(&format!(
         "unix_socket_directories = '{}'\n",
-        pgdata.parent().unwrap().display().to_string().replace("\\", "\\\\")
+        socket_dir.display().to_string().replace("\\", "\\\\")
     ));
     for setting in postgresql_conf {
         contents.push_str(&format!("{setting}\n"));
@@ -597,10 +626,10 @@ fn start_pg(loglines: LogLines, port_reservation: PortReservation) -> eyre::Resu
         command.arg("--time-stamp=yes");
         command.arg("--error-markers=VALGRINDERROR-BEGIN,VALGRINDERROR-END");
         command.arg("--trace-children=yes");
-        if let Ok(path) = valgrind_suppressions_path(&pg_config) {
-            if let Ok(true) = std::fs::exists(&path) {
-                command.arg(format!("--suppressions={}", path.display()));
-            }
+        if let Ok(path) = valgrind_suppressions_path(&pg_config)
+            && let Ok(true) = std::fs::exists(&path)
+        {
+            command.arg(format!("--suppressions={}", path.display()));
         }
         command.arg(pg_config.postmaster_path()?.display().to_string());
         file.write_all(format!("{command:?}").as_bytes())?;
@@ -706,10 +735,10 @@ fn start_pg(loglines: LogLines, port_reservation: PortReservation) -> eyre::Resu
             use std::io::Read;
             let mut buffer = vec![0u8; 4096];
             let mut result = Vec::new();
-            if let Ok(n) = pipe.read(&mut buffer) {
-                if n > 0 {
-                    result.extend(&buffer[..n]);
-                }
+            if let Ok(n) = pipe.read(&mut buffer)
+                && n > 0
+            {
+                result.extend(&buffer[..n]);
             }
             result
         };
@@ -754,6 +783,7 @@ fn start_pg(loglines: LogLines, port_reservation: PortReservation) -> eyre::Resu
 
         // clean up the per-invocation PGDATA directory
         let _ = std::fs::remove_dir_all(&pgdata);
+        let _ = std::fs::remove_dir_all(get_socket_dir_path());
     });
 
     let (sender, receiver) = std::sync::mpsc::channel();
@@ -911,8 +941,6 @@ fn get_extension_name() -> eyre::Result<String> {
 }
 
 fn get_pgdata_path() -> eyre::Result<PathBuf> {
-    // Note that this path is turned into an entry in the unix_socket_directories config.
-    // Each path has a low limit in maximum bytes, so we should avoid adding needless characters.
     let mut pgdata_base =
         std::env::var("CARGO_PGRX_TEST_PGDATA").map(PathBuf::from).unwrap_or_else(|_| {
             let mut target_dir = get_target_dir()
@@ -923,8 +951,29 @@ fn get_pgdata_path() -> eyre::Result<PathBuf> {
         });
 
     // each invocation gets its own PGDATA so parallel test runs don't collide
-    pgdata_base.push(format!("{}-{}", pg_sys::get_pg_major_version_num(), std::process::id()));
+    pgdata_base.push(test_invocation_dir_name());
     Ok(pgdata_base)
+}
+
+fn get_socket_dir_path() -> PathBuf {
+    let mut socket_dir = default_socket_dir_base();
+    socket_dir.push(format!("pgrx-test-sockets-{}", test_invocation_dir_name()));
+    socket_dir
+}
+
+#[cfg(target_family = "unix")]
+fn default_socket_dir_base() -> PathBuf {
+    // Keep Unix-domain socket paths short and avoid workspace mount semantics.
+    PathBuf::from("/tmp")
+}
+
+#[cfg(not(target_family = "unix"))]
+fn default_socket_dir_base() -> PathBuf {
+    std::env::temp_dir()
+}
+
+fn test_invocation_dir_name() -> String {
+    format!("{}-{}", pg_sys::get_pg_major_version_num(), std::process::id())
 }
 
 fn get_pid_file() -> eyre::Result<PathBuf> {
@@ -1141,6 +1190,38 @@ mod tests {
 
     fn command_args(command: &Command) -> Vec<OsString> {
         command.get_args().map(|arg| arg.to_os_string()).collect()
+    }
+
+    #[test]
+    fn test_pgdata_path_preserves_per_invocation_suffix() {
+        let tempdir = tempdir().expect("tempdir");
+        let _env = EnvGuard::apply(&[("CARGO_PGRX_TEST_PGDATA", Some(tempdir.path().as_os_str()))]);
+
+        let pgdata = get_pgdata_path().expect("pgdata path");
+
+        assert_eq!(pgdata, tempdir.path().join(test_invocation_dir_name()));
+    }
+
+    #[test]
+    fn test_socket_dir_is_separate_from_pgdata_parent() {
+        let tempdir = tempdir().expect("tempdir");
+        let _env = EnvGuard::apply(&[("CARGO_PGRX_TEST_PGDATA", Some(tempdir.path().as_os_str()))]);
+
+        let pgdata = get_pgdata_path().expect("pgdata path");
+        let socket_dir = get_socket_dir_path();
+        let expected_suffix = test_invocation_dir_name();
+        let expected_socket_dir_name = format!("pgrx-test-sockets-{expected_suffix}");
+
+        assert_eq!(socket_dir.file_name(), Some(OsStr::new(&expected_socket_dir_name)));
+        assert_ne!(socket_dir, pgdata.parent().expect("pgdata parent"));
+    }
+
+    #[cfg(target_family = "unix")]
+    #[test]
+    fn test_socket_dir_defaults_under_tmp_on_unix() {
+        let socket_dir = get_socket_dir_path();
+
+        assert_eq!(socket_dir.parent(), Some(Path::new("/tmp")));
     }
 
     #[test]
