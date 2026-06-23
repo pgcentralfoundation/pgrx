@@ -37,6 +37,9 @@ else
     # exit early if the script fails 
     ./update-versions.sh "${NEW_VERSION}" || exit $?
 
+    # format the code -- sometimes the bindgen bindings files are wonky
+    cargo fmt --all
+
     # sanity check the diffs, but not Cargo.lock files cuz ugh
     # git diff -- . ':(exclude)Cargo.lock'
 
