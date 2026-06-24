@@ -272,18 +272,12 @@ fn pglz_recommend(
     let avg_ratio = if total_raw == 0 { 1.0 } else { total_comp as f64 / total_raw as f64 };
     let savings_pct = ((1.0 - avg_ratio) * 100.0).max(0.0);
 
-    let ddl = if cfg!(any(
-        feature = "pg14",
-        feature = "pg15",
-        feature = "pg16",
-        feature = "pg17",
-        feature = "pg18",
-    )) {
+    let ddl = if cfg!(not(feature = "pg13")) {
         format!("ALTER TABLE {tbl_name} ALTER COLUMN {q_col} SET COMPRESSION pglz;")
     } else {
         format!(
             "-- pg13: SET COMPRESSION unavailable; use a BEFORE INSERT trigger \
-             that PGLZ-compresses {tbl_name}.{q_col} into a bytea sibling column."
+            that PGLZ-compresses {tbl_name}.{q_col} into a bytea sibling column."
         )
     };
 
