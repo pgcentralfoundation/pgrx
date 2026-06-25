@@ -1,0 +1,5 @@
+comment = 'generic_agg: polymorphic aggregate demonstrating utils/datum.h'
+default_version = '@CARGO_VERSION@'
+module_pathname = 'generic_agg'
+relocatable = false
+superuser = false

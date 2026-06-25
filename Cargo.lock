@@ -1187,6 +1187,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "generic_agg"
+version = "0.0.0"
+dependencies = [
+ "pgrx",
+ "pgrx-tests",
+]
+
+[[package]]
 name = "getrandom"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"

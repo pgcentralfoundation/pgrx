@@ -191,6 +191,7 @@
 #include "utils/builtins.h"
 #include "utils/date.h"
 #include "utils/datetime.h"
+#include "utils/datum.h"
 #include "utils/elog.h"
 #include "utils/float.h"
 #include "utils/fmgroids.h"
