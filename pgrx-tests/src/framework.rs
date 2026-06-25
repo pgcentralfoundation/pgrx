@@ -1154,14 +1154,25 @@ mod tests {
     use super::*;
     use std::env::consts::EXE_SUFFIX;
     use std::ffi::OsString;
+    use std::sync::{Mutex, MutexGuard};
     use tempfile::tempdir;
+
+    // The process environment is global, so tests that mutate it must not run
+    // concurrently or they'll clobber each other's variables mid-test.
+    static ENV_LOCK: Mutex<()> = Mutex::new(());
 
     struct EnvGuard {
         saved: Vec<(String, Option<OsString>)>,
+        // Held for the lifetime of the guard so env mutations are serialized.
+        // Declared last so it's released only after `saved` is restored in Drop.
+        _lock: MutexGuard<'static, ()>,
     }
 
     impl EnvGuard {
         fn apply(updates: &[(&str, Option<&OsStr>)]) -> Self {
+            // Recover from a poisoned lock: a test panicking while holding it
+            // doesn't leave the environment in a state we can't restore.
+            let lock = ENV_LOCK.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
             let mut saved = Vec::with_capacity(updates.len());
 
             for (key, value) in updates {
@@ -1173,7 +1184,7 @@ mod tests {
                 }
             }
 
-            Self { saved }
+            Self { saved, _lock: lock }
         }
     }
 
