@@ -52,6 +52,7 @@ impl CommandExecute for Connect {
             &Features::default(),
             self.package.as_deref(),
             self.manifest_path.as_deref(),
+            &[],
         )?;
         let (pg_config, _pg_version) = match pg_config_and_version(
             &pgrx,

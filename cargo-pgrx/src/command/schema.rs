@@ -97,6 +97,7 @@ impl CommandExecute for Schema {
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
+            &[],
         )?;
         // This does meaningful mutation, unfortunately
         let (_pg_config, _pg_version) = pg_config_and_version(

@@ -360,6 +360,7 @@ impl CommandExecute for Regress {
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
+            &[],
         )?;
         let extname = get_property(&manifest_path, "extname")?
             .expect("extension name property `extname` should always be known");

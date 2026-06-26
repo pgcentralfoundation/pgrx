@@ -56,6 +56,9 @@ pub(crate) struct Run {
     install_only: bool,
     #[clap(long)]
     valgrind: bool,
+    /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+    #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
+    cargo: Vec<String>,
 }
 
 impl From<&Regress> for Run {
@@ -73,6 +76,7 @@ impl From<&Regress> for Run {
             pgcli: false,
             install_only: false,
             valgrind: regress.valgrind,
+            cargo: Vec::new(),
         }
     }
 }
@@ -98,6 +102,7 @@ impl Run {
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
+            &self.cargo,
         )?;
         let (pg_config, _pg_version) = pg_config_and_version(
             &pgrx,
@@ -130,6 +135,7 @@ impl Run {
             self.valgrind,
             self.target.as_deref(),
             postgresql_conf,
+            &self.cargo,
         )?;
 
         Ok((pg_config, dbname))
@@ -165,6 +171,7 @@ pub(crate) fn run(
     use_valgrind: bool,
     target: Option<&str>,
     postgresql_conf: &HashMap<String, String>,
+    cargo_flags: &[String],
 ) -> eyre::Result<()> {
     // stop postgres
     stop_postgres(pg_config)?;
@@ -180,6 +187,7 @@ pub(crate) fn run(
         None,
         features,
         target,
+        cargo_flags,
     )?;
 
     if install_only {

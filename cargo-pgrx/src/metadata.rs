@@ -14,17 +14,32 @@ use owo_colors::*;
 use semver::VersionReq;
 use std::path::Path;
 
-pub fn metadata(
+pub(crate) fn metadata(
     features: &clap_cargo::Features,
     manifest_path: Option<&Path>,
+    cargo_flags: &[String],
 ) -> eyre::Result<Metadata> {
     let mut metadata_command = MetadataCommand::new();
     if let Some(manifest_path) = manifest_path {
         metadata_command.manifest_path(manifest_path.to_owned());
     }
+
+    // The `--cargo` passthrough must reach `cargo metadata` — the first cargo invocation, where config issues (private registries, etc.) fail first.
+    let cargo_flags = split_cargo_flags(cargo_flags);
+    if !cargo_flags.is_empty() {
+        metadata_command.other_options(cargo_flags);
+    }
     features.forward_metadata(&mut metadata_command);
     let metadata = metadata_command.exec()?;
     Ok(metadata)
+}
+
+/// Split each `--cargo` value on whitespace, so both the single-token form
+/// (`--cargo=--config=child/.cargo/config.toml`) and the quoted-string form
+/// (`--cargo "--config foo"`) work, forwarding each token as one argv element.
+// ponytail: naive whitespace split, same as PGRX_BUILD_FLAGS in cargo.rs. This splits *every* value, including the single-token `--cargo=--config=x` form, so a flag value containing spaces (e.g. a config path with a space) is NOT supported by any form; use a space-free path, or pass config inline as `--cargo=--config=key="value"`. Upgrade path if that ever bites: shell-style tokenization that honors quotes instead of a raw whitespace split.
+pub(crate) fn split_cargo_flags(cargo_flags: &[String]) -> Vec<String> {
+    cargo_flags.iter().flat_map(|f| f.split_ascii_whitespace().map(str::to_owned)).collect()
 }
 
 #[tracing::instrument(level = "error", skip_all)]
@@ -90,4 +105,34 @@ cargo-pgrx and pgrx library versions must be identical.
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::split_cargo_flags;
+
+    #[test]
+    fn split_cargo_flags_handles_both_forms() {
+        // single-token form is passed through untouched
+        assert_eq!(
+            split_cargo_flags(&["--config=child/.cargo/config.toml".into()]),
+            vec!["--config=child/.cargo/config.toml"]
+        );
+        // quoted-string form is split into separate argv tokens
+        assert_eq!(
+            split_cargo_flags(&["--config foo --offline".into()]),
+            vec!["--config", "foo", "--offline"]
+        );
+        // repeatable `--cargo` and whitespace-splitting compose
+        assert_eq!(
+            split_cargo_flags(&["--offline".into(), "--config foo".into()]),
+            vec!["--offline", "--config", "foo"]
+        );
+        // documented limitation: a value with an embedded space is split too,
+        // even in the single-token form, so space-containing paths are unsupported
+        assert_eq!(
+            split_cargo_flags(&["--config=/my path/config.toml".into()]),
+            vec!["--config=/my", "path/config.toml"]
+        );
+    }
 }

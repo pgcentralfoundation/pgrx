@@ -152,7 +152,7 @@ impl Cargo {
             cmd.arg(features.features.join(" "));
         }
 
-        // And now the miscellaneous build flags!
+        // And now the miscellaneous build flags!, `PGRX_BUILD_FLAGS` stays build-only.
         let flags = env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
         for arg in flags.split_ascii_whitespace() {
             cmd.arg(arg);
