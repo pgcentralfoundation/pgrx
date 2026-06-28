@@ -74,6 +74,7 @@
 #include "catalog/pg_type.h"
 #include "catalog/pg_user_mapping.h"
 #include "catalog/storage.h"
+#include "commands/async.h"
 #include "commands/comment.h"
 #include "commands/copy.h"
 #include "commands/dbcommands.h"

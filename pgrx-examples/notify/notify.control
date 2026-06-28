@@ -1,0 +1,5 @@
+comment = 'notify:  Created by pgrx'
+default_version = '@CARGO_VERSION@'
+module_pathname = 'notify'
+relocatable = false
+superuser = false
