@@ -395,6 +395,12 @@ where
     }
 }
 
+impl serde::Serialize for FlatArray<'_, super::Text> {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        s.collect_seq(self.iter().map(|n| n.into_option().map(|t| t.as_str())))
+    }
+}
+
 impl<'arr, T> ExactSizeIterator for ArrayIter<'arr, T> where T: ?Sized + Element {}
 impl<'arr, T> FusedIterator for ArrayIter<'arr, T> where T: ?Sized + Element {}
 

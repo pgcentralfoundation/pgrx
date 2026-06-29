@@ -31,6 +31,7 @@ mod element;
 mod flat_array;
 mod port;
 
+pub use crate::datum::Text;
 pub use element::Element;
 pub use flat_array::{ArrayAllocError, FlatArray};
 

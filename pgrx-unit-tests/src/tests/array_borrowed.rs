@@ -11,7 +11,7 @@
 use core::ffi::CStr;
 use pgrx::Json;
 use pgrx::PostgresEnum;
-use pgrx::array::{FlatArray, RawArray};
+use pgrx::array::{FlatArray, RawArray, Text};
 use pgrx::memcx::MemCx;
 use pgrx::nullable::Nullable;
 use pgrx::palloc::PBox;
@@ -68,11 +68,10 @@ fn borrow_optional_array_with_default(
     values.unwrap().iter().map(|v| v.into_option().copied().unwrap_or(0)).sum()
 }
 
-// FIXME: replace with Text
-// #[pg_extern]
-// fn borrow_serde_serialize_array<'dat>(values: &FlatArray<'dat, &'dat str>) -> Json {
-//     Json(json! { { "values": values } })
-// }
+#[pg_extern]
+fn borrow_serde_serialize_array(values: &FlatArray<'_, pgrx::array::Text>) -> Json {
+    Json(json! { { "values": values } })
+}
 
 #[pg_extern]
 fn borrow_serde_serialize_array_i32(values: &FlatArray<'_, i32>) -> Json {
@@ -265,16 +264,36 @@ mod tests {
         assert_eq!(sum, Ok(Some(6f32)));
     }
 
-    // TODO: fix this test by redesigning SPI.
-    // #[pg_test]
-    // fn borrow_test_serde_serialize_array() -> Result<(), pgrx::spi::Error> {
-    //     let json = Spi::get_one::<Json>(
-    //         "SELECT borrow_serde_serialize_array(ARRAY['one', null, 'two', 'three'])",
-    //     )?
-    //     .expect("returned json was null");
-    //     assert_eq!(json.0, json! {{"values": ["one", null, "two", "three"]}});
-    //     Ok(())
-    // }
+    #[pg_test]
+    fn borrow_test_serde_serialize_array() -> Result<(), pgrx::spi::Error> {
+        let json = Spi::get_one::<Json>(
+            "SELECT borrow_serde_serialize_array(ARRAY['one', null, 'two', 'three'])",
+        )?
+        .expect("returned json was null");
+        assert_eq!(json.0, json! {{"values": ["one", null, "two", "three"]}});
+        Ok(())
+    }
+
+    #[pg_test]
+    fn borrow_test_serde_serialize_array_mixed() -> Result<(), pgrx::spi::Error> {
+        // Stride stress: empty string, null, multibyte, and a >127-byte element
+        // (forces a 4-byte varlena header next to 1-byte ones). Mis-stride corrupts tail.
+        let long = "x".repeat(200);
+        let json = Spi::get_one::<Json>(&format!(
+            "SELECT borrow_serde_serialize_array(ARRAY['', null, '日本語', '{long}', 'z'])"
+        ))?
+        .expect("returned json was null");
+        assert_eq!(json.0, json! {{"values": ["", null, "日本語", long, "z"]}});
+        Ok(())
+    }
+
+    #[pg_test]
+    fn borrow_test_serde_serialize_array_empty() -> Result<(), pgrx::spi::Error> {
+        let json = Spi::get_one::<Json>("SELECT borrow_serde_serialize_array(ARRAY[]::text[])")?
+            .expect("returned json was null");
+        assert_eq!(json.0, json! {{"values": []}});
+        Ok(())
+    }
 
     #[pg_test]
     fn borrow_test_optional_array_with_default() {

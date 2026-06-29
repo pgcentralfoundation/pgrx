@@ -140,3 +140,46 @@ unsafe impl Element for ffi::CStr {
         unsafe { ffi::CStr::from_ptr(char_ptr) }
     }
 }
+
+/// A borrowed Postgres `text` varlena, usable as a `FlatArray` element.
+#[repr(transparent)]
+pub struct Text([u8]);
+
+impl Text {
+    /// The string contents (UTF-8), excluding the varlena header.
+    pub fn as_str(&self) -> &str {
+        // SAFETY: tail is a valid varlena; Postgres text is UTF-8 in pgrx's server encodings
+        unsafe { crate::varlena::text_to_rust_str_unchecked(self.0.as_ptr().cast()) }
+    }
+}
+
+unsafe impl DatumPass for Text {
+    const PASS: PassBy = PassBy::Ref;
+}
+unsafe impl Element for Text {
+    unsafe fn point_from(ptr: ptr::NonNull<u8>) -> ptr::NonNull<Self> {
+        // full varlena size so size_of_val == storage, keeping ArrayIter stride sound
+        let len = unsafe { crate::varlena::varsize_any(ptr.as_ptr().cast()) };
+        unsafe {
+            ptr::NonNull::new_unchecked(
+                ptr::slice_from_raw_parts_mut(ptr.as_ptr(), len) as *mut Self
+            )
+        }
+    }
+}
+
+unsafe impl pgrx_sql_entity_graph::metadata::SqlTranslatable for Text {
+    const TYPE_IDENT: &'static str = "Text";
+    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
+        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
+    const ARGUMENT_SQL: Result<
+        pgrx_sql_entity_graph::metadata::SqlMappingRef,
+        pgrx_sql_entity_graph::metadata::ArgumentError,
+    > = Ok(pgrx_sql_entity_graph::metadata::SqlMappingRef::literal("text"));
+    const RETURN_SQL: Result<
+        pgrx_sql_entity_graph::metadata::ReturnsRef,
+        pgrx_sql_entity_graph::metadata::ReturnsError,
+    > = Ok(pgrx_sql_entity_graph::metadata::ReturnsRef::One(
+        pgrx_sql_entity_graph::metadata::SqlMappingRef::literal("text"),
+    ));
+}
