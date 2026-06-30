@@ -882,6 +882,64 @@ Options:
   -V, --version                        Print version
 ```
 
+### Build a RPM package
+
+The `cargo pgrx package` command is able to generate a simple RPM if you add
+a metadata section in `Cargo.toml` such as:
+
+```toml
+[package.metadata.rpm]
+name = "${NAME}_${PG_MAJOR_VERSION}"
+description= "My great extension"
+maintainer = "Me, Myself and I"
+version = "${VERSION}"
+arch = "${ARCH}"
+license = "MIT"
+depends   = ["postgresql${PG_MAJOR_VERSION}-server"]
+files = [
+{ source="${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${NAME}.so", dest="/usr/pgsql-${PG_MAJ
+OR_VERSION}/lib/${NAME}.so", mode="0644" }
+]
+dirs = [
+{ source = "${BUILD_BASE_PATH}/${PG_SHAREDIR}/extension/", dest   = "/usr/pgsql-${P
+G_MAJOR_VERSION}/share/extension/" }
+]
+```
+
+The metadata above should work for most extensions. The `dest` paths are compatible
+with the PGDG postgres packages. Feel free to adapt as needed. For instance, if you
+want to distribute your extension to Fedora Postgres packages or SUSE Postgres
+packages, you might have to modify the `dest` location in the `files` and `dist`
+fields.
+
+The variables are subtituted on the fly depending on the context ( ARCH, PGVER )
+and the general metadata of the crate (name, version).
+
+### Building DEB packages
+
+Following the same principle, you can add a `package.metadata.deb` section in the
+`Cargo.toml` file in order to produce debian packages: 
+
+``` toml
+[package.metadata.deb]
+name = "${NAME}_${PG_MAJOR_VERSION}"
+description= "My Great Extension"
+maintainer = "Me, Myself & I"
+version = "${VERSION}"
+arch = "${ARCH}"
+license = "MIT"
+depends   = ["postgresql-${PG_MAJOR_VERSION}"]
+files = [
+{ source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${NAME}.so", dest = "/usr/lib/postgr
+esql/${PG_MAJOR_VERSION}/lib/${NAME}.so", mode="0644"}
+]
+dirs = [
+{ source = "${BUILD_BASE_PATH}/${PG_SHAREDIR}/extension/", dest = "/usr/share/postg
+resql/${PG_MAJOR_VERSION}/extension/" }
+]
+```
+
+
 ## Inspect your Extension Schema
 
 If you just want to look at the full extension schema that pgrx will generate, use

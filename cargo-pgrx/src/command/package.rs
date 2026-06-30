@@ -7,16 +7,18 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::CommandExecute;
 use crate::cargo::CargoProfile;
 use crate::command::get::get_property;
 use crate::command::install::{format_display_path, install_extension, warn_if_pg_bench_enabled};
-use crate::manifest::{PgVersionSource, display_version_info};
+use crate::manifest::{display_version_info, PgVersionSource};
+use crate::CommandExecute;
 use cargo_toml::Manifest;
-use eyre::{WrapErr, eyre};
+use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgrx_pg_config::{PgConfig, Pgrx, get_target_dir};
+use pgrx_pg_config::{get_target_dir, PgConfig, Pgrx};
 use std::path::{Path, PathBuf};
+
+use arx_pack;
 
 /// Create an installation package directory.
 #[derive(clap::Args, Debug)]
@@ -99,13 +101,8 @@ impl Package {
             self.target.as_deref(),
         )?;
 
-        if let Some(rpm_path) = rpm(&pg_config, &package_manifest_path, out_dir.clone())? {
-            eprintln!(
-                "{} RPM package to {}",
-                "     Writing".bold().green(),
-                format_display_path(&rpm_path)?.cyan()
-            );
-        }
+        build_distrib_packages(&pg_config, &package_manifest_path, &out_dir)?;
+
         Ok((out_dir, output_files))
     }
 }
@@ -173,60 +170,88 @@ pub(crate) fn build_base_path(
     Ok(target_dir)
 }
 
-fn rpm(
+fn build_distrib_packages(
     pg_config: &PgConfig,
     manifest_path: &Path,
-    outdir: PathBuf,
-) -> eyre::Result<Option<PathBuf>> {
-    use rpm;
-
-    // Read the `[package.metadata.rpm]` section in Cargo.toml manifest
-    // Quit right away if absent
+    out_dir: &PathBuf,
+) -> eyre::Result<Vec<PathBuf>> {
     let cargo_toml = Manifest::<toml::Value>::from_path_with_metadata(&manifest_path).unwrap();
     let package = cargo_toml.package();
+
+    // Quit right away if there's no metadata
     let Some(metadata) = package.metadata.clone() else {
-        return Ok(None);
-    };
-    let Some(rpm_metadata) = metadata.get("rpm") else {
-        return Ok(None);
+        return Ok(vec![]);
     };
 
-    // Prepare RPM metadata fields
-    let major_version = pg_config.major_version()?;
-    let extname = get_property(manifest_path, "extname")?
-        .ok_or(eyre!("could not determine extension name"))?;
-    let package_name = format!("{extname}-{major_version}");
-    let version = package.version();
-    let license = package.license().unwrap_or("None");
-    // Rust ARCH matches the RPM arch for "x86_64" and "aarch64"
-    let arch = std::env::consts::ARCH;
-    let description = package.description().unwrap_or("");
-    let url = package.homepage().unwrap_or("");
-    let vendor = rpm_metadata.get("vendor").and_then(|v| v.as_str()).unwrap_or("Undefined");
+    let mut distrib_packages = vec![];
 
-    // Prepare the files locations
-    // this is based on the PGDG packages.
-    let dest_pgsql_dir = format!("pgsql-{major_version}");
-    let libfile = format!("{extname}.so");
-    let src_libfile_path =
-        outdir.clone().join(pg_config.pkglibdir()?.strip_prefix("/")?).join(&libfile);
-    let dest_libfile_path =
-        PathBuf::new().join("/usr").join(dest_pgsql_dir).join("lib").join(&libfile);
-    let libfile_options = rpm::FileOptions::new(dest_libfile_path.display().to_string());
-    let src_extdir_path =
-        outdir.clone().join(pg_config.sharedir()?.strip_prefix("/")?).join("extension");
-    let dest_extdir_path = format!("/usr/pgsql-{major_version}/share/extension");
+    for kind in ["rpm", "deb"] {
+        if let Some(pkg_metadata) = metadata.get(kind) {
+            let path = build_distrib_package(
+                kind,
+                pkg_metadata,
+                pg_config,
+                out_dir,
+                package.name(),
+                package.version(),
+            )?;
+            distrib_packages.push(path);
+        }
+    }
+    Ok(distrib_packages)
+}
 
-    // Build the package
-    let build_config = rpm::BuildConfig::default().compression(rpm::CompressionType::Gzip);
-    let pkg = rpm::PackageBuilder::new(&package_name, version, license, arch, description)
-        .using_config(build_config)
-        .with_file(src_libfile_path, libfile_options)?
-        .with_dir(src_extdir_path, dest_extdir_path, |o| o.config())?
-        .requires(rpm::Dependency::any(format!("postgresql${major_version}-server")))
-        .vendor(vendor)
-        .url(url)
-        .build()?;
+// Using the same Cargo.toml metadata we are able to build a dozen of packages
+// ( one per Postgres major version and per distrib )
+fn build_distrib_package(
+    kind: &str,
+    metadata: &toml::Value,
+    pg_config: &PgConfig,
+    out_dir: &PathBuf,
+    pkg_name: &str,
+    pkg_version: &str,
+) -> eyre::Result<PathBuf> {
+    let meta_str = toml::to_string(metadata)
+        .wrap_err_with(|| format!("failed to serialize [package.metadata.{kind}]"))?;
 
-    Ok(Some(pkg.write_to(outdir)?))
+    let meta_subst = substitute(&meta_str, pg_config, out_dir, pkg_name, pkg_version)?;
+
+    let manifest =
+        arx_pack::Manifest::from_toml_str(&meta_subst).map_err(|e| eyre::eyre!("{e:#}"))?;
+
+    let path = match kind {
+        "rpm" => arx_pack::build_rpm(&manifest, out_dir),
+        "deb" => arx_pack::build_deb(&manifest, out_dir),
+        _ => return Err(eyre::eyre!("unsupported package kind: {kind}")),
+    }
+    .map_err(|e| eyre::eyre!("{e:#}"))?;
+
+    eprintln!(
+        "{} {} package to {}",
+        "     Writing".bold().green(),
+        kind.to_uppercase(),
+        format_display_path(&path)?.cyan()
+    );
+
+    Ok(path)
+}
+
+// A limited set of variables is allowed in the package metadata
+fn substitute(
+    src: &str,
+    pg_config: &PgConfig,
+    out_dir: &PathBuf,
+    name: &str,
+    version: &str,
+) -> eyre::Result<String> {
+    let mut result = src.to_owned();
+    result = result
+        .replace("${ARCH}", std::env::consts::ARCH)
+        .replace("${BUILD_BASE_PATH}", &out_dir.to_string_lossy())
+        .replace("${NAME}", name)
+        .replace("${PG_MAJOR_VERSION}", &pg_config.major_version()?.to_string())
+        .replace("${PG_PKGLIBDIR}", &pg_config.pkglibdir()?.to_string_lossy())
+        .replace("${PG_SHAREDIR}", &pg_config.sharedir()?.to_string_lossy())
+        .replace("${VERSION}", version);
+    Ok(result)
 }
