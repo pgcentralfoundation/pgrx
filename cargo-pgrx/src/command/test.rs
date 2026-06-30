@@ -24,8 +24,9 @@ pub(crate) struct Test {
     /// Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, pg19, or all?
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
-    /// If specified, only run tests containing this string in their names
-    testname: Option<String>,
+    /// If specified, only run tests containing any of these strings in their names
+    #[clap(value_name = "TESTNAME")]
+    testnames: Vec<String>,
     /// Package to build (see `cargo help pkgid`)
     #[clap(long, short)]
     package: Option<String>,
@@ -83,7 +84,7 @@ impl CommandExecute for Test {
                 &profile,
                 me.no_schema,
                 &features,
-                me.testname.as_deref(),
+                &me.testnames,
                 me.runas,
                 me.pgdata,
             )?;
@@ -98,15 +99,10 @@ impl CommandExecute for Test {
         )?;
         let pgrx = Pgrx::from_config()?;
 
-        // If the first positional arg isn't a recognized PG version (pgXX or "all")
-        // and no testname was given, treat it as a testname filter
-        if let Some(ref v) = self.pg_version
-            && v != "all"
-            && !pgrx.is_feature_flag(v)
-            && self.testname.is_none()
-        {
-            self.testname = self.pg_version.take();
-        }
+        (self.pg_version, self.testnames) =
+            resolve_test_args(self.pg_version.take(), self.testnames, |arg| {
+                arg == "all" || pgrx.is_feature_flag(arg)
+            });
 
         if self.pg_version.as_deref() == Some("all") {
             // run the tests for **all** the Postgres versions we know about
@@ -126,7 +122,7 @@ impl CommandExecute for Test {
 
 #[tracing::instrument(skip_all, fields(
     pg_version = %pg_config.version()?,
-    testname =  tracing::field::Empty,
+    testnames = tracing::field::Empty,
     ?profile,
 ))]
 pub fn test_extension(
@@ -135,7 +131,7 @@ pub fn test_extension(
     profile: &CargoProfile,
     no_schema: bool,
     features: &clap_cargo::Features,
-    testname: Option<&str>,
+    testnames: &[String],
     runas: Option<String>,
     pgdata: Option<PathBuf>,
 ) -> eyre::Result<()> {
@@ -144,8 +140,8 @@ pub fn test_extension(
         eyre::bail!("`--runas` is not supported on Windows");
     }
 
-    if let Some(ref testname) = testname {
-        tracing::Span::current().record("testname", tracing::field::display(&testname));
+    if !testnames.is_empty() {
+        tracing::Span::current().record("testnames", tracing::field::display(&testnames.join(",")));
     }
     let target_dir = get_target_dir()?;
 
@@ -196,9 +192,7 @@ pub fn test_extension(
 
     command.args(profile.cargo_args());
 
-    if let Some(testname) = testname {
-        command.arg(testname);
-    }
+    apply_test_filters_to_command(&mut command, testnames);
 
     eprintln!("{command:?}");
 
@@ -213,6 +207,31 @@ pub fn test_extension(
     Ok(())
 }
 
+fn resolve_test_args<F>(
+    pg_version: Option<String>,
+    mut testnames: Vec<String>,
+    is_pg_selector: F,
+) -> (Option<String>, Vec<String>)
+where
+    F: FnOnce(&str) -> bool,
+{
+    match pg_version {
+        Some(first) if is_pg_selector(&first) => (Some(first), testnames),
+        Some(first) => {
+            testnames.insert(0, first);
+            (None, testnames)
+        }
+        None => (None, testnames),
+    }
+}
+
+fn apply_test_filters_to_command(command: &mut std::process::Command, testnames: &[String]) {
+    if !testnames.is_empty() {
+        command.arg("--");
+        command.args(testnames);
+    }
+}
+
 fn apply_resolved_manifest_to_test_command(
     command: &mut std::process::Command,
     package_manifest_path: &Path,
@@ -225,9 +244,93 @@ fn apply_resolved_manifest_to_test_command(
 
 #[cfg(test)]
 mod tests {
-    use super::apply_resolved_manifest_to_test_command;
+    use super::{Test, apply_resolved_manifest_to_test_command, apply_test_filters_to_command};
+    use clap::{Args, Parser, Subcommand};
     use std::path::Path;
     use std::process::Command;
+
+    fn strings(args: &[&str]) -> Vec<String> {
+        args.iter().map(|arg| (*arg).to_string()).collect()
+    }
+
+    #[derive(Parser)]
+    struct CargoCli {
+        #[clap(subcommand)]
+        subcommand: CargoSubcommand,
+        #[clap(short = 'v', long, action = clap::ArgAction::Count, global = true)]
+        verbose: u8,
+    }
+
+    #[derive(Subcommand)]
+    enum CargoSubcommand {
+        Pgrx(PgrxCli),
+    }
+
+    #[derive(Args)]
+    struct PgrxCli {
+        #[clap(subcommand)]
+        subcommand: PgrxSubcommand,
+    }
+
+    #[derive(Subcommand)]
+    enum PgrxSubcommand {
+        Test(Test),
+    }
+
+    #[test]
+    fn test_cli_accepts_multiple_testnames() {
+        let parsed = CargoCli::try_parse_from([
+            "cargo",
+            "pgrx",
+            "test",
+            "--package",
+            "extension",
+            "pg18",
+            "test_a",
+            "test_b",
+            "test_n",
+        ])
+        .expect("multiple test filters should parse");
+
+        let CargoSubcommand::Pgrx(PgrxCli { subcommand: PgrxSubcommand::Test(test) }) =
+            parsed.subcommand;
+        assert_eq!(test.pg_version.as_deref(), Some("pg18"));
+        assert_eq!(test.testnames, strings(&["test_a", "test_b", "test_n"]));
+    }
+
+    #[test]
+    fn resolve_test_args_treats_non_version_first_arg_as_testname() {
+        let (pg_version, testnames) = super::resolve_test_args(
+            Some("test_a".to_string()),
+            strings(&["test_b", "test_n"]),
+            |arg| arg == "all" || arg == "pg18",
+        );
+
+        assert_eq!(pg_version, None);
+        assert_eq!(testnames, strings(&["test_a", "test_b", "test_n"]));
+    }
+
+    #[test]
+    fn resolve_test_args_keeps_pg_selector() {
+        let (pg_version, testnames) = super::resolve_test_args(
+            Some("pg18".to_string()),
+            strings(&["test_a", "test_b"]),
+            |arg| arg == "all" || arg == "pg18",
+        );
+
+        assert_eq!(pg_version.as_deref(), Some("pg18"));
+        assert_eq!(testnames, strings(&["test_a", "test_b"]));
+    }
+
+    #[test]
+    fn test_filters_are_passed_to_libtest_after_separator() {
+        let mut command = Command::new("cargo");
+        command.arg("test");
+        apply_test_filters_to_command(&mut command, &strings(&["test_a", "test_b", "test_n"]));
+
+        let args = command.get_args().map(|arg| arg.to_string_lossy()).collect::<Vec<_>>();
+        assert_eq!(args, ["test", "--", "test_a", "test_b", "test_n"]);
+    }
 
     #[test]
     fn test_command_targets_resolved_manifest_for_outer_and_inner_builds() {

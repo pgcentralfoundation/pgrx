@@ -511,11 +511,11 @@ will have the permissions of the user running `cargo pgrx test` and won't be cho
 $ cargo pgrx test --help
 Run the test suite for this crate
 
-Usage: cargo pgrx test [OPTIONS] [PG_VERSION] [TESTNAME]
+Usage: cargo pgrx test [OPTIONS] [PG_VERSION] [TESTNAME]...
 
 Arguments:
   [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, pg19, or all? [env: PG_VERSION=]
-  [TESTNAME]    If specified, only run tests containing this string in their names
+  [TESTNAME]... If specified, only run tests containing any of these strings in their names
 
 Options:
   -p, --package <PACKAGE>              Package to build (see `cargo help pkgid`)
