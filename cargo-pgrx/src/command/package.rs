@@ -7,15 +7,18 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::CommandExecute;
 use crate::cargo::CargoProfile;
 use crate::command::get::get_property;
-use crate::command::install::{install_extension, warn_if_pg_bench_enabled};
-use crate::manifest::{PgVersionSource, display_version_info};
+use crate::command::install::{format_display_path, install_extension, warn_if_pg_bench_enabled};
+use crate::manifest::{display_version_info, PgVersionSource};
+use crate::CommandExecute;
 use cargo_toml::Manifest;
-use eyre::{WrapErr, eyre};
-use pgrx_pg_config::{PgConfig, Pgrx, get_target_dir};
+use eyre::{eyre, WrapErr};
+use owo_colors::OwoColorize;
+use pgrx_pg_config::{get_target_dir, PgConfig, Pgrx};
 use std::path::{Path, PathBuf};
+
+use arx_pack;
 
 /// Create an installation package directory.
 #[derive(clap::Args, Debug)]
@@ -98,6 +101,8 @@ impl Package {
             self.target.as_deref(),
         )?;
 
+        build_distrib_packages(&pg_config, &package_manifest_path, &out_dir)?;
+
         Ok((out_dir, output_files))
     }
 }
@@ -163,4 +168,90 @@ pub(crate) fn build_base_path(
     target_dir.push(profile.target_subdir());
     target_dir.push(format!("{extname}-pg{pgver}"));
     Ok(target_dir)
+}
+
+fn build_distrib_packages(
+    pg_config: &PgConfig,
+    manifest_path: &Path,
+    out_dir: &PathBuf,
+) -> eyre::Result<Vec<PathBuf>> {
+    let cargo_toml = Manifest::<toml::Value>::from_path_with_metadata(&manifest_path).unwrap();
+    let package = cargo_toml.package();
+
+    // Quit right away if there's no metadata
+    let Some(metadata) = package.metadata.clone() else {
+        return Ok(vec![]);
+    };
+
+    let mut distrib_packages = vec![];
+
+    for kind in ["rpm", "deb"] {
+        if let Some(pkg_metadata) = metadata.get(kind) {
+            let path = build_distrib_package(
+                kind,
+                pkg_metadata,
+                pg_config,
+                out_dir,
+                package.name(),
+                package.version(),
+            )?;
+            distrib_packages.push(path);
+        }
+    }
+    Ok(distrib_packages)
+}
+
+// Using the same Cargo.toml metadata we are able to build a dozen of packages
+// ( one per Postgres major version and per distrib )
+fn build_distrib_package(
+    kind: &str,
+    metadata: &toml::Value,
+    pg_config: &PgConfig,
+    out_dir: &PathBuf,
+    pkg_name: &str,
+    pkg_version: &str,
+) -> eyre::Result<PathBuf> {
+    let meta_str = toml::to_string(metadata)
+        .wrap_err_with(|| format!("failed to serialize [package.metadata.{kind}]"))?;
+
+    let meta_subst = substitute(&meta_str, pg_config, out_dir, pkg_name, pkg_version)?;
+
+    let manifest =
+        arx_pack::Manifest::from_toml_str(&meta_subst).map_err(|e| eyre::eyre!("{e:#}"))?;
+
+    let path = match kind {
+        "rpm" => arx_pack::build_rpm(&manifest, out_dir),
+        "deb" => arx_pack::build_deb(&manifest, out_dir),
+        _ => return Err(eyre::eyre!("unsupported package kind: {kind}")),
+    }
+    .map_err(|e| eyre::eyre!("{e:#}"))?;
+
+    eprintln!(
+        "{} {} package to {}",
+        "     Writing".bold().green(),
+        kind.to_uppercase(),
+        format_display_path(&path)?.cyan()
+    );
+
+    Ok(path)
+}
+
+// A limited set of variables is allowed in the package metadata
+fn substitute(
+    src: &str,
+    pg_config: &PgConfig,
+    out_dir: &PathBuf,
+    name: &str,
+    version: &str,
+) -> eyre::Result<String> {
+    let mut result = src.to_owned();
+    result = result
+        .replace("${ARCH}", std::env::consts::ARCH)
+        .replace("${BUILD_BASE_PATH}", &out_dir.to_string_lossy())
+        .replace("${NAME}", name)
+        .replace("${PG_MAJOR_VERSION}", &pg_config.major_version()?.to_string())
+        .replace("${PG_PKGLIBDIR}", &pg_config.pkglibdir()?.to_string_lossy())
+        .replace("${PG_SHAREDIR}", &pg_config.sharedir()?.to_string_lossy())
+        .replace("${VERSION}", version);
+    Ok(result)
 }
