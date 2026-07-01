@@ -79,6 +79,12 @@ fn borrow_serde_serialize_array_i32(values: &FlatArray<'_, i32>) -> Json {
     Json(json! { { "values": values } })
 }
 
+// Exercises `Text::as_str` directly (not via serde): sum of UTF-8 byte lengths of the non-null elements. Verifies the varlena header is excluded from the data.
+#[pg_extern]
+fn borrow_text_total_len(values: &FlatArray<'_, pgrx::array::Text>) -> i64 {
+    values.iter().filter_map(|n| n.into_option()).map(|t| t.as_str().len() as i64).sum()
+}
+
 #[pg_extern]
 fn borrow_return_text_array() -> Vec<&'static str> {
     vec!["a", "b", "c", "d"]
@@ -293,6 +299,73 @@ mod tests {
             .expect("returned json was null");
         assert_eq!(json.0, json! {{"values": []}});
         Ok(())
+    }
+
+    #[pg_test]
+    fn borrow_test_serde_serialize_array_no_nulls() -> Result<(), pgrx::spi::Error> {
+        // No nulls => Postgres omits the null bitmap, exercising the None-bitmap iterator branch.
+        let json = Spi::get_one::<Json>("SELECT borrow_serde_serialize_array(ARRAY['a','b','c'])")?
+            .expect("returned json was null");
+        assert_eq!(json.0, json! {{"values": ["a", "b", "c"]}});
+        Ok(())
+    }
+
+    #[pg_test]
+    fn borrow_test_serde_serialize_array_all_nulls() -> Result<(), pgrx::spi::Error> {
+        let json = Spi::get_one::<Json>(
+            "SELECT borrow_serde_serialize_array(ARRAY[null,null,null]::text[])",
+        )?
+        .expect("returned json was null");
+        assert_eq!(json.0, json! {{"values": [null, null, null]}});
+        Ok(())
+    }
+
+    #[pg_test]
+    fn borrow_test_serde_serialize_array_json_special_chars() -> Result<(), pgrx::spi::Error> {
+        // Quote, backslash, newline, and tab must be serde-escaped, not emitted raw.
+        let json = Spi::get_one::<Json>(
+            r#"SELECT borrow_serde_serialize_array(ARRAY[E'a"b\\c', E'line1\nline2', E'\t'])"#,
+        )?
+        .expect("returned json was null");
+        assert_eq!(json.0, json! {{"values": ["a\"b\\c", "line1\nline2", "\t"]}});
+        Ok(())
+    }
+
+    #[pg_test]
+    fn borrow_test_serde_serialize_array_header_boundary() -> Result<(), pgrx::spi::Error> {
+        // Postgres switches from a 1-byte to a 4-byte varlena header at ~126 bytes.
+        // Place elements on both sides of that boundary adjacent to each other so a
+        // wrong stride would corrupt the following element.
+        let s125 = "a".repeat(125);
+        let s126 = "b".repeat(126);
+        let s127 = "c".repeat(127);
+        let json = Spi::get_one::<Json>(&format!(
+            "SELECT borrow_serde_serialize_array(ARRAY['{s125}','{s126}','{s127}','z'])"
+        ))?
+        .expect("returned json was null");
+        assert_eq!(json.0, json! {{"values": [s125, s126, s127, "z"]}});
+        Ok(())
+    }
+
+    #[pg_test]
+    fn borrow_test_text_as_str_len() {
+        // 'ab' (2) + null (skipped) + '日本語' (9 UTF-8 bytes) = 11; header excluded.
+        let len = Spi::get_one::<i64>(
+            "SELECT borrow_text_total_len(ARRAY['ab', null, '日本語']::text[])",
+        );
+        assert_eq!(len, Ok(Some(11)));
+    }
+
+    #[pg_test]
+    fn borrow_test_text_as_str_len_empty_and_all_null() {
+        assert_eq!(
+            Spi::get_one::<i64>("SELECT borrow_text_total_len(ARRAY[]::text[])"),
+            Ok(Some(0))
+        );
+        assert_eq!(
+            Spi::get_one::<i64>("SELECT borrow_text_total_len(ARRAY[null,null]::text[])"),
+            Ok(Some(0))
+        );
     }
 
     #[pg_test]

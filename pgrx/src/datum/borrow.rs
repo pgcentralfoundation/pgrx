@@ -146,10 +146,12 @@ unsafe impl Element for ffi::CStr {
 pub struct Text([u8]);
 
 impl Text {
-    /// The string contents (UTF-8), excluding the varlena header.
+    /// The string contents, excluding the varlena header.
+    ///
+    /// Uses pgrx's encoding-aware conversion: when the database encoding isn't guaranteed UTF-8 (e.g. `SQL_ASCII`), the bytes are validated and this panics on non-UTF-8 data — same behavior as reading a `text` datum as `&str`.
     pub fn as_str(&self) -> &str {
-        // SAFETY: tail is a valid varlena; Postgres text is UTF-8 in pgrx's server encodings
-        unsafe { crate::varlena::text_to_rust_str_unchecked(self.0.as_ptr().cast()) }
+        // SAFETY: tail is a valid varlena
+        unsafe { crate::datum::from::convert_varlena_to_str_memoized(self.0.as_ptr().cast()) }
     }
 }
 

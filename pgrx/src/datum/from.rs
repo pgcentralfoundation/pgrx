@@ -386,7 +386,9 @@ impl<'a> FromDatum for &'a str {
 
 // This is not marked inline on purpose, to allow it to be in a single code section
 // which is then branch-predicted on every time by the CPU.
-unsafe fn convert_varlena_to_str_memoized<'a>(varlena: *const pg_sys::varlena) -> &'a str {
+pub(crate) unsafe fn convert_varlena_to_str_memoized<'a>(
+    varlena: *const pg_sys::varlena,
+) -> &'a str {
     match *crate::UTF8DATABASE {
         crate::Utf8Compat::Yes => varlena::text_to_rust_str_unchecked(varlena),
         crate::Utf8Compat::Maybe => varlena::text_to_rust_str(varlena)
