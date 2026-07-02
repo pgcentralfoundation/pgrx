@@ -494,71 +494,114 @@ fn format_builtin_oid_impl(oids: BTreeMap<syn::Ident, Box<syn::Expr>>) -> proc_m
 
 /// Implement our `PgNode` marker trait for `pg_sys::Node` and its "subclasses"
 fn impl_pg_node(items: &[syn::Item]) -> eyre::Result<proc_macro2::TokenStream> {
-    let mut pgnode_impls = proc_macro2::TokenStream::new();
+    let struct_graph = StructGraph::from(items);
 
-    // we scope must of the computation so we can borrow `items` and then
-    // extend it at the very end.
-    let struct_graph: StructGraph = StructGraph::from(items);
-
-    // collect all the structs with `NodeTag` as their first member,
-    // these will serve as roots in our forest of `Node`s
-    let mut root_node_structs = Vec::new();
-    for descriptor in struct_graph.descriptors.iter() {
-        // grab the first field, if any
-        let first_field = match &descriptor.struct_.fields {
-            syn::Fields::Named(fields) => {
-                if let Some(first_field) = fields.named.first() {
-                    first_field
-                } else {
-                    continue;
-                }
+    // Look through the entire file to produce a set of all variants of the Postgres `NodeTag` enum.
+    // Also look at type aliases of structs, as these could be node structs, too.
+    let mut node_tags: BTreeSet<String> = BTreeSet::new();
+    let mut possible_alias_tags = HashMap::new();
+    for item in items {
+        match item {
+            // the `NodeTag` enum
+            syn::Item::Enum(item_enum) if item_enum.ident == "NodeTag" => {
+                node_tags.extend(item_enum.variants.iter().map(|v| v.ident.to_string()))
             }
-            syn::Fields::Unnamed(fields) => {
-                if let Some(first_field) = fields.unnamed.first() {
-                    first_field
-                } else {
-                    continue;
-                }
+            // one type alias of a struct; e.g. `pub type DistinctExpr = OpExpr`
+            syn::Item::Type(item_type)
+                if let syn::Type::Path(p) = &*item_type.ty
+                    && let Some(last) = p.path.segments.last()
+                    && struct_graph.name_tab.contains_key(&last.ident.to_string()) =>
+            {
+                let target_struct_name = last.ident.to_string();
+                let alias_name = item_type.ident.to_string();
+                let tag_name = format!("T_{}", alias_name);
+                possible_alias_tags
+                    .entry(target_struct_name)
+                    .or_insert_with(BTreeSet::new)
+                    .insert(tag_name);
             }
             _ => continue,
-        };
-
-        // grab the type name of the first field
-        let ty_name = if let syn::Type::Path(p) = &first_field.ty
-            && let Some(last_segment) = p.path.segments.last()
-        {
-            last_segment.ident.to_string()
-        } else {
-            continue;
-        };
-
-        if ty_name == "NodeTag" {
-            root_node_structs.push(descriptor);
         }
     }
 
-    // the set of types which subclass `Node` according to postgres' object system
-    let mut node_set = BTreeSet::new();
-    // fill in any children of the roots with a recursive DFS
-    // (we are not operating on user input, so it is ok to just
-    //  use direct recursion rather than an explicit stack).
-    for root in root_node_structs.into_iter() {
-        dfs_find_nodes(root, &struct_graph, &mut node_set);
+    // Identify the root nodes of the Postgres inheritance hierarchy (those having `NodeTag` as
+    // their first field) and recursively resolve the cast tags for them and their subclasses.
+    let mut identified_nodes = BTreeMap::new();
+    for descriptor in struct_graph.descriptors.iter() {
+        let first_field = {
+            if let syn::Fields::Named(fields) = &descriptor.struct_.fields
+                && let Some(first) = fields.named.first()
+            {
+                first
+            } else if let syn::Fields::Unnamed(fields) = &descriptor.struct_.fields
+                && let Some(first) = fields.unnamed.first()
+            {
+                first
+            } else {
+                continue;
+            }
+        };
+
+        let field_type_name = {
+            if let syn::Type::Path(p) = &first_field.ty
+                && let Some(last) = p.path.segments.last()
+            {
+                last.ident.to_string()
+            } else {
+                continue;
+            }
+        };
+
+        if field_type_name == "NodeTag" {
+            resolve_pg_node_tags(
+                descriptor,
+                &struct_graph,
+                &node_tags,
+                &possible_alias_tags,
+                &mut identified_nodes,
+            );
+        }
     }
 
-    // now we can finally iterate the Nodes and emit out Display impl
-    for node_struct in node_set.into_iter() {
-        let struct_name = &node_struct.struct_.ident;
+    // Finally, emit `PgNode` implementations for every detected Node.
+    let mut impls = proc_macro2::TokenStream::new();
+    for (struct_name, cast_tags) in identified_nodes {
+        let ident_struct_name = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
+        let ident_cast_tags: Vec<syn::Ident> =
+            cast_tags.iter().map(|t| syn::Ident::new(t, proc_macro2::Span::call_site())).collect();
 
-        // impl the PgNode trait for all nodes
-        pgnode_impls.extend(quote! {
-            impl pg_sys::seal::Sealed for #struct_name {}
-            impl pg_sys::PgNode for #struct_name {}
+        // Seal every Node.
+        impls.extend(quote! {
+            impl pg_sys::seal::Sealed for #ident_struct_name {}
         });
 
-        // impl Rust's Display trait for all nodes
-        pgnode_impls.extend(quote! {
-            impl ::core::fmt::Display for #struct_name {
+        // Implement PgNode for every Node.
+        impls.extend(match struct_name.as_str() {
+            // Override the default implementation of `try_cast` for Node.
+            "Node" => quote! {
+                impl pg_sys::PgNode for #ident_struct_name {
+                    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[];
+
+                    #[inline]
+                    fn try_cast<T: pg_sys::PgNode>(node: &T) -> Option<&Self> {
+                        Some(node.as_node())
+                    }
+                }
+            },
+
+            // Use the default implementation of `try_as` with populated CAST_TAGS.
+            _ => quote! {
+                impl pg_sys::PgNode for #ident_struct_name {
+                    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[
+                        #(pg_sys::NodeTag::#ident_cast_tags),*
+                    ];
+                }
+            },
+        });
+
+        // Implement Display for every Node.
+        impls.extend(quote! {
+            impl ::core::fmt::Display for #ident_struct_name {
                 fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
                     self.display_node().fmt(f)
                 }
@@ -566,23 +609,56 @@ fn impl_pg_node(items: &[syn::Item]) -> eyre::Result<proc_macro2::TokenStream> {
         });
     }
 
-    Ok(pgnode_impls)
+    Ok(impls)
 }
 
-/// Given a root node, dfs_find_nodes adds all its children nodes to `node_set`.
-fn dfs_find_nodes<'graph>(
-    node: &'graph StructDescriptor<'graph>,
-    graph: &'graph StructGraph<'graph>,
-    node_set: &mut BTreeSet<StructDescriptor<'graph>>,
-) {
-    node_set.insert(node.clone());
-
-    for child in node.children(graph) {
-        if node_set.contains(child) {
-            continue;
-        }
-        dfs_find_nodes(child, graph, node_set);
+/// Recursively traverse a Node's subclasses and return the union of cast node tags.
+/// At the same time, collect results into `identified_nodes`.
+fn resolve_pg_node_tags<'graph>(
+    descriptor: &'graph StructDescriptor<'graph>,
+    struct_graph: &'graph StructGraph<'graph>,
+    node_tags: &BTreeSet<String>,
+    possible_alias_tags: &HashMap<String, BTreeSet<String>>,
+    identified_nodes: &mut BTreeMap<String, BTreeSet<String>>,
+) -> BTreeSet<String> {
+    let struct_name = descriptor.struct_.ident.to_string();
+    if let Some(struct_tags) = identified_nodes.get(&struct_name) {
+        return struct_tags.clone();
     }
+
+    let mut cast_tags = BTreeSet::new();
+
+    // Start with the struct name. Any Node with this tag can cast to this struct.
+    let possible_tag_name = format!("T_{}", struct_name);
+    if node_tags.contains(&possible_tag_name) {
+        cast_tags.insert(possible_tag_name);
+    }
+
+    // Any Node with the tag of a typedef alias can also cast to this struct.
+    if let Some(possible_tags) = possible_alias_tags.get(&struct_name) {
+        for possible_tag_name in possible_tags {
+            if node_tags.contains(possible_tag_name) {
+                cast_tags.insert(possible_tag_name.clone());
+            }
+        }
+    }
+
+    // Recursively collect tags from child subclasses.
+    for child in descriptor.children(struct_graph) {
+        cast_tags.extend(resolve_pg_node_tags(
+            child,
+            struct_graph,
+            node_tags,
+            possible_alias_tags,
+            identified_nodes,
+        ));
+    }
+
+    // Register this Node and its resolved tags in the final result set.
+    identified_nodes.insert(struct_name, cast_tags.clone());
+
+    // Return this Nodes' resolved tags.
+    cast_tags
 }
 
 /// A graph describing the inheritance relationships between different nodes

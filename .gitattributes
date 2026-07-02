@@ -1,4 +1,9 @@
 # https://git-scm.com/docs/gitattributes
 
+# https://docs.gitlab.com/user/project/merge_requests/changes#collapse-generated-files
+# https://github.com/github-linguist/linguist/blob/-/docs/overrides.md#generated-code
+[attr]generated gitlab-generated linguist-generated
+
 # Preserve LF line endings in golden files during checkout.
 /cargo-pgrx/tests/fixtures/**/*.toml text eol=lf
+/pgrx-pg-sys/src/include/*.rs generated
