@@ -175,7 +175,9 @@ pub unsafe trait GucEnum: Copy + Send + Sync {
 /// [`GucValue::Raw`] must be `Send` and `Sync`, or it's a pointer type.
 pub unsafe trait GucValue {
     type Raw: Copy;
+    type RawConst: Copy;
     unsafe fn from_raw(raw: Self::Raw) -> Self;
+    unsafe fn from_raw_const(raw: Self::RawConst) -> Self;
     type BootVal: Copy + Send + Sync;
 }
 
@@ -200,7 +202,11 @@ impl<T: GucValue> GucSetting<T> {
 
 unsafe impl GucValue for bool {
     type Raw = bool;
+    type RawConst = bool;
     unsafe fn from_raw(raw: Self::Raw) -> Self {
+        raw
+    }
+    unsafe fn from_raw_const(raw: Self::RawConst) -> Self {
         raw
     }
     type BootVal = ();
@@ -213,7 +219,11 @@ impl GucSetting<bool> {
 
 unsafe impl GucValue for i32 {
     type Raw = i32;
+    type RawConst = i32;
     unsafe fn from_raw(raw: Self::Raw) -> Self {
+        raw
+    }
+    unsafe fn from_raw_const(raw: Self::RawConst) -> Self {
         raw
     }
     type BootVal = ();
@@ -226,7 +236,11 @@ impl GucSetting<i32> {
 
 unsafe impl GucValue for f64 {
     type Raw = f64;
+    type RawConst = f64;
     unsafe fn from_raw(raw: Self::Raw) -> Self {
+        raw
+    }
+    unsafe fn from_raw_const(raw: Self::RawConst) -> Self {
         raw
     }
     type BootVal = ();
@@ -239,7 +253,11 @@ impl GucSetting<f64> {
 
 unsafe impl GucValue for Option<CString> {
     type Raw = *mut std::ffi::c_char;
+    type RawConst = *const std::ffi::c_char;
     unsafe fn from_raw(raw: Self::Raw) -> Self {
+        if raw.is_null() { None } else { Some(CStr::from_ptr(raw).to_owned()) }
+    }
+    unsafe fn from_raw_const(raw: Self::RawConst) -> Self {
         if raw.is_null() { None } else { Some(CStr::from_ptr(raw).to_owned()) }
     }
     type BootVal = ();
@@ -259,7 +277,11 @@ impl GucSetting<Option<CString>> {
 
 unsafe impl<T: GucEnum> GucValue for T {
     type Raw = i32;
+    type RawConst = i32;
     unsafe fn from_raw(raw: Self::Raw) -> Self {
+        T::from_ordinal(raw)
+    }
+    unsafe fn from_raw_const(raw: Self::RawConst) -> Self {
         T::from_ordinal(raw)
     }
     type BootVal = T;

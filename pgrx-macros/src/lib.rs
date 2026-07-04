@@ -1596,13 +1596,13 @@ pub fn pg_guc_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
             quote! {
                 #[::pgrx::pg_guard]
                 #vis unsafe extern "C-unwind" fn #original_ident(
-                    newval: <#arg_type as ::pgrx::guc::GucValue>::Raw,
+                    newval: <#arg_type as ::pgrx::guc::GucValue>::RawConst,
                     extra: *mut ::core::ffi::c_void,
                 ) {
                     #[inline(always)]
                     #inner_func
 
-                    let value = unsafe { <#arg_type as ::pgrx::guc::GucValue>::from_raw(newval) };
+                    let value = unsafe { <#arg_type as ::pgrx::guc::GucValue>::from_raw_const(newval) };
                     #inner_ident(value);
                 }
             }

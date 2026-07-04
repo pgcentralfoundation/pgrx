@@ -109,7 +109,7 @@ mod tests {
         static GUC: GucSetting<Option<CString>> =
             GucSetting::<Option<CString>>::new(Some(c"this is a test"));
         GucRegistry::define_string_guc(
-            c"test.string",
+            c"test.string_guc",
             c"test string guc",
             c"test string guc",
             &GUC,
@@ -119,10 +119,10 @@ mod tests {
         assert!(GUC.get().is_some());
         assert_eq!(GUC.get().unwrap().to_str().unwrap(), "this is a test");
 
-        Spi::run("SET test.string = 'foo'").expect("SPI failed");
+        Spi::run("SET test.string_guc = 'foo'").expect("SPI failed");
         assert_eq!(GUC.get().unwrap().to_str().unwrap(), "foo");
 
-        Spi::run("SET test.string = DEFAULT").expect("SPI failed");
+        Spi::run("SET test.string_guc = DEFAULT").expect("SPI failed");
         assert_eq!(GUC.get().unwrap().to_str().unwrap(), "this is a test");
     }
 
@@ -130,7 +130,7 @@ mod tests {
     fn test_string_guc_null_default() {
         static GUC: GucSetting<Option<CString>> = GucSetting::<Option<CString>>::new(None);
         GucRegistry::define_string_guc(
-            c"test.string",
+            c"test.string_guc_null",
             c"test string guc",
             c"test string guc",
             &GUC,
@@ -139,10 +139,10 @@ mod tests {
         );
         assert!(GUC.get().is_none());
 
-        Spi::run("SET test.string = 'foo'").expect("SPI failed");
+        Spi::run("SET test.string_guc_null = 'foo'").expect("SPI failed");
         assert_eq!(GUC.get().unwrap().to_str().unwrap(), "foo");
 
-        Spi::run("SET test.string = DEFAULT").expect("SPI failed");
+        Spi::run("SET test.string_guc_null = DEFAULT").expect("SPI failed");
         assert!(GUC.get().is_none());
     }
 
@@ -234,7 +234,7 @@ mod tests {
     }
 
     #[pg_test]
-    #[should_panic(expected = "invalid value for parameter \"test.hooks\": 0")]
+    #[should_panic(expected = "invalid value for parameter \"test.check_hooks\": 0")]
     fn test_guc_check_hook() {
         static SIDE_EFFECT: std::sync::RwLock<i32> = std::sync::RwLock::new(0);
 
@@ -254,7 +254,7 @@ mod tests {
         static GUC: GucSetting<bool> = GucSetting::<bool>::new(true);
         unsafe {
             GucRegistry::define_bool_guc_with_hooks(
-                c"test.hooks",
+                c"test.check_hooks",
                 c"test hooks guc",
                 c"test hooks guc",
                 &GUC,
@@ -268,13 +268,13 @@ mod tests {
 
         // Test check hook - should reject false and not initialize the GUC
         assert!(
-            Spi::run("SET test.hooks TO false").is_err(),
-            "Expected panic when setting test.hooks to false"
+            Spi::run("SET test.check_hooks TO false").is_err(),
+            "Expected panic when setting test.check_hooks to false"
         );
         assert_eq!(*SIDE_EFFECT.read().unwrap(), 1);
 
         // Test check hook - should accept true and increment SIDE_EFFECT
-        assert!(Spi::run("SET test.hooks TO true").is_ok());
+        assert!(Spi::run("SET test.check_hooks TO true").is_ok());
         assert!(GUC.get());
         assert_eq!(*SIDE_EFFECT.read().unwrap(), 2);
     }
@@ -325,7 +325,7 @@ mod tests {
         static GUC: GucSetting<bool> = GucSetting::<bool>::new(false);
         unsafe {
             GucRegistry::define_bool_guc_with_hooks(
-                c"test.hooks",
+                c"test.assign_hooks",
                 c"test hooks guc",
                 c"test hooks guc",
                 &GUC,
@@ -338,11 +338,11 @@ mod tests {
         }
 
         // SIDE_EFFECT should not be updated
-        Spi::run("SET test.hooks TO false").unwrap();
+        Spi::run("SET test.assign_hooks TO false").unwrap();
         assert_eq!(*SIDE_EFFECT.read().unwrap(), 0);
 
         // SIDE_EFFECT should be updated
-        Spi::run("SET test.hooks TO true").unwrap();
+        Spi::run("SET test.assign_hooks TO true").unwrap();
         assert_eq!(*SIDE_EFFECT.read().unwrap(), 1);
     }
 
@@ -357,7 +357,7 @@ mod tests {
         static GUC: GucSetting<bool> = GucSetting::<bool>::new(false);
         unsafe {
             GucRegistry::define_bool_guc_with_hooks(
-                c"test.hooks",
+                c"test.show_hooks",
                 c"test hooks guc",
                 c"test hooks guc",
                 &GUC,
@@ -371,222 +371,302 @@ mod tests {
 
         // Test show hook
         Spi::connect_mut(|client| {
-            let r = client.update("SHOW test.hooks", None, &[]).expect("SPI failed");
+            let r = client.update("SHOW test.show_hooks", None, &[]).expect("SPI failed");
             let value: &str = r.first().get_one::<&str>().unwrap().unwrap();
             assert_eq!(value, "CUSTOM_SHOW_HOOK");
         });
     }
 
-    #[pg_test]
-    fn test_pg_guc_hook_macros() {
-        static GUC: GucSetting<i32> = GucSetting::<i32>::new(100);
-        static SIDE_EFFECT: std::sync::RwLock<i32> = std::sync::RwLock::new(0);
+    #[derive(PostgresGucEnum, Clone, Copy, PartialEq, Debug)]
+    enum HookTestEnum {
+        One,
+        Two,
+    }
 
-        #[pg_guc_hook(show)]
-        fn my_show_hook() -> String {
-            "SHOW_MACRO".to_owned()
-        }
+    macro_rules! test_pg_guc_hook_macro {
+        (
+            $test_name:ident,
+            $type:ty,
+            $initial_val:expr,
+            $base_param_name:expr,
+            $set_sql_val:expr,
+            $expected_val:expr,
+            |$guc_setting:ident, $name:ident, $check:ident, $assign:ident, $show:ident| $register_body:expr
+        ) => {
+            #[pg_test]
+            fn $test_name() {
+                static CALLED: std::sync::RwLock<Option<$type>> = std::sync::RwLock::new(None);
+                static GUC: GucSetting<$type> = GucSetting::<$type>::new($initial_val);
 
-        #[pg_guc_hook(check)]
-        fn my_check_hook(_newval: i32) -> Result<(), GucCheckError> {
-            *SIDE_EFFECT.write().unwrap() += 1;
-            Ok(())
-        }
+                // Postgres presents show hook return value.
+                #[pg_guc_hook(show)]
+                fn my_show_hook() -> String {
+                    "SHOW_MACRO".to_owned()
+                }
 
-        #[pg_guc_hook(assign)]
-        fn my_assign_hook(newval: i32) {
-            if newval > 200 {
-                *SIDE_EFFECT.write().unwrap() += newval;
+                // Check hook boolean true; accepts new value.
+                #[pg_guc_hook(check)]
+                fn my_check_hook(_newval: $type) -> bool {
+                    true
+                }
+
+                // Assign hook receives new value.
+                #[pg_guc_hook(assign)]
+                fn my_assign_hook(newval: $type) {
+                    *CALLED.write().unwrap() = Some(newval);
+                }
+
+                let c_name = CString::new(format!("{}_main", $base_param_name)).unwrap();
+                let leaked_name = Box::leak(c_name.into_boxed_c_str());
+
+                unsafe {
+                    let register = |$guc_setting: &'static GucSetting<$type>, $name, $check, $assign, $show| { $register_body };
+                    register(&GUC, leaked_name, Some(my_check_hook), Some(my_assign_hook), Some(my_show_hook));
+                }
+
+                Spi::connect_mut(|client| {
+                    let r = client.update(&format!("SHOW {}", leaked_name.to_str().unwrap()), None, &[]).unwrap();
+                    let value: &str = r.first().get_one::<&str>().unwrap().unwrap();
+                    assert_eq!(value, "SHOW_MACRO");
+                });
+
+                Spi::run(&format!("SET {} = {}", leaked_name.to_str().unwrap(), $set_sql_val)).unwrap();
+                assert_eq!(*CALLED.read().unwrap(), Some($expected_val));
             }
-        }
 
-        unsafe {
-            GucRegistry::define_int_guc_with_hooks(
-                c"test.hook_macros",
-                c"test hook macros",
-                c"test hook macros",
-                &GUC,
-                -100,
-                2000,
-                GucContext::Userset,
-                GucFlags::default(),
-                Some(my_check_hook),
-                Some(my_assign_hook),
-                Some(my_show_hook),
-            );
-        }
+            paste::paste! {
+                // Check hook Result Ok(); accepts new value.
+                #[pg_test]
+                fn [<$test_name _check_ok>]() {
+                    static CALLED: std::sync::RwLock<Option<$type>> = std::sync::RwLock::new(None);
+                    static GUC: GucSetting<$type> = GucSetting::<$type>::new($initial_val);
 
-        // Check hook accept default
-        assert_eq!(GUC.get(), 100);
-        assert_eq!(*SIDE_EFFECT.read().unwrap(), 1);
+                    #[pg_guc_hook(check)]
+                    fn my_check_hook(_newval: $type) -> Result<(), GucCheckError> {
+                        Ok(())
+                    }
 
-        Spi::connect_mut(|client| {
-            let r = client.update("SHOW test.hook_macros", None, &[]).expect("SPI failed");
-            let value: &str = r.first().get_one::<&str>().unwrap().unwrap();
-            assert_eq!(value, "SHOW_MACRO");
-        });
-        assert_eq!(*SIDE_EFFECT.read().unwrap(), 1);
+                    #[pg_guc_hook(assign)]
+                    fn my_assign_hook(newval: $type) {
+                        *CALLED.write().unwrap() = Some(newval);
+                    }
 
-        // Check hook accept followed by assign hook
-        Spi::run("SET test.hook_macros = 500").unwrap();
-        assert_eq!(GUC.get(), 500);
-        assert_eq!(*SIDE_EFFECT.read().unwrap(), 502);
-    }
+                    let c_name = CString::new(format!("{}_check_ok", $base_param_name)).unwrap();
+                    let leaked_name = Box::leak(c_name.into_boxed_c_str());
 
-    #[pg_test]
-    #[should_panic(expected = "value cannot be negative")]
-    fn test_pg_guc_hook_macro_check_message() {
-        static GUC: GucSetting<i32> = GucSetting::<i32>::new(100);
+                    unsafe {
+                        let register = |$guc_setting: &'static GucSetting<$type>, $name, $check, $assign, $show| { $register_body };
+                        register(&GUC, leaked_name, Some(my_check_hook), Some(my_assign_hook), None);
+                    }
 
-        #[pg_guc_hook(check)]
-        fn my_check_hook(newval: i32) -> Result<(), GucCheckError> {
-            if newval < 0 { Err(GucCheckError::new("value cannot be negative")) } else { Ok(()) }
-        }
+                    Spi::run(&format!("SET {} = {}", leaked_name.to_str().unwrap(), $set_sql_val)).unwrap();
+                    assert_eq!(*CALLED.read().unwrap(), Some($expected_val));
+                }
 
-        unsafe {
-            GucRegistry::define_int_guc_with_hooks(
-                c"test.hook_macro_check_message",
-                c"test hook macro check message",
-                c"test hook macro check message",
-                &GUC,
-                -100,
-                2000,
-                GucContext::Userset,
-                GucFlags::default(),
-                Some(my_check_hook),
-                None,
-                None,
-            );
-        }
+                // Check hook boolean false; rejects new value.
+                #[pg_test]
+                #[should_panic(expected = "invalid value")]
+                fn [<$test_name _check_false>]() {
+                    static GUC: GucSetting<$type> = GucSetting::<$type>::new($initial_val);
 
-        // Check hook reject with message
-        let _ = Spi::run("SET test.hook_macro_check_message = -10");
-    }
+                    #[pg_guc_hook(check)]
+                    fn my_check_hook(_newval: $type) -> bool {
+                        false
+                    }
 
-    #[pg_test]
-    #[should_panic(expected = "positive")]
-    fn test_pg_guc_hook_macro_check_hint() {
-        static GUC: GucSetting<i32> = GucSetting::<i32>::new(100);
+                    let c_name = CString::new(format!("{}_check_false", $base_param_name)).unwrap();
+                    let leaked_name = Box::leak(c_name.into_boxed_c_str());
 
-        #[pg_guc_hook(check)]
-        fn my_check_hook(newval: i32) -> Result<(), GucCheckError> {
-            if newval < 0 {
-                Err(GucCheckError::new("negative").with_hint("positive"))
-            } else {
-                Ok(())
+                    unsafe {
+                        let register = |$guc_setting: &'static GucSetting<$type>, $name, $check, $assign, $show| { $register_body };
+                        register(&GUC, leaked_name, Some(my_check_hook), None, None);
+                    }
+
+                    let _ = Spi::run(&format!("SET {} = {}", leaked_name.to_str().unwrap(), $set_sql_val));
+                }
+
+                // Check hook Result Err(); rejects with message.
+                #[pg_test]
+                #[should_panic(expected = "custom message")]
+                fn [<$test_name _check_err_message>]() {
+                    static GUC: GucSetting<$type> = GucSetting::<$type>::new($initial_val);
+
+                    #[pg_guc_hook(check)]
+                    fn my_check_hook(_newval: $type) -> Result<(), GucCheckError> {
+                        Err(GucCheckError::new("custom message"))
+                    }
+
+                    let c_name = CString::new(format!("{}_check_err_message", $base_param_name)).unwrap();
+                    let leaked_name = Box::leak(c_name.into_boxed_c_str());
+
+                    unsafe {
+                        let register = |$guc_setting: &'static GucSetting<$type>, $name, $check, $assign, $show| { $register_body };
+                        register(&GUC, leaked_name, Some(my_check_hook), None, None);
+                    }
+
+                    let _ = Spi::run(&format!("SET {} = {}", leaked_name.to_str().unwrap(), $set_sql_val));
+                }
+
+                // Check hook Result Err(); rejects with hint.
+                #[pg_test]
+                #[should_panic(expected = "positive")]
+                fn [<$test_name _check_err_hint>]() {
+                    static GUC: GucSetting<$type> = GucSetting::<$type>::new($initial_val);
+
+                    #[pg_guc_hook(check)]
+                    fn my_check_hook(_newval: $type) -> Result<(), GucCheckError> {
+                        Err(GucCheckError::new("negative").with_hint("positive"))
+                    }
+
+                    let c_name = CString::new(format!("{}_check_err_hint", $base_param_name)).unwrap();
+                    let leaked_name = Box::leak(c_name.into_boxed_c_str());
+
+                    unsafe {
+                        let register = |$guc_setting: &'static GucSetting<$type>, $name, $check, $assign, $show| { $register_body };
+                        register(&GUC, leaked_name, Some(my_check_hook), None, None);
+                    }
+
+                    let _ = Spi::run(&format!("SET {} = {}", leaked_name.to_str().unwrap(), $set_sql_val));
+                }
+
+                // Check hook receives a second argument.
+                #[pg_test]
+                fn [<$test_name _check_source_argument>]() {
+                    static CALLED: std::sync::RwLock<pg_sys::GucSource::Type> = std::sync::RwLock::new(100);
+                    static GUC: GucSetting<$type> = GucSetting::<$type>::new($initial_val);
+
+                    #[pg_guc_hook(check)]
+                    fn my_check_hook(_newval: $type, source: pg_sys::GucSource::Type) -> bool {
+                        *CALLED.write().unwrap() = source;
+                        true
+                    }
+
+                    let c_name = CString::new(format!("{}_check_source_argument", $base_param_name)).unwrap();
+                    let leaked_name = Box::leak(c_name.into_boxed_c_str());
+
+                    unsafe {
+                        let register = |$guc_setting: &'static GucSetting<$type>, $name, $check, $assign, $show| { $register_body };
+                        register(&GUC, leaked_name, Some(my_check_hook), None, None);
+                    }
+
+                    Spi::run(&format!("SET {} = {}", leaked_name.to_str().unwrap(), $set_sql_val)).unwrap();
+                    assert_eq!(*CALLED.read().unwrap(), pg_sys::GucSource::PGC_S_SESSION);
+                }
             }
-        }
-
-        unsafe {
-            GucRegistry::define_int_guc_with_hooks(
-                c"test.hook_macro_check_hint",
-                c"test hook macro check hint",
-                c"test hook macro check hint",
-                &GUC,
-                -100,
-                2000,
-                GucContext::Userset,
-                GucFlags::default(),
-                Some(my_check_hook),
-                None,
-                None,
-            );
-        }
-
-        // Check hook reject with hint
-        let _ = Spi::run("SET test.hook_macro_check_hint = -10");
+        };
     }
 
-    #[pg_test]
-    fn test_pg_guc_hook_macro_check_source_argument() {
-        static GUC: GucSetting<i32> = GucSetting::<i32>::new(100);
-        static SIDE_EFFECT: std::sync::RwLock<pg_sys::GucSource::Type> =
-            std::sync::RwLock::new(100);
-
-        #[pg_guc_hook(check)]
-        fn my_check_hook(
-            _newval: i32,
-            source: pg_sys::GucSource::Type,
-        ) -> Result<(), GucCheckError> {
-            *SIDE_EFFECT.write().unwrap() = source;
-            Ok(())
-        }
-
-        unsafe {
-            GucRegistry::define_int_guc_with_hooks(
-                c"test.hook_macro_check_two_args",
-                c"test hook macro check two args",
-                c"test hook macro check two args",
-                &GUC,
-                -100,
-                2000,
+    test_pg_guc_hook_macro!(
+        test_pg_guc_hook_bool,
+        bool,
+        false,
+        "test.macro_bool",
+        "true",
+        true,
+        |setting, name, check, assign, show| {
+            GucRegistry::define_bool_guc_with_hooks(
+                name,
+                c"test bool macro",
+                c"test bool macro",
+                setting,
                 GucContext::Userset,
                 GucFlags::default(),
-                Some(my_check_hook),
-                None,
-                None,
-            );
+                check,
+                assign,
+                show,
+            )
         }
+    );
 
-        Spi::run("SET test.hook_macro_check_two_args = 50").unwrap();
-        assert_eq!(*SIDE_EFFECT.read().unwrap(), pg_sys::GucSource::PGC_S_SESSION);
-    }
-
-    #[pg_test]
-    fn test_pg_guc_hook_macro_check_bool_accept() {
-        static GUC: GucSetting<i32> = GucSetting::<i32>::new(100);
-
-        #[pg_guc_hook(check)]
-        fn my_check_hook(newval: i32) -> bool {
-            newval >= 0
-        }
-
-        unsafe {
+    test_pg_guc_hook_macro!(
+        test_pg_guc_hook_int,
+        i32,
+        100,
+        "test.macro_int",
+        "500",
+        500,
+        |setting, name, check, assign, show| {
             GucRegistry::define_int_guc_with_hooks(
-                c"test.hook_macro_check_bool_accept",
-                c"test hook macro check bool accept",
-                c"test hook macro check bool accept",
-                &GUC,
-                -100,
-                2000,
+                name,
+                c"test int macro",
+                c"test int macro",
+                setting,
+                -1000,
+                1000,
                 GucContext::Userset,
                 GucFlags::default(),
-                Some(my_check_hook),
-                None,
-                None,
-            );
+                check,
+                assign,
+                show,
+            )
         }
+    );
 
-        Spi::run("SET test.hook_macro_check_bool_accept = 50").unwrap();
-        assert_eq!(GUC.get(), 50);
-    }
-
-    #[pg_test]
-    #[should_panic(expected = "invalid value")]
-    fn test_pg_guc_hook_macro_check_bool_reject() {
-        static GUC: GucSetting<i32> = GucSetting::<i32>::new(100);
-
-        #[pg_guc_hook(check)]
-        fn my_check_hook(newval: i32) -> bool {
-            newval >= 0
-        }
-
-        unsafe {
-            GucRegistry::define_int_guc_with_hooks(
-                c"test.hook_macro_check_bool_reject",
-                c"test hook macro check bool reject",
-                c"test hook macro check bool reject",
-                &GUC,
-                -100,
-                2000,
+    test_pg_guc_hook_macro!(
+        test_pg_guc_hook_float,
+        f64,
+        1.5,
+        "test.macro_float",
+        "3.15",
+        3.15,
+        |setting, name, check, assign, show| {
+            GucRegistry::define_float_guc_with_hooks(
+                name,
+                c"test float macro",
+                c"test float macro",
+                setting,
+                -10.0,
+                10.0,
                 GucContext::Userset,
                 GucFlags::default(),
-                Some(my_check_hook),
-                None,
-                None,
-            );
+                check,
+                assign,
+                show,
+            )
         }
+    );
 
-        let _ = Spi::run("SET test.hook_macro_check_bool_reject = -50");
-    }
+    test_pg_guc_hook_macro!(
+        test_pg_guc_hook_string,
+        Option<CString>,
+        None,
+        "test.macro_string",
+        "'hello'",
+        Some(CString::new("hello").unwrap()),
+        |setting, name, check, assign, show| {
+            GucRegistry::define_string_guc_with_hooks(
+                name,
+                c"test string macro",
+                c"test string macro",
+                setting,
+                GucContext::Userset,
+                GucFlags::default(),
+                check,
+                assign,
+                show,
+            )
+        }
+    );
+
+    test_pg_guc_hook_macro!(
+        test_pg_guc_hook_enum,
+        HookTestEnum,
+        HookTestEnum::One,
+        "test.macro_enum",
+        "'Two'",
+        HookTestEnum::Two,
+        |setting, name, check, assign, show| {
+            GucRegistry::define_enum_guc_with_hooks(
+                name,
+                c"test enum macro",
+                c"test enum macro",
+                setting,
+                GucContext::Userset,
+                GucFlags::default(),
+                check,
+                assign,
+                show,
+            )
+        }
+    );
 }
