@@ -526,7 +526,7 @@ impl GucRegistry {
     /// Any hook function that might panic must be marked with `#[pg_guard]` to ensure proper
     /// conversion of Rust panics into PostgreSQL errors.
     ///
-    pub fn define_float_guc_with_hooks(
+    pub unsafe fn define_float_guc_with_hooks(
         name: &'static CStr,
         short_description: &'static CStr,
         long_description: &'static CStr,
