@@ -11,9 +11,6 @@ use crate::{FromDatum, IntoDatum, direct_function_call, direct_function_call_as_
 use core::ffi::CStr;
 use pgrx_pg_sys::PgTryBuilder;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
-use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
-};
 use serde::de::{Error, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt;
@@ -123,11 +120,4 @@ impl From<String> for Inet {
     }
 }
 
-unsafe impl SqlTranslatable for Inet {
-    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(Inet);
-    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
-        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
-    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("inet"));
-    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
-        Ok(ReturnsRef::One(SqlMappingRef::literal("inet")));
-}
+crate::impl_sql_translatable!(Inet, "inet");

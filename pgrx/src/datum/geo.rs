@@ -18,10 +18,6 @@
 //! more information on the geometric types.
 use std::{mem, ptr};
 
-use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable, TypeOrigin,
-};
-
 use crate::{FromDatum, IntoDatum, PgMemoryContexts, pg_sys, set_varsize_4b};
 
 // Copy types
@@ -269,13 +265,7 @@ impl FromDatum for Path {
     }
 }
 
-unsafe impl SqlTranslatable for Path {
-    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(Path);
-    const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
-    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("path"));
-    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
-        Ok(ReturnsRef::One(SqlMappingRef::literal("path")));
-}
+crate::impl_sql_translatable!(Path, "path");
 
 /// An owned Postgres `polygon` type.
 #[derive(Debug, Clone, Default)]
@@ -284,14 +274,7 @@ pub struct Polygon {
     boundbox: Box,
 }
 
-unsafe impl SqlTranslatable for Polygon {
-    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(Polygon);
-    const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
-    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
-        Ok(SqlMappingRef::literal("polygon"));
-    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
-        Ok(ReturnsRef::One(SqlMappingRef::literal("polygon")));
-}
+crate::impl_sql_translatable!(Polygon, "polygon");
 
 impl Polygon {
     pub fn new(points: Vec<pg_sys::Point>) -> Self {

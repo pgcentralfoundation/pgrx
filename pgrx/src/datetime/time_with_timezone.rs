@@ -13,9 +13,6 @@ use crate::datum::{FromDatum, IntoDatum};
 use crate::{PgMemoryContexts, direct_function_call, direct_function_call_as_datum, pg_sys};
 use pgrx_pg_sys::PgTryBuilder;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
-use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
-};
 use std::panic::{RefUnwindSafe, UnwindSafe};
 
 /// A safe wrapper around Postgres `TIME WITH TIME ZONE` type, backed by a [`pg_sys::TimeTzADT`] integer value.
@@ -325,12 +322,4 @@ impl<'de> serde::Deserialize<'de> for TimeWithTimeZone {
     }
 }
 
-unsafe impl SqlTranslatable for TimeWithTimeZone {
-    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(TimeWithTimeZone);
-    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
-        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
-    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
-        Ok(SqlMappingRef::literal("time with time zone"));
-    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
-        Ok(ReturnsRef::One(SqlMappingRef::literal("time with time zone")));
-}
+crate::impl_sql_translatable!(TimeWithTimeZone, "time with time zone");

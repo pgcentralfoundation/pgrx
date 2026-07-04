@@ -8,9 +8,6 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::{FromDatum, IntoDatum, PgMemoryContexts, pg_sys};
-use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
-};
 
 /// Represents Postgres' `internal` data type, which is documented as:
 ///
@@ -181,12 +178,4 @@ impl IntoDatum for Internal {
     }
 }
 
-unsafe impl SqlTranslatable for crate::datum::Internal {
-    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(Internal);
-    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
-        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
-    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
-        Ok(SqlMappingRef::literal("internal"));
-    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
-        Ok(ReturnsRef::One(SqlMappingRef::literal("internal")));
-}
+crate::impl_sql_translatable!(Internal, "internal");

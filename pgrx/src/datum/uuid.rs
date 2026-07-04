@@ -9,9 +9,6 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::{FromDatum, IntoDatum, PgMemoryContexts, pg_sys};
 use core::fmt::Write;
-use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
-};
 use std::ops::{Deref, DerefMut};
 
 const UUID_BYTES_LEN: usize = 16;
@@ -130,11 +127,4 @@ impl std::fmt::UpperHex for Uuid {
     }
 }
 
-unsafe impl SqlTranslatable for Uuid {
-    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(Uuid);
-    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
-        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
-    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("uuid"));
-    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
-        Ok(ReturnsRef::One(SqlMappingRef::literal("uuid")));
-}
+crate::impl_sql_translatable!(Uuid, "uuid");

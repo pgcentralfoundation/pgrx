@@ -11,9 +11,6 @@ use crate::{
     FromDatum, IntoDatum, direct_function_call, direct_function_call_as_datum, pg_sys, vardata_any,
     varsize_any_exhdr, void_mut_ptr,
 };
-use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
-};
 use serde::{Serialize, Serializer};
 use serde_json::Value;
 
@@ -187,20 +184,6 @@ impl Serialize for JsonString {
     }
 }
 
-unsafe impl SqlTranslatable for Json {
-    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(Json);
-    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
-        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
-    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("json"));
-    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
-        Ok(ReturnsRef::One(SqlMappingRef::literal("json")));
-}
+crate::impl_sql_translatable!(Json, "json");
 
-unsafe impl SqlTranslatable for JsonB {
-    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(JsonB);
-    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
-        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
-    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("jsonb"));
-    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
-        Ok(ReturnsRef::One(SqlMappingRef::literal("jsonb")));
-}
+crate::impl_sql_translatable!(JsonB, "jsonb");

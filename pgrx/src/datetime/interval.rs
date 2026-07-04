@@ -11,9 +11,6 @@ use super::datetime_support::{IntervalConversionError, USECS_PER_DAY, USECS_PER_
 use super::{DateTimeParts, DateTimeTypeVisitor, Time, ToIsoString};
 use crate::datum::{FromDatum, IntoDatum};
 use crate::{direct_function_call, pg_sys};
-use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
-};
 
 /// From the PG docs <https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-INTERVAL-INPUT>
 /// Internally interval values are stored as months, days, and microseconds. This is done because the number of days in a month varies,
@@ -309,12 +306,4 @@ impl<'de> serde::Deserialize<'de> for Interval {
         deserializer.deserialize_str(DateTimeTypeVisitor::<Self>::new())
     }
 }
-unsafe impl SqlTranslatable for Interval {
-    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(Interval);
-    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
-        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
-    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
-        Ok(SqlMappingRef::literal("interval"));
-    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
-        Ok(ReturnsRef::One(SqlMappingRef::literal("interval")));
-}
+crate::impl_sql_translatable!(Interval, "interval");

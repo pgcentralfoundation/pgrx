@@ -8,9 +8,6 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::{FromDatum, IntoDatum, pg_sys};
-use pgrx_sql_entity_graph::metadata::{
-    ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
-};
 
 /// The [`anyelement` polymorphic pseudo-type][anyelement].
 ///
@@ -80,12 +77,4 @@ impl IntoDatum for AnyElement {
     }
 }
 
-unsafe impl SqlTranslatable for AnyElement {
-    const TYPE_IDENT: &'static str = crate::pgrx_resolved_type!(AnyElement);
-    const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin =
-        pgrx_sql_entity_graph::metadata::TypeOrigin::External;
-    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> =
-        Ok(SqlMappingRef::literal("anyelement"));
-    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
-        Ok(ReturnsRef::One(SqlMappingRef::literal("anyelement")));
-}
+crate::impl_sql_translatable!(AnyElement, "anyelement");

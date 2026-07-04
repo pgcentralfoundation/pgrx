@@ -529,47 +529,18 @@ unsafe impl BoxRet for f64 {
     }
 }
 
-unsafe impl BoxRet for &[u8] {
-    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
-        match self.into_datum() {
-            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
-            None => fcinfo.return_null(),
-        }
-    }
-}
-
-unsafe impl BoxRet for &str {
-    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
-        match self.into_datum() {
-            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
-            None => fcinfo.return_null(),
-        }
-    }
-}
-
-unsafe impl BoxRet for &CStr {
-    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
-        match self.into_datum() {
-            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
-            None => fcinfo.return_null(),
-        }
-    }
-}
-
 macro_rules! impl_repackage_into_datum {
     ($($boxable:ty),*) => {
         $(  unsafe impl BoxRet for $boxable {
                 unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
-                    match self.into_datum() {
-                        Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
-                        None => fcinfo.return_null(),
-                    }
+                    unsafe { fcinfo.return_optional_datum(self.into_datum()) }
                 }
           })*
     };
 }
 
 impl_repackage_into_datum! {
+    &[u8], &str, &CStr,
     String, CString, Vec<u8>, char,
     Json, JsonB, Inet, Uuid, AnyNumeric, AnyArray, AnyElement, Internal,
     Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
@@ -580,10 +551,7 @@ impl_repackage_into_datum! {
 
 unsafe impl<const P: u32, const S: u32> BoxRet for Numeric<P, S> {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
-        match self.into_datum() {
-            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
-            None => fcinfo.return_null(),
-        }
+        unsafe { fcinfo.return_optional_datum(self.into_datum()) }
     }
 }
 
@@ -592,10 +560,7 @@ where
     T: IntoDatum + RangeSubType,
 {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
-        match self.into_datum() {
-            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
-            None => fcinfo.return_null(),
-        }
+        unsafe { fcinfo.return_optional_datum(self.into_datum()) }
     }
 }
 
@@ -604,19 +569,13 @@ where
     T: IntoDatum,
 {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
-        match self.into_datum() {
-            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
-            None => fcinfo.return_null(),
-        }
+        unsafe { fcinfo.return_optional_datum(self.into_datum()) }
     }
 }
 
 unsafe impl<T: Copy> BoxRet for PgVarlena<T> {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
-        match self.into_datum() {
-            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
-            None => fcinfo.return_null(),
-        }
+        unsafe { fcinfo.return_optional_datum(self.into_datum()) }
     }
 }
 
@@ -625,10 +584,7 @@ where
     A: WhoAllocated,
 {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
-        match self.into_datum() {
-            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
-            None => fcinfo.return_null(),
-        }
+        unsafe { fcinfo.return_optional_datum(self.into_datum()) }
     }
 }
 
@@ -637,10 +593,7 @@ where
     A: WhoAllocated,
 {
     unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
-        match self.into_datum() {
-            Some(datum) => unsafe { fcinfo.return_raw_datum(datum) },
-            None => fcinfo.return_null(),
-        }
+        unsafe { fcinfo.return_optional_datum(self.into_datum()) }
     }
 }
 
@@ -745,6 +698,20 @@ impl<'fcx> FcInfo<'fcx> {
         unsafe {
             *self.set_return_is_null() = false;
             mem::transmute(datum)
+        }
+    }
+
+    /// Return an optional raw Datum: the Datum if `Some`, SQL null if `None`.
+    ///
+    /// Convenience for the ubiquitous "repackage an `IntoDatum` result" pattern.
+    ///
+    /// # Safety
+    /// Same as [`FcInfo::return_raw_datum`] for the `Some` case; the `None` case is always safe.
+    #[inline]
+    pub unsafe fn return_optional_datum(&mut self, datum: Option<pg_sys::Datum>) -> Datum<'fcx> {
+        match datum {
+            Some(datum) => unsafe { self.return_raw_datum(datum) },
+            None => self.return_null(),
         }
     }
 
