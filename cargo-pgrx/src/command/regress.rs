@@ -946,8 +946,10 @@ fn decorate_output(mut line: String) -> Option<(String, Option<TestResult>)> {
 fn make_test_name(entry: &DirEntry) -> String {
     let filename = entry.file_name();
     let filename = filename.to_str().unwrap_or_else(|| panic!("bogus file name: {entry:?}"));
-    let filename =
-        filename.split('.').next().unwrap_or_else(|| panic!("invalid filename: `{filename}`"));
+    let filename = filename
+        .rsplit_once('.')
+        .map(|(s, _)| s)
+        .unwrap_or_else(|| panic!("invalid filename: `{filename}`"));
     filename.to_string()
 }
 
