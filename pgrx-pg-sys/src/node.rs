@@ -129,4 +129,70 @@ mod tests {
         let node = expr.try_as::<crate::Node>().expect("upcast to Node should succeed");
         assert_eq!(node.node_tag(), crate::NodeTag::T_AlternativeSubPlan, "tag remains");
     }
+
+    // In versions prior to pg15, the `Value` struct is used with tags T_Null, T_Integer, T_Float,
+    // T_String, and T_BitString.
+    #[cfg(any(feature = "pg13", feature = "pg14"))]
+    #[test]
+    fn value_struct_cast() {
+        let value =
+            crate::Value { type_: crate::NodeTag::T_Integer, val: crate::ValUnion { ival: 42 } };
+
+        let node = value.as_node(); // infallible upcast
+        assert_eq!(node.node_tag(), crate::NodeTag::T_Integer, "tag remains");
+
+        let next = node.try_as::<crate::Value>().expect("downcast to self should succeed");
+        assert_eq!(next.node_tag(), crate::NodeTag::T_Integer, "tag remains");
+        assert_eq!(unsafe { next.val.ival }, 42);
+
+        for tag in &[
+            crate::NodeTag::T_Float,
+            crate::NodeTag::T_String,
+            crate::NodeTag::T_BitString,
+            crate::NodeTag::T_Null,
+        ] {
+            let value = crate::Value {
+                type_: *tag,
+                val: crate::ValUnion { str_: c"something".as_ptr() as *mut _ },
+            };
+
+            let node = value.as_node(); // infallible upcast
+            assert_eq!(node.node_tag(), *tag, "tag remains");
+
+            let next = node.try_as::<crate::Value>().expect("downcast to self should succeed");
+            assert_eq!(next.node_tag(), *tag, "tag remains");
+            assert_eq!(unsafe { next.val.str_ }, c"something".as_ptr() as *mut _);
+        }
+    }
+
+    // Since pg15, Boolean, Integer, Float, String, and BitString are separate node structs.
+    // `ValUnion` is a single node that can hold any one of these types. That union should implement
+    // PgNode so we can cast to one of the above structs.
+    #[cfg(any(
+        feature = "pg15",
+        feature = "pg16",
+        feature = "pg17",
+        feature = "pg18",
+        feature = "pg19"
+    ))]
+    #[test]
+    fn value_union_cast() {
+        let vu = crate::ValUnion {
+            sval: crate::String {
+                type_: crate::NodeTag::T_String,
+                sval: c"something".as_ptr() as *mut _,
+            },
+        };
+
+        let node = vu.try_as::<crate::Node>().expect("upcast to Node should succeed");
+        let next = node.try_as::<crate::String>().expect("downcast to self should succeed");
+
+        assert_eq!(next.type_, crate::NodeTag::T_String);
+        assert_eq!(next.sval, c"something".as_ptr() as *mut _);
+
+        assert!(
+            node.try_as::<crate::ValUnion>().is_none(),
+            "downcast to untagged union should fail"
+        );
+    }
 }
