@@ -102,6 +102,10 @@ pub(crate) struct Regress {
     /// Run Postgres under valgrind while executing the regression tests
     #[clap(long)]
     pub(crate) valgrind: bool,
+
+    /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+    #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
+    pub(crate) cargo: Vec<String>,
 }
 
 impl Regress {
@@ -360,7 +364,7 @@ impl CommandExecute for Regress {
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
-            &[],
+            &self.cargo,
         )?;
         let extname = get_property(&manifest_path, "extname")?
             .expect("extension name property `extname` should always be known");

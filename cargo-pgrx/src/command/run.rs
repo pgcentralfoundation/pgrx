@@ -76,7 +76,7 @@ impl From<&Regress> for Run {
             pgcli: false,
             install_only: false,
             valgrind: regress.valgrind,
-            cargo: Vec::new(),
+            cargo: regress.cargo.clone(),
         }
     }
 }
@@ -254,4 +254,49 @@ pub(crate) fn exec_psql(pg_config: &PgConfig, dbname: &str, pgcli: bool) -> eyre
     let output = command.output()?;
     tracing::trace!(status_code = %output.status, command = %command_str, "Finished");
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Run;
+    use crate::command::regress::Regress;
+    use clap::Parser;
+
+    /// Mirror the real CLI shape (global `--verbose` on the top-level parser,
+    /// `Regress` as a subcommand) so `Regress`'s `from_global` verbose resolves.
+    #[derive(Parser)]
+    struct Cli {
+        #[arg(short = 'v', long, action = clap::ArgAction::Count, global = true)]
+        verbose: u8,
+        #[command(subcommand)]
+        cmd: Cmd,
+    }
+
+    #[derive(clap::Subcommand)]
+    enum Cmd {
+        Regress(Regress),
+    }
+
+    /// `cargo pgrx regress` builds too, so `--cargo` must be exposed on it and
+    /// forwarded into the `Run` it delegates to. This locks in both: clap parses
+    /// the repeatable flag, and `Run::from(&Regress)` carries it over (not the
+    /// empty vec it used to hard-code).
+    #[test]
+    fn regress_cargo_flags_are_parsed_and_forwarded_to_run() {
+        let cli = Cli::try_parse_from([
+            "cargo-pgrx",
+            "regress",
+            "--cargo",
+            "--offline",
+            "--cargo",
+            "--config=child/.cargo/config.toml",
+        ])
+        .expect("regress should parse repeatable --cargo flags");
+        let Cmd::Regress(regress) = cli.cmd;
+
+        assert_eq!(regress.cargo, vec!["--offline", "--config=child/.cargo/config.toml"]);
+
+        let run = Run::from(&regress);
+        assert_eq!(run.cargo, regress.cargo, "Run::from(&Regress) must forward --cargo");
+    }
 }

@@ -429,6 +429,7 @@ fn copy_sql_files(
             // explicit ALTER EXTENSION would be redundant.
             false,
             output_tracking,
+            cargo_flags,
         )?;
     }
 

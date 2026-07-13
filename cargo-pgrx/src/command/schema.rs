@@ -74,6 +74,9 @@ pub(crate) struct Schema {
     /// already-installed extension.
     #[clap(long)]
     no_alter_extension: bool,
+    /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+    #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
+    cargo: Vec<String>,
 }
 
 impl CommandExecute for Schema {
@@ -97,7 +100,7 @@ impl CommandExecute for Schema {
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
-            &[],
+            &self.cargo,
         )?;
         // This does meaningful mutation, unfortunately
         let (_pg_config, _pg_version) = pg_config_and_version(
@@ -129,6 +132,7 @@ impl CommandExecute for Schema {
             items,
             attach,
             &mut vec![],
+            &self.cargo,
         )
     }
 }
@@ -175,6 +179,7 @@ pub(crate) fn generate_schema_for_cli(
     items: Option<&[String]>,
     attach: bool,
     output_tracking: &mut Vec<PathBuf>,
+    cargo_flags: &[String],
 ) -> eyre::Result<()> {
     let manifest = Manifest::from_path(package_manifest_path)?;
     let features_arg = features.features.join(" ");
@@ -190,7 +195,8 @@ pub(crate) fn generate_schema_for_cli(
         .std_streams([cargo::Stdio::Null, cargo::Stdio::Null, cargo::Stdio::Inherit])
         .manifest_path(user_manifest_path.map(|p| p.to_owned()))
         .log_level(log_level)
-        .features(features.clone());
+        .features(features.clone())
+        .cargo_flags(cargo_flags);
 
     if !skip_build {
         // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
@@ -412,10 +418,43 @@ fn first_build(
 
 #[cfg(test)]
 mod tests {
-    use super::{decode_section_entities, split_positional_args};
+    use super::{Schema, decode_section_entities, split_positional_args};
+    use clap::Parser;
 
     fn strs(args: &[&str]) -> Vec<String> {
         args.iter().map(|s| (*s).to_owned()).collect()
+    }
+
+    /// Mirror the real CLI shape so `Schema`'s `from_global` verbose resolves.
+    #[derive(Parser)]
+    struct Cli {
+        #[arg(short = 'v', long, action = clap::ArgAction::Count, global = true)]
+        verbose: u8,
+        #[command(subcommand)]
+        cmd: Cmd,
+    }
+
+    #[derive(clap::Subcommand)]
+    enum Cmd {
+        Schema(Schema),
+    }
+
+    /// `cargo pgrx schema` builds too, so it must expose repeatable `--cargo`
+    /// (forwarded to `cargo metadata` and the schema-gen build).
+    #[test]
+    fn schema_parses_repeatable_cargo_flags() {
+        let cli = Cli::try_parse_from([
+            "cargo-pgrx",
+            "schema",
+            "--cargo",
+            "--offline",
+            "--cargo",
+            "--config=child/.cargo/config.toml",
+        ])
+        .expect("schema should parse repeatable --cargo flags");
+        let Cmd::Schema(schema) = cli.cmd;
+
+        assert_eq!(schema.cargo, vec!["--offline", "--config=child/.cargo/config.toml"]);
     }
 
     #[test]
