@@ -438,3 +438,6 @@ unsafe impl Scalar for i32 {
 unsafe impl Scalar for i64 {
     const OID: pg_sys::Oid = pg_sys::INT8OID;
 }
+unsafe impl Scalar for crate::datum::Uuid {
+    const OID: pg_sys::Oid = pg_sys::UUIDOID;
+}
