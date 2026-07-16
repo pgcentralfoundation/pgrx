@@ -65,6 +65,7 @@ pub mod memcxt;
 pub mod misc;
 #[cfg(feature = "cshim")]
 pub mod namespace;
+pub mod net;
 pub mod nodes;
 pub mod nullable;
 pub mod palloc;
