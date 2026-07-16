@@ -56,6 +56,7 @@ pub mod htup;
 pub mod inoutfuncs;
 pub mod itemptr;
 pub mod iter;
+pub mod json;
 pub mod layout;
 pub mod list;
 pub mod lwlock;

@@ -23,7 +23,6 @@ pub mod geo;
 mod inet;
 mod internal;
 mod into;
-mod json;
 pub mod numeric;
 pub mod numeric_support;
 #[deny(unsafe_op_in_unsafe_fn)]
@@ -34,6 +33,7 @@ mod varlena;
 
 pub use crate::datetime::support as datetime_support;
 pub use crate::datetime::*;
+pub use crate::json::*;
 pub use crate::uuid::*;
 pub use anyarray::*;
 pub use anyelement::*;
@@ -44,7 +44,6 @@ pub use from::*;
 pub use inet::*;
 pub use internal::*;
 pub use into::*;
-pub use json::*;
 pub use numeric::{AnyNumeric, Numeric};
 pub use range::*;
 pub use unbox::*;
