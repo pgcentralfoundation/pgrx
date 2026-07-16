@@ -77,6 +77,7 @@ pub mod spinlock;
 pub mod stringinfo;
 pub mod trigger_support;
 pub mod tupdesc;
+pub mod uuid;
 pub mod varlena;
 pub mod wrappers;
 pub mod xid;

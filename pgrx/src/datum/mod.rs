@@ -30,12 +30,11 @@ pub mod numeric_support;
 mod range;
 mod tuples;
 mod unbox;
-mod uuid;
 mod varlena;
 
-pub use self::uuid::*;
 pub use crate::datetime::support as datetime_support;
 pub use crate::datetime::*;
+pub use crate::uuid::*;
 pub use anyarray::*;
 pub use anyelement::*;
 pub use array::*;
