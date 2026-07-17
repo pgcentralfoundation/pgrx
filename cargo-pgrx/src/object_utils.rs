@@ -172,7 +172,9 @@ fn parse_macho_header(data: &[u8]) -> eyre::Result<(MachBits, MachEndian, usize)
         object::macho::MH_MAGIC => Ok((MachBits::Bits32, MachEndian::Big, 28)),
         object::macho::MH_CIGAM_64 => Ok((MachBits::Bits64, MachEndian::Little, 32)),
         object::macho::MH_MAGIC_64 => Ok((MachBits::Bits64, MachEndian::Big, 32)),
-        _ => bail!("invalid Mach-O magic"),
+        _ => {
+            bail!("invalid Mach-O magic");
+        }
     }
 }
 

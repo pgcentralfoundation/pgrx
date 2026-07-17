@@ -264,7 +264,7 @@ fn copy_file(
 ) -> eyre::Result<()> {
     let Some(dest_dir) = dest.parent() else {
         // what fresh hell could ever cause such an error?
-        eyre::bail!("no directory to copy to: {}", dest.display())
+        eyre::bail!("no directory to copy to: {}", dest.display());
     };
     match dest_dir.try_exists() {
         Ok(false) => fs::create_dir_all(dest_dir).wrap_err_with(|| {
