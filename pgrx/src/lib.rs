@@ -68,6 +68,7 @@ pub mod namespace;
 pub mod net;
 pub mod nodes;
 pub mod nullable;
+pub mod num;
 pub mod palloc;
 pub mod pg_catalog;
 pub mod pgbox;
