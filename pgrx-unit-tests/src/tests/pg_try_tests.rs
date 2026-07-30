@@ -66,8 +66,8 @@ mod tests {
         Spi::get_one::<()>("SELECT crash()").map(|_| ())
     }
 
-    /// When a `pg_sys::` FFI call raises a Postgres ERROR (via longjmp), the error should
-    /// carry a Rust backtrace so that it appears in the ERROR's DETAIL line.
+    /// When a `pg_sys::` FFI call raises a Postgres ERROR (via longjmp), its `CaughtError`
+    /// should carry a Rust backtrace for catch handlers to inspect.
     #[pg_test]
     fn test_postgres_error_contains_backtrace() {
         use pgrx::pg_sys::panic::CaughtError;
@@ -88,8 +88,8 @@ mod tests {
         assert!(has_backtrace, "PostgresError from a pg_sys FFI call should contain a backtrace");
     }
 
-    /// When a Postgres ERROR propagates through Rust frames, destructors must run (via panic
-    /// unwinding) AND the resulting error should carry a Rust backtrace in its detail.
+    /// When a Postgres ERROR propagates through Rust frames, destructors must run via panic
+    /// unwinding and catch handlers should be able to inspect the captured Rust backtrace.
     #[pg_test]
     fn test_postgres_error_runs_drop_and_has_backtrace() {
         use pgrx::pg_sys::panic::CaughtError;

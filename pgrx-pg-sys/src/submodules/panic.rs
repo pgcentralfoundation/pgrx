@@ -390,6 +390,7 @@ impl CaughtError {
 #[derive(Debug)]
 enum GuardAction<R> {
     Return(R),
+    ReThrow,
     Report(ErrorReportWithLevel),
 }
 
@@ -431,6 +432,16 @@ where
 {
     match unsafe { run_guarded(AssertUnwindSafe(f)) } {
         GuardAction::Return(r) => r,
+        GuardAction::ReThrow => {
+            #[cfg_attr(target_os = "windows", link(name = "postgres"))]
+            unsafe extern "C-unwind" {
+                fn pg_re_throw() -> !;
+            }
+            unsafe {
+                crate::CurrentMemoryContext = crate::ErrorContext;
+                pg_re_throw()
+            }
+        }
         GuardAction::Report(ereport) => {
             do_ereport(ereport);
             unreachable!("pgrx reported a CaughtError that wasn't raised at ERROR or above");
@@ -447,11 +458,10 @@ where
     match catch_unwind(f) {
         Ok(v) => GuardAction::Return(v),
         Err(e) => match downcast_panic_payload(e) {
-            CaughtError::PostgresError(ereport) => {
-                // Postgres raised this error via longjmp, which pg_guard_ffi_boundary caught
-                // and converted into a Rust panic.  downcast_panic_payload already attached the
-                // Rust backtrace from the panic hook, so just report it through do_ereport.
-                GuardAction::Report(ereport)
+            CaughtError::PostgresError(_) => {
+                // Return to the caller to rethrow the original Postgres ErrorData unchanged.  We
+                // can't do it here because this function has non-POF frames.
+                GuardAction::ReThrow
             }
             CaughtError::ErrorReport(ereport) | CaughtError::RustPanic { ereport, .. } => {
                 GuardAction::Report(ereport)
@@ -468,8 +478,8 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
 
         // For PostgresErrors (originating from a pg_sys FFI longjmp caught by
         // pg_guard_ffi_boundary), the panic hook captured a Rust backtrace into
-        // PANIC_LOCATION.  Attach it now so callers (PgTryBuilder, run_guarded,
-        // etc.) can include it in the ERROR's DETAIL line.
+        // PANIC_LOCATION.  Attach it now so PgTryBuilder catch handlers can inspect it without
+        // changing the original Postgres error that will be rethrown.
         if let CaughtError::PostgresError(ref mut ereport) = caught {
             if ereport.inner.location.backtrace.is_none() {
                 let panic_location = take_panic_location();

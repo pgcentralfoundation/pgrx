@@ -240,12 +240,10 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
             };
             let line = errdata.lineno as _;
 
-            // clean up after ourselves by freeing the result of [CopyErrorData], flushing the
-            // Postgres error state (so the original error no longer occupies a slot on Postgres'
-            // fixed-size errordata[] stack), and restoring Postgres' understanding of where its
-            // next longjmp should go
+            // clean up after ourselves by freeing the result of [CopyErrorData] and restoring
+            // Postgres' understanding of where its next longjmp should go.  Keep the original
+            // error on Postgres' error stack so it can later be rethrown without losing fields.
             pg_sys::FreeErrorData(errdata_ptr);
-            pg_sys::FlushErrorState();
             pg_sys::PG_exception_stack = prev_exception_stack;
             pg_sys::error_context_stack = prev_error_context_stack;
 

@@ -298,10 +298,10 @@ mod tests {
     }
 
     #[pg_test(
-        error = "DIAG_PROBE: constraint_name=[diag_probe_k_unique] table_name=[diag_probe] sqlerrm=[duplicate key value violates unique constraint \"diag_probe_k_unique\"]"
+        error = "DIAG_PROBE: constraint_name=[diag_probe_k_unique] table_name=[diag_probe] detail=[Key (k)=(x) already exists.] sqlerrm=[duplicate key value violates unique constraint \"diag_probe_k_unique\"]"
     )]
     /// Proves errors crossing a guarded executor hook retain their structured
-    /// constraint and table names, not just the human-readable message.
+    /// diagnostics and original detail, not just the primary message.
     fn test_guarded_error_preserves_structured_diagnostics() {
         Spi::run(
             r#"
@@ -314,16 +314,19 @@ mod tests {
             DECLARE
                 violated_constraint text;
                 violated_table text;
+                violated_detail text;
             BEGIN
                 BEGIN
                     INSERT INTO diag_probe VALUES ('x');
                 EXCEPTION WHEN unique_violation THEN
                     GET STACKED DIAGNOSTICS
                         violated_constraint = CONSTRAINT_NAME,
-                        violated_table = TABLE_NAME;
-                    RAISE EXCEPTION 'DIAG_PROBE: constraint_name=[%] table_name=[%] sqlerrm=[%]',
+                        violated_table = TABLE_NAME,
+                        violated_detail = PG_EXCEPTION_DETAIL;
+                    RAISE EXCEPTION 'DIAG_PROBE: constraint_name=[%] table_name=[%] detail=[%] sqlerrm=[%]',
                         coalesce(violated_constraint, '<NULL>'),
                         coalesce(violated_table, '<NULL>'),
+                        coalesce(violated_detail, '<NULL>'),
                         SQLERRM;
                 END;
             END $$;
