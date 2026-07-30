@@ -26,6 +26,8 @@ pub struct Cargo {
     more_args: BTreeMap<String, Vec<String>>,
     // Extra arguments passed after `cargo rustc --`.
     rustc_args: Vec<String>,
+    // `--cargo` passthrough flags, forwarded verbatim (after whitespace-splitting).
+    cargo_flags: Vec<String>,
 }
 
 impl Cargo {
@@ -75,6 +77,12 @@ impl Cargo {
         self
     }
 
+    /// `--cargo` passthrough flags, forwarded to this cargo invocation.
+    pub fn cargo_flags(mut self, flags: &[String]) -> Self {
+        self.cargo_flags = crate::metadata::split_cargo_flags(flags);
+        self
+    }
+
     pub fn rustc_args<I, S>(mut self, args: I) -> Self
     where
         I: IntoIterator<Item = S>,
@@ -110,6 +118,7 @@ impl Cargo {
             subcmd: _,
             more_args,
             rustc_args,
+            cargo_flags,
         } = self;
 
         // set most-interesting flags first, like profile, target, and manifest-path
@@ -152,9 +161,14 @@ impl Cargo {
             cmd.arg(features.features.join(" "));
         }
 
-        // And now the miscellaneous build flags!
+        // And now the miscellaneous build flags!, `PGRX_BUILD_FLAGS` stays build-only.
         let flags = env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
         for arg in flags.split_ascii_whitespace() {
+            cmd.arg(arg);
+        }
+
+        // `--cargo` passthrough: forward each (already whitespace-split) token verbatim.
+        for arg in cargo_flags {
             cmd.arg(arg);
         }
 
@@ -392,5 +406,22 @@ mod tests {
             }),
             "expected no-GC rustc args after `--`: {args:?}"
         );
+    }
+
+    #[test]
+    fn cargo_flags_are_forwarded_and_whitespace_split() {
+        // `cargo pgrx schema` (and other builds) route `--cargo` through the
+        // `Cargo` builder; both the single-token and quoted-string forms must
+        // reach the spawned command as separate argv tokens.
+        let command = Cargo::default()
+            .subcommand("rustc")
+            .cargo_flags(&["--offline".into(), "--config foo".into()])
+            .into_command();
+        let args =
+            command.get_args().map(|arg| arg.to_string_lossy().into_owned()).collect::<Vec<_>>();
+
+        assert!(args.contains(&"--offline".to_string()), "missing --offline: {args:?}");
+        assert!(args.contains(&"--config".to_string()), "quoted form not split: {args:?}");
+        assert!(args.contains(&"foo".to_string()), "quoted form not split: {args:?}");
     }
 }

@@ -82,6 +82,9 @@ pub(crate) struct Bench {
     features: clap_cargo::Features,
     #[clap(long)]
     target: Option<String>,
+    /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+    #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
+    cargo: Vec<String>,
     #[clap(from_global, action = clap::ArgAction::Count)]
     verbose: u8,
     /// Custom `postgresql.conf` settings in the form of `key=value`
@@ -99,6 +102,7 @@ impl CommandExecute for Bench {
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
+            &self.cargo,
         )?;
         let mut resolved_features = self.features.clone();
         let (pg_config, _) = pg_config_and_version(
@@ -117,7 +121,7 @@ impl CommandExecute for Bench {
         }
 
         let postgresql_conf = collect_postgresql_conf_settings(&self.postgresql_conf)?;
-        let extversion = crate::command::install::get_version(&package_manifest_path)?;
+        let extversion = crate::command::install::get_version(&package_manifest_path, &self.cargo)?;
         let mut features = resolved_features;
         ensure_feature(&mut features, "pg_bench");
         let profile = CargoProfile::from_flags(
@@ -138,6 +142,7 @@ impl CommandExecute for Bench {
             false,
             self.target.as_deref(),
             &postgresql_conf,
+            &self.cargo,
         )?;
 
         if self.resetdb {
@@ -2301,5 +2306,29 @@ mod tests {
     fn format_wait_duration_uses_singular_and_plural_units() {
         assert_eq!(format_wait_duration(1), "1 second");
         assert_eq!(format_wait_duration(2), "2 seconds");
+    }
+
+    #[test]
+    fn cargo_flag_defaults_to_empty() {
+        let bench = parse_bench(&["cargo", "pgrx", "bench"]);
+        assert!(bench.cargo.is_empty());
+    }
+
+    #[test]
+    fn cargo_flag_is_repeatable() {
+        let bench = parse_bench(&[
+            "cargo",
+            "pgrx",
+            "bench",
+            "--cargo=--offline",
+            "--cargo",
+            "--config foo",
+        ]);
+        assert_eq!(bench.cargo, vec!["--offline".to_string(), "--config foo".to_string()]);
+        // and the shared splitter tokenizes each value the same way build/metadata will
+        assert_eq!(
+            crate::metadata::split_cargo_flags(&bench.cargo),
+            vec!["--offline", "--config", "foo"]
+        );
     }
 }

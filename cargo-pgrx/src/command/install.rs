@@ -57,6 +57,9 @@ pub(crate) struct Install {
     pub(crate) features: clap_cargo::Features,
     #[clap(long)]
     pub(crate) target: Option<String>,
+    /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+    #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
+    pub(crate) cargo: Vec<String>,
     #[clap(from_global, action = ArgAction::Count)]
     pub(crate) verbose: u8,
 }
@@ -72,8 +75,10 @@ impl CommandExecute for Install {
             return sudo_install.execute();
         }
 
-        let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_deref())
-            .wrap_err("couldn't get cargo metadata")?;
+        let cargo_flags = std::mem::take(&mut self.cargo);
+        let metadata =
+            crate::metadata::metadata(&self.features, self.manifest_path.as_deref(), &cargo_flags)
+                .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(self.manifest_path.as_deref(), &metadata)?;
         let package_manifest_path =
             crate::manifest::manifest_path(&metadata, self.package.as_deref())
@@ -110,6 +115,7 @@ impl CommandExecute for Install {
             None,
             &self.features,
             self.target.as_deref(),
+            &cargo_flags,
         )?;
         Ok(())
     }
@@ -147,6 +153,7 @@ pub(crate) fn install_extension(
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    cargo_flags: &[String],
 ) -> eyre::Result<Vec<PathBuf>> {
     let mut output_tracking = Vec::new();
 
@@ -158,7 +165,7 @@ pub(crate) fn install_extension(
     let build_manifest_path =
         manifest_path_for_build(user_manifest_path, user_package, package_manifest_path);
     let build_command_output =
-        build_extension(build_manifest_path, user_package, profile, features, target)?;
+        build_extension(build_manifest_path, user_package, profile, features, target, cargo_flags)?;
     let build_command_bytes = build_command_output.stdout;
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = CargoMessage::parse_stream(build_command_reader);
@@ -192,12 +199,13 @@ pub(crate) fn install_extension(
             true,
             package_manifest_path,
             &mut output_tracking,
+            cargo_flags,
         )?;
     }
 
     {
         let so_name = if versioned_so {
-            let extver = get_version(package_manifest_path)?;
+            let extver = get_version(package_manifest_path, cargo_flags)?;
             // note: versioned so-name format must agree with pgrx-utils
             format!("{extname}-{extver}")
         } else {
@@ -234,6 +242,7 @@ pub(crate) fn install_extension(
             false,
             package_manifest_path,
             &mut output_tracking,
+            cargo_flags,
         )?;
     }
 
@@ -248,6 +257,7 @@ pub(crate) fn install_extension(
         &extdir,
         true,
         &mut output_tracking,
+        cargo_flags,
     )?;
 
     println!("{} installing {}", "    Finished".bold().green(), extname);
@@ -261,6 +271,7 @@ fn copy_file(
     do_filter: bool,
     package_manifest_path: &Path,
     output_tracking: &mut Vec<PathBuf>,
+    cargo_flags: &[String],
 ) -> eyre::Result<()> {
     let Some(dest_dir) = dest.parent() else {
         // what fresh hell could ever cause such an error?
@@ -282,7 +293,7 @@ fn copy_file(
         // we want to filter the contents of the file we're to copy
         let input = fs::read_to_string(src)
             .wrap_err_with(|| format!("failed to read `{}`", src.display()))?;
-        let input = filter_contents(package_manifest_path, input)?;
+        let input = filter_contents(package_manifest_path, input, cargo_flags)?;
 
         fs::write(&dest, input).wrap_err_with(|| {
             format!("failed writing `{}` to `{}`", src.display(), dest.display())
@@ -303,6 +314,7 @@ pub(crate) fn build_extension(
     profile: &CargoProfile,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    cargo_flags: &[String],
 ) -> eyre::Result<std::process::Output> {
     let flags = std::env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
 
@@ -338,6 +350,10 @@ pub(crate) fn build_extension(
     command.arg("--message-format=json-render-diagnostics");
 
     for arg in flags.split_ascii_whitespace() {
+        command.arg(arg);
+    }
+
+    for arg in crate::metadata::split_cargo_flags(cargo_flags) {
         command.arg(arg);
     }
 
@@ -388,10 +404,11 @@ fn copy_sql_files(
     extdir: &Path,
     skip_build: bool,
     output_tracking: &mut Vec<PathBuf>,
+    cargo_flags: &[String],
 ) -> eyre::Result<()> {
     let (_, extname) = find_control_file(package_manifest_path)?;
     {
-        let version = get_version(package_manifest_path)?;
+        let version = get_version(package_manifest_path, cargo_flags)?;
         let filename = format!("{extname}--{version}.sql");
         let dest = extdir.join(filename);
 
@@ -412,6 +429,7 @@ fn copy_sql_files(
             // explicit ALTER EXTENSION would be redundant.
             false,
             output_tracking,
+            cargo_flags,
         )?;
     }
 
@@ -432,6 +450,7 @@ fn copy_sql_files(
                     true,
                     package_manifest_path,
                     output_tracking,
+                    cargo_flags,
                 )?;
             }
         }
@@ -482,7 +501,7 @@ pub(crate) fn find_library_file(
 
 static CARGO_VERSION: OnceLock<MemoizeKeyValue> = OnceLock::new();
 
-pub(crate) fn get_version(manifest_path: &Path) -> eyre::Result<String> {
+pub(crate) fn get_version(manifest_path: &Path, cargo_flags: &[String]) -> eyre::Result<String> {
     let path_string = manifest_path.to_owned();
 
     if let Some(version) =
@@ -494,8 +513,12 @@ pub(crate) fn get_version(manifest_path: &Path) -> eyre::Result<String> {
     let version = match get_property(manifest_path, "default_version")? {
         Some(v) => {
             if v == "@CARGO_VERSION@" {
-                let metadata = crate::metadata::metadata(&Default::default(), Some(manifest_path))
-                    .wrap_err("couldn't get cargo metadata")?;
+                let metadata = crate::metadata::metadata(
+                    &Default::default(),
+                    Some(manifest_path),
+                    cargo_flags,
+                )
+                .wrap_err("couldn't get cargo metadata")?;
                 crate::metadata::validate(Some(manifest_path), &metadata)?;
                 let manifest_path = crate::manifest::manifest_path(&metadata, None)
                     .wrap_err("Couldn't get manifest path")?;
@@ -587,7 +610,11 @@ pub(crate) fn format_display_path(path: &Path) -> eyre::Result<String> {
     Ok(out)
 }
 
-fn filter_contents(manifest_path: &Path, mut input: String) -> eyre::Result<String> {
+fn filter_contents(
+    manifest_path: &Path,
+    mut input: String,
+    cargo_flags: &[String],
+) -> eyre::Result<String> {
     if input.contains("@GIT_HASH@") {
         // avoid doing this if we don't actually have the token
         // the project might not be a git repo so running `git`
@@ -595,7 +622,7 @@ fn filter_contents(manifest_path: &Path, mut input: String) -> eyre::Result<Stri
         input = input.replace("@GIT_HASH@", &get_git_hash(manifest_path)?);
     }
 
-    input = input.replace("@CARGO_VERSION@", &get_version(manifest_path)?);
+    input = input.replace("@CARGO_VERSION@", &get_version(manifest_path, cargo_flags)?);
 
     Ok(input)
 }

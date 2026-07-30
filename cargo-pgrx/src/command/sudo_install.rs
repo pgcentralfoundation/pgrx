@@ -20,6 +20,7 @@ pub(crate) struct SudoInstall {
     features: clap_cargo::Features,
     target: Option<String>,
     verbose: u8,
+    cargo: Vec<String>,
 }
 
 impl From<Install> for SudoInstall {
@@ -35,6 +36,7 @@ impl From<Install> for SudoInstall {
             features: value.features,
             target: value.target,
             verbose: value.verbose,
+            cargo: value.cargo,
         }
     }
 }
@@ -52,6 +54,7 @@ impl From<SudoInstall> for Package {
             features: value.features,
             verbose: value.verbose,
             target: value.target,
+            cargo: value.cargo,
         }
     }
 }
