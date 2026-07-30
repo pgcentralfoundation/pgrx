@@ -1386,6 +1386,15 @@ pub const Anum_pg_amproc_amproc: u32 = 6;
 pub const Natts_pg_amproc: u32 = 6;
 pub const AccessMethodProcedureIndexId: u32 = 2655;
 pub const AccessMethodProcedureOidIndexId: u32 = 2757;
+pub const AuthMemRelationId: Oid = Oid(1261);
+pub const AuthMemRelation_Rowtype_Id: u32 = 2843;
+pub const Anum_pg_auth_members_roleid: u32 = 1;
+pub const Anum_pg_auth_members_member: u32 = 2;
+pub const Anum_pg_auth_members_grantor: u32 = 3;
+pub const Anum_pg_auth_members_admin_option: u32 = 4;
+pub const Natts_pg_auth_members: u32 = 4;
+pub const AuthMemRoleMemIndexId: u32 = 2694;
+pub const AuthMemMemRoleIndexId: u32 = 2695;
 pub const AuthIdRelationId: Oid = Oid(1260);
 pub const AuthIdRelation_Rowtype_Id: u32 = 2842;
 pub const Anum_pg_authid_oid: u32 = 1;
@@ -1849,6 +1858,7 @@ pub const Anum_pg_user_mapping_umoptions: u32 = 4;
 pub const Natts_pg_user_mapping: u32 = 4;
 pub const UserMappingOidIndexId: u32 = 174;
 pub const UserMappingUserServerIndexId: u32 = 175;
+pub const NUM_NOTIFY_BUFFERS: u32 = 8;
 pub const EventTriggerRelationId: Oid = Oid(3466);
 pub const Anum_pg_event_trigger_oid: u32 = 1;
 pub const Anum_pg_event_trigger_evtname: u32 = 2;
@@ -2317,6 +2327,7 @@ pub const BM_PERMANENT: u32 = 2147483648;
 pub const BM_MAX_USAGE_COUNT: u32 = 5;
 pub const FREENEXT_END_OF_LIST: i32 = -1;
 pub const FREENEXT_NOT_IN_LIST: i32 = -2;
+pub const NUM_SERIAL_BUFFERS: u32 = 16;
 pub const XLOG_STANDBY_LOCK: u32 = 0;
 pub const XLOG_RUNNING_XACTS: u32 = 16;
 pub const XLOG_INVALIDATIONS: u32 = 32;
@@ -23364,6 +23375,24 @@ impl Default for FormData_pg_amproc {
 pub type Form_pg_amproc = *mut FormData_pg_amproc;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct FormData_pg_auth_members {
+    pub roleid: Oid,
+    pub member: Oid,
+    pub grantor: Oid,
+    pub admin_option: bool,
+}
+impl Default for FormData_pg_auth_members {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type Form_pg_auth_members = *mut FormData_pg_auth_members;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct FormData_pg_authid {
     pub oid: Oid,
     pub rolname: NameData,
@@ -30088,6 +30117,7 @@ pub mod XLTW_Oper {
     pub const XLTW_FetchUpdated: Type = 7;
     pub const XLTW_RecheckExclusionConstr: Type = 8;
 }
+pub type SerializableXactHandle = *mut ::core::ffi::c_void;
 pub mod ProcSignalReason {
     pub type Type = ::core::ffi::c_uint;
     pub const PROCSIG_CATCHUP_INTERRUPT: Type = 0;
@@ -39066,6 +39096,29 @@ unsafe extern "C-unwind" {
     pub fn AtSubCommit_smgr();
     pub fn AtSubAbort_smgr();
     pub fn PostPrepare_smgr();
+    pub static mut Trace_notify: bool;
+    pub static mut notifyInterruptPending: sig_atomic_t;
+    pub fn AsyncShmemSize() -> Size;
+    pub fn AsyncShmemInit();
+    pub fn NotifyMyFrontEnd(
+        channel: *const ::core::ffi::c_char,
+        payload: *const ::core::ffi::c_char,
+        srcPid: int32,
+    );
+    pub fn Async_Notify(channel: *const ::core::ffi::c_char, payload: *const ::core::ffi::c_char);
+    pub fn Async_Listen(channel: *const ::core::ffi::c_char);
+    pub fn Async_Unlisten(channel: *const ::core::ffi::c_char);
+    pub fn Async_UnlistenAll();
+    pub fn PreCommit_Notify();
+    pub fn AtCommit_Notify();
+    pub fn AtAbort_Notify();
+    pub fn AtSubCommit_Notify();
+    pub fn AtSubAbort_Notify();
+    pub fn AtPrepare_Notify();
+    pub fn ProcessCompletedNotifies();
+    pub fn HandleNotifyInterrupt();
+    pub fn ProcessNotifyInterrupt(flush: bool);
+    pub fn AsyncNotifyFreezeXids(newFrozenXid: TransactionId);
     pub fn CommentObject(stmt: *mut CommentStmt) -> ObjectAddress;
     pub fn DeleteComments(oid: Oid, classoid: Oid, subid: int32);
     pub fn CreateComments(
@@ -40381,6 +40434,57 @@ unsafe extern "C-unwind" {
         op: *mut ExprEvalStep,
         econtext: *mut ExprContext,
     );
+    pub fn ExecInitIndexScan(
+        node: *mut IndexScan,
+        estate: *mut EState,
+        eflags: ::core::ffi::c_int,
+    ) -> *mut IndexScanState;
+    pub fn ExecEndIndexScan(node: *mut IndexScanState);
+    pub fn ExecIndexMarkPos(node: *mut IndexScanState);
+    pub fn ExecIndexRestrPos(node: *mut IndexScanState);
+    pub fn ExecReScanIndexScan(node: *mut IndexScanState);
+    pub fn ExecIndexScanEstimate(node: *mut IndexScanState, pcxt: *mut ParallelContext);
+    pub fn ExecIndexScanInitializeDSM(node: *mut IndexScanState, pcxt: *mut ParallelContext);
+    pub fn ExecIndexScanReInitializeDSM(node: *mut IndexScanState, pcxt: *mut ParallelContext);
+    pub fn ExecIndexScanInitializeWorker(
+        node: *mut IndexScanState,
+        pwcxt: *mut ParallelWorkerContext,
+    );
+    pub fn ExecIndexBuildScanKeys(
+        planstate: *mut PlanState,
+        index: Relation,
+        quals: *mut List,
+        isorderby: bool,
+        scanKeys: *mut ScanKey,
+        numScanKeys: *mut ::core::ffi::c_int,
+        runtimeKeys: *mut *mut IndexRuntimeKeyInfo,
+        numRuntimeKeys: *mut ::core::ffi::c_int,
+        arrayKeys: *mut *mut IndexArrayKeyInfo,
+        numArrayKeys: *mut ::core::ffi::c_int,
+    );
+    pub fn ExecIndexEvalRuntimeKeys(
+        econtext: *mut ExprContext,
+        runtimeKeys: *mut IndexRuntimeKeyInfo,
+        numRuntimeKeys: ::core::ffi::c_int,
+    );
+    pub fn ExecIndexEvalArrayKeys(
+        econtext: *mut ExprContext,
+        arrayKeys: *mut IndexArrayKeyInfo,
+        numArrayKeys: ::core::ffi::c_int,
+    ) -> bool;
+    pub fn ExecIndexAdvanceArrayKeys(
+        arrayKeys: *mut IndexArrayKeyInfo,
+        numArrayKeys: ::core::ffi::c_int,
+    ) -> bool;
+    pub fn ExecInitSubPlan(subplan: *mut SubPlan, parent: *mut PlanState) -> *mut SubPlanState;
+    pub fn ExecSubPlan(
+        node: *mut SubPlanState,
+        econtext: *mut ExprContext,
+        isNull: *mut bool,
+    ) -> Datum;
+    pub fn ExecReScanSetParamPlan(node: *mut SubPlanState, parent: *mut PlanState);
+    pub fn ExecSetParamPlan(node: *mut SubPlanState, econtext: *mut ExprContext);
+    pub fn ExecSetParamPlanMulti(params: *const Bitmapset, econtext: *mut ExprContext);
     pub static mut backslash_quote: ::core::ffi::c_int;
     pub static mut escape_string_warning: bool;
     pub static mut standard_conforming_strings: bool;
@@ -42508,6 +42612,26 @@ unsafe extern "C-unwind" {
         rel: *mut RelOptInfo,
         live_childrels: *mut List,
     );
+    pub fn make_placeholder_expr(
+        root: *mut PlannerInfo,
+        expr: *mut Expr,
+        phrels: Relids,
+    ) -> *mut PlaceHolderVar;
+    pub fn find_placeholder_info(
+        root: *mut PlannerInfo,
+        phv: *mut PlaceHolderVar,
+        create_new_ph: bool,
+    ) -> *mut PlaceHolderInfo;
+    pub fn find_placeholders_in_jointree(root: *mut PlannerInfo);
+    pub fn update_placeholder_eval_levels(root: *mut PlannerInfo, new_sjinfo: *mut SpecialJoinInfo);
+    pub fn fix_placeholder_input_needed_levels(root: *mut PlannerInfo);
+    pub fn add_placeholders_to_base_rels(root: *mut PlannerInfo);
+    pub fn add_placeholders_to_joinrel(
+        root: *mut PlannerInfo,
+        joinrel: *mut RelOptInfo,
+        outer_rel: *mut RelOptInfo,
+        inner_rel: *mut RelOptInfo,
+    );
     pub static mut get_relation_info_hook: get_relation_info_hook_type;
     pub fn get_relation_info(
         root: *mut PlannerInfo,
@@ -44508,6 +44632,56 @@ unsafe extern "C-unwind" {
     );
     pub fn DescribeLockTag(buf: StringInfo, tag: *const LOCKTAG);
     pub fn GetLockNameFromTagType(locktag_type: uint16) -> *const ::core::ffi::c_char;
+    pub static mut max_predicate_locks_per_xact: ::core::ffi::c_int;
+    pub static mut max_predicate_locks_per_relation: ::core::ffi::c_int;
+    pub static mut max_predicate_locks_per_page: ::core::ffi::c_int;
+    pub fn InitPredicateLocks();
+    pub fn PredicateLockShmemSize() -> Size;
+    pub fn CheckPointPredicate();
+    pub fn PageIsPredicateLocked(relation: Relation, blkno: BlockNumber) -> bool;
+    pub fn GetSerializableTransactionSnapshot(snapshot: Snapshot) -> Snapshot;
+    pub fn SetSerializableTransactionSnapshot(
+        snapshot: Snapshot,
+        sourcevxid: *mut VirtualTransactionId,
+        sourcepid: ::core::ffi::c_int,
+    );
+    pub fn RegisterPredicateLockingXid(xid: TransactionId);
+    pub fn PredicateLockRelation(relation: Relation, snapshot: Snapshot);
+    pub fn PredicateLockPage(relation: Relation, blkno: BlockNumber, snapshot: Snapshot);
+    pub fn PredicateLockTID(
+        relation: Relation,
+        tid: ItemPointer,
+        snapshot: Snapshot,
+        insert_xid: TransactionId,
+    );
+    pub fn PredicateLockPageSplit(relation: Relation, oldblkno: BlockNumber, newblkno: BlockNumber);
+    pub fn PredicateLockPageCombine(
+        relation: Relation,
+        oldblkno: BlockNumber,
+        newblkno: BlockNumber,
+    );
+    pub fn TransferPredicateLocksToHeapRelation(relation: Relation);
+    pub fn ReleasePredicateLocks(isCommit: bool, isReadOnlySafe: bool);
+    pub fn CheckForSerializableConflictOutNeeded(relation: Relation, snapshot: Snapshot) -> bool;
+    pub fn CheckForSerializableConflictOut(
+        relation: Relation,
+        xid: TransactionId,
+        snapshot: Snapshot,
+    );
+    pub fn CheckForSerializableConflictIn(relation: Relation, tid: ItemPointer, blkno: BlockNumber);
+    pub fn CheckTableForSerializableConflictIn(relation: Relation);
+    pub fn PreCommit_CheckForSerializationFailure();
+    pub fn AtPrepare_PredicateLocks();
+    pub fn PostPrepare_PredicateLocks(xid: TransactionId);
+    pub fn PredicateLockTwoPhaseFinish(xid: TransactionId, isCommit: bool);
+    pub fn predicatelock_twophase_recover(
+        xid: TransactionId,
+        info: uint16,
+        recdata: *mut ::core::ffi::c_void,
+        len: uint32,
+    );
+    pub fn ShareSerializableXact() -> SerializableXactHandle;
+    pub fn AttachSerializableXact(handle: SerializableXactHandle);
     pub fn ProcSignalShmemSize() -> Size;
     pub fn ProcSignalShmemInit();
     pub fn ProcSignalInit(pss_idx: ::core::ffi::c_int);
@@ -48021,6 +48195,36 @@ unsafe extern "C-unwind" {
         typmod: int32,
         error: *mut bool,
     ) -> bool;
+    pub fn datumGetSize(value: Datum, typByVal: bool, typLen: ::core::ffi::c_int) -> Size;
+    pub fn datumCopy(value: Datum, typByVal: bool, typLen: ::core::ffi::c_int) -> Datum;
+    pub fn datumTransfer(value: Datum, typByVal: bool, typLen: ::core::ffi::c_int) -> Datum;
+    pub fn datumIsEqual(
+        value1: Datum,
+        value2: Datum,
+        typByVal: bool,
+        typLen: ::core::ffi::c_int,
+    ) -> bool;
+    pub fn datum_image_eq(
+        value1: Datum,
+        value2: Datum,
+        typByVal: bool,
+        typLen: ::core::ffi::c_int,
+    ) -> bool;
+    pub fn datum_image_hash(value: Datum, typByVal: bool, typLen: ::core::ffi::c_int) -> uint32;
+    pub fn datumEstimateSpace(
+        value: Datum,
+        isnull: bool,
+        typByVal: bool,
+        typLen: ::core::ffi::c_int,
+    ) -> Size;
+    pub fn datumSerialize(
+        value: Datum,
+        isnull: bool,
+        typByVal: bool,
+        typLen: ::core::ffi::c_int,
+        start_address: *mut *mut ::core::ffi::c_char,
+    );
+    pub fn datumRestore(start_address: *mut *mut ::core::ffi::c_char, isnull: *mut bool) -> Datum;
     pub static mut extra_float_digits: ::core::ffi::c_int;
     pub fn float_overflow_error() -> !;
     pub fn float_underflow_error() -> !;
@@ -49008,2954 +49212,4049 @@ unsafe extern "C-unwind" {
     ) -> *mut text;
 }
 impl pg_sys::seal::Sealed for A_ArrayExpr {}
-impl pg_sys::PgNode for A_ArrayExpr {}
+impl pg_sys::PgNode for A_ArrayExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_A_ArrayExpr];
+}
 impl ::core::fmt::Display for A_ArrayExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for A_Const {}
-impl pg_sys::PgNode for A_Const {}
+impl pg_sys::PgNode for A_Const {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_A_Const];
+}
 impl ::core::fmt::Display for A_Const {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for A_Expr {}
-impl pg_sys::PgNode for A_Expr {}
+impl pg_sys::PgNode for A_Expr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_A_Expr];
+}
 impl ::core::fmt::Display for A_Expr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for A_Indices {}
-impl pg_sys::PgNode for A_Indices {}
+impl pg_sys::PgNode for A_Indices {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_A_Indices];
+}
 impl ::core::fmt::Display for A_Indices {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for A_Indirection {}
-impl pg_sys::PgNode for A_Indirection {}
+impl pg_sys::PgNode for A_Indirection {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_A_Indirection];
+}
 impl ::core::fmt::Display for A_Indirection {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for A_Star {}
-impl pg_sys::PgNode for A_Star {}
+impl pg_sys::PgNode for A_Star {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_A_Star];
+}
 impl ::core::fmt::Display for A_Star {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AccessPriv {}
-impl pg_sys::PgNode for AccessPriv {}
+impl pg_sys::PgNode for AccessPriv {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AccessPriv];
+}
 impl ::core::fmt::Display for AccessPriv {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Agg {}
-impl pg_sys::PgNode for Agg {}
+impl pg_sys::PgNode for Agg {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Agg];
+}
 impl ::core::fmt::Display for Agg {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AggPath {}
-impl pg_sys::PgNode for AggPath {}
+impl pg_sys::PgNode for AggPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AggPath];
+}
 impl ::core::fmt::Display for AggPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AggState {}
-impl pg_sys::PgNode for AggState {}
+impl pg_sys::PgNode for AggState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AggState];
+}
 impl ::core::fmt::Display for AggState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Aggref {}
-impl pg_sys::PgNode for Aggref {}
+impl pg_sys::PgNode for Aggref {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Aggref];
+}
 impl ::core::fmt::Display for Aggref {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Alias {}
-impl pg_sys::PgNode for Alias {}
+impl pg_sys::PgNode for Alias {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Alias];
+}
 impl ::core::fmt::Display for Alias {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterCollationStmt {}
-impl pg_sys::PgNode for AlterCollationStmt {}
+impl pg_sys::PgNode for AlterCollationStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterCollationStmt];
+}
 impl ::core::fmt::Display for AlterCollationStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterDatabaseSetStmt {}
-impl pg_sys::PgNode for AlterDatabaseSetStmt {}
+impl pg_sys::PgNode for AlterDatabaseSetStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterDatabaseSetStmt];
+}
 impl ::core::fmt::Display for AlterDatabaseSetStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterDatabaseStmt {}
-impl pg_sys::PgNode for AlterDatabaseStmt {}
+impl pg_sys::PgNode for AlterDatabaseStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterDatabaseStmt];
+}
 impl ::core::fmt::Display for AlterDatabaseStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterDefaultPrivilegesStmt {}
-impl pg_sys::PgNode for AlterDefaultPrivilegesStmt {}
+impl pg_sys::PgNode for AlterDefaultPrivilegesStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterDefaultPrivilegesStmt];
+}
 impl ::core::fmt::Display for AlterDefaultPrivilegesStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterDomainStmt {}
-impl pg_sys::PgNode for AlterDomainStmt {}
+impl pg_sys::PgNode for AlterDomainStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterDomainStmt];
+}
 impl ::core::fmt::Display for AlterDomainStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterEnumStmt {}
-impl pg_sys::PgNode for AlterEnumStmt {}
+impl pg_sys::PgNode for AlterEnumStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterEnumStmt];
+}
 impl ::core::fmt::Display for AlterEnumStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterEventTrigStmt {}
-impl pg_sys::PgNode for AlterEventTrigStmt {}
+impl pg_sys::PgNode for AlterEventTrigStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterEventTrigStmt];
+}
 impl ::core::fmt::Display for AlterEventTrigStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterExtensionContentsStmt {}
-impl pg_sys::PgNode for AlterExtensionContentsStmt {}
+impl pg_sys::PgNode for AlterExtensionContentsStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterExtensionContentsStmt];
+}
 impl ::core::fmt::Display for AlterExtensionContentsStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterExtensionStmt {}
-impl pg_sys::PgNode for AlterExtensionStmt {}
+impl pg_sys::PgNode for AlterExtensionStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterExtensionStmt];
+}
 impl ::core::fmt::Display for AlterExtensionStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterFdwStmt {}
-impl pg_sys::PgNode for AlterFdwStmt {}
+impl pg_sys::PgNode for AlterFdwStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterFdwStmt];
+}
 impl ::core::fmt::Display for AlterFdwStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterForeignServerStmt {}
-impl pg_sys::PgNode for AlterForeignServerStmt {}
+impl pg_sys::PgNode for AlterForeignServerStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterForeignServerStmt];
+}
 impl ::core::fmt::Display for AlterForeignServerStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterFunctionStmt {}
-impl pg_sys::PgNode for AlterFunctionStmt {}
+impl pg_sys::PgNode for AlterFunctionStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterFunctionStmt];
+}
 impl ::core::fmt::Display for AlterFunctionStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterObjectDependsStmt {}
-impl pg_sys::PgNode for AlterObjectDependsStmt {}
+impl pg_sys::PgNode for AlterObjectDependsStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterObjectDependsStmt];
+}
 impl ::core::fmt::Display for AlterObjectDependsStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterObjectSchemaStmt {}
-impl pg_sys::PgNode for AlterObjectSchemaStmt {}
+impl pg_sys::PgNode for AlterObjectSchemaStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterObjectSchemaStmt];
+}
 impl ::core::fmt::Display for AlterObjectSchemaStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterOpFamilyStmt {}
-impl pg_sys::PgNode for AlterOpFamilyStmt {}
+impl pg_sys::PgNode for AlterOpFamilyStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterOpFamilyStmt];
+}
 impl ::core::fmt::Display for AlterOpFamilyStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterOperatorStmt {}
-impl pg_sys::PgNode for AlterOperatorStmt {}
+impl pg_sys::PgNode for AlterOperatorStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterOperatorStmt];
+}
 impl ::core::fmt::Display for AlterOperatorStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterOwnerStmt {}
-impl pg_sys::PgNode for AlterOwnerStmt {}
+impl pg_sys::PgNode for AlterOwnerStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterOwnerStmt];
+}
 impl ::core::fmt::Display for AlterOwnerStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterPolicyStmt {}
-impl pg_sys::PgNode for AlterPolicyStmt {}
+impl pg_sys::PgNode for AlterPolicyStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterPolicyStmt];
+}
 impl ::core::fmt::Display for AlterPolicyStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterPublicationStmt {}
-impl pg_sys::PgNode for AlterPublicationStmt {}
+impl pg_sys::PgNode for AlterPublicationStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterPublicationStmt];
+}
 impl ::core::fmt::Display for AlterPublicationStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterRoleSetStmt {}
-impl pg_sys::PgNode for AlterRoleSetStmt {}
+impl pg_sys::PgNode for AlterRoleSetStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterRoleSetStmt];
+}
 impl ::core::fmt::Display for AlterRoleSetStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterRoleStmt {}
-impl pg_sys::PgNode for AlterRoleStmt {}
+impl pg_sys::PgNode for AlterRoleStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterRoleStmt];
+}
 impl ::core::fmt::Display for AlterRoleStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterSeqStmt {}
-impl pg_sys::PgNode for AlterSeqStmt {}
+impl pg_sys::PgNode for AlterSeqStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterSeqStmt];
+}
 impl ::core::fmt::Display for AlterSeqStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterStatsStmt {}
-impl pg_sys::PgNode for AlterStatsStmt {}
+impl pg_sys::PgNode for AlterStatsStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterStatsStmt];
+}
 impl ::core::fmt::Display for AlterStatsStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterSubscriptionStmt {}
-impl pg_sys::PgNode for AlterSubscriptionStmt {}
+impl pg_sys::PgNode for AlterSubscriptionStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterSubscriptionStmt];
+}
 impl ::core::fmt::Display for AlterSubscriptionStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterSystemStmt {}
-impl pg_sys::PgNode for AlterSystemStmt {}
+impl pg_sys::PgNode for AlterSystemStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterSystemStmt];
+}
 impl ::core::fmt::Display for AlterSystemStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterTSConfigurationStmt {}
-impl pg_sys::PgNode for AlterTSConfigurationStmt {}
+impl pg_sys::PgNode for AlterTSConfigurationStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterTSConfigurationStmt];
+}
 impl ::core::fmt::Display for AlterTSConfigurationStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterTSDictionaryStmt {}
-impl pg_sys::PgNode for AlterTSDictionaryStmt {}
+impl pg_sys::PgNode for AlterTSDictionaryStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterTSDictionaryStmt];
+}
 impl ::core::fmt::Display for AlterTSDictionaryStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterTableCmd {}
-impl pg_sys::PgNode for AlterTableCmd {}
+impl pg_sys::PgNode for AlterTableCmd {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterTableCmd];
+}
 impl ::core::fmt::Display for AlterTableCmd {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterTableMoveAllStmt {}
-impl pg_sys::PgNode for AlterTableMoveAllStmt {}
+impl pg_sys::PgNode for AlterTableMoveAllStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterTableMoveAllStmt];
+}
 impl ::core::fmt::Display for AlterTableMoveAllStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterTableSpaceOptionsStmt {}
-impl pg_sys::PgNode for AlterTableSpaceOptionsStmt {}
+impl pg_sys::PgNode for AlterTableSpaceOptionsStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterTableSpaceOptionsStmt];
+}
 impl ::core::fmt::Display for AlterTableSpaceOptionsStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterTableStmt {}
-impl pg_sys::PgNode for AlterTableStmt {}
+impl pg_sys::PgNode for AlterTableStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterTableStmt];
+}
 impl ::core::fmt::Display for AlterTableStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterTypeStmt {}
-impl pg_sys::PgNode for AlterTypeStmt {}
+impl pg_sys::PgNode for AlterTypeStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterTypeStmt];
+}
 impl ::core::fmt::Display for AlterTypeStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlterUserMappingStmt {}
-impl pg_sys::PgNode for AlterUserMappingStmt {}
+impl pg_sys::PgNode for AlterUserMappingStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterUserMappingStmt];
+}
 impl ::core::fmt::Display for AlterUserMappingStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AlternativeSubPlan {}
-impl pg_sys::PgNode for AlternativeSubPlan {}
+impl pg_sys::PgNode for AlternativeSubPlan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlternativeSubPlan];
+}
 impl ::core::fmt::Display for AlternativeSubPlan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Append {}
-impl pg_sys::PgNode for Append {}
+impl pg_sys::PgNode for Append {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Append];
+}
 impl ::core::fmt::Display for Append {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AppendPath {}
-impl pg_sys::PgNode for AppendPath {}
+impl pg_sys::PgNode for AppendPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AppendPath];
+}
 impl ::core::fmt::Display for AppendPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AppendRelInfo {}
-impl pg_sys::PgNode for AppendRelInfo {}
+impl pg_sys::PgNode for AppendRelInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AppendRelInfo];
+}
 impl ::core::fmt::Display for AppendRelInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for AppendState {}
-impl pg_sys::PgNode for AppendState {}
+impl pg_sys::PgNode for AppendState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AppendState];
+}
 impl ::core::fmt::Display for AppendState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ArrayCoerceExpr {}
-impl pg_sys::PgNode for ArrayCoerceExpr {}
+impl pg_sys::PgNode for ArrayCoerceExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ArrayCoerceExpr];
+}
 impl ::core::fmt::Display for ArrayCoerceExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ArrayExpr {}
-impl pg_sys::PgNode for ArrayExpr {}
+impl pg_sys::PgNode for ArrayExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ArrayExpr];
+}
 impl ::core::fmt::Display for ArrayExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for BaseBackupCmd {}
-impl pg_sys::PgNode for BaseBackupCmd {}
+impl pg_sys::PgNode for BaseBackupCmd {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_BaseBackupCmd];
+}
 impl ::core::fmt::Display for BaseBackupCmd {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for BitmapAnd {}
-impl pg_sys::PgNode for BitmapAnd {}
+impl pg_sys::PgNode for BitmapAnd {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_BitmapAnd];
+}
 impl ::core::fmt::Display for BitmapAnd {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for BitmapAndPath {}
-impl pg_sys::PgNode for BitmapAndPath {}
+impl pg_sys::PgNode for BitmapAndPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_BitmapAndPath];
+}
 impl ::core::fmt::Display for BitmapAndPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for BitmapAndState {}
-impl pg_sys::PgNode for BitmapAndState {}
+impl pg_sys::PgNode for BitmapAndState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_BitmapAndState];
+}
 impl ::core::fmt::Display for BitmapAndState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for BitmapHeapPath {}
-impl pg_sys::PgNode for BitmapHeapPath {}
+impl pg_sys::PgNode for BitmapHeapPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_BitmapHeapPath];
+}
 impl ::core::fmt::Display for BitmapHeapPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for BitmapHeapScan {}
-impl pg_sys::PgNode for BitmapHeapScan {}
+impl pg_sys::PgNode for BitmapHeapScan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_BitmapHeapScan];
+}
 impl ::core::fmt::Display for BitmapHeapScan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for BitmapHeapScanState {}
-impl pg_sys::PgNode for BitmapHeapScanState {}
+impl pg_sys::PgNode for BitmapHeapScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_BitmapHeapScanState];
+}
 impl ::core::fmt::Display for BitmapHeapScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for BitmapIndexScan {}
-impl pg_sys::PgNode for BitmapIndexScan {}
+impl pg_sys::PgNode for BitmapIndexScan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_BitmapIndexScan];
+}
 impl ::core::fmt::Display for BitmapIndexScan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for BitmapIndexScanState {}
-impl pg_sys::PgNode for BitmapIndexScanState {}
+impl pg_sys::PgNode for BitmapIndexScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_BitmapIndexScanState];
+}
 impl ::core::fmt::Display for BitmapIndexScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for BitmapOr {}
-impl pg_sys::PgNode for BitmapOr {}
+impl pg_sys::PgNode for BitmapOr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_BitmapOr];
+}
 impl ::core::fmt::Display for BitmapOr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for BitmapOrPath {}
-impl pg_sys::PgNode for BitmapOrPath {}
+impl pg_sys::PgNode for BitmapOrPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_BitmapOrPath];
+}
 impl ::core::fmt::Display for BitmapOrPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for BitmapOrState {}
-impl pg_sys::PgNode for BitmapOrState {}
+impl pg_sys::PgNode for BitmapOrState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_BitmapOrState];
+}
 impl ::core::fmt::Display for BitmapOrState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for BoolExpr {}
-impl pg_sys::PgNode for BoolExpr {}
+impl pg_sys::PgNode for BoolExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_BoolExpr];
+}
 impl ::core::fmt::Display for BoolExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for BooleanTest {}
-impl pg_sys::PgNode for BooleanTest {}
+impl pg_sys::PgNode for BooleanTest {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_BooleanTest];
+}
 impl ::core::fmt::Display for BooleanTest {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for BufferHeapTupleTableSlot {}
-impl pg_sys::PgNode for BufferHeapTupleTableSlot {}
+impl pg_sys::PgNode for BufferHeapTupleTableSlot {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[];
+}
 impl ::core::fmt::Display for BufferHeapTupleTableSlot {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CTECycleClause {}
-impl pg_sys::PgNode for CTECycleClause {}
+impl pg_sys::PgNode for CTECycleClause {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CTECycleClause];
+}
 impl ::core::fmt::Display for CTECycleClause {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CTESearchClause {}
-impl pg_sys::PgNode for CTESearchClause {}
+impl pg_sys::PgNode for CTESearchClause {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CTESearchClause];
+}
 impl ::core::fmt::Display for CTESearchClause {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CallContext {}
-impl pg_sys::PgNode for CallContext {}
+impl pg_sys::PgNode for CallContext {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CallContext];
+}
 impl ::core::fmt::Display for CallContext {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CallStmt {}
-impl pg_sys::PgNode for CallStmt {}
+impl pg_sys::PgNode for CallStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CallStmt];
+}
 impl ::core::fmt::Display for CallStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CaseExpr {}
-impl pg_sys::PgNode for CaseExpr {}
+impl pg_sys::PgNode for CaseExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CaseExpr];
+}
 impl ::core::fmt::Display for CaseExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CaseTestExpr {}
-impl pg_sys::PgNode for CaseTestExpr {}
+impl pg_sys::PgNode for CaseTestExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CaseTestExpr];
+}
 impl ::core::fmt::Display for CaseTestExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CaseWhen {}
-impl pg_sys::PgNode for CaseWhen {}
+impl pg_sys::PgNode for CaseWhen {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CaseWhen];
+}
 impl ::core::fmt::Display for CaseWhen {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CheckPointStmt {}
-impl pg_sys::PgNode for CheckPointStmt {}
+impl pg_sys::PgNode for CheckPointStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CheckPointStmt];
+}
 impl ::core::fmt::Display for CheckPointStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ClosePortalStmt {}
-impl pg_sys::PgNode for ClosePortalStmt {}
+impl pg_sys::PgNode for ClosePortalStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ClosePortalStmt];
+}
 impl ::core::fmt::Display for ClosePortalStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ClusterStmt {}
-impl pg_sys::PgNode for ClusterStmt {}
+impl pg_sys::PgNode for ClusterStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ClusterStmt];
+}
 impl ::core::fmt::Display for ClusterStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CoalesceExpr {}
-impl pg_sys::PgNode for CoalesceExpr {}
+impl pg_sys::PgNode for CoalesceExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CoalesceExpr];
+}
 impl ::core::fmt::Display for CoalesceExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CoerceToDomain {}
-impl pg_sys::PgNode for CoerceToDomain {}
+impl pg_sys::PgNode for CoerceToDomain {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CoerceToDomain];
+}
 impl ::core::fmt::Display for CoerceToDomain {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CoerceToDomainValue {}
-impl pg_sys::PgNode for CoerceToDomainValue {}
+impl pg_sys::PgNode for CoerceToDomainValue {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CoerceToDomainValue];
+}
 impl ::core::fmt::Display for CoerceToDomainValue {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CoerceViaIO {}
-impl pg_sys::PgNode for CoerceViaIO {}
+impl pg_sys::PgNode for CoerceViaIO {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CoerceViaIO];
+}
 impl ::core::fmt::Display for CoerceViaIO {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CollateClause {}
-impl pg_sys::PgNode for CollateClause {}
+impl pg_sys::PgNode for CollateClause {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CollateClause];
+}
 impl ::core::fmt::Display for CollateClause {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CollateExpr {}
-impl pg_sys::PgNode for CollateExpr {}
+impl pg_sys::PgNode for CollateExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CollateExpr];
+}
 impl ::core::fmt::Display for CollateExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ColumnDef {}
-impl pg_sys::PgNode for ColumnDef {}
+impl pg_sys::PgNode for ColumnDef {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ColumnDef];
+}
 impl ::core::fmt::Display for ColumnDef {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ColumnRef {}
-impl pg_sys::PgNode for ColumnRef {}
+impl pg_sys::PgNode for ColumnRef {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ColumnRef];
+}
 impl ::core::fmt::Display for ColumnRef {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CommentStmt {}
-impl pg_sys::PgNode for CommentStmt {}
+impl pg_sys::PgNode for CommentStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CommentStmt];
+}
 impl ::core::fmt::Display for CommentStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CommonTableExpr {}
-impl pg_sys::PgNode for CommonTableExpr {}
+impl pg_sys::PgNode for CommonTableExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CommonTableExpr];
+}
 impl ::core::fmt::Display for CommonTableExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CompositeTypeStmt {}
-impl pg_sys::PgNode for CompositeTypeStmt {}
+impl pg_sys::PgNode for CompositeTypeStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CompositeTypeStmt];
+}
 impl ::core::fmt::Display for CompositeTypeStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Const {}
-impl pg_sys::PgNode for Const {}
+impl pg_sys::PgNode for Const {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Const];
+}
 impl ::core::fmt::Display for Const {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Constraint {}
-impl pg_sys::PgNode for Constraint {}
+impl pg_sys::PgNode for Constraint {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Constraint];
+}
 impl ::core::fmt::Display for Constraint {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ConstraintsSetStmt {}
-impl pg_sys::PgNode for ConstraintsSetStmt {}
+impl pg_sys::PgNode for ConstraintsSetStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ConstraintsSetStmt];
+}
 impl ::core::fmt::Display for ConstraintsSetStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ConvertRowtypeExpr {}
-impl pg_sys::PgNode for ConvertRowtypeExpr {}
+impl pg_sys::PgNode for ConvertRowtypeExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ConvertRowtypeExpr];
+}
 impl ::core::fmt::Display for ConvertRowtypeExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CopyStmt {}
-impl pg_sys::PgNode for CopyStmt {}
+impl pg_sys::PgNode for CopyStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CopyStmt];
+}
 impl ::core::fmt::Display for CopyStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateAmStmt {}
-impl pg_sys::PgNode for CreateAmStmt {}
+impl pg_sys::PgNode for CreateAmStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateAmStmt];
+}
 impl ::core::fmt::Display for CreateAmStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateCastStmt {}
-impl pg_sys::PgNode for CreateCastStmt {}
+impl pg_sys::PgNode for CreateCastStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateCastStmt];
+}
 impl ::core::fmt::Display for CreateCastStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateConversionStmt {}
-impl pg_sys::PgNode for CreateConversionStmt {}
+impl pg_sys::PgNode for CreateConversionStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateConversionStmt];
+}
 impl ::core::fmt::Display for CreateConversionStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateDomainStmt {}
-impl pg_sys::PgNode for CreateDomainStmt {}
+impl pg_sys::PgNode for CreateDomainStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateDomainStmt];
+}
 impl ::core::fmt::Display for CreateDomainStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateEnumStmt {}
-impl pg_sys::PgNode for CreateEnumStmt {}
+impl pg_sys::PgNode for CreateEnumStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateEnumStmt];
+}
 impl ::core::fmt::Display for CreateEnumStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateEventTrigStmt {}
-impl pg_sys::PgNode for CreateEventTrigStmt {}
+impl pg_sys::PgNode for CreateEventTrigStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateEventTrigStmt];
+}
 impl ::core::fmt::Display for CreateEventTrigStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateExtensionStmt {}
-impl pg_sys::PgNode for CreateExtensionStmt {}
+impl pg_sys::PgNode for CreateExtensionStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateExtensionStmt];
+}
 impl ::core::fmt::Display for CreateExtensionStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateFdwStmt {}
-impl pg_sys::PgNode for CreateFdwStmt {}
+impl pg_sys::PgNode for CreateFdwStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateFdwStmt];
+}
 impl ::core::fmt::Display for CreateFdwStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateForeignServerStmt {}
-impl pg_sys::PgNode for CreateForeignServerStmt {}
+impl pg_sys::PgNode for CreateForeignServerStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateForeignServerStmt];
+}
 impl ::core::fmt::Display for CreateForeignServerStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateForeignTableStmt {}
-impl pg_sys::PgNode for CreateForeignTableStmt {}
+impl pg_sys::PgNode for CreateForeignTableStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateForeignTableStmt];
+}
 impl ::core::fmt::Display for CreateForeignTableStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateFunctionStmt {}
-impl pg_sys::PgNode for CreateFunctionStmt {}
+impl pg_sys::PgNode for CreateFunctionStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateFunctionStmt];
+}
 impl ::core::fmt::Display for CreateFunctionStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateOpClassItem {}
-impl pg_sys::PgNode for CreateOpClassItem {}
+impl pg_sys::PgNode for CreateOpClassItem {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateOpClassItem];
+}
 impl ::core::fmt::Display for CreateOpClassItem {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateOpClassStmt {}
-impl pg_sys::PgNode for CreateOpClassStmt {}
+impl pg_sys::PgNode for CreateOpClassStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateOpClassStmt];
+}
 impl ::core::fmt::Display for CreateOpClassStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateOpFamilyStmt {}
-impl pg_sys::PgNode for CreateOpFamilyStmt {}
+impl pg_sys::PgNode for CreateOpFamilyStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateOpFamilyStmt];
+}
 impl ::core::fmt::Display for CreateOpFamilyStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreatePLangStmt {}
-impl pg_sys::PgNode for CreatePLangStmt {}
+impl pg_sys::PgNode for CreatePLangStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreatePLangStmt];
+}
 impl ::core::fmt::Display for CreatePLangStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreatePolicyStmt {}
-impl pg_sys::PgNode for CreatePolicyStmt {}
+impl pg_sys::PgNode for CreatePolicyStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreatePolicyStmt];
+}
 impl ::core::fmt::Display for CreatePolicyStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreatePublicationStmt {}
-impl pg_sys::PgNode for CreatePublicationStmt {}
+impl pg_sys::PgNode for CreatePublicationStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreatePublicationStmt];
+}
 impl ::core::fmt::Display for CreatePublicationStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateRangeStmt {}
-impl pg_sys::PgNode for CreateRangeStmt {}
+impl pg_sys::PgNode for CreateRangeStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateRangeStmt];
+}
 impl ::core::fmt::Display for CreateRangeStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateReplicationSlotCmd {}
-impl pg_sys::PgNode for CreateReplicationSlotCmd {}
+impl pg_sys::PgNode for CreateReplicationSlotCmd {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateReplicationSlotCmd];
+}
 impl ::core::fmt::Display for CreateReplicationSlotCmd {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateRoleStmt {}
-impl pg_sys::PgNode for CreateRoleStmt {}
+impl pg_sys::PgNode for CreateRoleStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateRoleStmt];
+}
 impl ::core::fmt::Display for CreateRoleStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateSchemaStmt {}
-impl pg_sys::PgNode for CreateSchemaStmt {}
+impl pg_sys::PgNode for CreateSchemaStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateSchemaStmt];
+}
 impl ::core::fmt::Display for CreateSchemaStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateSeqStmt {}
-impl pg_sys::PgNode for CreateSeqStmt {}
+impl pg_sys::PgNode for CreateSeqStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateSeqStmt];
+}
 impl ::core::fmt::Display for CreateSeqStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateStatsStmt {}
-impl pg_sys::PgNode for CreateStatsStmt {}
+impl pg_sys::PgNode for CreateStatsStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateStatsStmt];
+}
 impl ::core::fmt::Display for CreateStatsStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateStmt {}
-impl pg_sys::PgNode for CreateStmt {}
+impl pg_sys::PgNode for CreateStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] =
+        &[pg_sys::NodeTag::T_CreateForeignTableStmt, pg_sys::NodeTag::T_CreateStmt];
+}
 impl ::core::fmt::Display for CreateStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateSubscriptionStmt {}
-impl pg_sys::PgNode for CreateSubscriptionStmt {}
+impl pg_sys::PgNode for CreateSubscriptionStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateSubscriptionStmt];
+}
 impl ::core::fmt::Display for CreateSubscriptionStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateTableAsStmt {}
-impl pg_sys::PgNode for CreateTableAsStmt {}
+impl pg_sys::PgNode for CreateTableAsStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateTableAsStmt];
+}
 impl ::core::fmt::Display for CreateTableAsStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateTableSpaceStmt {}
-impl pg_sys::PgNode for CreateTableSpaceStmt {}
+impl pg_sys::PgNode for CreateTableSpaceStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateTableSpaceStmt];
+}
 impl ::core::fmt::Display for CreateTableSpaceStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateTransformStmt {}
-impl pg_sys::PgNode for CreateTransformStmt {}
+impl pg_sys::PgNode for CreateTransformStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateTransformStmt];
+}
 impl ::core::fmt::Display for CreateTransformStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateTrigStmt {}
-impl pg_sys::PgNode for CreateTrigStmt {}
+impl pg_sys::PgNode for CreateTrigStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateTrigStmt];
+}
 impl ::core::fmt::Display for CreateTrigStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreateUserMappingStmt {}
-impl pg_sys::PgNode for CreateUserMappingStmt {}
+impl pg_sys::PgNode for CreateUserMappingStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreateUserMappingStmt];
+}
 impl ::core::fmt::Display for CreateUserMappingStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CreatedbStmt {}
-impl pg_sys::PgNode for CreatedbStmt {}
+impl pg_sys::PgNode for CreatedbStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreatedbStmt];
+}
 impl ::core::fmt::Display for CreatedbStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CteScan {}
-impl pg_sys::PgNode for CteScan {}
+impl pg_sys::PgNode for CteScan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CteScan];
+}
 impl ::core::fmt::Display for CteScan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CteScanState {}
-impl pg_sys::PgNode for CteScanState {}
+impl pg_sys::PgNode for CteScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CteScanState];
+}
 impl ::core::fmt::Display for CteScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CurrentOfExpr {}
-impl pg_sys::PgNode for CurrentOfExpr {}
+impl pg_sys::PgNode for CurrentOfExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CurrentOfExpr];
+}
 impl ::core::fmt::Display for CurrentOfExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CustomPath {}
-impl pg_sys::PgNode for CustomPath {}
+impl pg_sys::PgNode for CustomPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CustomPath];
+}
 impl ::core::fmt::Display for CustomPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CustomScan {}
-impl pg_sys::PgNode for CustomScan {}
+impl pg_sys::PgNode for CustomScan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CustomScan];
+}
 impl ::core::fmt::Display for CustomScan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for CustomScanState {}
-impl pg_sys::PgNode for CustomScanState {}
+impl pg_sys::PgNode for CustomScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CustomScanState];
+}
 impl ::core::fmt::Display for CustomScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for DeallocateStmt {}
-impl pg_sys::PgNode for DeallocateStmt {}
+impl pg_sys::PgNode for DeallocateStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_DeallocateStmt];
+}
 impl ::core::fmt::Display for DeallocateStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for DeclareCursorStmt {}
-impl pg_sys::PgNode for DeclareCursorStmt {}
+impl pg_sys::PgNode for DeclareCursorStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_DeclareCursorStmt];
+}
 impl ::core::fmt::Display for DeclareCursorStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for DefElem {}
-impl pg_sys::PgNode for DefElem {}
+impl pg_sys::PgNode for DefElem {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_DefElem];
+}
 impl ::core::fmt::Display for DefElem {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for DefineStmt {}
-impl pg_sys::PgNode for DefineStmt {}
+impl pg_sys::PgNode for DefineStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_DefineStmt];
+}
 impl ::core::fmt::Display for DefineStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for DeleteStmt {}
-impl pg_sys::PgNode for DeleteStmt {}
+impl pg_sys::PgNode for DeleteStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_DeleteStmt];
+}
 impl ::core::fmt::Display for DeleteStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for DiscardStmt {}
-impl pg_sys::PgNode for DiscardStmt {}
+impl pg_sys::PgNode for DiscardStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_DiscardStmt];
+}
 impl ::core::fmt::Display for DiscardStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for DoStmt {}
-impl pg_sys::PgNode for DoStmt {}
+impl pg_sys::PgNode for DoStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_DoStmt];
+}
 impl ::core::fmt::Display for DoStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for DomainConstraintState {}
-impl pg_sys::PgNode for DomainConstraintState {}
+impl pg_sys::PgNode for DomainConstraintState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_DomainConstraintState];
+}
 impl ::core::fmt::Display for DomainConstraintState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for DropOwnedStmt {}
-impl pg_sys::PgNode for DropOwnedStmt {}
+impl pg_sys::PgNode for DropOwnedStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_DropOwnedStmt];
+}
 impl ::core::fmt::Display for DropOwnedStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for DropReplicationSlotCmd {}
-impl pg_sys::PgNode for DropReplicationSlotCmd {}
+impl pg_sys::PgNode for DropReplicationSlotCmd {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_DropReplicationSlotCmd];
+}
 impl ::core::fmt::Display for DropReplicationSlotCmd {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for DropRoleStmt {}
-impl pg_sys::PgNode for DropRoleStmt {}
+impl pg_sys::PgNode for DropRoleStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_DropRoleStmt];
+}
 impl ::core::fmt::Display for DropRoleStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for DropStmt {}
-impl pg_sys::PgNode for DropStmt {}
+impl pg_sys::PgNode for DropStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_DropStmt];
+}
 impl ::core::fmt::Display for DropStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for DropSubscriptionStmt {}
-impl pg_sys::PgNode for DropSubscriptionStmt {}
+impl pg_sys::PgNode for DropSubscriptionStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_DropSubscriptionStmt];
+}
 impl ::core::fmt::Display for DropSubscriptionStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for DropTableSpaceStmt {}
-impl pg_sys::PgNode for DropTableSpaceStmt {}
+impl pg_sys::PgNode for DropTableSpaceStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_DropTableSpaceStmt];
+}
 impl ::core::fmt::Display for DropTableSpaceStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for DropUserMappingStmt {}
-impl pg_sys::PgNode for DropUserMappingStmt {}
+impl pg_sys::PgNode for DropUserMappingStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_DropUserMappingStmt];
+}
 impl ::core::fmt::Display for DropUserMappingStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for DropdbStmt {}
-impl pg_sys::PgNode for DropdbStmt {}
+impl pg_sys::PgNode for DropdbStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_DropdbStmt];
+}
 impl ::core::fmt::Display for DropdbStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for EState {}
-impl pg_sys::PgNode for EState {}
+impl pg_sys::PgNode for EState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_EState];
+}
 impl ::core::fmt::Display for EState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for EquivalenceClass {}
-impl pg_sys::PgNode for EquivalenceClass {}
+impl pg_sys::PgNode for EquivalenceClass {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_EquivalenceClass];
+}
 impl ::core::fmt::Display for EquivalenceClass {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for EquivalenceMember {}
-impl pg_sys::PgNode for EquivalenceMember {}
+impl pg_sys::PgNode for EquivalenceMember {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_EquivalenceMember];
+}
 impl ::core::fmt::Display for EquivalenceMember {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for EventTriggerData {}
-impl pg_sys::PgNode for EventTriggerData {}
+impl pg_sys::PgNode for EventTriggerData {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_EventTriggerData];
+}
 impl ::core::fmt::Display for EventTriggerData {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ExecuteStmt {}
-impl pg_sys::PgNode for ExecuteStmt {}
+impl pg_sys::PgNode for ExecuteStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ExecuteStmt];
+}
 impl ::core::fmt::Display for ExecuteStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ExplainStmt {}
-impl pg_sys::PgNode for ExplainStmt {}
+impl pg_sys::PgNode for ExplainStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ExplainStmt];
+}
 impl ::core::fmt::Display for ExplainStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Expr {}
-impl pg_sys::PgNode for Expr {}
+impl pg_sys::PgNode for Expr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[
+        pg_sys::NodeTag::T_Aggref,
+        pg_sys::NodeTag::T_AlternativeSubPlan,
+        pg_sys::NodeTag::T_ArrayCoerceExpr,
+        pg_sys::NodeTag::T_ArrayExpr,
+        pg_sys::NodeTag::T_BoolExpr,
+        pg_sys::NodeTag::T_BooleanTest,
+        pg_sys::NodeTag::T_CaseExpr,
+        pg_sys::NodeTag::T_CaseTestExpr,
+        pg_sys::NodeTag::T_CaseWhen,
+        pg_sys::NodeTag::T_CoalesceExpr,
+        pg_sys::NodeTag::T_CoerceToDomain,
+        pg_sys::NodeTag::T_CoerceToDomainValue,
+        pg_sys::NodeTag::T_CoerceViaIO,
+        pg_sys::NodeTag::T_CollateExpr,
+        pg_sys::NodeTag::T_Const,
+        pg_sys::NodeTag::T_ConvertRowtypeExpr,
+        pg_sys::NodeTag::T_CurrentOfExpr,
+        pg_sys::NodeTag::T_DistinctExpr,
+        pg_sys::NodeTag::T_Expr,
+        pg_sys::NodeTag::T_FieldSelect,
+        pg_sys::NodeTag::T_FieldStore,
+        pg_sys::NodeTag::T_FuncExpr,
+        pg_sys::NodeTag::T_GroupingFunc,
+        pg_sys::NodeTag::T_InferenceElem,
+        pg_sys::NodeTag::T_MinMaxExpr,
+        pg_sys::NodeTag::T_NamedArgExpr,
+        pg_sys::NodeTag::T_NextValueExpr,
+        pg_sys::NodeTag::T_NullIfExpr,
+        pg_sys::NodeTag::T_NullTest,
+        pg_sys::NodeTag::T_OpExpr,
+        pg_sys::NodeTag::T_Param,
+        pg_sys::NodeTag::T_PlaceHolderVar,
+        pg_sys::NodeTag::T_RelabelType,
+        pg_sys::NodeTag::T_RowCompareExpr,
+        pg_sys::NodeTag::T_RowExpr,
+        pg_sys::NodeTag::T_SQLValueFunction,
+        pg_sys::NodeTag::T_ScalarArrayOpExpr,
+        pg_sys::NodeTag::T_SetToDefault,
+        pg_sys::NodeTag::T_SubLink,
+        pg_sys::NodeTag::T_SubPlan,
+        pg_sys::NodeTag::T_SubscriptingRef,
+        pg_sys::NodeTag::T_TargetEntry,
+        pg_sys::NodeTag::T_Var,
+        pg_sys::NodeTag::T_WindowFunc,
+        pg_sys::NodeTag::T_XmlExpr,
+    ];
+}
 impl ::core::fmt::Display for Expr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ExprContext {}
-impl pg_sys::PgNode for ExprContext {}
+impl pg_sys::PgNode for ExprContext {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ExprContext];
+}
 impl ::core::fmt::Display for ExprContext {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ExprState {}
-impl pg_sys::PgNode for ExprState {}
+impl pg_sys::PgNode for ExprState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ExprState];
+}
 impl ::core::fmt::Display for ExprState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ExtensibleNode {}
-impl pg_sys::PgNode for ExtensibleNode {}
+impl pg_sys::PgNode for ExtensibleNode {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ExtensibleNode];
+}
 impl ::core::fmt::Display for ExtensibleNode {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for FdwRoutine {}
-impl pg_sys::PgNode for FdwRoutine {}
+impl pg_sys::PgNode for FdwRoutine {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_FdwRoutine];
+}
 impl ::core::fmt::Display for FdwRoutine {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for FetchStmt {}
-impl pg_sys::PgNode for FetchStmt {}
+impl pg_sys::PgNode for FetchStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_FetchStmt];
+}
 impl ::core::fmt::Display for FetchStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for FieldSelect {}
-impl pg_sys::PgNode for FieldSelect {}
+impl pg_sys::PgNode for FieldSelect {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_FieldSelect];
+}
 impl ::core::fmt::Display for FieldSelect {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for FieldStore {}
-impl pg_sys::PgNode for FieldStore {}
+impl pg_sys::PgNode for FieldStore {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_FieldStore];
+}
 impl ::core::fmt::Display for FieldStore {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ForeignKeyCacheInfo {}
-impl pg_sys::PgNode for ForeignKeyCacheInfo {}
+impl pg_sys::PgNode for ForeignKeyCacheInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ForeignKeyCacheInfo];
+}
 impl ::core::fmt::Display for ForeignKeyCacheInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ForeignKeyOptInfo {}
-impl pg_sys::PgNode for ForeignKeyOptInfo {}
+impl pg_sys::PgNode for ForeignKeyOptInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ForeignKeyOptInfo];
+}
 impl ::core::fmt::Display for ForeignKeyOptInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ForeignPath {}
-impl pg_sys::PgNode for ForeignPath {}
+impl pg_sys::PgNode for ForeignPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ForeignPath];
+}
 impl ::core::fmt::Display for ForeignPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ForeignScan {}
-impl pg_sys::PgNode for ForeignScan {}
+impl pg_sys::PgNode for ForeignScan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ForeignScan];
+}
 impl ::core::fmt::Display for ForeignScan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ForeignScanState {}
-impl pg_sys::PgNode for ForeignScanState {}
+impl pg_sys::PgNode for ForeignScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ForeignScanState];
+}
 impl ::core::fmt::Display for ForeignScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for FromExpr {}
-impl pg_sys::PgNode for FromExpr {}
+impl pg_sys::PgNode for FromExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_FromExpr];
+}
 impl ::core::fmt::Display for FromExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for FuncCall {}
-impl pg_sys::PgNode for FuncCall {}
+impl pg_sys::PgNode for FuncCall {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_FuncCall];
+}
 impl ::core::fmt::Display for FuncCall {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for FuncExpr {}
-impl pg_sys::PgNode for FuncExpr {}
+impl pg_sys::PgNode for FuncExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_FuncExpr];
+}
 impl ::core::fmt::Display for FuncExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for FunctionParameter {}
-impl pg_sys::PgNode for FunctionParameter {}
+impl pg_sys::PgNode for FunctionParameter {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_FunctionParameter];
+}
 impl ::core::fmt::Display for FunctionParameter {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for FunctionScan {}
-impl pg_sys::PgNode for FunctionScan {}
+impl pg_sys::PgNode for FunctionScan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_FunctionScan];
+}
 impl ::core::fmt::Display for FunctionScan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for FunctionScanState {}
-impl pg_sys::PgNode for FunctionScanState {}
+impl pg_sys::PgNode for FunctionScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_FunctionScanState];
+}
 impl ::core::fmt::Display for FunctionScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Gather {}
-impl pg_sys::PgNode for Gather {}
+impl pg_sys::PgNode for Gather {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Gather];
+}
 impl ::core::fmt::Display for Gather {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for GatherMerge {}
-impl pg_sys::PgNode for GatherMerge {}
+impl pg_sys::PgNode for GatherMerge {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GatherMerge];
+}
 impl ::core::fmt::Display for GatherMerge {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for GatherMergePath {}
-impl pg_sys::PgNode for GatherMergePath {}
+impl pg_sys::PgNode for GatherMergePath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GatherMergePath];
+}
 impl ::core::fmt::Display for GatherMergePath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for GatherMergeState {}
-impl pg_sys::PgNode for GatherMergeState {}
+impl pg_sys::PgNode for GatherMergeState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GatherMergeState];
+}
 impl ::core::fmt::Display for GatherMergeState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for GatherPath {}
-impl pg_sys::PgNode for GatherPath {}
+impl pg_sys::PgNode for GatherPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GatherPath];
+}
 impl ::core::fmt::Display for GatherPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for GatherState {}
-impl pg_sys::PgNode for GatherState {}
+impl pg_sys::PgNode for GatherState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GatherState];
+}
 impl ::core::fmt::Display for GatherState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for GrantRoleStmt {}
-impl pg_sys::PgNode for GrantRoleStmt {}
+impl pg_sys::PgNode for GrantRoleStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GrantRoleStmt];
+}
 impl ::core::fmt::Display for GrantRoleStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for GrantStmt {}
-impl pg_sys::PgNode for GrantStmt {}
+impl pg_sys::PgNode for GrantStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GrantStmt];
+}
 impl ::core::fmt::Display for GrantStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Group {}
-impl pg_sys::PgNode for Group {}
+impl pg_sys::PgNode for Group {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Group];
+}
 impl ::core::fmt::Display for Group {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for GroupPath {}
-impl pg_sys::PgNode for GroupPath {}
+impl pg_sys::PgNode for GroupPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GroupPath];
+}
 impl ::core::fmt::Display for GroupPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for GroupResultPath {}
-impl pg_sys::PgNode for GroupResultPath {}
+impl pg_sys::PgNode for GroupResultPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GroupResultPath];
+}
 impl ::core::fmt::Display for GroupResultPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for GroupState {}
-impl pg_sys::PgNode for GroupState {}
+impl pg_sys::PgNode for GroupState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GroupState];
+}
 impl ::core::fmt::Display for GroupState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for GroupingFunc {}
-impl pg_sys::PgNode for GroupingFunc {}
+impl pg_sys::PgNode for GroupingFunc {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GroupingFunc];
+}
 impl ::core::fmt::Display for GroupingFunc {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for GroupingSet {}
-impl pg_sys::PgNode for GroupingSet {}
+impl pg_sys::PgNode for GroupingSet {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GroupingSet];
+}
 impl ::core::fmt::Display for GroupingSet {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for GroupingSetData {}
-impl pg_sys::PgNode for GroupingSetData {}
+impl pg_sys::PgNode for GroupingSetData {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GroupingSetData];
+}
 impl ::core::fmt::Display for GroupingSetData {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for GroupingSetsPath {}
-impl pg_sys::PgNode for GroupingSetsPath {}
+impl pg_sys::PgNode for GroupingSetsPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GroupingSetsPath];
+}
 impl ::core::fmt::Display for GroupingSetsPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Hash {}
-impl pg_sys::PgNode for Hash {}
+impl pg_sys::PgNode for Hash {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Hash];
+}
 impl ::core::fmt::Display for Hash {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for HashJoin {}
-impl pg_sys::PgNode for HashJoin {}
+impl pg_sys::PgNode for HashJoin {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_HashJoin];
+}
 impl ::core::fmt::Display for HashJoin {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for HashJoinState {}
-impl pg_sys::PgNode for HashJoinState {}
+impl pg_sys::PgNode for HashJoinState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_HashJoinState];
+}
 impl ::core::fmt::Display for HashJoinState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for HashPath {}
-impl pg_sys::PgNode for HashPath {}
+impl pg_sys::PgNode for HashPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_HashPath];
+}
 impl ::core::fmt::Display for HashPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for HashState {}
-impl pg_sys::PgNode for HashState {}
+impl pg_sys::PgNode for HashState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_HashState];
+}
 impl ::core::fmt::Display for HashState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for HeapTupleTableSlot {}
-impl pg_sys::PgNode for HeapTupleTableSlot {}
+impl pg_sys::PgNode for HeapTupleTableSlot {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[];
+}
 impl ::core::fmt::Display for HeapTupleTableSlot {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for IdentifySystemCmd {}
-impl pg_sys::PgNode for IdentifySystemCmd {}
+impl pg_sys::PgNode for IdentifySystemCmd {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_IdentifySystemCmd];
+}
 impl ::core::fmt::Display for IdentifySystemCmd {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ImportForeignSchemaStmt {}
-impl pg_sys::PgNode for ImportForeignSchemaStmt {}
+impl pg_sys::PgNode for ImportForeignSchemaStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ImportForeignSchemaStmt];
+}
 impl ::core::fmt::Display for ImportForeignSchemaStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for IncrementalSort {}
-impl pg_sys::PgNode for IncrementalSort {}
+impl pg_sys::PgNode for IncrementalSort {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_IncrementalSort];
+}
 impl ::core::fmt::Display for IncrementalSort {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for IncrementalSortPath {}
-impl pg_sys::PgNode for IncrementalSortPath {}
+impl pg_sys::PgNode for IncrementalSortPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_IncrementalSortPath];
+}
 impl ::core::fmt::Display for IncrementalSortPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for IncrementalSortState {}
-impl pg_sys::PgNode for IncrementalSortState {}
+impl pg_sys::PgNode for IncrementalSortState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_IncrementalSortState];
+}
 impl ::core::fmt::Display for IncrementalSortState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for IndexAmRoutine {}
-impl pg_sys::PgNode for IndexAmRoutine {}
+impl pg_sys::PgNode for IndexAmRoutine {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_IndexAmRoutine];
+}
 impl ::core::fmt::Display for IndexAmRoutine {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for IndexClause {}
-impl pg_sys::PgNode for IndexClause {}
+impl pg_sys::PgNode for IndexClause {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_IndexClause];
+}
 impl ::core::fmt::Display for IndexClause {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for IndexElem {}
-impl pg_sys::PgNode for IndexElem {}
+impl pg_sys::PgNode for IndexElem {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_IndexElem];
+}
 impl ::core::fmt::Display for IndexElem {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for IndexInfo {}
-impl pg_sys::PgNode for IndexInfo {}
+impl pg_sys::PgNode for IndexInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_IndexInfo];
+}
 impl ::core::fmt::Display for IndexInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for IndexOnlyScan {}
-impl pg_sys::PgNode for IndexOnlyScan {}
+impl pg_sys::PgNode for IndexOnlyScan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_IndexOnlyScan];
+}
 impl ::core::fmt::Display for IndexOnlyScan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for IndexOnlyScanState {}
-impl pg_sys::PgNode for IndexOnlyScanState {}
+impl pg_sys::PgNode for IndexOnlyScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_IndexOnlyScanState];
+}
 impl ::core::fmt::Display for IndexOnlyScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for IndexOptInfo {}
-impl pg_sys::PgNode for IndexOptInfo {}
+impl pg_sys::PgNode for IndexOptInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_IndexOptInfo];
+}
 impl ::core::fmt::Display for IndexOptInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for IndexPath {}
-impl pg_sys::PgNode for IndexPath {}
+impl pg_sys::PgNode for IndexPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_IndexPath];
+}
 impl ::core::fmt::Display for IndexPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for IndexScan {}
-impl pg_sys::PgNode for IndexScan {}
+impl pg_sys::PgNode for IndexScan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_IndexScan];
+}
 impl ::core::fmt::Display for IndexScan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for IndexScanState {}
-impl pg_sys::PgNode for IndexScanState {}
+impl pg_sys::PgNode for IndexScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_IndexScanState];
+}
 impl ::core::fmt::Display for IndexScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for IndexStmt {}
-impl pg_sys::PgNode for IndexStmt {}
+impl pg_sys::PgNode for IndexStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_IndexStmt];
+}
 impl ::core::fmt::Display for IndexStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for InferClause {}
-impl pg_sys::PgNode for InferClause {}
+impl pg_sys::PgNode for InferClause {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_InferClause];
+}
 impl ::core::fmt::Display for InferClause {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for InferenceElem {}
-impl pg_sys::PgNode for InferenceElem {}
+impl pg_sys::PgNode for InferenceElem {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_InferenceElem];
+}
 impl ::core::fmt::Display for InferenceElem {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for InlineCodeBlock {}
-impl pg_sys::PgNode for InlineCodeBlock {}
+impl pg_sys::PgNode for InlineCodeBlock {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_InlineCodeBlock];
+}
 impl ::core::fmt::Display for InlineCodeBlock {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for InsertStmt {}
-impl pg_sys::PgNode for InsertStmt {}
+impl pg_sys::PgNode for InsertStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_InsertStmt];
+}
 impl ::core::fmt::Display for InsertStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for IntoClause {}
-impl pg_sys::PgNode for IntoClause {}
+impl pg_sys::PgNode for IntoClause {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_IntoClause];
+}
 impl ::core::fmt::Display for IntoClause {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Join {}
-impl pg_sys::PgNode for Join {}
+impl pg_sys::PgNode for Join {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[
+        pg_sys::NodeTag::T_HashJoin,
+        pg_sys::NodeTag::T_Join,
+        pg_sys::NodeTag::T_MergeJoin,
+        pg_sys::NodeTag::T_NestLoop,
+    ];
+}
 impl ::core::fmt::Display for Join {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for JoinExpr {}
-impl pg_sys::PgNode for JoinExpr {}
+impl pg_sys::PgNode for JoinExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_JoinExpr];
+}
 impl ::core::fmt::Display for JoinExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for JoinPath {}
-impl pg_sys::PgNode for JoinPath {}
+impl pg_sys::PgNode for JoinPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] =
+        &[pg_sys::NodeTag::T_HashPath, pg_sys::NodeTag::T_MergePath, pg_sys::NodeTag::T_NestPath];
+}
 impl ::core::fmt::Display for JoinPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for JoinState {}
-impl pg_sys::PgNode for JoinState {}
+impl pg_sys::PgNode for JoinState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[
+        pg_sys::NodeTag::T_HashJoinState,
+        pg_sys::NodeTag::T_JoinState,
+        pg_sys::NodeTag::T_MergeJoinState,
+        pg_sys::NodeTag::T_NestLoopState,
+    ];
+}
 impl ::core::fmt::Display for JoinState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for JunkFilter {}
-impl pg_sys::PgNode for JunkFilter {}
+impl pg_sys::PgNode for JunkFilter {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_JunkFilter];
+}
 impl ::core::fmt::Display for JunkFilter {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Limit {}
-impl pg_sys::PgNode for Limit {}
+impl pg_sys::PgNode for Limit {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Limit];
+}
 impl ::core::fmt::Display for Limit {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for LimitPath {}
-impl pg_sys::PgNode for LimitPath {}
+impl pg_sys::PgNode for LimitPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_LimitPath];
+}
 impl ::core::fmt::Display for LimitPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for LimitState {}
-impl pg_sys::PgNode for LimitState {}
+impl pg_sys::PgNode for LimitState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_LimitState];
+}
 impl ::core::fmt::Display for LimitState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for List {}
-impl pg_sys::PgNode for List {}
+impl pg_sys::PgNode for List {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_List];
+}
 impl ::core::fmt::Display for List {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ListenStmt {}
-impl pg_sys::PgNode for ListenStmt {}
+impl pg_sys::PgNode for ListenStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ListenStmt];
+}
 impl ::core::fmt::Display for ListenStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for LoadStmt {}
-impl pg_sys::PgNode for LoadStmt {}
+impl pg_sys::PgNode for LoadStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_LoadStmt];
+}
 impl ::core::fmt::Display for LoadStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for LockRows {}
-impl pg_sys::PgNode for LockRows {}
+impl pg_sys::PgNode for LockRows {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_LockRows];
+}
 impl ::core::fmt::Display for LockRows {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for LockRowsPath {}
-impl pg_sys::PgNode for LockRowsPath {}
+impl pg_sys::PgNode for LockRowsPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_LockRowsPath];
+}
 impl ::core::fmt::Display for LockRowsPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for LockRowsState {}
-impl pg_sys::PgNode for LockRowsState {}
+impl pg_sys::PgNode for LockRowsState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_LockRowsState];
+}
 impl ::core::fmt::Display for LockRowsState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for LockStmt {}
-impl pg_sys::PgNode for LockStmt {}
+impl pg_sys::PgNode for LockStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_LockStmt];
+}
 impl ::core::fmt::Display for LockStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for LockingClause {}
-impl pg_sys::PgNode for LockingClause {}
+impl pg_sys::PgNode for LockingClause {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_LockingClause];
+}
 impl ::core::fmt::Display for LockingClause {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Material {}
-impl pg_sys::PgNode for Material {}
+impl pg_sys::PgNode for Material {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Material];
+}
 impl ::core::fmt::Display for Material {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for MaterialPath {}
-impl pg_sys::PgNode for MaterialPath {}
+impl pg_sys::PgNode for MaterialPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_MaterialPath];
+}
 impl ::core::fmt::Display for MaterialPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for MaterialState {}
-impl pg_sys::PgNode for MaterialState {}
+impl pg_sys::PgNode for MaterialState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_MaterialState];
+}
 impl ::core::fmt::Display for MaterialState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Memoize {}
-impl pg_sys::PgNode for Memoize {}
+impl pg_sys::PgNode for Memoize {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Memoize];
+}
 impl ::core::fmt::Display for Memoize {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for MemoizePath {}
-impl pg_sys::PgNode for MemoizePath {}
+impl pg_sys::PgNode for MemoizePath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_MemoizePath];
+}
 impl ::core::fmt::Display for MemoizePath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for MemoizeState {}
-impl pg_sys::PgNode for MemoizeState {}
+impl pg_sys::PgNode for MemoizeState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_MemoizeState];
+}
 impl ::core::fmt::Display for MemoizeState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for MemoryContextData {}
-impl pg_sys::PgNode for MemoryContextData {}
+impl pg_sys::PgNode for MemoryContextData {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[];
+}
 impl ::core::fmt::Display for MemoryContextData {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for MergeAppend {}
-impl pg_sys::PgNode for MergeAppend {}
+impl pg_sys::PgNode for MergeAppend {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_MergeAppend];
+}
 impl ::core::fmt::Display for MergeAppend {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for MergeAppendPath {}
-impl pg_sys::PgNode for MergeAppendPath {}
+impl pg_sys::PgNode for MergeAppendPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_MergeAppendPath];
+}
 impl ::core::fmt::Display for MergeAppendPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for MergeAppendState {}
-impl pg_sys::PgNode for MergeAppendState {}
+impl pg_sys::PgNode for MergeAppendState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_MergeAppendState];
+}
 impl ::core::fmt::Display for MergeAppendState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for MergeJoin {}
-impl pg_sys::PgNode for MergeJoin {}
+impl pg_sys::PgNode for MergeJoin {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_MergeJoin];
+}
 impl ::core::fmt::Display for MergeJoin {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for MergeJoinState {}
-impl pg_sys::PgNode for MergeJoinState {}
+impl pg_sys::PgNode for MergeJoinState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_MergeJoinState];
+}
 impl ::core::fmt::Display for MergeJoinState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for MergePath {}
-impl pg_sys::PgNode for MergePath {}
+impl pg_sys::PgNode for MergePath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_MergePath];
+}
 impl ::core::fmt::Display for MergePath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for MinMaxAggInfo {}
-impl pg_sys::PgNode for MinMaxAggInfo {}
+impl pg_sys::PgNode for MinMaxAggInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_MinMaxAggInfo];
+}
 impl ::core::fmt::Display for MinMaxAggInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for MinMaxAggPath {}
-impl pg_sys::PgNode for MinMaxAggPath {}
+impl pg_sys::PgNode for MinMaxAggPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_MinMaxAggPath];
+}
 impl ::core::fmt::Display for MinMaxAggPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for MinMaxExpr {}
-impl pg_sys::PgNode for MinMaxExpr {}
+impl pg_sys::PgNode for MinMaxExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_MinMaxExpr];
+}
 impl ::core::fmt::Display for MinMaxExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for MinimalTupleTableSlot {}
-impl pg_sys::PgNode for MinimalTupleTableSlot {}
+impl pg_sys::PgNode for MinimalTupleTableSlot {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[];
+}
 impl ::core::fmt::Display for MinimalTupleTableSlot {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ModifyTable {}
-impl pg_sys::PgNode for ModifyTable {}
+impl pg_sys::PgNode for ModifyTable {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ModifyTable];
+}
 impl ::core::fmt::Display for ModifyTable {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ModifyTablePath {}
-impl pg_sys::PgNode for ModifyTablePath {}
+impl pg_sys::PgNode for ModifyTablePath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ModifyTablePath];
+}
 impl ::core::fmt::Display for ModifyTablePath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ModifyTableState {}
-impl pg_sys::PgNode for ModifyTableState {}
+impl pg_sys::PgNode for ModifyTableState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ModifyTableState];
+}
 impl ::core::fmt::Display for ModifyTableState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for MultiAssignRef {}
-impl pg_sys::PgNode for MultiAssignRef {}
+impl pg_sys::PgNode for MultiAssignRef {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_MultiAssignRef];
+}
 impl ::core::fmt::Display for MultiAssignRef {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for NamedArgExpr {}
-impl pg_sys::PgNode for NamedArgExpr {}
+impl pg_sys::PgNode for NamedArgExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_NamedArgExpr];
+}
 impl ::core::fmt::Display for NamedArgExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for NamedTuplestoreScan {}
-impl pg_sys::PgNode for NamedTuplestoreScan {}
+impl pg_sys::PgNode for NamedTuplestoreScan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_NamedTuplestoreScan];
+}
 impl ::core::fmt::Display for NamedTuplestoreScan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for NamedTuplestoreScanState {}
-impl pg_sys::PgNode for NamedTuplestoreScanState {}
+impl pg_sys::PgNode for NamedTuplestoreScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_NamedTuplestoreScanState];
+}
 impl ::core::fmt::Display for NamedTuplestoreScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for NestLoop {}
-impl pg_sys::PgNode for NestLoop {}
+impl pg_sys::PgNode for NestLoop {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_NestLoop];
+}
 impl ::core::fmt::Display for NestLoop {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for NestLoopParam {}
-impl pg_sys::PgNode for NestLoopParam {}
+impl pg_sys::PgNode for NestLoopParam {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_NestLoopParam];
+}
 impl ::core::fmt::Display for NestLoopParam {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for NestLoopState {}
-impl pg_sys::PgNode for NestLoopState {}
+impl pg_sys::PgNode for NestLoopState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_NestLoopState];
+}
 impl ::core::fmt::Display for NestLoopState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for NextValueExpr {}
-impl pg_sys::PgNode for NextValueExpr {}
+impl pg_sys::PgNode for NextValueExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_NextValueExpr];
+}
 impl ::core::fmt::Display for NextValueExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Node {}
-impl pg_sys::PgNode for Node {}
+impl pg_sys::PgNode for Node {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[];
+    #[inline]
+    fn try_cast<T: pg_sys::PgNode>(node: &T) -> Option<&Self> {
+        Some(node.as_node())
+    }
+}
 impl ::core::fmt::Display for Node {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for NotifyStmt {}
-impl pg_sys::PgNode for NotifyStmt {}
+impl pg_sys::PgNode for NotifyStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_NotifyStmt];
+}
 impl ::core::fmt::Display for NotifyStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for NullTest {}
-impl pg_sys::PgNode for NullTest {}
+impl pg_sys::PgNode for NullTest {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_NullTest];
+}
 impl ::core::fmt::Display for NullTest {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ObjectWithArgs {}
-impl pg_sys::PgNode for ObjectWithArgs {}
+impl pg_sys::PgNode for ObjectWithArgs {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ObjectWithArgs];
+}
 impl ::core::fmt::Display for ObjectWithArgs {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for OnConflictClause {}
-impl pg_sys::PgNode for OnConflictClause {}
+impl pg_sys::PgNode for OnConflictClause {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_OnConflictClause];
+}
 impl ::core::fmt::Display for OnConflictClause {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for OnConflictExpr {}
-impl pg_sys::PgNode for OnConflictExpr {}
+impl pg_sys::PgNode for OnConflictExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_OnConflictExpr];
+}
 impl ::core::fmt::Display for OnConflictExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for OnConflictSetState {}
-impl pg_sys::PgNode for OnConflictSetState {}
+impl pg_sys::PgNode for OnConflictSetState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_OnConflictSetState];
+}
 impl ::core::fmt::Display for OnConflictSetState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for OpExpr {}
-impl pg_sys::PgNode for OpExpr {}
+impl pg_sys::PgNode for OpExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[
+        pg_sys::NodeTag::T_DistinctExpr,
+        pg_sys::NodeTag::T_NullIfExpr,
+        pg_sys::NodeTag::T_OpExpr,
+    ];
+}
 impl ::core::fmt::Display for OpExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PLAssignStmt {}
-impl pg_sys::PgNode for PLAssignStmt {}
+impl pg_sys::PgNode for PLAssignStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PLAssignStmt];
+}
 impl ::core::fmt::Display for PLAssignStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Param {}
-impl pg_sys::PgNode for Param {}
+impl pg_sys::PgNode for Param {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Param];
+}
 impl ::core::fmt::Display for Param {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ParamPathInfo {}
-impl pg_sys::PgNode for ParamPathInfo {}
+impl pg_sys::PgNode for ParamPathInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ParamPathInfo];
+}
 impl ::core::fmt::Display for ParamPathInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ParamRef {}
-impl pg_sys::PgNode for ParamRef {}
+impl pg_sys::PgNode for ParamRef {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ParamRef];
+}
 impl ::core::fmt::Display for ParamRef {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PartitionBoundSpec {}
-impl pg_sys::PgNode for PartitionBoundSpec {}
+impl pg_sys::PgNode for PartitionBoundSpec {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PartitionBoundSpec];
+}
 impl ::core::fmt::Display for PartitionBoundSpec {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PartitionCmd {}
-impl pg_sys::PgNode for PartitionCmd {}
+impl pg_sys::PgNode for PartitionCmd {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PartitionCmd];
+}
 impl ::core::fmt::Display for PartitionCmd {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PartitionElem {}
-impl pg_sys::PgNode for PartitionElem {}
+impl pg_sys::PgNode for PartitionElem {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PartitionElem];
+}
 impl ::core::fmt::Display for PartitionElem {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PartitionPruneInfo {}
-impl pg_sys::PgNode for PartitionPruneInfo {}
+impl pg_sys::PgNode for PartitionPruneInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PartitionPruneInfo];
+}
 impl ::core::fmt::Display for PartitionPruneInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PartitionPruneStep {}
-impl pg_sys::PgNode for PartitionPruneStep {}
+impl pg_sys::PgNode for PartitionPruneStep {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] =
+        &[pg_sys::NodeTag::T_PartitionPruneStepCombine, pg_sys::NodeTag::T_PartitionPruneStepOp];
+}
 impl ::core::fmt::Display for PartitionPruneStep {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PartitionPruneStepCombine {}
-impl pg_sys::PgNode for PartitionPruneStepCombine {}
+impl pg_sys::PgNode for PartitionPruneStepCombine {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PartitionPruneStepCombine];
+}
 impl ::core::fmt::Display for PartitionPruneStepCombine {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PartitionPruneStepOp {}
-impl pg_sys::PgNode for PartitionPruneStepOp {}
+impl pg_sys::PgNode for PartitionPruneStepOp {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PartitionPruneStepOp];
+}
 impl ::core::fmt::Display for PartitionPruneStepOp {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PartitionRangeDatum {}
-impl pg_sys::PgNode for PartitionRangeDatum {}
+impl pg_sys::PgNode for PartitionRangeDatum {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PartitionRangeDatum];
+}
 impl ::core::fmt::Display for PartitionRangeDatum {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PartitionSpec {}
-impl pg_sys::PgNode for PartitionSpec {}
+impl pg_sys::PgNode for PartitionSpec {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PartitionSpec];
+}
 impl ::core::fmt::Display for PartitionSpec {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PartitionedRelPruneInfo {}
-impl pg_sys::PgNode for PartitionedRelPruneInfo {}
+impl pg_sys::PgNode for PartitionedRelPruneInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PartitionedRelPruneInfo];
+}
 impl ::core::fmt::Display for PartitionedRelPruneInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Path {}
-impl pg_sys::PgNode for Path {}
+impl pg_sys::PgNode for Path {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[
+        pg_sys::NodeTag::T_AggPath,
+        pg_sys::NodeTag::T_AppendPath,
+        pg_sys::NodeTag::T_BitmapAndPath,
+        pg_sys::NodeTag::T_BitmapHeapPath,
+        pg_sys::NodeTag::T_BitmapOrPath,
+        pg_sys::NodeTag::T_CustomPath,
+        pg_sys::NodeTag::T_ForeignPath,
+        pg_sys::NodeTag::T_GatherMergePath,
+        pg_sys::NodeTag::T_GatherPath,
+        pg_sys::NodeTag::T_GroupPath,
+        pg_sys::NodeTag::T_GroupResultPath,
+        pg_sys::NodeTag::T_GroupingSetsPath,
+        pg_sys::NodeTag::T_HashPath,
+        pg_sys::NodeTag::T_IncrementalSortPath,
+        pg_sys::NodeTag::T_IndexPath,
+        pg_sys::NodeTag::T_LimitPath,
+        pg_sys::NodeTag::T_LockRowsPath,
+        pg_sys::NodeTag::T_MaterialPath,
+        pg_sys::NodeTag::T_MemoizePath,
+        pg_sys::NodeTag::T_MergeAppendPath,
+        pg_sys::NodeTag::T_MergePath,
+        pg_sys::NodeTag::T_MinMaxAggPath,
+        pg_sys::NodeTag::T_ModifyTablePath,
+        pg_sys::NodeTag::T_NestPath,
+        pg_sys::NodeTag::T_Path,
+        pg_sys::NodeTag::T_ProjectSetPath,
+        pg_sys::NodeTag::T_ProjectionPath,
+        pg_sys::NodeTag::T_RecursiveUnionPath,
+        pg_sys::NodeTag::T_SetOpPath,
+        pg_sys::NodeTag::T_SortPath,
+        pg_sys::NodeTag::T_SubqueryScanPath,
+        pg_sys::NodeTag::T_TidPath,
+        pg_sys::NodeTag::T_TidRangePath,
+        pg_sys::NodeTag::T_UniquePath,
+        pg_sys::NodeTag::T_UpperUniquePath,
+        pg_sys::NodeTag::T_WindowAggPath,
+    ];
+}
 impl ::core::fmt::Display for Path {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PathKey {}
-impl pg_sys::PgNode for PathKey {}
+impl pg_sys::PgNode for PathKey {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PathKey];
+}
 impl ::core::fmt::Display for PathKey {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PathTarget {}
-impl pg_sys::PgNode for PathTarget {}
+impl pg_sys::PgNode for PathTarget {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PathTarget];
+}
 impl ::core::fmt::Display for PathTarget {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PlaceHolderInfo {}
-impl pg_sys::PgNode for PlaceHolderInfo {}
+impl pg_sys::PgNode for PlaceHolderInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PlaceHolderInfo];
+}
 impl ::core::fmt::Display for PlaceHolderInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PlaceHolderVar {}
-impl pg_sys::PgNode for PlaceHolderVar {}
+impl pg_sys::PgNode for PlaceHolderVar {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PlaceHolderVar];
+}
 impl ::core::fmt::Display for PlaceHolderVar {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Plan {}
-impl pg_sys::PgNode for Plan {}
+impl pg_sys::PgNode for Plan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[
+        pg_sys::NodeTag::T_Agg,
+        pg_sys::NodeTag::T_Append,
+        pg_sys::NodeTag::T_BitmapAnd,
+        pg_sys::NodeTag::T_BitmapHeapScan,
+        pg_sys::NodeTag::T_BitmapIndexScan,
+        pg_sys::NodeTag::T_BitmapOr,
+        pg_sys::NodeTag::T_CteScan,
+        pg_sys::NodeTag::T_CustomScan,
+        pg_sys::NodeTag::T_ForeignScan,
+        pg_sys::NodeTag::T_FunctionScan,
+        pg_sys::NodeTag::T_Gather,
+        pg_sys::NodeTag::T_GatherMerge,
+        pg_sys::NodeTag::T_Group,
+        pg_sys::NodeTag::T_Hash,
+        pg_sys::NodeTag::T_HashJoin,
+        pg_sys::NodeTag::T_IncrementalSort,
+        pg_sys::NodeTag::T_IndexOnlyScan,
+        pg_sys::NodeTag::T_IndexScan,
+        pg_sys::NodeTag::T_Join,
+        pg_sys::NodeTag::T_Limit,
+        pg_sys::NodeTag::T_LockRows,
+        pg_sys::NodeTag::T_Material,
+        pg_sys::NodeTag::T_Memoize,
+        pg_sys::NodeTag::T_MergeAppend,
+        pg_sys::NodeTag::T_MergeJoin,
+        pg_sys::NodeTag::T_ModifyTable,
+        pg_sys::NodeTag::T_NamedTuplestoreScan,
+        pg_sys::NodeTag::T_NestLoop,
+        pg_sys::NodeTag::T_Plan,
+        pg_sys::NodeTag::T_ProjectSet,
+        pg_sys::NodeTag::T_RecursiveUnion,
+        pg_sys::NodeTag::T_Result,
+        pg_sys::NodeTag::T_SampleScan,
+        pg_sys::NodeTag::T_Scan,
+        pg_sys::NodeTag::T_SeqScan,
+        pg_sys::NodeTag::T_SetOp,
+        pg_sys::NodeTag::T_Sort,
+        pg_sys::NodeTag::T_SubqueryScan,
+        pg_sys::NodeTag::T_TableFuncScan,
+        pg_sys::NodeTag::T_TidRangeScan,
+        pg_sys::NodeTag::T_TidScan,
+        pg_sys::NodeTag::T_Unique,
+        pg_sys::NodeTag::T_ValuesScan,
+        pg_sys::NodeTag::T_WindowAgg,
+        pg_sys::NodeTag::T_WorkTableScan,
+    ];
+}
 impl ::core::fmt::Display for Plan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PlanInvalItem {}
-impl pg_sys::PgNode for PlanInvalItem {}
+impl pg_sys::PgNode for PlanInvalItem {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PlanInvalItem];
+}
 impl ::core::fmt::Display for PlanInvalItem {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PlanRowMark {}
-impl pg_sys::PgNode for PlanRowMark {}
+impl pg_sys::PgNode for PlanRowMark {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PlanRowMark];
+}
 impl ::core::fmt::Display for PlanRowMark {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PlanState {}
-impl pg_sys::PgNode for PlanState {}
+impl pg_sys::PgNode for PlanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[
+        pg_sys::NodeTag::T_AggState,
+        pg_sys::NodeTag::T_AppendState,
+        pg_sys::NodeTag::T_BitmapAndState,
+        pg_sys::NodeTag::T_BitmapHeapScanState,
+        pg_sys::NodeTag::T_BitmapIndexScanState,
+        pg_sys::NodeTag::T_BitmapOrState,
+        pg_sys::NodeTag::T_CteScanState,
+        pg_sys::NodeTag::T_CustomScanState,
+        pg_sys::NodeTag::T_ForeignScanState,
+        pg_sys::NodeTag::T_FunctionScanState,
+        pg_sys::NodeTag::T_GatherMergeState,
+        pg_sys::NodeTag::T_GatherState,
+        pg_sys::NodeTag::T_GroupState,
+        pg_sys::NodeTag::T_HashJoinState,
+        pg_sys::NodeTag::T_HashState,
+        pg_sys::NodeTag::T_IncrementalSortState,
+        pg_sys::NodeTag::T_IndexOnlyScanState,
+        pg_sys::NodeTag::T_IndexScanState,
+        pg_sys::NodeTag::T_JoinState,
+        pg_sys::NodeTag::T_LimitState,
+        pg_sys::NodeTag::T_LockRowsState,
+        pg_sys::NodeTag::T_MaterialState,
+        pg_sys::NodeTag::T_MemoizeState,
+        pg_sys::NodeTag::T_MergeAppendState,
+        pg_sys::NodeTag::T_MergeJoinState,
+        pg_sys::NodeTag::T_ModifyTableState,
+        pg_sys::NodeTag::T_NamedTuplestoreScanState,
+        pg_sys::NodeTag::T_NestLoopState,
+        pg_sys::NodeTag::T_PlanState,
+        pg_sys::NodeTag::T_ProjectSetState,
+        pg_sys::NodeTag::T_RecursiveUnionState,
+        pg_sys::NodeTag::T_ResultState,
+        pg_sys::NodeTag::T_SampleScanState,
+        pg_sys::NodeTag::T_ScanState,
+        pg_sys::NodeTag::T_SeqScanState,
+        pg_sys::NodeTag::T_SetOpState,
+        pg_sys::NodeTag::T_SortState,
+        pg_sys::NodeTag::T_SubqueryScanState,
+        pg_sys::NodeTag::T_TableFuncScanState,
+        pg_sys::NodeTag::T_TidRangeScanState,
+        pg_sys::NodeTag::T_TidScanState,
+        pg_sys::NodeTag::T_UniqueState,
+        pg_sys::NodeTag::T_ValuesScanState,
+        pg_sys::NodeTag::T_WindowAggState,
+        pg_sys::NodeTag::T_WorkTableScanState,
+    ];
+}
 impl ::core::fmt::Display for PlanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PlannedStmt {}
-impl pg_sys::PgNode for PlannedStmt {}
+impl pg_sys::PgNode for PlannedStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PlannedStmt];
+}
 impl ::core::fmt::Display for PlannedStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PlannerGlobal {}
-impl pg_sys::PgNode for PlannerGlobal {}
+impl pg_sys::PgNode for PlannerGlobal {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PlannerGlobal];
+}
 impl ::core::fmt::Display for PlannerGlobal {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PlannerInfo {}
-impl pg_sys::PgNode for PlannerInfo {}
+impl pg_sys::PgNode for PlannerInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PlannerInfo];
+}
 impl ::core::fmt::Display for PlannerInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PlannerParamItem {}
-impl pg_sys::PgNode for PlannerParamItem {}
+impl pg_sys::PgNode for PlannerParamItem {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PlannerParamItem];
+}
 impl ::core::fmt::Display for PlannerParamItem {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for PrepareStmt {}
-impl pg_sys::PgNode for PrepareStmt {}
+impl pg_sys::PgNode for PrepareStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PrepareStmt];
+}
 impl ::core::fmt::Display for PrepareStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ProjectSet {}
-impl pg_sys::PgNode for ProjectSet {}
+impl pg_sys::PgNode for ProjectSet {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ProjectSet];
+}
 impl ::core::fmt::Display for ProjectSet {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ProjectSetPath {}
-impl pg_sys::PgNode for ProjectSetPath {}
+impl pg_sys::PgNode for ProjectSetPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ProjectSetPath];
+}
 impl ::core::fmt::Display for ProjectSetPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ProjectSetState {}
-impl pg_sys::PgNode for ProjectSetState {}
+impl pg_sys::PgNode for ProjectSetState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ProjectSetState];
+}
 impl ::core::fmt::Display for ProjectSetState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ProjectionInfo {}
-impl pg_sys::PgNode for ProjectionInfo {}
+impl pg_sys::PgNode for ProjectionInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ProjectionInfo];
+}
 impl ::core::fmt::Display for ProjectionInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ProjectionPath {}
-impl pg_sys::PgNode for ProjectionPath {}
+impl pg_sys::PgNode for ProjectionPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ProjectionPath];
+}
 impl ::core::fmt::Display for ProjectionPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Query {}
-impl pg_sys::PgNode for Query {}
+impl pg_sys::PgNode for Query {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Query];
+}
 impl ::core::fmt::Display for Query {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RangeFunction {}
-impl pg_sys::PgNode for RangeFunction {}
+impl pg_sys::PgNode for RangeFunction {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RangeFunction];
+}
 impl ::core::fmt::Display for RangeFunction {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RangeSubselect {}
-impl pg_sys::PgNode for RangeSubselect {}
+impl pg_sys::PgNode for RangeSubselect {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RangeSubselect];
+}
 impl ::core::fmt::Display for RangeSubselect {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RangeTableFunc {}
-impl pg_sys::PgNode for RangeTableFunc {}
+impl pg_sys::PgNode for RangeTableFunc {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RangeTableFunc];
+}
 impl ::core::fmt::Display for RangeTableFunc {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RangeTableFuncCol {}
-impl pg_sys::PgNode for RangeTableFuncCol {}
+impl pg_sys::PgNode for RangeTableFuncCol {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RangeTableFuncCol];
+}
 impl ::core::fmt::Display for RangeTableFuncCol {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RangeTableSample {}
-impl pg_sys::PgNode for RangeTableSample {}
+impl pg_sys::PgNode for RangeTableSample {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RangeTableSample];
+}
 impl ::core::fmt::Display for RangeTableSample {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RangeTblEntry {}
-impl pg_sys::PgNode for RangeTblEntry {}
+impl pg_sys::PgNode for RangeTblEntry {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RangeTblEntry];
+}
 impl ::core::fmt::Display for RangeTblEntry {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RangeTblFunction {}
-impl pg_sys::PgNode for RangeTblFunction {}
+impl pg_sys::PgNode for RangeTblFunction {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RangeTblFunction];
+}
 impl ::core::fmt::Display for RangeTblFunction {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RangeTblRef {}
-impl pg_sys::PgNode for RangeTblRef {}
+impl pg_sys::PgNode for RangeTblRef {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RangeTblRef];
+}
 impl ::core::fmt::Display for RangeTblRef {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RangeVar {}
-impl pg_sys::PgNode for RangeVar {}
+impl pg_sys::PgNode for RangeVar {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RangeVar];
+}
 impl ::core::fmt::Display for RangeVar {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RawStmt {}
-impl pg_sys::PgNode for RawStmt {}
+impl pg_sys::PgNode for RawStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RawStmt];
+}
 impl ::core::fmt::Display for RawStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ReassignOwnedStmt {}
-impl pg_sys::PgNode for ReassignOwnedStmt {}
+impl pg_sys::PgNode for ReassignOwnedStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ReassignOwnedStmt];
+}
 impl ::core::fmt::Display for ReassignOwnedStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RecursiveUnion {}
-impl pg_sys::PgNode for RecursiveUnion {}
+impl pg_sys::PgNode for RecursiveUnion {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RecursiveUnion];
+}
 impl ::core::fmt::Display for RecursiveUnion {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RecursiveUnionPath {}
-impl pg_sys::PgNode for RecursiveUnionPath {}
+impl pg_sys::PgNode for RecursiveUnionPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RecursiveUnionPath];
+}
 impl ::core::fmt::Display for RecursiveUnionPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RecursiveUnionState {}
-impl pg_sys::PgNode for RecursiveUnionState {}
+impl pg_sys::PgNode for RecursiveUnionState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RecursiveUnionState];
+}
 impl ::core::fmt::Display for RecursiveUnionState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RefreshMatViewStmt {}
-impl pg_sys::PgNode for RefreshMatViewStmt {}
+impl pg_sys::PgNode for RefreshMatViewStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RefreshMatViewStmt];
+}
 impl ::core::fmt::Display for RefreshMatViewStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ReindexStmt {}
-impl pg_sys::PgNode for ReindexStmt {}
+impl pg_sys::PgNode for ReindexStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ReindexStmt];
+}
 impl ::core::fmt::Display for ReindexStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RelOptInfo {}
-impl pg_sys::PgNode for RelOptInfo {}
+impl pg_sys::PgNode for RelOptInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RelOptInfo];
+}
 impl ::core::fmt::Display for RelOptInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RelabelType {}
-impl pg_sys::PgNode for RelabelType {}
+impl pg_sys::PgNode for RelabelType {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RelabelType];
+}
 impl ::core::fmt::Display for RelabelType {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RenameStmt {}
-impl pg_sys::PgNode for RenameStmt {}
+impl pg_sys::PgNode for RenameStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RenameStmt];
+}
 impl ::core::fmt::Display for RenameStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ReplicaIdentityStmt {}
-impl pg_sys::PgNode for ReplicaIdentityStmt {}
+impl pg_sys::PgNode for ReplicaIdentityStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ReplicaIdentityStmt];
+}
 impl ::core::fmt::Display for ReplicaIdentityStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ResTarget {}
-impl pg_sys::PgNode for ResTarget {}
+impl pg_sys::PgNode for ResTarget {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ResTarget];
+}
 impl ::core::fmt::Display for ResTarget {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RestrictInfo {}
-impl pg_sys::PgNode for RestrictInfo {}
+impl pg_sys::PgNode for RestrictInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RestrictInfo];
+}
 impl ::core::fmt::Display for RestrictInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Result {}
-impl pg_sys::PgNode for Result {}
+impl pg_sys::PgNode for Result {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Result];
+}
 impl ::core::fmt::Display for Result {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ResultRelInfo {}
-impl pg_sys::PgNode for ResultRelInfo {}
+impl pg_sys::PgNode for ResultRelInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ResultRelInfo];
+}
 impl ::core::fmt::Display for ResultRelInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ResultState {}
-impl pg_sys::PgNode for ResultState {}
+impl pg_sys::PgNode for ResultState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ResultState];
+}
 impl ::core::fmt::Display for ResultState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ReturnSetInfo {}
-impl pg_sys::PgNode for ReturnSetInfo {}
+impl pg_sys::PgNode for ReturnSetInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ReturnSetInfo];
+}
 impl ::core::fmt::Display for ReturnSetInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ReturnStmt {}
-impl pg_sys::PgNode for ReturnStmt {}
+impl pg_sys::PgNode for ReturnStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ReturnStmt];
+}
 impl ::core::fmt::Display for ReturnStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RoleSpec {}
-impl pg_sys::PgNode for RoleSpec {}
+impl pg_sys::PgNode for RoleSpec {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RoleSpec];
+}
 impl ::core::fmt::Display for RoleSpec {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RollupData {}
-impl pg_sys::PgNode for RollupData {}
+impl pg_sys::PgNode for RollupData {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RollupData];
+}
 impl ::core::fmt::Display for RollupData {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RowCompareExpr {}
-impl pg_sys::PgNode for RowCompareExpr {}
+impl pg_sys::PgNode for RowCompareExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RowCompareExpr];
+}
 impl ::core::fmt::Display for RowCompareExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RowExpr {}
-impl pg_sys::PgNode for RowExpr {}
+impl pg_sys::PgNode for RowExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RowExpr];
+}
 impl ::core::fmt::Display for RowExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RowIdentityVarInfo {}
-impl pg_sys::PgNode for RowIdentityVarInfo {}
+impl pg_sys::PgNode for RowIdentityVarInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RowIdentityVarInfo];
+}
 impl ::core::fmt::Display for RowIdentityVarInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RowMarkClause {}
-impl pg_sys::PgNode for RowMarkClause {}
+impl pg_sys::PgNode for RowMarkClause {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RowMarkClause];
+}
 impl ::core::fmt::Display for RowMarkClause {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for RuleStmt {}
-impl pg_sys::PgNode for RuleStmt {}
+impl pg_sys::PgNode for RuleStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RuleStmt];
+}
 impl ::core::fmt::Display for RuleStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SQLCmd {}
-impl pg_sys::PgNode for SQLCmd {}
+impl pg_sys::PgNode for SQLCmd {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SQLCmd];
+}
 impl ::core::fmt::Display for SQLCmd {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SQLValueFunction {}
-impl pg_sys::PgNode for SQLValueFunction {}
+impl pg_sys::PgNode for SQLValueFunction {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SQLValueFunction];
+}
 impl ::core::fmt::Display for SQLValueFunction {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SampleScan {}
-impl pg_sys::PgNode for SampleScan {}
+impl pg_sys::PgNode for SampleScan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SampleScan];
+}
 impl ::core::fmt::Display for SampleScan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SampleScanState {}
-impl pg_sys::PgNode for SampleScanState {}
+impl pg_sys::PgNode for SampleScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SampleScanState];
+}
 impl ::core::fmt::Display for SampleScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ScalarArrayOpExpr {}
-impl pg_sys::PgNode for ScalarArrayOpExpr {}
+impl pg_sys::PgNode for ScalarArrayOpExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ScalarArrayOpExpr];
+}
 impl ::core::fmt::Display for ScalarArrayOpExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Scan {}
-impl pg_sys::PgNode for Scan {}
+impl pg_sys::PgNode for Scan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[
+        pg_sys::NodeTag::T_BitmapHeapScan,
+        pg_sys::NodeTag::T_BitmapIndexScan,
+        pg_sys::NodeTag::T_CteScan,
+        pg_sys::NodeTag::T_CustomScan,
+        pg_sys::NodeTag::T_ForeignScan,
+        pg_sys::NodeTag::T_FunctionScan,
+        pg_sys::NodeTag::T_IndexOnlyScan,
+        pg_sys::NodeTag::T_IndexScan,
+        pg_sys::NodeTag::T_NamedTuplestoreScan,
+        pg_sys::NodeTag::T_SampleScan,
+        pg_sys::NodeTag::T_Scan,
+        pg_sys::NodeTag::T_SeqScan,
+        pg_sys::NodeTag::T_SubqueryScan,
+        pg_sys::NodeTag::T_TableFuncScan,
+        pg_sys::NodeTag::T_TidRangeScan,
+        pg_sys::NodeTag::T_TidScan,
+        pg_sys::NodeTag::T_ValuesScan,
+        pg_sys::NodeTag::T_WorkTableScan,
+    ];
+}
 impl ::core::fmt::Display for Scan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ScanState {}
-impl pg_sys::PgNode for ScanState {}
+impl pg_sys::PgNode for ScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[
+        pg_sys::NodeTag::T_AggState,
+        pg_sys::NodeTag::T_BitmapHeapScanState,
+        pg_sys::NodeTag::T_BitmapIndexScanState,
+        pg_sys::NodeTag::T_CteScanState,
+        pg_sys::NodeTag::T_CustomScanState,
+        pg_sys::NodeTag::T_ForeignScanState,
+        pg_sys::NodeTag::T_FunctionScanState,
+        pg_sys::NodeTag::T_GroupState,
+        pg_sys::NodeTag::T_IncrementalSortState,
+        pg_sys::NodeTag::T_IndexOnlyScanState,
+        pg_sys::NodeTag::T_IndexScanState,
+        pg_sys::NodeTag::T_MaterialState,
+        pg_sys::NodeTag::T_MemoizeState,
+        pg_sys::NodeTag::T_NamedTuplestoreScanState,
+        pg_sys::NodeTag::T_SampleScanState,
+        pg_sys::NodeTag::T_ScanState,
+        pg_sys::NodeTag::T_SeqScanState,
+        pg_sys::NodeTag::T_SortState,
+        pg_sys::NodeTag::T_SubqueryScanState,
+        pg_sys::NodeTag::T_TableFuncScanState,
+        pg_sys::NodeTag::T_TidRangeScanState,
+        pg_sys::NodeTag::T_TidScanState,
+        pg_sys::NodeTag::T_ValuesScanState,
+        pg_sys::NodeTag::T_WindowAggState,
+        pg_sys::NodeTag::T_WorkTableScanState,
+    ];
+}
 impl ::core::fmt::Display for ScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SecLabelStmt {}
-impl pg_sys::PgNode for SecLabelStmt {}
+impl pg_sys::PgNode for SecLabelStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SecLabelStmt];
+}
 impl ::core::fmt::Display for SecLabelStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SelectStmt {}
-impl pg_sys::PgNode for SelectStmt {}
+impl pg_sys::PgNode for SelectStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SelectStmt];
+}
 impl ::core::fmt::Display for SelectStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SeqScanState {}
-impl pg_sys::PgNode for SeqScanState {}
+impl pg_sys::PgNode for SeqScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SeqScanState];
+}
 impl ::core::fmt::Display for SeqScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SetExprState {}
-impl pg_sys::PgNode for SetExprState {}
+impl pg_sys::PgNode for SetExprState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SetExprState];
+}
 impl ::core::fmt::Display for SetExprState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SetOp {}
-impl pg_sys::PgNode for SetOp {}
+impl pg_sys::PgNode for SetOp {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SetOp];
+}
 impl ::core::fmt::Display for SetOp {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SetOpPath {}
-impl pg_sys::PgNode for SetOpPath {}
+impl pg_sys::PgNode for SetOpPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SetOpPath];
+}
 impl ::core::fmt::Display for SetOpPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SetOpState {}
-impl pg_sys::PgNode for SetOpState {}
+impl pg_sys::PgNode for SetOpState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SetOpState];
+}
 impl ::core::fmt::Display for SetOpState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SetOperationStmt {}
-impl pg_sys::PgNode for SetOperationStmt {}
+impl pg_sys::PgNode for SetOperationStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SetOperationStmt];
+}
 impl ::core::fmt::Display for SetOperationStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SetToDefault {}
-impl pg_sys::PgNode for SetToDefault {}
+impl pg_sys::PgNode for SetToDefault {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SetToDefault];
+}
 impl ::core::fmt::Display for SetToDefault {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Sort {}
-impl pg_sys::PgNode for Sort {}
+impl pg_sys::PgNode for Sort {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] =
+        &[pg_sys::NodeTag::T_IncrementalSort, pg_sys::NodeTag::T_Sort];
+}
 impl ::core::fmt::Display for Sort {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SortBy {}
-impl pg_sys::PgNode for SortBy {}
+impl pg_sys::PgNode for SortBy {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SortBy];
+}
 impl ::core::fmt::Display for SortBy {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SortGroupClause {}
-impl pg_sys::PgNode for SortGroupClause {}
+impl pg_sys::PgNode for SortGroupClause {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SortGroupClause];
+}
 impl ::core::fmt::Display for SortGroupClause {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SortPath {}
-impl pg_sys::PgNode for SortPath {}
+impl pg_sys::PgNode for SortPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] =
+        &[pg_sys::NodeTag::T_IncrementalSortPath, pg_sys::NodeTag::T_SortPath];
+}
 impl ::core::fmt::Display for SortPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SortState {}
-impl pg_sys::PgNode for SortState {}
+impl pg_sys::PgNode for SortState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SortState];
+}
 impl ::core::fmt::Display for SortState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SpecialJoinInfo {}
-impl pg_sys::PgNode for SpecialJoinInfo {}
+impl pg_sys::PgNode for SpecialJoinInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SpecialJoinInfo];
+}
 impl ::core::fmt::Display for SpecialJoinInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for StartReplicationCmd {}
-impl pg_sys::PgNode for StartReplicationCmd {}
+impl pg_sys::PgNode for StartReplicationCmd {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_StartReplicationCmd];
+}
 impl ::core::fmt::Display for StartReplicationCmd {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for StatisticExtInfo {}
-impl pg_sys::PgNode for StatisticExtInfo {}
+impl pg_sys::PgNode for StatisticExtInfo {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_StatisticExtInfo];
+}
 impl ::core::fmt::Display for StatisticExtInfo {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for StatsElem {}
-impl pg_sys::PgNode for StatsElem {}
+impl pg_sys::PgNode for StatsElem {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_StatsElem];
+}
 impl ::core::fmt::Display for StatsElem {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SubLink {}
-impl pg_sys::PgNode for SubLink {}
+impl pg_sys::PgNode for SubLink {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SubLink];
+}
 impl ::core::fmt::Display for SubLink {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SubPlan {}
-impl pg_sys::PgNode for SubPlan {}
+impl pg_sys::PgNode for SubPlan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SubPlan];
+}
 impl ::core::fmt::Display for SubPlan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SubPlanState {}
-impl pg_sys::PgNode for SubPlanState {}
+impl pg_sys::PgNode for SubPlanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SubPlanState];
+}
 impl ::core::fmt::Display for SubPlanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SubqueryScan {}
-impl pg_sys::PgNode for SubqueryScan {}
+impl pg_sys::PgNode for SubqueryScan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SubqueryScan];
+}
 impl ::core::fmt::Display for SubqueryScan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SubqueryScanPath {}
-impl pg_sys::PgNode for SubqueryScanPath {}
+impl pg_sys::PgNode for SubqueryScanPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SubqueryScanPath];
+}
 impl ::core::fmt::Display for SubqueryScanPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SubqueryScanState {}
-impl pg_sys::PgNode for SubqueryScanState {}
+impl pg_sys::PgNode for SubqueryScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SubqueryScanState];
+}
 impl ::core::fmt::Display for SubqueryScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SubscriptingRef {}
-impl pg_sys::PgNode for SubscriptingRef {}
+impl pg_sys::PgNode for SubscriptingRef {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SubscriptingRef];
+}
 impl ::core::fmt::Display for SubscriptingRef {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SupportRequestCost {}
-impl pg_sys::PgNode for SupportRequestCost {}
+impl pg_sys::PgNode for SupportRequestCost {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SupportRequestCost];
+}
 impl ::core::fmt::Display for SupportRequestCost {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SupportRequestIndexCondition {}
-impl pg_sys::PgNode for SupportRequestIndexCondition {}
+impl pg_sys::PgNode for SupportRequestIndexCondition {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] =
+        &[pg_sys::NodeTag::T_SupportRequestIndexCondition];
+}
 impl ::core::fmt::Display for SupportRequestIndexCondition {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SupportRequestRows {}
-impl pg_sys::PgNode for SupportRequestRows {}
+impl pg_sys::PgNode for SupportRequestRows {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SupportRequestRows];
+}
 impl ::core::fmt::Display for SupportRequestRows {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SupportRequestSelectivity {}
-impl pg_sys::PgNode for SupportRequestSelectivity {}
+impl pg_sys::PgNode for SupportRequestSelectivity {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SupportRequestSelectivity];
+}
 impl ::core::fmt::Display for SupportRequestSelectivity {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for SupportRequestSimplify {}
-impl pg_sys::PgNode for SupportRequestSimplify {}
+impl pg_sys::PgNode for SupportRequestSimplify {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SupportRequestSimplify];
+}
 impl ::core::fmt::Display for SupportRequestSimplify {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TableAmRoutine {}
-impl pg_sys::PgNode for TableAmRoutine {}
+impl pg_sys::PgNode for TableAmRoutine {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TableAmRoutine];
+}
 impl ::core::fmt::Display for TableAmRoutine {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TableFunc {}
-impl pg_sys::PgNode for TableFunc {}
+impl pg_sys::PgNode for TableFunc {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TableFunc];
+}
 impl ::core::fmt::Display for TableFunc {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TableFuncScan {}
-impl pg_sys::PgNode for TableFuncScan {}
+impl pg_sys::PgNode for TableFuncScan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TableFuncScan];
+}
 impl ::core::fmt::Display for TableFuncScan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TableFuncScanState {}
-impl pg_sys::PgNode for TableFuncScanState {}
+impl pg_sys::PgNode for TableFuncScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TableFuncScanState];
+}
 impl ::core::fmt::Display for TableFuncScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TableLikeClause {}
-impl pg_sys::PgNode for TableLikeClause {}
+impl pg_sys::PgNode for TableLikeClause {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TableLikeClause];
+}
 impl ::core::fmt::Display for TableLikeClause {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TableSampleClause {}
-impl pg_sys::PgNode for TableSampleClause {}
+impl pg_sys::PgNode for TableSampleClause {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TableSampleClause];
+}
 impl ::core::fmt::Display for TableSampleClause {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TargetEntry {}
-impl pg_sys::PgNode for TargetEntry {}
+impl pg_sys::PgNode for TargetEntry {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TargetEntry];
+}
 impl ::core::fmt::Display for TargetEntry {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TidPath {}
-impl pg_sys::PgNode for TidPath {}
+impl pg_sys::PgNode for TidPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TidPath];
+}
 impl ::core::fmt::Display for TidPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TidRangePath {}
-impl pg_sys::PgNode for TidRangePath {}
+impl pg_sys::PgNode for TidRangePath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TidRangePath];
+}
 impl ::core::fmt::Display for TidRangePath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TidRangeScan {}
-impl pg_sys::PgNode for TidRangeScan {}
+impl pg_sys::PgNode for TidRangeScan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TidRangeScan];
+}
 impl ::core::fmt::Display for TidRangeScan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TidRangeScanState {}
-impl pg_sys::PgNode for TidRangeScanState {}
+impl pg_sys::PgNode for TidRangeScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TidRangeScanState];
+}
 impl ::core::fmt::Display for TidRangeScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TidScan {}
-impl pg_sys::PgNode for TidScan {}
+impl pg_sys::PgNode for TidScan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TidScan];
+}
 impl ::core::fmt::Display for TidScan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TidScanState {}
-impl pg_sys::PgNode for TidScanState {}
+impl pg_sys::PgNode for TidScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TidScanState];
+}
 impl ::core::fmt::Display for TidScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TimeLineHistoryCmd {}
-impl pg_sys::PgNode for TimeLineHistoryCmd {}
+impl pg_sys::PgNode for TimeLineHistoryCmd {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TimeLineHistoryCmd];
+}
 impl ::core::fmt::Display for TimeLineHistoryCmd {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TransactionStmt {}
-impl pg_sys::PgNode for TransactionStmt {}
+impl pg_sys::PgNode for TransactionStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TransactionStmt];
+}
 impl ::core::fmt::Display for TransactionStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TriggerData {}
-impl pg_sys::PgNode for TriggerData {}
+impl pg_sys::PgNode for TriggerData {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TriggerData];
+}
 impl ::core::fmt::Display for TriggerData {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TriggerTransition {}
-impl pg_sys::PgNode for TriggerTransition {}
+impl pg_sys::PgNode for TriggerTransition {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TriggerTransition];
+}
 impl ::core::fmt::Display for TriggerTransition {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TruncateStmt {}
-impl pg_sys::PgNode for TruncateStmt {}
+impl pg_sys::PgNode for TruncateStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TruncateStmt];
+}
 impl ::core::fmt::Display for TruncateStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TsmRoutine {}
-impl pg_sys::PgNode for TsmRoutine {}
+impl pg_sys::PgNode for TsmRoutine {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TsmRoutine];
+}
 impl ::core::fmt::Display for TsmRoutine {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TupleTableSlot {}
-impl pg_sys::PgNode for TupleTableSlot {}
+impl pg_sys::PgNode for TupleTableSlot {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TupleTableSlot];
+}
 impl ::core::fmt::Display for TupleTableSlot {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TypeCast {}
-impl pg_sys::PgNode for TypeCast {}
+impl pg_sys::PgNode for TypeCast {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TypeCast];
+}
 impl ::core::fmt::Display for TypeCast {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for TypeName {}
-impl pg_sys::PgNode for TypeName {}
+impl pg_sys::PgNode for TypeName {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_TypeName];
+}
 impl ::core::fmt::Display for TypeName {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Unique {}
-impl pg_sys::PgNode for Unique {}
+impl pg_sys::PgNode for Unique {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Unique];
+}
 impl ::core::fmt::Display for Unique {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for UniquePath {}
-impl pg_sys::PgNode for UniquePath {}
+impl pg_sys::PgNode for UniquePath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_UniquePath];
+}
 impl ::core::fmt::Display for UniquePath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for UniqueState {}
-impl pg_sys::PgNode for UniqueState {}
+impl pg_sys::PgNode for UniqueState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_UniqueState];
+}
 impl ::core::fmt::Display for UniqueState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for UnlistenStmt {}
-impl pg_sys::PgNode for UnlistenStmt {}
+impl pg_sys::PgNode for UnlistenStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_UnlistenStmt];
+}
 impl ::core::fmt::Display for UnlistenStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for UpdateStmt {}
-impl pg_sys::PgNode for UpdateStmt {}
+impl pg_sys::PgNode for UpdateStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_UpdateStmt];
+}
 impl ::core::fmt::Display for UpdateStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for UpperUniquePath {}
-impl pg_sys::PgNode for UpperUniquePath {}
+impl pg_sys::PgNode for UpperUniquePath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_UpperUniquePath];
+}
 impl ::core::fmt::Display for UpperUniquePath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for VacuumRelation {}
-impl pg_sys::PgNode for VacuumRelation {}
+impl pg_sys::PgNode for VacuumRelation {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_VacuumRelation];
+}
 impl ::core::fmt::Display for VacuumRelation {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for VacuumStmt {}
-impl pg_sys::PgNode for VacuumStmt {}
+impl pg_sys::PgNode for VacuumStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_VacuumStmt];
+}
 impl ::core::fmt::Display for VacuumStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Value {}
-impl pg_sys::PgNode for Value {}
+impl pg_sys::PgNode for Value {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[
+        pg_sys::NodeTag::T_BitString,
+        pg_sys::NodeTag::T_Float,
+        pg_sys::NodeTag::T_Integer,
+        pg_sys::NodeTag::T_Null,
+        pg_sys::NodeTag::T_String,
+        pg_sys::NodeTag::T_Value,
+    ];
+}
 impl ::core::fmt::Display for Value {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ValuesScan {}
-impl pg_sys::PgNode for ValuesScan {}
+impl pg_sys::PgNode for ValuesScan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ValuesScan];
+}
 impl ::core::fmt::Display for ValuesScan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ValuesScanState {}
-impl pg_sys::PgNode for ValuesScanState {}
+impl pg_sys::PgNode for ValuesScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ValuesScanState];
+}
 impl ::core::fmt::Display for ValuesScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for Var {}
-impl pg_sys::PgNode for Var {}
+impl pg_sys::PgNode for Var {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Var];
+}
 impl ::core::fmt::Display for Var {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for VariableSetStmt {}
-impl pg_sys::PgNode for VariableSetStmt {}
+impl pg_sys::PgNode for VariableSetStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_VariableSetStmt];
+}
 impl ::core::fmt::Display for VariableSetStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for VariableShowStmt {}
-impl pg_sys::PgNode for VariableShowStmt {}
+impl pg_sys::PgNode for VariableShowStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_VariableShowStmt];
+}
 impl ::core::fmt::Display for VariableShowStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for ViewStmt {}
-impl pg_sys::PgNode for ViewStmt {}
+impl pg_sys::PgNode for ViewStmt {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ViewStmt];
+}
 impl ::core::fmt::Display for ViewStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for VirtualTupleTableSlot {}
-impl pg_sys::PgNode for VirtualTupleTableSlot {}
+impl pg_sys::PgNode for VirtualTupleTableSlot {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[];
+}
 impl ::core::fmt::Display for VirtualTupleTableSlot {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for WindowAgg {}
-impl pg_sys::PgNode for WindowAgg {}
+impl pg_sys::PgNode for WindowAgg {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_WindowAgg];
+}
 impl ::core::fmt::Display for WindowAgg {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for WindowAggPath {}
-impl pg_sys::PgNode for WindowAggPath {}
+impl pg_sys::PgNode for WindowAggPath {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_WindowAggPath];
+}
 impl ::core::fmt::Display for WindowAggPath {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for WindowAggState {}
-impl pg_sys::PgNode for WindowAggState {}
+impl pg_sys::PgNode for WindowAggState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_WindowAggState];
+}
 impl ::core::fmt::Display for WindowAggState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for WindowClause {}
-impl pg_sys::PgNode for WindowClause {}
+impl pg_sys::PgNode for WindowClause {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_WindowClause];
+}
 impl ::core::fmt::Display for WindowClause {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for WindowDef {}
-impl pg_sys::PgNode for WindowDef {}
+impl pg_sys::PgNode for WindowDef {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_WindowDef];
+}
 impl ::core::fmt::Display for WindowDef {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for WindowFunc {}
-impl pg_sys::PgNode for WindowFunc {}
+impl pg_sys::PgNode for WindowFunc {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_WindowFunc];
+}
 impl ::core::fmt::Display for WindowFunc {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for WindowFuncExprState {}
-impl pg_sys::PgNode for WindowFuncExprState {}
+impl pg_sys::PgNode for WindowFuncExprState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_WindowFuncExprState];
+}
 impl ::core::fmt::Display for WindowFuncExprState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for WithCheckOption {}
-impl pg_sys::PgNode for WithCheckOption {}
+impl pg_sys::PgNode for WithCheckOption {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_WithCheckOption];
+}
 impl ::core::fmt::Display for WithCheckOption {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for WithClause {}
-impl pg_sys::PgNode for WithClause {}
+impl pg_sys::PgNode for WithClause {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_WithClause];
+}
 impl ::core::fmt::Display for WithClause {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for WorkTableScan {}
-impl pg_sys::PgNode for WorkTableScan {}
+impl pg_sys::PgNode for WorkTableScan {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_WorkTableScan];
+}
 impl ::core::fmt::Display for WorkTableScan {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for WorkTableScanState {}
-impl pg_sys::PgNode for WorkTableScanState {}
+impl pg_sys::PgNode for WorkTableScanState {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_WorkTableScanState];
+}
 impl ::core::fmt::Display for WorkTableScanState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for XmlExpr {}
-impl pg_sys::PgNode for XmlExpr {}
+impl pg_sys::PgNode for XmlExpr {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_XmlExpr];
+}
 impl ::core::fmt::Display for XmlExpr {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
 }
 impl pg_sys::seal::Sealed for XmlSerialize {}
-impl pg_sys::PgNode for XmlSerialize {}
+impl pg_sys::PgNode for XmlSerialize {
+    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_XmlSerialize];
+}
 impl ::core::fmt::Display for XmlSerialize {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
