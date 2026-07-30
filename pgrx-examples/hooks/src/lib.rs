@@ -38,6 +38,48 @@ fn only_superusers_can_truncate(pstmt: PgBox<pg_sys::PlannedStmt>) {
 
 unsafe fn register_hooks() {
     //
+    // Executor Run Hook
+    //
+    static mut PREV_EXECUTOR_RUN_HOOK: pg_sys::ExecutorRun_hook_type = None;
+    PREV_EXECUTOR_RUN_HOOK = pg_sys::ExecutorRun_hook;
+    pg_sys::ExecutorRun_hook = Some(executor_run_hook);
+
+    #[cfg(any(
+        feature = "pg13",
+        feature = "pg14",
+        feature = "pg15",
+        feature = "pg16",
+        feature = "pg17"
+    ))]
+    #[pg_guard]
+    unsafe extern "C-unwind" fn executor_run_hook(
+        query_desc: *mut pg_sys::QueryDesc,
+        direction: pg_sys::ScanDirection::Type,
+        count: pg_sys::uint64,
+        execute_once: bool,
+    ) {
+        if let Some(prev_hook) = PREV_EXECUTOR_RUN_HOOK {
+            pg_guard_ffi_boundary(|| prev_hook(query_desc, direction, count, execute_once));
+        } else {
+            pg_sys::standard_ExecutorRun(query_desc, direction, count, execute_once)
+        }
+    }
+
+    #[cfg(any(feature = "pg18", feature = "pg19"))]
+    #[pg_guard]
+    unsafe extern "C-unwind" fn executor_run_hook(
+        query_desc: *mut pg_sys::QueryDesc,
+        direction: pg_sys::ScanDirection::Type,
+        count: pg_sys::uint64,
+    ) {
+        if let Some(prev_hook) = PREV_EXECUTOR_RUN_HOOK {
+            pg_guard_ffi_boundary(|| prev_hook(query_desc, direction, count));
+        } else {
+            pg_sys::standard_ExecutorRun(query_desc, direction, count)
+        }
+    }
+
+    //
     // Client Authentication hook
     //
     static mut PREV_CLIENTAUTHENTICATION_HOOK: pg_sys::libpq::ClientAuthentication_hook_type = None;
@@ -251,6 +293,43 @@ mod tests {
             SET ROLE bob;
             TRUNCATE t;
             ",
+        )
+        .unwrap();
+    }
+
+    #[pg_test(
+        error = "DIAG_PROBE: constraint_name=[diag_probe_k_unique] table_name=[diag_probe] sqlerrm=[duplicate key value violates unique constraint \"diag_probe_k_unique\"]"
+    )]
+    /// Proves errors crossing a guarded executor hook retain their structured
+    /// constraint and table names, not just the human-readable message.
+    fn test_guarded_error_preserves_structured_diagnostics() {
+        Spi::run(
+            r#"
+            CREATE TEMP TABLE diag_probe (
+                k text CONSTRAINT diag_probe_k_unique UNIQUE
+            );
+            INSERT INTO diag_probe VALUES ('x');
+
+            DO $$
+            DECLARE
+                violated_constraint text;
+                violated_table text;
+            BEGIN
+                BEGIN
+                    INSERT INTO diag_probe VALUES ('x');
+                EXCEPTION WHEN unique_violation THEN
+                    GET STACKED DIAGNOSTICS
+                        violated_constraint = CONSTRAINT_NAME,
+                        violated_table = TABLE_NAME;
+                    RAISE EXCEPTION 'DIAG_PROBE: constraint_name=[%] table_name=[%] sqlerrm=[%]',
+                        coalesce(violated_constraint, '<NULL>'),
+                        coalesce(violated_table, '<NULL>'),
+                        SQLERRM;
+                END;
+            END $$;
+
+            DROP TABLE diag_probe;
+            "#,
         )
         .unwrap();
     }
