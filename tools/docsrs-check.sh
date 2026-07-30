@@ -68,6 +68,6 @@ if [[ -n "${docsrs_target}" ]]; then
 fi
 
 docsrs_rustdocflags="${RUSTDOCFLAGS:-}"
-docsrs_rustdocflags="${docsrs_rustdocflags:+${docsrs_rustdocflags} }--cfg docsrs -Z unstable-options --emit=invocation-specific --cap-lints warn"
+docsrs_rustdocflags="${docsrs_rustdocflags:+${docsrs_rustdocflags} }--cfg docsrs -Z unstable-options --emit=html-non-static-files --cap-lints warn"
 
 DOCS_RS=1 RUSTDOCFLAGS="${docsrs_rustdocflags}" "${rustdoc_cmd[@]}"
