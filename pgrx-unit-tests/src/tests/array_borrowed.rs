@@ -96,6 +96,11 @@ fn borrow_get_arr_nelems(arr: &FlatArray<'_, i32>) -> libc::c_int {
 }
 
 #[pg_extern]
+fn borrow_iter_array<'a>(arr: &'a FlatArray<'a, i32>) -> SetOfIterator<'a, i32> {
+    SetOfIterator::new(arr.iter_non_null().copied())
+}
+
+#[pg_extern]
 fn borrow_get_arr_data_ptr_nth_elem(arr: &FlatArray<'_, i32>, elem: i32) -> Option<i32> {
     arr.get(elem as usize).unwrap().into_option().copied()
 }
@@ -181,7 +186,7 @@ mod tests {
     use pgrx::datum::DatumWithOid;
     use pgrx::memcx;
     use pgrx::prelude::*;
-    use pgrx::{IntoDatum, Json};
+    use pgrx::{IntoDatum, Json, PgMemoryContexts, direct_pg_extern_function_call};
     use serde_json::json;
 
     #[pg_test]
@@ -328,6 +333,67 @@ mod tests {
     fn borrow_test_arr_data_ptr() {
         let len = Spi::get_one::<i32>("SELECT borrow_get_arr_nelems('{1,2,3,4,5}'::int[])");
         assert_eq!(len, Ok(Some(5)));
+    }
+
+    #[pg_test]
+    fn borrow_test_toasted_flat_array() -> Result<(), pgrx::spi::Error> {
+        Spi::run("CREATE TEMP TABLE flat_array_toast_test (arr integer[])")?;
+        Spi::run("ALTER TABLE flat_array_toast_test ALTER COLUMN arr SET STORAGE EXTERNAL")?;
+        Spi::run(
+            "INSERT INTO flat_array_toast_test \
+             SELECT array_agg(i) FROM generate_series(1, 2500) i",
+        )?;
+
+        let result = Spi::get_two::<i32, i32>(
+            "SELECT borrow_get_arr_nelems(arr), borrow_sum_array(arr) \
+             FROM flat_array_toast_test",
+        );
+        assert_eq!(result, Ok((Some(2500), Some(3_126_250))));
+
+        let iterated = Spi::get_two::<i64, i64>(
+            "SELECT count(*), sum(value) \
+             FROM flat_array_toast_test, LATERAL borrow_iter_array(arr) value",
+        );
+        assert_eq!(iterated, Ok((Some(2500), Some(3_126_250))));
+
+        Spi::connect(|client| {
+            let table =
+                client.select("SELECT arr FROM flat_array_toast_test", Some(1), &[])?.first();
+            let datum = table.get_datum_by_ordinal(1)?.expect("array was null");
+            assert!(unsafe { pgrx::varlena::varatt_is_1b_e(datum.cast_mut_ptr()) });
+
+            unsafe {
+                PgMemoryContexts::Transient {
+                    parent: PgMemoryContexts::CurrentMemoryContext.value(),
+                    name: "toasted FlatArray cleanup test",
+                    min_context_size: 8 * 1024,
+                    initial_block_size: 8 * 1024,
+                    max_block_size: 8 * 1024,
+                }
+                .switch_to(|context| {
+                    let call = || {
+                        direct_pg_extern_function_call::<i32>(
+                            super::borrow_get_arr_nelems_wrapper,
+                            &[Some(datum)],
+                        )
+                    };
+
+                    assert_eq!(call(), Some(2500));
+                    let warmed = pg_sys::MemoryContextMemAllocated(context.value(), true);
+                    for _ in 0..64 {
+                        assert_eq!(call(), Some(2500));
+                    }
+                    let after = pg_sys::MemoryContextMemAllocated(context.value(), true);
+
+                    assert!(
+                        after <= warmed + 64 * 1024,
+                        "detoasted arguments accumulated {} bytes",
+                        after - warmed
+                    );
+                });
+            }
+            Ok(())
+        })
     }
 
     #[pg_test]

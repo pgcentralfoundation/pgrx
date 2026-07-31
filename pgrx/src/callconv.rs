@@ -27,22 +27,9 @@ use crate::rel::PgRelation;
 use crate::{PgBox, PgMemoryContexts};
 
 use core::marker::PhantomData;
-use core::{iter, mem, ptr, slice};
+use core::{mem, ptr};
 use std::ffi::{CStr, CString};
 use std::ptr::NonNull;
-
-struct ReadOnly<T>(T);
-
-impl<T> ReadOnly<T> {
-    unsafe fn refer_to(&self) -> &T {
-        &self.0
-    }
-}
-
-unsafe impl<T> Sync for ReadOnly<T> {}
-
-static VIRTUAL_ARGUMENT: ReadOnly<pg_sys::NullableDatum> =
-    ReadOnly(pg_sys::NullableDatum { value: pg_sys::Datum::null(), isnull: true });
 
 /// How to pass a value from Postgres to Rust
 ///
@@ -288,7 +275,7 @@ where
         };
         unsafe {
             let ptr = ptr::NonNull::new_unchecked(ptr);
-            T::borrow_unchecked(ptr)
+            T::borrow_arg_unchecked(ptr, |ptr| arg.0.register_detoasted_arg(ptr))
         }
     }
 
@@ -299,7 +286,11 @@ where
         });
         match (arg.is_null(), ptr) {
             (true, _) | (false, None) => Nullable::Null,
-            (false, Some(ptr)) => unsafe { Nullable::Valid(T::borrow_unchecked(ptr)) },
+            (false, Some(ptr)) => unsafe {
+                Nullable::Valid(T::borrow_arg_unchecked(ptr, |ptr| {
+                    arg.0.register_detoasted_arg(ptr)
+                }))
+            },
         }
     }
 }
@@ -332,7 +323,7 @@ pub unsafe trait RetAbi: Sized {
     }
 
     fn check_and_prepare(fcinfo: &mut FcInfo<'_>) -> CallCx {
-        unsafe { Self::check_fcinfo_and_prepare(fcinfo.0) }
+        unsafe { Self::check_fcinfo_and_prepare(fcinfo.ptr) }
     }
 
     /// answer what kind and how many returns happen from this type
@@ -340,7 +331,7 @@ pub unsafe trait RetAbi: Sized {
 
     // move into the function context and obtain a Datum
     unsafe fn box_ret_in<'fcx>(fcinfo: &mut FcInfo<'fcx>, ret: Self::Ret) -> Datum<'fcx> {
-        let fcinfo = fcinfo.0;
+        let fcinfo = fcinfo.ptr;
         unsafe { mem::transmute(Self::box_ret_in_fcinfo(fcinfo, ret)) }
     }
 
@@ -369,7 +360,7 @@ pub unsafe trait RetAbi: Sized {
     }
 
     fn ret_from_fcx(fcinfo: &mut FcInfo<'_>) -> Self::Ret {
-        let fcinfo = fcinfo.0;
+        let fcinfo = fcinfo.ptr;
         unsafe { Self::ret_from_fcinfo_fcx(fcinfo) }
     }
 
@@ -599,8 +590,27 @@ where
 
 type FcInfoData = pg_sys::FunctionCallInfoBaseData;
 
-#[derive(Clone)]
-pub struct FcInfo<'fcx>(pgrx_pg_sys::FunctionCallInfo, PhantomData<&'fcx mut FcInfoData>);
+/// A uniquely owned PostgreSQL function call frame.
+///
+/// Argument decoding may register temporary detoast allocations here, so this type is intentionally
+/// not cloneable.
+pub struct FcInfo<'fcx> {
+    ptr: pgrx_pg_sys::FunctionCallInfo,
+    detoasted_arg_allocations: Vec<NonNull<u8>>,
+    entry_memory_context: pg_sys::MemoryContext,
+    argument_memory_context: pg_sys::MemoryContext,
+    _marker: PhantomData<&'fcx mut FcInfoData>,
+}
+
+impl Drop for FcInfo<'_> {
+    fn drop(&mut self) {
+        for allocation in self.detoasted_arg_allocations.drain(..) {
+            // SAFETY: `BorrowDatum::borrow_arg_unchecked` requires registered pointers to be
+            // PostgreSQL allocations that can be released after the function result is boxed.
+            unsafe { pg_sys::pfree(allocation.as_ptr().cast()) }
+        }
+    }
+}
 
 // when talking about this, there's the lifetime for setreturningfunction, and then there's the current context's lifetime.
 // Potentially <'srf, 'curr, 'ret: 'curr + 'srf> -> <'ret> but don't start with that.
@@ -615,12 +625,40 @@ impl<'fcx> FcInfo<'fcx> {
     ///
     /// # Safety
     ///
-    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
+    /// - `fcinfo` must be a valid [`pg_sys::FunctionCallInfo`] pointer and must not be wrapped by
+    ///   another live `FcInfo` for `'fcx`.
+    /// - PostgreSQL must be initialized, and its current memory context must not be reset or deleted
+    ///   while the function call is active.
     #[inline]
     pub unsafe fn from_ptr(fcinfo: pg_sys::FunctionCallInfo) -> FcInfo<'fcx> {
         let _nullptr_check = NonNull::new(fcinfo).expect("fcinfo pointer must be non-null");
-        Self(fcinfo, PhantomData)
+        let entry_memory_context = NonNull::new(unsafe { pg_sys::CurrentMemoryContext })
+            .expect("CurrentMemoryContext must be non-null")
+            .as_ptr();
+        Self {
+            ptr: fcinfo,
+            detoasted_arg_allocations: Vec::new(),
+            entry_memory_context,
+            argument_memory_context: entry_memory_context,
+            _marker: PhantomData,
+        }
+    }
+
+    fn register_detoasted_arg(&mut self, ptr: NonNull<u8>) {
+        // Set-returning functions unbox their arguments in a multi-call context so an iterator
+        // may retain borrows across calls. That context owns its detoast allocations and releases
+        // them when the SRF finishes. Ordinary functions unbox in the entry context, where we can
+        // release fresh detoast copies as soon as their result has been boxed.
+        assert_eq!(
+            unsafe { pg_sys::CurrentMemoryContext },
+            self.argument_memory_context,
+            "detoasted argument was allocated outside its selected memory context"
+        );
+        if self.argument_memory_context != self.entry_memory_context {
+            return;
+        }
+
+        self.detoasted_arg_allocations.push(ptr);
     }
     /// Retrieve the arguments to this function call as a slice of [`pgrx_pg_sys::NullableDatum`]
     #[inline]
@@ -628,8 +666,8 @@ impl<'fcx> FcInfo<'fcx> {
         // Null pointer check already performed on immutable pointer
         // at construction time.
         unsafe {
-            let arg_len = (*self.0).nargs;
-            let args_ptr: *const pg_sys::NullableDatum = ptr::addr_of!((*self.0).args).cast();
+            let arg_len = (*self.ptr).nargs;
+            let args_ptr: *const pg_sys::NullableDatum = ptr::addr_of!((*self.ptr).args).cast();
             // A valid FcInfoWrapper constructed from a valid FuntionCallInfo should always have
             // at least nargs elements of NullableDatum.
             std::slice::from_raw_parts(args_ptr, arg_len as _)
@@ -641,7 +679,7 @@ impl<'fcx> FcInfo<'fcx> {
     /// that type is sufficient.
     #[inline]
     pub unsafe fn as_mut_ptr(&self) -> pg_sys::FunctionCallInfo {
-        self.0
+        self.ptr
     }
 
     /// Accessor for the "is null" flag
@@ -650,7 +688,7 @@ impl<'fcx> FcInfo<'fcx> {
     /// If this flag is set to "false", then the resulting return must be a valid [`Datum`] for
     /// the function call's result type.
     pub unsafe fn set_return_is_null(&mut self) -> &mut bool {
-        unsafe { &mut (*self.0).isnull }
+        unsafe { &mut (*self.ptr).isnull }
     }
 
     /// Modifies the function call's return to be null
@@ -721,7 +759,7 @@ impl<'fcx> FcInfo<'fcx> {
     #[inline]
     pub fn get_collation(&self) -> Option<pg_sys::Oid> {
         // SAFETY: see FcInfo::from_ptr
-        let fcinfo = unsafe { self.0.as_mut() }.unwrap();
+        let fcinfo = unsafe { self.ptr.as_mut() }.unwrap();
         (fcinfo.fncollation.to_u32() != 0).then_some(fcinfo.fncollation)
     }
 
@@ -732,11 +770,11 @@ impl<'fcx> FcInfo<'fcx> {
         // SAFETY: see FcInfo::from_ptr
         unsafe {
             // bool::then() is lazy-evaluated, then_some is not.
-            (num < ((*self.0).nargs as usize)).then(
+            (num < ((*self.ptr).nargs as usize)).then(
                 #[inline]
                 || {
                     pg_sys::get_fn_expr_argtype(
-                        self.0.as_ref().unwrap().flinfo,
+                        self.ptr.as_ref().unwrap().flinfo,
                         num as std::os::raw::c_int,
                     )
                 },
@@ -754,7 +792,7 @@ impl<'fcx> FcInfo<'fcx> {
         // to construct a FcInfo. If that constraint is maintained, this should
         // be safe.
         unsafe {
-            let mut flinfo = NonNull::new((*self.0).flinfo).unwrap();
+            let mut flinfo = NonNull::new((*self.ptr).flinfo).unwrap();
             if flinfo.as_ref().fn_extra.is_null() {
                 flinfo.as_mut().fn_extra = PgMemoryContexts::For(flinfo.as_ref().fn_mcxt)
                     .leak_and_drop_on_delete(default())
@@ -771,17 +809,17 @@ impl<'fcx> FcInfo<'fcx> {
         // Safety: User must supply a valid fcinfo to from_ptr() in order
         // to construct a FcInfo. If that constraint is maintained, this should
         // be safe.
-        unsafe { !(*(*self.0).flinfo).fn_extra.is_null() }
+        unsafe { !(*(*self.ptr).flinfo).fn_extra.is_null() }
     }
 
     /// Thin wrapper around [`pg_sys::init_MultiFuncCall`], made necessary
     /// because this structure's FunctionCallInfo is a private field.
     ///
-    /// This should initialize `self.0.flinfo.fn_extra`
+    /// This should initialize `self.ptr.flinfo.fn_extra`
     #[inline]
     pub unsafe fn init_multi_func_call(&mut self) -> &'fcx mut pg_sys::FuncCallContext {
         unsafe {
-            let fcx: *mut pg_sys::FuncCallContext = pg_sys::init_MultiFuncCall(self.0);
+            let fcx: *mut pg_sys::FuncCallContext = pg_sys::init_MultiFuncCall(self.ptr);
             debug_assert!(!fcx.is_null());
             &mut *fcx
         }
@@ -790,18 +828,18 @@ impl<'fcx> FcInfo<'fcx> {
     /// Equivalent to "per_MultiFuncCall" with no FFI cost, and a lifetime
     /// constraint.
     ///
-    /// Safety: Assumes `self.0.flinfo.fn_extra` is non-null
+    /// Safety: Assumes `self.ptr.flinfo.fn_extra` is non-null
     /// i.e. [`FcInfo::srf_is_initialized()`] would be `true`.
     #[inline]
     pub(crate) unsafe fn deref_fcx(&mut self) -> &'fcx mut pg_sys::FuncCallContext {
         unsafe {
-            let fcx: *mut pg_sys::FuncCallContext = (*(*self.0).flinfo).fn_extra.cast();
+            let fcx: *mut pg_sys::FuncCallContext = (*(*self.ptr).flinfo).fn_extra.cast();
             debug_assert!(!fcx.is_null());
             &mut *fcx
         }
     }
 
-    /// Safety: Assumes `self.0.flinfo.fn_extra` is non-null
+    /// Safety: Assumes `self.ptr.flinfo.fn_extra` is non-null
     /// i.e. [`FcInfo::srf_is_initialized()`] would be `true`.
     #[inline]
     pub unsafe fn srf_return_next(&mut self) {
@@ -811,12 +849,12 @@ impl<'fcx> FcInfo<'fcx> {
         }
     }
 
-    /// Safety: Assumes `self.0.flinfo.fn_extra` is non-null
+    /// Safety: Assumes `self.ptr.flinfo.fn_extra` is non-null
     /// i.e. [`FcInfo::srf_is_initialized()`] would be `true`.
     #[inline]
     pub unsafe fn srf_return_done(&mut self) {
         unsafe {
-            pg_sys::end_MultiFuncCall(self.0, self.deref_fcx());
+            pg_sys::end_MultiFuncCall(self.ptr, self.deref_fcx());
             self.get_result_info().set_is_done(pg_sys::ExprDoneCond::ExprEndResult);
         }
     }
@@ -826,18 +864,42 @@ impl<'fcx> FcInfo<'fcx> {
     #[inline]
     pub unsafe fn get_result_info(&self) -> ReturnSetInfoWrapper<'fcx> {
         unsafe {
-            ReturnSetInfoWrapper::from_ptr((*self.0).resultinfo as *mut pg_sys::ReturnSetInfo)
+            ReturnSetInfoWrapper::from_ptr((*self.ptr).resultinfo as *mut pg_sys::ReturnSetInfo)
         }
     }
 
+    /// Create a decoder for this function call's arguments.
+    ///
+    /// The decoder borrows the call frame exclusively so temporary argument allocations have one
+    /// unambiguous owner.
     #[inline]
-    pub fn args<'arg>(&'arg self) -> Args<'arg, 'fcx> {
-        Args { iter: self.raw_args().iter().enumerate(), fcinfo: self }
+    pub fn args<'arg>(&'arg mut self) -> Args<'arg, 'fcx> {
+        let entry_memory_context = self.entry_memory_context;
+        unsafe { self.args_in(entry_memory_context) }
+    }
+
+    /// Create a decoder whose temporary argument allocations belong to `memory_context`.
+    ///
+    /// # Safety
+    /// - `memory_context` must be valid and must not be reset or deleted while any borrow returned
+    ///   by the decoder is live.
+    /// - Arguments must be decoded while `memory_context` is PostgreSQL's current memory context.
+    /// - If this is not the call's entry memory context, it must own and release temporary argument
+    ///   allocations after all returned borrows expire.
+    #[doc(hidden)]
+    #[inline]
+    pub unsafe fn args_in<'arg>(
+        &'arg mut self,
+        memory_context: pg_sys::MemoryContext,
+    ) -> Args<'arg, 'fcx> {
+        let _nullptr_check = NonNull::new(memory_context).expect("memory context must be non-null");
+        self.argument_memory_context = memory_context;
+        Args { next: 0, fcinfo: self }
     }
 }
 
 // TODO: rebadge this as AnyElement
-pub struct Arg<'a, 'fcx>(&'a FcInfo<'fcx>, usize, &'a pg_sys::NullableDatum);
+pub struct Arg<'a, 'fcx>(&'a mut FcInfo<'fcx>, usize, pg_sys::NullableDatum);
 
 impl<'a, 'fcx> Arg<'a, 'fcx> {
     /// # Performance note
@@ -880,23 +942,30 @@ impl<'a, 'fcx> Arg<'a, 'fcx> {
     }
 }
 
+/// A lending-style decoder for PostgreSQL function arguments.
+///
+/// This is deliberately not an [`Iterator`]: each decoded [`Arg`] temporarily borrows the call
+/// frame's detoast cleanup state.
 pub struct Args<'a, 'fcx> {
-    iter: iter::Enumerate<slice::Iter<'a, pg_sys::NullableDatum>>,
-    fcinfo: &'a FcInfo<'fcx>,
-}
-
-impl<'a, 'fcx> Iterator for Args<'a, 'fcx> {
-    type Item = Arg<'a, 'fcx>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|(a, b)| Arg(self.fcinfo, a, b))
-    }
+    next: usize,
+    fcinfo: &'a mut FcInfo<'fcx>,
 }
 
 impl<'a, 'fcx> Args<'a, 'fcx> {
     // generate an argument for use by virtual args
-    fn synthesize_virtual_arg(&self) -> Arg<'a, 'fcx> {
-        Arg(self.fcinfo, usize::MAX, unsafe { VIRTUAL_ARGUMENT.refer_to() })
+    fn synthesize_virtual_arg(&mut self) -> Arg<'_, 'fcx> {
+        Arg(
+            self.fcinfo,
+            usize::MAX,
+            pg_sys::NullableDatum { value: pg_sys::Datum::null(), isnull: true },
+        )
+    }
+
+    fn next_raw(&mut self) -> Option<Arg<'_, 'fcx>> {
+        let index = self.next;
+        let datum = self.fcinfo.raw_args().get(index).copied()?;
+        self.next += 1;
+        Some(Arg(self.fcinfo, index, datum))
     }
 
     /// # Safety
@@ -910,7 +979,7 @@ impl<'a, 'fcx> Args<'a, 'fcx> {
             unsafe { Some(T::unbox_arg_unchecked(self.synthesize_virtual_arg())) }
         } else {
             // SAFETY: caller upholds
-            unsafe { self.next().map(|next| T::unbox_arg_unchecked(next)) }
+            unsafe { self.next_raw().map(|next| T::unbox_arg_unchecked(next)) }
         }
     }
 
@@ -923,7 +992,7 @@ impl<'a, 'fcx> Args<'a, 'fcx> {
             unsafe { Some(T::unbox_nullable_arg(self.synthesize_virtual_arg())) }
         } else {
             // SAFETY: caller upholds
-            unsafe { self.next().map(|next| T::unbox_nullable_arg(next)) }
+            unsafe { self.next_raw().map(|next| T::unbox_nullable_arg(next)) }
         }
     }
 }

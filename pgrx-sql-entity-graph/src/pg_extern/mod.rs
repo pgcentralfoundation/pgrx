@@ -468,8 +468,8 @@ impl PgExtern {
                             let call_flow = <#ret_ty as ::pgrx::callconv::RetAbi>::check_and_prepare(fcinfo);
                             let result = match call_flow {
                                 ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
+                                    let mut #args_ident = unsafe { fcinfo.args_in(mcx) };
                                     let mut mcx = ::pgrx::PgMemoryContexts::For(mcx);
-                                    let #args_ident = &mut fcinfo.args();
                                     let call_result = mcx.switch_to(|_| {
                                         #(#arg_fetches)*
                                         #func_name( #(#arg_pats),* )

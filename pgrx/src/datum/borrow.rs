@@ -63,6 +63,31 @@ pub unsafe trait BorrowDatum {
     unsafe fn borrow_unchecked<'dat>(ptr: ptr::NonNull<u8>) -> &'dat Self {
         unsafe { BorrowDatum::point_from(ptr).as_ref() }
     }
+
+    /// Prepare and borrow a function argument, registering any temporary allocation for cleanup.
+    ///
+    /// This is used by pgrx's function-call machinery. Implementors that must copy an argument
+    /// before it can be borrowed should pass that allocation to `register` before returning the
+    /// borrow. The allocation must have been made by PostgreSQL and ownership is transferred to
+    /// `register`, which keeps it alive for the function's return ABI and releases it afterward.
+    ///
+    /// # Safety
+    /// - `ptr` must point to an initialized function argument representation that is valid for
+    ///   `Self` and [`BorrowDatum::PASS`].
+    /// - The pointer ultimately passed to [`BorrowDatum::point_from`] must satisfy that method's
+    ///   safety requirements for `Self`.
+    /// - The returned reference must remain valid for `'dat`. If it refers to a temporary copy,
+    ///   the implementation must pass that copy to `register` before returning.
+    /// - An allocation passed to `register` must be a fresh, live PostgreSQL allocation that may be
+    ///   released with `pg_sys::pfree`. Passing it transfers ownership, so the implementation must
+    ///   not free it or register the caller-owned `ptr`.
+    #[doc(hidden)]
+    unsafe fn borrow_arg_unchecked<'dat>(
+        ptr: ptr::NonNull<u8>,
+        _register: impl FnOnce(ptr::NonNull<u8>),
+    ) -> &'dat Self {
+        unsafe { BorrowDatum::borrow_unchecked(ptr) }
+    }
 }
 
 /// From a pointer to a Datum, obtain a pointer to T's bytes
