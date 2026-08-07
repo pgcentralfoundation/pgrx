@@ -453,11 +453,11 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
                 #pg_extern_attr
-                fn #fn_name(this: #type_state_without_self, buf: Vec<u8>, internal: ::pgrx::pgbox::PgBox<#type_state_without_self>, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pgbox::PgBox<#type_state_without_self> {
+                fn #fn_name(buf: Vec<u8>, internal: ::pgrx::datum::Internal, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::datum::Internal {
                     unsafe {
                         <#target_path as ::pgrx::aggregate::Aggregate::<#generic_type>>::in_memory_context(
                             fcinfo,
-                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate::<#generic_type>>::deserial(this, buf, internal, fcinfo)
+                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate::<#generic_type>>::deserial(buf, internal, fcinfo)
                         )
                     }
                 }
@@ -465,7 +465,7 @@ impl PgAggregate {
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn deserial(current: #type_state_without_self, _buf: Vec<u8>, _internal: ::pgrx::pgbox::PgBox<#type_state_without_self>, _fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pgbox::PgBox<#type_state_without_self> {
+                fn deserial(_buf: Vec<u8>, _internal: ::pgrx::datum::Internal, _fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::datum::Internal {
                     unimplemented!("Call to deserial on an aggregate which does not support it.")
                 }
             });
@@ -1266,7 +1266,7 @@ mod tests {
         let tokens: ItemImpl = parse_quote! {
             #[pg_aggregate]
             impl Aggregate<DemoName> for DemoAgg {
-                type State = PgVarlena<Self>;
+                type State = Internal;
                 type Args = i32;
                 type OrderBy = i32;
                 type MovingState = i32;
@@ -1294,7 +1294,7 @@ mod tests {
                     todo!()
                 }
 
-                fn deserial(current: Self::State, _buf: Vec<u8>, _internal: PgBox<Self>) -> PgBox<Self> {
+                fn deserial(_buf: Vec<u8>, _internal: Internal) -> Internal {
                     todo!()
                 }
 
@@ -1322,6 +1322,40 @@ mod tests {
         assert_eq!(extern_fn.sig.ident.to_string(), "demo_agg_demo_name_state");
         // It should be possible to generate entity tokens.
         let _ = agg.to_token_stream();
+        Ok(())
+    }
+
+    #[test]
+    fn agg_deserial_has_postgres_signature() -> Result<()> {
+        let tokens: ItemImpl = parse_quote! {
+            #[pg_aggregate]
+            impl Aggregate<DemoName> for DemoAgg {
+                type State = Internal;
+                type Args = i32;
+
+                fn state(current: Self::State, arg: Self::Args) -> Self::State {
+                    todo!()
+                }
+
+                fn deserial(buf: Vec<u8>, internal: Internal) -> Internal {
+                    todo!()
+                }
+            }
+        };
+
+        let agg = PgAggregate::new(tokens)?;
+        let deserial = agg
+            .0
+            .pg_externs
+            .iter()
+            .find(|func| func.sig.ident == "demo_agg_demo_name_deserial")
+            .expect("deserial extern should be generated");
+
+        assert_eq!(deserial.sig.inputs.len(), 3);
+        let signature = deserial.sig.to_token_stream().to_string();
+        assert!(signature.contains("buf : Vec < u8 >"));
+        assert!(signature.contains("internal : :: pgrx :: datum :: Internal"));
+        assert!(signature.ends_with("-> :: pgrx :: datum :: Internal"));
         Ok(())
     }
 
