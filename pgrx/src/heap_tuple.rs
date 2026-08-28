@@ -296,13 +296,15 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
     pub unsafe fn from_composite_datum(composite: pg_sys::Datum) -> Self {
         let htup_header =
             pg_sys::pg_detoast_datum(composite.cast_mut_ptr()) as pg_sys::HeapTupleHeader;
-        let tup_type = crate::heap_tuple_header_get_type_id(htup_header);
-        let tup_typmod = crate::heap_tuple_header_get_typmod(htup_header);
+        let htup_header_ref =
+            unsafe { htup_header.as_ref() }.expect("pg_detoast_datum returned null");
+        let tup_type = crate::heap_tuple_header_get_type_id(htup_header_ref);
+        let tup_typmod = crate::heap_tuple_header_get_typmod(htup_header_ref);
         let tupdesc = pg_sys::lookup_rowtype_tupdesc(tup_type, tup_typmod);
 
         let mut data = PgBox::<pg_sys::HeapTupleData>::alloc0();
 
-        data.t_len = crate::heap_tuple_header_get_datum_length(htup_header) as u32;
+        data.t_len = crate::heap_tuple_header_get_datum_length(htup_header_ref) as u32;
         data.t_data = htup_header;
 
         Self { tuple: data, tupdesc: PgTupleDesc::from_pg(tupdesc) }
@@ -569,7 +571,7 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
 
                 // it's a valid attribute number
                 Some(att) => {
-                    let datum = heap_getattr_raw(self.tuple.as_ptr(), attno, self.tupdesc.as_ptr());
+                    let datum = heap_getattr_raw(self.tuple.as_ref(), attno, self.tupdesc.as_ptr());
                     if datum.is_none() {
                         return Ok(None);
                     }
