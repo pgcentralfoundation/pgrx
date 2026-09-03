@@ -64,10 +64,10 @@ macro_rules! pg_shmem_init {
         ))]
         unsafe {
             static mut PREV_SHMEM_REQUEST_HOOK: Option<unsafe extern "C-unwind" fn()> = None;
-            PREV_SHMEM_REQUEST_HOOK = pg_sys::shmem_request_hook;
-            pg_sys::shmem_request_hook = Some(on_shmem_request);
+            PREV_SHMEM_REQUEST_HOOK = $crate::pg_sys::shmem_request_hook;
+            $crate::pg_sys::shmem_request_hook = Some(on_shmem_request);
 
-            #[pg_guard]
+            #[$crate::pg_guard]
             unsafe extern "C-unwind" fn on_shmem_request() {
                 unsafe {
                     if let Some(i) = PREV_SHMEM_REQUEST_HOOK {
@@ -82,10 +82,10 @@ macro_rules! pg_shmem_init {
 
         unsafe {
             static mut PREV_SHMEM_STARTUP_HOOK: Option<unsafe extern "C-unwind" fn()> = None;
-            PREV_SHMEM_STARTUP_HOOK = pg_sys::shmem_startup_hook;
-            pg_sys::shmem_startup_hook = Some(on_shmem_startup);
+            PREV_SHMEM_STARTUP_HOOK = $crate::pg_sys::shmem_startup_hook;
+            $crate::pg_sys::shmem_startup_hook = Some(on_shmem_startup);
 
-            #[pg_guard]
+            #[$crate::pg_guard]
             #[forbid(unsafe_op_in_unsafe_fn)]
             unsafe extern "C-unwind" fn on_shmem_startup() {
                 unsafe {
