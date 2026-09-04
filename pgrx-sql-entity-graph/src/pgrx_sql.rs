@@ -1721,7 +1721,7 @@ fn initialize_aggregates<'a>(
             )?;
         }
 
-        for arg in item.direct_args.as_ref().unwrap_or(&vec![]) {
+        for arg in item.direct_args.as_deref().unwrap_or(&[]) {
             if !arg.used_ty.needs_type_resolution() {
                 continue;
             }
@@ -1829,7 +1829,7 @@ fn connect_aggregate<'a>(
         )?;
     }
 
-    for arg in item.direct_args.as_ref().unwrap_or(&vec![]) {
+    for arg in item.direct_args.as_deref().unwrap_or(&[]) {
         if !arg.used_ty.needs_type_resolution() {
             continue;
         }

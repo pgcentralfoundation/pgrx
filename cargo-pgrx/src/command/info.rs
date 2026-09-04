@@ -56,7 +56,7 @@ impl CommandExecute for Info {
                         .get(&version(pg_ver))?
                         .parent_path()
                         .parent()
-                        .ok_or(eyre::Error::msg("can't get path"))?
+                        .ok_or_else(|| eyre::Error::msg("can't get path"))?
                         .display()
                 );
             }
@@ -66,7 +66,7 @@ impl CommandExecute for Info {
                     config
                         .get(&version(pg_ver))?
                         .path()
-                        .ok_or(eyre::Error::msg("can't get path"))?
+                        .ok_or_else(|| eyre::Error::msg("can't get path"))?
                         .display()
                 );
             }
