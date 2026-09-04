@@ -340,7 +340,7 @@ fn generate_bindings(
     let lib_dir = pg_config.lib_dir()?;
     println!(
         "cargo:rustc-link-search={}",
-        lib_dir.to_str().ok_or(eyre!("{lib_dir:?} is not valid UTF-8 string"))?
+        lib_dir.to_str().ok_or_else(|| eyre!("{lib_dir:?} is not valid UTF-8 string"))?
     );
     Ok(())
 }
@@ -1253,7 +1253,7 @@ fn rust_fmt(path: &Path) -> eyre::Result<()> {
         }
         Err(e)
             if e.downcast_ref::<std::io::Error>()
-                .ok_or(eyre!("Couldn't downcast error ref"))?
+                .ok_or_else(|| eyre!("Couldn't downcast error ref"))?
                 .kind()
                 == std::io::ErrorKind::NotFound =>
         {

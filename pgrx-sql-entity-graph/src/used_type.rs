@@ -95,10 +95,9 @@ impl UsedType {
             }
             syn::Type::Path(path) => {
                 let segments = &path.path;
-                let last = segments
-                    .segments
-                    .last()
-                    .ok_or(syn::Error::new(path.span(), "Could not read last segment of path"))?;
+                let last = segments.segments.last().ok_or_else(|| {
+                    syn::Error::new(path.span(), "Could not read last segment of path")
+                })?;
 
                 match last.ident.to_string().as_str() {
                     // Option<composite_type!(..)>
@@ -132,30 +131,32 @@ impl UsedType {
         let (resolved_ty, variadic, optional, result) = match resolved_ty {
             syn::Type::Path(type_path) => {
                 let path = &type_path.path;
-                let last_segment = path.segments.last().ok_or(syn::Error::new(
-                    path.span(),
-                    "No last segment found while scanning path",
-                ))?;
+                let last_segment = path.segments.last().ok_or_else(|| {
+                    syn::Error::new(path.span(), "No last segment found while scanning path")
+                })?;
                 let ident_string = last_segment.ident.to_string();
                 match ident_string.as_str() {
                     "Result" => {
                         if let syn::PathArguments::AngleBracketed(angles) = &last_segment.arguments
                             && let syn::GenericArgument::Type(inner_ty) =
-                                angles.args.first().ok_or(syn::Error::new(
-                                    angles.span(),
-                                    "No inner arg for Result<T, E> found",
-                                ))?
+                                angles.args.first().ok_or_else(|| {
+                                    syn::Error::new(
+                                        angles.span(),
+                                        "No inner arg for Result<T, E> found",
+                                    )
+                                })?
                         {
                             match inner_ty {
                                 // Result<$Type<T>>
                                 syn::Type::Path(inner_type_path) => {
                                     let path = &inner_type_path.path;
-                                    let last_segment = inner_type_path.path.segments.last().ok_or(
-                                        syn::Error::new(
-                                            path.span(),
-                                            "No last segment found while scanning path",
-                                        ),
-                                    )?;
+                                    let last_segment =
+                                        inner_type_path.path.segments.last().ok_or_else(|| {
+                                            syn::Error::new(
+                                                path.span(),
+                                                "No last segment found while scanning path",
+                                            )
+                                        })?;
                                     let ident_string = last_segment.ident.to_string();
                                     match ident_string.as_str() {
                                         "VariadicArray" => {
@@ -186,20 +187,23 @@ impl UsedType {
                         // Option<VariadicArray<T>>
                         if let syn::PathArguments::AngleBracketed(angles) = &last_segment.arguments
                             && let syn::GenericArgument::Type(inner_ty) =
-                                angles.args.first().ok_or(syn::Error::new(
-                                    angles.span(),
-                                    "No inner arg for Option<T> found",
-                                ))?
+                                angles.args.first().ok_or_else(|| {
+                                    syn::Error::new(
+                                        angles.span(),
+                                        "No inner arg for Option<T> found",
+                                    )
+                                })?
                         {
                             match inner_ty {
                                 // Option<VariadicArray<T>>
                                 syn::Type::Path(inner_type_path) => {
                                     let path = &inner_type_path.path;
-                                    let last_segment =
-                                        path.segments.last().ok_or(syn::Error::new(
+                                    let last_segment = path.segments.last().ok_or_else(|| {
+                                        syn::Error::new(
                                             path.span(),
                                             "No last segment found while scanning path",
-                                        ))?;
+                                        )
+                                    })?;
                                     let ident_string = last_segment.ident.to_string();
                                     match ident_string.as_str() {
                                         // Option<VariadicArray<T>>
@@ -257,7 +261,8 @@ impl UsedType {
 
     pub fn entity_tokens(&self) -> syn::Expr {
         let mut resolved_ty = self.resolved_ty.clone();
-        let mut resolved_ty_inner = self.resolved_ty_inner.clone().unwrap_or(resolved_ty.clone());
+        let mut resolved_ty_inner =
+            self.resolved_ty_inner.clone().unwrap_or_else(|| resolved_ty.clone());
         // The lifetimes of these are not relevant. Previously, we solved this by staticizing them
         // but we want to avoid staticizing in this codebase going forward. Anonymization makes it
         // easier to name the lifetime-bounded objects without the context for those lifetimes,
@@ -454,7 +459,7 @@ fn resolve_vec_inner(
     let last = segments
         .segments
         .last()
-        .ok_or(syn::Error::new(original.span(), "Could not read last segment of path"))?;
+        .ok_or_else(|| syn::Error::new(original.span(), "Could not read last segment of path"))?;
 
     if let syn::PathArguments::AngleBracketed(path_arg) = &last.arguments
         && let Some(syn::GenericArgument::Type(ty)) = path_arg.args.last()
@@ -481,11 +486,9 @@ fn resolve_vec_inner(
                 }
             }
             syn::Type::Path(arg_type_path) => {
-                let last = arg_type_path
-                    .path
-                    .segments
-                    .last()
-                    .ok_or(syn::Error::new(arg_type_path.span(), "No last segment in type path"))?;
+                let last = arg_type_path.path.segments.last().ok_or_else(|| {
+                    syn::Error::new(arg_type_path.span(), "No last segment in type path")
+                })?;
                 if last.ident == "Option" {
                     let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
                     let wrapped_ty = syn::parse_quote! {
@@ -534,7 +537,7 @@ fn resolve_variadic_array_inner(
         .path
         .segments
         .last_mut()
-        .ok_or(syn::Error::new(original_span, "Could not read last segment of path"))?;
+        .ok_or_else(|| syn::Error::new(original_span, "Could not read last segment of path"))?;
 
     if let syn::PathArguments::AngleBracketed(ref mut path_arg) = last.arguments
         // TODO: Lifetime????
@@ -562,11 +565,9 @@ fn resolve_variadic_array_inner(
                 }
             }
             syn::Type::Path(arg_type_path) => {
-                let last = arg_type_path
-                    .path
-                    .segments
-                    .last()
-                    .ok_or(syn::Error::new(arg_type_path.span(), "No last segment in type path"))?;
+                let last = arg_type_path.path.segments.last().ok_or_else(|| {
+                    syn::Error::new(arg_type_path.span(), "No last segment in type path")
+                })?;
                 if last.ident == "Option" {
                     let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
                     let wrapped_ty = syn::parse_quote! {
@@ -592,7 +593,7 @@ fn resolve_array_inner(
         .path
         .segments
         .last_mut()
-        .ok_or(syn::Error::new(original_span, "Could not read last segment of path"))?;
+        .ok_or_else(|| syn::Error::new(original_span, "Could not read last segment of path"))?;
 
     if let syn::PathArguments::AngleBracketed(ref mut path_arg) = last.arguments
         && let Some(syn::GenericArgument::Type(ty)) = path_arg.args.last()
@@ -619,11 +620,9 @@ fn resolve_array_inner(
                 }
             }
             syn::Type::Path(arg_type_path) => {
-                let last = arg_type_path
-                    .path
-                    .segments
-                    .last()
-                    .ok_or(syn::Error::new(arg_type_path.span(), "No last segment in type path"))?;
+                let last = arg_type_path.path.segments.last().ok_or_else(|| {
+                    syn::Error::new(arg_type_path.span(), "No last segment in type path")
+                })?;
                 match last.ident.to_string().as_str() {
                     "Option" => {
                         let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
@@ -649,7 +648,7 @@ fn resolve_option_inner(
     let last = segments
         .segments
         .last()
-        .ok_or(syn::Error::new(original.span(), "Could not read last segment of path"))?;
+        .ok_or_else(|| syn::Error::new(original.span(), "Could not read last segment of path"))?;
 
     if let syn::PathArguments::AngleBracketed(path_arg) = &last.arguments
         && let Some(syn::GenericArgument::Type(ty)) = path_arg.args.first()
@@ -678,11 +677,9 @@ fn resolve_option_inner(
                 }
             }
             syn::Type::Path(arg_type_path) => {
-                let last = arg_type_path
-                    .path
-                    .segments
-                    .last()
-                    .ok_or(syn::Error::new(arg_type_path.span(), "No last segment in type path"))?;
+                let last = arg_type_path.path.segments.last().ok_or_else(|| {
+                    syn::Error::new(arg_type_path.span(), "No last segment in type path")
+                })?;
                 match last.ident.to_string().as_str() {
                     // Option<Vec<composite_type!(..)>>
                     // Option<Vec<Option<composite_type!(..)>>>
@@ -729,7 +726,7 @@ fn resolve_result_inner(
     let last = segments
         .segments
         .last()
-        .ok_or(syn::Error::new(original.span(), "Could not read last segment of path"))?;
+        .ok_or_else(|| syn::Error::new(original.span(), "Could not read last segment of path"))?;
 
     // Get the path of our Result type, to handle crate::module::Result pattern
     let mut without_type_args = original.path.clone();
@@ -810,11 +807,9 @@ fn resolve_result_inner(
                 }
             }
             syn::Type::Path(arg_type_path) => {
-                let last = arg_type_path
-                    .path
-                    .segments
-                    .last()
-                    .ok_or(syn::Error::new(arg_type_path.span(), "No last segment in type path"))?;
+                let last = arg_type_path.path.segments.last().ok_or_else(|| {
+                    syn::Error::new(arg_type_path.span(), "No last segment in type path")
+                })?;
                 match last.ident.to_string().as_str() {
                     // Result<Option<composite_type!(..)>>
                     // Result<Option<Vec<composite_type!(..)>>>>

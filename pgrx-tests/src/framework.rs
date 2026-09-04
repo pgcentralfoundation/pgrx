@@ -318,8 +318,8 @@ pub fn client() -> eyre::Result<(postgres::Client, String)> {
 }
 
 fn install_extension() -> eyre::Result<()> {
-    let profile = std::env::var("PGRX_BUILD_PROFILE").unwrap_or("debug".into());
-    let no_schema = std::env::var("PGRX_NO_SCHEMA").unwrap_or("false".into()) == "true";
+    let profile = std::env::var("PGRX_BUILD_PROFILE").unwrap_or_else(|_| "debug".into());
+    let no_schema = std::env::var("PGRX_NO_SCHEMA").is_ok_and(|v| v == "true");
     let mut features = std::env::var("PGRX_FEATURES")
         .unwrap_or("".to_string())
         .split_ascii_whitespace()
@@ -327,9 +327,8 @@ fn install_extension() -> eyre::Result<()> {
         .collect::<HashSet<_>>();
     features.insert("pg_test".into());
 
-    let no_default_features =
-        std::env::var("PGRX_NO_DEFAULT_FEATURES").unwrap_or("false".to_string()) == "true";
-    let all_features = std::env::var("PGRX_ALL_FEATURES").unwrap_or("false".to_string()) == "true";
+    let no_default_features = std::env::var("PGRX_NO_DEFAULT_FEATURES").is_ok_and(|v| v == "true");
+    let all_features = std::env::var("PGRX_ALL_FEATURES").is_ok_and(|v| v == "true");
 
     let pg_version = format!("pg{}", pg_sys::get_pg_major_version_string());
     let pgrx = Pgrx::from_config()?;
@@ -343,7 +342,7 @@ fn install_extension() -> eyre::Result<()> {
         .arg("install")
         .arg("--test")
         .arg("--pg-config")
-        .arg(pg_config.path().ok_or(eyre!("No pg_config found"))?)
+        .arg(pg_config.path().ok_or_else(|| eyre!("No pg_config found"))?)
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .env("CARGO_TARGET_DIR", get_target_dir()?);
@@ -1033,9 +1032,11 @@ fn get_cargo_test_features() -> eyre::Result<clap_cargo::Features> {
         match part.as_str() {
             "--no-default-features" => features.no_default_features = true,
             "--features" => {
-                let configured_features = iter.next().ok_or(eyre!(
-                    "no `--features` specified in the cargo argument list: {cargo_user_args:?}"
-                ))?;
+                let configured_features = iter.next().ok_or_else(|| {
+                    eyre!(
+                        "no `--features` specified in the cargo argument list: {cargo_user_args:?}"
+                    )
+                })?;
                 features.features = configured_features
                     .split(|c: char| c.is_ascii_whitespace() || c == ',')
                     .map(|s| s.to_string())
