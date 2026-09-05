@@ -157,13 +157,19 @@ impl ErrorReportWithLevel {
             PgLogLevel::ERROR => panic_any(self),
 
             // FATAL and PANIC are reported directly to Postgres -- they abort the process
-            PgLogLevel::FATAL | PgLogLevel::PANIC => {
+            PgLogLevel::FATAL | PgLogLevel::PANIC => unsafe {
+                crate::InterruptHoldoffCount += 1;
                 do_ereport(self);
                 unreachable!()
-            }
+            },
 
             // Everything else (INFO, WARN, LOG, DEBUG, etc) are reported to Postgres too but they only emit messages
-            _ => do_ereport(self),
+            _ => unsafe {
+                crate::InterruptHoldoffCount += 1;
+                do_ereport(self);
+                assert!(crate::InterruptHoldoffCount > 0);
+                crate::InterruptHoldoffCount -= 1;
+            },
         }
     }
 
@@ -443,7 +449,9 @@ where
             }
         }
         GuardAction::Report(ereport) => {
-            do_ereport(ereport);
+            unsafe {
+                do_ereport(ereport);
+            }
             unreachable!("pgrx reported a CaughtError that wasn't raised at ERROR or above");
         }
     }
@@ -547,7 +555,7 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
 /// We localize the definition of the various `err*()` functions involved in reporting a Postgres
 /// error (and purposely exclude them from `build.rs`) to ensure users can't get into trouble
 /// trying to roll their own error handling.
-fn do_ereport(ereport: ErrorReportWithLevel) {
+unsafe fn do_ereport(ereport: ErrorReportWithLevel) {
     const PERCENT_S: &CStr = c"%s";
     const DEFAULT_DOMAIN: *const ::std::os::raw::c_char = std::ptr::null_mut();
 
