@@ -57,6 +57,9 @@ pub(crate) struct Install {
     pub(crate) features: clap_cargo::Features,
     #[clap(long)]
     pub(crate) target: Option<String>,
+    /// Disable automatic assembly of unreleased migration fragments into the installed extension directory
+    #[clap(long)]
+    pub(crate) no_assemble_unreleased: bool,
     /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
     #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
     pub(crate) cargo: Vec<String>,
@@ -105,6 +108,11 @@ impl CommandExecute for Install {
         );
 
         display_version_info(&pg_config, &PgVersionSource::PgConfig(pg_config.label()?));
+        let unreleased_mode = if self.no_assemble_unreleased {
+            crate::command::migrate::UnreleasedFragmentMode::Skip
+        } else {
+            crate::command::migrate::UnreleasedFragmentMode::AssembleEphemeral
+        };
         install_extension(
             self.manifest_path.as_deref(),
             self.package.as_deref(),
@@ -115,6 +123,7 @@ impl CommandExecute for Install {
             None,
             &self.features,
             self.target.as_deref(),
+            unreleased_mode,
             metadata.target_directory.as_std_path(),
             &cargo_flags,
             None,
@@ -155,6 +164,7 @@ pub(crate) fn install_extension(
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    unreleased_mode: crate::command::migrate::UnreleasedFragmentMode,
     target_dir: &Path,
     cargo_flags: &[String],
     prefix_directory: Option<PathBuf>,
@@ -260,6 +270,15 @@ pub(crate) fn install_extension(
         true,
         &mut output_tracking,
         cargo_flags,
+    )?;
+
+    crate::command::migrate::handle_unreleased_fragments(
+        &manifest,
+        package_manifest_path,
+        &extname,
+        &extdir,
+        unreleased_mode,
+        &mut output_tracking,
     )?;
 
     println!("{} installing {}", "    Finished".bold().green(), extname);

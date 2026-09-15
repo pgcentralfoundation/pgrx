@@ -56,6 +56,9 @@ pub(crate) struct Run {
     install_only: bool,
     #[clap(long)]
     valgrind: bool,
+    /// Disable automatic assembly of unreleased migration fragments into the installed extension directory
+    #[clap(long)]
+    no_assemble_unreleased: bool,
     /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
     #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
     cargo: Vec<String>,
@@ -76,6 +79,7 @@ impl From<&Regress> for Run {
             pgcli: false,
             install_only: false,
             valgrind: regress.valgrind,
+            no_assemble_unreleased: false,
             cargo: regress.cargo.clone(),
         }
     }
@@ -123,6 +127,12 @@ impl Run {
             if self.release { CargoProfile::Release } else { CargoProfile::Dev },
         )?;
 
+        let unreleased_mode = if self.no_assemble_unreleased {
+            crate::command::migrate::UnreleasedFragmentMode::Skip
+        } else {
+            crate::command::migrate::UnreleasedFragmentMode::AssembleEphemeral
+        };
+
         run(
             &pg_config,
             self.manifest_path.as_deref(),
@@ -137,6 +147,7 @@ impl Run {
             self.target.as_deref(),
             &target_dir,
             postgresql_conf,
+            unreleased_mode,
             &self.cargo,
         )?;
 
@@ -174,6 +185,7 @@ pub(crate) fn run(
     target: Option<&str>,
     target_dir: &Path,
     postgresql_conf: &HashMap<String, String>,
+    unreleased_mode: crate::command::migrate::UnreleasedFragmentMode,
     cargo_flags: &[String],
 ) -> eyre::Result<()> {
     // stop postgres
@@ -190,6 +202,7 @@ pub(crate) fn run(
         None,
         features,
         target,
+        unreleased_mode,
         target_dir,
         cargo_flags,
         None,

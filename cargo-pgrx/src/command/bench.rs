@@ -143,6 +143,7 @@ impl CommandExecute for Bench {
             self.target.as_deref(),
             &target_dir,
             &postgresql_conf,
+            crate::command::migrate::UnreleasedFragmentMode::AssembleEphemeral,
             &self.cargo,
         )?;
 
