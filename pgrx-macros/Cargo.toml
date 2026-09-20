@@ -26,6 +26,7 @@ proc-macro = true
 
 [features]
 no-schema-generation = ["pgrx-sql-entity-graph/no-schema-generation"]
+pgrust = ["pgrx-sql-entity-graph/pgrust"]
 
 
 [dependencies]

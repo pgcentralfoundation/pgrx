@@ -13,11 +13,14 @@ pub mod transaction_id;
 pub mod elog;
 pub mod cmp;
 pub mod errcodes;
+#[cfg(not(feature = "pgrust"))]
 pub mod ffi;
+#[cfg(not(feature = "pgrust"))]
 pub mod htup;
 pub mod oids;
 pub mod panic;
 pub mod pg_try;
+#[cfg(not(feature = "pgrust"))]
 #[doc(hidden)]
 pub mod thread_check;
 pub mod tupdesc;
@@ -30,6 +33,7 @@ mod sql_translatable;
 pub use datum::Datum;
 pub use transaction_id::{MultiXactId, TransactionId};
 
+#[cfg(not(feature = "pgrust"))]
 pub use htup::*;
 pub use oids::*;
 pub use pg_try::*;

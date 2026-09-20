@@ -184,6 +184,7 @@ pub fn is_schema_section_name(name: &str) -> bool {
         || name == LEGACY_MACHO_SECTION_PATH
 }
 
+#[cfg(not(feature = "pgrust"))]
 #[macro_export]
 macro_rules! __pgrx_schema_entry {
     ($name:ident, $len:expr, $payload:expr) => {
@@ -193,6 +194,28 @@ macro_rules! __pgrx_schema_entry {
         #[cfg_attr(target_os = "macos", unsafe(link_section = "__DATA,__pgrxsc"))]
         #[cfg_attr(not(target_os = "macos"), unsafe(link_section = ".pgrxsc"))]
         static $name: [u8; $len] = $payload;
+    };
+}
+
+/// pgrust: the entry also joins the `PGRX_ENTITIES` registry, which is how
+/// the server generates the extension's SQL at registration time (no object
+/// file to read a section from).
+#[cfg(feature = "pgrust")]
+#[macro_export]
+macro_rules! __pgrx_schema_entry {
+    ($name:ident, $len:expr, $payload:expr) => {
+        #[doc(hidden)]
+        #[used]
+        #[allow(non_upper_case_globals)]
+        static $name: [u8; $len] = $payload;
+        const _: () = {
+            #[::pgrx::pg_sys::pgrust::linkme::distributed_slice(::pgrx::pg_sys::pgrust::PGRX_ENTITIES)]
+            #[linkme(crate = ::pgrx::pg_sys::pgrust::linkme)]
+            static __PGRX_ENTITY_LINK: ::pgrx::pg_sys::pgrust::EntityEntry = ::pgrx::pg_sys::pgrust::EntityEntry {
+                krate: env!("CARGO_PKG_NAME"),
+                bytes: &$name,
+            };
+        };
     };
 }
 

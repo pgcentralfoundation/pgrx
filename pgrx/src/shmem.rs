@@ -60,7 +60,8 @@ macro_rules! pg_shmem_init {
             feature = "pg16",
             feature = "pg17",
             feature = "pg18",
-            feature = "pg19"
+            feature = "pg19",
+            feature = "pgrust"
         ))]
         unsafe {
             static mut PREV_SHMEM_REQUEST_HOOK: Option<unsafe extern "C-unwind" fn()> = None;

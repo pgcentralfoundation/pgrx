@@ -83,7 +83,7 @@ pub fn current_context<'curr, F, T>(f: F) -> T
 where
     F: for<'clos> FnOnce(&'clos MemCx<'curr>) -> T,
 {
-    let memcx = unsafe { MemCx::from_ptr(pg_sys::CurrentMemoryContext) };
+    let memcx = unsafe { MemCx::from_ptr(crate::memcxt::current_memory_context_ptr()) };
 
     f(&memcx)
 }
@@ -91,7 +91,7 @@ where
 // `MemoryContextAllocAligned` was introduced in Postgres 16
 #[cfg(all(
     feature = "nightly",
-    any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19")
+    any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19", feature = "pgrust")
 ))]
 mod nightly {
     use super::*;
@@ -155,12 +155,23 @@ unsafe impl<'fcx> ArgAbi<'fcx> for &MemCx<'fcx> {
         // and achieve an "in-place" transformation of CurrentMemoryContext's pointer.
         // The soundness of this is riding on the lifetimes used for `unbox_arg_unchecked` in our macros,
         // as the expanded code is designed so that `fcinfo` and each `arg` are truly "borrowed" in rustc's eyes.
-        unsafe { &*((&raw mut pg_sys::CurrentMemoryContext).cast()) }
+        #[cfg(not(feature = "pgrust"))]
+        unsafe {
+            &*((&raw mut pg_sys::CurrentMemoryContext).cast())
+        }
+        #[cfg(feature = "pgrust")]
+        unsafe {
+            // The current context lives in a per-thread cell; hand out a
+            // leaked view of it for the call's lifetime.
+            let cell: &'static mut pg_sys::MemoryContext =
+                Box::leak(Box::new(crate::memcxt::current_memory_context_ptr()));
+            &*((cell as *mut pg_sys::MemoryContext).cast())
+        }
     }
 
     unsafe fn unbox_nullable_arg(arg: Arg<'_, 'fcx>) -> Nullable<Self> {
         // SAFETY: Should never happen in actuality, but as long as we're here...
-        if unsafe { pg_sys::CurrentMemoryContext.is_null() } {
+        if crate::memcxt::current_memory_context_ptr().is_null() {
             Nullable::Null
         } else {
             Nullable::Valid(Self::unbox_arg_unchecked(arg))

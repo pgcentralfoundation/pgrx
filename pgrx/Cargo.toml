@@ -38,6 +38,9 @@ pg17 = ["pgrx-pg-sys/pg17"]
 pg18 = ["pgrx-pg-sys/pg18"]
 pg19 = ["pgrx-pg-sys/pg19"]
 no-schema-generation = ["pgrx-macros/no-schema-generation", "pgrx-sql-entity-graph/no-schema-generation"]
+# The pgrust target (docs/pgrust/pgrx-target.md): the extension is linked
+# into the pgrust server instead of being dlopen'd by Postgres.
+pgrust = ["pgrx-pg-sys/pgrust", "pgrx-macros/pgrust", "pgrx-sql-entity-graph/pgrust"]
 unsafe-postgres = []     # when trying to compile against something that looks like Postgres but claims to be different
 nightly = []    # For features and functionality which require nightly Rust - for example, std::mem::allocator.
 

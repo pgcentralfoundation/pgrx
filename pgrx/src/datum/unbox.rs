@@ -295,6 +295,7 @@ unbox_with_fromdatum! {
     TimeWithTimeZone, AnyNumeric, char, pg_sys::Point, Interval, pg_sys::BOX, pg_sys::ItemPointerData,
 }
 
+#[cfg(not(feature = "pgrust"))]
 unsafe impl UnboxDatum for PgHeapTuple<'_, crate::AllocatedByRust> {
     #[rustfmt::skip]
     type As<'src> = PgHeapTuple<'src, AllocatedByRust> where Self: 'src;

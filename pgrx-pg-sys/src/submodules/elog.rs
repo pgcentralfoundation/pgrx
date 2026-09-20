@@ -437,7 +437,14 @@ macro_rules! ereport {
 /// Is an interrupt pending?
 #[inline]
 pub fn interrupt_pending() -> bool {
-    unsafe { crate::InterruptPending != 0 }
+    #[cfg(feature = "pgrust")]
+    {
+        ::pgr_init_small::globals::InterruptPending()
+    }
+    #[cfg(not(feature = "pgrust"))]
+    unsafe {
+        crate::InterruptPending != 0
+    }
 }
 
 /// Send some kind of message to Postgres similar to the ereport macro, while specifying
@@ -583,6 +590,7 @@ macro_rules! ereport_domain {
 
 /// If an interrupt is pending (perhaps a user-initiated "cancel query" message to this backend),
 /// this will safely abort the current transaction
+#[cfg(not(feature = "pgrust"))]
 #[macro_export]
 macro_rules! check_for_interrupts {
     () => {
@@ -592,5 +600,13 @@ macro_rules! check_for_interrupts {
                 $crate::ProcessInterrupts();
             }
         }
+    };
+}
+
+#[cfg(feature = "pgrust")]
+#[macro_export]
+macro_rules! check_for_interrupts {
+    () => {
+        $crate::pgrust::check_for_interrupts()
     };
 }

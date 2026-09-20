@@ -14,6 +14,7 @@ pub use pgrx_pg_sys::*;
      ((RangeTblEntry *) list_nth(rangetable, (rangetable_index)-1))
 ```
 */
+#[cfg(not(feature = "pgrust"))]
 #[inline]
 pub unsafe fn rt_fetch(index: Index, range_table: *mut List) -> *mut RangeTblEntry {
     memcx::current_context(|cx| {
@@ -37,6 +38,7 @@ pub unsafe fn rt_fetch(index: Index, range_table: *mut List) -> *mut RangeTblEnt
     rt_fetch(rti, (root)->parse->rtable))
 ```
 */
+#[cfg(not(feature = "pgrust"))]
 #[inline]
 pub unsafe fn planner_rt_fetch(index: Index, root: *mut PlannerInfo) -> *mut RangeTblEntry {
     unsafe {

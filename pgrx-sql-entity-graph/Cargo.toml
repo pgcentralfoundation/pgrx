@@ -25,6 +25,9 @@ include = ["src/**/*", "README.md"]
 [features]
 syntax-highlighting = ["dep:syntect", "dep:owo-colors"]
 no-schema-generation = []
+# The pgrust target: schema entries also join a registry slice, and the V1
+# wrapper takes the host's native call signature (see finfo.rs).
+pgrust = []
 
 [dependencies]
 eyre.workspace = true

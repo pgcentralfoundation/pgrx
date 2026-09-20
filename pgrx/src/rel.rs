@@ -23,7 +23,7 @@ macro_rules! pgstat_count_impl {
             if self.should_count_relation() {
                 let info = self.pgstat_info;
 
-                #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+                #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19", feature = "pgrust"))]
                 unsafe {
                     (*info).counts.$new_field += 1;
                 }
@@ -318,7 +318,8 @@ impl PgRelation {
             feature = "pg16",
             feature = "pg17",
             feature = "pg18",
-            feature = "pg19"
+            feature = "pg19",
+            feature = "pgrust"
         ))]
         if self.pgstat_enabled {
             unsafe {
@@ -341,7 +342,7 @@ impl PgRelation {
     pub fn count_index_tuples(&mut self, n: i64) {
         if self.should_count_relation() {
             let info = self.pgstat_info;
-            #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+            #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19", feature = "pgrust"))]
             unsafe {
                 (*info).counts.tuples_returned += n;
             }

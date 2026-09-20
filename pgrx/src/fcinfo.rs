@@ -14,7 +14,13 @@
 
 use crate::{FromDatum, PgBox, PgMemoryContexts, pg_sys, void_mut_ptr};
 use core::{ptr, slice};
+#[cfg(not(feature = "pgrust"))]
 use pgrx_pg_sys::ffi::pg_guard_ffi_boundary;
+#[cfg(feature = "pgrust")]
+#[inline(always)]
+fn pg_guard_ffi_boundary<T>(f: impl FnOnce() -> T) -> T {
+    f()
+}
 
 /// A macro for specifying default argument values so they get properly translated to SQL in
 /// `CREATE FUNCTION` statements
@@ -376,6 +382,7 @@ pub unsafe fn srf_is_first_call(fcinfo: pg_sys::FunctionCallInfo) -> bool {
     (*(*fcinfo).flinfo).fn_extra.is_null()
 }
 
+#[cfg(not(feature = "pgrust"))]
 #[inline]
 #[deprecated(since = "0.12.0", note = "you want pg_sys::init_MultiFuncCall")]
 pub unsafe fn srf_first_call_init(
@@ -384,12 +391,14 @@ pub unsafe fn srf_first_call_init(
     pg_sys::init_MultiFuncCall(fcinfo)
 }
 
+#[cfg(not(feature = "pgrust"))]
 #[inline]
 #[deprecated(since = "0.12.0", note = "you want pg_sys::per_MultiFuncCall")]
 pub unsafe fn srf_per_call_setup(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
     pg_sys::per_MultiFuncCall(fcinfo)
 }
 
+#[cfg(not(feature = "pgrust"))]
 #[inline]
 pub unsafe fn srf_return_next(
     fcinfo: pg_sys::FunctionCallInfo,
@@ -400,6 +409,7 @@ pub unsafe fn srf_return_next(
         pg_sys::ExprDoneCond::ExprMultipleResult;
 }
 
+#[cfg(not(feature = "pgrust"))]
 #[inline]
 pub unsafe fn srf_return_done(
     fcinfo: pg_sys::FunctionCallInfo,

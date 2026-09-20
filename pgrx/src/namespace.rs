@@ -20,7 +20,8 @@ pub struct PgQualifiedNameBuilder {
         feature = "pg16",
         feature = "pg17",
         feature = "pg18",
-        feature = "pg19"
+        feature = "pg19",
+        feature = "pgrust"
     ))]
     list: PgList<pg_sys::String>,
     #[cfg(not(any(
@@ -28,7 +29,8 @@ pub struct PgQualifiedNameBuilder {
         feature = "pg16",
         feature = "pg17",
         feature = "pg18",
-        feature = "pg19"
+        feature = "pg19",
+        feature = "pgrust"
     )))]
     list: PgList<pg_sys::Value>,
 }
@@ -47,7 +49,8 @@ impl PgQualifiedNameBuilder {
                 feature = "pg16",
                 feature = "pg17",
                 feature = "pg18",
-                feature = "pg19"
+                feature = "pg19",
+                feature = "pgrust"
             ))]
             list: PgList::<pg_sys::String>::new(),
             #[cfg(not(any(
@@ -55,7 +58,8 @@ impl PgQualifiedNameBuilder {
                 feature = "pg16",
                 feature = "pg17",
                 feature = "pg18",
-                feature = "pg19"
+                feature = "pg19",
+                feature = "pgrust"
             )))]
             list: PgList::<pg_sys::Value>::new(),
         }

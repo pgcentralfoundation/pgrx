@@ -40,45 +40,61 @@ pub mod prelude;
 
 pub mod aggregate;
 pub mod array;
+#[cfg(not(feature = "pgrust"))]
 pub mod atomics;
+#[cfg(not(feature = "pgrust"))]
 pub mod bgworkers;
+#[cfg(not(feature = "pgrust"))]
 pub mod callbacks;
 pub mod callconv;
 pub mod datetime;
 pub mod datum;
+#[cfg(not(feature = "pgrust"))]
 pub mod enum_helper;
 pub mod fcinfo;
 pub mod ffi;
+#[cfg(not(feature = "pgrust"))]
 pub mod fn_call;
 pub mod guc;
 pub mod heap_tuple;
+#[cfg(not(feature = "pgrust"))]
 pub mod htup;
+#[cfg(feature = "pgrust")]
+mod htup_pgrust;
 pub mod inoutfuncs;
 pub mod itemptr;
 pub mod iter;
 pub mod layout;
+#[cfg(not(feature = "pgrust"))]
 pub mod list;
+#[cfg(not(feature = "pgrust"))]
 pub mod lwlock;
 pub mod memcx;
 pub mod memcxt;
 pub mod misc;
 #[cfg(feature = "cshim")]
 pub mod namespace;
+#[cfg(not(feature = "pgrust"))]
 pub mod nodes;
 pub mod nullable;
 pub mod palloc;
+#[cfg(not(feature = "pgrust"))]
 pub mod pg_catalog;
 pub mod pgbox;
+#[cfg(not(feature = "pgrust"))]
 pub mod rel;
+#[cfg(not(feature = "pgrust"))]
 pub mod shmem;
 pub mod spi;
 #[cfg(feature = "cshim")]
 pub mod spinlock;
 pub mod stringinfo;
+#[cfg(not(feature = "pgrust"))]
 pub mod trigger_support;
 pub mod tupdesc;
 pub mod varlena;
 pub mod wrappers;
+#[cfg(not(feature = "pgrust"))]
 pub mod xid;
 
 /// Not ready for public exposure.
@@ -87,33 +103,45 @@ mod slice;
 mod toast;
 
 pub use aggregate::*;
+#[cfg(not(feature = "pgrust"))]
 pub use atomics::*;
+#[cfg(not(feature = "pgrust"))]
 pub use callbacks::*;
 pub use datum::{
     AnyArray, AnyElement, AnyNumeric, Array, FromDatum, Inet, Internal, IntoDatum, Json, JsonB,
     Numeric, Range, Uuid, VariadicArray, geo, numeric,
 };
+#[cfg(not(feature = "pgrust"))]
 pub use enum_helper::*;
 pub use fcinfo::*;
 pub use guc::*;
+#[cfg(not(feature = "pgrust"))]
 pub use htup::*;
+#[cfg(feature = "pgrust")]
+pub use htup_pgrust::*;
 pub use inoutfuncs::*;
 #[cfg(feature = "cshim")]
 pub use list::old_list::*;
+#[cfg(not(feature = "pgrust"))]
 pub use lwlock::*;
 pub use memcxt::*;
 #[cfg(feature = "cshim")]
 pub use namespace::*;
+#[cfg(not(feature = "pgrust"))]
 pub use nodes::*;
 pub use pgbox::*;
+#[cfg(not(feature = "pgrust"))]
 pub use rel::*;
+#[cfg(not(feature = "pgrust"))]
 pub use shmem::*;
 pub use spi::Spi; // only Spi.  We don't want the top-level namespace polluted with spi::Result and spi::Error
 pub use stringinfo::*;
+#[cfg(not(feature = "pgrust"))]
 pub use trigger_support::*;
 pub use tupdesc::*;
 pub use varlena::*;
 pub use wrappers::*;
+#[cfg(not(feature = "pgrust"))]
 pub use xid::*;
 
 pub mod pg_sys;
@@ -157,25 +185,25 @@ pub mod pg_magic_func_support {
             feature = "pg16",
             feature = "pg17",
             feature = "pg18",
-            feature = "pg19"
+            feature = "pg19", feature = "pgrust"
         ))]
         let abi_extra = abi_extra();
 
         pg_sys::Pg_magic_struct {
             len,
-            #[cfg(not(any(feature = "pg18", feature = "pg19")))]
+            #[cfg(not(any(feature = "pg18", feature = "pg19", feature = "pgrust", feature = "pgrust")))]
             version,
-            #[cfg(not(any(feature = "pg18", feature = "pg19")))]
+            #[cfg(not(any(feature = "pg18", feature = "pg19", feature = "pgrust", feature = "pgrust")))]
             funcmaxargs,
-            #[cfg(not(any(feature = "pg18", feature = "pg19")))]
+            #[cfg(not(any(feature = "pg18", feature = "pg19", feature = "pgrust", feature = "pgrust")))]
             indexmaxkeys,
-            #[cfg(not(any(feature = "pg18", feature = "pg19")))]
+            #[cfg(not(any(feature = "pg18", feature = "pg19", feature = "pgrust", feature = "pgrust")))]
             namedatalen,
-            #[cfg(not(any(feature = "pg18", feature = "pg19")))]
+            #[cfg(not(any(feature = "pg18", feature = "pg19", feature = "pgrust", feature = "pgrust")))]
             float8byval,
             #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
             abi_extra,
-            #[cfg(any(feature = "pg18", feature = "pg19"))]
+            #[cfg(any(feature = "pg18", feature = "pg19", feature = "pgrust", feature = "pgrust"))]
             abi_fields: pg_sys::Pg_abi_values {
                 version,
                 funcmaxargs,
@@ -184,9 +212,9 @@ pub mod pg_magic_func_support {
                 float8byval,
                 abi_extra,
             },
-            #[cfg(any(feature = "pg18", feature = "pg19"))]
+            #[cfg(any(feature = "pg18", feature = "pg19", feature = "pgrust", feature = "pgrust"))]
             name: ::core::ptr::null(),
-            #[cfg(any(feature = "pg18", feature = "pg19"))]
+            #[cfg(any(feature = "pg18", feature = "pg19", feature = "pgrust", feature = "pgrust"))]
             version: ::core::ptr::null(),
         }
     }
@@ -196,7 +224,7 @@ pub mod pg_magic_func_support {
         feature = "pg16",
         feature = "pg17",
         feature = "pg18",
-        feature = "pg19"
+        feature = "pg19", feature = "pgrust"
     ))]
     const fn abi_extra() -> [::core::ffi::c_char; 32] {
         // We'll use what the bindings tell us, but if it ain't "PostgreSQL" then we'll
@@ -216,7 +244,7 @@ pub mod pg_magic_func_support {
         mut magic: pg_sys::Pg_magic_struct,
         name: &'static CStr,
     ) -> pg_sys::Pg_magic_struct {
-        #[cfg(any(feature = "pg18", feature = "pg19"))]
+        #[cfg(any(feature = "pg18", feature = "pg19", feature = "pgrust", feature = "pgrust"))]
         {
             magic.name = CStr::as_ptr(name);
         }
@@ -228,7 +256,7 @@ pub mod pg_magic_func_support {
         mut magic: pg_sys::Pg_magic_struct,
         version: &'static CStr,
     ) -> pg_sys::Pg_magic_struct {
-        #[cfg(any(feature = "pg18", feature = "pg19"))]
+        #[cfg(any(feature = "pg18", feature = "pg19", feature = "pgrust", feature = "pgrust"))]
         {
             magic.version = CStr::as_ptr(version);
         }
@@ -242,7 +270,7 @@ pub mod pg_magic_func_support {
 //
 // Unless the compiling user explicitly told us that they're aware of this via `--features unsafe-postgres`.
 #[cfg(all(
-    any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"),
+    any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19", feature = "pgrust", feature = "pgrust"),
     not(feature = "unsafe-postgres")
 ))]
 const _: () = {
@@ -316,6 +344,48 @@ macro_rules! pg_module_magic {
 /// [Benjamin Fry]: https://github.com/bluejekyll/pg-extend-rs
 /// [Daniel Fagnan]: https://github.com/thehydroimpulse/postgres-extension.rs
 /// [Dynamic Loading]: https://www.postgresql.org/docs/current/xfunc-c.html#XFUNC-C-DYNLOAD
+/// pgrust: no `Pg_magic_func` (nothing dlopens the crate). Instead the
+/// crate declares its extension (name, version, control file) and an
+/// `init_seams()` the server calls at startup to register the crate's
+/// wrappers with `dfmgr` and its generated SQL as an embedded extension.
+#[cfg(feature = "pgrust")]
+#[macro_export]
+macro_rules! pg_magic_func {
+    ($($key:ident $(= $value: expr)?),*) => {
+        ::pgrx::pgrx_sql_entity_graph::__pgrx_schema_entry!(
+            __PGRX_SCHEMA_SECTION_SENTINEL,
+            ::pgrx::pgrx_sql_entity_graph::section::SECTION_SENTINEL_ENTRY_LEN,
+            ::pgrx::pgrx_sql_entity_graph::section::schema_section_sentinel_entry()
+        );
+
+        #[doc(hidden)]
+        pub static __PGRX_EXTENSION: ::pgrx::pg_sys::pgrust::ExtensionDesc =
+            ::pgrx::pg_sys::pgrust::ExtensionDesc {
+                krate: env!("CARGO_PKG_NAME"),
+                name: env!("CARGO_PKG_NAME"),
+                version: env!("CARGO_PKG_VERSION"),
+                control: include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/", env!("CARGO_PKG_NAME"), ".control")),
+                pg_init: Some(__pgrx_pg_init),
+            };
+
+        #[doc(hidden)]
+        fn __pgrx_pg_init() -> ::pgrx::pg_sys::pgrust::NativeUnitResult {
+            ::pgrx::pg_sys::pgrust::run_pg_init(env!("CARGO_PKG_NAME"))
+        }
+
+        #[doc(hidden)]
+        fn __pgrx_lookup(symbol: &str) -> ::core::option::Option<::pgrx::pg_sys::pgrust::NativePGFunction> {
+            ::pgrx::pg_sys::pgrust::lookup_in(env!("CARGO_PKG_NAME"), symbol)
+        }
+
+        /// Register this extension with the pgrust server (called from seams_init).
+        pub fn init_seams() {
+            ::pgrx::pg_sys::pgrust::register_extension(&__PGRX_EXTENSION, __pgrx_lookup)
+        }
+    };
+}
+
+#[cfg(not(feature = "pgrust"))]
 #[macro_export]
 macro_rules! pg_magic_func {
     ($($key:ident $(= $value: expr)?),*) => {

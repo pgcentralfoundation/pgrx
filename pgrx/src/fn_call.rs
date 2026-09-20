@@ -405,7 +405,8 @@ fn lookup_fn(fname: &str, args: &[&dyn FnCallArg]) -> Result<pg_sys::Oid> {
                     feature = "pg16",
                     feature = "pg17",
                     feature = "pg18",
-                    feature = "pg19"
+                    feature = "pg19",
+                    feature = "pgrust"
                 ))]
                 {
                     let s = s.cast::<pg_sys::String>();

@@ -33,6 +33,45 @@ pg17 = []
 pg18 = []
 pg19 = []
 cshim = []
+# The pgrust target (docs/pgrust/pgrx-target.md): pgrx over pgrust, an
+# in-process Rust reimplementation of the Postgres backend, instead of the C
+# ABI. src/pgrust/ is the backend module; the host crates are path deps into
+# the pgrust tree (crates/pgrx/pgrx-pg-sys lives there), so this feature
+# resolves only inside that tree.
+pgrust = [
+    "pgrx-sql-entity-graph/pgrust",
+    "dep:linkme",
+    "dep:allocator-api2",
+    "dep:pgr_datum",
+    "dep:pgr_mcx",
+    "dep:pgr_fmgr",
+    "dep:pgr_types_error",
+    "dep:pgr_types_core",
+    "dep:pgr_types_tuple",
+    "dep:pgr_elog",
+    "dep:pgr_varlena",
+    "dep:pgr_detoast",
+    "dep:pgr_arrayfuncs",
+    "dep:pgr_lsyscache",
+    "dep:pgr_fmgr_core",
+    "dep:pgr_funcapi",
+    "dep:pgr_dfmgr",
+    "dep:pgr_format_type",
+    "dep:pgr_coerce",
+    "dep:pgr_init_small",
+    "dep:pgr_postgres_seams",
+    "dep:pgr_mbutils",
+    "dep:pgr_xact",
+    "dep:pgr_adt_timestamp",
+    "dep:pgr_spi",
+    "dep:pgr_adt_quote",
+    "dep:pgr_ruleutils",
+    "dep:pgr_heaptuple",
+    "dep:pgr_tupdesc",
+    "dep:pgr_typcache",
+    "dep:pgr_guc",
+    "dep:pgr_types_guc",
+]
 
 [package.metadata.docs.rs]
 features = ["pg14", "cshim"]
@@ -46,6 +85,39 @@ pgrx-sql-entity-graph.workspace = true
 libc.workspace = true
 
 serde.workspace = true # impls on pub types
+
+# pgrust target (feature `pgrust`); the pgr_* paths are the pgrust tree's
+linkme = { version = "0.3", optional = true }
+allocator-api2 = { version = "0.2", default-features = false, optional = true }
+pgr_datum = { package = "datum", path = "../../_support/types/datum", optional = true }
+pgr_mcx = { package = "mcx", path = "../../_support/mcx", optional = true }
+pgr_fmgr = { package = "types_fmgr", path = "../../_support/types/fmgr", optional = true }
+pgr_types_error = { package = "types_error", path = "../../_support/types/types_error", optional = true }
+pgr_types_core = { package = "types_core", path = "../../_support/types/types_core", optional = true }
+pgr_types_tuple = { package = "types_tuple", path = "../../_support/types/types_tuple", optional = true }
+pgr_elog = { package = "elog", path = "../../backend/utils/error/elog", optional = true }
+pgr_varlena = { package = "varlena", path = "../../backend/utils/adt/varlena", optional = true }
+pgr_detoast = { package = "detoast", path = "../../backend/access/common/detoast", optional = true }
+pgr_arrayfuncs = { package = "arrayfuncs", path = "../../backend/utils/adt/arrayfuncs", optional = true }
+pgr_lsyscache = { package = "lsyscache", path = "../../backend/utils/cache/lsyscache", optional = true }
+pgr_fmgr_core = { package = "fmgr_core", path = "../../backend/utils/fmgr/fmgr_core", optional = true }
+pgr_funcapi = { package = "funcapi", path = "../../backend/utils/fmgr/funcapi", optional = true }
+pgr_dfmgr = { package = "dfmgr", path = "../../backend/utils/fmgr/dfmgr", optional = true }
+pgr_format_type = { package = "format_type", path = "../../backend/utils/adt/format_type", optional = true }
+pgr_coerce = { package = "coerce", path = "../../backend/parser/coerce", optional = true }
+pgr_init_small = { package = "init_small", path = "../../backend/utils/init/init_small", optional = true }
+pgr_postgres_seams = { package = "postgres_seams", path = "../../backend/tcop/postgres_seams", optional = true }
+pgr_mbutils = { package = "mbutils", path = "../../backend/utils/mb/mbutils", optional = true }
+pgr_xact = { package = "xact", path = "../../backend/access/transam/xact", optional = true }
+pgr_adt_timestamp = { package = "adt_timestamp", path = "../../backend/utils/adt/adt_timestamp", optional = true }
+pgr_spi = { package = "spi", path = "../../backend/executor/spi", optional = true }
+pgr_adt_quote = { package = "adt_quote", path = "../../backend/utils/adt/quote", optional = true }
+pgr_ruleutils = { package = "ruleutils", path = "../../backend/utils/adt/ruleutils", optional = true }
+pgr_heaptuple = { package = "heaptuple", path = "../../backend/access/common/heaptuple", optional = true }
+pgr_tupdesc = { package = "tupdesc", path = "../../backend/access/common/tupdesc", optional = true }
+pgr_typcache = { package = "typcache", path = "../../backend/utils/cache/typcache", optional = true }
+pgr_guc = { package = "guc", path = "../../backend/utils/misc/guc", optional = true }
+pgr_types_guc = { package = "types_guc", path = "../../_support/types/types_guc", optional = true }
 
 [target.'cfg(all(any(target_os = "linux", target_os = "macos"), any(target_arch = "x86_64", target_arch = "aarch64")))'.dependencies]
 # Safer `sigsetjmp` and `siglongjmp`

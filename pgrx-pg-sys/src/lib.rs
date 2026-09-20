@@ -11,18 +11,28 @@
 
 #[cfg(
     // no features at all will cause problems
-    not(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))
+    not(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19", feature = "pgrust"))
 )]
 std::compile_error!(
     "exactly one feature must be provided (pg13, pg14, pg15, pg16, pg17, pg18, pg19)"
 );
 
+#[cfg(not(feature = "pgrust"))]
 mod cshim;
 mod cstr;
+#[cfg(not(feature = "pgrust"))]
 mod include;
 mod node;
+#[cfg(not(feature = "pgrust"))]
 mod port;
+#[cfg(feature = "pgrust")]
+pub mod pgrust;
+#[cfg(feature = "pgrust")]
+pub use pgrust::*;
+#[cfg(feature = "pgrust")]
+pub use pgrust::oids_table::BuiltinOid;
 
+#[cfg(not(feature = "pgrust"))]
 pub mod libpq;
 pub mod submodules;
 
@@ -32,8 +42,10 @@ pub mod submodules;
 pub use cshim::*;
 
 pub use cstr::AsPgCStr;
+#[cfg(not(feature = "pgrust"))]
 pub use include::*;
 pub use node::PgNode;
+#[cfg(not(feature = "pgrust"))]
 pub use port::*;
 
 // For postgres 18+, some functions will reexport when enabling `cshim` feature

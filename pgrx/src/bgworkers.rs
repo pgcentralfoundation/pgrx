@@ -78,7 +78,8 @@ impl BackgroundWorker {
             feature = "pg16",
             feature = "pg17",
             feature = "pg18",
-            feature = "pg19"
+            feature = "pg19",
+            feature = "pgrust"
         ))]
         const LEN: usize = 96;
 
@@ -222,7 +223,8 @@ impl BackgroundWorker {
                 feature = "pg16",
                 feature = "pg17",
                 feature = "pg18",
-                feature = "pg19"
+                feature = "pg19",
+                feature = "pgrust"
             ))]
             pg_sys::BackgroundWorkerInitializeConnection(db, user, 0);
         };
@@ -249,7 +251,8 @@ impl BackgroundWorker {
                 feature = "pg16",
                 feature = "pg17",
                 feature = "pg18",
-                feature = "pg19"
+                feature = "pg19",
+                feature = "pgrust"
             ))]
             pg_sys::BackgroundWorkerInitializeConnectionByOid(dboid, useroid, 0);
         };
@@ -279,7 +282,7 @@ impl BackgroundWorker {
                     feature = "pg17"
                 ))]
                 pg_sys::pqsignal(pg_sys::SIGHUP as i32, Some(worker_spi_sighup));
-                #[cfg(any(feature = "pg18", feature = "pg19"))]
+                #[cfg(any(feature = "pg18", feature = "pg19", feature = "pgrust"))]
                 pg_sys::pqsignal_be(pg_sys::SIGHUP as i32, Some(worker_spi_sighup));
             }
             if wake.contains(SignalWakeFlags::SIGTERM) {
@@ -291,7 +294,7 @@ impl BackgroundWorker {
                     feature = "pg17"
                 ))]
                 pg_sys::pqsignal(pg_sys::SIGTERM as i32, Some(worker_spi_sigterm));
-                #[cfg(any(feature = "pg18", feature = "pg19"))]
+                #[cfg(any(feature = "pg18", feature = "pg19", feature = "pgrust"))]
                 pg_sys::pqsignal_be(pg_sys::SIGTERM as i32, Some(worker_spi_sigterm));
             }
             if wake.contains(SignalWakeFlags::SIGINT) {
@@ -303,7 +306,7 @@ impl BackgroundWorker {
                     feature = "pg17"
                 ))]
                 pg_sys::pqsignal(pg_sys::SIGINT as i32, Some(worker_spi_sigint));
-                #[cfg(any(feature = "pg18", feature = "pg19"))]
+                #[cfg(any(feature = "pg18", feature = "pg19", feature = "pgrust"))]
                 pg_sys::pqsignal_be(pg_sys::SIGINT as i32, Some(worker_spi_sigint));
             }
             if wake.contains(SignalWakeFlags::SIGCHLD) {
@@ -315,7 +318,7 @@ impl BackgroundWorker {
                     feature = "pg17"
                 ))]
                 pg_sys::pqsignal(pg_sys::SIGCHLD as i32, Some(worker_spi_sigchld));
-                #[cfg(any(feature = "pg18", feature = "pg19"))]
+                #[cfg(any(feature = "pg18", feature = "pg19", feature = "pgrust"))]
                 pg_sys::pqsignal_be(pg_sys::SIGCHLD as i32, Some(worker_spi_sigchld));
             }
             pg_sys::BackgroundWorkerUnblockSignals();
@@ -745,12 +748,12 @@ impl<'a> From<&'a BackgroundWorkerBuilder> for pg_sys::BackgroundWorker {
                 Some(d) => d.as_secs() as i32,
             },
             bgw_library_name: {
-                #[cfg(not(any(feature = "pg17", feature = "pg18", feature = "pg19")))]
+                #[cfg(not(any(feature = "pg17", feature = "pg18", feature = "pg19", feature = "pgrust")))]
                 {
                     RpgffiChar::from(&builder.bgw_library_name[..]).0
                 }
 
-                #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+                #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19", feature = "pgrust"))]
                 {
                     RpgffiChar1024::from(&builder.bgw_library_name[..]).0
                 }
@@ -785,7 +788,8 @@ fn wait_latch(timeout: libc::c_long, wakeup_flags: WLflags) -> i32 {
     feature = "pg16",
     feature = "pg17",
     feature = "pg18",
-    feature = "pg19"
+    feature = "pg19",
+    feature = "pgrust"
 ))]
 type RpgffiChar = RpgffiChar96;
 

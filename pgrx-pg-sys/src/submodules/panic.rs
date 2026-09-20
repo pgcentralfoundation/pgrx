@@ -22,6 +22,7 @@ use std::panic::{
 
 use crate::elog::PgLogLevel;
 use crate::errcodes::PgSqlErrorCode;
+#[cfg(not(feature = "pgrust"))]
 use crate::{AsPgCStr, MemoryContextSwitchTo, pfree};
 
 /// Indicates that something can be reported as a Postgres ERROR, if that's what it might represent.
@@ -129,6 +130,10 @@ pub struct ErrorReport {
     pub(crate) detail: Option<String>,
     pub(crate) domain: Option<String>,
     pub(crate) location: ErrorReportLocation,
+    /// pgrust: the original backend error this report was made from, kept so
+    /// it can be returned unchanged at the function boundary.
+    #[cfg(feature = "pgrust")]
+    pub(crate) pgrust: Option<Box<::pgr_types_error::PgError>>,
 }
 
 impl Display for ErrorReport {
@@ -261,6 +266,8 @@ impl ErrorReport {
             detail: None,
             domain: None,
             location,
+            #[cfg(feature = "pgrust")]
+            pgrust: None,
         }
     }
 
@@ -280,6 +287,8 @@ impl ErrorReport {
             detail: None,
             domain: None,
             location,
+            #[cfg(feature = "pgrust")]
+            pgrust: None,
         }
     }
 
@@ -339,6 +348,13 @@ fn take_panic_location() -> ErrorReportLocation {
     PANIC_LOCATION.with(|p| p.take().unwrap_or_default())
 }
 
+#[cfg(feature = "pgrust")]
+pub fn register_pg_guard_panic_hook() {
+    // pgrust owns the process-wide panic hook; installing pgrx's would silence
+    // the backend's own panic reports. Panic locations are simply not captured.
+}
+
+#[cfg(not(feature = "pgrust"))]
 pub fn register_pg_guard_panic_hook() {
     use super::thread_check::is_os_main_thread;
 
@@ -387,6 +403,7 @@ impl CaughtError {
     }
 }
 
+#[cfg(not(feature = "pgrust"))]
 #[derive(Debug)]
 enum GuardAction<R> {
     Return(R),
@@ -426,6 +443,17 @@ enum GuardAction<R> {
 #[doc(hidden)]
 // FIXME: previously, R was bounded on Copy, but this prevents using move-only POD types
 // what we really want is a bound of R: !Drop, but negative bounds don't exist yet
+#[cfg(feature = "pgrust")]
+pub unsafe fn pgrx_extern_c_guard<Func, R>(f: Func) -> R
+where
+    Func: FnOnce() -> R,
+{
+    // Under pgrust the single catch point is `pgrust::call_v1`, which turns
+    // the panic payload into the call's `Err`; nothing to do here.
+    f()
+}
+
+#[cfg(not(feature = "pgrust"))]
 pub unsafe fn pgrx_extern_c_guard<Func, R>(f: Func) -> R
 where
     Func: FnOnce() -> R,
@@ -450,6 +478,7 @@ where
 }
 
 // SAFETY: similar constraints as pgrx_extern_c_guard
+#[cfg(not(feature = "pgrust"))]
 #[inline(never)]
 unsafe fn run_guarded<F, R>(f: F) -> GuardAction<R>
 where
@@ -472,6 +501,12 @@ where
 
 /// convert types of `e` that we understand/expect into the representative [CaughtError]
 pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
+    #[cfg(feature = "pgrust")]
+    if e.downcast_ref::<crate::pgrust::PgrustError>().is_some() {
+        // a pgrust-backed shim raised a backend error
+        let err = e.downcast::<crate::pgrust::PgrustError>().unwrap().0;
+        return CaughtError::PostgresError(crate::pgrust::error::report_from_pg_error(err));
+    }
     if e.downcast_ref::<CaughtError>().is_some() {
         // caught a previously caught CaughtError that is being rethrown
         let mut caught = *e.downcast::<CaughtError>().unwrap();
@@ -547,6 +582,12 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
 /// We localize the definition of the various `err*()` functions involved in reporting a Postgres
 /// error (and purposely exclude them from `build.rs`) to ensure users can't get into trouble
 /// trying to roll their own error handling.
+#[cfg(feature = "pgrust")]
+fn do_ereport(ereport: ErrorReportWithLevel) {
+    crate::pgrust::error::do_ereport(ereport)
+}
+
+#[cfg(not(feature = "pgrust"))]
 fn do_ereport(ereport: ErrorReportWithLevel) {
     const PERCENT_S: &CStr = c"%s";
     const DEFAULT_DOMAIN: *const ::std::os::raw::c_char = std::ptr::null_mut();

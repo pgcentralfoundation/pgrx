@@ -141,6 +141,7 @@ impl<'a> PgTupleDesc<'a> {
         }
     }
 
+    #[cfg(not(feature = "pgrust"))]
     /// wrap the `pg_sys::TupleDesc` contained by the specified `PgRelation`
     pub fn from_relation(parent: &PgRelation) -> PgTupleDesc<'_> {
         PgTupleDesc {
@@ -300,7 +301,7 @@ fn tupdesc_get_attr(
 }
 
 /// `attno` is 0-based
-#[cfg(any(feature = "pg18", feature = "pg19"))]
+#[cfg(any(feature = "pg18", feature = "pg19", feature = "pgrust"))]
 #[inline]
 fn tupdesc_get_attr(
     tupdesc: &PgBox<pg_sys::TupleDescData>,

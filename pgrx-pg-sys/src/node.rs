@@ -67,6 +67,11 @@ pub trait PgNode: crate::seal::Sealed + Sized {
 /// # Safety
 /// Don't use this on anything that doesn't impl PgNode, or the type may be off
 #[warn(unsafe_op_in_unsafe_fn)]
+#[cfg(feature = "pgrust")]
+pub(crate) unsafe fn display_node_impl(_node: NonNull<crate::Node>) -> String {
+    String::from("<node display is not available under pgrust>")
+}
+#[cfg(not(feature = "pgrust"))]
 pub(crate) unsafe fn display_node_impl(node: NonNull<crate::Node>) -> String {
     // SAFETY: It's fine to call nodeToString with non-null well-typed pointers,
     // and pg_sys::nodeToString() returns data via palloc, which is never null

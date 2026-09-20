@@ -97,7 +97,7 @@ bitflags! {
         const UNIT_MIN = pg_sys::GUC_UNIT_MIN as i32;
         /// Include in `EXPLAIN` output
         const EXPLAIN = pg_sys::GUC_EXPLAIN as i32;
-        #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+        #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19", feature = "pgrust"))]
         /// `RUNTIME_COMPUTED` is intended for runtime-computed GUCs that are only available via
         /// `postgres -C` if the server is not running
         const RUNTIME_COMPUTED = pg_sys::GUC_RUNTIME_COMPUTED as i32;
@@ -140,6 +140,7 @@ impl GucCheckError {
     /// # Safety
     ///
     /// This should only be called from within a GUC `check_hook`.
+    #[cfg(not(feature = "pgrust"))]
     pub unsafe fn apply(self) {
         if let Some(errcode) = self.errcode {
             unsafe { pg_sys::GUC_check_errcode(errcode) }
@@ -153,6 +154,17 @@ impl GucCheckError {
         if let Some(hint) = self.hint {
             unsafe { pg_sys::GUC_check_errhint_string = hint.into_pg() }
         }
+    }
+
+    /// pgrust: check hooks are not supported yet, so there is no GUC check
+    /// error state to fill in.
+    ///
+    /// # Safety
+    ///
+    /// This should only be called from within a GUC `check_hook`.
+    #[cfg(feature = "pgrust")]
+    pub unsafe fn apply(self) {
+        let _ = (self.errcode, self.message, self.detail, self.hint);
     }
 }
 
@@ -179,6 +191,10 @@ pub unsafe trait GucValue {
     unsafe fn from_raw(raw: Self::Raw) -> Self;
     unsafe fn from_raw_const(raw: Self::RawConst) -> Self;
     type BootVal: Copy + Send + Sync;
+    /// pgrust: the current value from the GUC store, keyed by the setting's
+    /// address (registered at define time); `None` when not defined yet.
+    #[cfg(feature = "pgrust")]
+    fn pgrust_read(key: usize) -> Option<Self::Raw>;
 }
 
 /// A safe wrapper around a global variable that can be edited through a GUC
@@ -191,7 +207,12 @@ unsafe impl<T: GucValue> Sync for GucSetting<T> {}
 
 impl<T: GucValue> GucSetting<T> {
     pub fn get(&self) -> T {
+        #[cfg(not(feature = "pgrust"))]
         pg_sys::submodules::thread_check::check_active_thread();
+        #[cfg(feature = "pgrust")]
+        if let Some(raw) = T::pgrust_read(self.value.as_ptr() as usize) {
+            return unsafe { GucValue::from_raw(raw) };
+        }
         unsafe { GucValue::from_raw(self.value.get()) }
     }
 
@@ -210,6 +231,10 @@ unsafe impl GucValue for bool {
         raw
     }
     type BootVal = ();
+    #[cfg(feature = "pgrust")]
+    fn pgrust_read(key: usize) -> Option<Self::Raw> {
+        pg_sys::pgrust::guc_read_bool(key)
+    }
 }
 impl GucSetting<bool> {
     pub const fn new(value: bool) -> Self {
@@ -227,6 +252,10 @@ unsafe impl GucValue for i32 {
         raw
     }
     type BootVal = ();
+    #[cfg(feature = "pgrust")]
+    fn pgrust_read(key: usize) -> Option<Self::Raw> {
+        pg_sys::pgrust::guc_read_int(key)
+    }
 }
 impl GucSetting<i32> {
     pub const fn new(value: i32) -> Self {
@@ -244,6 +273,10 @@ unsafe impl GucValue for f64 {
         raw
     }
     type BootVal = ();
+    #[cfg(feature = "pgrust")]
+    fn pgrust_read(key: usize) -> Option<Self::Raw> {
+        pg_sys::pgrust::guc_read_real(key)
+    }
 }
 impl GucSetting<f64> {
     pub const fn new(value: f64) -> Self {
@@ -261,6 +294,10 @@ unsafe impl GucValue for Option<CString> {
         if raw.is_null() { None } else { Some(CStr::from_ptr(raw).to_owned()) }
     }
     type BootVal = ();
+    #[cfg(feature = "pgrust")]
+    fn pgrust_read(key: usize) -> Option<Self::Raw> {
+        pg_sys::pgrust::guc_read_string(key)
+    }
 }
 impl GucSetting<Option<CString>> {
     pub const fn new(value: Option<&'static CStr>) -> Self {
@@ -285,6 +322,10 @@ unsafe impl<T: GucEnum> GucValue for T {
         T::from_ordinal(raw)
     }
     type BootVal = T;
+    #[cfg(feature = "pgrust")]
+    fn pgrust_read(key: usize) -> Option<Self::Raw> {
+        pg_sys::pgrust::guc_read_enum(key)
+    }
 }
 impl<T: GucEnum> GucSetting<T> {
     pub const fn new(value: T) -> Self {

@@ -40,6 +40,7 @@ pub use crate::{
 };
 
 // Trigger support
+#[cfg(not(feature = "pgrust"))]
 pub use crate::trigger_support::{
     PgTrigger, PgTriggerError, PgTriggerLevel, PgTriggerOperation, PgTriggerWhen,
 };

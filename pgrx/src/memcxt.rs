@@ -171,6 +171,32 @@ pub enum PgMemoryContexts {
     },
 }
 
+/// C's `CurrentMemoryContext` read.
+#[inline]
+pub(crate) fn current_memory_context_ptr() -> pg_sys::MemoryContext {
+    #[cfg(feature = "pgrust")]
+    {
+        pg_sys::current_memory_context()
+    }
+    #[cfg(not(feature = "pgrust"))]
+    unsafe {
+        pg_sys::CurrentMemoryContext
+    }
+}
+
+/// C's `CurrentMemoryContext = ctx`.
+#[inline]
+pub(crate) unsafe fn set_current_memory_context_ptr(ctx: pg_sys::MemoryContext) {
+    #[cfg(feature = "pgrust")]
+    {
+        pg_sys::set_current_memory_context(ctx)
+    }
+    #[cfg(not(feature = "pgrust"))]
+    unsafe {
+        pg_sys::CurrentMemoryContext = ctx
+    }
+}
+
 /// A `pg_sys::MemoryContext` that is owned by `PgMemoryContexts::Owned`
 #[derive(Debug)]
 pub struct OwnedMemoryContext {
@@ -183,8 +209,8 @@ impl Drop for OwnedMemoryContext {
         unsafe {
             // In order to prevent crashes, if we're trying to drop
             // a context that is current, switch to its predecessor, and then drop it
-            if ptr::eq(pg_sys::CurrentMemoryContext, self.owned) {
-                pg_sys::CurrentMemoryContext = self.previous;
+            if ptr::eq(current_memory_context_ptr(), self.owned) {
+                set_current_memory_context_ptr(self.previous);
             }
             pg_sys::MemoryContextDelete(self.owned);
         }
@@ -247,14 +273,38 @@ impl PgMemoryContexts {
     /// This works for every type except the `::Transient` type.
     pub fn value(&self) -> pg_sys::MemoryContext {
         match self {
-            PgMemoryContexts::CurrentMemoryContext => unsafe { pg_sys::CurrentMemoryContext },
+            PgMemoryContexts::CurrentMemoryContext => current_memory_context_ptr(),
+            #[cfg(feature = "pgrust")]
+            PgMemoryContexts::TopMemoryContext => pg_sys::top_memory_context(),
+            #[cfg(feature = "pgrust")]
+            PgMemoryContexts::PortalContext => pg_sys::portal_context(),
+            #[cfg(feature = "pgrust")]
+            PgMemoryContexts::ErrorContext => pg_sys::error_context(),
+            #[cfg(feature = "pgrust")]
+            PgMemoryContexts::PostmasterContext => pg_sys::postmaster_context(),
+            #[cfg(feature = "pgrust")]
+            PgMemoryContexts::CacheMemoryContext => pg_sys::cache_memory_context(),
+            #[cfg(feature = "pgrust")]
+            PgMemoryContexts::MessageContext => pg_sys::message_context(),
+            #[cfg(feature = "pgrust")]
+            PgMemoryContexts::TopTransactionContext => pg_sys::top_transaction_context(),
+            #[cfg(feature = "pgrust")]
+            PgMemoryContexts::CurTransactionContext => pg_sys::cur_transaction_context(),
+            #[cfg(not(feature = "pgrust"))]
             PgMemoryContexts::TopMemoryContext => unsafe { pg_sys::TopMemoryContext },
+            #[cfg(not(feature = "pgrust"))]
             PgMemoryContexts::PortalContext => unsafe { pg_sys::PortalContext },
+            #[cfg(not(feature = "pgrust"))]
             PgMemoryContexts::ErrorContext => unsafe { pg_sys::ErrorContext },
+            #[cfg(not(feature = "pgrust"))]
             PgMemoryContexts::PostmasterContext => unsafe { pg_sys::PostmasterContext },
+            #[cfg(not(feature = "pgrust"))]
             PgMemoryContexts::CacheMemoryContext => unsafe { pg_sys::CacheMemoryContext },
+            #[cfg(not(feature = "pgrust"))]
             PgMemoryContexts::MessageContext => unsafe { pg_sys::MessageContext },
+            #[cfg(not(feature = "pgrust"))]
             PgMemoryContexts::TopTransactionContext => unsafe { pg_sys::TopTransactionContext },
+            #[cfg(not(feature = "pgrust"))]
             PgMemoryContexts::CurTransactionContext => unsafe { pg_sys::CurTransactionContext },
             PgMemoryContexts::For(mc) => *mc,
             PgMemoryContexts::Owned(mc) => mc.owned,
@@ -267,7 +317,7 @@ impl PgMemoryContexts {
 
     /// Set this MemoryContext as the `CurrentMemoryContext, returning whatever `CurrentMemoryContext` is
     pub unsafe fn set_as_current(&mut self) -> PgMemoryContexts {
-        let old_context = pg_sys::CurrentMemoryContext;
+        let old_context = current_memory_context_ptr();
 
         if let PgMemoryContexts::Owned(mc) = self {
             // If the context is set as current while it's already current,
@@ -277,7 +327,7 @@ impl PgMemoryContexts {
             }
         }
 
-        pg_sys::CurrentMemoryContext = self.value();
+        set_current_memory_context_ptr(self.value());
 
         PgMemoryContexts::For(old_context)
     }
@@ -581,14 +631,14 @@ impl PgMemoryContexts {
 
         // mimic what palloc.h does for switching memory contexts
         unsafe {
-            prev_context = pg_sys::CurrentMemoryContext;
-            pg_sys::CurrentMemoryContext = context;
+            prev_context = current_memory_context_ptr();
+            set_current_memory_context_ptr(context);
         }
 
         let result = f(&mut PgMemoryContexts::For(context));
         // restore our understanding of the current memory context
         unsafe {
-            pg_sys::CurrentMemoryContext = prev_context;
+            set_current_memory_context_ptr(prev_context);
         }
 
         result

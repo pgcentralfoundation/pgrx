@@ -154,6 +154,12 @@ pub fn main() -> eyre::Result<()> {
         return Ok(());
     }
 
+    // The pgrust target has no C headers to bind: its backend module is
+    // hand-written over the host's crates (pgrx-pg-sys/src/pgrust/).
+    if env_tracked("CARGO_FEATURE_PGRUST").as_deref() == Some("1") {
+        return Ok(());
+    }
+
     // dump the environment for debugging if asked
     if env_tracked("PGRX_BUILD_VERBOSE").as_deref() == Some("true") {
         for (k, v) in std::env::vars() {

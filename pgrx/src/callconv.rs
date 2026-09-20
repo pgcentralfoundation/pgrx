@@ -23,6 +23,7 @@ use crate::layout::PassBy;
 use crate::nullable::Nullable;
 use crate::pg_sys;
 use crate::pgbox::*;
+#[cfg(not(feature = "pgrust"))]
 use crate::rel::PgRelation;
 use crate::{PgBox, PgMemoryContexts};
 
@@ -147,7 +148,7 @@ unsafe impl<'fcx> ArgAbi<'fcx> for PgHeapTuple<'fcx, AllocatedByRust> {
     unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         let index = arg.index();
         unsafe {
-            FromDatum::from_datum(arg.2.value, arg.is_null())
+            <Self as FromDatum>::from_datum(arg.2.value, arg.is_null())
                 .unwrap_or_else(|| panic!("argument {index} must not be null"))
         }
     }
@@ -255,7 +256,7 @@ macro_rules! argue_from_datum {
         $(unsafe impl<$lt> ArgAbi<$lt> for $unboxable {
             unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
                 let index = arg.index();
-                unsafe { arg.unbox_arg_using_from_datum().unwrap_or_else(|| panic!("argument {index} must not be null")) }
+                unsafe { arg.unbox_arg_using_from_datum::<Self>().unwrap_or_else(|| panic!("argument {index} must not be null")) }
             }
 
             unsafe fn unbox_nullable_arg(arg: Arg<'_, 'fcx>) -> Nullable<Self> {
@@ -268,7 +269,9 @@ macro_rules! argue_from_datum {
 argue_from_datum! { 'fcx; i8, i16, i32, i64, f32, f64, bool, char, String, Vec<u8> }
 argue_from_datum! { 'fcx; Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone }
 argue_from_datum! { 'fcx; AnyArray, AnyElement, AnyNumeric }
-argue_from_datum! { 'fcx; Inet, Internal, Json, JsonB, Uuid, PgRelation }
+argue_from_datum! { 'fcx; Inet, Internal, Json, JsonB, Uuid }
+#[cfg(not(feature = "pgrust"))]
+argue_from_datum! { 'fcx; PgRelation }
 argue_from_datum! { 'fcx; pg_sys::BOX, pg_sys::CIRCLE, pg_sys::LINE, pg_sys::LSEG, pg_sys::ItemPointerData, pg_sys::Oid, pg_sys::Point, pg_sys::TransactionId }
 argue_from_datum! { 'fcx; Path, Polygon }
 // We could use the upcoming impl of ArgAbi for `&'fcx T where T: ?Sized + BorrowDatum`
@@ -328,7 +331,7 @@ pub unsafe trait RetAbi: Sized {
     /// # Safety
     /// Requires a valid FunctionCallInfo.
     unsafe fn check_fcinfo_and_prepare(_fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
-        CallCx::WrappedFn(unsafe { pg_sys::CurrentMemoryContext })
+        CallCx::WrappedFn(crate::memcxt::current_memory_context_ptr())
     }
 
     fn check_and_prepare(fcinfo: &mut FcInfo<'_>) -> CallCx {
@@ -413,7 +416,7 @@ where
     }
 
     unsafe fn check_fcinfo_and_prepare(_fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
-        CallCx::WrappedFn(unsafe { pg_sys::CurrentMemoryContext })
+        CallCx::WrappedFn(crate::memcxt::current_memory_context_ptr())
     }
 
     unsafe fn fill_fcinfo_fcx(&self, _fcinfo: pg_sys::FunctionCallInfo) {}
@@ -455,10 +458,54 @@ where
     }
 }
 
+#[cfg(not(feature = "pgrust"))]
 unsafe impl<T, E> RetAbi for Result<T, E>
 where
     T: RetAbi,
     T::Item: RetAbi,
+    E: core::any::Any + core::fmt::Display,
+{
+    type Item = T::Item;
+    type Ret = T::Ret;
+
+    unsafe fn check_fcinfo_and_prepare(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+        unsafe { T::check_fcinfo_and_prepare(fcinfo) }
+    }
+
+    fn to_ret(self) -> Self::Ret {
+        let value = pg_sys::panic::ErrorReportable::unwrap_or_report(self);
+        value.to_ret()
+    }
+
+    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
+        unsafe { T::box_ret_in_fcinfo(fcinfo, ret) }
+    }
+
+    unsafe fn fill_fcinfo_fcx(&self, fcinfo: pg_sys::FunctionCallInfo) {
+        if let Ok(value) = self {
+            unsafe { value.fill_fcinfo_fcx(fcinfo) }
+        }
+    }
+
+    unsafe fn move_into_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
+        if let Ok(value) = self {
+            unsafe { value.move_into_fcinfo_fcx(fcinfo) }
+        }
+    }
+
+    unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Self::Ret {
+        unsafe { T::ret_from_fcinfo_fcx(fcinfo) }
+    }
+
+    unsafe fn finish_call_fcinfo(fcinfo: pg_sys::FunctionCallInfo) {
+        unsafe { T::finish_call_fcinfo(fcinfo) }
+    }
+}
+
+#[cfg(feature = "pgrust")]
+unsafe impl<T, E> RetAbi for Result<T, E>
+where
+    T: RetAbi,
     E: core::any::Any + core::fmt::Display,
 {
     type Item = T::Item;
@@ -774,6 +821,7 @@ impl<'fcx> FcInfo<'fcx> {
         unsafe { !(*(*self.0).flinfo).fn_extra.is_null() }
     }
 
+    #[cfg(not(feature = "pgrust"))]
     /// Thin wrapper around [`pg_sys::init_MultiFuncCall`], made necessary
     /// because this structure's FunctionCallInfo is a private field.
     ///
@@ -801,6 +849,7 @@ impl<'fcx> FcInfo<'fcx> {
         }
     }
 
+    #[cfg(not(feature = "pgrust"))]
     /// Safety: Assumes `self.0.flinfo.fn_extra` is non-null
     /// i.e. [`FcInfo::srf_is_initialized()`] would be `true`.
     #[inline]
@@ -811,6 +860,7 @@ impl<'fcx> FcInfo<'fcx> {
         }
     }
 
+    #[cfg(not(feature = "pgrust"))]
     /// Safety: Assumes `self.0.flinfo.fn_extra` is non-null
     /// i.e. [`FcInfo::srf_is_initialized()`] would be `true`.
     #[inline]

@@ -86,10 +86,32 @@ pub fn item_fn_without_rewrite(
     let func_name = func.sig.ident.clone();
     let func_name = format_ident!("{}", func_name);
 
+    #[cfg(not(feature = "pgrust"))]
     let prolog = if input_func_name == "_PG_init" || input_func_name == "_PG_fini" {
         quote! {
             #[allow(non_snake_case)]
             #[unsafe(no_mangle)]
+        }
+    } else {
+        quote! {}
+    };
+    // pgrust: nothing dlsyms `_PG_init`; the crate's registry entry runs it
+    // when the library is first loaded in a session.
+    #[cfg(feature = "pgrust")]
+    let prolog = if input_func_name == "_PG_init" {
+        let ident = &sig.ident;
+        quote! {
+            #[::pgrx::pg_sys::pgrust::linkme::distributed_slice(::pgrx::pg_sys::pgrust::PGRX_PG_INIT)]
+            #[linkme(crate = ::pgrx::pg_sys::pgrust::linkme)]
+            static __PGRX_PG_INIT: ::pgrx::pg_sys::pgrust::PgInitEntry = ::pgrx::pg_sys::pgrust::PgInitEntry {
+                krate: env!("CARGO_PKG_NAME"),
+                func: || unsafe { #ident() },
+            };
+            #[allow(non_snake_case)]
+        }
+    } else if input_func_name == "_PG_fini" {
+        quote! {
+            #[allow(non_snake_case)]
         }
     } else {
         quote! {}

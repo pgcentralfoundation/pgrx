@@ -10,10 +10,16 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 use core::{iter, ptr};
 
-use crate::callconv::{BoxRet, CallCx, RetAbi};
+#[cfg(not(feature = "pgrust"))]
+use crate::callconv::BoxRet;
+use crate::callconv::{CallCx, RetAbi};
+#[cfg(not(feature = "pgrust"))]
 use crate::fcinfo::{pg_return_null, srf_is_first_call, srf_return_done, srf_return_next};
+#[cfg(not(feature = "pgrust"))]
 use crate::ptr::PointerExt;
-use crate::{IntoDatum, IntoHeapTuple, PgMemoryContexts, pg_sys};
+#[cfg(not(feature = "pgrust"))]
+use crate::{IntoHeapTuple, PgMemoryContexts};
+use crate::{IntoDatum, pg_sys};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable, setof_return_sql,
     table_item_sql,
@@ -173,6 +179,7 @@ where
     };
 }
 
+#[cfg(not(feature = "pgrust"))]
 unsafe impl<T> RetAbi for SetOfIterator<'_, T>
 where
     T: BoxRet,
@@ -221,6 +228,7 @@ where
     }
 }
 
+#[cfg(not(feature = "pgrust"))]
 unsafe impl<Row> RetAbi for TableIterator<'_, Row>
 where
     Row: RetAbi,
@@ -300,15 +308,68 @@ where
 }
 
 /// How iterators are returned
+/// pgrust: a row of a `TableIterator` as its column datums.
+#[cfg(feature = "pgrust")]
+pub trait IntoDatums {
+    fn into_datums(self) -> Vec<Option<pg_sys::Datum>>;
+}
+
+#[cfg(feature = "pgrust")]
+impl<C: IntoDatum> IntoDatums for (C,) {
+    fn into_datums(self) -> Vec<Option<pg_sys::Datum>> {
+        vec![self.0.into_datum()]
+    }
+}
+
+// pgrust: set-returning functions materialize the whole iterator into the
+// executor's tuplestore in one call (pgrust's InitMaterializedSRF), instead
+// of the value-per-call protocol over C fmgr state.
+#[cfg(feature = "pgrust")]
+unsafe impl<T> RetAbi for SetOfIterator<'_, T>
+where
+    T: IntoDatum,
+{
+    type Item = T;
+    type Ret = Self;
+    fn to_ret(self) -> Self::Ret {
+        self
+    }
+    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
+        unsafe { pg_sys::pgrust::srf::materialize(fcinfo, ret.map(|v| vec![v.into_datum()])) }
+    }
+    unsafe fn move_into_fcinfo_fcx(self, _fcinfo: pg_sys::FunctionCallInfo) {}
+    unsafe fn fill_fcinfo_fcx(&self, _fcinfo: pg_sys::FunctionCallInfo) {}
+}
+
+#[cfg(feature = "pgrust")]
+unsafe impl<Row> RetAbi for TableIterator<'_, Row>
+where
+    Row: IntoDatums,
+{
+    type Item = Row;
+    type Ret = Self;
+    fn to_ret(self) -> Self::Ret {
+        self
+    }
+    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
+        unsafe { pg_sys::pgrust::srf::materialize(fcinfo, ret.map(|row| row.into_datums())) }
+    }
+    unsafe fn move_into_fcinfo_fcx(self, _fcinfo: pg_sys::FunctionCallInfo) {}
+    unsafe fn fill_fcinfo_fcx(&self, _fcinfo: pg_sys::FunctionCallInfo) {}
+}
+
+#[cfg(not(feature = "pgrust"))]
 pub struct IterRet<T: RetAbi>(Step<T>);
 
 /// ValuePerCall SRF steps
+#[cfg(not(feature = "pgrust"))]
 enum Step<T: RetAbi> {
     Done,
     Once(T::Item),
     Init(T, T::Item),
 }
 
+#[cfg(not(feature = "pgrust"))]
 pub(crate) unsafe fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
     unsafe {
         let fcx = deref_fcx(fcinfo);
@@ -318,10 +379,12 @@ pub(crate) unsafe fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datu
 }
 
 /// "per_MultiFuncCall" but no FFI cost
+#[cfg(not(feature = "pgrust"))]
 pub(crate) unsafe fn deref_fcx(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
     unsafe { (*(*fcinfo).flinfo).fn_extra.cast() }
 }
 
+#[cfg(not(feature = "pgrust"))]
 pub(crate) unsafe fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryContexts {
     unsafe { PgMemoryContexts::For((*fcx).multi_call_memory_ctx) }
 }
@@ -333,6 +396,7 @@ pub(crate) unsafe fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryCon
 /// This lets them simply return a simple Datum instead of handling a TupleDesc and HeapTuple, but
 /// means we need to have this distinct impl, as the return type is not `TYPEFUNC_COMPOSITE`!
 /// Fortunately, RetAbi lets `TableIterator<'a, Tup>` handle this by calling `<Tup as RetAbi>`.
+#[cfg(not(feature = "pgrust"))]
 unsafe impl<C> RetAbi for (C,)
 where
     C: BoxRet, // so we support TableIterator<'a, (Option<T>,)> as well
@@ -385,6 +449,15 @@ macro_rules! impl_table_iter {
             const RETURN_SQL: Result<ReturnsRef, ReturnsError> = table_return_sql!($($C),*);
         }
 
+        #[cfg(feature = "pgrust")]
+        #[allow(non_snake_case)]
+        impl<$($C: IntoDatum),*> IntoDatums for ($($C,)*) {
+            fn into_datums(self) -> Vec<Option<pg_sys::Datum>> {
+                let ($($C,)*) = self;
+                vec![$($C.into_datum(),)*]
+            }
+        }
+        #[cfg(not(feature = "pgrust"))]
         #[allow(non_snake_case)]
         impl<$($C: IntoDatum),*> IntoHeapTuple for ($($C,)*) {
             unsafe fn into_heap_tuple(self, tupdesc: pg_sys::TupleDesc) -> *mut pg_sys::HeapTupleData {
@@ -402,6 +475,7 @@ macro_rules! impl_table_iter {
             }
         }
 
+        #[cfg(not(feature = "pgrust"))]
         #[allow(non_snake_case)]
         unsafe impl<$($C),*> RetAbi for ($($C,)*)
         where

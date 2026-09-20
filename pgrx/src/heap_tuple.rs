@@ -11,13 +11,14 @@
 //!
 //! [`PgHeapTuple`]s also describe composite types as defined by [`pgrx::composite_type!()`][crate::composite_type].
 use crate::datum::{UnboxDatum, lookup_type_name};
-use crate::{
-    AllocatedByPostgres, AllocatedByRust, heap_getattr_raw, pg_sys, trigger_fired_by_delete,
-    trigger_fired_by_insert, trigger_fired_by_update, trigger_fired_for_statement,
-};
+#[cfg(not(feature = "pgrust"))]
+use crate::{trigger_fired_by_delete, trigger_fired_by_insert, trigger_fired_by_update, trigger_fired_for_statement};
+use crate::{AllocatedByPostgres, AllocatedByRust, heap_getattr_raw, pg_sys};
 
 use crate::datum::{FromDatum, IntoDatum, TryFromDatumError};
-use crate::{PgBox, PgMemoryContexts, PgTupleDesc, TriggerTuple, WhoAllocated};
+#[cfg(not(feature = "pgrust"))]
+use crate::TriggerTuple;
+use crate::{PgBox, PgMemoryContexts, PgTupleDesc, WhoAllocated};
 use pgrx_pg_sys::PgTryBuilder;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_sql_entity_graph::metadata::{
@@ -103,6 +104,7 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByPostgres> {
         Self { tuple: PgBox::from_pg(heap_tuple), tupdesc }
     }
 
+    #[cfg(not(feature = "pgrust"))]
     /// Creates a new [PgHeapTuple] identified by the `which_tuple` trigger tuple.  The returned
     /// [PgHeapTuple] will be considered by have been allocated by Postgres and is not mutable until
     /// [PgHeapTuple::into_owned] is called.
@@ -439,11 +441,16 @@ impl<'mcx, AllocatedBy: WhoAllocated> IntoDatum for PgHeapTuple<'mcx, AllocatedB
     }
 
     fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        #[cfg(not(feature = "pgrust"))]
         fn is_composite(oid: pg_sys::Oid) -> bool {
             unsafe {
                 let entry = pg_sys::lookup_type_cache(oid, pg_sys::TYPECACHE_TUPDESC as _);
                 (*entry).typtype as i8 == pg_sys::RELKIND_COMPOSITE_TYPE as i8
             }
+        }
+        #[cfg(feature = "pgrust")]
+        fn is_composite(oid: pg_sys::Oid) -> bool {
+            unsafe { pg_sys::get_typtype(oid) as u8 == b'c' }
         }
         Self::type_oid() == other || is_composite(other)
     }

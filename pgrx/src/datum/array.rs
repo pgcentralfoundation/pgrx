@@ -1021,6 +1021,7 @@ where
     }
 }
 
+#[cfg(not(feature = "pgrust"))]
 #[inline]
 /// Converts an iterator into an array datum
 fn array_datum_from_iter<T: IntoDatum>(elements: impl Iterator<Item = T>) -> Option<pg_sys::Datum> {
@@ -1051,6 +1052,47 @@ fn array_datum_from_iter<T: IntoDatum>(elements: impl Iterator<Item = T>) -> Opt
     assert!(!state.is_null());
 
     Some(unsafe { pg_sys::makeArrayResult(state, PgMemoryContexts::CurrentMemoryContext.value()) })
+}
+
+/// pgrust: collect the elements, then build the array image in one call.
+#[cfg(feature = "pgrust")]
+#[inline]
+fn array_datum_from_iter<T: IntoDatum>(elements: impl Iterator<Item = T>) -> Option<pg_sys::Datum> {
+    let mut datums: Vec<pg_sys::Datum> = Vec::new();
+    let mut nulls: Vec<bool> = Vec::new();
+    for s in elements {
+        match s.into_datum() {
+            Some(d) => {
+                datums.push(d);
+                nulls.push(false);
+            }
+            None => {
+                datums.push(pg_sys::Datum::from(0));
+                nulls.push(true);
+            }
+        }
+    }
+    let elmtype = T::type_oid();
+    let mut typlen: i16 = 0;
+    let mut typbyval = false;
+    let mut typalign: core::ffi::c_char = 0;
+    unsafe {
+        pg_sys::get_typlenbyvalalign(elmtype, &mut typlen, &mut typbyval, &mut typalign);
+        let mut dims = [datums.len() as core::ffi::c_int];
+        let mut lbs = [1 as core::ffi::c_int];
+        let array = pg_sys::construct_md_array(
+            datums.as_mut_ptr(),
+            nulls.as_mut_ptr(),
+            1,
+            dims.as_mut_ptr(),
+            lbs.as_mut_ptr(),
+            elmtype,
+            typlen as core::ffi::c_int,
+            typbyval,
+            typalign,
+        );
+        Some(pg_sys::Datum::from(array))
+    }
 }
 
 impl<T> IntoDatum for Vec<T>

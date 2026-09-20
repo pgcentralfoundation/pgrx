@@ -16,9 +16,25 @@ use std::ffi::{CStr, CString};
 use std::fmt::Debug;
 use std::mem;
 
+#[cfg(not(feature = "pgrust"))]
 mod client;
+#[cfg(not(feature = "pgrust"))]
 mod cursor;
+#[cfg(not(feature = "pgrust"))]
 mod query;
+#[cfg(not(feature = "pgrust"))]
+mod tuple;
+#[cfg(feature = "pgrust")]
+#[path = "spi_pgrust/client.rs"]
+mod client;
+#[cfg(feature = "pgrust")]
+#[path = "spi_pgrust/cursor.rs"]
+mod cursor;
+#[cfg(feature = "pgrust")]
+#[path = "spi_pgrust/query.rs"]
+mod query;
+#[cfg(feature = "pgrust")]
+#[path = "spi_pgrust/tuple.rs"]
 mod tuple;
 pub use client::SpiClient;
 pub use cursor::SpiCursor;
