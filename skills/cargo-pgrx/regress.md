@@ -1,108 +1,81 @@
 # cargo pgrx regress
 
-Runs SQL regression tests using expected-output diffing, similar to
-Postgres' own `pg_regress` tool.
+Builds and installs the extension, restarts its managed PostgreSQL instance,
+and compares SQL results with expected output using `pg_regress`. It uses the
+ordinary managed instance, not the separate backend-test cluster. Use a
+[private home](init.md#private-pgrx_home-for-agent-worktrees) for agent experiments
+and stop the temporary server when finished.
 
-Regression tests execute SQL scripts against a live Postgres instance and
-compare the output against committed expected-output files. This catches
-changes in SQL-level behavior.
+## Files and database lifecycle
 
-## What it does
+Paths are relative to the selected extension manifest:
 
-1. Compiles and installs the extension
-2. Starts a pgrx-managed Postgres instance
-3. Creates (or reuses) a test database
-4. For each test, runs `sql/<test>.sql` and compares output against
-   `expected/<test>.out`
-5. Reports diffs for any mismatches
+| Path | Purpose |
+|------|---------|
+| `tests/pg_regress/sql/*.sql` | SQL inputs |
+| `tests/pg_regress/expected/*.out` | Committed expectations |
+| `tests/pg_regress/results/*.out` | Actual results |
+| `tests/pg_regress/regression.diffs` | Differences; repeated runs preserve numbered diff files |
 
-## Usage
+The database defaults to `<extname>_regress`. It is reused unless `--resetdb`
+is given or `setup.sql` is newer than its expected output, in which case it is
+recreated. `setup.sql` is included when the database is created, including
+filtered runs. Check ownership before using any option that recreates a database.
 
+## Usage and options
+
+```text
+cargo pgrx regress [OPTIONS] [PG_VERSION] [TESTNAME]
 ```
-cargo pgrx regress [OPTIONS] [ARGS]...
-```
 
-### Arguments
+The optional version is `pg13` through `pg19`; the test selector is a substring
+filter. A lone non-version argument is a filter. With two arguments the version
+must come first. `PG_VERSION` can supply the positional default.
 
-Positional: `[pgXX] [testname]`
+| Flag | Meaning |
+|------|---------|
+| `-a, --auto` | Promote changed output for tests with existing expectations |
+| `--add <TEST>` | Bootstrap one test's expectation; implies `--resetdb` |
+| `--dry-run` | Preview selection without building, installing, starting PostgreSQL, or running SQL |
+| `--resetdb` | Recreate the regression database |
+| `--repeat <N>` | Repeat the suite; default 1 |
+| `--dbname <DB>` | Override the regression database name |
+| `-r, --release` | Release profile; default is development |
+| `--profile <P>` | Custom profile; overrides `--release` |
+| `--psql-verbosity <V>` | `default`, `verbose`, `terse`, or `sqlstate`; default is terse |
+| `--postgresql-conf <K=V>` | Repeatable server settings; the runner appends `client_min_messages=warning` |
+| `--valgrind` | Start PostgreSQL under Valgrind |
+| `--runas <USER>` | Used for database creation/deletion through sudo; not for managed server startup |
+| `--pgdata <DIR>`, `-n, --no-schema` | Accepted but currently not applied to the regression install/start path |
+| `-F, --features <F>` | Additional Cargo features |
+| `--no-default-features`, `--all-features` | Cargo feature selection |
+| `-p, --package <PKG>`, `--manifest-path <PATH>` | Select the extension |
+| `--cargo <FLAG>` | Repeatable Cargo flags, including for metadata |
+| `-v` | Print diff contents as well as their location |
 
-- `cargo pgrx regress` -- all tests, default pg version
-- `cargo pgrx regress pg18` -- all tests against pg18
-- `cargo pgrx regress pg18 mytest` -- specific test against pg18
-- `cargo pgrx regress mytest` -- specific test, default pg version
+`--dry-run` still resolves Cargo metadata and may create missing regression
+directories. It is not a substitute for inspecting the selected manifest and
+database before an actual run. `--pgdata` does not isolate this command; choose
+the private `PGRX_HOME` explicitly.
 
-### Key flags
-
-| Flag | Short | Description |
-|------|-------|-------------|
-| `--auto` | `-a` | Overwrite expected output with actual output for failed tests |
-| `--add <TEST>` | | Bootstrap a new test: run it, promote output to expected/, exit. Implies `--resetdb` |
-| `--dry-run` | | Print what would happen without doing it |
-| `--resetdb` | | Drop and recreate the test database before running |
-| `--repeat <N>` | | Run the suite N times (default: 1). Useful for detecting flaky tests |
-| `--dbname <DB>` | | Custom database name instead of auto-generated `<ext>_regress` |
-| `--release` | `-r` | Compile in release mode |
-| `--profile <P>` | | Specific Cargo profile |
-| `--no-schema` | `-n` | Skip schema regeneration |
-| `--runas <USER>` | | Run Postgres as this system user |
-| `--pgdata <DIR>` | | Custom pgdata directory |
-| `--psql-verbosity <V>` | | Error report verbosity: `default`, `verbose`, `terse`, `sqlstate` |
-| `--postgresql-conf <K=V>` | | Custom postgresql.conf settings |
-| `--features <F>` | `-F` | Cargo features |
-| `--no-default-features` | | Disable default features |
-| `--all-features` | | Enable all features |
-| `--package <PKG>` | `-p` | Package in workspace |
-| `--manifest-path <PATH>` | | Path to Cargo.toml |
-
-## Examples
+## Expected-output workflow
 
 ```bash
-# Run all regression tests
-cargo pgrx regress
-
-# Run a specific test
+cargo pgrx regress pg18 -v
 cargo pgrx regress pg18 search_basic
-
-# Create a new regression test (writes expected output)
-cargo pgrx regress --add my_new_test
-
-# See what changed without promoting anything
-cargo pgrx regress
-
-# After reviewing diffs, promote actual output to expected
-cargo pgrx regress --auto
-
-# Recreate the database (useful after schema changes)
-cargo pgrx regress --resetdb
-
-# Detect flaky tests by repeating
-cargo pgrx regress --repeat 5
-
-# Dry run to see which tests would execute
-cargo pgrx regress --dry-run
+cargo pgrx regress pg18 --add my_new_test
+cargo pgrx regress pg18 --auto
+cargo pgrx regress pg18 --resetdb --repeat 5
+cargo pgrx regress pg18 --dry-run
 ```
 
-## Workflow discipline
+Run without `--auto` first and inspect failures. Promote only intentional
+changes, then rerun without promotion to verify the new expectations. A run
+that encountered failures still exits unsuccessfully even if `--auto` copied
+its results into expected files.
 
-1. **Always run without `--auto` first.** See the diffs. Understand them.
-2. **Only use `--auto` after confirming diffs are intentional.** `--auto`
-   silently blesses whatever output Postgres produces. If the output is
-   wrong, you have committed a bug as "expected."
-3. **Use `--add` for new tests.** It runs the test's `setup.sql`, executes
-   the test, and promotes the output in one step.
-4. **Use `--resetdb` when schema changes.** Stale schema in the test database
-   causes false failures.
-5. **Do not hand-edit files in `expected/`.** Let `--auto` or `--add` write
-   them, then review the git diff.
-
-## When to use
-
-- Validating SQL-level behavior of the extension
-- Catching regressions in query output, error messages, or plan shapes
-- Documenting expected behavior as executable tests
-
-## When NOT to use
-
-- Unit testing Rust logic -- use `#[test]`
-- Testing Postgres internals from Rust -- use `#[pg_test]`
-- Performance testing -- use `cargo pgrx bench`
+Unfiltered runs skip tests without expected output; explicitly selecting one
+reports an error directing you to `--add`. Bootstrap new tests with `--add`,
+which runs setup, generates output, and stages the new expected files when in
+a Git repository. Review both working-tree and staged diffs. Do not hand-edit
+expected output to hide failures.

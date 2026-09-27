@@ -1,89 +1,66 @@
 # cargo pgrx bench
 
-Runs in-process Postgres benchmarks defined with `#[pg_bench]` functions.
+Runs `#[pg_bench]` functions inside PostgreSQL using pgrx-bench and Criterion.
+The CLI enables `pg_bench`, builds in release mode by default, installs the
+extension, and stores measurements and comparison history in the benchmark
+database. See [the benchmark example](../../pgrx-examples/benching) for the
+optional `pgrx-bench` dependency, feature, and `benches` schema setup.
 
-Benchmarks execute inside a live Postgres backend with the extension loaded,
-measuring real SQL and index operations with statistical rigor.
+## Usage and options
 
-## What it does
-
-1. Compiles and installs the extension (release mode by default)
-2. Starts a pgrx-managed Postgres instance
-3. Creates (or reuses) a benchmark database
-4. Discovers and runs `#[pg_bench]` functions
-5. Collects timing samples, computes statistics
-6. Optionally compares against a previous named run
-
-## Usage
-
-```
-cargo pgrx bench [OPTIONS] [ARGS]...
+```text
+cargo pgrx bench [OPTIONS] [PG_VERSION] [BENCHNAME]
 ```
 
-### Arguments
+The optional version is `pg13` through `pg19`; the benchmark selector filters
+names. `PG_VERSION` can supply the positional default. The default database is
+`<extname>_benches` in the ordinary managed instance. Use a
+[private home](init.md#private-pgrx_home-for-agent-worktrees) for agent work and
+stop its server afterward.
 
-Positional: `[pgXX] [benchname]`
+| Flag | Meaning |
+|------|---------|
+| `--group-name <NAME>` | Name this run group; otherwise a name is generated |
+| `--compare-group <NAME>` | Compare with an existing named group |
+| `--resetdb` | Recreate the benchmark database, deleting its history |
+| `--cascade` | Use CASCADE when dropping the extension during refresh |
+| `--list` | Build, install, refresh the extension, then list benchmarks |
+| `--report` | Read stored history without building or refreshing the extension |
+| `--json` | Emit the final benchmark summary as JSON |
+| `--wait <SECONDS>` | Pause after printing the backend PID for profiler attachment |
+| `--debug` | Development profile instead of release |
+| `--profile <P>` | Custom profile; overrides `--debug` |
+| `--postgresql-conf <K=V>` | Repeatable server settings |
+| `--dbname <DB>` | Override the benchmark database name |
+| `-F, --features <F>` | Additional Cargo features |
+| `--no-default-features`, `--all-features` | Cargo feature selection |
+| `-p, --package <PKG>`, `--manifest-path <PATH>` | Select the extension |
+| `--target <TARGET>` | Cargo compilation target |
+| `--cargo <FLAG>` | Repeatable Cargo flags, including for metadata |
 
-### Key flags
-
-| Flag | Description |
-|------|-------------|
-| `--group-name <NAME>` | Tag this benchmark run with a name (for later comparison) |
-| `--compare-group <NAME>` | Compare results against a previously tagged run |
-| `--resetdb` | Recreate the benchmark database before running |
-| `--cascade` | Use `CASCADE` when dropping the extension during refresh |
-| `--list` | List discovered benchmark functions and exit |
-| `--report` | Render a history report from the benchmark database |
-| `--json` | Emit the summary as JSON |
-| `--wait <SECS>` | Sleep N seconds after printing PID before starting (for attaching profilers) |
-| `--debug` | Compile in debug mode (default is release) |
-| `--profile <P>` | Specific Cargo profile |
-| `--postgresql-conf <K=V>` | Custom postgresql.conf settings |
-| `--dbname <DB>` | Custom database name |
-| `--features <F>` | `-F` Cargo features |
-| `--package <PKG>` | `-p` Package in workspace |
-| `--manifest-path <PATH>` | Path to Cargo.toml |
-| `--target <TARGET>` | Cross-compilation target |
-
-## Examples
+## Runs and comparisons
 
 ```bash
-# Run all benchmarks
-cargo pgrx bench
-
-# Run a specific benchmark
-cargo pgrx bench pg18 index_build
-
-# Tag a baseline run
-cargo pgrx bench --group-name before-optimization
-
-# Run again and compare
-cargo pgrx bench --group-name after-optimization --compare-group before-optimization
-
-# List available benchmarks
-cargo pgrx bench --list
-
-# View historical results
-cargo pgrx bench --report
-
-# JSON output for CI integration
-cargo pgrx bench --json
-
-# Wait 5 seconds for profiler attachment
-cargo pgrx bench --wait 5
-
-# Fresh database for clean measurement
-cargo pgrx bench --resetdb
+cargo pgrx bench pg18
+cargo pgrx bench pg18 index_build --group-name before
+cargo pgrx bench pg18 index_build --group-name after --compare-group before
+cargo pgrx bench pg18 --list
+cargo pgrx bench pg18 --report
+cargo pgrx bench pg18 --json
+cargo pgrx bench pg18 --wait 5
 ```
 
-## When to use
+Without `--compare-group`, the CLI chooses the most recent completed or partial
+group with the same Cargo profile, when available. Record named baselines when
+the comparison matters. Keep the database between runs to retain history;
+`--resetdb` discards it.
 
-- Measuring performance of extension operations (index builds, queries, scans)
-- Before/after comparison for optimization work
-- CI performance regression detection
+Normal runs restart the managed server and refresh the installed extension.
+`--list` also performs that setup. `--report` reads existing history and may
+start a stopped server, but requires the benchmark database to exist. It cannot
+be combined with `--group-name`, `--compare-group`, `--resetdb`, `--cascade`,
+`--list`, `--json`, a nonzero `--wait`, or `--postgresql-conf`.
 
-## When NOT to use
-
-- Correctness testing -- use `cargo pgrx test` or `cargo pgrx regress`
-- Compile-time checks -- use `cargo check`
-- Pure Rust microbenchmarks with no Postgres dependency -- use `criterion`
+Keep `pg_bench` disabled for ordinary deployment artifacts. For pure Rust
+benchmarks that need no PostgreSQL state, use the project's ordinary Rust
+benchmark setup instead.

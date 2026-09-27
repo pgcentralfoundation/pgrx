@@ -1,83 +1,53 @@
 # cargo pgrx run
 
-Compiles the extension, installs it into a pgrx-managed Postgres instance,
-starts the instance, and opens an interactive `psql` session.
+Builds and installs an extension, starts its managed PostgreSQL instance,
+creates the named database if missing, and opens `psql` or `pgcli`. It stops the
+managed server before installing and restarts it afterward. Run this only
+against an authorized instance, using a [private home](init.md#private-pgrx_home-for-agent-worktrees)
+for agent worktree experiments.
 
-This is the primary development loop command: edit code, `cargo pgrx run`,
-test interactively in psql, repeat.
+Installing files does not execute `CREATE EXTENSION` in the database. Create or
+update the extension there as the task requires. Exiting the client leaves the
+server running; shut down task-owned instances when finished.
 
-## What it does
+## Usage and options
 
-1. Compiles the extension (`cargo build --lib`)
-2. Generates and installs the SQL schema
-3. Starts the pgrx-managed Postgres instance (if not running)
-4. Creates the target database if it does not exist
-5. Opens `psql` (or `pgcli`) connected to the database
-
-## Usage
-
-```
+```text
 cargo pgrx run [OPTIONS] [PG_VERSION] [DBNAME]
 ```
 
-### Arguments
+`PG_VERSION` accepts `pg13` through `pg19`, with `PG_VERSION` as an environment
+fallback. Otherwise the CLI uses a PostgreSQL feature supplied explicitly or in
+the manifest's defaults. `DBNAME` defaults to the extension name. If the first
+positional argument is not a recognized version and no second argument is given,
+it is treated as the database name.
 
-| Argument | Description |
-|----------|-------------|
-| `PG_VERSION` | `pg13`..`pg19`. Defaults to first pgXX feature in Cargo.toml. Env: `PG_VERSION` |
-| `DBNAME` | Database to connect to (and create if needed). Defaults to the extension name |
+| Flag | Meaning |
+|------|---------|
+| `-r, --release` | Release profile; default is development |
+| `--profile <P>` | Custom profile; overrides `--release` |
+| `--pgcli` | Use pgcli on PATH; also accepts `PGRX_PGCLI` |
+| `--valgrind` | Start PostgreSQL under Valgrind |
+| `--install-only` | Skip restarting the server and creating the database; see the limitation below |
+| `-F, --features <F>` | Additional Cargo features |
+| `--no-default-features`, `--all-features` | Cargo feature selection |
+| `-p, --package <PKG>` | Select a workspace extension |
+| `--manifest-path <PATH>` | Select its manifest |
+| `--target <TARGET>` | Cargo compilation target; the installed artifact must run on this server |
+| `--cargo <FLAG>` | Repeatable Cargo flags, including for metadata |
 
-**Smart argument detection:** If the first positional argument is not a
-recognized Postgres version (`pgXX`), it is treated as `DBNAME` and the
-default Postgres version is used. This means `cargo pgrx run mydb` works
-as a shorthand for `cargo pgrx run pgXX mydb`.
-
-### Flags
-
-| Flag | Short | Description |
-|------|-------|-------------|
-| `--release` | `-r` | Compile in release mode |
-| `--profile <P>` | | Specific Cargo profile |
-| `--install-only` | | Install the extension but do not launch psql |
-| `--pgcli` | | Use `pgcli` instead of `psql`. Env: `PGRX_PGCLI` |
-| `--valgrind` | | Run Postgres under Valgrind |
-| `--features <F>` | `-F` | Cargo features to activate |
-| `--no-default-features` | | Disable default features |
-| `--all-features` | | Enable all features |
-| `--package <PKG>` | `-p` | Package in workspace |
-| `--manifest-path <PATH>` | | Path to Cargo.toml |
-| `--target <TARGET>` | | Cross-compilation target |
-
-## Examples
+In the current implementation, `--install-only` skips server startup inside the
+installation step, but command dispatch still attempts to open the client.
+Use [cargo pgrx install](install.md) with an explicit `--pg-config` for a command
+that installs files without stopping or starting PostgreSQL or opening a client.
 
 ```bash
-# Build, install, and open psql against default Postgres
-cargo pgrx run
-
-# Connect to a specific database (using default PG version)
-cargo pgrx run mydb
-
-# Target a specific Postgres version and database
-cargo pgrx run pg18 mydb
-
-# Install only, don't open psql (useful for scripted workflows)
-cargo pgrx run --install-only
-
-# Use pgcli for a nicer interactive experience
-cargo pgrx run --pgcli
-
-# Release mode for performance testing
-cargo pgrx run --release
+cargo pgrx run pg18
+cargo pgrx run pg18 scratch_db
+cargo pgrx run pg18 scratch_db --pgcli
+cargo pgrx run pg18 --release --cargo=--config=./cargo-local.toml
 ```
 
-## When to use
-
-- Interactive development and manual testing
-- Quick smoke tests after code changes
-- Exploring extension behavior with ad-hoc SQL
-
-## When NOT to use
-
-- Running automated tests -- use `cargo pgrx test`
-- Just checking compilation -- use `cargo check`
-- Installing into a non-pgrx-managed Postgres -- use `cargo pgrx install`
+Use `cargo check` for compilation and `cargo pgrx test` or `cargo pgrx regress`
+for automated coverage. `connect` can open a client without rebuilding, but may
+also start the server and create a database.
