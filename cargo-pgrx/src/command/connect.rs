@@ -77,7 +77,7 @@ impl CommandExecute for Connect {
                 // We should infer from package
                 get_property(&package_manifest_path, "extname")
                     .wrap_err("could not determine extension name")?
-                    .ok_or(eyre!("extname not found in control file"))?
+                    .ok_or_else(|| eyre!("extname not found in control file"))?
             }
         };
 

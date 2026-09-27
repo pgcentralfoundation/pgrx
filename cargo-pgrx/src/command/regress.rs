@@ -226,7 +226,7 @@ impl Regress {
         test_file: &DirEntry,
     ) -> eyre::Result<()> {
         let test_name = make_test_name(test_file);
-        let verbosity = &self.psql_verbosity.clone().unwrap_or("terse".into());
+        let verbosity = &self.psql_verbosity.clone().unwrap_or_else(|| "terse".into());
 
         println!("{} new test `{}`", "Bootstrapping".bold().green(), test_name.bold().cyan());
 
@@ -291,7 +291,7 @@ impl Regress {
 
         // The default verbosity is terse in order to avoid verbose log output
         // being enshrined in expected test output
-        let verbosity = &self.psql_verbosity.clone().unwrap_or("terse".into());
+        let verbosity = &self.psql_verbosity.clone().unwrap_or_else(|| "terse".into());
 
         // Run all tests that have expected output
         let success =
@@ -579,7 +579,7 @@ impl Regress {
                 )?;
             } else {
                 // Run setup.sql normally to establish schema/data
-                let verbosity = &self.psql_verbosity.clone().unwrap_or("terse".into());
+                let verbosity = &self.psql_verbosity.clone().unwrap_or_else(|| "terse".into());
                 run_tests(pg_config, pgregress_path, dbname, &[setup_entry], verbosity, 0)?;
             }
         }

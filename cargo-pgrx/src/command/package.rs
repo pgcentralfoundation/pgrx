@@ -156,7 +156,7 @@ pub(crate) fn build_base_path(
     let mut target_dir = get_target_dir()?;
     let pgver = pg_config.major_version()?;
     let extname = get_property(manifest_path, "extname")?
-        .ok_or(eyre!("could not determine extension name"))?;
+        .ok_or_else(|| eyre!("could not determine extension name"))?;
     if let Some(target) = target {
         target_dir.push(target);
     }

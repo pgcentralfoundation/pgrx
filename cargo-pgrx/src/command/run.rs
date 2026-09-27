@@ -110,7 +110,7 @@ impl Run {
         let dbname = match &self.dbname {
             Some(dbname) => dbname.clone(),
             None => get_property(&package_manifest_path, "extname")?
-                .ok_or(eyre!("could not determine extension name"))?,
+                .ok_or_else(|| eyre!("could not determine extension name"))?,
         };
         let profile = CargoProfile::from_flags(
             self.profile.as_deref(),

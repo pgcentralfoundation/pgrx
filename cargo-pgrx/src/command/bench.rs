@@ -110,7 +110,7 @@ impl CommandExecute for Bench {
         )?;
 
         let extname = get_property(&package_manifest_path, "extname")?
-            .ok_or(eyre!("could not determine extension name"))?;
+            .ok_or_else(|| eyre!("could not determine extension name"))?;
         let dbname = self.dbname.clone().unwrap_or_else(|| format!("{extname}_benches"));
         if self.report {
             return self.execute_report(&pg_config, &dbname, &extname, bench_filter.as_deref());
