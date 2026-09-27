@@ -56,6 +56,9 @@ pub(crate) struct Run {
     install_only: bool,
     #[clap(long)]
     valgrind: bool,
+    /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+    #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
+    cargo: Vec<String>,
 }
 
 impl From<&Regress> for Run {
@@ -73,6 +76,7 @@ impl From<&Regress> for Run {
             pgcli: false,
             install_only: false,
             valgrind: regress.valgrind,
+            cargo: regress.cargo.clone(),
         }
     }
 }
@@ -94,10 +98,11 @@ impl Run {
             self.dbname = self.pg_version.take();
         }
 
-        let (package_manifest, package_manifest_path) = get_package_manifest(
+        let (package_manifest, package_manifest_path, target_dir) = get_package_manifest(
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
+            &self.cargo,
         )?;
         let (pg_config, _pg_version) = pg_config_and_version(
             &pgrx,
@@ -110,7 +115,7 @@ impl Run {
         let dbname = match &self.dbname {
             Some(dbname) => dbname.clone(),
             None => get_property(&package_manifest_path, "extname")?
-                .ok_or(eyre!("could not determine extension name"))?,
+                .ok_or_else(|| eyre!("could not determine extension name"))?,
         };
         let profile = CargoProfile::from_flags(
             self.profile.as_deref(),
@@ -129,7 +134,9 @@ impl Run {
             self.install_only,
             self.valgrind,
             self.target.as_deref(),
+            &target_dir,
             postgresql_conf,
+            &self.cargo,
         )?;
 
         Ok((pg_config, dbname))
@@ -164,7 +171,9 @@ pub(crate) fn run(
     install_only: bool,
     use_valgrind: bool,
     target: Option<&str>,
+    target_dir: &Path,
     postgresql_conf: &HashMap<String, String>,
+    cargo_flags: &[String],
 ) -> eyre::Result<()> {
     // stop postgres
     stop_postgres(pg_config)?;
@@ -180,6 +189,8 @@ pub(crate) fn run(
         None,
         features,
         target,
+        target_dir,
+        cargo_flags,
         None,
     )?;
 
@@ -247,4 +258,49 @@ pub(crate) fn exec_psql(pg_config: &PgConfig, dbname: &str, pgcli: bool) -> eyre
     let output = command.output()?;
     tracing::trace!(status_code = %output.status, command = %command_str, "Finished");
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Run;
+    use crate::command::regress::Regress;
+    use clap::Parser;
+
+    /// Mirror the real CLI shape (global `--verbose` on the top-level parser,
+    /// `Regress` as a subcommand) so `Regress`'s `from_global` verbose resolves.
+    #[derive(Parser)]
+    struct Cli {
+        #[arg(short = 'v', long, action = clap::ArgAction::Count, global = true)]
+        verbose: u8,
+        #[command(subcommand)]
+        cmd: Cmd,
+    }
+
+    #[derive(clap::Subcommand)]
+    enum Cmd {
+        Regress(Regress),
+    }
+
+    /// `cargo pgrx regress` builds too, so `--cargo` must be exposed on it and
+    /// forwarded into the `Run` it delegates to. This locks in both: clap parses
+    /// the repeatable flag, and `Run::from(&Regress)` carries it over (not the
+    /// empty vec it used to hard-code).
+    #[test]
+    fn regress_cargo_flags_are_parsed_and_forwarded_to_run() {
+        let cli = Cli::try_parse_from([
+            "cargo-pgrx",
+            "regress",
+            "--cargo",
+            "--offline",
+            "--cargo",
+            "--config=child/.cargo/config.toml",
+        ])
+        .expect("regress should parse repeatable --cargo flags");
+        let Cmd::Regress(regress) = cli.cmd;
+
+        assert_eq!(regress.cargo, vec!["--offline", "--config=child/.cargo/config.toml"]);
+
+        let run = Run::from(&regress);
+        assert_eq!(run.cargo, regress.cargo, "Run::from(&Regress) must forward --cargo");
+    }
 }

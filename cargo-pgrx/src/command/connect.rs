@@ -48,10 +48,11 @@ impl CommandExecute for Connect {
     fn execute(mut self) -> eyre::Result<()> {
         let pgrx = Pgrx::from_config()?;
 
-        let (package_manifest, package_manifest_path) = get_package_manifest(
+        let (package_manifest, package_manifest_path, _) = get_package_manifest(
             &Features::default(),
             self.package.as_deref(),
             self.manifest_path.as_deref(),
+            &[],
         )?;
         let (pg_config, _pg_version) = match pg_config_and_version(
             &pgrx,
@@ -77,7 +78,7 @@ impl CommandExecute for Connect {
                 // We should infer from package
                 get_property(&package_manifest_path, "extname")
                     .wrap_err("could not determine extension name")?
-                    .ok_or(eyre!("extname not found in control file"))?
+                    .ok_or_else(|| eyre!("extname not found in control file"))?
             }
         };
 

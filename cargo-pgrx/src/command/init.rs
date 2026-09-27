@@ -659,7 +659,7 @@ fn validate_pg_config(pg_config: &PgConfig) -> eyre::Result<()> {
     Ok(())
 }
 
-fn write_config(pg_configs: &Vec<PgConfig>, init: &Init) -> eyre::Result<()> {
+fn write_config(pg_configs: &[PgConfig], init: &Init) -> eyre::Result<()> {
     let config_path = Pgrx::config_toml()?;
     let mut config = match std::fs::read_to_string(&config_path) {
         Ok(file) => toml::from_str::<ConfigToml>(&file)?,
@@ -675,9 +675,10 @@ fn write_config(pg_configs: &Vec<PgConfig>, init: &Init) -> eyre::Result<()> {
     config.base_port = init.base_port;
     config.base_testing_port = init.base_testing_port;
     for pg_config in pg_configs {
-        config
-            .configs
-            .insert(pg_config.label()?, pg_config.path().ok_or(eyre!("no path for pg_config"))?);
+        config.configs.insert(
+            pg_config.label()?,
+            pg_config.path().ok_or_else(|| eyre!("no path for pg_config"))?,
+        );
     }
 
     let mut file = File::create(&config_path)?;

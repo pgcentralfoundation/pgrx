@@ -54,6 +54,36 @@ Options:
   -V, --version     Print version
 ```
 
+### Passing Flags to Cargo
+
+`cargo pgrx install`, `package`, `run`, `test`, `bench`, `regress`, and `schema` accept a repeatable
+`--cargo <FLAG>` option. These flags are forwarded to every Cargo invocation made by the command, including
+the initial `cargo metadata` call.
+
+To install an extension from a parent directory using the extension's Cargo configuration:
+
+```console
+$ cargo pgrx install --manifest-path child/Cargo.toml --cargo=--config=child/.cargo/config.toml
+```
+
+This makes the child's registry, source, or proxy configuration available during dependency resolution and builds.
+You can also supply Cargo configuration inline:
+
+```console
+$ cargo pgrx install --cargo='--config=net.offline=true'
+```
+
+Repeat `--cargo` to pass multiple flags, or group them in a quoted string:
+
+```console
+$ cargo pgrx install --cargo=--offline --cargo=--frozen
+$ cargo pgrx install --cargo "--offline --frozen"
+```
+
+Each `--cargo` value is split on ASCII whitespace. Paths and values containing spaces are unsupported, even when quoted.
+Use flags accepted by every Cargo command invoked, including `cargo metadata`. `PGRX_BUILD_FLAGS` applies only to build
+commands and does not reach `cargo metadata`.
+
 ## Environment Variables
 
 - `PGRX_HOME` - Defaults to "${HOME}/.pgrx/" if not set.
@@ -359,6 +389,7 @@ Options:
   -F, --features <FEATURES>            Space-separated list of features to activate
       --pgcli                          Use an existing `pgcli` on the $PATH [env: PGRX_PGCLI=]
       --install-only                   Install without running
+      --cargo <FLAG>                   Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
   -h, --help                           Print help
   -V, --version                        Print version
 ```
@@ -455,6 +486,7 @@ Options:
       --all-features                   Activate all available features
       --no-default-features            Do not activate the `default` feature
   -F, --features <FEATURES>            Space-separated list of features to activate
+      --cargo <FLAG>                   Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
   -h, --help                           Print help
   -V, --version                        Print version
 ```
@@ -529,6 +561,7 @@ Options:
       --all-features                   Activate all available features
       --no-default-features            Do not activate the `default` feature
   -F, --features <FEATURES>            Space-separated list of features to activate
+      --cargo <FLAG>                   Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
   -h, --help                           Print help
   -V, --version                        Print version
 ```
@@ -671,6 +704,8 @@ Options:
   -F, --features <FEATURES>
           Space-separated list of features to activate
       --target <TARGET>
+      --cargo <FLAG>
+          Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
       --postgresql-conf <POSTGRESQL_CONF>
           Custom `postgresql.conf` settings in the form of `key=value`
   -h, --help
@@ -696,6 +731,7 @@ Key flags:
 | `-v` / `--verbose` | Print regression diffs to stderr on failure                                                  |
 | `--dry-run` | Print what would happen without doing it                                                     |
 | `--repeat <N>` | Run the entire configuration N times (default: 1)                                            |
+| `--cargo <FLAG>` | Forward extra Cargo flags (repeatable; see [Passing Flags to Cargo](#passing-flags-to-cargo)) |
 | `-p` / `--package <name>` | Package to build (auto-detected in workspaces with a single pgrx extension)                  |
 | `[PG_VERSION]` | Postgres version (e.g., `pg18`). Optional — defaults to Cargo.toml's default feature         |
 
@@ -878,6 +914,7 @@ Options:
       --all-features                   Activate all available features
       --no-default-features            Do not activate the `default` feature
   -F, --features <FEATURES>            Space-separated list of features to activate
+      --cargo <FLAG>                   Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
       --prefix-dir <PREFIX_DIR>        The directory within out_dir to put extension assets (default is based on pg_config path)
   -h, --help                           Print help
   -V, --version                        Print version
@@ -934,6 +971,7 @@ Options:
       --skip-build                     Skip building a fresh extension shared object
       --no-alter-extension             Don't emit `ALTER EXTENSION ... ADD ...` statements when
                                        extracting specific items (see "Attaching Slices" below)
+      --cargo <FLAG>                   Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
   -h, --help                           Print help
   -V, --version                        Print version
 ```

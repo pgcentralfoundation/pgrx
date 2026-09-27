@@ -34,7 +34,7 @@ impl CommandExecute for Get {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let metadata =
-            crate::metadata::metadata(&Default::default(), self.manifest_path.as_deref())
+            crate::metadata::metadata(&Default::default(), self.manifest_path.as_deref(), &[])
                 .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(self.manifest_path.as_deref(), &metadata)?;
         let package_manifest_path =

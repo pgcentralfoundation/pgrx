@@ -106,9 +106,8 @@ fn query_toml(query_args: &QueryCargoVersionArgs) {
     // default to <cwd>/pgrx-version-updater/Cargo.toml where <cwd> is assumed to be
     // the root of a PGRX checkout directory
     let filepath = match &query_args.file_path {
-        Some(path) => {
-            fullpath(path).expect(format!("Could not get full path for file: {path}").as_str())
-        }
+        Some(path) => fullpath(path)
+            .unwrap_or_else(|e| panic!("Could not get full path for file: {path}: {e:?}")),
         None => {
             let mut current_dir = env::current_dir().expect("Could not get current_dir!");
             current_dir.push("pgrx-version-updater/Cargo.toml");
@@ -118,11 +117,11 @@ fn query_toml(query_args: &QueryCargoVersionArgs) {
 
     // Open the Cargo.toml via toml_edit and parse it out.
     let data = fs::read_to_string(&filepath)
-        .expect(format!("Unable to open file at {}", filepath.display()).as_str());
+        .unwrap_or_else(|e| panic!("Unable to open file at {}: {e:?}", filepath.display()));
 
-    let doc = data.parse::<DocumentMut>().expect(
-        format!("File at location {} is an invalid Cargo.toml file", filepath.display()).as_str(),
-    );
+    let doc = data.parse::<DocumentMut>().unwrap_or_else(|e| {
+        panic!("File at location {} is an invalid Cargo.toml file: {e:?}", filepath.display())
+    });
 
     if let Some(package_version) = doc.get("package").and_then(|p| p.get("version")) {
         println!("{}", package_version.as_str().expect("Could not turn package version into str"));
@@ -179,7 +178,8 @@ fn update_files(args: &UpdateFilesArgs) {
     let mut exclude_version_files = HashSet::default();
     for file in &args.exclude_from_version_change {
         exclude_version_files.insert(
-            fullpath(file).expect(format!("Could not get full path for file: {file}").as_str()),
+            fullpath(file)
+                .unwrap_or_else(|e| panic!("Could not get full path for file: {file}: {e:?}")),
         );
     }
 
@@ -190,9 +190,9 @@ fn update_files(args: &UpdateFilesArgs) {
         .filter_map(|v| v.ok())
     {
         if is_cargo_toml_file(&entry) {
-            let filepath = fullpath(entry.path()).expect(
-                format!("Could not get full path for file {}", entry.path().display()).as_str(),
-            );
+            let filepath = fullpath(entry.path()).unwrap_or_else(|e| {
+                panic!("Could not get full path for file {}: {e:?}", entry.path().display())
+            });
 
             let output = format!(
                 "{} Cargo.toml file at {}",
@@ -210,8 +210,8 @@ fn update_files(args: &UpdateFilesArgs) {
 
     // Loop through all files that are included for dependency updates via CLI params
     for file in &args.include_for_dep_updates {
-        let filepath =
-            fullpath(file).expect(format!("Could not get full path for file {file}").as_str());
+        let filepath = fullpath(file)
+            .unwrap_or_else(|e| panic!("Could not get full path for file {file}: {e:?}"));
 
         let output = format!(
             "{} Cargo.toml file at {} for processing",
@@ -247,12 +247,11 @@ fn update_files(args: &UpdateFilesArgs) {
         );
 
         let data = fs::read_to_string(&filepath)
-            .expect(format!("Unable to open file at {}", filepath.display()).as_str());
+            .unwrap_or_else(|e| panic!("Unable to open file at {}: {e:?}", filepath.display()));
 
-        let mut doc = data.parse::<DocumentMut>().expect(
-            format!("File at location {} is an invalid Cargo.toml file", filepath.display())
-                .as_str(),
-        );
+        let mut doc = data.parse::<DocumentMut>().unwrap_or_else(|e| {
+            panic!("File at location {} is an invalid Cargo.toml file: {e:?}", filepath.display())
+        });
 
         if exclude_version_files.contains(&filepath) {
             output.push_str(
@@ -435,9 +434,9 @@ fn fullpath<P: AsRef<Path>>(test_path: P) -> Result<PathBuf, std::io::Error> {
 // Walkdir filter, ensure we don't traverse down a directory that should be ignored
 // e.g. .git/ and target/ directories should never be traversed.
 fn is_not_excluded_dir(entry: &DirEntry) -> bool {
-    let metadata = entry.metadata().expect(
-        format!("Could not get metadata for: {}", entry.file_name().to_string_lossy()).as_str(),
-    );
+    let metadata = entry.metadata().unwrap_or_else(|e| {
+        panic!("Could not get metadata for: {}: {e:?}", entry.file_name().to_string_lossy())
+    });
 
     if metadata.is_dir() {
         return !IGNORE_DIRS.contains(&entry.file_name().to_string_lossy().as_ref());
@@ -448,9 +447,9 @@ fn is_not_excluded_dir(entry: &DirEntry) -> bool {
 
 // Check if a specific DirEntry is named "Cargo.toml"
 fn is_cargo_toml_file(entry: &DirEntry) -> bool {
-    let metadata = entry.metadata().expect(
-        format!("Could not get metadata for: {}", entry.file_name().to_string_lossy()).as_str(),
-    );
+    let metadata = entry.metadata().unwrap_or_else(|e| {
+        panic!("Could not get metadata for: {}: {e:?}", entry.file_name().to_string_lossy())
+    });
 
     if metadata.is_file() {
         return entry.file_name().eq_ignore_ascii_case("Cargo.toml");

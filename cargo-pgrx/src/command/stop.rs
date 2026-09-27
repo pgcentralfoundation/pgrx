@@ -37,10 +37,11 @@ impl CommandExecute for Stop {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         fn perform(me: Stop, pgrx: &Pgrx) -> eyre::Result<()> {
-            let (package_manifest, _) = get_package_manifest(
+            let (package_manifest, _, _) = get_package_manifest(
                 &clap_cargo::Features::default(),
                 me.package.as_deref(),
                 me.manifest_path.as_deref(),
+                &[],
             )?;
             let (pg_config, _) =
                 pg_config_and_version(pgrx, &package_manifest, me.pg_version, None, false)?;
@@ -49,10 +50,11 @@ impl CommandExecute for Stop {
         }
 
         let pgrx = Pgrx::from_config()?;
-        let (package_manifest, _) = get_package_manifest(
+        let (package_manifest, _, _) = get_package_manifest(
             &clap_cargo::Features::default(),
             self.package.as_deref(),
             self.manifest_path.as_deref(),
+            &[],
         )?;
         if self.pg_version == Some("all".into()) {
             for v in crate::manifest::all_pg_in_both_tomls(&package_manifest, &pgrx) {

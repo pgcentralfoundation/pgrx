@@ -102,6 +102,10 @@ pub(crate) struct Regress {
     /// Run Postgres under valgrind while executing the regression tests
     #[clap(long)]
     pub(crate) valgrind: bool,
+
+    /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+    #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
+    pub(crate) cargo: Vec<String>,
 }
 
 impl Regress {
@@ -226,7 +230,7 @@ impl Regress {
         test_file: &DirEntry,
     ) -> eyre::Result<()> {
         let test_name = make_test_name(test_file);
-        let verbosity = &self.psql_verbosity.clone().unwrap_or("terse".into());
+        let verbosity = &self.psql_verbosity.clone().unwrap_or_else(|| "terse".into());
 
         println!("{} new test `{}`", "Bootstrapping".bold().green(), test_name.bold().cyan());
 
@@ -291,7 +295,7 @@ impl Regress {
 
         // The default verbosity is terse in order to avoid verbose log output
         // being enshrined in expected test output
-        let verbosity = &self.psql_verbosity.clone().unwrap_or("terse".into());
+        let verbosity = &self.psql_verbosity.clone().unwrap_or_else(|| "terse".into());
 
         // Run all tests that have expected output
         let success =
@@ -356,10 +360,11 @@ impl CommandExecute for Regress {
             self.resetdb = true;
         }
 
-        let (_, manifest_path) = get_package_manifest(
+        let (_, manifest_path, _) = get_package_manifest(
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
+            &self.cargo,
         )?;
         let extname = get_property(&manifest_path, "extname")?
             .expect("extension name property `extname` should always be known");
@@ -579,7 +584,7 @@ impl Regress {
                 )?;
             } else {
                 // Run setup.sql normally to establish schema/data
-                let verbosity = &self.psql_verbosity.clone().unwrap_or("terse".into());
+                let verbosity = &self.psql_verbosity.clone().unwrap_or_else(|| "terse".into());
                 run_tests(pg_config, pgregress_path, dbname, &[setup_entry], verbosity, 0)?;
             }
         }

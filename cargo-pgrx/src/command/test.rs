@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use cargo_toml::Manifest;
 use eyre::Context;
-use pgrx_pg_config::{PgConfig, Pgrx, get_target_dir};
+use pgrx_pg_config::{PgConfig, Pgrx};
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 
@@ -50,6 +50,9 @@ pub(crate) struct Test {
     pgdata: Option<PathBuf>,
     #[clap(flatten)]
     features: clap_cargo::Features,
+    /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+    #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
+    cargo: Vec<String>,
     #[clap(from_global, action = clap::ArgAction::Count)]
     verbose: u8,
 }
@@ -63,6 +66,7 @@ impl CommandExecute for Test {
             pgrx: &Pgrx,
             package_manifest: &Manifest,
             package_manifest_path: &Path,
+            target_dir: &Path,
         ) -> eyre::Result<()> {
             let mut features = me.features.clone();
             let (pg_config, _pg_version) = pg_config_and_version(
@@ -87,15 +91,18 @@ impl CommandExecute for Test {
                 &me.testnames,
                 me.runas,
                 me.pgdata,
+                target_dir,
+                &me.cargo,
             )?;
 
             Ok(())
         }
 
-        let (package_manifest, package_manifest_path) = get_package_manifest(
+        let (package_manifest, package_manifest_path, target_dir) = get_package_manifest(
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
+            &self.cargo,
         )?;
         let pgrx = Pgrx::from_config()?;
 
@@ -109,13 +116,19 @@ impl CommandExecute for Test {
             for v in crate::manifest::all_pg_in_both_tomls(&package_manifest, &pgrx) {
                 let mut versioned_test = self.clone();
                 versioned_test.pg_version = Some(v?.label()?);
-                perform(versioned_test, &pgrx, &package_manifest, &package_manifest_path)?;
+                perform(
+                    versioned_test,
+                    &pgrx,
+                    &package_manifest,
+                    &package_manifest_path,
+                    &target_dir,
+                )?;
             }
 
             Ok(())
         } else {
             // attempt to run the test for the Postgres version `run_test()` will figure out
-            perform(self, &pgrx, &package_manifest, &package_manifest_path)
+            perform(self, &pgrx, &package_manifest, &package_manifest_path, &target_dir)
         }
     }
 }
@@ -125,7 +138,7 @@ impl CommandExecute for Test {
     testnames = tracing::field::Empty,
     ?profile,
 ))]
-pub fn test_extension(
+pub(crate) fn test_extension(
     pg_config: &PgConfig,
     package_manifest_path: &Path,
     profile: &CargoProfile,
@@ -134,6 +147,8 @@ pub fn test_extension(
     testnames: &[String],
     runas: Option<String>,
     pgdata: Option<PathBuf>,
+    target_dir: &Path,
+    cargo_flags: &[String],
 ) -> eyre::Result<()> {
     #[cfg(target_os = "windows")]
     if runas.is_some() {
@@ -143,8 +158,6 @@ pub fn test_extension(
     if !testnames.is_empty() {
         tracing::Span::current().record("testnames", tracing::field::display(&testnames.join(",")));
     }
-    let target_dir = get_target_dir()?;
-
     let mut command = crate::cargo::cargo();
 
     let no_default_features_arg = features.no_default_features;
@@ -157,12 +170,18 @@ pub fn test_extension(
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .arg("test")
-        .env("CARGO_TARGET_DIR", &target_dir)
+        .env("CARGO_TARGET_DIR", target_dir)
         .env("PGRX_FEATURES", features_arg.clone())
         .env("PGRX_NO_DEFAULT_FEATURES", if no_default_features_arg { "true" } else { "false" })
         .env("PGRX_ALL_FEATURES", if features.all_features { "true" } else { "false" })
         .env("PGRX_BUILD_PROFILE", profile.name())
         .env("PGRX_NO_SCHEMA", if no_schema { "true" } else { "false" });
+
+    // The `--cargo` passthrough reaches every cargo invocation; here, `cargo test`.
+    for arg in crate::metadata::split_cargo_flags(cargo_flags) {
+        command.arg(arg);
+    }
+
     apply_resolved_manifest_to_test_command(&mut command, package_manifest_path);
 
     if let Some(runas) = runas {

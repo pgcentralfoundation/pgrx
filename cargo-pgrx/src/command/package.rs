@@ -14,7 +14,7 @@ use crate::command::install::{install_extension, warn_if_pg_bench_enabled};
 use crate::manifest::{PgVersionSource, display_version_info};
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
-use pgrx_pg_config::{PgConfig, Pgrx, get_target_dir};
+use pgrx_pg_config::{PgConfig, Pgrx};
 use std::path::{Path, PathBuf};
 
 /// Create an installation package directory.
@@ -46,6 +46,9 @@ pub(crate) struct Package {
     pub(crate) features: clap_cargo::Features,
     #[clap(long)]
     pub(crate) target: Option<String>,
+    /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+    #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
+    pub(crate) cargo: Vec<String>,
     #[clap(from_global, action = ArgAction::Count)]
     pub(crate) verbose: u8,
     /// The directory within out_dir to put extension assets (default is based on pg_config path)
@@ -56,8 +59,10 @@ pub(crate) struct Package {
 impl Package {
     pub(crate) fn perform(mut self) -> eyre::Result<(PathBuf, Vec<PathBuf>)> {
         warn_if_pg_bench_enabled(&self.features, "package");
-        let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_deref())
-            .wrap_err("couldn't get cargo metadata")?;
+        let cargo_flags = std::mem::take(&mut self.cargo);
+        let metadata =
+            crate::metadata::metadata(&self.features, self.manifest_path.as_deref(), &cargo_flags)
+                .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(self.manifest_path.as_deref(), &metadata)?;
         let package_manifest_path =
             crate::manifest::manifest_path(&metadata, self.package.as_deref())
@@ -86,7 +91,13 @@ impl Package {
         let out_dir = if let Some(out_dir) = self.out_dir {
             out_dir
         } else {
-            build_base_path(&pg_config, &package_manifest_path, &profile, self.target.as_deref())?
+            build_base_path(
+                &pg_config,
+                &package_manifest_path,
+                &profile,
+                self.target.as_deref(),
+                metadata.target_directory.as_std_path(),
+            )?
         };
 
         let output_files = package_extension(
@@ -99,6 +110,8 @@ impl Package {
             self.test,
             &self.features,
             self.target.as_deref(),
+            metadata.target_directory.as_std_path(),
+            &cargo_flags,
             self.prefix_dir.clone(),
         )?;
 
@@ -129,6 +142,8 @@ pub(crate) fn package_extension(
     is_test: bool,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    target_dir: &Path,
+    cargo_flags: &[String],
     prefix_dir: Option<PathBuf>,
 ) -> eyre::Result<Vec<PathBuf>> {
     let out_dir_exists = out_dir.try_exists().wrap_err_with(|| {
@@ -149,6 +164,8 @@ pub(crate) fn package_extension(
         Some(out_dir),
         features,
         target,
+        target_dir,
+        cargo_flags,
         prefix_dir,
     )
 }
@@ -158,11 +175,12 @@ pub(crate) fn build_base_path(
     manifest_path: &Path,
     profile: &CargoProfile,
     target: Option<&str>,
+    target_dir: &Path,
 ) -> eyre::Result<PathBuf> {
-    let mut target_dir = get_target_dir()?;
+    let mut target_dir = target_dir.to_path_buf();
     let pgver = pg_config.major_version()?;
     let extname = get_property(manifest_path, "extname")?
-        .ok_or(eyre!("could not determine extension name"))?;
+        .ok_or_else(|| eyre!("could not determine extension name"))?;
     if let Some(target) = target {
         target_dir.push(target);
     }

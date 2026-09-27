@@ -340,7 +340,7 @@ fn generate_bindings(
     let lib_dir = pg_config.lib_dir()?;
     println!(
         "cargo:rustc-link-search={}",
-        lib_dir.to_str().ok_or(eyre!("{lib_dir:?} is not valid UTF-8 string"))?
+        lib_dir.to_str().ok_or_else(|| eyre!("{lib_dir:?} is not valid UTF-8 string"))?
     );
     Ok(())
 }
@@ -958,8 +958,13 @@ fn add_blocklists(
         .blocklist_function("PageIsValid")
         // it's defined twice on Windows, so use PGERROR instead
         .blocklist_item("ERROR")
-        // it causes strange linker errors for PostgreSQL 14 on Windows
+        // they cause linker errors for PostgreSQL 14 on Windows
         .blocklist_function("IsQueryIdEnabled")
+        .blocklist_function("am_tablesync_worker")
+        .blocklist_function("am_sequencesync_worker")
+        .blocklist_function("am_leader_apply_worker")
+        .blocklist_function("am_parallel_apply_worker")
+        .blocklist_function("get_logical_worker_type")
 }
 
 fn add_allowlists<'a>(
@@ -1253,7 +1258,7 @@ fn rust_fmt(path: &Path) -> eyre::Result<()> {
         }
         Err(e)
             if e.downcast_ref::<std::io::Error>()
-                .ok_or(eyre!("Couldn't downcast error ref"))?
+                .ok_or_else(|| eyre!("Couldn't downcast error ref"))?
                 .kind()
                 == std::io::ErrorKind::NotFound =>
         {
