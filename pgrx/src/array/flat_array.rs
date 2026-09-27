@@ -316,6 +316,7 @@ fn alloc_zeroed_head(
 
 unsafe impl<T: ?Sized> BorrowDatum for FlatArray<'_, T> {
     const PASS: layout::PassBy = layout::PassBy::Ref;
+
     unsafe fn point_from(ptr: ptr::NonNull<u8>) -> ptr::NonNull<Self> {
         unsafe {
             let len =
@@ -324,6 +325,22 @@ unsafe impl<T: ?Sized> BorrowDatum for FlatArray<'_, T> {
                 ptr::slice_from_raw_parts_mut(ptr.as_ptr(), len) as *mut Self
             )
         }
+    }
+
+    unsafe fn borrow_arg_unchecked<'dat>(
+        ptr: ptr::NonNull<u8>,
+        register: impl FnOnce(ptr::NonNull<u8>),
+    ) -> &'dat Self {
+        // SAFETY: The caller guarantees `ptr` points to a valid PostgreSQL array Datum.
+        let detoasted = unsafe { pg_sys::pg_detoast_datum(ptr.as_ptr().cast()) };
+        let detoasted = ptr::NonNull::new(detoasted).expect("pg_detoast_datum returned null");
+        if detoasted.cast() != ptr {
+            register(detoasted.cast());
+        }
+
+        // SAFETY: `pg_detoast_datum` returns an aligned, contiguous, initialized ArrayType, and a
+        // fresh allocation is registered above to live until the function result has been boxed.
+        unsafe { Self::point_from(detoasted.cast()).as_ref() }
     }
 }
 
