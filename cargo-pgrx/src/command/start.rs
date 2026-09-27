@@ -50,7 +50,7 @@ impl CommandExecute for Start {
             pgrx: &Pgrx,
             postgresql_conf: &HashMap<String, String>,
         ) -> eyre::Result<()> {
-            let (package_manifest, _) = get_package_manifest(
+            let (package_manifest, _, _) = get_package_manifest(
                 &clap_cargo::Features::default(),
                 me.package.as_deref(),
                 me.manifest_path.as_deref(),
@@ -62,7 +62,7 @@ impl CommandExecute for Start {
 
             start_postgres(&pg_config, postgresql_conf, me.valgrind)
         }
-        let (package_manifest, _) = get_package_manifest(
+        let (package_manifest, _, _) = get_package_manifest(
             &clap_cargo::Features::default(),
             self.package.as_deref(),
             self.manifest_path.as_deref(),

@@ -360,7 +360,7 @@ impl CommandExecute for Regress {
             self.resetdb = true;
         }
 
-        let (_, manifest_path) = get_package_manifest(
+        let (_, manifest_path, _) = get_package_manifest(
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),

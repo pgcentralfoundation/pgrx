@@ -98,7 +98,7 @@ impl CommandExecute for Bench {
         let (resolved_pg_version, bench_filter) = self.resolve_args()?;
         let pgrx = Pgrx::from_config()?;
 
-        let (package_manifest, package_manifest_path) = get_package_manifest(
+        let (package_manifest, package_manifest_path, target_dir) = get_package_manifest(
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
@@ -141,6 +141,7 @@ impl CommandExecute for Bench {
             false,
             false,
             self.target.as_deref(),
+            &target_dir,
             &postgresql_conf,
             &self.cargo,
         )?;

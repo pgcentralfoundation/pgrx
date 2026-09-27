@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use cargo_toml::Manifest;
 use eyre::Context;
-use pgrx_pg_config::{PgConfig, Pgrx, get_target_dir};
+use pgrx_pg_config::{PgConfig, Pgrx};
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 
@@ -66,6 +66,7 @@ impl CommandExecute for Test {
             pgrx: &Pgrx,
             package_manifest: &Manifest,
             package_manifest_path: &Path,
+            target_dir: &Path,
         ) -> eyre::Result<()> {
             let mut features = me.features.clone();
             let (pg_config, _pg_version) = pg_config_and_version(
@@ -90,13 +91,14 @@ impl CommandExecute for Test {
                 &me.testnames,
                 me.runas,
                 me.pgdata,
+                target_dir,
                 &me.cargo,
             )?;
 
             Ok(())
         }
 
-        let (package_manifest, package_manifest_path) = get_package_manifest(
+        let (package_manifest, package_manifest_path, target_dir) = get_package_manifest(
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
@@ -114,13 +116,19 @@ impl CommandExecute for Test {
             for v in crate::manifest::all_pg_in_both_tomls(&package_manifest, &pgrx) {
                 let mut versioned_test = self.clone();
                 versioned_test.pg_version = Some(v?.label()?);
-                perform(versioned_test, &pgrx, &package_manifest, &package_manifest_path)?;
+                perform(
+                    versioned_test,
+                    &pgrx,
+                    &package_manifest,
+                    &package_manifest_path,
+                    &target_dir,
+                )?;
             }
 
             Ok(())
         } else {
             // attempt to run the test for the Postgres version `run_test()` will figure out
-            perform(self, &pgrx, &package_manifest, &package_manifest_path)
+            perform(self, &pgrx, &package_manifest, &package_manifest_path, &target_dir)
         }
     }
 }
@@ -139,6 +147,7 @@ pub(crate) fn test_extension(
     testnames: &[String],
     runas: Option<String>,
     pgdata: Option<PathBuf>,
+    target_dir: &Path,
     cargo_flags: &[String],
 ) -> eyre::Result<()> {
     #[cfg(target_os = "windows")]
@@ -149,8 +158,6 @@ pub(crate) fn test_extension(
     if !testnames.is_empty() {
         tracing::Span::current().record("testnames", tracing::field::display(&testnames.join(",")));
     }
-    let target_dir = get_target_dir()?;
-
     let mut command = crate::cargo::cargo();
 
     let no_default_features_arg = features.no_default_features;
@@ -163,7 +170,7 @@ pub(crate) fn test_extension(
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .arg("test")
-        .env("CARGO_TARGET_DIR", &target_dir)
+        .env("CARGO_TARGET_DIR", target_dir)
         .env("PGRX_FEATURES", features_arg.clone())
         .env("PGRX_NO_DEFAULT_FEATURES", if no_default_features_arg { "true" } else { "false" })
         .env("PGRX_ALL_FEATURES", if features.all_features { "true" } else { "false" })

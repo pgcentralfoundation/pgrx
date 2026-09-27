@@ -231,7 +231,7 @@ pub(crate) fn get_package_manifest(
     package_name: Option<&str>,
     manifest_path: Option<&Path>,
     cargo_flags: &[String],
-) -> eyre::Result<(Manifest, PathBuf)> {
+) -> eyre::Result<(Manifest, PathBuf, PathBuf)> {
     let metadata = crate::metadata::metadata(features, manifest_path, cargo_flags)
         .wrap_err("couldn't get cargo metadata")?;
     crate::metadata::validate(manifest_path, &metadata)?;
@@ -241,6 +241,7 @@ pub(crate) fn get_package_manifest(
     Ok((
         Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?,
         package_manifest_path,
+        metadata.target_directory.into_std_path_buf(),
     ))
 }
 

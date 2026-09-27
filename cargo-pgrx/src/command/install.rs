@@ -16,7 +16,7 @@ use cargo_metadata::{CrateType, Message as CargoMessage};
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
-use pgrx_pg_config::{PgConfig, Pgrx, cargo::PgrxManifestExt, get_target_dir};
+use pgrx_pg_config::{PgConfig, Pgrx, cargo::PgrxManifestExt};
 use std::collections::HashMap;
 use std::fs;
 use std::io::BufReader;
@@ -115,6 +115,7 @@ impl CommandExecute for Install {
             None,
             &self.features,
             self.target.as_deref(),
+            metadata.target_directory.as_std_path(),
             &cargo_flags,
         )?;
         Ok(())
@@ -153,6 +154,7 @@ pub(crate) fn install_extension(
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    target_dir: &Path,
     cargo_flags: &[String],
 ) -> eyre::Result<Vec<PathBuf>> {
     let mut output_tracking = Vec::new();
@@ -199,6 +201,7 @@ pub(crate) fn install_extension(
             true,
             package_manifest_path,
             &mut output_tracking,
+            target_dir,
             cargo_flags,
         )?;
     }
@@ -242,6 +245,7 @@ pub(crate) fn install_extension(
             false,
             package_manifest_path,
             &mut output_tracking,
+            target_dir,
             cargo_flags,
         )?;
     }
@@ -254,6 +258,7 @@ pub(crate) fn install_extension(
         is_test,
         features,
         target,
+        target_dir,
         &extdir,
         true,
         &mut output_tracking,
@@ -271,6 +276,7 @@ fn copy_file(
     do_filter: bool,
     package_manifest_path: &Path,
     output_tracking: &mut Vec<PathBuf>,
+    target_dir: &Path,
     cargo_flags: &[String],
 ) -> eyre::Result<()> {
     let Some(dest_dir) = dest.parent() else {
@@ -287,7 +293,12 @@ fn copy_file(
         })?,
     };
 
-    println!("{} {} to {}", "     Copying".bold().green(), msg, format_display_path(&dest)?.cyan());
+    println!(
+        "{} {} to {}",
+        "     Copying".bold().green(),
+        msg,
+        format_display_path(&dest, target_dir).cyan()
+    );
 
     if do_filter {
         // we want to filter the contents of the file we're to copy
@@ -401,6 +412,7 @@ fn copy_sql_files(
     is_test: bool,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    target_dir: &Path,
     extdir: &Path,
     skip_build: bool,
     output_tracking: &mut Vec<PathBuf>,
@@ -420,6 +432,7 @@ fn copy_sql_files(
             is_test,
             features,
             target,
+            target_dir,
             Some(&dest),
             None,
             None,
@@ -450,6 +463,7 @@ fn copy_sql_files(
                     true,
                     package_manifest_path,
                     output_tracking,
+                    target_dir,
                     cargo_flags,
                 )?;
             }
@@ -601,13 +615,13 @@ fn make_relative_extdir(_: PathBuf) -> PathBuf {
     "share/extension".into()
 }
 
-pub(crate) fn format_display_path(path: &Path) -> eyre::Result<String> {
-    let out = path
-        .strip_prefix(get_target_dir()?.parent().unwrap())
+fn format_display_path(path: &Path, target_dir: &Path) -> String {
+    target_dir
+        .parent()
+        .and_then(|parent| path.strip_prefix(parent).ok())
         .unwrap_or(path)
         .display()
-        .to_string();
-    Ok(out)
+        .to_string()
 }
 
 fn filter_contents(

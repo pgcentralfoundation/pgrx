@@ -37,7 +37,7 @@ impl CommandExecute for Stop {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         fn perform(me: Stop, pgrx: &Pgrx) -> eyre::Result<()> {
-            let (package_manifest, _) = get_package_manifest(
+            let (package_manifest, _, _) = get_package_manifest(
                 &clap_cargo::Features::default(),
                 me.package.as_deref(),
                 me.manifest_path.as_deref(),
@@ -50,7 +50,7 @@ impl CommandExecute for Stop {
         }
 
         let pgrx = Pgrx::from_config()?;
-        let (package_manifest, _) = get_package_manifest(
+        let (package_manifest, _, _) = get_package_manifest(
             &clap_cargo::Features::default(),
             self.package.as_deref(),
             self.manifest_path.as_deref(),

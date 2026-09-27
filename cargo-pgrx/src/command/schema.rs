@@ -16,7 +16,7 @@ use cargo_toml::Manifest;
 use eyre::WrapErr;
 use owo_colors::OwoColorize;
 use pgrx_pg_config::cargo::PgrxManifestExt;
-use pgrx_pg_config::{Pgrx, get_target_dir, is_supported_major_version};
+use pgrx_pg_config::{Pgrx, is_supported_major_version};
 use pgrx_sql_entity_graph::section::decode_entities;
 use pgrx_sql_entity_graph::{ControlFile, PgrxSql, SqlGraphEntity};
 use std::path::{Path, PathBuf};
@@ -96,7 +96,7 @@ impl CommandExecute for Schema {
         let (pg_version, items) = split_positional_args(&self.args);
 
         let pgrx = Pgrx::from_config()?;
-        let (package_manifest, package_manifest_path) = get_package_manifest(
+        let (package_manifest, package_manifest_path, target_dir) = get_package_manifest(
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
@@ -125,6 +125,7 @@ impl CommandExecute for Schema {
             self.test,
             &self.features,
             self.target.as_deref(),
+            &target_dir,
             self.out.as_deref(),
             self.dot.as_deref(),
             log_level,
@@ -172,6 +173,7 @@ pub(crate) fn generate_schema_for_cli(
     is_test: bool,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    target_dir: &Path,
     path: Option<&Path>,
     dot: Option<&Path>,
     log_level: Option<String>,
@@ -206,6 +208,7 @@ pub(crate) fn generate_schema_for_cli(
         package_manifest_path,
         profile,
         target,
+        target_dir,
         path,
         dot,
         items,
@@ -220,6 +223,7 @@ pub(crate) fn generate_schema_implicit(
     package_manifest_path: &Path,
     profile: &CargoProfile,
     target: Option<&str>,
+    target_dir: &Path,
     path: Option<&Path>,
     dot: Option<&Path>,
     items: Option<&[String]>,
@@ -244,7 +248,7 @@ pub(crate) fn generate_schema_implicit(
         tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
     }
 
-    let lib_so_data = load_section_data(profile, &lib_filename, target)?;
+    let lib_so_data = load_section_data(profile, &lib_filename, target, target_dir)?;
     let section_entities = decode_section_entities(&lib_so_data)?;
     report_entity_counts(&section_entities);
 
@@ -309,8 +313,9 @@ fn load_section_data(
     profile: &CargoProfile,
     lib_filename: &str,
     target: Option<&str>,
+    target_dir: &Path,
 ) -> eyre::Result<Vec<u8>> {
-    let mut lib_so = get_target_dir()?;
+    let mut lib_so = target_dir.to_path_buf();
     if let Some(target) = target {
         lib_so.push(target);
     }

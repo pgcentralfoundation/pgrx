@@ -48,7 +48,7 @@ impl CommandExecute for Connect {
     fn execute(mut self) -> eyre::Result<()> {
         let pgrx = Pgrx::from_config()?;
 
-        let (package_manifest, package_manifest_path) = get_package_manifest(
+        let (package_manifest, package_manifest_path, _) = get_package_manifest(
             &Features::default(),
             self.package.as_deref(),
             self.manifest_path.as_deref(),

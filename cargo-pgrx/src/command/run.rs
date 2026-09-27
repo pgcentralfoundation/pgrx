@@ -98,7 +98,7 @@ impl Run {
             self.dbname = self.pg_version.take();
         }
 
-        let (package_manifest, package_manifest_path) = get_package_manifest(
+        let (package_manifest, package_manifest_path, target_dir) = get_package_manifest(
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
@@ -134,6 +134,7 @@ impl Run {
             self.install_only,
             self.valgrind,
             self.target.as_deref(),
+            &target_dir,
             postgresql_conf,
             &self.cargo,
         )?;
@@ -170,6 +171,7 @@ pub(crate) fn run(
     install_only: bool,
     use_valgrind: bool,
     target: Option<&str>,
+    target_dir: &Path,
     postgresql_conf: &HashMap<String, String>,
     cargo_flags: &[String],
 ) -> eyre::Result<()> {
@@ -187,6 +189,7 @@ pub(crate) fn run(
         None,
         features,
         target,
+        target_dir,
         cargo_flags,
     )?;
 
