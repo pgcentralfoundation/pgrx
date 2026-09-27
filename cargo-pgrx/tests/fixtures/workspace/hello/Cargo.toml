@@ -27,7 +27,7 @@ workspace = true
 
 [dev-dependencies]
 [dev-dependencies.pgrx-tests]
-version = "=0.19.2"
+version = "=0.19.3"
 
 [profile.dev]
 panic = "unwind"
