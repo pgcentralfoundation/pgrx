@@ -915,9 +915,24 @@ Options:
       --no-default-features            Do not activate the `default` feature
   -F, --features <FEATURES>            Space-separated list of features to activate
       --cargo <FLAG>                   Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+      --prefix-dir <PREFIX_DIR>        The directory within out_dir to put extension assets (default is based on pg_config path)
   -h, --help                           Print help
   -V, --version                        Print version
 ```
+
+### Extension Artifact Placement
+
+On Unix, `--prefix-dir <PREFIX_DIR>` overrides the installation paths obtained from `pg_config`, placing the control file,
+SQL files, and shared library in the same directory within the package output. Use `--out-dir` to choose the package output
+directory:
+
+```console
+$ cargo pgrx package --out-dir ./package --prefix-dir /opt/my_extension
+```
+
+This places the extension assets in `./package/opt/my_extension/`. An absolute prefix is made relative to the package output
+directory. If you omit `--prefix-dir`, the layout follows `pg_config`. On Windows, the package layout uses `lib` and
+`share/extension` regardless of this option.
 
 ## Inspect your Extension Schema
 

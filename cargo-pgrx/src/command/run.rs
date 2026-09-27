@@ -191,6 +191,7 @@ pub(crate) fn run(
         target,
         target_dir,
         cargo_flags,
+        None,
     )?;
 
     if install_only {

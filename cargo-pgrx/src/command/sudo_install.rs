@@ -21,6 +21,7 @@ pub(crate) struct SudoInstall {
     target: Option<String>,
     verbose: u8,
     cargo: Vec<String>,
+    prefix_dir: Option<PathBuf>,
 }
 
 impl From<Install> for SudoInstall {
@@ -37,6 +38,7 @@ impl From<Install> for SudoInstall {
             target: value.target,
             verbose: value.verbose,
             cargo: value.cargo,
+            prefix_dir: None,
         }
     }
 }
@@ -55,6 +57,7 @@ impl From<SudoInstall> for Package {
             verbose: value.verbose,
             target: value.target,
             cargo: value.cargo,
+            prefix_dir: value.prefix_dir,
         }
     }
 }
