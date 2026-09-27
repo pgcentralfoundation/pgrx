@@ -552,7 +552,7 @@ jobs:
         postgresql: [ 15, 16 ]
 
     steps:
-      - uses: Homebrew/actions/setup-homebrew@master
+      - uses: Homebrew/actions/setup-homebrew@main
 
       # install postgres with homebrew, but do't let homebrew do an update too.  The update
       # process not only takes forever, but it tends to fail when the internet changes

@@ -958,8 +958,13 @@ fn add_blocklists(
         .blocklist_function("PageIsValid")
         // it's defined twice on Windows, so use PGERROR instead
         .blocklist_item("ERROR")
-        // it causes strange linker errors for PostgreSQL 14 on Windows
+        // they cause linker errors for PostgreSQL 14 on Windows
         .blocklist_function("IsQueryIdEnabled")
+        .blocklist_function("am_tablesync_worker")
+        .blocklist_function("am_sequencesync_worker")
+        .blocklist_function("am_leader_apply_worker")
+        .blocklist_function("am_parallel_apply_worker")
+        .blocklist_function("get_logical_worker_type")
 }
 
 fn add_allowlists<'a>(
