@@ -1,59 +1,45 @@
 # cargo pgrx install
 
-Compiles the extension and installs it into a Postgres instance specified by
-`pg_config`. Does not start Postgres or open a shell.
+Builds the extension, generates its SQL, and installs the shared library into
+`pg_config --pkglibdir` and the control and SQL files into the installation's
+extension directory. It does not start PostgreSQL, create a database, or execute
+`CREATE EXTENSION`.
 
-## What it does
+The destination is selected by `--pg-config`, falling back to `pg_config` on
+`PATH`. Supply an explicit path when the destination matters. A private
+`PGRX_HOME` does not redirect files written into a reused installation prefix.
 
-1. Runs `cargo build --lib` to produce the shared library
-2. Copies the `.so`/`.dylib` to Postgres' `pkglibdir`
-3. Copies SQL files and the `.control` file to `sharedir`
+## Usage and options
 
-## Usage
-
-```
+```text
 cargo pgrx install [OPTIONS]
 ```
 
-### Key flags
-
-| Flag | Short | Description |
-|------|-------|-------------|
-| `--pg-config <PATH>` | `-c` | Path to `pg_config` (default: first in `$PATH`) |
-| `--release` | `-r` | Compile in release mode |
-| `--profile <P>` | | Specific Cargo profile |
-| `--test` | | Build in test mode (used internally by `cargo pgrx test`) |
-| `--sudo` | `-s` | Use `sudo` for file installation |
-| `--features <F>` | `-F` | Cargo features |
-| `--no-default-features` | | Disable default features |
-| `--all-features` | | Enable all features |
-| `--package <PKG>` | `-p` | Package in workspace |
-| `--manifest-path <PATH>` | | Path to Cargo.toml |
-| `--target <TARGET>` | | Cross-compilation target |
-
-## Examples
+| Flag | Meaning |
+|------|---------|
+| `-c, --pg-config <PATH>` | Target installation and PostgreSQL version |
+| `-r, --release` | Release profile; default is development |
+| `--profile <P>` | Custom profile; overrides `--release` |
+| `--test` | Include test support, used by the backend test harness |
+| `-s, --sudo` | Use sudo for copying extension artifacts |
+| `-F, --features <F>` | Additional Cargo features |
+| `--no-default-features`, `--all-features` | Cargo feature selection |
+| `-p, --package <PKG>` | Select a workspace extension |
+| `--manifest-path <PATH>` | Select its manifest |
+| `--target <TARGET>` | Cargo compilation target |
+| `--cargo <FLAG>` | Repeatable Cargo flags, including for metadata |
 
 ```bash
-# Install to default pg_config
-cargo pgrx install
-
-# Install to a specific Postgres installation
 cargo pgrx install --pg-config /usr/local/pgsql/bin/pg_config
-
-# Release build for production
-cargo pgrx install --release
-
-# Install when extension dir requires root
-cargo pgrx install --release --sudo
+cargo pgrx install --pg-config /usr/local/pgsql/bin/pg_config --release
+cargo pgrx install --cargo=--config=./cargo-local.toml
 ```
 
-## When to use
+Use `--sudo` only when authorized to install into the chosen prefix. Installation
+can replace files used by other databases or worktrees sharing that prefix.
+For staged distribution files, use [package](package.md), which also provides
+`--prefix-dir`. For interactive development, use [run](run.md).
 
-- Installing into a non-pgrx-managed Postgres (production, staging)
-- CI/CD deployment pipelines
-- When you need `cargo pgrx run` behavior without the psql session
-
-## When NOT to use
-
-- Interactive development -- use `cargo pgrx run` instead
-- Testing -- use `cargo pgrx test` instead
+Building with `pg_bench` includes benchmark functions and their dependencies;
+cargo-pgrx warns about this during install. Keep that feature out of ordinary
+deployment builds unless explicitly wanted.

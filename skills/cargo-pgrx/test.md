@@ -1,102 +1,90 @@
 # cargo pgrx test
 
-Runs both `#[test]` and `#[pg_test]` functions for a pgrx extension.
+Runs ordinary Rust tests and backend `#[pg_test]` functions. The CLI selects a
+PostgreSQL version, adjusts features, adds `pg_test`, and invokes `cargo test`.
+The pgrx-tests harness builds and installs the extension, initializes a separate
+test cluster, and runs the backend tests there. Plain `cargo test` can use the
+same harness when the extension's test setup and features are configured.
 
-Both `cargo pgrx test` and plain `cargo test` work for pgrx extensions --
-the pgrx test framework handles `#[pg_test]` execution either way.
-`cargo pgrx test` adds convenience (auto-starts Postgres, manages features)
-but is not strictly required.
+## Usage and options
 
-## What it does
-
-1. Determines the target Postgres version (from argument or Cargo.toml features)
-2. Compiles the extension as a cdylib and as a test binary
-3. Generates and installs the SQL schema into a pgrx-managed Postgres instance
-4. Starts the Postgres instance if not already running
-5. Runs `cargo test` with the `pg_test` feature enabled
-6. `#[pg_test]` functions execute inside the Postgres backend process
-7. `#[test]` functions execute in the test binary as usual
-
-## Usage
-
-```
-cargo pgrx test [OPTIONS] [PG_VERSION] [TESTNAME]
+```text
+cargo pgrx test [OPTIONS] [PG_VERSION] [TESTNAME]...
 ```
 
-### Arguments
+`PG_VERSION` accepts `pg13` through `pg19`, or `all`, and can come from the
+environment variable of the same name. Without a selector, version resolution
+uses explicit PostgreSQL features or the manifest's defaults. A first positional
+argument that is not a recognized version is treated as a test filter.
 
-| Argument | Description |
-|----------|-------------|
-| `PG_VERSION` | `pg13`, `pg14`, `pg15`, `pg16`, `pg17`, `pg18`, `pg19`, or `all`. Defaults to the first pgXX feature in Cargo.toml. Env: `PG_VERSION` |
-| `TESTNAME` | If specified, only run tests whose names contain this string |
+Multiple filters match test names containing any supplied substring. `all` runs
+versions present in both the extension's features and the active configuration.
 
-**Smart argument detection:** If the first positional argument is not a
-recognized Postgres version (`pgXX` or `all`), it is treated as `TESTNAME`
-and the default Postgres version is used. This means `cargo pgrx test foo`
-works as a shorthand for `cargo pgrx test pgXX foo`.
-
-### Flags
-
-| Flag | Short | Description |
-|------|-------|-------------|
-| `--release` | `-r` | Compile in release mode (default is debug) |
-| `--profile <P>` | | Use a specific Cargo profile (conflicts with `--release`) |
-| `--no-schema` | `-n` | Skip SQL schema regeneration |
-| `--runas <USER>` | | Use `sudo` to run the Postgres instance as this system user |
-| `--pgdata <DIR>` | | Store the test database cluster in this directory |
-| `--features <F>` | `-F` | Space-separated list of Cargo features to activate |
-| `--no-default-features` | | Disable default features |
-| `--all-features` | | Enable all features |
-| `--package <PKG>` | `-p` | Select a specific package in a workspace |
-| `--manifest-path <PATH>` | | Path to Cargo.toml |
-
-## Examples
+| Flag | Meaning |
+|------|---------|
+| `-r, --release` | Release profile; default is development |
+| `--profile <P>` | Custom profile; overrides `--release` |
+| `-n, --no-schema` | Request skipping SQL generation; currently incompatible with the harness install step described below |
+| `--runas <USER>` | Use sudo for the PostgreSQL test instance; unsupported on Windows |
+| `--pgdata <DIR>` | Base directory for test clusters; must be writable by the runas user |
+| `-F, --features <F>` | Additional Cargo features |
+| `--no-default-features`, `--all-features` | Cargo feature selection; avoid incompatible PostgreSQL features |
+| `-p, --package <PKG>` | Select a workspace extension |
+| `--manifest-path <PATH>` | Select its manifest |
+| `--cargo <FLAG>` | Repeatable Cargo flags, including for metadata; see [SKILL.md](SKILL.md#versions-features-and-cargo-flags) |
 
 ```bash
-# Run all tests against the default Postgres version
-cargo pgrx test
-
-# Run all tests against Postgres 18
 cargo pgrx test pg18
-
-# Run only tests whose names contain "spi" (using default PG version)
+cargo pgrx test pg18 spi memory_context
 cargo pgrx test spi
-
-# Run only tests whose names contain "spi" against Postgres 18
-cargo pgrx test pg18 spi
-
-# Run tests in release mode
-cargo pgrx test --release
-
-# Run tests for a specific workspace member
-cargo pgrx test --package my-extension
-
-# Run tests against every configured Postgres version
-cargo pgrx test all
-
-# Skip schema regeneration (faster if schema hasn't changed)
-cargo pgrx test --no-schema
+cargo pgrx test all --package my-extension
+cargo pgrx test pg18 --release
+cargo pgrx test pg18 --cargo=--config=./cargo-local.toml
 ```
 
-## When to use
+Use ordinary `#[test]` only for code independent of the backend, including its
+cleanup paths. Calls into PostgreSQL belong in `#[pg_test]`. Use
+`cargo check` for compilation, [regress](regress.md) for SQL expectations, and
+[bench](bench.md) for measurements.
 
-- **Always** when you want to run tests for a pgrx extension
-- After modifying extension code to verify correctness
-- In CI pipelines as the primary test command
+## Harness installation
 
-## When NOT to use
+The harness invokes cargo-pgrx separately to install the test extension. It uses
+`CARGO_PGRX` when set, otherwise prefers the source checkout's CLI when available,
+then falls back to PATH. Keep that executable compatible with the tested code.
 
-- For compile-checking only -- use `cargo check` instead (faster)
-- For SQL regression testing -- use `cargo pgrx regress` instead
-- For benchmarking -- use `cargo pgrx bench` instead
+The top-level `--cargo` arguments are not explicitly forwarded into this separate
+install command. Configuration needed there must also be available through
+Cargo's normal configuration discovery or environment. The resolved
+`CARGO_TARGET_DIR` is inherited, so artifact locations remain consistent.
 
-## Common issues
+Currently `--no-schema` makes the harness pass `--no-schema` to `cargo pgrx install`,
+whose parser does not accept that option. Avoid it for backend tests and allow
+the schema to regenerate.
 
-**Linker errors mentioning Postgres symbols.** A `#[test]` function
-(or code it calls) references `pg_sys` symbols. Change it to `#[pg_test]`.
+## Test cluster lifecycle
 
-**Tests hang or timeout.** The pgrx-managed Postgres instance may be in a
-bad state. Try `cargo pgrx stop` then re-run.
+The current harness reserves a free TCP port for each test executable, overriding
+the configured testing port. It creates a cluster under
+`<resolved-target-dir>/test-pgdata/<major>-<test-process-id>`. `--pgdata` or
+`CARGO_PGRX_TEST_PGDATA` changes the base directory; the invocation suffix remains.
+On Unix, socket directories are separate short paths under `/tmp`.
 
-**Schema mismatch errors.** The installed extension schema may be stale.
-Remove `--no-schema` or explicitly reinstall.
+Shutdown hooks normally stop PostgreSQL and remove the invocation's data and
+socket directories. A forced termination can prevent cleanup. Use the failed
+run's logs and exact data path to identify its server before using that
+installation's `pg_ctl stop -D <owned-test-data-dir> -m fast`, under the same OS
+user that started it. Do not delete a running cluster or use a broad process kill.
+`cargo pgrx stop` only handles managed `PGRX_HOME/data-<major>` instances and will
+not clean up these test clusters.
+
+An isolated [PGRX_HOME](init.md#private-pgrx_home-for-agent-worktrees) still helps
+select the intended installation. Dynamic test ports and unique data directories
+do not isolate extension artifacts installed into a shared PostgreSQL prefix.
+
+## Diagnosing failures
+
+For missing PostgreSQL symbols, trace any backend calls made by plain unit tests.
+For stale SQL, regenerate it from the current build. For hangs or crashes,
+inspect the test server's logs, resource limits, and backtrace before changing
+code or stopping a server; the ordinary managed instance may be unrelated.

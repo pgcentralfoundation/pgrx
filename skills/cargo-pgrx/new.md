@@ -1,49 +1,42 @@
 # cargo pgrx new
 
-Scaffolds a new pgrx extension crate with a working project structure.
+Creates a pgrx extension directory with a standard template or a background
+worker template. Choose a new directory name; this command writes template
+files and is not a migration tool for an existing extension.
 
-## What it creates
-
-- `Cargo.toml` with pgrx dependencies and pgXX feature flags
-- `src/lib.rs` with a minimal `#[pg_extern]` function
-- `.cargo/config.toml` with macOS linker flags
-- `<name>.control` extension control file
-- SQL setup files
-- `.gitignore`
-
-## Usage
-
-```
+```text
 cargo pgrx new [OPTIONS] <NAME>
 ```
 
-### Arguments
+`-b, --bgworker` selects the background worker template.
 
-| Argument | Description |
-|----------|-------------|
-| `NAME` | The extension name (becomes the crate name and Postgres extension name) |
+## Generated files
 
-### Flags
+- `Cargo.toml` with a cdylib target, matching pgrx and pgrx-tests dependencies,
+  PostgreSQL features, `pg_test`, and optional `pg_bench` support
+- `src/lib.rs` with the selected extension template and backend test setup
+- `.cargo/config.toml` with macOS linker settings
+- `<name>.control` and `.gitignore`
+- `tests/pg_regress/sql/setup.sql` and
+  `tests/pg_regress/expected/setup.out`
+- An initially empty `sql/` directory for extension SQL files
 
-| Flag | Short | Description |
-|------|-------|-------------|
-| `--bgworker` | `-b` | Generate a background worker template instead of the default |
-
-## Examples
+The current template supports `pg13` through `pg19` and defaults to `pg13`.
+Select another configured version explicitly or adjust the default feature.
 
 ```bash
-# Create a standard extension
 cargo pgrx new my_extension
+cd my_extension
+cargo pgrx test pg18
+```
 
-# Create a background worker extension
+For a background worker:
+
+```bash
 cargo pgrx new my_worker --bgworker
 ```
 
-## After creation
-
-```bash
-cd my_extension
-cargo pgrx run pg18     # build, install, and open psql
-```
-
-The scaffolded project is immediately runnable with `cargo pgrx run`.
+Initialize the needed PostgreSQL version first, using
+[a private PGRX_HOME](init.md#private-pgrx_home-for-agent-worktrees) for agent
+worktrees. Interactive use with `cargo pgrx run pg18` starts a persistent managed
+server; stop the task's server afterward.

@@ -2,58 +2,61 @@
 
 ## cargo pgrx info
 
-Provides information about the pgrx-managed development environment.
-
-### Subcommands
+Reads the active pgrx configuration. Versions can be given as `18` or `pg18`.
 
 ```bash
-cargo pgrx info path pg18        # print Postgres install path
-cargo pgrx info pg-config pg18   # print path to pg_config
-cargo pgrx info version pg18     # print exact Postgres version string
+cargo pgrx info path 18
+cargo pgrx info pg-config 18
+cargo pgrx info version 18
 ```
 
-## cargo pgrx get <property>
+These print the installation path, `pg_config` path, and full PostgreSQL version
+respectively. `info pg-config` is useful for finding an existing installation
+before registering it in a [private worktree home](init.md#private-pgrx_home-for-agent-worktrees).
 
-Reads a property from the extension's `.control` file.
+## cargo pgrx get
+
+Reads a property from the extension's control file. It also provides the derived
+`extname` and `git_hash` properties. `--package` and `--manifest-path` select the
+extension; Cargo metadata is resolved before reading its control file.
 
 ```bash
-cargo pgrx get comment           # print the extension comment
-cargo pgrx get default_version   # print the default version
-cargo pgrx get superuser         # print superuser requirement
+cargo pgrx get comment
+cargo pgrx get default_version
+cargo pgrx get extname
 ```
-
-Flags: `--package`, `--manifest-path`
 
 ## cargo pgrx upgrade
 
-Upgrades pgrx crate versions in `Cargo.toml`.
+Updates pgrx dependency version requirements in the selected manifest. It does
+not upgrade the cargo-pgrx executable or initialize PostgreSQL installations.
+Review the manifest changes and keep the CLI compatible with the dependencies.
 
 ```bash
-# Upgrade to latest release
-cargo pgrx upgrade
-
-# Upgrade to specific version
-cargo pgrx upgrade --to 0.17.0
-
-# Preview changes without modifying Cargo.toml
 cargo pgrx upgrade --dry-run
-
-# Include pre-release versions
+cargo pgrx upgrade
+cargo pgrx upgrade --to '=0.19.2'
 cargo pgrx upgrade --include-prereleases
-
-# Upgrade a specific workspace member
 cargo pgrx upgrade --package my-extension
 ```
 
-Flags: `--to <VERSION>`, `--manifest-path`, `--dry-run`,
-`--include-prereleases`, `--package`
+Options: `--to <VERSION_REQUIREMENT>`, `-m, --manifest-path`,
+`-n, --dry-run`, `--include-prereleases`, and `-p, --package`.
+`--dry-run` prints the proposed manifest instead of writing it.
 
-## cargo pgrx cross (experimental)
+## cargo pgrx cross pgrx-target
 
-Commands for cross-compilation support.
+Builds a target-information bundle using a PostgreSQL installation on the target
+machine. This is an experimental cross-compilation facility; read the
+[cross-compilation guide](../../docs/src/extension/build/cross-compile.md) for
+target headers and toolchain requirements.
 
 ```bash
-cargo pgrx cross             # see available cross subcommands
+cargo pgrx cross pgrx-target --pg-config /usr/bin/pg_config --pg-version 18
 ```
 
-This is experimental and not commonly used in normal development workflows.
+It builds a temporary crate to produce bindings and writes
+`pgrx-target.<architecture>.tgz` in the current directory. Select the deployment
+installation rather than assuming a pgrx development build represents it.
+`--pg-sys-path` can select a local pgrx-pg-sys checkout. The parser also accepts
+`--output`, but the current implementation still writes the default filename.

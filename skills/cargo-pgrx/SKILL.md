@@ -1,179 +1,126 @@
 ---
 name: cargo-pgrx
-description: "Choose and run cargo-pgrx commands, pgrx tests, pg_test coverage, and pg_sys boundary checks."
+description: "Choose cargo-pgrx commands for extension development, tests, SQL regressions, benchmarks, packaging, and isolated worktree environments."
 user-invocable: false
 ---
 
 # cargo pgrx
 
-You understand that a pgrx extension lives in two worlds. The extension's
-shared library runs inside the Postgres backend -- it shares an address space
-with the server, has access to every internal symbol, and obeys Postgres
-memory management. The Rust test binary runs outside Postgres -- it is a
-normal executable with no access to Postgres symbols whatsoever. Every
-decision about testing, building, and running flows from knowing which world
-you are in.
+Use this skill to choose commands and understand their effects on an extension,
+its build artifacts, and PostgreSQL. Follow the user's execution limits and the
+repository's instructions. A request to edit documentation does not require
+running the commands it describes.
 
-Your professional value is **never writing code that crosses the boundary
-wrong**. You know which symbols live in Postgres and which live in Rust. You
-know which `cargo` command produces which artifact. You do not guess.
+Use a cargo-pgrx version compatible with the extension's pgrx dependencies. When
+working on pgrx itself, use the CLI from the same checkout; see the repository's
+[development instructions](../../README.md#hacking). Read the relevant command
+reference before running it. The command implementations in
+[`cargo-pgrx/src/command`](../../cargo-pgrx/src/command) and the
+[`pgrx-tests` harness](../../pgrx-tests/src/framework.rs) define current behavior.
 
-## The two worlds
+## Rust tests and backend tests
 
-A pgrx extension compiles to a `cdylib` -- a shared library that Postgres
-loads with `LOAD` or `CREATE EXTENSION`. At load time, the dynamic linker
-resolves every `pg_sys::*` symbol against the running Postgres binary. This
-works because the extension runs *inside* the server process.
+The extension's shared library runs inside PostgreSQL. A Rust test executable
+runs outside the backend and cannot safely call PostgreSQL functions or access
+its runtime state. Such calls can fail to link or crash; successfully linking
+does not make them valid.
 
-A `#[test]` function compiles into a standalone test binary. This binary is
-not Postgres. It does not link against Postgres. The `pg_sys::*` symbols do
-not exist in its address space. Any reference to them causes linker errors
-on both Linux and macOS.
+Use `#[test]` for pure Rust operations, including operations on bindings that
+do not call the backend. Constants, enums, and simple value types such as
+`pg_sys::Oid` can be used in ordinary unit tests. Check the entire call path,
+including destructors, before classifying a test as independent of PostgreSQL.
 
-## Test classification
+Use `#[pg_test]` for SPI, PostgreSQL allocation, memory contexts, relations,
+backend error reporting, and other code requiring a running backend. Follow the
+extension's existing `tests` schema and feature setup. When dependencies are
+unclear, inspect them before choosing a test tier.
 
-Every test function belongs to exactly one category. There is no grey area.
+Both `cargo pgrx test` and correctly configured `cargo test` can drive the
+pgrx-tests harness. The CLI selects a PostgreSQL version and adds `pg_test`;
+plain Cargo requires the caller to select compatible features. For example,
+with PG18 configured:
 
-**`#[test]`** -- pure Rust logic. Zero Postgres contact.
-
-The function, and everything it transitively calls, must resolve without
-Postgres. This means no `pg_sys::*` functions, no `pg_sys::*` statics,
-and no pgrx wrappers that call into Postgres internally.
-
-```rust
-#[test]
-fn oid_round_trips_through_bytes() {
-    let oid = pg_sys::Oid::from(42);
-    let bytes = oid.to_le_bytes();
-    assert_eq!(u32::from_le_bytes(bytes), 42);
-}
+```bash
+cargo pgrx test pg18
+cargo test --no-default-features --features "pg18 pg_test"
 ```
-
-**`#[pg_test]`** -- needs Postgres. Runs inside a live backend.
-
-`cargo pgrx test` starts a Postgres instance, installs the extension, and
-executes `#[pg_test]` functions inside the server process where `pg_sys::*`
-symbols are available.
-
-```rust
-#[pg_test]
-fn spi_returns_value() {
-    let val = Spi::get_one::<i64>("SELECT 42").unwrap();
-    assert_eq!(val, Some(42));
-}
-```
-
-### The classification rule
-
-Ask one question: **does this function, or anything it calls, need a symbol
-that lives in Postgres?**
-
-If yes: `#[pg_test]`.
-If no: `#[test]`.
-If unsure: `#[pg_test]`. The cost of running a pure-Rust test inside Postgres
-is a few milliseconds of overhead. The cost of running a Postgres-dependent
-test outside Postgres is a linker error or a segfault.
-
-### What counts as "needs Postgres"
-
-All of these require Postgres and therefore require `#[pg_test]`:
-
-| Category | Examples |
-|----------|----------|
-| Direct pg_sys calls | `pg_sys::palloc`, `pg_sys::elog`, `pg_sys::GetCurrentTransactionId` |
-| pg_sys statics | `pg_sys::DataDir`, `pg_sys::CurrentMemoryContext`, `pg_sys::MyDatabaseId` |
-| SPI | `Spi::get_one`, `Spi::connect`, `Spi::run` |
-| Memory contexts | `PgMemoryContexts::*`, `palloc!`, `pfree!` |
-| Relations | `PgRelation::open`, `PgRelation::with_lock` |
-| Heap tuples | `PgHeapTuple::*` |
-| Error reporting | `ereport!`, `pgrx::error!`, `pgrx::warning!` |
-| PgBox | `PgBox::from_pg`, `PgBox::alloc` |
-| GUC access | `GucSetting::get` at runtime |
-| Any pgrx type with a `Drop` that calls pg_sys | `PgRelation`, `PgTupleDesc`, `SpiClient` |
-
-Things that are safe in `#[test]`:
-
-| Category | Examples |
-|----------|----------|
-| Pure types and enums | `pg_sys::Oid`, `pg_sys::Datum`, `pg_sys::BuiltinOid` |
-| Constants | `pg_sys::BLCKSZ`, `pg_sys::InvalidOid` |
-| Struct definitions | `pg_sys::HeapTupleData` (the *type*, not a live instance) |
-| Derive macros | `#[derive(PostgresType)]` at compile time |
-| Your own pure-Rust code | Parsers, data structures, serialization, algorithms |
 
 ## Command routing
 
-Pick the narrowest command that achieves the goal:
-
 | Intent | Command |
 |--------|---------|
-| Does it compile? | `cargo check` (not `cargo pgrx` -- plain cargo is fine and faster) |
-| Run all tests | `cargo pgrx test` or `cargo test` |
-| Run one test | `cargo pgrx test pg18 test_name` or `cargo test test_name` |
-| Interactive REPL | `cargo pgrx run` |
-| Install only (no psql) | `cargo pgrx run --install-only` or `cargo pgrx install` |
-| SQL regression tests | `cargo pgrx regress` |
-| Bootstrap new regression test | `cargo pgrx regress --add test_name` |
-| Promote regression output | `cargo pgrx regress --auto` (review diffs first!) |
-| Run benchmarks | `cargo pgrx bench` |
-| Generate SQL schema | `cargo pgrx schema` |
-| Create extension package | `cargo pgrx package` |
+| Check compilation | `cargo check --no-default-features --features pg18` |
+| Run Rust and backend tests | `cargo pgrx test pg18` |
+| Filter tests by one or more substrings | `cargo pgrx test pg18 spi memory` |
+| Build, install, and open psql | `cargo pgrx run pg18` |
+| Install files without starting PostgreSQL or opening psql | `cargo pgrx install --pg-config /path/to/pg_config` |
+| Run SQL regressions | `cargo pgrx regress pg18` |
+| Bootstrap a regression expectation | `cargo pgrx regress pg18 --add test_name` |
+| Promote reviewed regression output | `cargo pgrx regress pg18 --auto` |
+| Run backend benchmarks | `cargo pgrx bench pg18` |
+| Generate all SQL or selected items | `cargo pgrx schema pg18 [ITEM]...` |
+| Create an installation package | `cargo pgrx package` |
 
-**`cargo check` is always valid.** It does not link, so the pg_sys boundary
-is irrelevant. Use it freely for compile verification, IDE support, and
-iterative development. It is faster than any `cargo pgrx` command.
+`cargo check` skips the final link but still runs build scripts and may require
+configured PostgreSQL headers and build dependencies. It does not validate
+runtime behavior or FFI safety. `cargo build` produces artifacts without
+installing them or starting PostgreSQL.
 
-**`cargo test` works**, and so does `cargo pgrx test`. The pgrx test framework
-handles `#[pg_test]` execution correctly either way. The *only* problem is
-putting pg_sys/pgrx/Postgres symbols inside `#[test]` functions -- that
-causes linker errors (Linux) or silent crashes (macOS) because the test
-binary is not linked against Postgres.
+## Versions, features, and Cargo flags
 
-**`cargo build` is rarely what you want.** It builds the cdylib but does not
-install it into Postgres. Use `cargo pgrx run` or `cargo pgrx install` to
-get a working extension.
+Supported major-version labels are `pg13` through `pg19`. Where a command accepts
+a version selector, selection generally uses the explicit argument, then a
+PostgreSQL feature supplied with `--features`, then the manifest's default
+PostgreSQL feature unless defaults are disabled. Supply an explicit selector
+when the target version matters. `install` and `package` select PostgreSQL
+through `--pg-config`, falling back to `pg_config` on `PATH`.
 
-### The pgXX version argument
+`test`, `start`, and `stop` accept `all` for versions present in both the
+extension's features and the active pgrx configuration. `status` defaults to
+all configured instances. Other commands do not have that `all` behavior.
+Avoid `--all-features` for extensions whose PostgreSQL features are mutually
+exclusive. Use `--package` or `--manifest-path` to select a workspace extension.
 
-Most commands accept an optional Postgres version: `pg13`, `pg14`, `pg15`,
-`pg16`, `pg17`, `pg18`, `pg19`, or `all`. If omitted, the default is determined by
-the first `pgXX` feature in the crate's `Cargo.toml`. You rarely need to
-specify it explicitly.
+`bench`, `install`, `package`, `regress`, `run`, `schema`, and `test` accept
+repeatable `--cargo <FLAG>` values. These reach the command's Cargo invocations
+beginning with `cargo metadata`, so use flags valid for every invoked Cargo
+subcommand. See [test.md](test.md) for the backend harness's separate install step.
 
-## Anti-patterns
+```bash
+cargo pgrx test pg18 --cargo=--config=./cargo-local.toml
+cargo pgrx package --cargo "--offline --frozen"
+```
 
-**Putting pg_sys symbols in `#[test]` functions.** This is the single most
-common mistake. `#[test]` functions run in a plain Rust binary with no
-Postgres symbols available. Use `#[pg_test]` for anything that touches
-Postgres.
+Each value is split on ASCII whitespace, without shell quote parsing. Paths or
+values containing spaces cannot be preserved by quoting inside `--cargo`.
+`PGRX_BUILD_FLAGS` applies to build commands and does not configure the initial
+metadata call. Artifact lookup uses Cargo metadata's resolved target directory,
+including Cargo configuration and `CARGO_TARGET_DIR`; do not assume `./target`.
 
-**Using `--auto` without reviewing diffs.** `cargo pgrx regress --auto`
-silently promotes actual output to expected output. If the output is *wrong*,
-you have just blessed a bug. Always run without `--auto` first, review the
-diffs, then promote.
+## Agent worktrees
 
-**Running `cargo pgrx run` when you just need `cargo check`.** `cargo pgrx
-run` compiles, generates schema, installs the extension, starts Postgres, and
-opens psql. That is heavy. If you just want to know whether the code compiles,
-`cargo check` finishes in seconds.
+Before starting PostgreSQL for worktree work, read
+[the private PGRX_HOME procedure](init.md#private-pgrx_home-for-agent-worktrees).
+Use a private home and distinct managed ports, reuse an existing PostgreSQL
+installation when appropriate, and keep track of servers created by the task.
+Sharing binaries still shares extension installation directories, so account
+for that before installing a worktree's extension.
 
-**Forgetting `--resetdb` on `cargo pgrx regress`.** If the extension schema
-has changed, regression tests may fail because the test database has stale
-schema. Use `--resetdb` to start fresh.
+`run`, `connect`, `regress`, and `bench` can start a managed server and leave it
+running. Stop temporary instances using the same private `PGRX_HOME` before
+removing their data or abandoning the worktree. The backend test harness uses
+separate clusters and dynamic ports; see [test.md](test.md) for its cleanup.
 
-## Reference files
+## References
 
-Each subcommand has a dedicated reference with full flags, examples, and
-use-case guidance:
-
-- [test.md](test.md) -- `cargo pgrx test`: run `#[test]` and `#[pg_test]` functions
-- [run.md](run.md) -- `cargo pgrx run`: build, install, open psql
-- [regress.md](regress.md) -- `cargo pgrx regress`: SQL regression tests
-- [bench.md](bench.md) -- `cargo pgrx bench`: in-process benchmarks
-- [install.md](install.md) -- `cargo pgrx install`: install into Postgres
-- [schema.md](schema.md) -- `cargo pgrx schema`: generate SQL schema
-- [new.md](new.md) -- `cargo pgrx new`: scaffold a new extension
-- [init.md](init.md) -- `cargo pgrx init`: set up development environment
-- [package.md](package.md) -- `cargo pgrx package`: create install package
-- [instance-management.md](instance-management.md) -- `start`, `stop`, `status`, `connect`
-- [utilities.md](utilities.md) -- `info`, `get`, `upgrade`, `cross`
+- [init.md](init.md): initialization, port selection, private worktree homes
+- [test.md](test.md): Rust and backend tests, filters, test cluster lifecycle
+- [run.md](run.md): build, install, restart, and open a client
+- [regress.md](regress.md): SQL regressions and expected-output management
+- [bench.md](bench.md): backend benchmarks and stored comparisons
+- [install.md](install.md): installation into a chosen PostgreSQL prefix
+- [schema.md](schema.md): full schemas and selected SQL items
+- [package.md](package.md): installation packages and artifact placement
+- [new.md](new.md): extension scaffolding
+- [instance-management.md](instance-management.md): start, stop, status, connect
+- [utilities.md](utilities.md): info, get, upgrade, cross

@@ -1,54 +1,49 @@
 # cargo pgrx package
 
-Creates an installation package directory containing the compiled extension
-and all files needed to install it into a Postgres instance.
+Builds an extension and stages its control file, SQL, and shared library in a
+directory for distribution. It defaults to a release build and does not start
+PostgreSQL or install files into the server's live installation.
 
-Used for distribution and deployment, not development.
+## Usage and options
 
-## What it does
-
-1. Compiles the extension (release mode by default)
-2. Creates a directory tree mirroring the Postgres installation layout
-3. Copies the shared library, SQL files, and control file into the tree
-
-## Usage
-
-```
+```text
 cargo pgrx package [OPTIONS]
 ```
 
-### Key flags
+| Flag | Meaning |
+|------|---------|
+| `-c, --pg-config <PATH>` | Target installation and PostgreSQL version; default is pg_config on PATH |
+| `--out-dir <DIR>` | Package staging directory |
+| `--prefix-dir <DIR>` | Override artifact placement inside the staging directory on Unix |
+| `-d, --debug` | Development profile instead of release |
+| `--profile <P>` | Custom profile; overrides `--debug` |
+| `--test` | Build with test support |
+| `-F, --features <F>` | Additional Cargo features |
+| `--no-default-features`, `--all-features` | Cargo feature selection |
+| `-p, --package <PKG>` | Select a workspace extension |
+| `--manifest-path <PATH>` | Select its manifest |
+| `--target <TARGET>` | Cargo compilation target |
+| `--cargo <FLAG>` | Repeatable Cargo flags, including for metadata |
 
-| Flag | Short | Description |
-|------|-------|-------------|
-| `--pg-config <PATH>` | `-c` | Target `pg_config` (determines install paths) |
-| `--out-dir <DIR>` | | Output directory (default: `target/<profile>/<ext>-pgXX/`) |
-| `--debug` | `-d` | Build in debug mode (default is release) |
-| `--profile <P>` | | Specific Cargo profile |
-| `--test` | | Build in test mode |
-| `--features <F>` | `-F` | Cargo features |
-| `--package <PKG>` | `-p` | Package in workspace |
-| `--manifest-path <PATH>` | | Path to Cargo.toml |
-| `--target <TARGET>` | | Cross-compilation target |
+Without `--out-dir`, output goes under Cargo's resolved target directory as
+`[<target>/]<profile>/<extname>-pg<major>/`, with the development profile using
+`debug`. This respects Cargo configuration and `CARGO_TARGET_DIR`.
 
-## Examples
+## Extension artifact placement
+
+The default Unix package layout mirrors `pg_config`'s installation paths beneath
+the staging directory. `--prefix-dir` puts the control file, SQL files, and shared
+library together under the supplied path inside that directory. A leading slash
+is removed when composing the staging path:
 
 ```bash
-# Create a package for the default Postgres
-cargo pgrx package
-
-# Package for a specific Postgres installation
 cargo pgrx package --pg-config /usr/local/pgsql/bin/pg_config
-
-# Custom output directory
-cargo pgrx package --out-dir ./dist
-
-# Package for cross-compilation target
-cargo pgrx package --target x86_64-unknown-linux-gnu
+cargo pgrx package --out-dir ./dist --prefix-dir /opt/my_extension
+cargo pgrx package --debug --cargo=--config=./cargo-local.toml
 ```
 
-## When to use
-
-- Building release artifacts for deployment
-- Creating packages for package managers (deb, rpm, etc.)
-- CI pipelines that produce installable artifacts
+The second command places the files in `./dist/opt/my_extension/`. The option
+controls staging layout, not PostgreSQL's runtime search paths. On Windows,
+the package uses `lib` and `share/extension` regardless of `--prefix-dir`.
+Avoid enabling `pg_bench` in distribution builds unless benchmark support is
+intended; cargo-pgrx warns when it is enabled for packaging.
