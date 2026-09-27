@@ -69,6 +69,7 @@ fn create_directory_structure(root: PathBuf) -> Result<(), std::io::Error> {
     std::fs::create_dir_all(root.join("tests").join("pg_regress").join("expected"))?;
     std::fs::create_dir_all(root.join("tests").join("pg_regress").join("sql"))?;
     std::fs::create_dir_all(root.join("sql"))?;
+    std::fs::create_dir_all(root.join("sql").join("unreleased"))?;
 
     Ok(())
 }

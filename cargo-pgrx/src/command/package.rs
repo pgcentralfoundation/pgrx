@@ -46,6 +46,9 @@ pub(crate) struct Package {
     pub(crate) features: clap_cargo::Features,
     #[clap(long)]
     pub(crate) target: Option<String>,
+    /// Assemble unreleased SQL fragments directly into the package directory
+    #[clap(long)]
+    pub(crate) assemble_unreleased: bool,
     #[clap(from_global, action = ArgAction::Count)]
     pub(crate) verbose: u8,
 }
@@ -86,6 +89,12 @@ impl Package {
             build_base_path(&pg_config, &package_manifest_path, &profile, self.target.as_deref())?
         };
 
+        let unreleased_mode = if self.assemble_unreleased {
+            crate::command::migrate::UnreleasedFragmentMode::PackageAssemble
+        } else {
+            crate::command::migrate::UnreleasedFragmentMode::Disallow
+        };
+
         let output_files = package_extension(
             self.manifest_path.as_deref(),
             self.package.as_deref(),
@@ -96,6 +105,7 @@ impl Package {
             self.test,
             &self.features,
             self.target.as_deref(),
+            unreleased_mode,
         )?;
 
         Ok((out_dir, output_files))
@@ -125,6 +135,7 @@ pub(crate) fn package_extension(
     is_test: bool,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    unreleased_mode: crate::command::migrate::UnreleasedFragmentMode,
 ) -> eyre::Result<Vec<PathBuf>> {
     let out_dir_exists = out_dir.try_exists().wrap_err_with(|| {
         format!("failed to access {} while packaging extension", out_dir.display())
@@ -144,6 +155,7 @@ pub(crate) fn package_extension(
         Some(out_dir),
         features,
         target,
+        unreleased_mode,
     )
 }
 

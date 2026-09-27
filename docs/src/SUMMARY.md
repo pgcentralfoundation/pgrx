@@ -10,6 +10,7 @@
     - [Memory Checking](./extension/test/memory-checking.md)
   - [Installing a PGRX Extension](./extension/install.md)
   - [Schema Configuration](./extension/schema.md)
+  - [Extension Upgrades & Migrations](./extension/migrations.md)
 - [Basics of Postgres Internals](./pg-internal.md)
   - [Pass-By-Datum](./pg-internal/datum.md)
   - [Memory Contexts](./pg-internal/memory-context.md)

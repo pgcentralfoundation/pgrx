@@ -29,6 +29,7 @@
    + `cargo pgrx run`: Run your extension and interactively test it in `psql` (or `pgcli`)
    + `cargo pgrx test`: Unit-test your extension across multiple PostgreSQL versions
    + `cargo pgrx package`: Create installation packages for your extension
+   + `cargo pgrx migrate`: Manage modular SQL migration fragments, release assembly, and CI linting
    + More in the [`README.md`](cargo-pgrx/README.md)!
 - **Target Multiple Postgres Versions**
    + Support from Postgres 13 to Postgres 19 from the same codebase

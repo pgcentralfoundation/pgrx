@@ -53,9 +53,12 @@ pub(crate) struct Run {
     pgcli: bool,
     /// Install without running
     #[clap(long)]
-    install_only: bool,
+    pub(crate) install_only: bool,
     #[clap(long)]
-    valgrind: bool,
+    pub(crate) valgrind: bool,
+    /// Disable automatic assembly of unreleased migration fragments into the installed extension directory
+    #[clap(long)]
+    pub(crate) no_assemble_unreleased: bool,
 }
 
 impl From<&Regress> for Run {
@@ -73,6 +76,7 @@ impl From<&Regress> for Run {
             pgcli: false,
             install_only: false,
             valgrind: regress.valgrind,
+            no_assemble_unreleased: false,
         }
     }
 }
@@ -117,6 +121,12 @@ impl Run {
             if self.release { CargoProfile::Release } else { CargoProfile::Dev },
         )?;
 
+        let unreleased_mode = if self.no_assemble_unreleased {
+            crate::command::migrate::UnreleasedFragmentMode::Skip
+        } else {
+            crate::command::migrate::UnreleasedFragmentMode::AssembleEphemeral
+        };
+
         run(
             &pg_config,
             self.manifest_path.as_deref(),
@@ -130,6 +140,7 @@ impl Run {
             self.valgrind,
             self.target.as_deref(),
             postgresql_conf,
+            unreleased_mode,
         )?;
 
         Ok((pg_config, dbname))
@@ -165,6 +176,7 @@ pub(crate) fn run(
     use_valgrind: bool,
     target: Option<&str>,
     postgresql_conf: &HashMap<String, String>,
+    unreleased_mode: crate::command::migrate::UnreleasedFragmentMode,
 ) -> eyre::Result<()> {
     // stop postgres
     stop_postgres(pg_config)?;
@@ -180,6 +192,7 @@ pub(crate) fn run(
         None,
         features,
         target,
+        unreleased_mode,
     )?;
 
     if install_only {

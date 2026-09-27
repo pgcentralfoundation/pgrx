@@ -18,6 +18,7 @@ pub(crate) mod get;
 pub(crate) mod info;
 pub(crate) mod init;
 pub(crate) mod install;
+pub(crate) mod migrate;
 pub(crate) mod new;
 pub(crate) mod package;
 pub(crate) mod pgrx;

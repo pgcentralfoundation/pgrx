@@ -57,6 +57,9 @@ pub(crate) struct Install {
     pub(crate) features: clap_cargo::Features,
     #[clap(long)]
     pub(crate) target: Option<String>,
+    /// Disable automatic assembly of unreleased migration fragments into the installed extension directory
+    #[clap(long)]
+    pub(crate) no_assemble_unreleased: bool,
     #[clap(from_global, action = ArgAction::Count)]
     pub(crate) verbose: u8,
 }
@@ -100,6 +103,11 @@ impl CommandExecute for Install {
         );
 
         display_version_info(&pg_config, &PgVersionSource::PgConfig(pg_config.label()?));
+        let unreleased_mode = if self.no_assemble_unreleased {
+            crate::command::migrate::UnreleasedFragmentMode::Skip
+        } else {
+            crate::command::migrate::UnreleasedFragmentMode::AssembleEphemeral
+        };
         install_extension(
             self.manifest_path.as_deref(),
             self.package.as_deref(),
@@ -110,6 +118,7 @@ impl CommandExecute for Install {
             None,
             &self.features,
             self.target.as_deref(),
+            unreleased_mode,
         )?;
         Ok(())
     }
@@ -147,6 +156,7 @@ pub(crate) fn install_extension(
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    unreleased_mode: crate::command::migrate::UnreleasedFragmentMode,
 ) -> eyre::Result<Vec<PathBuf>> {
     let mut output_tracking = Vec::new();
 
@@ -247,6 +257,15 @@ pub(crate) fn install_extension(
         target,
         &extdir,
         true,
+        &mut output_tracking,
+    )?;
+
+    crate::command::migrate::handle_unreleased_fragments(
+        &manifest,
+        package_manifest_path,
+        &extname,
+        &extdir,
+        unreleased_mode,
         &mut output_tracking,
     )?;
 

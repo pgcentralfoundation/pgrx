@@ -138,6 +138,7 @@ impl CommandExecute for Bench {
             false,
             self.target.as_deref(),
             &postgresql_conf,
+            crate::command::migrate::UnreleasedFragmentMode::AssembleEphemeral,
         )?;
 
         if self.resetdb {

@@ -19,6 +19,7 @@ pub(crate) struct SudoInstall {
     out_dir: Option<PathBuf>,
     features: clap_cargo::Features,
     target: Option<String>,
+    no_assemble_unreleased: bool,
     verbose: u8,
 }
 
@@ -34,6 +35,7 @@ impl From<Install> for SudoInstall {
             out_dir: None,
             features: value.features,
             target: value.target,
+            no_assemble_unreleased: value.no_assemble_unreleased,
             verbose: value.verbose,
         }
     }
@@ -52,6 +54,7 @@ impl From<SudoInstall> for Package {
             features: value.features,
             verbose: value.verbose,
             target: value.target,
+            assemble_unreleased: !value.no_assemble_unreleased,
         }
     }
 }

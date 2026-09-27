@@ -46,6 +46,7 @@ Commands:
   cross         Commands having to do with cross-compilation. (Experimental)
   upgrade       Upgrade pgrx crate versions in `Cargo.toml`. Defaults to latest
   regress       Run the regression test suite for this crate
+  migrate       Manage extension SQL migrations and upgrade scripts
   help          Print this message or the help of the given subcommand(s)
 
 Options:
@@ -977,37 +978,163 @@ attached automatically; the emitter prints a warning to stderr naming the
 block's `file:line` so the user knows which objects to attach by hand.
 
 
-## Extension Version Upgrade Scripts
+## Extension Version Upgrade Scripts & Migration Fragments
 
-When creating a pgrx extension using `cargo pgrx new foo`, the new extension template directory tree includes a 
-directory named `./sql`:
+Postgres extensions support in-place version upgrades via upgrade scripts named in the format prescribed by the [Postgres Extension Updates documentation](https://www.postgresql.org/docs/current/extend-extensions.html#EXTEND-EXTENSIONS-UPDATES): `<extname>--<oldver>--<newver>.sql` (for example, `my_ext--1.0.0--1.1.0.sql`).
+
+When a user runs `ALTER EXTENSION my_ext UPDATE TO '1.1.0';` in Postgres, the database constructs a graph of available upgrade scripts from the extension directory, finding the shortest path from the installed version to the target version and executing each script in order.
+
+Postgres upgrade scripts must contain the explicit DDL statements (such as `ALTER TABLE`, `CREATE OR REPLACE FUNCTION`, custom type alterations) required to migrate your database schema from the old version to the new version. `pgrx` itself does not auto-generate these DDL migration statements from Rust code diffs. However, managing monolithic upgrade script files directly in source control across multiple developers and feature branches frequently causes merge conflicts.
+
+To solve this, `pgrx` provides a modular migration fragments architecture and the `cargo pgrx migrate` toolchain.
+
+### Migration Fragments Directory (`sql/unreleased/`)
+
+Instead of editing a shared upgrade script, developers place individual SQL snippets in `sql/unreleased/`:
 
 ```shell
 $ tree
 .
 ├── Cargo.toml
-├── blah.control
+├── my_ext.control
 ├── sql
+│   ├── my_ext--0.24.0--0.25.0.sql
+│   └── unreleased
+│       ├── 101.add_custom_index.sql
+│       ├── 102.new_vector_proc.sql
+│       └── 105.alter_vector_proc.sql
 └── src
     └── lib.rs
-
-2 directories, 3 files
 ```
 
-It is in this directory that you would **manually** create extension version upgrade scripts.  The files you create should
-be named in the manner prescribed by the [Postgres Extension Updates documentation](https://www.postgresql.org/docs/current/extend-extensions.html#EXTEND-EXTENSIONS-UPDATES).
-Generally that format is `foo--oldver--newver.sql`.  For example, `foo--1.0.0--1.0.1.sql`.  
+#### Fragment Naming & Identification
 
-When a user runs `ALTER EXTENSION foo UPDATE;` in a database with the `foo` extension, Postgres will build a graph of
-upgrade scripts to run, starting with the currently installed version and ending with the `default_version` defined in
-the extensions `.control` file.  Postgres will then execute the scripts along the shortest path.
+Fragments are typically named with a PR or issue number prefix and a descriptive slug:
+* `<PR_NUMBER>.<slug>.sql` (e.g. `101.add_custom_index.sql` -> ID `101`)
+* `<slug>.sql` (e.g. `add_custom_index.sql` -> ID `add_custom_index`)
 
-It is your responsibility to hand-write these extension upgrade scripts in whatever manner would allow Postgres to update
-your extension from one version to the next.  pgrx has no ability to auto-generate these scripts.
+#### Declaring Prerequisites (`-- depends-on:`)
 
-While pgrx does not generate these upgrade scripts, it does know about them and all pgrx commands (`cargo pgrx test/run/install/package/bench`) 
-that generate extension artifacts will automatically copy these files, and only these files, from the `./sql` directory 
-to their final destination as dictated by `pg_config`.
+When a fragment relies on database objects created or modified in another unreleased fragment, it declares dependencies in a header comment:
+
+```sql
+-- depends-on: 101, 102
+/* depends-on: 103 */
+
+ALTER FUNCTION my_vector_proc(integer) ...;
+```
+
+`pgrx` topologically sorts fragments according to their dependency graph. Ties between independent fragments are broken deterministically by ID (numerically, then alphabetically by filename). Missing prerequisites that are not present in `sql/unreleased/` are assumed to have been applied in a predecessor release.
+
+### Ephemeral Development Assembly (`install`, `run`, `test`)
+
+During development workflows (`cargo pgrx install`, `cargo pgrx run`, `cargo pgrx test`), `pgrx` automatically compiles and installs unreleased migration fragments:
+
+1. Resolves the latest released target version in `sql/` (or package version in `Cargo.toml`).
+2. Derives an ephemeral target version bump (e.g. `0.25.0` -> `0.25.1`).
+3. Assembles unreleased fragments topologically directly into the destination extension directory as `my_ext--0.25.0--0.25.1.sql`.
+4. Copies the generated base schema to `my_ext--0.25.1.sql` so `CREATE EXTENSION` installs directly at the ephemeral version without walking upgrade paths.
+5. Updates `default_version` in the installed `my_ext.control` file.
+
+This allows developers to test migrations seamlessly in local Postgres instances without modifying or dirtying the Git working tree. To disable ephemeral assembly during install or run, pass `--no-assemble-unreleased`.
+
+### Packaging for Release (`cargo pgrx package`)
+
+To prevent unreleased development fragments from accidentally leaking into release distribution tarballs, `cargo pgrx package` disallows unreleased fragments by default and exits with an error:
+
+```
+error: found unreleased SQL migration fragments in `sql/unreleased`.
+Run `cargo pgrx migrate assemble` before packaging for release, or pass `--assemble-unreleased`.
+```
+
+### Assembling Release Upgrade Scripts (`cargo pgrx migrate assemble`)
+
+When preparing a release, run `cargo pgrx migrate assemble` to consolidate unreleased fragments into a permanent upgrade script:
+
+```console
+$ cargo pgrx migrate assemble 0.26.0 --update-control
+  Assembling 3 SQL migration fragment(s) from sql/unreleased
+   - 101.add_custom_index.sql
+   - 102.new_vector_proc.sql
+   - 105.alter_vector_proc.sql
+       Saved assembled upgrade script to sql/my_ext--0.25.0--0.26.0.sql
+     Updated default_version = '0.26.0' in my_ext.control
+     Removed consumed fragment 101.add_custom_index.sql
+     Removed consumed fragment 102.new_vector_proc.sql
+     Removed consumed fragment 105.alter_vector_proc.sql
+```
+
+#### Assemble Options
+
+* `[TARGET_VERSION]`: Target release version. Defaults to `package.version` in `Cargo.toml` if greater than existing `sql/` releases, or derives the next patch version from the latest existing release script.
+* `--update-control`: Automatically updates `default_version = '<clean_target>'` in `<extname>.control`.
+* `--prev-version <VERSION>`: Explicit predecessor version to upgrade from (overriding automatic resolution from existing `sql/` scripts or `Cargo.toml`).
+* `--allow-empty`: Allows generating a valid stub upgrade script (containing an `ALTER EXTENSION ... UPDATE TO ...` notice) when no schema changes occurred.
+* `--preserve-fragments`: Keeps fragment files in `sql/unreleased/` instead of deleting (consuming) them.
+* `--output-dir <PATH>`: Custom directory for the assembled script (defaults to `<crate>/sql/`).
+* `--dry-run`: Previews the migration plan without generating files or deleting fragments.
+* `--json`: Outputs the migration plan in structured JSON format.
+
+### CI & Pre-Commit Linting (`cargo pgrx migrate check` / `lint`)
+
+To catch invalid directives, cyclic dependencies, or missing dependency declarations before merging PRs, run `cargo pgrx migrate check` (or its alias `cargo pgrx migrate lint`) in CI:
+
+```console
+$ cargo pgrx migrate check --format github
+::error file=sql/unreleased/105.alter_vector_proc.sql::Fragment touches unreleased object(s) from fragment `102` but does not declare '-- depends-on: 102'
+❌ 105.alter_vector_proc.sql: Fragment touches unreleased object(s) from fragment `102` but does not declare '-- depends-on: 102'
+
+❌ Migration fragment lint failed with 1 error(s).
+```
+
+#### Lint Validation Rules
+ 
+- DAG cycles and directive syntax: Verifies that `-- depends-on:` directives parse cleanly and contain no circular dependency loops.
+- Undeclared dependencies on unreleased objects: Extracts top-level SQL statements (`CREATE`, `ALTER`, `DROP` for `FUNCTION`, `PROCEDURE`, `AGGREGATE`, `TABLE`, `VIEW`, `TYPE`, `OPERATOR`). If fragment `B` alters or replaces an object introduced in unreleased fragment `A`, `B` must declare `-- depends-on: <A>`.
+- Preventing mixed objects (`--deny-mixed-objects`): Flags fragments that modify both already-released database objects and unreleased objects. In projects maintaining stable backport branches (e.g. `0.25.x`), mixing released and unreleased objects in a single fragment breaks cherry-picking.
+- Git diff scoping (`--base <REF>` / `--diff <REF>`): Scopes validation only to fragments added or modified relative to `<REF>` (e.g. `main` or `origin/main`).
+- Formatting (`--format <text|json|github>`): Formats diagnostic messages as colored terminal text, structured JSON, or GitHub Actions workflow annotations (`::error file=...::`).
+
+### Inspecting Migration Plans (`cargo pgrx migrate info`)
+
+CI workflows and release orchestration scripts can inspect predecessor versions, target versions, and the ordered fragment plan without mutating disk state:
+
+```console
+$ cargo pgrx migrate info 0.26.0 --json
+{
+  "extension_name": "my_ext",
+  "target_version": "0.26.0",
+  "prev_version": "0.25.0",
+  "output_file": "/path/to/my_ext/sql/my_ext--0.25.0--0.26.0.sql",
+  "is_empty": false,
+  "fragments": [
+    {
+      "filename": "101.add_custom_index.sql",
+      "id": "101",
+      "dependencies": []
+    },
+    {
+      "filename": "102.new_vector_proc.sql",
+      "id": "102",
+      "dependencies": []
+    },
+    {
+      "filename": "105.alter_vector_proc.sql",
+      "id": "105",
+      "dependencies": ["102"]
+    }
+  ]
+}
+```
+
+### Customizing the Unreleased SQL Directory
+
+By default, fragments are loaded from `<crate>/sql/unreleased/`. You can specify a custom directory in `Cargo.toml`:
+
+```toml
+[package.metadata.pgrx]
+unreleased-sql-dir = "migrations/unreleased"
+```
 
 
 ## Information about pgrx-managed development environment
