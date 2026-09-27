@@ -10,7 +10,7 @@
 
 [package]
 name = "pgrx"
-version = "0.19.2"
+version = "0.19.3"
 authors.workspace = true
 license.workspace = true
 description = "pgrx:  A Rust framework for creating Postgres extensions"
