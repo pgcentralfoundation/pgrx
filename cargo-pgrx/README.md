@@ -857,18 +857,6 @@ version of Postgres is likely to split `pg_config --pkglibdir` and `pg_config --
 (In the example screenshot above, `cargo pgrx package` was used to build a directory structure using my manually installed
 version of Postgres 12.)
 
-On Unix, `--prefix-dir <PREFIX_DIR>` overrides the installation paths obtained from `pg_config`, placing the control file,
-SQL files, and shared library in the same directory within the package output. Use `--out-dir` to choose the package output
-directory:
-
-```console
-$ cargo pgrx package --out-dir ./package --prefix-dir /opt/my_extension
-```
-
-This places the extension assets in `./package/opt/my_extension/`. An absolute prefix is made relative to the package output
-directory. If you omit `--prefix-dir`, the layout follows `pg_config`. On Windows, the package layout uses `lib` and
-`share/extension` regardless of this option.
-
 This command could be useful from Dockerfiles, for example, to automate building installation packages for various Linux
 distributions or MacOS Postgres installations.
 
@@ -894,6 +882,20 @@ Options:
   -h, --help                           Print help
   -V, --version                        Print version
 ```
+
+### Extension Artifact Placement
+
+On Unix, `--prefix-dir <PREFIX_DIR>` overrides the installation paths obtained from `pg_config`, placing the control file,
+SQL files, and shared library in the same directory within the package output. Use `--out-dir` to choose the package output
+directory:
+
+```console
+$ cargo pgrx package --out-dir ./package --prefix-dir /opt/my_extension
+```
+
+This places the extension assets in `./package/opt/my_extension/`. An absolute prefix is made relative to the package output
+directory. If you omit `--prefix-dir`, the layout follows `pg_config`. On Windows, the package layout uses `lib` and
+`share/extension` regardless of this option.
 
 ## Inspect your Extension Schema
 
