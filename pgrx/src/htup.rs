@@ -9,44 +9,48 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Utility functions for working with [`pg_sys::HeapTuple`] and [`pg_sys::HeapTupleHeader`] structs
 use crate::*;
-use std::num::NonZeroUsize;
+use std::{num::NonZeroUsize, ptr::NonNull};
 
 /// Given a `pg_sys::Datum` representing a composite row type, return a boxed `HeapTupleData`,
 /// which can be used by the various `heap_getattr` methods
 ///
-/// ## Safety
+/// # Panics
 ///
-/// This function is safe, but if the provided `HeapTupleHeader` is null, it will `panic!()`
+/// Panics if Postgres returns a null [`pg_sys::HeapTupleHeader`].
 #[inline]
 pub fn composite_row_type_make_tuple(
     row: pg_sys::Datum,
 ) -> PgBox<pg_sys::HeapTupleData, AllocatedByRust> {
-    let htup_header =
-        unsafe { pg_sys::pg_detoast_datum_packed(row.cast_mut_ptr()) } as pg_sys::HeapTupleHeader;
+    let htup_header = NonNull::new(
+        unsafe { pg_sys::pg_detoast_datum(row.cast_mut_ptr()) } as pg_sys::HeapTupleHeader
+    )
+    .expect("pg_detoast_datum returned null");
     let mut tuple = unsafe { PgBox::<pg_sys::HeapTupleData>::alloc0() };
 
-    tuple.t_len = heap_tuple_header_get_datum_length(htup_header) as u32;
-    tuple.t_data = htup_header;
+    // SAFETY: pg_detoast_datum returned this non-null, properly aligned composite tuple header.
+    let htup_header_ref = unsafe { htup_header.as_ref() };
+    tuple.t_len = heap_tuple_header_get_datum_length(htup_header_ref) as u32;
+    tuple.t_data = htup_header.as_ptr();
 
     tuple
 }
 
-/// ## Safety
-///
-/// This function is safe, but if the provided `HeapTupleHeader` is null, it will `panic!()`
+/// Return the datum length stored in a heap tuple header.
 #[inline]
-pub fn heap_tuple_header_get_datum_length(htup_header: pg_sys::HeapTupleHeader) -> usize {
-    if htup_header.is_null() {
-        panic!("Attempt to dereference a null HeapTupleHeader");
-    }
-
-    unsafe { crate::varlena::varsize(htup_header as *const pg_sys::varlena) }
+pub fn heap_tuple_header_get_datum_length(htup_header: &pg_sys::HeapTupleHeaderData) -> usize {
+    // SAFETY: A HeapTupleHeaderData starts with its varlena-compatible datum length.
+    unsafe { crate::varlena::varsize(std::ptr::from_ref(htup_header).cast()) }
 }
 
-/// convert a HeapTupleHeader to a Datum.
+/// Convert a heap tuple to a [`pg_sys::Datum`].
+///
+/// # Safety
+///
+/// `heap_tuple.t_data` must point to a valid composite tuple header suitable for
+/// [`pg_sys::HeapTupleHeaderGetDatum`].
 #[inline]
-pub unsafe fn heap_tuple_get_datum(heap_tuple: pg_sys::HeapTuple) -> pg_sys::Datum {
-    unsafe { pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data) }
+pub unsafe fn heap_tuple_get_datum(heap_tuple: &pg_sys::HeapTupleData) -> pg_sys::Datum {
+    unsafe { pg_sys::HeapTupleHeaderGetDatum(heap_tuple.t_data) }
 }
 
 /// ```c
@@ -55,9 +59,15 @@ pub unsafe fn heap_tuple_get_datum(heap_tuple: pg_sys::HeapTuple) -> pg_sys::Dat
 /// (tup)->t_choice.t_datum.datum_typeid \
 /// )
 /// ```
+///
+/// # Safety
+///
+/// `htup_header.t_choice` must contain an initialized `t_datum` field.
 #[inline]
-pub unsafe fn heap_tuple_header_get_type_id(htup_header: pg_sys::HeapTupleHeader) -> pg_sys::Oid {
-    htup_header.as_ref().unwrap().t_choice.t_datum.datum_typeid
+pub unsafe fn heap_tuple_header_get_type_id(
+    htup_header: &pg_sys::HeapTupleHeaderData,
+) -> pg_sys::Oid {
+    unsafe { htup_header.t_choice.t_datum.datum_typeid }
 }
 
 /// ```c
@@ -66,9 +76,13 @@ pub unsafe fn heap_tuple_header_get_type_id(htup_header: pg_sys::HeapTupleHeader
 /// (tup)->t_choice.t_datum.datum_typmod \
 /// )
 /// ```
+///
+/// # Safety
+///
+/// `htup_header.t_choice` must contain an initialized `t_datum` field.
 #[inline]
-pub unsafe fn heap_tuple_header_get_typmod(htup_header: pg_sys::HeapTupleHeader) -> i32 {
-    htup_header.as_ref().unwrap().t_choice.t_datum.datum_typmod
+pub unsafe fn heap_tuple_header_get_typmod(htup_header: &pg_sys::HeapTupleHeaderData) -> i32 {
+    unsafe { htup_header.t_choice.t_datum.datum_typmod }
 }
 
 /// Extract an attribute of a heap tuple and return it as Rust type.
@@ -111,17 +125,25 @@ pub fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
 ///
 /// `attno` is 1-based
 ///
-/// ## Safety
+/// # Safety
 ///
-/// This function is unsafe as it cannot validate that the provided pointers are valid.
+/// `tuple.t_data` and `tupdesc` must be valid and describe the same row. Any by-reference datum
+/// returned by this function must not outlive the tuple storage.
 #[inline]
 pub unsafe fn heap_getattr_raw(
-    tuple: *mut pg_sys::HeapTupleData,
+    tuple: &pg_sys::HeapTupleData,
     attno: NonZeroUsize,
     tupdesc: pg_sys::TupleDesc,
 ) -> Option<pg_sys::Datum> {
     let mut is_null = false;
-    let datum = pg_sys::heap_getattr(tuple, attno.get() as _, tupdesc, &mut is_null);
+    let datum = unsafe {
+        pg_sys::heap_getattr(
+            std::ptr::from_ref(tuple).cast_mut(),
+            attno.get() as _,
+            tupdesc,
+            &mut is_null,
+        )
+    };
     if is_null { None } else { Some(datum) }
 }
 
