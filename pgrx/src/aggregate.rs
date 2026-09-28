@@ -272,10 +272,10 @@ CREATE AGGREGATE DemoSum (
 
 */
 
+use crate::datum::Internal;
 use crate::error;
 use crate::memcxt::PgMemoryContexts;
 use crate::pg_sys::{AggCheckCallContext, CurrentMemoryContext, FunctionCallInfo, MemoryContext};
-use crate::pgbox::PgBox;
 
 pub use pgrx_sql_entity_graph::{FinalizeModify, ParallelOption};
 
@@ -416,13 +416,12 @@ where
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
     fn serial(current: Self::State, fcinfo: FunctionCallInfo) -> Vec<u8>;
 
+    /// Deserializes a `bytea` value into an `internal` aggregate state.
+    ///
+    /// PostgreSQL requires the second `internal` argument for type safety but does not use it.
+    ///
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn deserial(
-        current: Self::State,
-        _buf: Vec<u8>,
-        _internal: PgBox<Self::State>,
-        fcinfo: FunctionCallInfo,
-    ) -> PgBox<Self::State>;
+    fn deserial(_buf: Vec<u8>, _internal: Internal, fcinfo: FunctionCallInfo) -> Internal;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
     fn moving_state(

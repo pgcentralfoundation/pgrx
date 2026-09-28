@@ -156,6 +156,59 @@ impl Aggregate<DemoPercentileDisc> for DemoPercentileDisc {
     }
 }
 
+#[derive(AggregateName)]
+struct ParallelInternalSum;
+
+#[pg_aggregate]
+impl Aggregate<ParallelInternalSum> for ParallelInternalSum {
+    type Args = i32;
+    type State = Internal;
+    type Finalize = i64;
+
+    const PARALLEL: Option<ParallelOption> = Some(ParallelOption::Safe);
+
+    fn state(
+        mut current: Self::State,
+        arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::State {
+        unsafe {
+            *current.get_or_insert_default::<i64>() += i64::from(arg);
+        }
+        current
+    }
+
+    fn combine(
+        mut current: Self::State,
+        other: Self::State,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::State {
+        let other = unsafe { other.get::<i64>().copied().unwrap_or_default() };
+        unsafe {
+            *current.get_or_insert_default::<i64>() += other;
+        }
+        current
+    }
+
+    fn finalize(
+        current: Self::State,
+        _direct_args: Self::OrderedSetArgs,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::Finalize {
+        unsafe { current.get::<i64>().copied().unwrap_or_default() }
+    }
+
+    fn serial(current: Self::State, _fcinfo: pg_sys::FunctionCallInfo) -> Vec<u8> {
+        let value = unsafe { current.get::<i64>().copied().unwrap_or_default() };
+        value.to_le_bytes().to_vec()
+    }
+
+    fn deserial(buf: Vec<u8>, _internal: Internal, _fcinfo: pg_sys::FunctionCallInfo) -> Internal {
+        let value = i64::from_le_bytes(buf.try_into().expect("serialized i64 state"));
+        Internal::new(value)
+    }
+}
+
 #[pgrx::pg_schema]
 mod demo_schema {
     use pgrx::PostgresType;
@@ -335,6 +388,21 @@ mod tests {
             "SELECT DemoPercentileDisc(0.05) WITHIN GROUP (ORDER BY income) FROM UNNEST(ARRAY [5, 100000000, 6000, 70000, 500]) as income;",
         );
         assert_eq!(retval, Ok(Some(5)));
+    }
+
+    #[pg_test]
+    fn aggregate_parallel_internal_deserial() {
+        let signature = Spi::get_one::<String>(
+            "SELECT oidvectortypes(proargtypes) FROM pg_proc \
+             WHERE proname = 'parallel_internal_sum_parallel_internal_sum_deserial'",
+        );
+        assert_eq!(signature, Ok(Some("bytea, internal".into())));
+
+        let value = Spi::get_one::<i64>(
+            "SELECT ParallelInternalSum(value) \
+             FROM UNNEST(ARRAY [1, 1, 2]) AS value",
+        );
+        assert_eq!(value, Ok(Some(4)));
     }
 
     #[pg_test]

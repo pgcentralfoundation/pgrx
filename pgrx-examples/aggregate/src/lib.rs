@@ -120,7 +120,7 @@ impl Aggregate<IntegerAvgState> for IntegerAvgState {
     //     unimplemented!()
     // }
 
-    // fn deserial(current: Self::State, _buf: Vec<u8>, _internal: PgBox<Self::State>, _fcinfo: pgrx::pg_sys::FunctionCallInfo) -> PgBox<Self::State> {
+    // fn deserial(_buf: Vec<u8>, _internal: pgrx::Internal, _fcinfo: pgrx::pg_sys::FunctionCallInfo) -> pgrx::Internal {
     //     unimplemented!()
     // }
 
