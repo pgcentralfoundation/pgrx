@@ -32,6 +32,7 @@ mod tuples;
 mod unbox;
 mod uuid;
 mod varlena;
+pub mod varlena_buf;
 
 pub use self::uuid::*;
 pub use crate::datetime::support as datetime_support;
@@ -50,6 +51,7 @@ pub use numeric::{AnyNumeric, Numeric};
 pub use range::*;
 pub use unbox::*;
 pub use varlena::*;
+pub use varlena_buf::{RawVarlena, VarlenaBuf};
 
 use crate::memcx::MemCx;
 use crate::pg_sys;

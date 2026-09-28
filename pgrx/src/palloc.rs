@@ -1,3 +1,3 @@
 mod pbox;
 
-pub use pbox::PBox;
+pub use pbox::{FromIterError, PBox};

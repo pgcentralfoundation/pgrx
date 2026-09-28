@@ -14,8 +14,7 @@ use core::{ops::DerefMut, slice, str};
 
 /// # Safety
 ///
-/// The caller asserts the specified `ptr` really is a non-null, palloc'd [`pg_sys::varlena`] pointer
-/// that is aligned to 4 bytes, and that the `len` is a half of [`i32::MAX`]
+/// The caller asserts the specified `ptr` really is a non-null, palloc'd [`pg_sys::varlena`] pointer that is aligned to 4 bytes, and that the `len` is a half of [`i32::MAX`]
 #[inline(always)]
 pub unsafe fn set_varsize_4b(ptr: *mut pg_sys::varlena, len: i32) {
     // #ifdef WORDS_BIGENDIAN
@@ -28,8 +27,7 @@ pub unsafe fn set_varsize_4b(ptr: *mut pg_sys::varlena, len: i32) {
 
     // SAFETY:  A varlena can be safely cast to a varattrib_4b
     let header = &mut (*ptr.cast::<pg_sys::varattrib_4b>()).va_4byte.deref_mut().va_header;
-    // Using core::ptr::write(), which never calls drop(), to prevent
-    // automatically dropping a field of a ManuallyDrop<T>
+    // Using core::ptr::write(), which never calls drop(), to prevent automatically dropping a field of a ManuallyDrop<T>
     core::ptr::write(header, encode_vlen_4b(len))
 }
 
@@ -51,8 +49,7 @@ pub(crate) fn encode_vlen_1b(len: i32) -> u8 {
 
 /// # Safety
 ///
-/// The caller asserts the specified `ptr` really is a non-null, palloc'd [`pg_sys::varlena`] pointer
-/// that is aligned to 4 bytes.
+/// The caller asserts the specified `ptr` really is a non-null, palloc'd [`pg_sys::varlena`] pointer that is aligned to 4 bytes.
 #[inline(always)]
 #[deprecated(since = "0.12.0", note = "you probably meant set_varsize_4b")]
 pub unsafe fn set_varsize(ptr: *mut pg_sys::varlena, len: i32) {
@@ -417,8 +414,7 @@ pub unsafe fn vardata_any(ptr: *const pg_sys::varlena) -> *const std::os::raw::c
 ///
 /// This function is unsafe because it blindly assumes the provided varlena pointer is non-null.
 ///
-/// Note also that this function is zero-copy and the underlying Rust &str is backed by Postgres-allocated
-/// memory.  As such, the return value will become invalid the moment Postgres frees the varlena
+/// Note also that this function is zero-copy and the underlying Rust &str is backed by Postgres-allocated memory.  As such, the return value will become invalid the moment Postgres frees the varlena
 #[inline]
 pub unsafe fn text_to_rust_str<'a>(
     varlena: *const pg_sys::varlena,
@@ -448,8 +444,7 @@ pub unsafe fn text_to_rust_str_unchecked<'a>(varlena: *const pg_sys::varlena) ->
 ///
 /// This function is unsafe because it blindly assumes the provided varlena pointer is non-null.
 ///
-/// Note also that this function is zero-copy and the underlying Rust `&[u8]` slice is backed by Postgres-allocated
-/// memory.  As such, the return value will become invalid the moment Postgres frees the varlena
+/// Note also that this function is zero-copy and the underlying Rust `&[u8]` slice is backed by Postgres-allocated memory.  As such, the return value will become invalid the moment Postgres frees the varlena
 #[inline]
 pub unsafe fn varlena_to_byte_slice<'a>(varlena: *const pg_sys::varlena) -> &'a [u8] {
     let len = varsize_any_exhdr(varlena);

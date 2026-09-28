@@ -2176,6 +2176,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "pbox_slice"
+version = "0.0.0"
+dependencies = [
+ "pgrx",
+ "pgrx-tests",
+]
+
+[[package]]
 name = "pem-rfc7468"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
