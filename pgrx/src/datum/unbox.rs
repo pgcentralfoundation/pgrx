@@ -1,6 +1,6 @@
 use super::Datum;
-use super::uuid::Uuid;
 use crate::prelude::*;
+use crate::uuid::Uuid;
 use crate::varlena::{text_to_rust_str_unchecked, varlena_to_byte_slice};
 use crate::{Json, JsonB};
 use alloc::ffi::CString;
