@@ -472,6 +472,11 @@ impl PgConfig {
         Ok(self.run("--cppflags")?.into())
     }
 
+    /// Compiler flags recorded by the selected PostgreSQL installation.
+    pub fn cflags(&self) -> eyre::Result<OsString> {
+        Ok(self.run("--cflags")?.into())
+    }
+
     pub fn extension_dir(&self) -> eyre::Result<PathBuf> {
         let mut path = self.sharedir()?;
         path.push("extension");
@@ -499,7 +504,16 @@ impl PgConfig {
             });
 
             match Command::new(&pg_config).arg(arg).output() {
-                Ok(output) => Ok(decode_from_bytes(&output.stdout).trim().to_string()),
+                Ok(output) if output.status.success() => {
+                    Ok(decode_from_bytes(&output.stdout).trim().to_string())
+                }
+                Ok(output) => Err(eyre::eyre!(
+                    "{} {} failed ({}): {}",
+                    pg_config.display(),
+                    arg,
+                    output.status,
+                    decode_from_bytes(&output.stderr).trim(),
+                )),
                 Err(e) => match e.kind() {
                     ErrorKind::NotFound => Err(e).wrap_err_with(|| {
                         let pg_config_str = pg_config.display().to_string();
@@ -996,6 +1010,42 @@ fn parse_version() {
         PgConfig::parse_version_str("PostgreSQL 12.f").expect_err("Parsed invalid version string");
     let _ =
         PgConfig::parse_version_str("PostgreSQL .53").expect_err("Parsed invalid version string");
+}
+
+#[test]
+fn compiler_flags_from_known_properties_preserve_the_recorded_value() {
+    let flags = "-O2 -fwrapv -isysroot '/sdk with spaces'";
+    let config = PgConfig {
+        known_props: Some(BTreeMap::from([("--cflags".into(), flags.into())])),
+        ..PgConfig::default()
+    };
+    assert_eq!(config.cflags().unwrap(), OsString::from(flags));
+    assert!(
+        PgConfig { known_props: Some(BTreeMap::new()), ..PgConfig::default() }.cflags().is_err()
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn failed_pg_config_queries_do_not_accept_partial_stdout() {
+    use std::os::unix::fs::PermissionsExt;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+    let path = std::env::temp_dir().join(format!("pgrx-pg-config-{}-{nonce}", std::process::id()));
+    std::fs::write(
+        &path,
+        "#!/bin/sh\nprintf 'partial flags\\n'\nprintf 'query failed\\n' >&2\nexit 7\n",
+    )
+    .unwrap();
+    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+    let result = PgConfig::new_with_defaults(path.clone()).cflags();
+    std::fs::remove_file(path).unwrap();
+    let error = result.expect_err("nonzero pg_config status must reject its stdout").to_string();
+    assert!(error.contains("--cflags"), "{error}");
+    assert!(error.contains("7"), "{error}");
+    assert!(error.contains("query failed"), "{error}");
+    assert!(!error.contains("partial flags"), "{error}");
 }
 
 #[test]

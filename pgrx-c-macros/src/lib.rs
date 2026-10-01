@@ -10,6 +10,15 @@
 //! rather than a byte-for-byte copy of the source.
 //! [`PostgresConfig::scan`] separates PostgreSQL function macros from conversion context;
 //! [`MacroScanner::scan`] provides the raw inventory without ownership filtering.
+//!
+//! [`PostgresConfig::inspect`] also obtains the final active macro map, declaration catalog,
+//! and target facts under the installation's recorded compiler flags. [`analyze`] identifies
+//! a bounded family of integer expressions and records explicit reasons for other macros.
+//! [`AnalysisSession`] expands a batch with the matched compiler while preserving the main
+//! file's preprocessing context. [`emit`] produces Rust macros for a bounded integer family,
+//! using the C integer support in `pgrx-pg-sys`. Emitted source preserves C type identity,
+//! argument occurrences, lazy branches and the inspected signed-overflow policy. It is
+//! runtime-only, and individual invocation equivalence still requires validation.
 
 use clang::{Clang, EntityKind, EntityVisitResult, Index};
 use serde::{Deserialize, Serialize};
@@ -18,7 +27,32 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 mod postgres;
-pub use postgres::{PostgresConfig, PostgresError, PostgresInventory};
+pub use postgres::{
+    PostgresConfig, PostgresError, PostgresInventory, postgres_function_macro_names,
+};
+mod model;
+pub use model::*;
+mod frontend;
+pub use frontend::{FrontendError, inspect};
+mod syntax;
+pub use syntax::{
+    BinaryOperator, Expression, ExpressionKind, ExpressionNode, IntegerLiteral, IntegerSuffix,
+    NodeId, TokenRange, UnaryOperator,
+};
+mod analysis;
+pub use analysis::*;
+mod expansion;
+pub use expansion::{
+    ExpandedMacro, ExpansionBatch, ExpansionDependency, ExpansionLimits, ExpansionResult,
+    ExpansionSkip, ExpansionSkipCode, ParameterOccurrence, prepare_expansions,
+    prepare_expansions_with_limits,
+};
+mod session;
+pub use session::AnalysisSession;
+mod support_generation;
+pub use support_generation::*;
+mod emit;
+pub use emit::*;
 
 /// An owned record of the definitions and diagnostics encountered while processing a file.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -203,6 +237,25 @@ impl MacroScanner {
     /// Use the process working directory instead of Clang's `-working-directory` option,
     /// which would make relative filenames ambiguous when recording provenance.
     pub fn scan(&self, header: &Path, clang_args: &[String]) -> Result<MacroInventory, Error> {
+        self.with_translation_unit(header, clang_args, None, |_, inventory| Ok(inventory))
+    }
+
+    pub(crate) fn scan_unsaved(
+        &self,
+        header: &Path,
+        contents: &str,
+        clang_args: &[String],
+    ) -> Result<MacroInventory, Error> {
+        self.with_translation_unit(header, clang_args, Some(contents), |_, inventory| Ok(inventory))
+    }
+
+    pub(crate) fn with_translation_unit<R>(
+        &self,
+        header: &Path,
+        clang_args: &[String],
+        contents: Option<&str>,
+        callback: impl FnOnce(&clang::TranslationUnit<'_>, MacroInventory) -> Result<R, Error>,
+    ) -> Result<R, Error> {
         let path = header
             .to_str()
             .ok_or_else(|| Error::InvalidInput("header path is not UTF-8".into()))?;
@@ -231,13 +284,13 @@ impl MacroScanner {
             .chain(clang_args.iter().map(String::as_str))
             .collect::<Vec<_>>();
         let index = Index::new(&self.clang, false, false);
-        let translation_unit = index
-            .parser(header)
-            .arguments(&arguments)
-            .detailed_preprocessing_record(true)
-            .skip_function_bodies(true)
-            .parse()
-            .map_err(|source| Error::Parse { header: header.into(), source })?;
+        let mut parser = index.parser(header);
+        parser.arguments(&arguments).detailed_preprocessing_record(true).skip_function_bodies(true);
+        if let Some(contents) = contents {
+            parser.unsaved(&[clang::Unsaved::new(header, contents)]);
+        }
+        let translation_unit =
+            parser.parse().map_err(|source| Error::Parse { header: header.into(), source })?;
         let diagnostics = translation_unit
             .get_diagnostics()
             .into_iter()
@@ -332,7 +385,7 @@ impl MacroScanner {
         if let Some(error) = error {
             return Err(error);
         }
-        Ok(MacroInventory { macros, diagnostics })
+        callback(&translation_unit, MacroInventory { macros, diagnostics })
     }
 }
 

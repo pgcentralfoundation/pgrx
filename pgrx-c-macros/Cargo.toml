@@ -1,6 +1,6 @@
 [package]
 name = "pgrx-c-macros"
-description = "Discover C macros for pgrx binding generation"
+description = "Discover and translate C macros for pgrx binding generation"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -11,18 +11,19 @@ repository.workspace = true
 
 [features]
 default = ["cli"]
-cli = ["dep:clap", "dep:serde_json"]
+cli = ["dep:clap"]
 
 [dependencies]
 pgrx-pg-config.workspace = true
 eyre.workspace = true
 shlex.workspace = true
+sha2 = "0.11"
 clang = { version = "2.1", features = ["runtime", "clang_6_0"] }
 clang-sys = { version = "1", features = ["runtime", "clang_6_0"] }
 serde.workspace = true
 thiserror.workspace = true
 clap = { version = "4.4.2", features = ["derive"], optional = true }
-serde_json = { workspace = true, optional = true }
+serde_json.workspace = true
 
 [dev-dependencies]
 bindgen = { version = "0.72.1", default-features = false, features = ["runtime"] }
