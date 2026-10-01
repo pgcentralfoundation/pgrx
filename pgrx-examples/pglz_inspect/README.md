@@ -1,7 +1,7 @@
 # pglz_inspect
 
 A pgrx-based PostgreSQL extension that helps DBAs decide whether to enable PGLZ compression on a column. Samples real data, runs it through the in-tree `pglz_compress` implementation, and reports compression ratio, acceptance rate, estimated disk savings, and an actionable recommendation.
-Supports PostgreSQL 13–18.
+Supports PostgreSQL 15–19.
 
 ## Install
 

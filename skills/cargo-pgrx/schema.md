@@ -10,7 +10,7 @@ package, and backend-test workflows already generate the required schema.
 cargo pgrx schema [OPTIONS] [PG_VERSION] [ITEM]...
 ```
 
-If the first positional value is a supported `pg13` through `pg19` label, it
+If the first positional value is a supported `pg15` through `pg19` label, it
 selects the PostgreSQL version. Otherwise all positional values are item names,
 and version selection uses explicit Cargo features or the manifest's default.
 With no items, the command emits the complete extension schema.

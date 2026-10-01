@@ -506,9 +506,3 @@
 #include "utils/typcache.h"
 #include "utils/varlena.h"
 #include "utils/wait_event.h"
-
-#if PG_VERSION_NUM < 140000
-#ifndef WIN32
-#define PGERROR ERROR
-#endif
-#endif

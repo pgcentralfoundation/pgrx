@@ -75,7 +75,7 @@ pub const unsafe fn MAXALIGN(len: usize) -> usize {
 /// [`palloc`]: crate::palloc
 #[allow(non_snake_case)]
 pub unsafe fn GetMemoryChunkContext(pointer: *mut std::os::raw::c_void) -> pg_sys::MemoryContext {
-    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+    #[cfg(feature = "pg15")]
     {
         // Postgres versions <16 don't export the "GetMemoryChunkContext" function.  It's a "static inline"
         // function in `memutils.h`, so we port it to Rust right here
@@ -163,10 +163,7 @@ pub fn get_pg_version_string() -> &'static str {
     super::PG_VERSION_STR.to_str().unwrap()
 }
 
-#[cfg(all(
-    target_env = "msvc",
-    any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16")
-))]
+#[cfg(all(target_env = "msvc", any(feature = "pg15", feature = "pg16")))]
 #[inline]
 pub fn get_pg_version_string() -> &'static str {
     // bindgen cannot get value of PG_VERSION_STR
@@ -341,8 +338,6 @@ pub unsafe fn type_is_array(typoid: super::Oid) -> bool {
 /// #define BufferGetPage(buffer) ((Page)BufferGetBlock(buffer))
 #[inline]
 #[cfg(any(
-    feature = "pg13",
-    feature = "pg14",
     feature = "pg15",
     all(
         not(feature = "cshim"),
@@ -363,8 +358,6 @@ pub unsafe fn BufferGetPage(buffer: crate::Buffer) -> crate::Page {
 /// )
 #[inline]
 #[cfg(any(
-    feature = "pg13",
-    feature = "pg14",
     feature = "pg15",
     all(
         not(feature = "cshim"),
@@ -417,7 +410,7 @@ pub unsafe fn heap_tuple_get_struct<T>(htup: super::HeapTuple) -> *mut T {
 //
 // As a result, we redeclare their functions with the arguments they should have on earlier Postgres
 // and we route people to the old symbols they were using before on later ones.
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(feature = "pg15")]
 #[::pgrx_macros::pg_guard]
 unsafe extern "C-unwind" {
     pub fn planstate_tree_walker(
@@ -577,7 +570,7 @@ pub unsafe fn MemoryContextSwitchTo(context: crate::MemoryContext) -> crate::Mem
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(feature = "pg15")]
 pub unsafe fn BufferGetPageSize(buffer: pg_sys::Buffer) -> pg_sys::Size {
     // #define BufferGetPageSize(buffer) \
     // ( \
@@ -590,7 +583,7 @@ pub unsafe fn BufferGetPageSize(buffer: pg_sys::Buffer) -> pg_sys::Size {
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(feature = "pg15")]
 pub unsafe fn ItemIdGetOffset(item_id: pg_sys::ItemId) -> u32 {
     // #define ItemIdGetOffset(itemId) \
     // ((itemId)->lp_off)
@@ -606,7 +599,7 @@ pub const unsafe fn PageIsValid(page: pg_sys::Page) -> bool {
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(feature = "pg15")]
 pub unsafe fn PageIsEmpty(page: pg_sys::Page) -> bool {
     // #define PageIsEmpty(page) \
     // (((PageHeader) (page))->pd_lower <= SizeOfPageHeaderData)
@@ -618,7 +611,7 @@ pub unsafe fn PageIsEmpty(page: pg_sys::Page) -> bool {
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(feature = "pg15")]
 pub unsafe fn PageIsNew(page: pg_sys::Page) -> bool {
     // #define PageIsNew(page) (((PageHeader) (page))->pd_upper == 0)
     let page_header = page as *mut pg_sys::PageHeaderData;
@@ -627,7 +620,7 @@ pub unsafe fn PageIsNew(page: pg_sys::Page) -> bool {
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(feature = "pg15")]
 pub unsafe fn PageGetItemId(page: pg_sys::Page, offset: pg_sys::OffsetNumber) -> pg_sys::ItemId {
     // #define PageGetItemId(page, offsetNumber) \
     // ((ItemId) (&((PageHeader) (page))->pd_linp[(offsetNumber) - 1]))
@@ -637,7 +630,7 @@ pub unsafe fn PageGetItemId(page: pg_sys::Page, offset: pg_sys::OffsetNumber) ->
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(feature = "pg15")]
 pub unsafe fn PageGetContents(page: pg_sys::Page) -> *mut ::core::ffi::c_char {
     // #define PageGetContents(page) \
     // ((char *) (page) + MAXALIGN(SizeOfPageHeaderData))
@@ -648,7 +641,7 @@ pub unsafe fn PageGetContents(page: pg_sys::Page) -> *mut ::core::ffi::c_char {
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(feature = "pg15")]
 pub fn PageSizeIsValid(page_size: usize) -> bool {
     // #define PageSizeIsValid(pageSize) ((pageSize) == BLCKSZ)
     page_size == pg_sys::BLCKSZ as usize
@@ -656,7 +649,7 @@ pub fn PageSizeIsValid(page_size: usize) -> bool {
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(feature = "pg15")]
 pub unsafe fn PageGetPageSize(page: pg_sys::Page) -> usize {
     // #define PageGetPageSize(page) \
     // ((Size) (((PageHeader) (page))->pd_pagesize_version & (uint16) 0xFF00))
@@ -666,7 +659,7 @@ pub unsafe fn PageGetPageSize(page: pg_sys::Page) -> usize {
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(feature = "pg15")]
 pub unsafe fn PageGetPageLayoutVersion(page: pg_sys::Page) -> ::core::ffi::c_char {
     // #define PageGetPageLayoutVersion(page) \
     // (((PageHeader) (page))->pd_pagesize_version & 0x00FF)
@@ -676,7 +669,7 @@ pub unsafe fn PageGetPageLayoutVersion(page: pg_sys::Page) -> ::core::ffi::c_cha
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(feature = "pg15")]
 pub unsafe fn PageSetPageSizeAndVersion(page: pg_sys::Page, size: u16, version: u8) {
     // #define PageSetPageSizeAndVersion(page, size, version) \
     // ((PageHeader) (page))->pd_pagesize_version = (size) | (version)
@@ -686,7 +679,7 @@ pub unsafe fn PageSetPageSizeAndVersion(page: pg_sys::Page, size: u16, version: 
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(feature = "pg15")]
 pub unsafe fn PageGetSpecialSize(page: pg_sys::Page) -> u16 {
     // #define PageGetSpecialSize(page) \
     // ((uint16) (PageGetPageSize(page) - ((PageHeader)(page))->pd_special))
@@ -730,13 +723,7 @@ pub const unsafe fn PageValidateSpecialPointer(page: pg_sys::Page) -> bool {
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15",
-    feature = "pg18",
-    feature = "pg19"
-))]
+#[cfg(any(feature = "pg15", feature = "pg18", feature = "pg19"))]
 pub unsafe fn PageGetSpecialPointer(page: pg_sys::Page) -> *mut ::core::ffi::c_char {
     /*
     #define PageGetSpecialPointer(page) \
@@ -754,7 +741,7 @@ pub unsafe fn PageGetSpecialPointer(page: pg_sys::Page) -> *mut ::core::ffi::c_c
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(feature = "pg15")]
 pub unsafe fn PageGetItem(page: pg_sys::Page, item_id: pg_sys::ItemId) -> *mut ::core::ffi::c_char {
     // #define PageGetItem(page, itemId) \
     // (((char *)(page)) + ItemIdGetOffset(itemId))
@@ -763,7 +750,7 @@ pub unsafe fn PageGetItem(page: pg_sys::Page, item_id: pg_sys::ItemId) -> *mut :
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(feature = "pg15")]
 pub unsafe fn PageGetMaxOffsetNumber(page: pg_sys::Page) -> pg_sys::OffsetNumber {
     // #define PageGetMaxOffsetNumber(page) \
     // (((PageHeader) (page))->pd_lower <= SizeOfPageHeaderData ? 0 : \
@@ -781,7 +768,7 @@ pub unsafe fn PageGetMaxOffsetNumber(page: pg_sys::Page) -> pg_sys::OffsetNumber
 
 #[allow(non_snake_case)]
 #[inline(always)]
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(feature = "pg15")]
 pub unsafe fn BufferIsValid(buffer: pg_sys::Buffer) -> bool {
     // static inline bool
     // BufferIsValid(Buffer bufnum)

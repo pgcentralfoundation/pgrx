@@ -12,7 +12,7 @@ optional `pgrx-bench` dependency, feature, and `benches` schema setup.
 cargo pgrx bench [OPTIONS] [PG_VERSION] [BENCHNAME]
 ```
 
-The optional version is `pg13` through `pg19`; the benchmark selector filters
+The optional version is `pg15` through `pg19`; the benchmark selector filters
 names. `PG_VERSION` can supply the positional default. The default database is
 `<extname>_benches` in the ordinary managed instance. Use a
 [private home](init.md#private-pgrx_home-for-agent-worktrees) for agent work and

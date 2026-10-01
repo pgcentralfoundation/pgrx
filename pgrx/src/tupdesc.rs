@@ -283,13 +283,7 @@ pub unsafe fn release_tupdesc(ptr: pg_sys::TupleDesc) {
 }
 
 /// `attno` is 0-based
-#[cfg(any(
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15",
-    feature = "pg16",
-    feature = "pg17"
-))]
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 #[inline]
 fn tupdesc_get_attr(
     tupdesc: &PgBox<pg_sys::TupleDescData>,

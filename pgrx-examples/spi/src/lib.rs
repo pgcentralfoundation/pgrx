@@ -33,10 +33,6 @@ fn spi_return_query() -> Result<
     TableIterator<'static, (name!(oid, Option<pg_sys::Oid>), name!(name, Option<String>))>,
     spi::Error,
 > {
-    #[cfg(feature = "pg13")]
-    let query = "SELECT oid, relname::text || '-pg13' FROM pg_class";
-    #[cfg(feature = "pg14")]
-    let query = "SELECT oid, relname::text || '-pg14' FROM pg_class";
     #[cfg(feature = "pg15")]
     let query = "SELECT oid, relname::text || '-pg15' FROM pg_class";
     #[cfg(feature = "pg16")]

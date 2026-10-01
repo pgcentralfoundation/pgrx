@@ -21,7 +21,7 @@ use crate::manifest::{get_package_manifest, pg_config_and_version};
 #[derive(clap::Args, Debug, Clone)]
 #[clap(author)]
 pub(crate) struct Test {
-    /// Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, pg19, or all?
+    /// Do you want to run against pg15, pg16, pg17, pg18, pg19, or all?
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
     /// If specified, only run tests containing any of these strings in their names
@@ -109,7 +109,7 @@ impl CommandExecute for Test {
         (self.pg_version, self.testnames) =
             resolve_test_args(self.pg_version.take(), self.testnames, |arg| {
                 arg == "all" || pgrx.is_feature_flag(arg)
-            });
+            })?;
 
         if self.pg_version.as_deref() == Some("all") {
             // run the tests for **all** the Postgres versions we know about
@@ -230,18 +230,19 @@ fn resolve_test_args<F>(
     pg_version: Option<String>,
     mut testnames: Vec<String>,
     is_pg_selector: F,
-) -> (Option<String>, Vec<String>)
+) -> eyre::Result<(Option<String>, Vec<String>)>
 where
     F: FnOnce(&str) -> bool,
 {
-    match pg_version {
+    super::reject_removed_pg_version(pg_version.as_deref())?;
+    Ok(match pg_version {
         Some(first) if is_pg_selector(&first) => (Some(first), testnames),
         Some(first) => {
             testnames.insert(0, first);
             (None, testnames)
         }
         None => (None, testnames),
-    }
+    })
 }
 
 fn apply_test_filters_to_command(command: &mut std::process::Command, testnames: &[String]) {
@@ -323,7 +324,8 @@ mod tests {
             Some("test_a".to_string()),
             strings(&["test_b", "test_n"]),
             |arg| arg == "all" || arg == "pg18",
-        );
+        )
+        .unwrap();
 
         assert_eq!(pg_version, None);
         assert_eq!(testnames, strings(&["test_a", "test_b", "test_n"]));
@@ -335,10 +337,20 @@ mod tests {
             Some("pg18".to_string()),
             strings(&["test_a", "test_b"]),
             |arg| arg == "all" || arg == "pg18",
-        );
+        )
+        .unwrap();
 
         assert_eq!(pg_version.as_deref(), Some("pg18"));
         assert_eq!(testnames, strings(&["test_a", "test_b"]));
+    }
+
+    #[test]
+    fn resolve_test_args_rejects_removed_versions_before_test_filter_fallback() {
+        for label in ["pg13", "pg14"] {
+            let err = super::resolve_test_args(Some(label.into()), vec![], |_| false)
+                .expect_err("removed versions must not become test filters");
+            assert!(err.to_string().contains("no longer supported"));
+        }
     }
 
     #[test]

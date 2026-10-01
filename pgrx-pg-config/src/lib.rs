@@ -594,7 +594,11 @@ impl Pgrx {
             Ok(pg_config) => {
                 // we have an environment variable that tells us the pg_config to use
                 let mut pgrx = Self::default();
-                pgrx.push(PgConfig::new(pg_config.into(), pgrx.base_port, pgrx.base_testing_port));
+                pgrx.push(Self::supported_config(PgConfig::new(
+                    pg_config.into(),
+                    pgrx.base_port,
+                    pgrx.base_testing_port,
+                ))?);
                 Ok(pgrx)
             }
             Err(_) => {
@@ -609,23 +613,36 @@ impl Pgrx {
                 };
 
                 match toml::from_str::<ConfigToml>(&std::fs::read_to_string(&path)?) {
-                    Ok(configs) => {
-                        let mut pgrx = Self::new(
-                            configs.base_port.unwrap_or(BASE_POSTGRES_PORT_NO),
-                            configs.base_testing_port.unwrap_or(BASE_POSTGRES_TESTING_PORT_NO),
-                        );
-
-                        for (_, v) in configs.configs {
-                            pgrx.push(PgConfig::new(v, pgrx.base_port, pgrx.base_testing_port));
-                        }
-                        Ok(pgrx)
-                    }
+                    Ok(configs) => Ok(Self::from_config_toml(configs)),
                     Err(e) => {
                         Err(e).wrap_err_with(|| format!("Could not read `{}`", path.display()))
                     }
                 }
             }
         }
+    }
+
+    fn from_config_toml(configs: ConfigToml) -> Self {
+        let mut pgrx = Self::new(
+            configs.base_port.unwrap_or(BASE_POSTGRES_PORT_NO),
+            configs.base_testing_port.unwrap_or(BASE_POSTGRES_TESTING_PORT_NO),
+        );
+
+        for (label, path) in configs.configs {
+            // Ignore retired installations before querying potentially stale pg_config paths.
+            if pgrx.is_feature_flag(&label) {
+                pgrx.push(PgConfig::new(path, pgrx.base_port, pgrx.base_testing_port));
+            }
+        }
+        pgrx
+    }
+
+    fn supported_config(pg_config: PgConfig) -> eyre::Result<PgConfig> {
+        let major = pg_config.major_version()?;
+        if !is_supported_major_version(major) {
+            return Err(eyre!("Postgres `pg{major}` is not supported by pgrx"));
+        }
+        Ok(pg_config)
     }
 
     pub fn push(&mut self, pg_config: PgConfig) {
@@ -638,7 +655,7 @@ impl Pgrx {
     /// `PGRX_PG_CONFIG_AS_ENV` is set to a value that isn't `"false"`then this function will return
     /// a one-element iterator that represents that single "pg_config".
     ///
-    /// Otherwise, we'll follow the rules of [`PgConfigSelector::All`] being everything in `$PGRX_HOME/config.toml`,
+    /// Otherwise, we'll follow the rules of [`PgConfigSelector::All`] being supported versions in `$PGRX_HOME/config.toml`,
     /// [`PgConfigSelector::Specific`] being that specific version from `$PGRX_HOME/config.toml`, and
     /// [`PgConfigSelector::Environment`] being the one described in the environment.
     pub fn iter(
@@ -647,7 +664,7 @@ impl Pgrx {
     ) -> impl std::iter::Iterator<Item = eyre::Result<PgConfig>> {
         match (which, PgConfig::is_in_environment()) {
             (PgConfigSelector::All, true) | (PgConfigSelector::Environment, _) => {
-                vec![PgConfig::from_env()].into_iter()
+                vec![PgConfig::from_env().and_then(Self::supported_config)].into_iter()
             }
 
             (PgConfigSelector::All, _) => {
@@ -658,13 +675,20 @@ impl Pgrx {
                         .cmp(&b.major_version().expect("no major version"))
                 });
 
-                configs.into_iter().map(|c| Ok(c.clone())).collect::<Vec<_>>().into_iter()
+                configs
+                    .into_iter()
+                    .map(|c| Self::supported_config(c.clone()))
+                    .collect::<Vec<_>>()
+                    .into_iter()
             }
             (PgConfigSelector::Specific(label), _) => vec![self.get(label)].into_iter(),
         }
     }
 
     pub fn get(&self, label: &str) -> eyre::Result<PgConfig> {
+        if !self.is_feature_flag(label) {
+            return Err(eyre!("Postgres `{label}` is not supported by pgrx"));
+        }
         for pg_config in self.pg_configs.iter() {
             if pg_config.label()? == label {
                 return Ok(pg_config.clone());
@@ -674,7 +698,7 @@ impl Pgrx {
     }
 
     /// Returns true if the specified `label` represents a Postgres version number feature flag,
-    /// such as `pg14` or `pg15`
+    /// such as `pg15` or `pg16`
     pub fn is_feature_flag(&self, label: &str) -> bool {
         for pgver in SUPPORTED_VERSIONS() {
             if label == format!("pg{}", pgver.major) {
@@ -726,8 +750,6 @@ impl Pgrx {
 #[allow(non_snake_case)]
 pub fn SUPPORTED_VERSIONS() -> Vec<PgVersion> {
     vec![
-        PgVersion::new(13, PgMinorVersion::Latest, None),
-        PgVersion::new(14, PgMinorVersion::Latest, None),
         PgVersion::new(15, PgMinorVersion::Latest, None),
         PgVersion::new(16, PgMinorVersion::Latest, None),
         PgVersion::new(17, PgMinorVersion::Latest, None),
@@ -904,6 +926,43 @@ fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> eyre::Result<bool> {
         let count = i32::from_str(decode_from_bytes(&output.stdout).trim())
             .wrap_err("result is not a number")?;
         Ok(count > 0)
+    }
+}
+
+#[test]
+fn config_ignores_retired_installations_without_querying_their_paths() {
+    let supported_path = PathBuf::from("unused-pg15-pg-config");
+    let configs = ConfigToml {
+        base_port: Some(30000),
+        base_testing_port: Some(33000),
+        configs: HashMap::from([
+            ("pg13".into(), PathBuf::from("missing-pg13-pg-config")),
+            ("pg14".into(), PathBuf::from("missing-pg14-pg-config")),
+            ("pg15".into(), supported_path.clone()),
+        ]),
+    };
+
+    let pgrx = Pgrx::from_config_toml(configs);
+    assert_eq!(pgrx.pg_configs.len(), 1);
+    assert_eq!(pgrx.pg_configs[0].path(), Some(supported_path));
+    assert_eq!(pgrx.pg_configs[0].base_port, 30000);
+    assert_eq!(pgrx.pg_configs[0].base_testing_port, 33000);
+    for label in ["pg13", "pg14"] {
+        let err = pgrx.get(label).expect_err("retired labels must fail before querying paths");
+        assert!(err.to_string().contains("not supported"));
+    }
+}
+
+#[test]
+fn selected_configs_require_a_supported_major_version() {
+    for major in [13, 14] {
+        let config = PgConfig::from(PgVersion::new(major, PgMinorVersion::Release(1), None));
+        let err = Pgrx::supported_config(config).expect_err("retired major should be rejected");
+        assert!(err.to_string().contains("not supported"));
+    }
+    for major in 15..=19 {
+        let config = PgConfig::from(PgVersion::new(major, PgMinorVersion::Release(1), None));
+        assert_eq!(Pgrx::supported_config(config).unwrap().major_version().unwrap(), major);
     }
 }
 

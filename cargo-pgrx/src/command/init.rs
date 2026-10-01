@@ -47,12 +47,6 @@ static PROCESS_ENV_DENYLIST: &[&str] = &[
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Init {
-    /// If installed locally, the path to PG13's `pgconfig` tool, or `download` to have pgrx download/compile/install it
-    #[clap(env = "PG13_PG_CONFIG", long)]
-    pg13: Option<String>,
-    /// If installed locally, the path to PG14's `pgconfig` tool, or `download` to have pgrx download/compile/install it
-    #[clap(env = "PG14_PG_CONFIG", long)]
-    pg14: Option<String>,
     /// If installed locally, the path to PG15's `pgconfig` tool, or `download` to have pgrx download/compile/install it
     #[clap(env = "PG15_PG_CONFIG", long)]
     pg15: Option<String>,
@@ -113,12 +107,6 @@ impl CommandExecute for Init {
 
         let mut versions = HashMap::new();
 
-        if let Some(ref version) = self.pg13 {
-            versions.insert("pg13", version.clone());
-        }
-        if let Some(ref version) = self.pg14 {
-            versions.insert("pg14", version.clone());
-        }
         if let Some(ref version) = self.pg15 {
             versions.insert("pg15", version.clone());
         }

@@ -1,15 +1,15 @@
 #! /usr/bin/env bash
 
 # Environment variables:
-#   PG_MAJOR_VER: The major version of Postgres in which to build/run. E.g. 13, 14, 15
+#   PG_MAJOR_VER: The major version of Postgres in which to build/run. E.g. 15, 16, 17
 #   DOCKERFILE_ID: The Dockerfile identifier to be built, included in this repo,
 #                  e.g. debian:bullseye or amazon:2
 #   CARGO_LOCKED_OPTION: Set to '--locked' to use "cargo --locked", or set to
 #                        blank '' to use "cargo" without "--locked"
 
 # Examples of running this script in CI (currently Github Actions):
-#   ./.github/docker/run-docker.sh 14 debian_bullseye
-#   ./.github/docker/run-docker.sh 13 fedora
+#   ./.github/docker/run-docker.sh 15 debian_bullseye
+#   ./.github/docker/run-docker.sh 15 fedora
 
 set -x
 

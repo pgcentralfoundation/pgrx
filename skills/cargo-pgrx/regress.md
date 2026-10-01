@@ -28,7 +28,7 @@ filtered runs. Check ownership before using any option that recreates a database
 cargo pgrx regress [OPTIONS] [PG_VERSION] [TESTNAME]
 ```
 
-The optional version is `pg13` through `pg19`; the test selector is a substring
+The optional version is `pg15` through `pg19`; the test selector is a substring
 filter. A lone non-version argument is a filter. With two arguments the version
 must come first. `PG_VERSION` can supply the positional default.
 

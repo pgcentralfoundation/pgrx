@@ -97,57 +97,11 @@ commands and does not reach `cargo metadata`.
 
 ```console
 $ cargo pgrx init
-   Discovered Postgres v12.16, v13.12, v14.9, v15.4, v16.0
-  Downloading Postgres v14.9 from https://ftp.postgresql.org/pub/source/v14.9/postgresql-14.9.tar.bz2
-  Downloading Postgres v15.4 from https://ftp.postgresql.org/pub/source/v15.4/postgresql-15.4.tar.bz2
-  Downloading Postgres v12.16 from https://ftp.postgresql.org/pub/source/v12.16/postgresql-12.16.tar.bz2
-  Downloading Postgres v13.12 from https://ftp.postgresql.org/pub/source/v13.12/postgresql-13.12.tar.bz2
-  Downloading Postgres v16.0 from https://ftp.postgresql.org/pub/source/v16.0/postgresql-16.0.tar.bz2
-     Removing /home/you/.pgrx/12.16_unpack
-     Removing /home/you/.pgrx/14.9_unpack
-    Untarring Postgres v12.16 to /home/you/.pgrx/12.16_unpack
-    Untarring Postgres v14.9 to /home/you/.pgrx/14.9_unpack
-     Removing /home/you/.pgrx/15.4_unpack
-    Untarring Postgres v15.4 to /home/you/.pgrx/15.4_unpack
-     Removing /home/you/.pgrx/16.0_unpack
-    Untarring Postgres v16.0 to /home/you/.pgrx/16.0_unpack
-     Removing /home/you/.pgrx/13.12_unpack
-    Untarring Postgres v13.12 to /home/you/.pgrx/13.12_unpack
-     Removing /home/you/.pgrx/12.16
-     Removing /home/you/.pgrx/14.9
-     Renaming /home/you/.pgrx/12.16_unpack/postgresql-12.16 -> /home/you/.pgrx/12.16
-  Configuring Postgres v12.16
-     Renaming /home/you/.pgrx/14.9_unpack/postgresql-14.9 -> /home/you/.pgrx/14.9
-  Configuring Postgres v14.9
-     Removing /home/you/.pgrx/15.4
-     Renaming /home/you/.pgrx/15.4_unpack/postgresql-15.4 -> /home/you/.pgrx/15.4
-  Configuring Postgres v15.4
-     Removing /home/you/.pgrx/16.0
-     Renaming /home/you/.pgrx/16.0_unpack/postgresql-16.0 -> /home/you/.pgrx/16.0
-  Configuring Postgres v16.0
-     Removing /home/you/.pgrx/13.12
-     Renaming /home/you/.pgrx/13.12_unpack/postgresql-13.12 -> /home/you/.pgrx/13.12
-  Configuring Postgres v13.12
-    Compiling Postgres v16.0
-    Compiling Postgres v12.16
-    Compiling Postgres v14.9
-    Compiling Postgres v15.4
-    Compiling Postgres v13.12
-   Installing Postgres v12.16 to /home/you/.pgrx/12.16/pgrx-install
-   Installing Postgres v13.12 to /home/you/.pgrx/13.12/pgrx-install
-   Installing Postgres v14.9 to /home/you/.pgrx/14.9/pgrx-install
-   Installing Postgres v15.4 to /home/you/.pgrx/15.4/pgrx-install
-   Installing Postgres v16.0 to /home/you/.pgrx/16.0/pgrx-install
-   Validating /home/you/.pgrx/12.16/pgrx-install/bin/pg_config
-   Validating /home/you/.pgrx/13.12/pgrx-install/bin/pg_config
-   Validating /home/you/.pgrx/14.9/pgrx-install/bin/pg_config
-   Validating /home/you/.pgrx/15.4/pgrx-install/bin/pg_config
-   Validating /home/you/.pgrx/16.0/pgrx-install/bin/pg_config
 ```
 
 `cargo pgrx init` is required to be run once to properly configure the `pgrx` development environment.
 
-As shown by the screenshot above, it downloads the latest releases of supported Postgres versions,
+It downloads the latest releases of supported Postgres versions,
 configures them for debugging, compiles them with assertions, and installs them to "${PGRX_HOME}".
 These include all [`contrib`] extensions and tools included with Postgres.
 Other `cargo pgrx` commands such as `run` and `test` will manage and use these installations on
@@ -187,6 +141,8 @@ You'll also want to make sure you have the "postgresql-server-dev" package insta
 
 Once complete, `cargo pgrx init` also creates "${PGRX_HOME}/config.toml" which describes where to
 find each version's `pg_config` tool.
+Entries for unsupported PostgreSQL versions are ignored when loading this configuration.
+Their installations and database directories are left intact.
 
 If a new minor Postgres version is released in the future you can simply run `cargo pgrx init [args]` again, and your local version will be updated, preserving all existing databases and configuration.
 
@@ -197,11 +153,7 @@ Initialize pgrx development environment for the first time
 Usage: cargo pgrx init [OPTIONS]
 
 Options:
-      --pg13 <PG13>                            If installed locally, the path to PG13's `pgconfig` tool, or `download`
-                                               to have pgrx download/compile/install it [env: PG13_PG_CONFIG=]
   -v, --verbose...                             Enable info logs, -vv for debug, -vvv for trace
-      --pg14 <PG14>                            If installed locally, the path to PG14's `pgconfig` tool, or `download`
-                                               to have pgrx download/compile/install it [env: PG14_PG_CONFIG=]
       --pg15 <PG15>                            If installed locally, the path to PG15's `pgconfig` tool, or `download`
                                                to have pgrx download/compile/install it [env: PG15_PG_CONFIG=]
       --pg16 <PG16>                            If installed locally, the path to PG16's `pgconfig` tool, or `download`
@@ -261,32 +213,32 @@ OPTIONS:
 
 ```console
 $ cargo pgrx status all
-Postgres v12 is stopped
-Postgres v13 is stopped
-Postgres v14 is stopped
 Postgres v15 is stopped
 Postgres v16 is stopped
+Postgres v17 is stopped
+Postgres v18 is stopped
+Postgres v19 is stopped
 
 $ cargo pgrx start all
-    Starting Postgres v12 on port 28812
-    Starting Postgres v13 on port 28813
-    Starting Postgres v14 on port 28814
     Starting Postgres v15 on port 28815
     Starting Postgres v16 on port 28816
+    Starting Postgres v17 on port 28817
+    Starting Postgres v18 on port 28818
+    Starting Postgres v19 on port 28819
 
 $ cargo pgrx status all
-Postgres v12 is running
-Postgres v13 is running
-Postgres v14 is running
 Postgres v15 is running
 Postgres v16 is running
+Postgres v17 is running
+Postgres v18 is running
+Postgres v19 is running
 
 $ cargo pgrx stop all
-    Stopping Postgres v12
-    Stopping Postgres v13
-    Stopping Postgres v14
     Stopping Postgres v15
     Stopping Postgres v16
+    Stopping Postgres v17
+    Stopping Postgres v18
+    Stopping Postgres v19
 ```
 
 `cargo pgrx` has three commands for managing Postgres installations: `start`, `stop`, and `status`.
@@ -296,7 +248,7 @@ in terms of an extension's `pg{MAJOR}` features in its Cargo.toml, except for `c
 
 When starting a Postgres instance, `pgrx` starts it on port `28800 + PG_MAJOR_VERSION`, so
 Postgres 15 runs on `28815`, 16 on `28816`, etc. Additionally, the first time any of these are
-started, it will initialize `PGDATA` directories in `"${PGRX_HOME}"/data-{12,13,14,15,16}`.
+started, it will initialize `PGDATA` directories in `"${PGRX_HOME}"/data-{15,16,17,18,19}`.
 Doing so allows `pgrx` to manage either Postgres versions it installed or ones already on your
 computer, and ensure that the `pgrx` managed versions don't interfere with what might already
 be running. The locale of the instance is `C.UTF-8` (or equivalently, a locale of `C` with a
@@ -311,23 +263,23 @@ However, you probably just want the `cargo pgrx run` command.
 ## Compiling and Running Your Extension
 
 ```console
-$ cargo pgrx run pg13
+$ cargo pgrx run pg15
 building extension with features ``
 "cargo" "build" "--message-format=json-render-diagnostics"
     Finished dev [unoptimized + debuginfo] target(s) in 0.06s
 
 installing extension
-     Copying control file to /home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/strings.control
-     Copying shared library to /home/ana/.pgrx/13.5/pgrx-install/lib/postgresql/strings.so
+     Copying control file to /home/ana/.pgrx/15.4/pgrx-install/share/postgresql/extension/strings.control
+     Copying shared library to /home/ana/.pgrx/15.4/pgrx-install/lib/postgresql/strings.so
     Building for SQL generation with features ``
     Finished dev [unoptimized + debuginfo] target(s) in 0.07s
  Discovering SQL entities
   Discovered 6 SQL entities: 0 schemas (0 unique), 6 functions, 0 types, 0 enums, 0 sqls, 0 ords, 0 hashes, 0 aggregates
-     Writing SQL entities to /home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/strings--0.1.0.sql
+     Writing SQL entities to /home/ana/.pgrx/15.4/pgrx-install/share/postgresql/extension/strings--0.1.0.sql
     Finished installing strings
-    Starting Postgres v13 on port 28813
+    Starting Postgres v15 on port 28815
     Re-using existing database strings
-psql (13.5)
+psql (15.4)
 Type "help" for help.
 
 strings=# DROP EXTENSION strings;
@@ -353,7 +305,7 @@ strings=# select strings.to_lowercase('PGRX');
 (1 row)
 ```
 
-`cargo pgrx run <pg13 | pg14 | pg15 | pg16 | pg17>` is the primary interface into compiling and interactively testing/using your extension during development.
+`cargo pgrx run <pg15 | pg16 | pg17 | pg18 | pg19>` is the primary interface into compiling and interactively testing/using your extension during development.
 
 The very first time you execute `cargo pgrx run pgXX`, it needs to compile not only your extension, but pgrx itself, along with all its dependencies. Depending on your computer, this could take a bit of time (`pgrx` is nearly 200k lines of Rust when counting the generated bindings for Postgres). Afterwards, however (as seen in the above screenshot), it's fairly fast.
 
@@ -375,7 +327,7 @@ Compile/install extension to a pgrx-managed Postgres instance and start psql
 Usage: cargo pgrx run [OPTIONS] [PG_VERSION] [DBNAME]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, or pg19? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg15, pg16, pg17, pg18, or pg19? [env: PG_VERSION=]
   [DBNAME]      The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
 
 Options:
@@ -399,7 +351,7 @@ Options:
 ```console
 $ cargo pgrx connect
     Re-using existing database strings
-psql (13.5)
+psql (15.4)
 Type "help" for help.
 
 strings=# select strings.to_lowercase('PGRX');
@@ -412,7 +364,7 @@ strings=#
 ```
 
 If you'd simply like to connect to a managed version of Postgres without re-compiling and installing
-your extension, use `cargo pgrx connect <pg13 | pg14 | pg15 | pg16 | pg17>`.
+your extension, use `cargo pgrx connect <pg15 | pg16 | pg17 | pg18 | pg19>`.
 
 This command will use the default database named for your extension, or you can specify another
 database name as the final argument.
@@ -427,7 +379,7 @@ Connect, via psql, to a Postgres instance
 Usage: cargo pgrx connect [OPTIONS] [PG_VERSION] [DBNAME]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, or pg19? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg15, pg16, pg17, pg18, or pg19? [env: PG_VERSION=]
   [DBNAME]      The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name [env: DBNAME=]
 
 Options:
@@ -448,13 +400,13 @@ building extension with features ``
     Finished dev [unoptimized + debuginfo] target(s) in 0.06s
 
 installing extension
-     Copying control file to /usr/share/postgresql/13/extension/strings.control
-     Copying shared library to /usr/lib/postgresql/13/lib/strings.so
+     Copying control file to /usr/share/postgresql/15/extension/strings.control
+     Copying shared library to /usr/lib/postgresql/15/lib/strings.so
     Building for SQL generation with features ``
     Finished dev [unoptimized + debuginfo] target(s) in 0.06s
  Discovering SQL entities
   Discovered 6 SQL entities: 0 schemas (0 unique), 6 functions, 0 types, 0 enums, 0 sqls, 0 ords, 0 hashes, 0 aggregates
-     Writing SQL entities to /usr/share/postgresql/13/extension/strings--0.1.0.sql
+     Writing SQL entities to /usr/share/postgresql/15/extension/strings--0.1.0.sql
     Finished installing strings
 ```
 
@@ -505,13 +457,13 @@ building extension with features ` pg_test`
     Finished dev [unoptimized + debuginfo] target(s) in 0.06s
 
 installing extension
-     Copying control file to /home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/spi.control
-     Copying shared library to /home/ana/.pgrx/13.5/pgrx-install/lib/postgresql/spi.so
+     Copying control file to /home/ana/.pgrx/15.4/pgrx-install/share/postgresql/extension/spi.control
+     Copying shared library to /home/ana/.pgrx/15.4/pgrx-install/lib/postgresql/spi.so
     Building for SQL generation with features ` pg_test`
     Finished test [unoptimized + debuginfo] target(s) in 0.07s
  Discovering SQL entities
   Discovered 11 SQL entities: 1 schemas (1 unique), 8 functions, 0 types, 0 enums, 2 sqls, 0 ords, 0 hashes, 0 aggregates
-     Writing SQL entities to /home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/spi--0.0.0.sql
+     Writing SQL entities to /home/ana/.pgrx/15.4/pgrx-install/share/postgresql/extension/spi--0.0.0.sql
     Finished installing spi
 test tests::pg_test_spi_query_by_id_direct ... ok
 test tests::pg_test_spi_query_by_id_via_spi ... ok
@@ -546,7 +498,7 @@ Run the test suite for this crate
 Usage: cargo pgrx test [OPTIONS] [PG_VERSION] [TESTNAME]...
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, pg19, or all? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg15, pg16, pg17, pg18, pg19, or all? [env: PG_VERSION=]
   [TESTNAME]... If specified, only run tests containing any of these strings in their names
 
 Options:
@@ -871,13 +823,13 @@ building extension with features ``
     Finished release [optimized] target(s) in 0.07s
 
 installing extension
-     Copying control file to target/release/spi-pg13/usr/share/postgresql/13/extension/spi.control
-     Copying shared library to target/release/spi-pg13/usr/lib/postgresql/13/lib/spi.so
+     Copying control file to target/release/spi-pg15/usr/share/postgresql/15/extension/spi.control
+     Copying shared library to target/release/spi-pg15/usr/lib/postgresql/15/lib/spi.so
     Building for SQL generation with features ``
     Finished release [optimized] target(s) in 0.07s
  Discovering SQL entities
   Discovered 8 SQL entities: 0 schemas (0 unique), 6 functions, 0 types, 0 enums, 2 sqls, 0 ords, 0 hashes, 0 aggregates
-     Writing SQL entities to target/release/spi-pg13/usr/share/postgresql/13/extension/spi--0.0.0.sql
+     Writing SQL entities to target/release/spi-pg15/usr/share/postgresql/15/extension/spi--0.0.0.sql
     Finished installing spi
 ```
 
@@ -890,8 +842,7 @@ The intent is that you'd then change into that directory and build a tarball or 
 The directory structure `cargo pgrx package` creates starts at the root of the filesystem, as a package-manager installed
 version of Postgres is likely to split `pg_config --pkglibdir` and `pg_config --sharedir` into different base paths.
 
-(In the example screenshot above, `cargo pgrx package` was used to build a directory structure using my manually installed
-version of Postgres 12.)
+The example above uses a manually installed PostgreSQL 15 installation.
 
 This command could be useful from Dockerfiles, for example, to automate building installation packages for various Linux
 distributions or MacOS Postgres installations.
@@ -946,7 +897,7 @@ Generate extension schema files
 Usage: cargo pgrx schema [OPTIONS] [ARGS]...
 
 Arguments:
-  [ARGS]...  First arg may be a PostgreSQL version label (`pg13`..`pg19`).
+  [ARGS]...  First arg may be a PostgreSQL version label (`pg15`..`pg19`).
              Remaining args are SQL item names to emit (functions, types,
              enums, operators, aggregates, triggers, schemas, extension_sql
              blocks). When item names are given, only those items and their
