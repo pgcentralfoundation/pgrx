@@ -1,0 +1,263 @@
+use std::path::{Path, PathBuf};
+use std::sync::Mutex;
+
+use pgrx_c_macros::{DiagnosticSeverity, Error, MacroKind, MacroScanner, TokenKind};
+
+// The clang wrapper permits one live Clang instance in a process.
+static SCANNER_LOCK: Mutex<()> = Mutex::new(());
+
+fn fixture(name: &str) -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures").join(name)
+}
+
+#[test]
+fn discovers_source_macros_without_losing_preprocessor_syntax() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available for these tests");
+    let header = fixture("definitions.h");
+    let inventory = scanner.scan(&header, &[]).expect("fixture must parse");
+    assert!(inventory.diagnostics.is_empty(), "{:?}", inventory.diagnostics);
+
+    let find = |name: &str| {
+        inventory.macros.iter().find(|definition| definition.name == name).unwrap_or_else(|| {
+            panic!("missing macro {name}");
+        })
+    };
+    for name in ["OBJECT_PARENS", "OBJECT_SPACED", "EMPTY_OBJECT", "STRING_LITERAL"] {
+        assert_eq!(find(name).kind, MacroKind::ObjectLike, "{name}");
+    }
+    for name in [
+        "INCLUDED_FUNCTION",
+        "FUNCTION",
+        "EMPTY_FUNCTION",
+        "MULTILINE",
+        "COMMENTED",
+        "STRINGIFY",
+        "TOKEN_PASTE",
+        "VARIADIC",
+        "GNU_VARIADIC",
+        "IN_BODY",
+    ] {
+        assert_eq!(find(name).kind, MacroKind::FunctionLike, "{name}");
+    }
+
+    let spellings = |name: &str| {
+        find(name).tokens.iter().map(|token| token.spelling.as_str()).collect::<Vec<_>>()
+    };
+    assert_eq!(spellings("EMPTY_OBJECT"), ["EMPTY_OBJECT"]);
+    assert_eq!(spellings("EMPTY_FUNCTION"), ["EMPTY_FUNCTION", "(", ")"]);
+    assert_eq!(spellings("OBJECT_SPACED"), ["OBJECT_SPACED", "(", "value", ")", "(", "value", ")"]);
+    assert_eq!(
+        spellings("MULTILINE"),
+        ["MULTILINE", "(", "value", ")", "(", "(", "value", ")", "+", "2", ")"]
+    );
+    assert_eq!(spellings("STRINGIFY"), ["STRINGIFY", "(", "value", ")", "#", "value"]);
+    assert_eq!(
+        spellings("TOKEN_PASTE"),
+        ["TOKEN_PASTE", "(", "left", ",", "right", ")", "left", "##", "right"]
+    );
+    assert_eq!(
+        spellings("VARIADIC"),
+        ["VARIADIC", "(", "first", ",", "...", ")", "first", ",", "__VA_ARGS__"]
+    );
+    assert_eq!(
+        spellings("GNU_VARIADIC"),
+        ["GNU_VARIADIC", "(", "first", ",", "rest", "...", ")", "first", ",", "rest"]
+    );
+    let comment = find("COMMENTED").tokens.iter().find(|token| token.kind == TokenKind::Comment);
+    assert_eq!(
+        comment.expect("inline comments must survive discovery").spelling,
+        "/* retained comment */"
+    );
+    let literal = find("STRING_LITERAL").tokens.last().expect("string macro has a replacement");
+    assert_eq!(literal.kind, TokenKind::Literal);
+    assert_eq!(literal.spelling, r#""quoted \\ path""#);
+
+    assert!(find("FUNCTION").to_string().starts_with("#define FUNCTION("));
+    assert!(find("EMPTY_FUNCTION").to_string().starts_with("#define EMPTY_FUNCTION("));
+    assert!(find("OBJECT_SPACED").to_string().starts_with("#define OBJECT_SPACED ("));
+    assert_eq!(find("EMPTY_OBJECT").to_string(), "#define EMPTY_OBJECT");
+    assert!(find("COMMENTED").to_string().contains("/* retained comment */"));
+    assert!(find("TOKEN_PASTE").to_string().contains("##"));
+    assert!(find("STRING_LITERAL").to_string().contains(&literal.spelling));
+
+    let included = find("INCLUDED_VALUE");
+    let included_location =
+        included.location.as_ref().expect("included macro has a source location");
+    assert_eq!(
+        included_location.file.canonicalize().unwrap(),
+        fixture("included.h").canonicalize().unwrap()
+    );
+    assert_eq!((included_location.line, included_location.column), (1, 9));
+    assert!(!included.builtin);
+
+    let source = std::fs::read_to_string(&header).unwrap();
+    let main_file = header.canonicalize().unwrap();
+    let mut source_offsets = Vec::new();
+    for definition in &inventory.macros {
+        let Some(location) = &definition.location else { continue };
+        if location.file.canonicalize().ok().as_ref() != Some(&main_file) {
+            continue;
+        }
+        let offset = usize::try_from(location.offset).unwrap();
+        assert!(source[offset..].starts_with(&definition.name), "{}", definition.name);
+        let prefix = &source[..offset];
+        assert_eq!(
+            usize::try_from(location.line).unwrap(),
+            prefix.bytes().filter(|byte| *byte == b'\n').count() + 1
+        );
+        assert_eq!(
+            usize::try_from(location.column).unwrap(),
+            prefix.rsplit('\n').next().unwrap().len() + 1
+        );
+        source_offsets.push(location.offset);
+        assert!(!definition.builtin);
+    }
+    assert!(source_offsets.windows(2).all(|offsets| offsets[0] < offsets[1]));
+
+    let redefined = inventory
+        .macros
+        .iter()
+        .filter(|definition| definition.name == "REDEFINED")
+        .collect::<Vec<_>>();
+    assert_eq!(redefined.len(), 2, "definition history must include definitions removed by #undef");
+    assert_eq!(redefined[0].tokens.last().unwrap().spelling, "1");
+    assert_eq!(redefined[1].tokens.last().unwrap().spelling, "2");
+    assert!(inventory.macros.iter().any(|definition| definition.builtin));
+
+    // No token, source location, or definition may borrow from Clang's translation unit.
+    drop(scanner);
+    assert!(inventory.macros.iter().any(|definition| definition.name == "IN_BODY"));
+    assert!(inventory.macros.iter().filter(|definition| !definition.builtin).all(|definition| {
+        definition.to_string().starts_with("#define ") && !definition.tokens.is_empty()
+    }));
+}
+
+#[test]
+fn applies_clang_defines_and_undefines_before_recording_active_macros() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available for these tests");
+    let header = fixture("configured.h");
+    let disabled = scanner.scan(&header, &[]).unwrap();
+    assert!(disabled.macros.iter().any(|definition| definition.name == "DISABLED_VALUE"));
+    assert!(!disabled.macros.iter().any(|definition| matches!(
+        definition.name.as_str(),
+        "ENABLED_VALUE" | "INACTIVE_VALUE" | "COMMAND_LINE_PRESENT"
+    )));
+
+    let enabled = scanner
+        .scan(&header, &["-DENABLE_BRANCH".into(), "-DCOMMAND_LINE_VALUE=73".into()])
+        .unwrap();
+    assert!(enabled.macros.iter().any(|definition| definition.name == "ENABLED_VALUE"));
+    assert!(enabled.macros.iter().any(|definition| definition.name == "COMMAND_LINE_PRESENT"));
+    assert!(
+        !enabled.macros.iter().any(|definition| matches!(
+            definition.name.as_str(),
+            "DISABLED_VALUE" | "INACTIVE_VALUE"
+        ))
+    );
+    let command_line = enabled
+        .macros
+        .iter()
+        .find(|definition| definition.name == "COMMAND_LINE_VALUE")
+        .expect("command-line definitions must be available in the library inventory");
+    assert_eq!(command_line.kind, MacroKind::ObjectLike);
+    assert_eq!(command_line.tokens.last().unwrap().spelling, "73");
+    assert!(!command_line.builtin);
+
+    let undefined =
+        scanner.scan(&header, &["-DENABLE_BRANCH".into(), "-UENABLE_BRANCH".into()]).unwrap();
+    assert!(undefined.macros.iter().any(|definition| definition.name == "DISABLED_VALUE"));
+    assert!(!undefined.macros.iter().any(|definition| definition.name == "ENABLED_VALUE"));
+}
+
+#[test]
+fn rejects_error_diagnostics_but_preserves_warning_diagnostics() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available for these tests");
+    let header = fixture("diagnostics.h");
+    for (argument, expected_message) in [
+        ("-DTEST_ERROR", "expected macro scanner failure"),
+        ("-DTEST_MISSING_INCLUDE", "pgrx_macro_fixture_missing_header.h"),
+    ] {
+        let error = scanner
+            .scan(&header, &[argument.into()])
+            .expect_err("error diagnostics must not produce a partial inventory");
+        let Error::Diagnostics(diagnostics) = error else {
+            panic!("expected diagnostics, got {error}")
+        };
+        assert!(
+            diagnostics.iter().any(|diagnostic| {
+                matches!(diagnostic.severity, DiagnosticSeverity::Error | DiagnosticSeverity::Fatal)
+                    && diagnostic.message.contains(expected_message)
+            }),
+            "{diagnostics:?}"
+        );
+    }
+    let warned = scanner
+        .scan(&header, &["-DTEST_WARNING".into()])
+        .expect("warnings must not reject a translation unit");
+    assert!(warned.diagnostics.iter().any(|diagnostic| {
+        diagnostic.severity == DiagnosticSeverity::Warning
+            && diagnostic.message.contains("expected macro scanner warning")
+    }));
+    assert!(warned.macros.iter().any(|definition| definition.name == "AFTER_DIAGNOSTIC"));
+}
+
+#[test]
+fn preserves_spliced_macro_syntax_and_physical_locations_and_rejects_invalid_inputs() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available for these tests");
+    let header = fixture("edgecases.h");
+    let inventory = scanner.scan(&header, &[]).unwrap();
+    let find = |name: &str| {
+        inventory.macros.iter().find(|definition| definition.name == name).unwrap_or_else(|| {
+            panic!("missing macro {name}");
+        })
+    };
+    let spliced_name = find("SPLICED_NAME");
+    assert_eq!(spliced_name.tokens[0].spelling, "SPLICED_NAME");
+    assert_eq!(spliced_name.kind, MacroKind::ObjectLike);
+    assert!(spliced_name.to_string().starts_with("#define SPLICED_NAME "));
+    let function = find("SPLICED_FUNCTION");
+    assert_eq!(function.kind, MacroKind::FunctionLike);
+    assert!(function.to_string().starts_with("#define SPLICED_FUNCTION("));
+    let object = find("OBJECT_COMMENT");
+    assert_eq!(object.kind, MacroKind::ObjectLike);
+    assert!(object.to_string().starts_with("#define OBJECT_COMMENT "));
+
+    let physical = find("PHYSICAL_LINE").location.as_ref().unwrap();
+    assert_eq!(physical.file.canonicalize().unwrap(), header.canonicalize().unwrap());
+    assert_eq!((physical.line, physical.column), (13, 9));
+
+    for (name, expected) in
+        [("DIRECT_REDEFINED", ["old", "new"]), ("REPEATED_IDENTICAL", ["3", "3"])]
+    {
+        let definitions = inventory
+            .macros
+            .iter()
+            .filter(|definition| definition.name == name)
+            .collect::<Vec<_>>();
+        assert_eq!(definitions.len(), 2, "both definitions of {name} must survive");
+        assert_eq!(
+            definitions
+                .iter()
+                .map(|definition| definition.tokens.last().unwrap().spelling.as_str())
+                .collect::<Vec<_>>(),
+            expected
+        );
+        assert!(
+            definitions[0].location.as_ref().unwrap().offset
+                < definitions[1].location.as_ref().unwrap().offset
+        );
+    }
+
+    assert!(matches!(scanner.scan(&header, &["-DVALUE=\0".into()]), Err(Error::InvalidInput(_))));
+    assert!(matches!(scanner.scan(Path::new("header\0.h"), &[]), Err(Error::InvalidInput(_))));
+    #[cfg(unix)]
+    {
+        use std::os::unix::ffi::OsStringExt;
+        let non_utf8 = PathBuf::from(std::ffi::OsString::from_vec(b"header\xff.h".to_vec()));
+        assert!(matches!(scanner.scan(&non_utf8, &[]), Err(Error::InvalidInput(_))));
+    }
+}
