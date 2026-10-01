@@ -3,7 +3,10 @@
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
+
+static NEXT_CONFIG: AtomicU64 = AtomicU64::new(0);
 
 fn fixture(name: &str) -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures").join(name)
@@ -17,8 +20,9 @@ struct TestConfig {
 impl TestConfig {
     fn new() -> Self {
         let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
-        let home =
-            std::env::temp_dir().join(format!("pgrx-c-macros-cli-{}-{nonce}", std::process::id()));
+        let number = NEXT_CONFIG.fetch_add(1, Ordering::Relaxed);
+        let home = std::env::temp_dir()
+            .join(format!("pgrx-c-macros-cli-{}-{nonce}-{number}", std::process::id()));
         std::fs::create_dir(&home).expect("isolated PGRX_HOME must be created");
         let config = Self { include_dir: home.join("include"), home };
         let wrapper = Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -56,6 +60,8 @@ impl TestConfig {
             .env("PGRX_HOME", &self.home)
             .env("PGRX_C_MACROS_TEST_INCLUDE_DIR", &self.include_dir)
             .env_remove("PGRX_C_MACROS_TEST_CPPFLAGS")
+            .env_remove("PGRX_C_MACROS_TEST_CFLAGS")
+            .env_remove("PGRX_C_MACROS_TEST_CONFIGURE")
             .env_remove("PGRX_PG_CONFIG_PATH")
             .env_remove("PGRX_PG_CONFIG_AS_ENV")
             .env_remove("PG_CONFIG");
@@ -141,6 +147,151 @@ fn requires_a_configured_version_and_lists_functions_from_the_complete_default_w
     assert!(!unconfigured.status.success());
     assert!(String::from_utf8_lossy(&unconfigured.stderr).contains("pg17"));
     assert!(unconfigured.stdout.is_empty());
+}
+
+#[test]
+fn analyzes_final_postgres_functions_with_profile_and_explicit_skips() {
+    let config = TestConfig::new();
+    let stdout = successful_stdout(
+        config.command().args(["analyze", "pg18", "--format", "json"]).output().unwrap(),
+    );
+    let report: serde_json::Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(report["postgres_version"], "18.0");
+    assert_eq!(report["profile"]["signed_overflow"], "wrapping");
+    assert!(!report["profile"]["target"]["triple"].as_str().unwrap().is_empty());
+    assert!(
+        report["profile"]["arguments"].as_array().unwrap().contains(&serde_json::json!("-fwrapv"))
+    );
+    let macros = report["macros"].as_array().unwrap();
+    assert_eq!(
+        macros.iter().map(|item| item["name"].as_str().unwrap()).collect::<Vec<_>>(),
+        [
+            "CPPFLAGS_FUNCTION",
+            "INCLUDED_FUNCTION",
+            "LATE_WRAPPER_FUNCTION",
+            "POSTGRES_FIXTURE_FUNCTION"
+        ]
+    );
+    let candidate = &macros[2];
+    assert_eq!(candidate["status"]["status"], "candidate");
+    assert_eq!(candidate["const_capability"], "not_established");
+    assert_json_provenance(candidate, &config.include_dir.join("utils/varlena.h"), 1, 1);
+    assert_eq!(macros[0]["status"]["status"], "candidate");
+    assert!(!macros[0]["dependencies"].as_array().unwrap().is_empty());
+
+    let human = successful_stdout(
+        config
+            .command()
+            .args(["analyze", "18", "--name", "LATE_WRAPPER_FUNCTION"])
+            .output()
+            .unwrap(),
+    );
+    assert!(human.contains("1 analyzed candidates (pending Rust validation), 0 skipped"));
+    assert!(human.contains("LATE_WRAPPER_FUNCTION: candidate"));
+    let missing = config.command().arg("analyze").output().unwrap();
+    assert_eq!(missing.status.code(), Some(2));
+    assert!(String::from_utf8_lossy(&missing.stderr).contains("<PG_VERSION>"));
+}
+
+#[test]
+fn analysis_uses_recorded_cflags_and_explicit_overrides() {
+    let config = TestConfig::new();
+    let stdout = successful_stdout(
+        config
+            .command()
+            .args([
+                "analyze",
+                "pg18",
+                "--format",
+                "json",
+                "--name",
+                "LATE_WRAPPER_FUNCTION",
+                "--",
+                "-fno-wrapv",
+            ])
+            .output()
+            .unwrap(),
+    );
+    let report: serde_json::Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(report["profile"]["signed_overflow"], "undefined");
+    assert_eq!(report["macros"].as_array().unwrap().len(), 1);
+    let malformed = config
+        .command()
+        .env("PGRX_C_MACROS_TEST_CFLAGS", "-DUNTERMINATED='")
+        .args(["analyze", "pg18"])
+        .output()
+        .unwrap();
+    assert!(!malformed.status.success());
+    assert!(malformed.stdout.is_empty());
+    assert!(String::from_utf8_lossy(&malformed.stderr).contains("CFLAGS"));
+    let invalid = config
+        .command()
+        .args(["analyze", "pg18", "--", "-o", "should-not-exist"])
+        .output()
+        .unwrap();
+    assert!(!invalid.status.success());
+    assert!(invalid.stdout.is_empty());
+    assert!(String::from_utf8_lossy(&invalid.stderr).contains("arguments"));
+}
+
+#[test]
+fn analysis_filters_final_external_definitions_and_reports_ambiguous_postgres_sources() {
+    let config = TestConfig::new();
+    let external = config.home.join("external.h");
+    std::fs::write(&external, "#undef REPLACED_BY_EXTERNAL\n#define REPLACED_BY_EXTERNAL(x) ((x) + 4)\n#define EXTERNAL_ONLY(x) ((x) + 5)\n").unwrap();
+    let header = config.include_dir.join("analysis.h");
+    std::fs::write(&header, format!(
+        "#define LOCAL_SCALAR(x) ((x) + 1)\n#define REPLACED_BY_EXTERNAL(x) ((x) + 2)\n#define REMOVED_SCALAR(x) ((x) + 3)\n#undef REMOVED_SCALAR\n#define IDENTICAL_SCALAR(x) ((x) + 5)\n#undef IDENTICAL_SCALAR\n#define IDENTICAL_SCALAR(x) ((x) + 5)\n#include {}\n",
+        serde_json::to_string(&external).unwrap()
+    )).unwrap();
+    let stdout = successful_stdout(
+        config
+            .command()
+            .args(["analyze", "pg18"])
+            .arg(&header)
+            .args(["--format", "json"])
+            .output()
+            .unwrap(),
+    );
+    let report: serde_json::Value = serde_json::from_str(&stdout).unwrap();
+    let macros = report["macros"].as_array().unwrap();
+    assert_eq!(
+        macros.iter().map(|item| item["name"].as_str().unwrap()).collect::<Vec<_>>(),
+        ["IDENTICAL_SCALAR", "LOCAL_SCALAR"]
+    );
+    assert_eq!(macros[0]["status"]["reason"]["code"], "provenance_ambiguous");
+    let spans = macros[0]["status"]["reason"]["spans"].as_array().unwrap();
+    assert_eq!(
+        spans.iter().map(|span| span["start_line"].as_u64().unwrap()).collect::<Vec<_>>(),
+        [5, 7]
+    );
+    assert_eq!(macros[1]["status"]["status"], "candidate");
+}
+
+#[test]
+fn analysis_reports_c_type_errors_and_preserves_successful_warnings() {
+    let config = TestConfig::new();
+    let header = config.include_dir.join("invalid_types.h");
+    std::fs::write(&header, "typedef missing_c_type CannotResolve;\n").unwrap();
+    let failure = config.command().args(["analyze", "pg18"]).arg(&header).output().unwrap();
+    assert!(!failure.status.success());
+    assert!(failure.stdout.is_empty());
+    assert!(
+        String::from_utf8_lossy(&failure.stderr).contains("unknown type name 'missing_c_type'")
+    );
+    std::fs::write(&header, "#warning effective profile warning\n#define WARN_FUNC(x) ((x) + 1)\n")
+        .unwrap();
+    let warning = config
+        .command()
+        .args(["analyze", "pg18"])
+        .arg(&header)
+        .args(["--format", "json"])
+        .output()
+        .unwrap();
+    assert!(warning.status.success(), "{}", String::from_utf8_lossy(&warning.stderr));
+    assert!(String::from_utf8_lossy(&warning.stderr).contains("effective profile warning"));
+    let report: serde_json::Value = serde_json::from_slice(&warning.stdout).unwrap();
+    assert_eq!(report["macros"][0]["name"], "WARN_FUNC");
 }
 
 #[test]
@@ -434,4 +585,121 @@ fn passes_clang_arguments_and_reports_diagnostics_without_partial_output() {
         diagnostic["severity"] == "warning"
             && diagnostic["message"].as_str().unwrap().contains("expected macro scanner warning")
     }));
+}
+
+#[test]
+fn emits_supported_postgres_macros_with_positional_version_and_structured_skips() {
+    let config = TestConfig::new();
+    let header = config.include_dir.join("emit.h");
+    std::fs::write(&header,
+        "#define EMIT_BASE 19\n#define LOCAL_EMIT(x) ((x) + EMIT_BASE)\n#define LOCAL_POINTER(x) (*(x))\n"
+    ).unwrap();
+    let report = successful_stdout(
+        config
+            .command()
+            .args(["emit", "pg18"])
+            .arg(&header)
+            .args(["--format", "json"])
+            .output()
+            .unwrap(),
+    );
+    let report: serde_json::Value = serde_json::from_str(&report).unwrap();
+    assert_eq!(report["profile"]["signed_overflow"], "wrapping");
+    let macros = report["macros"].as_array().unwrap();
+    assert_eq!(macros.len(), 2);
+    assert_eq!(macros[0]["analysis"]["name"], "LOCAL_EMIT");
+    assert_eq!(macros[0]["status"]["status"], "emitted");
+    assert_eq!(macros[0]["status"]["const_capability"], "runtime_only");
+    assert!(macros[0]["status"]["rust"].as_str().unwrap().contains("macro_rules! LOCAL_EMIT"));
+    assert_eq!(macros[1]["status"]["reason"]["code"], "pointer_operation");
+    let output = config.command().args(["emit", "18"]).arg(&header).output().unwrap();
+    assert!(output.status.success());
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    let stderr = String::from_utf8(output.stderr).unwrap();
+    assert!(stdout.contains("macro_rules! LOCAL_EMIT"));
+    assert!(!stdout.contains("LOCAL_POINTER"));
+    assert!(stderr.contains("LOCAL_POINTER: skipped:"));
+    assert!(stderr.contains("1 emitted (runtime integer family), 1 skipped"));
+    let missing = config.command().arg("emit").output().unwrap();
+    assert_eq!(missing.status.code(), Some(2));
+    assert!(String::from_utf8_lossy(&missing.stderr).contains("<PG_VERSION>"));
+}
+
+#[test]
+fn compiler_override_wins_and_incompatible_or_empty_recorded_hints_fall_back() {
+    let config = TestConfig::new();
+    let arguments = ["analyze", "pg18", "--format", "json", "--name", "LATE_WRAPPER_FUNCTION"];
+    let baseline = successful_stdout(
+        config.command().env_remove("CLANG_PATH").args(arguments).output().unwrap(),
+    );
+    let baseline: serde_json::Value = serde_json::from_str(&baseline).unwrap();
+    let compiler = baseline["profile"]["compiler"]["executable"].as_str().unwrap();
+    let wrong = config.home.join("wrong-clang");
+    let marker = config.home.join("wrong-clang-invoked");
+    std::fs::write(
+        &wrong,
+        format!("#!/bin/sh\ntouch '{}'\nprintf '%s\\n' 'clang version 0.0.0'\n", marker.display()),
+    )
+    .unwrap();
+    std::fs::set_permissions(&wrong, std::fs::Permissions::from_mode(0o700)).unwrap();
+    let hint = format!("CLANG={}", wrong.display());
+    let overridden = successful_stdout(
+        config
+            .command()
+            .env("PGRX_C_MACROS_TEST_CONFIGURE", &hint)
+            .env("CLANG_PATH", compiler)
+            .args(arguments)
+            .output()
+            .unwrap(),
+    );
+    let overridden: serde_json::Value = serde_json::from_str(&overridden).unwrap();
+    assert_eq!(overridden["profile"]["compiler"]["executable"], compiler);
+    assert!(!marker.exists(), "the explicit compiler override must bypass a recorded hint");
+    for hint in [hint.as_str(), "CLANG="] {
+        let output = successful_stdout(
+            config
+                .command()
+                .env("PGRX_C_MACROS_TEST_CONFIGURE", hint)
+                .env_remove("CLANG_PATH")
+                .args(arguments)
+                .output()
+                .unwrap(),
+        );
+        let report: serde_json::Value = serde_json::from_str(&output).unwrap();
+        assert_eq!(report["profile"]["compiler"]["executable"], compiler);
+    }
+    assert!(
+        marker.exists(),
+        "an incompatible recorded compiler is checked before automatic fallback"
+    );
+}
+
+#[test]
+fn cflags_precede_cppflags_and_final_explicit_overrides() {
+    let config = TestConfig::new();
+    std::fs::write(config.include_dir.join("order.h"), "#define PROFILE_ORDER(x) ((x) + ORDER)\n")
+        .unwrap();
+    let report = successful_stdout(
+        config
+            .command()
+            .env("PGRX_C_MACROS_TEST_CFLAGS", "-fwrapv -DORDER=1")
+            .env("PGRX_C_MACROS_TEST_CPPFLAGS", "-DORDER=2")
+            .args(["analyze", "pg18"])
+            .arg(config.include_dir.join("order.h"))
+            .args(["--format", "json", "--name", "PROFILE_ORDER", "--", "-DORDER=3"])
+            .output()
+            .unwrap(),
+    );
+    let report: serde_json::Value = serde_json::from_str(&report).unwrap();
+    let arguments = report["profile"]["arguments"].as_array().unwrap();
+    let position = |flag: &str| arguments.iter().position(|argument| argument == flag).unwrap();
+    assert!(position("-DORDER=1") < position("-DORDER=2"));
+    assert!(position("-DORDER=2") < position("-DORDER=3"));
+    assert!(
+        report["macros"][0]["expression"]["syntax"]["nodes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|node| node["kind"]["literal"]["value"] == 3)
+    );
 }

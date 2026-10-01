@@ -7,6 +7,7 @@ pub(crate) mod pg15 {
     #![allow(clippy::all)]
     #![allow(unknown_lints, unnecessary_transmutes)]
     include!(concat!(env!("OUT_DIR"), "/pg15.rs"));
+    include!(concat!(env!("OUT_DIR"), "/pg15_macros.rs"));
 }
 #[cfg(all(feature = "pg15", docsrs))]
 pub(crate) mod pg15;
@@ -16,6 +17,7 @@ pub(crate) mod pg16 {
     #![allow(clippy::all)]
     #![allow(unknown_lints, unnecessary_transmutes)]
     include!(concat!(env!("OUT_DIR"), "/pg16.rs"));
+    include!(concat!(env!("OUT_DIR"), "/pg16_macros.rs"));
 }
 #[cfg(all(feature = "pg16", docsrs))]
 pub(crate) mod pg16;
@@ -25,6 +27,7 @@ pub(crate) mod pg17 {
     #![allow(clippy::all)]
     #![allow(unknown_lints, unnecessary_transmutes)]
     include!(concat!(env!("OUT_DIR"), "/pg17.rs"));
+    include!(concat!(env!("OUT_DIR"), "/pg17_macros.rs"));
 }
 #[cfg(all(feature = "pg17", docsrs))]
 pub(crate) mod pg17;
@@ -34,6 +37,7 @@ pub(crate) mod pg18 {
     #![allow(clippy::all)]
     #![allow(unknown_lints, unnecessary_transmutes)]
     include!(concat!(env!("OUT_DIR"), "/pg18.rs"));
+    include!(concat!(env!("OUT_DIR"), "/pg18_macros.rs"));
 }
 #[cfg(all(feature = "pg18", docsrs))]
 pub(crate) mod pg18;
@@ -43,6 +47,7 @@ pub(crate) mod pg19 {
     #![allow(clippy::all)]
     #![allow(unknown_lints, unnecessary_transmutes)]
     include!(concat!(env!("OUT_DIR"), "/pg19.rs"));
+    include!(concat!(env!("OUT_DIR"), "/pg19_macros.rs"));
 }
 #[cfg(all(feature = "pg19", docsrs))]
 pub(crate) mod pg19;

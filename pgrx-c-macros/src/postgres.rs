@@ -2,9 +2,12 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-use crate::{Error, MacroDefinition, MacroInventory, MacroKind, MacroScanner};
+use crate::{
+    ActiveProvenance, Error, FrontendOutput, MacroDefinition, MacroInventory, MacroKind,
+    MacroScanner,
+};
 use pgrx_pg_config::{PgConfig, Pgrx};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
 /// PostgreSQL function macros and the other definitions needed to interpret them.
@@ -53,19 +56,18 @@ impl PostgresConfig {
             directories.push(pg_config.includedir_server_port_win32_msvc()?);
         }
         let mut clang_args = Vec::new();
-        for directory in directories {
-            let path = directory
-                .to_str()
-                .ok_or_else(|| PostgresError::InvalidIncludeDirectory(directory.clone()))?;
-            clang_args.push(format!("-I{path}"));
-        }
-
         // PostgreSQL's Windows CPPFLAGS are for MSVC; the binding generator also
         // omits them when parsing with Clang.
         if !cfg!(target_os = "windows") {
             let flags = pg_config.cppflags()?;
             let flags = flags.to_str().ok_or(PostgresError::InvalidCppFlags)?;
             clang_args.extend(shlex::split(flags).ok_or(PostgresError::InvalidCppFlags)?);
+        }
+        for directory in directories {
+            let path = directory
+                .to_str()
+                .ok_or_else(|| PostgresError::InvalidIncludeDirectory(directory.clone()))?;
+            clang_args.push(format!("-I{path}"));
         }
         Ok(Self { pg_config, header, server_include_dir, clang_args })
     }
@@ -83,6 +85,111 @@ impl PostgresConfig {
     /// Compiler arguments derived from the server include directory and CPPFLAGS.
     pub fn clang_args(&self) -> &[String] {
         &self.clang_args
+    }
+
+    /// Inspect the final C environment using the installation's recorded compiler flags.
+    ///
+    /// Explicit arguments follow the recorded flags, so callers can supply the target and
+    /// overrides used by a binding generator. Discovery through [`Self::scan`] retains its
+    /// existing preprocessing-only behavior.
+    pub fn inspect(
+        &self,
+        scanner: &MacroScanner,
+        header: Option<&Path>,
+        extra_clang_args: &[String],
+        compiler: Option<&Path>,
+    ) -> Result<FrontendOutput, PostgresError> {
+        let mut arguments = Vec::new();
+        let cflags = self.pg_config.cflags()?;
+        let cflags = cflags.to_str().ok_or(PostgresError::InvalidCFlags)?;
+        arguments.extend(shlex::split(cflags).ok_or(PostgresError::InvalidCFlags)?);
+        // PostgreSQL's COMPILE.c applies CFLAGS before CPPFLAGS. Preserve that
+        // precedence before the same include defaults and explicit overrides as bindgen.
+        arguments.extend_from_slice(&self.clang_args);
+        arguments.extend_from_slice(extra_clang_args);
+        self.inspect_with_arguments(scanner, header.unwrap_or(&self.header), &arguments, compiler)
+    }
+
+    /// Inspect the exact flags already resolved by a binding generator.
+    ///
+    /// The caller supplies the complete CFLAGS, CPPFLAGS, target, include directories and
+    /// overrides in their intended order. No installation flags are added here. Inspection
+    /// may append an explicit compiler resource directory; use the returned profile's
+    /// arguments when parsing the bindings so both tools see the same environment.
+    pub fn inspect_with_arguments(
+        &self,
+        scanner: &MacroScanner,
+        header: &Path,
+        arguments: &[String],
+        compiler: Option<&Path>,
+    ) -> Result<FrontendOutput, PostgresError> {
+        let configured_compiler = if compiler.is_none()
+            && std::env::var_os("CLANG_PATH").is_none()
+            && self.pg_config.is_real()
+        {
+            self.pg_config
+                .configure()?
+                .get("CLANG")
+                .filter(|value| !value.is_empty())
+                .map(PathBuf::from)
+        } else {
+            None
+        };
+        let mut inspected = crate::frontend::inspect_with_compiler_hint(
+            scanner,
+            header,
+            arguments,
+            compiler,
+            configured_compiler.as_deref(),
+        )?;
+        if let Some(pg_config) = self.pg_config.path() {
+            inspected.profile.inputs.files.push(pg_config);
+        }
+        if let Ok(config) = Pgrx::config_toml() {
+            inspected.profile.inputs.files.push(config);
+        }
+        for name in [
+            "HOME",
+            "USERPROFILE",
+            "PGRX_HOME",
+            "PGRX_PG_CONFIG_PATH",
+            "PGRX_PG_CONFIG_AS_ENV",
+            "PGRX_PG_CONFIG_VERSION",
+            "PGRX_PG_CONFIG_INCLUDEDIR-SERVER",
+            "PGRX_PG_CONFIG_CPPFLAGS",
+            "PGRX_PG_CONFIG_CFLAGS",
+            "PGRX_PG_CONFIG_CONFIGURE",
+            "PGRX_PG_CONFIG_PKGINCLUDEDIR",
+            "PG_CONFIG",
+        ] {
+            let value = match std::env::var(name) {
+                Ok(value) => Some(value),
+                Err(std::env::VarError::NotPresent) => None,
+                Err(std::env::VarError::NotUnicode(_)) => {
+                    return Err(PostgresError::Configuration(eyre::eyre!(
+                        "compilation input {name} is not UTF-8"
+                    )));
+                }
+            };
+            inspected.profile.inputs.environment.insert(name.into(), value);
+        }
+        inspected.profile.inputs.files.sort();
+        inspected.profile.inputs.files.dedup();
+        for file in &inspected.profile.inputs.files {
+            if !inspected.profile.inputs.fingerprints.contains_key(file) {
+                inspected
+                    .profile
+                    .inputs
+                    .fingerprints
+                    .extend(crate::frontend::fingerprint_files(std::iter::once(file))?);
+            }
+        }
+        Ok(inspected)
+    }
+
+    /// The physical server header tree that owns PostgreSQL macro candidates.
+    pub fn server_include_dir(&self) -> &Path {
+        &self.server_include_dir
     }
 
     /// Inventory PostgreSQL function macros from the version's pgrx wrapper or supplied header.
@@ -132,6 +239,60 @@ impl PostgresConfig {
     }
 }
 
+/// Select final active function macros owned by a PostgreSQL server header tree.
+///
+/// Canonical source paths establish ownership. An external final redefinition is excluded;
+/// ambiguous or unresolved definitions with PostgreSQL history remain candidates so the
+/// analyzer can report why they are skipped. Results are sorted by macro name.
+pub fn postgres_function_macro_names(
+    inspected: &FrontendOutput,
+    server_include_dir: &Path,
+) -> Result<Vec<String>, PostgresError> {
+    let root = canonicalize_header_path(server_include_dir)?;
+    let mut sources = HashMap::new();
+    let mut owned_history = HashSet::new();
+    for definition in &inspected.inventory().macros {
+        if definition.kind == MacroKind::FunctionLike
+            && let Some(span) = &definition.provenance
+            && owns_source(&span.file, &root, &mut sources)?
+        {
+            owned_history.insert(definition.name.as_str());
+        }
+    }
+    let mut names = Vec::new();
+    for (name, active) in &inspected.environment().active {
+        if active.definition.kind != MacroKind::FunctionLike {
+            continue;
+        }
+        let owned = match &active.provenance {
+            ActiveProvenance::Resolved => match &active.definition.provenance {
+                Some(span) => owns_source(&span.file, &root, &mut sources)?,
+                None => false,
+            },
+            ActiveProvenance::Ambiguous(_) | ActiveProvenance::Unresolved => {
+                owned_history.contains(name.as_str())
+            }
+        };
+        if owned {
+            names.push(name.clone());
+        }
+    }
+    Ok(names)
+}
+
+fn owns_source(
+    file: &Path,
+    root: &Path,
+    cache: &mut HashMap<PathBuf, bool>,
+) -> Result<bool, PostgresError> {
+    if let Some(owned) = cache.get(file) {
+        return Ok(*owned);
+    }
+    let owned = canonicalize_header_path(file)?.starts_with(root);
+    cache.insert(file.to_path_buf(), owned);
+    Ok(owned)
+}
+
 fn canonicalize_header_path(path: &Path) -> Result<PathBuf, PostgresError> {
     path.canonicalize().map_err(|source| PostgresError::HeaderPath { path: path.into(), source })
 }
@@ -147,6 +308,10 @@ pub enum PostgresError {
     InvalidIncludeDirectory(PathBuf),
     #[error("PostgreSQL CPPFLAGS must be UTF-8 with balanced shell quoting")]
     InvalidCppFlags,
+    #[error("PostgreSQL CFLAGS must be UTF-8 with balanced shell quoting")]
+    InvalidCFlags,
+    #[error(transparent)]
+    Frontend(#[from] crate::FrontendError),
     #[error(transparent)]
     Discovery(#[from] Error),
 }
