@@ -1,13 +1,28 @@
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
-use pgrx_c_macros::{DiagnosticSeverity, Error, MacroKind, MacroScanner, TokenKind};
+use pgrx_c_macros::{
+    DiagnosticSeverity, Error, MacroDefinition, MacroKind, MacroScanner, TokenKind,
+};
 
 // The clang wrapper permits one live Clang instance in a process.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
 fn fixture(name: &str) -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures").join(name)
+}
+
+fn assert_provenance(definition: &MacroDefinition, file: &Path, start_line: u32, end_line: u32) {
+    let span = definition.provenance.as_ref().expect("file-defined macro has physical provenance");
+    assert!(span.file.is_absolute(), "{}", definition.name);
+    assert_eq!(span.file.file_name(), file.file_name(), "{}", definition.name);
+    assert_eq!(
+        span.file.canonicalize().unwrap(),
+        file.canonicalize().unwrap(),
+        "{}",
+        definition.name
+    );
+    assert_eq!((span.start_line, span.end_line), (start_line, end_line), "{}", definition.name);
 }
 
 #[test]
@@ -90,6 +105,18 @@ fn discovers_source_macros_without_losing_preprocessor_syntax() {
     );
     assert_eq!((included_location.line, included_location.column), (1, 9));
     assert!(!included.builtin);
+    assert_provenance(included, &fixture("included.h"), 1, 1);
+    assert_provenance(find("INCLUDED_FUNCTION"), &fixture("included.h"), 2, 2);
+    for (name, start, end) in [
+        ("OBJECT_PARENS", 3, 3),
+        ("EMPTY_OBJECT", 6, 6),
+        ("EMPTY_FUNCTION", 7, 7),
+        ("MULTILINE", 8, 10),
+        ("COMMENTED", 11, 11),
+        ("IN_BODY", 23, 23),
+    ] {
+        assert_provenance(find(name), &header, start, end);
+    }
 
     let source = std::fs::read_to_string(&header).unwrap();
     let main_file = header.canonicalize().unwrap();
@@ -123,10 +150,21 @@ fn discovers_source_macros_without_losing_preprocessor_syntax() {
     assert_eq!(redefined.len(), 2, "definition history must include definitions removed by #undef");
     assert_eq!(redefined[0].tokens.last().unwrap().spelling, "1");
     assert_eq!(redefined[1].tokens.last().unwrap().spelling, "2");
+    assert_provenance(redefined[0], &header, 17, 17);
+    assert_provenance(redefined[1], &header, 19, 19);
     assert!(inventory.macros.iter().any(|definition| definition.builtin));
+    assert!(
+        inventory
+            .macros
+            .iter()
+            .filter(|definition| definition.builtin)
+            .all(|definition| definition.provenance.is_none())
+    );
 
     // No token, source location, or definition may borrow from Clang's translation unit.
     drop(scanner);
+    assert_provenance(find("MULTILINE"), &header, 8, 10);
+    assert_provenance(find("INCLUDED_FUNCTION"), &fixture("included.h"), 2, 2);
     assert!(inventory.macros.iter().any(|definition| definition.name == "IN_BODY"));
     assert!(inventory.macros.iter().filter(|definition| !definition.builtin).all(|definition| {
         definition.to_string().starts_with("#define ") && !definition.tokens.is_empty()
@@ -164,6 +202,19 @@ fn applies_clang_defines_and_undefines_before_recording_active_macros() {
     assert_eq!(command_line.kind, MacroKind::ObjectLike);
     assert_eq!(command_line.tokens.last().unwrap().spelling, "73");
     assert!(!command_line.builtin);
+    assert!(command_line.location.is_none());
+    assert!(command_line.provenance.is_none());
+    let function_define =
+        scanner.scan(&header, &["-DFROM_COMMAND_LINE(value)=value".into()]).unwrap();
+    let function_define = function_define
+        .macros
+        .iter()
+        .find(|definition| definition.name == "FROM_COMMAND_LINE")
+        .unwrap();
+    assert_eq!(function_define.kind, MacroKind::FunctionLike);
+    assert!(!function_define.builtin);
+    assert!(function_define.location.is_none());
+    assert!(function_define.provenance.is_none());
 
     let undefined =
         scanner.scan(&header, &["-DENABLE_BRANCH".into(), "-UENABLE_BRANCH".into()]).unwrap();
@@ -219,9 +270,11 @@ fn preserves_spliced_macro_syntax_and_physical_locations_and_rejects_invalid_inp
     assert_eq!(spliced_name.tokens[0].spelling, "SPLICED_NAME");
     assert_eq!(spliced_name.kind, MacroKind::ObjectLike);
     assert!(spliced_name.to_string().starts_with("#define SPLICED_NAME "));
+    assert_provenance(spliced_name, &header, 1, 2);
     let function = find("SPLICED_FUNCTION");
     assert_eq!(function.kind, MacroKind::FunctionLike);
     assert!(function.to_string().starts_with("#define SPLICED_FUNCTION("));
+    assert_provenance(function, &header, 3, 4);
     let object = find("OBJECT_COMMENT");
     assert_eq!(object.kind, MacroKind::ObjectLike);
     assert!(object.to_string().starts_with("#define OBJECT_COMMENT "));
@@ -229,6 +282,7 @@ fn preserves_spliced_macro_syntax_and_physical_locations_and_rejects_invalid_inp
     let physical = find("PHYSICAL_LINE").location.as_ref().unwrap();
     assert_eq!(physical.file.canonicalize().unwrap(), header.canonicalize().unwrap());
     assert_eq!((physical.line, physical.column), (13, 9));
+    assert_provenance(find("PHYSICAL_LINE"), &header, 13, 13);
 
     for (name, expected) in
         [("DIRECT_REDEFINED", ["old", "new"]), ("REPEATED_IDENTICAL", ["3", "3"])]
@@ -250,14 +304,81 @@ fn preserves_spliced_macro_syntax_and_physical_locations_and_rejects_invalid_inp
             definitions[0].location.as_ref().unwrap().offset
                 < definitions[1].location.as_ref().unwrap().offset
         );
+        let first_line = if name == "DIRECT_REDEFINED" { 7 } else { 9 };
+        assert_provenance(definitions[0], &header, first_line, first_line);
+        assert_provenance(definitions[1], &header, first_line + 1, first_line + 1);
     }
 
     assert!(matches!(scanner.scan(&header, &["-DVALUE=\0".into()]), Err(Error::InvalidInput(_))));
+    for arguments in [
+        vec!["-working-directory".into(), "somewhere".into()],
+        vec!["-working-directory=somewhere".into()],
+        vec!["-Xclang".into(), "-working-directory".into(), "-Xclang".into(), "somewhere".into()],
+    ] {
+        assert!(matches!(
+            scanner.scan(&header, &arguments),
+            Err(Error::InvalidInput(message)) if message.contains("-working-directory")
+        ));
+    }
     assert!(matches!(scanner.scan(Path::new("header\0.h"), &[]), Err(Error::InvalidInput(_))));
     #[cfg(unix)]
     {
         use std::os::unix::ffi::OsStringExt;
         let non_utf8 = PathBuf::from(std::ffi::OsString::from_vec(b"header\xff.h".to_vec()));
         assert!(matches!(scanner.scan(&non_utf8, &[]), Err(Error::InvalidInput(_))));
+    }
+}
+
+#[test]
+fn records_token_extents_with_trailing_trivia_crlf_and_end_of_file() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available for these tests");
+    let header = fixture("provenance.h");
+    let inventory = scanner.scan(&header, &[]).unwrap();
+    for (name, start, end) in [
+        ("SINGLE_LINE", 1, 1),
+        ("EMPTY_OBJECT_RANGE", 2, 2),
+        ("EMPTY_FUNCTION_RANGE", 3, 3),
+        ("EMPTY_CONTINUED", 4, 4),
+        ("TRAILING_COMMENT", 7, 7),
+        ("NEXT_VALUE", 9, 9),
+        ("LAST_TOKEN", 10, 11),
+        ("AFTER_LINE_DIRECTIVE", 14, 14),
+        ("MIDDLE_COMMENT", 15, 16),
+    ] {
+        let definition =
+            inventory.macros.iter().find(|definition| definition.name == name).unwrap();
+        assert_provenance(definition, &header, start, end);
+    }
+
+    struct TemporaryHeader(PathBuf);
+    impl TemporaryHeader {
+        fn new(name: &str, bytes: &[u8]) -> Self {
+            let nonce = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos();
+            let header = Self(
+                std::env::temp_dir()
+                    .join(format!("pgrx-macro-{name}-{}-{nonce}.h", std::process::id())),
+            );
+            std::fs::write(&header.0, bytes).unwrap();
+            header
+        }
+    }
+    impl Drop for TemporaryHeader {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_file(&self.0);
+        }
+    }
+    for (name, contents, expected_end) in [
+        ("eof", b"#define AT_END(value) \\\n    value".as_slice(), 2),
+        ("crlf", b"#define AT_END(value) \\\r\n    value\r\n".as_slice(), 2),
+    ] {
+        let header = TemporaryHeader::new(name, contents);
+        let inventory = scanner.scan(&header.0, &[]).unwrap();
+        let definition =
+            inventory.macros.iter().find(|definition| definition.name == "AT_END").unwrap();
+        assert_provenance(definition, &header.0, 1, expected_end);
     }
 }

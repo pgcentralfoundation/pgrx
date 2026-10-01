@@ -23,3 +23,7 @@ static int scanner_body_fixture(void)
 #define IN_BODY(value) ((value) * 2)
     return IN_BODY(3);
 }
+
+#define REDEFINED_FUNCTION(value) ((value) + 1)
+#undef REDEFINED_FUNCTION
+#define REDEFINED_FUNCTION(value) ((value) + 2)

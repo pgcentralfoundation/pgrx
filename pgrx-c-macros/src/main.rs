@@ -3,7 +3,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 use clap::{Args, Parser, Subcommand, ValueEnum};
-use pgrx_c_macros::{Diagnostic, Error, MacroKind, MacroScanner, PostgresConfig, PostgresError};
+use pgrx_c_macros::{Diagnostic, Error, MacroScanner, PostgresConfig, PostgresError};
 use std::collections::HashSet;
 use std::io::{self, BufWriter, Write};
 use std::path::PathBuf;
@@ -18,7 +18,7 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// List the macro definitions encountered while processing a C header or source file.
+    /// List function-like macros from the selected PostgreSQL version's pgrx headers.
     List(ListArgs),
 }
 
@@ -27,7 +27,7 @@ struct ListArgs {
     /// Configured PostgreSQL major version, such as 18 or pg18.
     pg_version: String,
 
-    /// Wrapper header or source file; defaults to the selected server's postgres.h.
+    /// Override pgrx's version-specific wrapper header with a header or source file.
     header: Option<PathBuf>,
 
     /// Output names, normalized C definitions, or a JSON inventory.
@@ -38,21 +38,9 @@ struct ListArgs {
     #[arg(long)]
     name: Vec<String>,
 
-    /// List only function-like macros.
-    #[arg(long, conflicts_with = "object_like")]
-    function_like: bool,
-
-    /// List only object-like macros.
-    #[arg(long, conflicts_with = "function_like")]
-    object_like: bool,
-
     /// Exclude definitions from included files and macros without a source file.
     #[arg(long)]
     main_file_only: bool,
-
-    /// Include compiler-provided macro definitions.
-    #[arg(long)]
-    include_builtins: bool,
 
     /// Additional Clang arguments after --, such as -Iinclude, -DNAME, or --target=....
     #[arg(last = true, allow_hyphen_values = true)]
@@ -103,17 +91,15 @@ fn run(cli: Cli) -> Result<(), CliError> {
     let Command::List(args) = cli.command;
     let postgres = PostgresConfig::resolve(&args.pg_version)?;
     let scanner = MacroScanner::new()?;
-    let mut inventory = postgres.scan(&scanner, args.header.as_deref(), &args.clang_args)?;
+    let mut inventory =
+        postgres.scan(&scanner, args.header.as_deref(), &args.clang_args)?.inventory;
     for diagnostic in &inventory.diagnostics {
         print_diagnostic(diagnostic);
     }
 
     let names: HashSet<_> = args.name.iter().map(String::as_str).collect();
     inventory.macros.retain(|definition| {
-        (args.include_builtins || !definition.builtin)
-            && (names.is_empty() || names.contains(definition.name.as_str()))
-            && (!args.function_like || definition.kind == MacroKind::FunctionLike)
-            && (!args.object_like || definition.kind == MacroKind::ObjectLike)
+        (names.is_empty() || names.contains(definition.name.as_str()))
             && (!args.main_file_only || definition.main_file)
     });
     // Stable sorting retains preprocessing order for repeated definitions of the same name.

@@ -11,3 +11,13 @@
 #ifdef COMMAND_LINE_VALUE
 #define COMMAND_LINE_PRESENT COMMAND_LINE_VALUE
 #endif
+
+#ifdef ENABLE_BRANCH
+#define ENABLED_FUNCTION(value) ((value) + 11)
+#else
+#define DISABLED_FUNCTION(value) ((value) + 22)
+#endif
+
+#ifdef COMMAND_LINE_VALUE
+#define COMMAND_LINE_FUNCTION(value) ((value) + COMMAND_LINE_VALUE)
+#endif
