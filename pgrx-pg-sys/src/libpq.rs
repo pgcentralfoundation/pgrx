@@ -21,8 +21,8 @@ pub mod be {
     #[cfg(any(feature = "pg18", feature = "pg19"))]
     const SCRAM_MAX_KEY_LEN: usize = 32;
 
-    /// Port for Postgres 13..=16
-    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
+    /// Port for Postgres 15..=16
+    #[cfg(any(feature = "pg15", feature = "pg16"))]
     #[repr(C)]
     pub struct Port {
         pub sock: crate::pgsocket,
@@ -49,7 +49,7 @@ pub mod be {
         // This should be `*mut crate::HbaLine` if we ever bind that
         hba: *mut core::ffi::c_void,
 
-        #[cfg(any(feature = "pg14", feature = "pg15"))]
+        #[cfg(feature = "pg15")]
         authn_id: *const core::ffi::c_char,
 
         default_keepalives_idle: core::ffi::c_int,
@@ -66,7 +66,6 @@ pub mod be {
 
         ssl_in_use: bool,
         peer_cn: *mut core::ffi::c_char,
-        #[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16"))]
         peer_dn: *mut core::ffi::c_char,
         peer_cert_valid: bool,
     }

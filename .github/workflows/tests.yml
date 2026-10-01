@@ -112,7 +112,7 @@ jobs:
 
     strategy:
       matrix:
-        postgres: [ 13, 14, 15, 16, 17, 18, 19 ]
+        postgres: [ 15, 16, 17, 18, 19 ]
         include:
           - postgres: 16
             rust: "beta"
@@ -654,7 +654,7 @@ jobs:
     strategy:
       matrix:
         os: [ "windows-2022" ]
-        postgresql: [ 13, 17 ]
+        postgresql: [ 15, 17 ]
 
     steps:
       - uses: actions/checkout@v4

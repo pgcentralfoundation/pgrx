@@ -104,12 +104,3 @@ EOF
     | grep -v '^tcop/cmdtaglist\.h$' \
     | sed 's/^/#include "/' \
     | sed 's/$/"/')
-
-cat << EOF
-
-#if PG_VERSION_NUM < 140000
-#ifndef WIN32
-#define PGERROR ERROR
-#endif
-#endif
-EOF

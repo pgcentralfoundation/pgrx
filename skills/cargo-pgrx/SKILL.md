@@ -68,7 +68,7 @@ installing them or starting PostgreSQL.
 
 ## Versions, features, and Cargo flags
 
-Supported major-version labels are `pg13` through `pg19`. Where a command accepts
+Supported major-version labels are `pg15` through `pg19`. Where a command accepts
 a version selector, selection generally uses the explicit argument, then a
 PostgreSQL feature supplied with `--features`, then the manifest's default
 PostgreSQL feature unless defaults are disabled. Supply an explicit selector

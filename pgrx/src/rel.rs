@@ -27,7 +27,7 @@ macro_rules! pgstat_count_impl {
                 unsafe {
                     (*info).counts.$new_field += 1;
                 }
-                #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+                #[cfg(feature = "pg15")]
                 unsafe {
                     (*info).t_counts.$old_field += 1;
                 }
@@ -313,13 +313,6 @@ impl PgRelation {
             return true;
         }
 
-        #[cfg(any(
-            feature = "pg15",
-            feature = "pg16",
-            feature = "pg17",
-            feature = "pg18",
-            feature = "pg19"
-        ))]
         if self.pgstat_enabled {
             unsafe {
                 pg_sys::pgstat_assoc_relation(self.as_ptr());
@@ -345,7 +338,7 @@ impl PgRelation {
             unsafe {
                 (*info).counts.tuples_returned += n;
             }
-            #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+            #[cfg(feature = "pg15")]
             unsafe {
                 (*info).t_counts.t_tuples_returned += n;
             }

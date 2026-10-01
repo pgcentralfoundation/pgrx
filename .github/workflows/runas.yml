@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   TOOL_DIR: ./tools
-  PG_VER: 14
+  PG_VER: 15
 
 jobs:
   ubuntu:
@@ -95,9 +95,9 @@ jobs:
         run: cd cargo-pgrx && cargo install --path . --debug --locked
 
       - name: cargo pgrx init
-        run: cargo pgrx init --pg14=$(which pg_config)
+        run: cargo pgrx init --pg15=$(which pg_config)
 
       - name: Test cargo pgrx test --runas
         run: |
           echo 0 | sudo tee /proc/sys/fs/protected_fifos
-          cd pgrx-examples/arrays && cargo pgrx test pg14 --runas postgres --pgdata=/tmp/pgdata
+          cd pgrx-examples/arrays && cargo pgrx test pg15 --runas postgres --pgdata=/tmp/pgdata

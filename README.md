@@ -13,7 +13,7 @@
 
 `pgrx` is a framework for developing PostgreSQL extensions in Rust and strives to be as idiomatic and safe as possible.
 
-`pgrx` supports Postgres 13 through Postgres 18, plus Postgres 19beta4.
+`pgrx` supports Postgres 15 through Postgres 18, plus Postgres 19beta4.
 
 ## Want to chat with us or get a question answered?
 
@@ -31,7 +31,7 @@
    + `cargo pgrx package`: Create installation packages for your extension
    + More in the [`README.md`](cargo-pgrx/README.md)!
 - **Target Multiple Postgres Versions**
-   + Support from Postgres 13 to Postgres 19 from the same codebase
+   + Support from Postgres 15 to Postgres 19 from the same codebase
    + Use Rust feature gating to use version-specific APIs
    + Seamlessly test against all versions
 - **Automatic Schema Generation**
@@ -189,7 +189,7 @@ cargo pgrx run
 
 This compiles the extension to a shared library, copies it to the specified Postgres installation, starts that Postgres instance and connects you to a database named the same as the extension.
 
-Once `cargo-pgrx` drops us into `psql` we can [load the extension](https://www.postgresql.org/docs/13/sql-createextension.html) and do a SELECT on the example function.
+Once `cargo-pgrx` drops us into `psql` we can [load the extension](https://www.postgresql.org/docs/15/sql-createextension.html) and do a SELECT on the example function.
 
 ```sql
 my_extension=# CREATE EXTENSION my_extension;

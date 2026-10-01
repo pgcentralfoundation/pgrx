@@ -70,6 +70,6 @@ cargo run -p pgrx-version-updater \
 echo "Generating bindings -- this may take a few moments"
 # cshim is required: without it, bindgen omits __pgrx_cshim wrappers for Postgres
 # macros and static-inline helpers that have no linkable symbol.
-PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run $CARGO_QUIET_FLAG --workspace --no-default-features --features "pg${PG_VER:-14} cshim"
+PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run $CARGO_QUIET_FLAG --workspace --no-default-features --features "pg${PG_VER:-15} cshim"
 
 echo "Done!"

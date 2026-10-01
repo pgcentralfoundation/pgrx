@@ -15,7 +15,7 @@ the version directory. The current PG19 download is PostgreSQL 19beta4.
 Init stops the selected managed instances in the active home, validates each
 installation, and creates missing `data-<major>` clusters unless `--no-run` is
 set or the caller is root. It writes `config.toml` with the selected `pg_config`
-paths and port bases. Existing version entries are retained, but omitted port
+paths and port bases. Existing supported version entries are retained, but omitted port
 bases revert to defaults; repeat custom port flags when reinitializing a home.
 
 ## Usage and options
@@ -26,8 +26,6 @@ cargo pgrx init [OPTIONS]
 
 | Flag | Environment variable | Meaning |
 |------|----------------------|---------|
-| `--pg13 <PATH\|download>` | `PG13_PG_CONFIG` | PostgreSQL 13 |
-| `--pg14 <PATH\|download>` | `PG14_PG_CONFIG` | PostgreSQL 14 |
 | `--pg15 <PATH\|download>` | `PG15_PG_CONFIG` | PostgreSQL 15 |
 | `--pg16 <PATH\|download>` | `PG16_PG_CONFIG` | PostgreSQL 16 |
 | `--pg17 <PATH\|download>` | `PG17_PG_CONFIG` | PostgreSQL 17 |
@@ -103,7 +101,7 @@ The subshell preserves the caller's original `PGRX_HOME`. Keep the private path
 available for later commands and cleanup, and pass it explicitly in new shells.
 `PGRX_PG_CONFIG_PATH` bypasses `config.toml` and its custom port bases;
 `PGRX_PG_CONFIG_AS_ENV` also overrides configuration selection. Clear inherited
-overrides that defeat the private configuration. Inherited `PG13_PG_CONFIG`
+overrides that defeat the private configuration. Inherited `PG15_PG_CONFIG`
 through `PG19_PG_CONFIG` values can register additional versions during init.
 
 ## Shut down temporary PostgreSQL

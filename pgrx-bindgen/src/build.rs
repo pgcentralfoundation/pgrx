@@ -32,8 +32,6 @@ const YANKED_POSTGRES_VERSIONS: &[PgVersion] = &[
     PgVersion::new(17, PgMinorVersion::Release(1), None),
     PgVersion::new(16, PgMinorVersion::Release(5), None),
     PgVersion::new(15, PgMinorVersion::Release(9), None),
-    PgVersion::new(14, PgMinorVersion::Release(14), None),
-    PgVersion::new(13, PgMinorVersion::Release(17), None),
 ];
 
 pub(super) mod clang;
@@ -297,7 +295,7 @@ fn generate_bindings(
         .wrap_err_with(|| format!("bindgen failed for pg{major_version}"))?;
 
     let oids = extract_oids(&bindgen_output);
-    let rewritten_items = rewrite_items(major_version, bindgen_output, &oids)
+    let rewritten_items = rewrite_items(bindgen_output, &oids)
         .wrap_err_with(|| format!("failed to rewrite items for pg{major_version}"))?;
     let oids = format_builtin_oid_impl(oids);
 
@@ -404,14 +402,13 @@ fn write_rs_file(
 /// Given a token stream representing a file, apply a series of transformations to munge
 /// the bindgen generated code with some postgres specific enhancements
 fn rewrite_items(
-    major_version: u16,
     mut file: syn::File,
     oids: &BTreeMap<syn::Ident, Box<syn::Expr>>,
 ) -> eyre::Result<proc_macro2::TokenStream> {
     rewrite_c_abi_to_c_unwind(&mut file);
     let items_vec = rewrite_oid_consts(&file.items, oids);
     let mut items = apply_pg_guard(&items_vec)?;
-    let pgnode_impls = impl_pg_node(major_version, &items_vec)?;
+    let pgnode_impls = impl_pg_node(&items_vec)?;
 
     // append the pgnodes to the set of items
     items.extend(pgnode_impls);
@@ -493,7 +490,7 @@ fn format_builtin_oid_impl(oids: BTreeMap<syn::Ident, Box<syn::Expr>>) -> proc_m
 }
 
 /// Implement our `PgNode` marker trait for `pg_sys::Node` and its "subclasses"
-fn impl_pg_node(major_version: u16, items: &[syn::Item]) -> eyre::Result<proc_macro2::TokenStream> {
+fn impl_pg_node(items: &[syn::Item]) -> eyre::Result<proc_macro2::TokenStream> {
     let type_graph = TypeGraph::from(items);
 
     // Look through the entire file to produce a set of all variants of the Postgres `NodeTag` enum.
@@ -570,17 +567,6 @@ fn impl_pg_node(major_version: u16, items: &[syn::Item]) -> eyre::Result<proc_ma
                 &mut identified_nodes,
             );
         }
-    }
-
-    // The `Value` struct of pg13 and pg14 is used with multiple node tags, but there's nothing in
-    // the bindgen bindings to indicate that. For these versions, directly include the tags used in
-    // the constructors defined in `nodes/value.c`.
-    if (major_version == 13 || major_version == 14)
-        && let Some(cast_tags) = identified_nodes.get_mut("Value")
-    {
-        cast_tags.extend(
-            ["T_Integer", "T_Float", "T_String", "T_BitString", "T_Null"].map(|s| s.to_string()),
-        );
     }
 
     // Finally, emit `PgNode` implementations for every detected Node.
@@ -958,7 +944,7 @@ fn add_blocklists(
         .blocklist_function("PageIsValid")
         // it's defined twice on Windows, so use PGERROR instead
         .blocklist_item("ERROR")
-        // they cause linker errors for PostgreSQL 14 on Windows
+        // Keep these inline helpers blocklisted for compatibility with Windows linking.
         .blocklist_function("IsQueryIdEnabled")
         .blocklist_function("am_tablesync_worker")
         .blocklist_function("am_sequencesync_worker")
