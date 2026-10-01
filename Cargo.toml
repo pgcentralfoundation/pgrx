@@ -21,6 +21,7 @@ members = [
     "pgrx-tests",
     "pgrx-unit-tests",
     "pgrx-bindgen",
+    "pgrx-c-macros",
     "pgrx-examples/*",
     "tools/version-updater",
 ]

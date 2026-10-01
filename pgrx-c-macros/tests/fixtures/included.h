@@ -1,0 +1,2 @@
+#define INCLUDED_VALUE 41
+#define INCLUDED_FUNCTION(value) ((value) + INCLUDED_VALUE)
