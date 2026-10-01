@@ -1,3 +1,8 @@
-#include "definitions.h"
+#include "included.h"
 
 #define POSTGRES_FIXTURE_SERVER 18
+#define POSTGRES_FIXTURE_FUNCTION(value) ((value) + POSTGRES_FIXTURE_SERVER)
+
+#ifdef PG_CONFIG_FIXTURE_VALUE
+#define CPPFLAGS_FUNCTION(value) ((value) + PG_CONFIG_FIXTURE_VALUE)
+#endif

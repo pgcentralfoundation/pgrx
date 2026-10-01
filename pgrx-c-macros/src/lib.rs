@@ -8,6 +8,8 @@
 //! undefined. Inactive conditional branches are excluded. The inventory owns its data and does
 //! not borrow from Clang's translation unit. Token spellings are Clang's UTF-8 representations,
 //! rather than a byte-for-byte copy of the source.
+//! [`PostgresConfig::scan`] separates PostgreSQL function macros from conversion context;
+//! [`MacroScanner::scan`] provides the raw inventory without ownership filtering.
 
 use clang::{Clang, EntityKind, EntityVisitResult, Index};
 use serde::{Deserialize, Serialize};
@@ -16,7 +18,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 mod postgres;
-pub use postgres::{PostgresConfig, PostgresError};
+pub use postgres::{PostgresConfig, PostgresError, PostgresInventory};
 
 /// An owned record of the definitions and diagnostics encountered while processing a file.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -31,6 +33,8 @@ pub struct MacroDefinition {
     pub name: String,
     pub kind: MacroKind,
     pub location: Option<SourceLocation>,
+    /// Physical definition span; absent for definitions without a source file.
+    pub provenance: Option<SourceSpan>,
     /// Tokens include the macro name and, for function-like macros, the parameter list.
     pub tokens: Vec<Token>,
     pub builtin: bool,
@@ -54,6 +58,49 @@ pub struct SourceLocation {
     pub column: u32,
     /// Byte offset from the start of the file.
     pub offset: u32,
+}
+
+/// The absolute filename and inclusive, one-based physical lines of a macro's tokens.
+///
+/// The span starts at the macro name and ends at its last token. It includes line splices
+/// and interior comments, but excludes trailing comments and empty continuation lines.
+/// `#line` directives do not change these coordinates.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SourceSpan {
+    pub file: PathBuf,
+    pub start_line: u32,
+    pub end_line: u32,
+}
+
+impl SourceSpan {
+    fn from_range(
+        range: clang::source::SourceRange<'_>,
+        directory: &Path,
+    ) -> Result<Option<Self>, String> {
+        let start = range.get_start().get_spelling_location();
+        let end = range.get_end().get_spelling_location();
+        let (Some(file), Some(end_file)) = (start.file, end.file) else {
+            if start.file.is_none() && end.file.is_none() {
+                return Ok(None);
+            }
+            return Err("source range has only one physical endpoint".into());
+        };
+        let path = file.get_path();
+        if path != end_file.get_path() || end.offset <= start.offset {
+            return Err("source range does not span one file".into());
+        }
+        // Clang's range end is exclusive. Locating its final byte handles a range
+        // that ends at column one of the next line without including that line.
+        let last = file.get_offset_location(end.offset - 1).get_spelling_location();
+        if start.line == 0 || last.line < start.line {
+            return Err("source range has invalid line numbers".into());
+        }
+        Ok(Some(Self {
+            file: if path.is_absolute() { path } else { directory.join(path) },
+            start_line: start.line,
+            end_line: last.line,
+        }))
+    }
 }
 
 /// A token's spelling and lexical category, including comments.
@@ -153,6 +200,8 @@ impl MacroScanner {
     /// targets. Compiler-provided and command-line definitions are included. Errors and fatal
     /// diagnostics reject the scan; warnings and notes remain in a successful inventory.
     /// Paths must be UTF-8, and paths and arguments must not contain NUL bytes.
+    /// Use the process working directory instead of Clang's `-working-directory` option,
+    /// which would make relative filenames ambiguous when recording provenance.
     pub fn scan(&self, header: &Path, clang_args: &[String]) -> Result<MacroInventory, Error> {
         let path = header
             .to_str()
@@ -163,9 +212,19 @@ impl MacroScanner {
         if clang_args.iter().any(|argument| argument.contains('\0')) {
             return Err(Error::InvalidInput("Clang argument contains a NUL byte".into()));
         }
+        if clang_args.iter().any(|argument| {
+            argument == "-working-directory" || argument.starts_with("-working-directory=")
+        }) {
+            return Err(Error::InvalidInput(
+                "Clang's -working-directory is unsupported for source provenance; set the process working directory instead".into(),
+            ));
+        }
         if clang_args.len() > i32::MAX as usize - 2 {
             return Err(Error::InvalidInput("too many Clang arguments".into()));
         }
+        let directory = std::env::current_dir().map_err(|error| {
+            Error::InvalidInput(format!("could not resolve the working directory: {error}"))
+        })?;
 
         let arguments = ["-x", "c"]
             .into_iter()
@@ -215,6 +274,13 @@ impl MacroScanner {
                     Some(Error::InvalidDefinition(format!("source range for {name} is missing")));
                 return EntityVisitResult::Break;
             };
+            let provenance = match SourceSpan::from_range(range, &directory) {
+                Ok(provenance) => provenance,
+                Err(cause) => {
+                    error = Some(Error::InvalidDefinition(format!("{name}: {cause}")));
+                    return EntityVisitResult::Break;
+                }
+            };
             let tokens = range
                 .tokenize()
                 .into_iter()
@@ -256,6 +322,7 @@ impl MacroScanner {
                     MacroKind::ObjectLike
                 },
                 location: entity.get_location().and_then(source_location),
+                provenance,
                 tokens,
                 builtin,
                 main_file: entity.is_in_main_file(),
