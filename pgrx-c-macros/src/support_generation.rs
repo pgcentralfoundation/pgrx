@@ -208,11 +208,14 @@ mod tests {
     #[test]
     fn pg_sys_bridges_require_the_original_typedef_identity_and_storage() {
         use crate::{DeclarationCatalog, MacroEnvironment, MacroInventory};
+        let environment = MacroEnvironment::default();
+        let dependencies = crate::MacroDependencyGraph::from_environment(&environment);
         let mut frontend = FrontendOutput {
             profile: profile(),
-            environment: MacroEnvironment::default(),
+            environment,
             declarations: DeclarationCatalog::default(),
             inventory: MacroInventory { macros: Vec::new(), diagnostics: Vec::new() },
+            dependencies,
         };
         for name in ["Oid", "TransactionId"] {
             frontend.declarations.types.insert(

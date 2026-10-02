@@ -2279,6 +2279,7 @@ dependencies = [
  "clang-sys",
  "clap",
  "eyre",
+ "petgraph",
  "pgrx-pg-config",
  "serde",
  "serde_json",

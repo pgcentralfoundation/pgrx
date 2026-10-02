@@ -156,10 +156,18 @@ object macros remain context.
 `emit` writes Rust source to stdout and skip reasons to stderr. JSON output contains
 the compilation profile, analysis, source, and structured skips. Emitted source
 uses `$crate::__pgrx_c_macros`, provided by `pgrx-pg-sys`, and includes a target guard.
+Each generated macro's documentation includes its source location and full unexpanded
+C definition in a fenced `text` block. As in `list` output, whitespace is normalized
+and line comments are omitted.
 The bindgen build pipeline generates these definitions alongside the bindings.
 Each selected version gets `pgN_macros.rs` and `pgN_macro_report.json` in `OUT_DIR`.
 The report records the C profile, input dependencies, emitted source and explicit
-skip reasons. The active version's macros are exported from `pgrx-pg-sys`.
+skip reasons, along with independently resolved constants and their Rust binding
+paths. The active version's macros are exported from `pgrx-pg-sys`.
+Setting `PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1` also writes `pgN_macros.rs`
+to `pgrx-pg-sys/src/include`, alongside the shipped bindings and OIDs. These
+documentation snapshots include the generated input adapters. Their target guards
+remain active outside `docsrs`; normal builds regenerate macros for their own C profile.
 
 Binding and macro inspection share the complete flags, target, include directories
 and compiler resource directory. Recorded CFLAGS precede CPPFLAGS, and bindgen's
@@ -174,12 +182,39 @@ Custom compiler or `pg_config` wrappers must declare hidden inputs in their buil
 script so changes to those inputs can trigger generation.
 
 Windows/MSVC and precomputed target-binding imports currently report macro generation
-unavailable. Other unsupported inspected profiles retain per-macro skips. The current
-docs.rs path uses shipped bindings and does not expose generated macros or input
-adapters. Existing handwritten ports remain available while migration proceeds.
+unavailable. Other unsupported inspected profiles retain per-macro skips. The docs.rs
+path uses shipped bindings, macro definitions and input adapters without requiring
+PostgreSQL or Clang. Existing handwritten ports remain available while migration proceeds.
 
 The first supported family covers integer expressions, casts, comparisons, shifts,
 and lazy logical and conditional operators on checked signed-char LP64 targets.
+Emitted literals keep their radix and digit spelling. C suffixes, octal notation
+and character escapes are adjusted to Rust syntax without changing the inferred
+C type or value.
+Binding-aware emission preserves verified names such as `$crate::MaxAllocHugeSize`
+and enum constants in their generated modules. The Rust binding supplies the
+referenced value; Clang supplies its original C integer type and independently
+verifies its value. Bindgen's values
+and types remain unchanged. A disagreement skips the entire macro and produces
+a build warning naming the constant, both values and the skipped macro.
+A shared petgraph graph records conservative dependencies among all final active
+macros, including object macros and external context. Reverse graph traversal
+also skips dependent macros and explains their skipped dependencies in build
+warnings. Historical definitions and shadowed formal parameter names do not
+create active dependency edges. A second preprocessing pass proves that preserving
+an object name reproduces the original expansion, and requires atomic or fully
+parenthesized object expressions. Otherwise expansion remains, with a
+`/* PGRX: ... */` explanation. Literal fallbacks retain their original spelling.
+Uncertain constant arithmetic also stays expanded so folding cannot bypass the
+support's checks for undefined operations, even when Clang can evaluate it.
+
+Direct wrappers such as `BUFFERALIGN` call `$crate::TYPEALIGN!` when that callee
+is emitted. Matching the two compiler-expanded expression trees recovers the
+argument expressions while preserving grouping, C type identity, repeated
+evaluation and lazy branches. Calls inside larger expressions, unsupported
+callees and unrecoverable arguments still expand with explanatory comments.
+The CLI preserves calls between its emitted macros; without a Rust binding
+catalog, named constants use documented fallbacks.
 Ordinary character literals support a bounded ASCII subset after compiler and
 libclang probes verify the execution character set; wide, multi-character and
 unmodeled encoding forms remain explicit skips.
@@ -220,6 +255,15 @@ type/profile facts to compiler expansion. Input content, environment, working
 directory and include resolution are checked during preparation; changed inputs
 require another inspection. `session.analyze(name)` and `emit(&session, name)`
 return owned reports. No macro signature list is required.
+`session.integer_constants()` exposes the probed C object constants.
+`emit_with_bindings` accepts a `BindingCatalog` of actual Rust constant paths,
+values, storage representations and available macro names. It checks every
+constant value against C before emitting a reference; callers must supply the
+catalog from the defining crate's generated bindings.
+Generators should use `emit_batch_with_bindings` to establish available callees
+and propagate value-mismatch failures through the shared dependency graph.
+`frontend.dependencies()` exposes that graph, its direct and reverse edges,
+and affected callers for auditing.
 
 The tests compile original C and emitted Rust separately, comparing integer type
 identities, values and evaluation counts. Downstream tests also cover `$crate`

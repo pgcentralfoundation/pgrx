@@ -7,8 +7,8 @@
 use crate::{
     ActiveMacro, ActiveProvenance, BuildInputs, ByteOrder, CompilationProfile, CompilerIdentity,
     DeclarationCatalog, Error, FrontendOutput, IntegerConstant, IntegerKind, IntegerType,
-    IntegerValue, MacroDefinition, MacroEnvironment, MacroInventory, MacroKind, MacroScanner,
-    SignedOverflow, TargetFacts, TokenKind, TypeCategory, TypeInfo,
+    IntegerValue, MacroDefinition, MacroDependencyGraph, MacroEnvironment, MacroInventory,
+    MacroKind, MacroScanner, SignedOverflow, TargetFacts, TokenKind, TypeCategory, TypeInfo,
 };
 use clang::{EntityKind, EntityVisitResult, TranslationUnit, Type, TypeKind};
 use sha2::{Digest, Sha256};
@@ -161,6 +161,10 @@ pub(crate) fn inspect_with_compiler_hint(
         predefines.ascii_execution_charset,
     )?;
     let environment = join_active(live, &inventory);
+    let macro_dependencies = MacroDependencyGraph::from_environment_with_constants(
+        &environment,
+        &declarations.integer_constants,
+    );
     let (signed_overflow, unsupported_options) =
         semantic_options(&arguments, &preprocessing.stderr)?;
     let mut input_files = driver_files;
@@ -184,6 +188,7 @@ pub(crate) fn inspect_with_compiler_hint(
         environment,
         declarations,
         inventory,
+        dependencies: macro_dependencies,
     })
 }
 
@@ -508,9 +513,10 @@ fn collect_declarations(unit: &TranslationUnit<'_>) -> (DeclarationCatalog, BTre
                         } else {
                             IntegerValue::Signed(signed)
                         };
-                        catalog
-                            .integer_constants
-                            .insert(name, IntegerConstant { ty: type_info(ty), value });
+                        catalog.integer_constants.insert(
+                            name,
+                            IntegerConstant { ty: type_info(ty), value, literal: None },
+                        );
                     }
                 }
             }
@@ -530,7 +536,7 @@ fn collect_declarations(unit: &TranslationUnit<'_>) -> (DeclarationCatalog, BTre
     (catalog, included)
 }
 
-fn type_info(ty: Type<'_>) -> TypeInfo {
+pub(crate) fn type_info(ty: Type<'_>) -> TypeInfo {
     let canonical = ty.get_canonical_type();
     let category = if has_type_attributes(ty) {
         TypeCategory::Other

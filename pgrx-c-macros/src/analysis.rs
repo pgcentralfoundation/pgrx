@@ -12,8 +12,8 @@
 //! environment match the inspection, rather than arbitrary caller-local rebindings.
 
 use crate::model::{
-    ActiveMacro, ActiveProvenance, DeclarationCatalog, FrontendOutput, IntegerKind, IntegerType,
-    IntegerValue, SignedOverflow, TargetFacts, TypeCategory,
+    ActiveMacro, ActiveProvenance, DeclarationCatalog, FrontendOutput, IntegerConstant,
+    IntegerKind, IntegerType, IntegerValue, SignedOverflow, TargetFacts, TypeCategory,
 };
 use crate::syntax::{
     BinaryOperator, Expression, ExpressionKind, IntegerLiteral, NodeId, SyntaxError,
@@ -91,6 +91,8 @@ pub enum SkipReasonCode {
     DynamicBuiltin,
     CompilerRejected,
     UnrecognizedExpansion,
+    BindingValueMismatch,
+    DependencySkipped,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -213,6 +215,8 @@ pub struct ResolvedConstant {
     pub name: String,
     pub ty: IntegerType,
     pub value: IntegerValue,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub literal: Option<crate::IntegerLiteral>,
 }
 
 /// Analyze a definition only in the profile/environment/catalog resolved together by
@@ -226,6 +230,15 @@ pub(crate) fn analyze_active(
     frontend: &FrontendOutput,
     name: &str,
     active: Option<&ActiveMacro>,
+) -> MacroAnalysis {
+    analyze_active_with_constants(frontend, name, active, &BTreeMap::new())
+}
+
+pub(crate) fn analyze_active_with_constants(
+    frontend: &FrontendOutput,
+    name: &str,
+    active: Option<&ActiveMacro>,
+    object_constants: &BTreeMap<String, IntegerConstant>,
 ) -> MacroAnalysis {
     let profile = frontend.profile();
     let mut result = MacroAnalysis {
@@ -313,7 +326,9 @@ pub(crate) fn analyze_active(
             let parameter = &mut result.parameters[parameter];
             parameter.roles = vec![ParameterRole::Unknown];
             parameter.uses.push(ParameterUse { tokens: range, grouped: false });
-        } else if let Some(dependency) = frontend.environment().active.get(&token.spelling) {
+        } else if let Some(dependency) = frontend.environment().active.get(&token.spelling)
+            && !object_constants.contains_key(&token.spelling)
+        {
             dependencies
                 .entry(token.spelling.clone())
                 .or_insert_with(|| MacroDependency {
@@ -402,7 +417,7 @@ pub(crate) fn analyze_active(
         let tokens = usage.tokens;
         return result.skip(SkipReasonCode::InvocationGrouping, "a parameter occurrence is not explicitly parenthesized; Rust expr fragments would change textual C grouping", Some(tokens));
     }
-    match analyze_types(&syntax, catalog, &profile.target) {
+    match analyze_types(&syntax, catalog, &profile.target, object_constants) {
         Ok((types, constants, helpers)) => {
             let root = &syntax.nodes[syntax.root];
             if !matches!(
@@ -546,10 +561,85 @@ fn formal_parameters(
 type TypeFailure = (SkipReasonCode, String, TokenRange);
 type TypeAnalysis = (Vec<TypeExpression>, Vec<ResolvedConstant>, BTreeSet<HelperRequirement>);
 
+/// Constant probes accept only expressions already covered by the integer model.
+/// In particular, evaluating a variable or a function is never a way to discover a constant.
+pub(crate) fn validate_constant_expression(
+    frontend: &FrontendOutput,
+    tokens: &[Token],
+) -> Result<(), String> {
+    let catalog = frontend.declarations();
+    let target = &frontend.profile().target;
+    let expression = parse_expression(tokens, &[], |name| recognized_type(name, catalog, target))
+        .map_err(|error| error.message)?;
+    let (types, _, _) = analyze_types(&expression, catalog, target, &BTreeMap::new())
+        .map_err(|(_, message, _)| message)?;
+    for (index, node) in expression.nodes.iter().enumerate() {
+        let TypeExpression::Concrete { ty } = types[index] else {
+            return Err("constant expression has no concrete integer type".into());
+        };
+        if ty.bits > 64 {
+            return Err(
+                "constant folding requires every intermediate integer to fit within 64 bits".into(),
+            );
+        }
+        let literal_operand = |mut operand: NodeId| {
+            while let ExpressionKind::Group { operand: child } = expression.nodes[operand].kind {
+                operand = child;
+            }
+            match &expression.nodes[operand].kind {
+                ExpressionKind::IntegerLiteral { literal } => Some(literal.value),
+                _ => None,
+            }
+        };
+        // Compiler constant evaluation alone does not prove a defined C operation.
+        // Keep uncertain operations in the expansion, where the semantic support
+        // checks their domain instead of silently replacing them with a value.
+        match node.kind {
+            ExpressionKind::Binary {
+                operator: BinaryOperator::Divide | BinaryOperator::Remainder,
+                right,
+                ..
+            } if literal_operand(right).is_none_or(|value| value == 0) => {
+                return Err("constant division requires a positive literal divisor to exclude zero and signed division overflow".into());
+            }
+            ExpressionKind::Binary {
+                operator: BinaryOperator::ShiftLeft | BinaryOperator::ShiftRight,
+                right,
+                ..
+            } if literal_operand(right).is_none_or(|value| value >= u128::from(ty.bits)) => {
+                return Err("constant shifting requires a literal count within the promoted left operand's width".into());
+            }
+            ExpressionKind::Binary {
+                operator:
+                    BinaryOperator::Add
+                    | BinaryOperator::Subtract
+                    | BinaryOperator::Multiply
+                    | BinaryOperator::ShiftLeft,
+                ..
+            } if ty.signed && frontend.profile().signed_overflow != SignedOverflow::Wrapping => {
+                return Err(
+                    "signed constant arithmetic must remain checked under this overflow policy"
+                        .into(),
+                );
+            }
+            ExpressionKind::Unary { operator: UnaryOperator::Negate, operand }
+                if ty.signed
+                    && frontend.profile().signed_overflow != SignedOverflow::Wrapping
+                    && literal_operand(operand).is_none() =>
+            {
+                return Err("signed constant negation needs a representable literal operand under this overflow policy".into());
+            }
+            _ => {}
+        }
+    }
+    Ok(())
+}
+
 fn analyze_types(
     expression: &Expression,
     catalog: &DeclarationCatalog,
     target: &TargetFacts,
+    object_constants: &BTreeMap<String, IntegerConstant>,
 ) -> Result<TypeAnalysis, TypeFailure> {
     let mut types = Vec::<TypeExpression>::with_capacity(expression.nodes.len());
     let mut constants = Vec::new();
@@ -578,7 +668,9 @@ fn analyze_types(
                 ))? }
             }
             ExpressionKind::Identifier { name } => {
-                let Some(constant) = catalog.integer_constants.get(name) else {
+                let Some(constant) =
+                    object_constants.get(name).or_else(|| catalog.integer_constants.get(name))
+                else {
                     let (code, message) = if catalog.variables.contains_key(name) {
                         (
                             SkipReasonCode::VariableAccess,
@@ -613,6 +705,7 @@ fn analyze_types(
                     name: name.clone(),
                     ty,
                     value: constant.value,
+                    literal: constant.literal.clone(),
                 });
                 TypeExpression::Concrete { ty }
             }
@@ -1133,6 +1226,14 @@ mod tests {
             builtin: false,
             main_file: true,
         };
+        let environment = MacroEnvironment {
+            active: [(
+                "F".into(),
+                ActiveMacro { definition, provenance: ActiveProvenance::Resolved },
+            )]
+            .into_iter()
+            .collect(),
+        };
         FrontendOutput {
             profile: CompilationProfile {
                 header: "fixture.h".into(),
@@ -1147,14 +1248,8 @@ mod tests {
                 unsupported_options: Vec::new(),
                 inputs: BuildInputs::default(),
             },
-            environment: MacroEnvironment {
-                active: [(
-                    "F".into(),
-                    ActiveMacro { definition, provenance: ActiveProvenance::Resolved },
-                )]
-                .into_iter()
-                .collect(),
-            },
+            dependencies: crate::MacroDependencyGraph::from_environment(&environment),
+            environment,
             declarations: DeclarationCatalog::default(),
             inventory: MacroInventory { macros: Vec::new(), diagnostics: Vec::new() },
         }

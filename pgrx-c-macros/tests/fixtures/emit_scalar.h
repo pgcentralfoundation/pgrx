@@ -25,6 +25,11 @@ enum { EMIT_SEVEN = 7 };
 #define EMIT_CHOOSE(condition, yes, no) ((condition) ? (yes) : (no))
 #define match(value) ((value) + 1)
 
+#define EMIT_DOCUMENTED(value) \
+    EMIT_ADD(value, /* ``` "quoted" \\ backslash
+`````
+    */ 1)
+
 #define EMIT_UNGROUPED(value) (value) + 1
 #define EMIT_UNKNOWN(value) ((value) + EMIT_UNDECLARED)
 #define EMIT_POINTER(value) (*(value))

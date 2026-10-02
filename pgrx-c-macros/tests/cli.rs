@@ -696,10 +696,10 @@ fn cflags_precede_cppflags_and_final_explicit_overrides() {
     assert!(position("-DORDER=1") < position("-DORDER=2"));
     assert!(position("-DORDER=2") < position("-DORDER=3"));
     assert!(
-        report["macros"][0]["expression"]["syntax"]["nodes"]
+        report["macros"][0]["expression"]["constants"]
             .as_array()
             .unwrap()
             .iter()
-            .any(|node| node["kind"]["literal"]["value"] == 3)
+            .any(|constant| constant["name"] == "ORDER" && constant["value"]["value"] == 3)
     );
 }

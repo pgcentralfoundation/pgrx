@@ -18,6 +18,9 @@ use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::io::Read;
 use std::path::{Path, PathBuf};
 
+mod constants;
+pub(crate) use constants::retain_integer_constants;
+
 const NAMESPACE: &str = "__pgrx_c_expand_";
 
 #[derive(Clone, Debug, Serialize)]
@@ -46,6 +49,18 @@ pub struct ExpandedMacro {
     /// Conservative closure, including object-like/external context definitions.
     /// This establishes possible origins, not an exact per-token source map.
     pub dependencies: Vec<ExpansionDependency>,
+    /// Object dependencies that remain expanded, with the reason symbol retention
+    /// could not establish the same C expression semantics.
+    pub constant_fallbacks: Vec<ConstantFallback>,
+}
+
+/// Why an object-macro dependency could not become an atomic constant reference.
+#[derive(Clone, Debug, Serialize)]
+pub struct ConstantFallback {
+    /// The final active C object-macro name.
+    pub name: String,
+    /// The missing proof or unsupported construct that required compiler expansion.
+    pub reason: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -418,6 +433,7 @@ fn prepare_inner(
                     symbolic_parameters: item.markers,
                     occurrences,
                     dependencies: item.dependencies,
+                    constant_fallbacks: Vec::new(),
                 },
             },
         );
@@ -425,7 +441,7 @@ fn prepare_inner(
     Ok(ExpansionBatch { results, inputs })
 }
 
-fn verify_environment(frontend: &FrontendOutput) -> Result<(), FrontendError> {
+pub(crate) fn verify_environment(frontend: &FrontendOutput) -> Result<(), FrontendError> {
     let directory = std::env::current_dir().map_err(|error| {
         FrontendError::Environment(format!("could not check working directory: {error}"))
     })?;

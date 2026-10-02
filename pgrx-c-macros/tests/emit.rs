@@ -74,6 +74,7 @@ fn emitted_macros_keep_provenance_occurrences_names_and_structured_skips() {
         let rust = source(&emission);
         assert!(rust.contains("$crate::__pgrx_c_macros::"), "{name}: {rust}");
         assert!(rust.contains("emit_scalar.h:"), "source line must survive lowering");
+        assert!(rust.contains("```text\\n#define "), "original C definition is plain text");
         assert!(rust.contains("compile_error!"), "standalone emissions need their ABI guard");
         assert!(!rust.contains("/Users/"), "emitted documentation must not contain private paths");
     }
@@ -98,6 +99,38 @@ fn emitted_macros_keep_provenance_occurrences_names_and_structured_skips() {
             assert!(reason.spans.contains(span));
         }
     }
+}
+
+#[test]
+fn documented_definition_keeps_unexpanded_calls_parameters_and_fenced_comments() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &fixture("emit_scalar.h"), &[], None).unwrap();
+    let session = AnalysisSession::prepare(&scanner, &frontend, &["EMIT_DOCUMENTED"]).unwrap();
+    let emission = emit(&session, "EMIT_DOCUMENTED");
+    let rust = source(&emission);
+    assert!(
+        rust.contains("\\n\\n``````text\\n#define EMIT_DOCUMENTED( value ) EMIT_ADD ( value ,")
+    );
+    assert!(rust.contains("/* ``` \\\"quoted\\\" \\\\\\\\ backslash\\n`````\\n"));
+    assert!(rust.contains("*/ 1 )\\n``````\\n\""));
+    assert!(!rust.contains("#define EMIT_DOCUMENTED( __pgrx_c_"));
+
+    // Check the generated Rust doc attribute and ensure the C fence creates no
+    // Rust doctest, even when its original comment contains shorter fences.
+    let directory = TemporaryDirectory::new();
+    let runtime = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../pgrx-pg-sys/src/c_macros/support.rs")
+        .canonicalize()
+        .unwrap();
+    let library = directory.0.join("documented.rs");
+    fs::write(&library, format!("#[path = {runtime:?}]\npub mod __pgrx_c_macros;\n{rust}"))
+        .unwrap();
+    let mut rustdoc = Command::new("rustdoc");
+    rustdoc.args(["--edition=2024", "--test"]).arg(&library);
+    let (status, stdout, stderr) = run_bounded(&mut rustdoc, &directory.0, "documented");
+    assert!(status.success(), "rustdoc failed ({status}):\n{stderr}\n{stdout}");
+    assert!(stdout.contains("running 0 tests"), "C documentation must not create Rust doctests");
 }
 
 #[test]

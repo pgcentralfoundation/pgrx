@@ -1,0 +1,232 @@
+//LICENSE Portions Copyright 2026 PgCentral Foundation, Inc. <contact@pgcentral.org>
+//LICENSE
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+#[path = "support/oracle.rs"]
+mod oracle;
+#[path = "support/rust_oracle.rs"]
+mod rust_oracle;
+
+use pgrx_c_macros::{
+    AnalysisSession, BindingCatalog, EmissionStatus, MacroScanner, emit, emit_with_bindings,
+    inspect,
+};
+use std::fmt::Write;
+use std::path::PathBuf;
+use std::sync::Mutex;
+
+static SCANNER_LOCK: Mutex<()> = Mutex::new(());
+const NAMES: &[&str] = &[
+    "DELEGATE_TYPEALIGN",
+    "DELEGATE_BUFFERALIGN",
+    "DELEGATE_GROUPED_ALIGN",
+    "DELEGATE_ALIGN_ALIAS",
+    "DELEGATE_ADD",
+    "DELEGATE_SWAP",
+    "DELEGATE_REPEAT",
+    "DELEGATE_TWICE",
+    "DELEGATE_NESTED",
+    "DELEGATE_CHOOSE",
+    "DELEGATE_SELECT",
+    "DELEGATE_ONE_ARGUMENT",
+    "DELEGATE_VALUE",
+    "DELEGATE_ZERO_ARGUMENT",
+    "match",
+    "DELEGATE_KEYWORD",
+    "DELEGATE_UNUSED",
+    "DELEGATE_UNUSED_WRAPPER",
+    "DELEGATE_UNGROUPED",
+    "DELEGATE_GROUPING_FIXED",
+];
+
+fn header() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/macro_delegation.h")
+}
+
+fn arguments() -> Vec<String> {
+    let arguments = vec!["-std=c11".into(), "-fwrapv".into()];
+    #[cfg(target_os = "macos")]
+    {
+        let mut arguments = arguments;
+        let sdk = rust_oracle::run_tool(
+            std::process::Command::new("xcrun").arg("--show-sdk-path"),
+            "Apple SDK lookup",
+        );
+        let sdk = sdk.trim();
+        assert!(!sdk.is_empty() && std::path::Path::new(sdk).is_dir());
+        arguments.extend(["-isysroot".into(), sdk.into()]);
+        arguments
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        arguments
+    }
+}
+
+fn emitted(source: pgrx_c_macros::MacroEmission) -> String {
+    match source.status {
+        EmissionStatus::Emitted { rust, .. } => rust,
+        other => panic!("{} must emit: {other:?}", source.analysis.name),
+    }
+}
+
+fn bindings() -> BindingCatalog {
+    BindingCatalog {
+        macros: NAMES
+            .iter()
+            .filter(|&&name| name != "DELEGATE_UNGROUPED")
+            .map(|name| (*name).to_owned())
+            .collect(),
+        ..BindingCatalog::default()
+    }
+}
+
+#[test]
+fn direct_calls_preserve_shape_and_explain_fallbacks() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let frontend = inspect(&scanner, &header(), &arguments(), None).unwrap();
+    let session = AnalysisSession::prepare(&scanner, &frontend, NAMES).unwrap();
+    let bindings = bindings();
+    for (caller, callee) in [
+        ("DELEGATE_BUFFERALIGN", "DELEGATE_TYPEALIGN"),
+        ("DELEGATE_GROUPED_ALIGN", "DELEGATE_TYPEALIGN"),
+        ("DELEGATE_ALIGN_ALIAS", "DELEGATE_BUFFERALIGN"),
+        ("DELEGATE_SWAP", "DELEGATE_ADD"),
+        ("DELEGATE_TWICE", "DELEGATE_REPEAT"),
+        ("DELEGATE_NESTED", "DELEGATE_REPEAT"),
+        ("DELEGATE_SELECT", "DELEGATE_CHOOSE"),
+        ("DELEGATE_ONE_ARGUMENT", "DELEGATE_CHOOSE"),
+        ("DELEGATE_ZERO_ARGUMENT", "DELEGATE_VALUE"),
+        ("DELEGATE_KEYWORD", "r#match"),
+    ] {
+        let source = emitted(emit_with_bindings(&session, caller, &bindings));
+        let body = source.split_once("=> {").unwrap().1;
+        assert!(body.contains(&format!("$crate::{callee}!(")), "{caller}: {body}");
+    }
+    let source = emitted(emit_with_bindings(&session, "DELEGATE_BUFFERALIGN", &bindings));
+    let body = source.split_once("=> {").unwrap().1;
+    assert!(!body.contains("::bitand("), "wrapper must retain its callee: {body}");
+
+    for (caller, callee, explanation) in [
+        ("DELEGATE_UNUSED_WRAPPER", "DELEGATE_UNUSED", "unused"),
+        ("DELEGATE_GROUPING_FIXED", "DELEGATE_UNGROUPED", "supported"),
+    ] {
+        let source = emitted(emit_with_bindings(&session, caller, &bindings));
+        let body = source.split_once("=> {").unwrap().1;
+        assert!(!body.contains(&format!("$crate::{callee}!")), "{body}");
+        assert!(body.contains("/* PGRX:"), "fallback must explain expansion: {body}");
+        assert!(body.contains(explanation), "{body}");
+    }
+    let source = emitted(emit(&session, "DELEGATE_BUFFERALIGN"));
+    let body = source.split_once("=> {").unwrap().1;
+    assert!(!body.contains("$crate::DELEGATE_TYPEALIGN!"));
+    assert!(body.contains("/* PGRX:"));
+}
+
+#[test]
+fn preserved_macro_calls_match_original_c_types_values_and_evaluation() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let frontend = inspect(&scanner, &header(), &arguments(), None).unwrap();
+    let session = AnalysisSession::prepare(&scanner, &frontend, NAMES).unwrap();
+    let bindings = bindings();
+    let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../pgrx-pg-sys/src/c_macros/support.rs")
+        .canonicalize()
+        .unwrap();
+    let mut rust = format!("#[path = {support:?}]\npub mod __pgrx_c_macros;\n");
+    for &name in NAMES.iter().filter(|&&name| name != "DELEGATE_UNGROUPED") {
+        rust.push_str(&emitted(emit_with_bindings(&session, name, &bindings)));
+    }
+    rust.push_str(
+        r#"
+use __pgrx_c_macros::{CInteger, CValue, CUnsignedLong};
+fn record<K: CInteger>(name: &str, value: CValue<K>) {
+    let kind = std::any::type_name::<K>().rsplit("::").next().unwrap();
+    println!("{name}\t{kind}\t{}\t{:032x}", K::BITS, K::encode(value.get()));
+}
+fn main() {
+"#,
+    );
+    let mut c = String::from(
+        r#"
+#include <limits.h>
+#include <stdio.h>
+#define KIND(value) _Generic((value), int: "CInt", unsigned int: "CUnsignedInt", \
+    long: "CLong", unsigned long: "CUnsignedLong", \
+    long long: "CLongLong", unsigned long long: "CUnsignedLongLong")
+#define RECORD(name, expression) do { \
+    __typeof__(expression) value = (expression); \
+    const unsigned __int128 bits = (unsigned __int128)value; \
+    printf("%s\t%s\t%u\t%016llx%016llx\n", name, KIND(value), \
+        (unsigned)(sizeof(value) * CHAR_BIT), (unsigned long long)(bits >> 64), \
+        (unsigned long long)bits); \
+} while (0)
+static int calls;
+static int tick(void) { return ++calls; }
+int main(void) {
+"#,
+    );
+    for (name, c_arguments, rust_arguments) in [
+        ("DELEGATE_BUFFERALIGN", "0U", "0_u32"),
+        ("DELEGATE_BUFFERALIGN", "33", "33_i32"),
+        ("DELEGATE_GROUPED_ALIGN", "-1", "-1_i32"),
+        ("DELEGATE_ALIGN_ALIAS", "65", "65_i32"),
+        ("DELEGATE_SWAP", "-1, 1U", "-1_i32, 1_u32"),
+        ("DELEGATE_TWICE", "2147483647", "2147483647_i32"),
+        ("DELEGATE_NESTED", "-7", "-7_i32"),
+        ("DELEGATE_SELECT", "0, -1, 1U", "0_i32, -1_i32, 1_u32"),
+        ("DELEGATE_SELECT", "1, -1, 1U", "1_i32, -1_i32, 1_u32"),
+        ("DELEGATE_ONE_ARGUMENT", "-1", "-1_i32"),
+        ("DELEGATE_ONE_ARGUMENT", "0", "0_i32"),
+        ("DELEGATE_ZERO_ARGUMENT", "", ""),
+        ("DELEGATE_KEYWORD", "(unsigned long)3", "CValue::<CUnsignedLong>::new(3)"),
+        ("DELEGATE_GROUPING_FIXED", "3 + 4", "3_i32 + 4_i32"),
+        ("DELEGATE_UNUSED_WRAPPER", "not_a_binding", "not_a_binding"),
+    ] {
+        writeln!(c, "RECORD(\"{name}\", {name}({c_arguments}));").unwrap();
+        writeln!(rust, "record(\"{name}\", {name}!({rust_arguments}));").unwrap();
+    }
+    c.push_str(
+        r#"
+calls = 0;
+RECORD("repeat_evaluation", DELEGATE_TWICE(tick()));
+printf("calls\t%d\n", calls);
+calls = 0;
+RECORD("lazy_evaluation", DELEGATE_SELECT(0, tick(), 9U));
+printf("calls\t%d\n", calls);
+calls = 0;
+RECORD("chosen_evaluation", DELEGATE_SELECT(1, tick(), 9U));
+printf("calls\t%d\n", calls);
+return 0;
+}
+"#,
+    );
+    rust.push_str(
+        r#"
+let calls = std::cell::Cell::new(0_i32);
+let tick = || { calls.set(calls.get() + 1); calls.get() };
+record("repeat_evaluation", DELEGATE_TWICE!(tick()));
+println!("calls\t{}", calls.get());
+calls.set(0);
+record("lazy_evaluation", DELEGATE_SELECT!(0_i32, tick(), 9_u32));
+println!("calls\t{}", calls.get());
+calls.set(0);
+record("chosen_evaluation", DELEGATE_SELECT!(1_i32, tick(), 9_u32));
+println!("calls\t{}", calls.get());
+}
+"#,
+    );
+    let profile = frontend.profile();
+    let original = oracle::run_c(
+        &profile.compiler.executable,
+        &profile.header,
+        &c,
+        &profile.arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        true,
+    );
+    let generated = rust_oracle::run_rust(&rust);
+    assert_eq!(original.lines().count(), 21, "complete original C comparison corpus");
+    assert_eq!(generated, original, "C and Rust delegated types, values and evaluation");
+}
