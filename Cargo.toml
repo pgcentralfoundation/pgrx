@@ -85,3 +85,7 @@ debug = 'line-tables-only'
 
 [profile.dev.build-override]
 opt-level = 3
+
+# Macro analysis fingerprints the compiler and headers repeatedly, including in the CLI.
+[profile.dev.package.sha2]
+opt-level = 3

@@ -6,8 +6,9 @@
 mod oracle;
 
 use pgrx_c_macros::{
-    ExpandedMacro, ExpansionBatch, ExpansionLimits, ExpansionResult, ExpansionSkipCode,
-    FrontendError, MacroScanner, inspect, prepare_expansions, prepare_expansions_with_limits,
+    AnalysisSession, ExpandedMacro, ExpansionBatch, ExpansionLimits, ExpansionResult,
+    ExpansionSkipCode, FrontendError, MacroScanner, inspect, prepare_expansions,
+    prepare_expansions_with_limits,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -289,10 +290,25 @@ fn stale_declarations_and_new_shadowing_headers_reject_even_with_identical_macro
         .unwrap();
     let scanner = MacroScanner::new().unwrap();
     let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let metadata = std::fs::metadata(&header).unwrap();
     std::fs::write(&header, "typedef long ValueType;\n#define EXP_STALE(x) ((ValueType)(x))\n")
         .unwrap();
+    std::fs::OpenOptions::new()
+        .write(true)
+        .open(&header)
+        .unwrap()
+        .set_times(std::fs::FileTimes::new().set_modified(metadata.modified().unwrap()))
+        .unwrap();
+    assert_eq!(std::fs::metadata(&header).unwrap().len(), metadata.len());
+    assert_eq!(
+        std::fs::metadata(&header).unwrap().modified().unwrap(),
+        metadata.modified().unwrap()
+    );
     assert!(
         matches!(prepare_expansions(&scanner, &frontend, &["EXP_STALE"]), Err(FrontendError::Environment(message)) if message.contains("changed"))
+    );
+    assert!(
+        matches!(AnalysisSession::prepare(&scanner, &frontend, &["EXP_STALE"]), Err(FrontendError::Environment(message)) if message.contains("changed"))
     );
 
     let earlier = directory.0.join("earlier");
@@ -312,6 +328,9 @@ fn stale_declarations_and_new_shadowing_headers_reject_even_with_identical_macro
     std::fs::write(earlier.join("choice.h"), "typedef long ValueType;\n").unwrap();
     assert!(
         matches!(prepare_expansions(&scanner, &frontend, &["EXP_STALE"]), Err(FrontendError::Environment(message)) if message.contains("new header dependency"))
+    );
+    assert!(
+        matches!(AnalysisSession::prepare(&scanner, &frontend, &["EXP_STALE"]), Err(FrontendError::Environment(message)) if message.contains("new header dependency"))
     );
 }
 

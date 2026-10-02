@@ -26,14 +26,13 @@ enum Task {
     Text(String),
 }
 
-/// Prepared compiler facts and storage reconciliation for every arm of one macro.
-/// The declaration graph is indexed once, including recovered argument contexts.
+/// Per-macro expression facts borrowing the pass's immutable storage reconciliation.
 pub(super) struct Renderer<'a> {
     frontend: &'a FrontendOutput,
     analysis: &'a MacroAnalysis,
     bindings: &'a BindingCatalog,
     constants: &'a [Option<&'a ResolvedConstant>],
-    lowering: Lowering<'a>,
+    lowering: &'a Lowering<'a>,
     floats: bool,
     places: Vec<bool>,
     objects: Vec<Option<TypeInfo>>,
@@ -45,6 +44,7 @@ impl<'a> Renderer<'a> {
         analysis: &'a MacroAnalysis,
         bindings: &'a BindingCatalog,
         constants: &'a [Option<&'a ResolvedConstant>],
+        lowering: &'a Lowering<'a>,
     ) -> Self {
         let expression = analysis.expression.as_ref().expect("candidate expression");
         // Native Rust operands and public macro results are evaluated value
@@ -82,8 +82,7 @@ impl<'a> Renderer<'a> {
                 _ => false,
             });
         }
-        let lowering = Lowering::new(frontend.declarations(), bindings, &frontend.profile().target);
-        let objects = declared_objects(frontend, analysis, &lowering);
+        let objects = declared_objects(frontend, analysis, lowering);
         Self { frontend, analysis, bindings, constants, lowering, floats, places, objects }
     }
 
@@ -98,7 +97,7 @@ impl<'a> Renderer<'a> {
             self.analysis,
             self.bindings,
             self.constants,
-            &self.lowering,
+            self.lowering,
             self.floats,
         );
         let expression = analysis.expression.as_ref().expect("candidate expression");

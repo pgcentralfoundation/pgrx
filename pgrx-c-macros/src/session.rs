@@ -36,17 +36,25 @@ impl<'a> AnalysisSession<'a> {
         names: &[impl AsRef<str>],
         limits: ExpansionLimits,
     ) -> Result<Self, FrontendError> {
-        let mut expansions =
-            crate::expansion::prepare_expansions_with_limits(scanner, frontend, names, limits)?;
+        crate::expansion::verify_environment(frontend)?;
+        crate::frontend::verify_input_files(&frontend.profile().inputs)?;
+        // Adjacent compiler phases share a boundary check. Check failed passes too,
+        // so a changed snapshot takes precedence over their compiler diagnostics.
+        let expansions = crate::expansion::prepare_inner(scanner, frontend, names, limits);
+        crate::frontend::verify_input_files(&frontend.profile().inputs)?;
+        crate::expansion::verify_environment(frontend)?;
+        let mut expansions = expansions?;
         let integer_constants =
-            crate::expansion::retain_integer_constants(scanner, frontend, &mut expansions, limits)?;
+            crate::expansion::retain_integer_constants(scanner, frontend, &mut expansions, limits);
+        crate::frontend::verify_input_files(&frontend.profile().inputs)?;
+        crate::expansion::verify_environment(frontend)?;
+        let integer_constants = integer_constants?;
         let mut session = Self {
             frontend,
             expansions,
             integer_constants,
             integer_zero_constants: BTreeMap::new(),
         };
-        session.verify_inputs()?;
         session.integer_zero_constants = crate::frontend::zero_constants::probe(scanner, &session)?;
         session.verify_inputs()?;
         Ok(session)
