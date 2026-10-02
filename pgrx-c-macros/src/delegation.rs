@@ -139,6 +139,14 @@ fn match_node(
     pending: &mut Vec<(NodeId, NodeId)>,
 ) -> bool {
     match (&pattern.syntax.nodes[left].kind, &candidate.syntax.nodes[right].kind) {
+        (
+            ExpressionKind::OffsetOf { record: left_record, fields: left_fields },
+            ExpressionKind::OffsetOf { record: right_record, fields: right_fields },
+        ) => {
+            left_record == right_record
+                && left_fields == right_fields
+                && same_concrete_type(pattern, left, candidate, right)
+        }
         (ExpressionKind::Parameter { index: left }, ExpressionKind::Parameter { index: right }) => {
             left == right
         }

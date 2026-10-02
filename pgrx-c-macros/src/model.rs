@@ -103,6 +103,10 @@ pub struct TargetFacts {
     pub triple: String,
     pub pointer_bits: u32,
     pub function_pointer: PointerLayout,
+    /// Canonical unsigned C identity of `sizeof` and `_Alignof` results.
+    pub size_type: IntegerKind,
+    /// The intrinsic's result identity and direct/nested/array offsets agree with Clang.
+    pub offsetof_supported: bool,
     pub char_bits: u32,
     pub char_is_signed: bool,
     /// Both compiler and libclang verified the supported ASCII characters and basic escapes.

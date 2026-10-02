@@ -246,6 +246,10 @@ The typed expression support also covers:
   flow match the selected profile. Input conversion and result rank follow C;
   the lowered operation uses Rust's byte swap. Intrinsic addresses and callbacks
   remain unsupported.
+- `offsetof` with named records, type parameters, and dotted member paths,
+  including member-path parameters. Offset metadata checks Clang's layouts
+  against the actual bindings without accessing memory or requiring a loadable
+  field value. Bitfields, array indices, and indirect member paths are rejected.
 - C enums whose compatible integer representation is established by Clang,
   including values without a named Rust enum variant.
 - `float` and `double` where the compiler profile establishes the modeled IEEE

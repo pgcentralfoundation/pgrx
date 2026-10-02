@@ -644,6 +644,8 @@ fn integer_kind(kind: TypeKind) -> Option<IntegerKind> {
 struct VerifiedPredefines {
     macros: Vec<MacroDefinition>,
     integers: BTreeMap<IntegerKind, IntegerType>,
+    size_type: IntegerKind,
+    offsetof_supported: bool,
     ascii_execution_charset: bool,
     floating_types: BTreeMap<FloatingKind, (u64, Option<u64>)>,
     evaluation_method: i32,
@@ -668,6 +670,30 @@ fn verify_predefines(
     command.push("-".into());
     let dump = run_compiler(compiler, &command)?;
     let predefines = tokenize_snapshot(scanner, &dump.stdout)?;
+    let actual: BTreeMap<_, _> =
+        predefines.iter().map(|definition| (definition.name.as_str(), definition)).collect();
+    for name in
+        ["sizeof", "_Alignof", "__typeof__", "_Static_assert", "__builtin_types_compatible_p"]
+    {
+        if actual.contains_key(name) {
+            return Err(FrontendError::Environment(format!(
+                "compiler fundamental type proof requires unshadowed {name}"
+            )));
+        }
+    }
+    let probe_offsetof = !actual.keys().any(|name| {
+        name.starts_with("__pgrx_c_offset_")
+            || matches!(
+                *name,
+                "__builtin_offsetof"
+                    | "__has_builtin"
+                    | "struct"
+                    | "first"
+                    | "nested"
+                    | "prefix"
+                    | "values"
+            )
+    });
     let header = std::env::temp_dir().join("pgrx-c-macros-target.h");
     let fundamental_source = "\
 typedef _Bool __pgrx_c_bool;\n\
@@ -682,6 +708,8 @@ typedef long __pgrx_c_long;\n\
 typedef unsigned long __pgrx_c_ulong;\n\
 typedef long long __pgrx_c_llong;\n\
 typedef unsigned long long __pgrx_c_ullong;\n\
+typedef __typeof__(sizeof(0)) __pgrx_c_size_type;\n\
+typedef __typeof__(_Alignof(int)) __pgrx_c_align_type;\n\
 typedef float __pgrx_c_float;\n\
 typedef double __pgrx_c_double;\n\
 typedef long double __pgrx_c_ldouble;\n\
@@ -693,9 +721,31 @@ typedef unsigned __int128 __pgrx_c_u128;\n\
 _Static_assert((((unsigned __int128)-1) >> 127) == 1, \"unsupported __int128 precision\");\n\
 #endif\n";
     let ascii = ascii_character_predicate();
+    let offsetof_source = if probe_offsetof {
+        "\
+#if __has_builtin(__builtin_offsetof)\n\
+struct __pgrx_c_offset_nested { char prefix; unsigned long values[3]; };\n\
+struct __pgrx_c_offset_probe { char first; struct __pgrx_c_offset_nested nested; };\n\
+typedef __typeof__(__builtin_offsetof(struct __pgrx_c_offset_probe, first)) __pgrx_c_offset_type;\n\
+enum { __pgrx_c_offset_first = __builtin_offsetof(struct __pgrx_c_offset_probe, first),\n\
+__pgrx_c_offset_nested = __builtin_offsetof(struct __pgrx_c_offset_probe, nested),\n\
+__pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, nested.values[2]) };\n\
+#endif\n"
+    } else {
+        ""
+    };
     let fundamental_source =
-        format!("{fundamental_source}\nenum {{ __pgrx_c_ascii = ({ascii}) }};\n");
-    let mut probe = driver_arguments(&without_includes, &["-fsyntax-only"], None);
+        format!("{fundamental_source}\nenum {{ __pgrx_c_ascii = ({ascii}) }};\n{offsetof_source}");
+    let mut probe = driver_arguments(
+        &without_includes,
+        &[
+            "-fsyntax-only",
+            "-ferror-limit=0",
+            "-fno-color-diagnostics",
+            "-fdiagnostics-format=clang",
+        ],
+        None,
+    );
     probe.push("-".into());
     let source = format!("_Static_assert(({ascii}), \"pgrx_ascii_execution_charset\");\n");
     let driver_ascii = match run_compiler_with_input(compiler, &probe, Some(source)) {
@@ -707,73 +757,155 @@ _Static_assert((((unsigned __int128)-1) >> 127) == 1, \"unsupported __int128 pre
         }
         Err(error) => return Err(error),
     };
-    let (inventory, (widths, floating_types, library_ascii, evaluation_method, function_pointer)) =
-        scanner.with_translation_unit(
-            &header,
-            &without_includes,
-            Some(&fundamental_source),
-            |unit, inventory| {
-                let mut widths = BTreeMap::new();
-                let mut library_ascii = false;
-                let mut floating_types = BTreeMap::new();
-                let mut evaluation_method = None;
-                let mut function_pointer = None;
-                unit.get_entity().visit_children(|entity, _| {
-                    if entity.get_kind() == EntityKind::EnumDecl {
-                        entity.visit_children(|constant, _| {
-                            if constant.get_name().as_deref() == Some("__pgrx_c_ascii") {
-                                library_ascii = constant
-                                    .get_enum_constant_value()
-                                    .is_some_and(|(value, _)| value == 1);
-                            } else if constant.get_name().as_deref()
-                                == Some("__pgrx_c_float_eval_method")
-                            {
-                                evaluation_method = constant
-                                    .get_enum_constant_value()
-                                    .and_then(|(value, _)| i32::try_from(value).ok());
-                            }
-                            EntityVisitResult::Continue
+    let (
+        inventory,
+        (
+            widths,
+            floating_types,
+            library_ascii,
+            evaluation_method,
+            function_pointer,
+            size_type,
+            offsetof,
+        ),
+    ) = scanner.with_translation_unit(
+        &header,
+        &without_includes,
+        Some(&fundamental_source),
+        |unit, inventory| {
+            let mut widths = BTreeMap::new();
+            let mut library_ascii = false;
+            let mut floating_types = BTreeMap::new();
+            let mut evaluation_method = None;
+            let mut function_pointer = None;
+            let mut size_type = None;
+            let mut align_type = None;
+            let mut offsetof_type = None;
+            let mut offsetof_values = BTreeMap::new();
+            let mut offset_nested = None;
+            let mut offset_record = None;
+            unit.get_entity().visit_children(|entity, _| {
+                if entity.get_kind() == EntityKind::EnumDecl {
+                    entity.visit_children(|constant, _| {
+                        if constant.get_name().as_deref() == Some("__pgrx_c_ascii") {
+                            library_ascii = constant
+                                .get_enum_constant_value()
+                                .is_some_and(|(value, _)| value == 1);
+                        } else if constant.get_name().as_deref()
+                            == Some("__pgrx_c_float_eval_method")
+                        {
+                            evaluation_method = constant
+                                .get_enum_constant_value()
+                                .and_then(|(value, _)| i32::try_from(value).ok());
+                        } else if let Some(name) = constant.get_name()
+                            && matches!(
+                                name.as_str(),
+                                "__pgrx_c_offset_first"
+                                    | "__pgrx_c_offset_nested"
+                                    | "__pgrx_c_offset_indexed"
+                            )
+                            && let Some((value, _)) = constant.get_enum_constant_value()
+                            && let Ok(value) = u64::try_from(value)
+                        {
+                            offsetof_values.insert(name, value);
+                        }
+                        EntityVisitResult::Continue
+                    });
+                }
+                if entity.get_kind() == EntityKind::StructDecl {
+                    match entity.get_name().as_deref() {
+                        Some("__pgrx_c_offset_nested") => offset_nested = entity.get_type(),
+                        Some("__pgrx_c_offset_probe") => offset_record = entity.get_type(),
+                        _ => {}
+                    }
+                }
+                if entity.get_kind() == EntityKind::TypedefDecl
+                    && entity.get_name().is_some_and(|name| name.starts_with("__pgrx_c_"))
+                    && let Some(ty) =
+                        entity.get_typedef_underlying_type().map(|ty| ty.get_canonical_type())
+                {
+                    match entity.get_name().as_deref() {
+                        Some("__pgrx_c_size_type") => size_type = integer_kind(ty.get_kind()),
+                        Some("__pgrx_c_align_type") => align_type = integer_kind(ty.get_kind()),
+                        Some("__pgrx_c_offset_type") => offsetof_type = integer_kind(ty.get_kind()),
+                        _ => {}
+                    }
+                    if entity.get_name().as_deref() == Some("__pgrx_c_function_pointer")
+                        && let (Ok(size), Ok(alignment)) = (ty.get_sizeof(), ty.get_alignof())
+                    {
+                        function_pointer = Some(crate::PointerLayout {
+                            size: size as u64,
+                            alignment: alignment as u64,
                         });
                     }
-                    if entity.get_kind() == EntityKind::TypedefDecl
-                        && entity.get_name().is_some_and(|name| name.starts_with("__pgrx_c_"))
-                        && let Some(ty) =
-                            entity.get_typedef_underlying_type().map(|ty| ty.get_canonical_type())
-                    {
-                        if entity.get_name().as_deref() == Some("__pgrx_c_function_pointer")
-                            && let (Ok(size), Ok(alignment)) = (ty.get_sizeof(), ty.get_alignof())
-                        {
-                            function_pointer = Some(crate::PointerLayout {
-                                size: size as u64,
-                                alignment: alignment as u64,
-                            });
-                        }
-                        if let (Some(kind), Ok(size)) =
-                            (integer_kind(ty.get_kind()), ty.get_sizeof())
-                        {
-                            widths.insert(kind, (size, ty.get_kind() == TypeKind::CharS));
-                        }
-                        let kind = match ty.get_kind() {
-                            TypeKind::Float => Some(FloatingKind::Float),
-                            TypeKind::Double => Some(FloatingKind::Double),
-                            TypeKind::LongDouble => Some(FloatingKind::LongDouble),
-                            _ => None,
-                        };
-                        if let (Some(kind), Ok(size)) = (kind, ty.get_sizeof()) {
-                            floating_types.insert(
-                                kind,
-                                (size as u64, ty.get_alignof().ok().map(|align| align as u64)),
-                            );
-                        }
+                    if let (Some(kind), Ok(size)) = (integer_kind(ty.get_kind()), ty.get_sizeof()) {
+                        widths.insert(kind, (size, ty.get_kind() == TypeKind::CharS));
                     }
-                    EntityVisitResult::Continue
-                });
-                Ok((
-                    inventory,
-                    (widths, floating_types, library_ascii, evaluation_method, function_pointer),
-                ))
-            },
-        )?;
+                    let kind = match ty.get_kind() {
+                        TypeKind::Float => Some(FloatingKind::Float),
+                        TypeKind::Double => Some(FloatingKind::Double),
+                        TypeKind::LongDouble => Some(FloatingKind::LongDouble),
+                        _ => None,
+                    };
+                    if let (Some(kind), Ok(size)) = (kind, ty.get_sizeof()) {
+                        floating_types.insert(
+                            kind,
+                            (size as u64, ty.get_alignof().ok().map(|align| align as u64)),
+                        );
+                    }
+                }
+                EntityVisitResult::Continue
+            });
+            if align_type != size_type {
+                return Err(Error::InvalidInput(
+                    "libclang sizeof and _Alignof canonical result identities differ".into(),
+                ));
+            }
+            let offsetof = (|| {
+                let nested = offset_nested?;
+                let record = offset_record?;
+                let first = record.get_offsetof("first").ok()? as u64;
+                let nested_offset = record.get_offsetof("nested").ok()? as u64;
+                let values = nested.get_offsetof("values").ok()? as u64;
+                // Clang offsets use bits; predefines establish how many comprise a C byte.
+                let bits = macro_number(&actual, "__CHAR_BIT__").ok()?;
+                if bits == 0 {
+                    return None;
+                }
+                let indexed = nested_offset.checked_add(values)?.checked_add(
+                    (widths.get(&IntegerKind::UnsignedLong)?.0 as u64)
+                        .checked_mul(bits)?
+                        .checked_mul(2)?,
+                )?;
+                let expected = [first, nested_offset, indexed];
+                if offsetof_type != size_type {
+                    return None;
+                }
+                for (name, offset) in
+                    ["__pgrx_c_offset_first", "__pgrx_c_offset_nested", "__pgrx_c_offset_indexed"]
+                        .into_iter()
+                        .zip(expected)
+                {
+                    if offsetof_values.get(name)?.checked_mul(bits)? != offset {
+                        return None;
+                    }
+                }
+                Some(expected)
+            })();
+            Ok((
+                inventory,
+                (
+                    widths,
+                    floating_types,
+                    library_ascii,
+                    evaluation_method,
+                    function_pointer,
+                    size_type,
+                    offsetof,
+                ),
+            ))
+        },
+    )?;
     let mut expected: BTreeMap<_, _> =
         inventory.macros.iter().map(|definition| (definition.name.as_str(), definition)).collect();
     let mut overrides = BTreeMap::new();
@@ -796,10 +928,6 @@ _Static_assert((((unsigned __int128)-1) >> 127) == 1, \"unsupported __int128 pre
         }
     }
     expected.retain(|name, _| overrides.get(name) != Some(&false));
-    let mut actual = BTreeMap::new();
-    for definition in &predefines {
-        actual.insert(definition.name.as_str(), definition);
-    }
     let differing: Vec<_> = actual
         .iter()
         .filter_map(|(name, definition)| {
@@ -823,9 +951,31 @@ _Static_assert((((unsigned __int128)-1) >> 127) == 1, \"unsupported __int128 pre
     let function_pointer = function_pointer.ok_or_else(|| {
         FrontendError::Output("libclang did not establish the C function-pointer layout".into())
     })?;
+    let size_type = size_type.ok_or_else(|| {
+        FrontendError::Output("libclang did not establish the sizeof result identity".into())
+    })?;
+    let size_spelling = match size_type {
+        IntegerKind::UnsignedChar => "unsigned char",
+        IntegerKind::UnsignedShort => "unsigned short",
+        IntegerKind::UnsignedInt => "unsigned int",
+        IntegerKind::UnsignedLong => "unsigned long",
+        IntegerKind::UnsignedLongLong => "unsigned long long",
+        IntegerKind::UnsignedInt128 => "unsigned __int128",
+        _ => {
+            return Err(FrontendError::Environment(format!(
+                "sizeof has non-unsigned canonical result {size_type:?}"
+            )));
+        }
+    };
     let mut float_source = format!(
         "_Static_assert(__FLT_EVAL_METHOD__ == {evaluation_method}, \"pgrx_float_evaluation_method\");\n"
     );
+    float_source.push_str(&format!(
+        "_Static_assert(__builtin_types_compatible_p(__typeof__(sizeof(0)), {size_spelling}), \"pgrx_size_type\");\n"
+    ));
+    float_source.push_str(&format!(
+        "_Static_assert(__builtin_types_compatible_p(__typeof__(_Alignof(int)), {size_spelling}), \"pgrx_align_type\");\n"
+    ));
     float_source.push_str(&format!("typedef void (*__pgrx_c_function_pointer)(void);\n_Static_assert(sizeof(__pgrx_c_function_pointer) == {}, \"pgrx_function_pointer_size\");\n_Static_assert(_Alignof(__pgrx_c_function_pointer) == {}, \"pgrx_function_pointer_alignment\");\n", function_pointer.size, function_pointer.alignment));
     for (kind, spelling) in [
         (FloatingKind::Float, "float"),
@@ -841,12 +991,37 @@ _Static_assert((((unsigned __int128)-1) >> 127) == 1, \"unsupported __int128 pre
             }
         }
     }
-    run_compiler_with_input(compiler, &probe, Some(float_source)).map_err(|error| match error {
-        FrontendError::CompilerFailed { diagnostics, .. } => FrontendError::Environment(format!(
-            "compiler floating-point facts differ from libclang: {diagnostics}"
-        )),
-        error => error,
-    })?;
+    if let Some(offsets) = offsetof {
+        // Optional failures must be attributable to this final capability block.
+        // Required fundamental assertions precede it, with diagnostic limits disabled.
+        float_source.push_str("#line 1 \"pgrx_c_offsetof_proof\"\n");
+        float_source.push_str(offsetof_source);
+        float_source.push_str(&format!(
+            "_Static_assert(__builtin_types_compatible_p(__typeof__(__builtin_offsetof(struct __pgrx_c_offset_probe, first)), {size_spelling}), \"pgrx_offsetof_type\");\n"
+        ));
+        for (designator, offset) in ["first", "nested", "nested.values[2]"].into_iter().zip(offsets)
+        {
+            float_source.push_str(&format!(
+                "_Static_assert(__builtin_offsetof(struct __pgrx_c_offset_probe, {designator}) * __CHAR_BIT__ == {offset}, \"pgrx_offsetof_layout\");\n"
+            ));
+        }
+    }
+    let offsetof_supported = match run_compiler_with_input(compiler, &probe, Some(float_source)) {
+        Ok(_) => offsetof.is_some(),
+        Err(FrontendError::CompilerFailed { diagnostics, status, .. })
+            if status.code().is_some()
+                && offsetof.is_some()
+                && only_offsetof_errors(&diagnostics) =>
+        {
+            false
+        }
+        Err(FrontendError::CompilerFailed { diagnostics, .. }) => {
+            return Err(FrontendError::Environment(format!(
+                "compiler fundamental type facts differ from libclang: {diagnostics}"
+            )));
+        }
+        Err(error) => return Err(error),
+    };
     let bits = macro_number(&actual, "__CHAR_BIT__")?
         .try_into()
         .map_err(|_| FrontendError::Output("invalid CHAR_BIT".into()))?;
@@ -880,11 +1055,24 @@ _Static_assert((((unsigned __int128)-1) >> 127) == 1, \"unsupported __int128 pre
     Ok(VerifiedPredefines {
         macros: predefines,
         integers,
+        size_type,
+        offsetof_supported,
         ascii_execution_charset: driver_ascii && library_ascii,
         floating_types,
         evaluation_method,
         function_pointer,
     })
+}
+
+fn only_offsetof_errors(diagnostics: &str) -> bool {
+    let mut found = false;
+    for line in diagnostics.lines().filter(|line| line.contains("error:")) {
+        if !line.starts_with("pgrx_c_offsetof_proof:") || line.contains("fatal error:") {
+            return false;
+        }
+        found = true;
+    }
+    found
 }
 
 fn ascii_character_predicate() -> String {
@@ -950,6 +1138,8 @@ fn target_facts(
     let VerifiedPredefines {
         macros: predefines,
         integers,
+        size_type,
+        offsetof_supported,
         ascii_execution_charset,
         floating_types,
         evaluation_method,
@@ -1041,6 +1231,8 @@ fn target_facts(
         triple,
         pointer_bits,
         function_pointer,
+        size_type,
+        offsetof_supported,
         char_bits,
         char_is_signed,
         ascii_execution_charset,
@@ -1788,6 +1980,21 @@ fn validate_fact_override(value: &str) -> Result<(), FrontendError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn optional_offsetof_failures_cannot_hide_required_fact_errors() {
+        assert!(only_offsetof_errors(
+            "pgrx_c_offsetof_proof:7:1: error: static assertion failed: pgrx_offsetof_layout\n1 error generated.\n"
+        ));
+        assert!(!only_offsetof_errors(
+            "<stdin>:2:1: error: static assertion failed: pgrx_size_type\npgrx_c_offsetof_proof:7:1: error: static assertion failed: pgrx_offsetof_layout\n2 errors generated.\n"
+        ));
+        assert!(!only_offsetof_errors("clang: error: unable to execute command\n"));
+        assert!(!only_offsetof_errors(
+            "pgrx_c_offsetof_proof:7:1: fatal error: internal compiler failure\n"
+        ));
+        assert!(!only_offsetof_errors(""));
+    }
 
     #[test]
     fn protection_codegen_options_require_exact_reviewed_spellings() {

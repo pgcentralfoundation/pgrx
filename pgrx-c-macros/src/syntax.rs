@@ -137,6 +137,21 @@ pub enum ExpressionKind {
     SizeOfTypeParameter { parameter: usize, pointers: u8, is_const: bool },
     AlignOfTypeParameter { parameter: usize, pointers: u8, is_const: bool },
     TypeParameterCast { parameter: usize, pointers: u8, is_const: bool, operand: NodeId },
+    OffsetOf { record: OffsetRecord, fields: Vec<OffsetComponent> },
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum OffsetRecord {
+    Named { name: String },
+    Parameter { index: usize },
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum OffsetComponent {
+    Named { name: String },
+    Parameter { index: usize },
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -294,6 +309,9 @@ fn parse(
             ExpressionKind::TypeParameterCast { parameter, .. }
             | ExpressionKind::SizeOfTypeParameter { parameter, .. }
             | ExpressionKind::AlignOfTypeParameter { parameter, .. } => Some(parameter),
+            ExpressionKind::OffsetOf { record: OffsetRecord::Parameter { index }, .. } => {
+                Some(index)
+            }
             _ => None,
         })
         .collect();
@@ -478,6 +496,7 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             return Ok(self.push(ExpressionKind::Unary { operator, operand }, tokens));
         }
         match spelling {
+            "__builtin_offsetof" => return self.offset_of(start),
             "(" => {
                 if let Some((end, type_name)) = self.cast_type() {
                     self.position = end + 1;
@@ -617,6 +636,81 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             return Ok(self.push(kind, TokenRange { start, end: start + 1 }));
         }
         Err(self.unexpected())
+    }
+
+    fn offset_of(&mut self, start: usize) -> Result<NodeId, SyntaxError> {
+        self.position += 1;
+        self.expect("(")?;
+        let type_start = self.position;
+        while self.spelling().is_some_and(|token| token != ",") {
+            if matches!(self.spelling(), Some("(" | ")" | "[" | "]" | "{" | "}" | ";")) {
+                return Err(self.error(
+                    SyntaxErrorKind::TypeParameter,
+                    "offsetof requires a flat named C type or one type parameter",
+                ));
+            }
+            self.position += 1;
+        }
+        let type_tokens = &self.tokens[type_start..self.position];
+        let record = if type_tokens.len() == 1
+            && let Some(&index) = self.parameters.get(type_tokens[0].token.spelling.as_str())
+        {
+            OffsetRecord::Parameter { index }
+        } else {
+            let name = type_tokens
+                .iter()
+                .map(|token| token.token.spelling.as_str())
+                .collect::<Vec<_>>()
+                .join(" ");
+            if type_tokens.is_empty()
+                || type_tokens
+                    .iter()
+                    .any(|token| self.parameters.contains_key(token.token.spelling.as_str()))
+                || !(self.is_type)(&name)
+            {
+                return Err(self.error(
+                    SyntaxErrorKind::TypeParameter,
+                    "offsetof requires an established C record type",
+                ));
+            }
+            OffsetRecord::Named { name }
+        };
+        self.expect(",")?;
+        let mut fields = Vec::new();
+        loop {
+            let Some(token) = self.tokens.get(self.position) else {
+                return Err(self.error(
+                    SyntaxErrorKind::InvalidExpression,
+                    "offsetof is missing its member path",
+                ));
+            };
+            if !matches!(token.token.kind, TokenKind::Identifier | TokenKind::Keyword) {
+                return Err(self.error(SyntaxErrorKind::PointerOperation, "offsetof requires a nonempty path of member identifiers; array indices and indirect access are not modeled"));
+            }
+            fields.push(if let Some(&index) = self.parameters.get(token.token.spelling.as_str()) {
+                OffsetComponent::Parameter { index }
+            } else {
+                OffsetComponent::Named { name: token.token.spelling.clone() }
+            });
+            self.position += 1;
+            if fields.len() > MAX_DEPTH {
+                return Err(self.error(
+                    SyntaxErrorKind::BudgetExceeded,
+                    "offsetof member path exceeds the 64-component bound",
+                ));
+            }
+            if self.spelling() == Some(".") {
+                self.position += 1;
+            } else {
+                break;
+            }
+        }
+        if self.spelling() != Some(")") {
+            return Err(self.error(SyntaxErrorKind::PointerOperation, "offsetof array indices, indirect access, and evaluated member operands are not modeled"));
+        }
+        self.position += 1;
+        let end = self.tokens[self.position - 1].index + 1;
+        Ok(self.push(ExpressionKind::OffsetOf { record, fields }, TokenRange { start, end }))
     }
 
     // Only a flat, catalog-recognized concrete type is a cast. Parenthesized expressions
@@ -991,6 +1085,80 @@ mod tests {
             expression.nodes[right].kind,
             ExpressionKind::Binary { operator: BinaryOperator::Multiply, .. }
         ));
+    }
+
+    #[test]
+    fn offset_operands_are_structural_holes_and_establish_earlier_type_uses() {
+        let parsed = parse_expression(
+            &tokens(&[
+                "sizeof",
+                "(",
+                "T",
+                ")",
+                "+",
+                "__builtin_offsetof",
+                "(",
+                "T",
+                ",",
+                "outer",
+                ".",
+                "member",
+                ")",
+            ]),
+            &["T".into(), "member".into()],
+            |_| false,
+        )
+        .unwrap();
+        assert!(matches!(
+            parsed.nodes[0].kind,
+            ExpressionKind::SizeOfTypeParameter { parameter: 0, .. }
+        ));
+        let offset = parsed
+            .nodes
+            .iter()
+            .find_map(|node| match &node.kind {
+                ExpressionKind::OffsetOf { record, fields } => Some((record, fields)),
+                _ => None,
+            })
+            .unwrap();
+        assert_eq!(offset.0, &OffsetRecord::Parameter { index: 0 });
+        assert_eq!(
+            offset.1,
+            &[
+                OffsetComponent::Named { name: "outer".into() },
+                OffsetComponent::Parameter { index: 1 }
+            ]
+        );
+        assert!(
+            !parsed.nodes.iter().any(|node| matches!(node.kind, ExpressionKind::Parameter { .. }))
+        );
+    }
+
+    #[test]
+    fn offset_paths_reject_evaluated_and_malformed_operands() {
+        for fields in [
+            vec!["array", "[", "0", "]"],
+            vec!["array", "[", "i", "++", "]"],
+            vec!["next", "->", "field"],
+            vec!["field", "(", ")"],
+            vec!["field", "."],
+            vec![],
+        ] {
+            let mut source = vec!["__builtin_offsetof", "(", "Record", ","];
+            source.extend(fields);
+            source.push(")");
+            assert!(
+                parse_expression(&tokens(&source), &[], |ty| ty == "Record").is_err(),
+                "{source:?}"
+            );
+        }
+        let mut source = vec!["__builtin_offsetof", "(", "Record", ",", "field"];
+        for _ in 0..64 {
+            source.extend([".", "field"]);
+        }
+        source.push(")");
+        let error = parse_expression(&tokens(&source), &[], |ty| ty == "Record").unwrap_err();
+        assert_eq!(error.kind, SyntaxErrorKind::BudgetExceeded);
     }
 
     #[test]

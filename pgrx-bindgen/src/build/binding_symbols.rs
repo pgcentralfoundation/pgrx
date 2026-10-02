@@ -959,6 +959,8 @@ mod tests {
             triple: "x86_64-unknown-linux-gnu".into(),
             pointer_bits: 64,
             function_pointer: pgrx_c_macros::PointerLayout { size: 8, alignment: 8 },
+            size_type: IntegerKind::UnsignedLong,
+            offsetof_supported: true,
             char_bits: 8,
             char_is_signed: true,
             ascii_execution_charset: true,

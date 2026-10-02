@@ -141,12 +141,26 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<ArgumentAdapter, Skip
             ));
         }
         if parameter.roles.contains(&ParameterRole::Identifier)
-            && parameter.roles != [ParameterRole::Identifier]
+            && parameter.roles.iter().any(|role| {
+                !matches!(role, ParameterRole::Identifier | ParameterRole::FieldDesignator)
+            })
         {
             return Err(skip(
                 analysis,
                 SkipReasonCode::UnsupportedType,
                 "a macro parameter combines a field identifier with another operand role",
+                None,
+            ));
+        }
+        if parameter.roles.contains(&ParameterRole::FieldDesignator)
+            && parameter.roles.iter().any(|role| {
+                !matches!(role, ParameterRole::Identifier | ParameterRole::FieldDesignator)
+            })
+        {
+            return Err(skip(
+                analysis,
+                SkipReasonCode::UnsupportedType,
+                "a macro parameter combines an offsetof member path with another operand role",
                 None,
             ));
         }
@@ -156,7 +170,8 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<ArgumentAdapter, Skip
         let endings = if last { vec!["", ", $($rest:tt)*"] } else { vec![", $($rest:tt)*"] };
         let atomic = parameter.uses.iter().any(|usage| !usage.grouped);
         if parameter.roles != [ParameterRole::Type]
-            && parameter.roles != [ParameterRole::Identifier]
+            && !parameter.roles.contains(&ParameterRole::Identifier)
+            && !parameter.roles.contains(&ParameterRole::FieldDesignator)
         {
             // A literal parser commits after '-'. Route other negative operands
             // through :expr after checking both complete literal ending forms.
@@ -190,8 +205,12 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<ArgumentAdapter, Skip
                 writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; $argument:ty{ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* $argument,]; {rest}) }};").expect("String output");
                 continue;
             }
-            if parameter.roles == [ParameterRole::Identifier] {
+            if parameter.roles.contains(&ParameterRole::Identifier) {
                 writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; $argument:ident{ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* $argument,]; {rest}) }};").expect("String output");
+                continue;
+            }
+            if parameter.roles == [ParameterRole::FieldDesignator] {
+                writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; $head:ident $(.$tail:ident)*{ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* ($head $(.$tail)*),]; {rest}) }};").expect("String output");
                 continue;
             }
             writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]){ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* (@native [$argument]),]; {rest}) }};").expect("String output");

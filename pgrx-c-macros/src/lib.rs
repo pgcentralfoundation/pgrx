@@ -44,7 +44,7 @@ pub use frontend::{FrontendError, compile_native_support, inspect};
 mod syntax;
 pub use syntax::{
     BinaryOperator, Expression, ExpressionKind, ExpressionNode, IntegerLiteral, IntegerSuffix,
-    NodeId, Statement, StatementBody, TokenRange, UnaryOperator,
+    NodeId, OffsetComponent, OffsetRecord, Statement, StatementBody, TokenRange, UnaryOperator,
 };
 mod analysis;
 pub use analysis::*;

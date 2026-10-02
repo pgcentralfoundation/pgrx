@@ -8,7 +8,9 @@ use super::arguments::{self, ArgumentContext};
 use super::types::{EXPRESSION, Lowering, rust_path};
 use super::{BindingCatalog, MAX_EMISSION_BYTES, SUPPORT, binary_helper, render_expression, skip};
 use crate::analysis::{MacroAnalysis, ResolvedConstant, SkipReason, SkipReasonCode};
-use crate::syntax::{BinaryOperator, ExpressionKind, NodeId, UnaryOperator};
+use crate::syntax::{
+    BinaryOperator, ExpressionKind, NodeId, OffsetComponent, OffsetRecord, UnaryOperator,
+};
 use crate::{FrontendOutput, SignedOverflow, TypeCategory, TypeInfo, TypeShapeKind};
 use std::collections::BTreeMap;
 use std::fmt::Write;
@@ -769,6 +771,61 @@ impl<'a> Renderer<'a> {
                                 lowered.marker
                             )
                             .expect("String output");
+                        }
+                        ExpressionKind::OffsetOf { record, fields } => {
+                            let (marker, mut canonical) = match record {
+                                OffsetRecord::Parameter { index } => (
+                                    format!(
+                                        "<${} as {EXPRESSION}::NativeType>::Marker",
+                                        arguments::name(analysis, *index)
+                                    ),
+                                    None,
+                                ),
+                                OffsetRecord::Named { name } => {
+                                    let ty = crate::analysis::resolve_type_info(
+                                        name,
+                                        frontend.declarations(),
+                                        &frontend.profile().target,
+                                    )
+                                    .ok_or_else(|| {
+                                        failure(format!("{name}: unresolved offsetof type"))
+                                    })?;
+                                    let binding = lowering.record_binding(&ty).map_err(failure)?;
+                                    (
+                                        format!(
+                                            "{EXPRESSION}::CRecord<{}>",
+                                            rust_path(&binding.path).map_err(failure)?
+                                        ),
+                                        Some(ty.canonical_spelling),
+                                    )
+                                }
+                            };
+                            let mut path = Vec::with_capacity(fields.len());
+                            for (position, field) in fields.iter().enumerate() {
+                                match field {
+                                    OffsetComponent::Named { name } => {
+                                        if let Some(record) = &canonical {
+                                            let key = format!("{record}::{name}");
+                                            let member = bindings.offset_capabilities.get(&key).ok_or_else(|| failure(bindings.offset_unavailable.get(&key).cloned().unwrap_or_else(|| format!("{key}: no compiler-verified offset capability"))))?;
+                                            if member.is_none() && position + 1 != fields.len() {
+                                                return Err(failure(format!(
+                                                    "{key}: offsetof member continuation requires a record"
+                                                )));
+                                            }
+                                            canonical = member.clone();
+                                        }
+                                        path.push(super::field_identifier(name).ok_or_else(|| failure(format!("{name}: offsetof member has no supported identifier")))?.to_owned());
+                                    }
+                                    OffsetComponent::Parameter { index } => {
+                                        canonical = None;
+                                        path.push(format!(
+                                            "${}",
+                                            arguments::name(analysis, *index)
+                                        ));
+                                    }
+                                }
+                            }
+                            write!(rust, "{EXPRESSION}::offset_of::<{marker}, $crate::__pgrx_c_field_marker!(@path; {})>()", path.join(" . ")).expect("String output");
                         }
                         ExpressionKind::SizeOfExpression { operand } => {
                             tasks.push(Task::Node(*operand, Context::Size));
