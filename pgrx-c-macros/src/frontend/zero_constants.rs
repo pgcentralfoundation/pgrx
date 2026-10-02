@@ -67,6 +67,19 @@ pub(crate) fn probe(
                     children = [Some(*condition), Some(*then_value), Some(*else_value)];
                     pure[*condition] && pure[*then_value] && pure[*else_value]
                 }
+                ExpressionKind::Call { callee, arguments } if arguments.len() == 1 => {
+                    let mut callee = *callee;
+                    while let ExpressionKind::Group { operand } =
+                        expression.syntax.nodes[callee].kind
+                    {
+                        callee = operand;
+                    }
+                    children[0] = Some(arguments[0]);
+                    matches!(&expression.syntax.nodes[callee].kind,
+                        ExpressionKind::Identifier { name }
+                            if session.frontend().declarations().builtins.get(name).is_some_and(|builtin| matches!(builtin.kind, crate::BuiltinKind::ByteSwap { .. })))
+                        && pure[arguments[0]]
+                }
                 _ => false,
             };
             let allowed = allowed

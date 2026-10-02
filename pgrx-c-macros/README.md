@@ -242,6 +242,10 @@ The typed expression support also covers:
   field-name parameters, unused arguments, and empty replacements.
 - Calls through complete C prototypes, including static inline functions and
   nullable function pointers, and addresses of original C functions.
+- Compiler byte-swap intrinsics whose direct-call prototypes and LLVM value
+  flow match the selected profile. Input conversion and result rank follow C;
+  the lowered operation uses Rust's byte swap. Intrinsic addresses and callbacks
+  remain unsupported.
 - C enums whose compatible integer representation is established by Clang,
   including values without a named Rust enum variant.
 - `float` and `double` where the compiler profile establishes the modeled IEEE

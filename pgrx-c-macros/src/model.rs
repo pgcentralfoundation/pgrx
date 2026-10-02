@@ -310,6 +310,12 @@ pub struct DeclarationCatalog {
     /// Complete and incomplete record declarations, keyed by canonical type spelling.
     pub records: BTreeMap<String, RecordInfo>,
     pub function_signatures: BTreeMap<String, FunctionInfo>,
+    /// Compiler-owned operations proved under this profile, separate from native functions.
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub builtins: BTreeMap<String, BuiltinInfo>,
+    /// Referenced compiler operations whose type or expression semantics were not established.
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub builtin_unavailable: BTreeMap<String, String>,
     /// Profile-specific expression types for bitfields, keyed by `record::field`.
     pub bitfields: BTreeMap<String, BitfieldFacts>,
 }
@@ -397,6 +403,19 @@ pub struct FunctionSignature {
     pub variadic: bool,
     /// The convention exposed by libclang, or None when it cannot establish one.
     pub calling_convention: Option<String>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum BuiltinKind {
+    ByteSwap { bits: u16 },
+}
+
+/// A direct builtin call has this verified C prototype and pure operation.
+#[derive(Clone, Debug, Serialize)]
+pub struct BuiltinInfo {
+    pub kind: BuiltinKind,
+    pub signature: FunctionSignature,
 }
 
 #[derive(Clone, Debug, Serialize)]
