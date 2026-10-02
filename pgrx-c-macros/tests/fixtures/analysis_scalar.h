@@ -25,6 +25,7 @@ extern int analysis_function(int value);
 #define ANALYSIS_ASSIGN(value) ((value) = 1)
 #define ANALYSIS_CALL(value) analysis_function((value))
 #define ANALYSIS_STATEMENT(value) do { (value)++; } while (0)
+#define ANALYSIS_CONTROL_FLOW(value) do { while (value) (value)--; } while (0)
 #define ANALYSIS_SIZEOF(value) sizeof(value)
 #define ANALYSIS_TYPE_PARAMETER(type, value) ((type) (value))
 #define ANALYSIS_COMMA(left, right) ((left), (right))

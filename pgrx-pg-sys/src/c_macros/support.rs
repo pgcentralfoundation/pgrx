@@ -22,6 +22,7 @@ use core::marker::PhantomData;
 
 pub mod expression;
 pub mod expression_result;
+pub mod statements;
 
 pub(crate) mod sealed {
     pub trait Sealed {}

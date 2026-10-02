@@ -17,12 +17,12 @@ use crate::model::{
     IntegerKind, IntegerType, IntegerValue, SignedOverflow, TargetFacts, TypeCategory, TypeInfo,
 };
 use crate::syntax::{
-    BinaryOperator, Expression, ExpressionKind, IntegerLiteral, NodeId, SyntaxError,
-    SyntaxErrorKind, TokenRange, UnaryOperator, parse_expression,
+    BinaryOperator, Expression, ExpressionKind, IntegerLiteral, NodeId, Statement, SyntaxError,
+    SyntaxErrorKind, TokenRange, UnaryOperator, parse_expression, parse_replacement,
 };
 use crate::{MacroKind, SourceSpan, Token, TokenKind};
 use serde::Serialize;
-use std::collections::{BTreeMap, BTreeSet, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
 /// Analysis of one final active definition under the inspected compilation profile.
 #[derive(Clone, Debug, Serialize)]
@@ -158,6 +158,14 @@ pub enum InvocationContract {
     /// must explicitly request the semantics of a parenthesized C invocation;
     /// surrounding textual C precedence is outside this invocation contract.
     ExplicitExpressionBoundary,
+    /// A complete terminal-return statement executes in the caller's function.
+    /// Callers must supply a compatible C return type and preserve the recorded
+    /// argument grouping. Introduced local names cannot occur in supplied arguments;
+    /// C textual capture of those names is outside this invocation family.
+    ReturningStatements,
+    /// A complete C statement body executes in order and yields no value.
+    /// Local capture and argument grouping constraints match returning statements.
+    Statements,
     NotEstablished,
 }
 
@@ -423,7 +431,7 @@ pub(crate) fn analyze_active_with_constants(
         return result.skip(SkipReasonCode::InvalidTarget, message, None);
     }
     let catalog = frontend.declarations();
-    let mut syntax = match parse_expression(body, &parameters, |name| {
+    let mut syntax = match parse_replacement(body, &parameters, |name| {
         recognized_type(name, catalog, &profile.target)
     }) {
         Ok(syntax) => syntax,
@@ -435,9 +443,19 @@ pub(crate) fn analyze_active_with_constants(
     // with values and without inventing a signature from one sample invocation.
     if compiler_expanded {
         let mut captures = BTreeMap::new();
+        let locals = syntax
+            .statement_body
+            .iter()
+            .flat_map(|body| body.walk())
+            .filter_map(|statement| match statement {
+                Statement::Declaration { name, .. } => Some(name.as_str()),
+                _ => None,
+            })
+            .collect::<BTreeSet<_>>();
         for node in &mut syntax.nodes {
             let ExpressionKind::Identifier { name } = &node.kind else { continue };
-            if catalog.integer_constants.contains_key(name)
+            if locals.contains(name.as_str())
+                || catalog.integer_constants.contains_key(name)
                 || object_constants.contains_key(name)
                 || catalog.variables.contains_key(name)
                 || catalog.functions.contains_key(name)
@@ -546,17 +564,21 @@ pub(crate) fn analyze_active_with_constants(
     match analyze_types(&syntax, catalog, &profile.target, object_constants) {
         Ok((types, constants, helpers)) => {
             let root = &syntax.nodes[syntax.root];
-            let expression_boundary = !matches!(
-                root.kind,
-                ExpressionKind::Group { .. }
-                    | ExpressionKind::IntegerLiteral { .. }
-                    | ExpressionKind::Identifier { .. }
-                    | ExpressionKind::Empty
-                    | ExpressionKind::Parameter { .. }
-                    | ExpressionKind::Call { .. }
-                    | ExpressionKind::Member { .. }
-                    | ExpressionKind::Index { .. }
-            );
+            let statements = syntax.statement_body.is_some();
+            let returning =
+                syntax.statement_body.as_ref().is_some_and(|body| body.return_tokens.is_some());
+            let expression_boundary = !statements
+                && !matches!(
+                    root.kind,
+                    ExpressionKind::Group { .. }
+                        | ExpressionKind::IntegerLiteral { .. }
+                        | ExpressionKind::Identifier { .. }
+                        | ExpressionKind::Empty
+                        | ExpressionKind::Parameter { .. }
+                        | ExpressionKind::Call { .. }
+                        | ExpressionKind::Member { .. }
+                        | ExpressionKind::Index { .. }
+                );
             if expression_boundary && !compiler_expanded {
                 return result.skip(
                     SkipReasonCode::InvocationGrouping,
@@ -571,7 +593,11 @@ pub(crate) fn analyze_active_with_constants(
                 integer_zero_constants: BTreeSet::new(),
             });
             result.required_helpers = helpers.into_iter().collect();
-            result.invocation = if expression_boundary {
+            result.invocation = if returning {
+                InvocationContract::ReturningStatements
+            } else if statements {
+                InvocationContract::Statements
+            } else if expression_boundary {
                 InvocationContract::ExplicitExpressionBoundary
             } else if atomic_arguments {
                 InvocationContract::AtomicArguments
@@ -583,6 +609,9 @@ pub(crate) fn analyze_active_with_constants(
                 EvaluationRequirement::ExcludeUndefinedCOperations,
                 EvaluationRequirement::RespectSignedOverflowProfile,
             ];
+            if statements {
+                result.const_capability = ConstCapability::RuntimeOnly;
+            }
             if result.expression.as_ref().is_some_and(|expression| {
                 expression
                     .syntax
@@ -798,6 +827,41 @@ fn analyze_types(
     target: &TargetFacts,
     object_constants: &BTreeMap<String, IntegerConstant>,
 ) -> Result<TypeAnalysis, TypeFailure> {
+    let mut locals = HashMap::new();
+    for statement in expression.statement_body.iter().flat_map(|body| body.walk()) {
+        let Statement::Declaration { name, type_name, tokens, .. } = statement else {
+            continue;
+        };
+        if catalog.variables.contains_key(name)
+            || catalog.functions.contains_key(name)
+            || catalog.integer_constants.contains_key(name)
+            || object_constants.contains_key(name)
+            || catalog.types.contains_key(name)
+        {
+            return Err((
+                SkipReasonCode::Statement,
+                format!("local {name:?} would shadow a compiler-owned declaration"),
+                *tokens,
+            ));
+        }
+        let Some(ty) = resolve_type_info(type_name, catalog, target) else {
+            return Err((
+                SkipReasonCode::UnsupportedType,
+                format!("local {name:?} has no established compiler type {type_name:?}"),
+                *tokens,
+            ));
+        };
+        if matches!(ty.category, TypeCategory::Void | TypeCategory::Function | TypeCategory::Other)
+        {
+            return Err((
+                SkipReasonCode::UnsupportedType,
+                format!("local {name:?} does not have a supported C object type"),
+                *tokens,
+            ));
+        }
+        locals.insert(name.as_str(), ty);
+    }
+    validate_local_initialization(expression, &locals)?;
     let mut types = Vec::<TypeExpression>::with_capacity(expression.nodes.len());
     let mut constants = Vec::new();
     let mut helpers = BTreeSet::new();
@@ -826,6 +890,10 @@ fn analyze_types(
                 ))? }
             }
             ExpressionKind::Identifier { name } => {
+                if let Some(ty) = locals.get(name.as_str()) {
+                    types.push(declared_type(ty, target));
+                    continue;
+                }
                 let Some(constant) =
                     object_constants.get(name).or_else(|| catalog.integer_constants.get(name))
                 else {
@@ -1072,6 +1140,113 @@ fn analyze_types(
         types.push(ty);
     }
     Ok((types, constants, helpers))
+}
+
+/// Initialization is proved only at complete straight-line statement boundaries.
+/// Taking an address or passing it to a function does not prove that C wrote it.
+fn validate_local_initialization(
+    expression: &Expression,
+    locals: &HashMap<&str, TypeInfo>,
+) -> Result<(), TypeFailure> {
+    let Some(body) = expression.statement_body.as_ref().filter(|_| !locals.is_empty()) else {
+        return Ok(());
+    };
+    fn check_statements<'a>(
+        expression: &Expression,
+        statements: &'a [Statement],
+        locals: &HashMap<&'a str, TypeInfo>,
+        initialized: &mut HashSet<&'a str>,
+    ) -> Result<(), TypeFailure> {
+        for statement in statements {
+            match statement {
+                Statement::Declaration { name, initializer, .. } => {
+                    if let Some(initializer) = initializer {
+                        check_local_reads(expression, *initializer, locals, initialized)?;
+                        initialized.insert(name.as_str());
+                    }
+                }
+                Statement::Expression { expression: root, .. } => {
+                    check_local_reads(expression, *root, locals, initialized)?;
+                    let mut root = *root;
+                    while let ExpressionKind::Group { operand } = expression.nodes[root].kind {
+                        root = operand;
+                    }
+                    if let ExpressionKind::Assignment { operator: None, mut place, .. } =
+                        expression.nodes[root].kind
+                    {
+                        while let ExpressionKind::Group { operand } = expression.nodes[place].kind {
+                            place = operand;
+                        }
+                        if let ExpressionKind::Identifier { name } = &expression.nodes[place].kind
+                            && let Some((&name, _)) = locals.get_key_value(name.as_str())
+                        {
+                            initialized.insert(name);
+                        }
+                    }
+                }
+                Statement::Block { statements, .. } => {
+                    check_statements(expression, statements, locals, initialized)?;
+                }
+                Statement::Return { expression: root, .. } => {
+                    check_local_reads(expression, *root, locals, initialized)?;
+                }
+            }
+        }
+        Ok(())
+    }
+    check_statements(expression, &body.statements, locals, &mut HashSet::new())
+}
+
+fn check_local_reads(
+    expression: &Expression,
+    root: NodeId,
+    locals: &HashMap<&str, TypeInfo>,
+    initialized: &HashSet<&str>,
+) -> Result<(), TypeFailure> {
+    // Keep the walk iterative: left-associated C expressions can have a deep arena
+    // even when the recursive parser's nesting budget is satisfied.
+    let mut work = vec![(root, true)];
+    while let Some((index, read)) = work.pop() {
+        let node = &expression.nodes[index];
+        match &node.kind {
+            ExpressionKind::Identifier { name }
+                if read
+                    && locals.contains_key(name.as_str())
+                    && !initialized.contains(name.as_str()) =>
+            {
+                return Err((
+                    SkipReasonCode::Statement,
+                    format!("local {name:?} is read before definite initialization is established"),
+                    node.tokens,
+                ));
+            }
+            ExpressionKind::Group { operand } => work.push((*operand, read)),
+            ExpressionKind::AddressOf { operand } => work.push((*operand, false)),
+            ExpressionKind::Unary { operand, .. }
+            | ExpressionKind::Cast { operand, .. }
+            | ExpressionKind::TypeParameterCast { operand, .. }
+            | ExpressionKind::Dereference { operand }
+            | ExpressionKind::Update { operand, .. } => work.push((*operand, true)),
+            ExpressionKind::Member { base, indirect, .. } => work.push((*base, read || *indirect)),
+            ExpressionKind::Index { base, index } => work.extend([(*base, true), (*index, true)]),
+            ExpressionKind::Assignment { operator, place, value } => {
+                work.extend([(*place, operator.is_some()), (*value, true)]);
+            }
+            ExpressionKind::Binary { left, right, .. } | ExpressionKind::Comma { left, right } => {
+                work.extend([(*left, true), (*right, true)])
+            }
+            ExpressionKind::Conditional { condition, then_value, else_value } => {
+                work.extend([(*condition, true), (*then_value, true), (*else_value, true)]);
+            }
+            ExpressionKind::Call { callee, arguments } => {
+                work.push((*callee, true));
+                work.extend(arguments.iter().map(|argument| (*argument, true)));
+            }
+            // sizeof is unevaluated; type operands have no value reads.
+            _ => {}
+        }
+    }
+    Ok(())
 }
 
 fn validate_target(target: &TargetFacts) -> Result<(), String> {
@@ -1671,5 +1846,114 @@ mod tests {
             IntegerType { kind: IntegerKind::Int128, bits: 128, signed: true, rank: 6 },
         );
         assert!(validate_target(&target).is_err());
+    }
+
+    #[test]
+    fn terminal_return_locals_use_declared_types_and_are_never_caller_captures() {
+        let input = frontend(&[
+            "do", "{", "unsigned", "short", "local", ";", "local", "=", "(", "x", ")", ";",
+            "return", "local", ";", "}", "while", "(", "0", ")",
+        ]);
+        let analysis = analyze_active_with_constants(
+            &input,
+            "F",
+            input.environment.active.get("F"),
+            &BTreeMap::new(),
+            true,
+        );
+        assert!(matches!(analysis.status, AnalysisStatus::Candidate));
+        assert_eq!(analysis.invocation, InvocationContract::ReturningStatements);
+        assert_eq!(analysis.const_capability, ConstCapability::RuntimeOnly);
+        assert_eq!(analysis.parameters.len(), 2);
+        let expression = analysis.expression.unwrap();
+        for (index, node) in expression.syntax.nodes.iter().enumerate() {
+            if matches!(&node.kind, ExpressionKind::Identifier { name } if name == "local") {
+                assert!(matches!(
+                    expression.types[index],
+                    TypeExpression::Concrete { ty } if ty.kind == IntegerKind::UnsignedShort
+                ));
+            }
+        }
+    }
+
+    #[test]
+    fn return_declarations_cannot_rebind_compiler_owned_names() {
+        let mut input =
+            frontend(&["{", "int", "local", "=", "1", ";", "return", "local", ";", "}"]);
+        let ty = resolve_type_info("int", &input.declarations, &input.profile.target).unwrap();
+        input.declarations.variables.insert("local".into(), ty);
+        let AnalysisStatus::Skipped { reason } = analyze(&input, "F").status else {
+            panic!("global shadowing must stay outside the supported invocation family")
+        };
+        assert_eq!(reason.code, SkipReasonCode::Statement);
+        assert_eq!(reason.tokens, Some(TokenRange { start: 1, end: 6 }));
+        assert!(reason.message.contains("compiler-owned declaration"));
+    }
+
+    #[test]
+    fn returning_local_reads_require_proved_straight_line_initialization() {
+        for body in [
+            vec!["{", "int", "local", ";", "return", "local", ";", "}"],
+            vec!["{", "int", "local", ";", "local", "+=", "1", ";", "return", "local", ";", "}"],
+            vec!["{", "int", "local", "=", "local", ";", "return", "local", ";", "}"],
+            vec![
+                "{", "int", "local", ";", "(", "void", ")", "&", "local", ";", "return", "local",
+                ";", "}",
+            ],
+        ] {
+            let AnalysisStatus::Skipped { reason } = analyze(&frontend(&body), "F").status else {
+                panic!("unproved initialization must skip: {body:?}")
+            };
+            assert_eq!(reason.code, SkipReasonCode::Statement);
+            assert!(reason.message.contains("definite initialization"));
+        }
+        for body in [
+            vec!["{", "int", "local", "=", "1", ";", "return", "local", ";", "}"],
+            vec![
+                "{", "int", "local", ";", "(", "local", ")", "=", "1", ";", "return", "local", ";",
+                "}",
+            ],
+            vec!["{", "int", "local", ";", "return", "sizeof", "local", ";", "}"],
+        ] {
+            assert!(
+                matches!(analyze(&frontend(&body), "F").status, AnalysisStatus::Candidate),
+                "{body:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn nested_terminal_return_preserves_caller_captures() {
+        let input = frontend(&[
+            "do", "{", "fcinfo", "->", "isnull", "=", "1", ";", "do", "{", "return", "(", "int",
+            ")", "0", ";", "}", "while", "(", "0", ")", ";", "}", "while", "(", "0", ")",
+        ]);
+        let analysis = analyze_active_with_constants(
+            &input,
+            "F",
+            input.environment.active.get("F"),
+            &BTreeMap::new(),
+            true,
+        );
+        assert!(matches!(analysis.status, AnalysisStatus::Candidate));
+        let captures = analysis
+            .parameters
+            .iter()
+            .filter(|parameter| parameter.origin == ParameterOrigin::FreeIdentifier)
+            .map(|parameter| parameter.name.as_str())
+            .collect::<Vec<_>>();
+        assert_eq!(captures, ["fcinfo"]);
+        assert_eq!(analysis.invocation, InvocationContract::ReturningStatements);
+        let body = analysis.expression.unwrap().syntax.statement_body.unwrap();
+        assert_eq!(
+            body.walk()
+                .filter(|statement| matches!(statement, Statement::Expression { .. }))
+                .count(),
+            1
+        );
+        assert_eq!(
+            body.walk().filter(|statement| matches!(statement, Statement::Return { .. })).count(),
+            1
+        );
     }
 }

@@ -88,4 +88,7 @@ fn main() {
     record("atomic_signed_parenthesized", value, trace.get(), calls.get());
     let value = EXPR_ATOMIC_POW2!(0x80000000_u32);
     record("atomic_unsigned", value, trace.get(), calls.get());
+    reset();
+    let value = EXPR_STATEMENT!(tick(4, 7));
+    record_void("statement", value, trace.get(), calls.get());
 }

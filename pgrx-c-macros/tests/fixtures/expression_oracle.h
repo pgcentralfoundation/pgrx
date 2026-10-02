@@ -17,7 +17,8 @@
     (((void) (left), (right)), (result))
 #define EXPR_ATOMIC_POW2(value) (value > 0 && ((value) & ((value) - 1)) == 0)
 #define EXPR_POINTER_CAST(value) ((char *) (value))
-#define EXPR_BAD_STATEMENT(value) do { (void) (value); } while (0)
+#define EXPR_STATEMENT(value) do { (void) (value); } while (0)
+#define EXPR_BAD_LOOP(value) do { while (value) (value)--; } while (0)
 #define EXPR_BAD_PASTE(value) value ## suffix
 #define EXPR_BAD_STRINGIFY(value) #value
 #define EXPR_BAD_VARIADIC(...) (__VA_ARGS__)
