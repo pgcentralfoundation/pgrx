@@ -8,7 +8,8 @@
 //! context, so repeated operands and lazy branches retain C substitution semantics.
 
 use super::{MAX_EMISSION_BYTES, macro_identifier, skip};
-use crate::{MacroAnalysis, ParameterRole, SkipReason, SkipReasonCode};
+use crate::{MacroAnalysis, ParameterOrigin, ParameterRole, SkipReason, SkipReasonCode};
+use std::borrow::Cow;
 use std::collections::BTreeSet;
 use std::fmt::Write;
 
@@ -29,6 +30,34 @@ pub(super) enum ArgumentContext {
     Discard,
 }
 
+/// Rust accepts keywords as metavariable names, including `self` and `_`.
+/// `$crate` alone has special meaning and cannot bind a C argument.
+pub(super) fn name(analysis: &MacroAnalysis, index: usize) -> Cow<'_, str> {
+    let parameter = &analysis.parameters[index];
+    if parameter.origin == ParameterOrigin::Formal
+        || (parameter.name != "crate"
+            && !analysis.parameters[..index].iter().any(|earlier| earlier.name == parameter.name))
+    {
+        return Cow::Borrowed(&parameter.name);
+    }
+    // An expanded macro may capture an identifier with the same spelling as an
+    // outer formal. They remain distinct operands under C substitution rules.
+    let mut capture = format!("__pgrx_c_capture_{index}");
+    while analysis.parameters.iter().any(|parameter| parameter.name == capture) {
+        capture.push('_');
+    }
+    Cow::Owned(capture)
+}
+
+/// Explicit-return arms bind an extra type fragment beside the C arguments.
+pub(super) fn return_marker(analysis: &MacroAnalysis) -> String {
+    let mut marker = String::from("__pgrx_c_return");
+    while analysis.parameters.iter().any(|parameter| parameter.name == marker) {
+        marker.push('_');
+    }
+    marker
+}
+
 /// Matcher for the internal context arms, after syntactic normalization.
 pub(super) fn matcher(analysis: &MacroAnalysis) -> String {
     let mut matcher = String::new();
@@ -41,7 +70,7 @@ pub(super) fn matcher(analysis: &MacroAnalysis) -> String {
             [ParameterRole::Identifier] => "ident",
             _ => "tt",
         };
-        write!(matcher, "$__pgrx_c_arg{index}:{fragment}").expect("String output");
+        write!(matcher, "${}:{fragment}", name(analysis, index)).expect("String output");
     }
     if !analysis.parameters.is_empty() {
         matcher.push_str(" $(,)?");
@@ -58,6 +87,24 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<ArgumentAdapter, Skip
             "C macro argument normalization exceeds its 64-parameter bound",
             None,
         ));
+    }
+    for (index, parameter) in analysis.parameters.iter().enumerate() {
+        let name = name(analysis, index);
+        let mut bytes = name.bytes();
+        if name == "crate"
+            || !bytes.next().is_some_and(|byte| byte.is_ascii_alphabetic() || byte == b'_')
+            || !bytes.all(|byte| byte.is_ascii_alphanumeric() || byte == b'_')
+        {
+            return Err(skip(
+                analysis,
+                SkipReasonCode::UnsupportedType,
+                format!(
+                    "C argument {:?} cannot retain its name as a Rust metavariable; $crate is reserved and only ASCII identifier spellings are modeled",
+                    parameter.name
+                ),
+                None,
+            ));
+        }
     }
     let identifier = macro_identifier(&analysis.name).ok_or_else(|| {
         skip(analysis, SkipReasonCode::UnsupportedType, "macro has no Rust identifier", None)
@@ -201,12 +248,15 @@ pub(super) fn shared(exports: &BTreeSet<String>) -> Result<String, String> {
             return Err(format!("{name}: invalid generated Rust macro export"));
         }
         writeln!(rust, "(@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; {name}) => {{ $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group) }};").expect("String output");
+        writeln!(rust, "(@if_available {name} {{ $($items:tt)* }}) => {{ $($items)* }};")
+            .expect("String output");
         if rust.len() > MAX_EMISSION_BYTES {
             return Err("generated macro export classifier exceeds the output bound".into());
         }
     }
     rust.push_str(
-        "(@path [$callback:ident] $state:tt [$($original:tt)*] $path:tt $group:tt $budget:tt; $last:ident) => { $crate::$callback!(@classified $state (@native [$($original)*])) };\n\
+        "(@if_available $unknown:ident { $($items:tt)* }) => {};\n\
+         (@path [$callback:ident] $state:tt [$($original:tt)*] $path:tt $group:tt $budget:tt; $last:ident) => { $crate::$callback!(@classified $state (@native [$($original)*])) };\n\
          (@path [$callback:ident] $state:tt $original:tt $path:tt $group:tt []; $($raw:tt)+) => { compile_error!(\"C macro path exceeds the 64-component normalization bound\") };\n\
          (@known [$callback:ident] $state:tt [$($path:tt)*]; ($($inner:tt)*)) => { $crate::$callback!(@classified $state (@macro [$($path)*] [$($inner)*])) };\n\
          (@known [$callback:ident] $state:tt [$($path:tt)*]; [$($inner:tt)*]) => { $crate::$callback!(@classified $state (@macro [$($path)*] [$($inner)*])) };\n\
@@ -242,6 +292,7 @@ pub(super) fn shared(exports: &BTreeSet<String>) -> Result<String, String> {
 }
 
 pub(super) fn render_operand(
+    analysis: &MacroAnalysis,
     parameter: usize,
     context: ArgumentContext,
     floats: bool,
@@ -254,6 +305,6 @@ pub(super) fn render_operand(
         ArgumentContext::Size => "@size".into(),
         ArgumentContext::Discard => format!("@discard [{floats}]"),
     };
-    write!(rust, "$crate::__pgrx_c_operand!({mode}; $__pgrx_c_arg{parameter})")
+    write!(rust, "$crate::__pgrx_c_operand!({mode}; ${})", name(analysis, parameter))
         .expect("String output");
 }

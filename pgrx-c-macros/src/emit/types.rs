@@ -18,6 +18,12 @@ pub(super) struct LoweredType {
     pub storage: String,
 }
 
+struct CastStorage {
+    spelling: String,
+    ty: RustBindingType,
+    is_const: bool,
+}
+
 pub(super) struct Lowering<'a> {
     declarations: &'a DeclarationCatalog,
     bindings: &'a BindingCatalog,
@@ -435,6 +441,97 @@ impl<'a> Lowering<'a> {
 
     pub fn resolve(&self, ty: &TypeInfo) -> Result<LoweredType, String> {
         self.resolve_at(ty, 0)
+    }
+
+    /// Use the exact source typedef, never an alias guessed from its representation.
+    /// The marker still carries C rank and qualifications after Rust erases aliases.
+    pub fn cast_alias(
+        &self,
+        name: &str,
+        ty: &TypeInfo,
+    ) -> Option<Result<(String, LoweredType), String>> {
+        let storage = self.alias_storage(name, 0)?;
+        Some(storage.and_then(|storage| {
+            let lowered = self.resolve_with_storage(ty, &storage.ty)?;
+            Ok((storage.spelling, lowered))
+        }))
+    }
+
+    // Follow the same flat pointer/qualifier grammar admitted by resolve_type_info.
+    // Every named leaf must exist in the compiler catalog and the actual bindings.
+    fn alias_storage(&self, name: &str, depth: usize) -> Option<Result<CastStorage, String>> {
+        if depth > 64 {
+            return Some(Err("named cast storage exceeds the bounded lowering depth".into()));
+        }
+        if let Some(ty) = self.declarations.types.get(name) {
+            return Some((|| {
+                let path = if let Some(alias) = self.bindings.types.get(name) {
+                    alias.path.clone()
+                } else if self.bindings.integer_storage.contains_key(name) {
+                    // The binding generator may replace this typedef with an
+                    // imported newtype; its verified adapter owns that path.
+                    name.split("::").map(str::to_owned).collect()
+                } else if let Some(binding) =
+                    self.bindings.records.get(name).filter(|_| ty.category == TypeCategory::Record)
+                {
+                    binding.path.clone()
+                } else if let Some(binding) =
+                    self.bindings.enums.get(name).filter(|_| ty.category == TypeCategory::Enum)
+                {
+                    binding.path.clone()
+                } else if name.starts_with("struct ") || name.starts_with("union ") {
+                    self.record_binding(ty)?.path.clone()
+                } else if name.starts_with("enum ") {
+                    self.enum_binding(ty)?
+                        .ok_or("the C enum tag has no corresponding named Rust binding")?
+                        .path
+                        .clone()
+                } else {
+                    return Err("the C type has no corresponding named Rust binding".into());
+                };
+                Ok(CastStorage {
+                    spelling: rust_path(&path)?,
+                    ty: RustBindingType::Named { path },
+                    is_const: ty.is_const,
+                })
+            })());
+        }
+        if let Some((pointee, qualifiers)) = name.rsplit_once('*') {
+            if !qualifiers.split_whitespace().all(|word| matches!(word, "const" | "volatile")) {
+                return None;
+            }
+            let pointee = pointee.trim();
+            let storage = self.alias_storage(pointee, depth + 1)?;
+            return Some(storage.map(|storage| {
+                let mutable = !storage.is_const;
+                CastStorage {
+                    spelling: format!(
+                        "*{} {}",
+                        if mutable { "mut" } else { "const" },
+                        storage.spelling
+                    ),
+                    ty: RustBindingType::Pointer { pointee: Box::new(storage.ty), mutable },
+                    is_const: qualifiers.split_whitespace().any(|word| word == "const"),
+                }
+            }));
+        }
+        let words = name.split_whitespace().collect::<Vec<_>>();
+        let unqualified = words
+            .iter()
+            .copied()
+            .filter(|word| !matches!(*word, "const" | "volatile"))
+            .collect::<Vec<_>>()
+            .join(" ");
+        if words.iter().any(|word| matches!(*word, "const" | "volatile")) {
+            self.alias_storage(&unqualified, depth + 1).map(|storage| {
+                storage.map(|mut storage| {
+                    storage.is_const |= words.contains(&"const");
+                    storage
+                })
+            })
+        } else {
+            None
+        }
     }
 
     /// Macro casts can retain a typedef spelling absent from the canonical

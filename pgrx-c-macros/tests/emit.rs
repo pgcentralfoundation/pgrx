@@ -93,9 +93,9 @@ fn emitted_macros_keep_provenance_occurrences_names_and_structured_skips() {
         assert!(!rust.contains("/Users/"), "emitted documentation must not contain private paths");
     }
     let repeated = emit(&session, "EMIT_REPEAT");
-    assert_eq!(public_body(source(&repeated)).matches("$__pgrx_c_arg0").count(), 2);
+    assert_eq!(public_body(source(&repeated)).matches("$value").count(), 2);
     let unused = emit(&session, "EMIT_UNUSED");
-    assert_eq!(public_body(source(&unused)).matches("$__pgrx_c_arg0").count(), 0);
+    assert_eq!(public_body(source(&unused)).matches("$value").count(), 0);
     assert!(source(&emit(&session, "match")).contains("macro_rules! r#match"));
     let ungrouped = emit(&session, "EMIT_UNGROUPED");
     assert_eq!(ungrouped.analysis.invocation, InvocationContract::ExplicitExpressionBoundary);
@@ -267,7 +267,7 @@ fn atomic_argument_rules_reject_unparenthesized_multi_token_substitutions() {
     let frontend = inspect(&scanner, &fixture("expression_oracle.h"), &[], None).unwrap();
     let session = AnalysisSession::prepare(&scanner, &frontend, &["EXPR_ATOMIC_POW2"]).unwrap();
     let emission = emit(&session, "EXPR_ATOMIC_POW2");
-    assert!(source(&emission).contains("$__pgrx_c_arg0:tt"));
+    assert!(source(&emission).contains("$value:tt"));
 
     let directory = TemporaryDirectory::new();
     let runtime = PathBuf::from(env!("CARGO_MANIFEST_DIR"))

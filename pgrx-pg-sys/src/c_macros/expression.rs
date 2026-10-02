@@ -1133,6 +1133,12 @@ pub fn cast<M: CType, V: CastTo<M>>(value: V) -> M::Value {
     value.cast_to()
 }
 
+/// Retain a verified binding's name without losing its distinct C type identity.
+/// Rust aliases can share storage while differing in C integer rank or qualifiers.
+pub fn cast_as<S, M: CType<Storage = S>, V: CastTo<M>>(value: V) -> M::Value {
+    cast::<M, V>(value)
+}
+
 /// A C assignment/prototype conversion, excluding conversions needing a cast.
 pub trait ImplicitTo<M: CType>: CExprValue {
     fn implicit_to(self) -> M::Value;

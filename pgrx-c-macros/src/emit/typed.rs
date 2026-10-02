@@ -82,13 +82,20 @@ impl<'a> Renderer<'a> {
         // boundaries. The fully expanded arena includes contraction across
         // recovered source-level macro calls.
         let multiplication = expression.syntax.nodes.iter().any(|node| {
-            matches!(node.kind, ExpressionKind::Binary { operator: BinaryOperator::Multiply, .. })
+            matches!(
+                node.kind,
+                ExpressionKind::Binary { operator: BinaryOperator::Multiply, .. }
+                    | ExpressionKind::Assignment { operator: Some(BinaryOperator::Multiply), .. }
+            )
         });
         let addition = expression.syntax.nodes.iter().any(|node| {
             matches!(
                 node.kind,
                 ExpressionKind::Binary {
                     operator: BinaryOperator::Add | BinaryOperator::Subtract,
+                    ..
+                } | ExpressionKind::Assignment {
+                    operator: Some(BinaryOperator::Add | BinaryOperator::Subtract),
                     ..
                 }
             )
@@ -157,7 +164,7 @@ impl<'a> Renderer<'a> {
             ungrouped = operand;
         }
         if let ExpressionKind::Parameter { index } = expression.syntax.nodes[ungrouped].kind {
-            write!(rust, "$__pgrx_c_arg{index}, ").expect("String output");
+            write!(rust, "${}, ", arguments::name(self.analysis, index)).expect("String output");
             return;
         }
         rust.push_str("(@compiled ");
@@ -257,6 +264,7 @@ impl<'a> Renderer<'a> {
                             tasks.push(Task::Node(operand, context));
                         } else if let ExpressionKind::Parameter { index: parameter } = node.kind {
                             arguments::render_operand(
+                                analysis,
                                 parameter,
                                 if matches!(context, Context::Size) {
                                     ArgumentContext::Size
@@ -279,7 +287,7 @@ impl<'a> Renderer<'a> {
                                 && !self.places[index]
                             {
                                 let marker = match field_parameter {
-                                    Some(parameter) => format!("$crate::__pgrx_c_field_marker!($__pgrx_c_arg{parameter})"),
+                                    Some(parameter) => format!("$crate::__pgrx_c_field_marker!(${})", arguments::name(analysis, *parameter)),
                                     None => bindings.field_capabilities.get(field).cloned().ok_or_else(|| failure(format!("{field}: no compiler-checked field adapter is available")))?,
                                 };
                                 write!(rust, "{EXPRESSION}::record::size_of_member_type::<{marker}, _>(if false {{ Some(unsafe {{ ").expect("String output");
@@ -315,6 +323,7 @@ impl<'a> Renderer<'a> {
                         }
                         ExpressionKind::Parameter { index: parameter } => {
                             arguments::render_operand(
+                                analysis,
                                 *parameter,
                                 match context {
                                     Context::Value => ArgumentContext::Value,
@@ -408,7 +417,14 @@ impl<'a> Renderer<'a> {
                                     && matches!(ty.category, TypeCategory::Integer(_))
                                     && !expression.integer_zero_constants.contains(&index);
                                 let void_null = null && is_unqualified_void_pointer(frontend, &ty);
-                                let ty = lowering.resolve(&ty).map_err(failure)?;
+                                let (ty, alias) = match lowering.cast_alias(type_name, &ty) {
+                                    Some(Ok((alias, lowered))) => (lowered, Some(alias)),
+                                    Some(Err(reason)) => {
+                                        super::write_fallback(rust, type_name, &reason);
+                                        (lowering.resolve(&ty).map_err(failure)?, None)
+                                    }
+                                    None => (lowering.resolve(&ty).map_err(failure)?, None),
+                                };
                                 if integer_null {
                                     write!(rust, "{EXPRESSION}::null_constant(")
                                         .expect("String output");
@@ -416,8 +432,17 @@ impl<'a> Renderer<'a> {
                                     write!(rust, "{EXPRESSION}::null::null_void(")
                                         .expect("String output");
                                 }
-                                write!(rust, "{EXPRESSION}::cast::<{}, _>(", ty.marker)
+                                if let Some(alias) = alias {
+                                    write!(
+                                        rust,
+                                        "{EXPRESSION}::cast_as::<{alias}, {}, _>(",
+                                        ty.marker
+                                    )
                                     .expect("String output");
+                                } else {
+                                    write!(rust, "{EXPRESSION}::cast::<{}, _>(", ty.marker)
+                                        .expect("String output");
+                                }
                                 tasks.extend([
                                     text(if integer_null || void_null { "))" } else { ")" }),
                                     value(*operand),
@@ -528,7 +553,7 @@ impl<'a> Renderer<'a> {
                         }
                         ExpressionKind::Member { base, field, field_parameter, indirect } => {
                             let marker = match field_parameter {
-                                Some(parameter) => format!("$crate::__pgrx_c_field_marker!($__pgrx_c_arg{parameter})"),
+                                Some(parameter) => format!("$crate::__pgrx_c_field_marker!(${})", arguments::name(analysis, *parameter)),
                                 None => bindings.field_capabilities.get(field).cloned().ok_or_else(|| skip(analysis, SkipReasonCode::PointerOperation, format!("{field}: no compiler-checked field adapter is available"), Some(node.tokens)))?,
                             };
                             let direct_place = self.places[*base];
@@ -729,7 +754,8 @@ impl<'a> Renderer<'a> {
                             operand,
                         } => {
                             let mut marker = format!(
-                                "<$__pgrx_c_arg{parameter} as {EXPRESSION}::NativeType>::Marker"
+                                "<${} as {EXPRESSION}::NativeType>::Marker",
+                                arguments::name(analysis, *parameter)
                             );
                             for depth in 0..*pointers {
                                 marker = format!(
@@ -744,7 +770,8 @@ impl<'a> Renderer<'a> {
                         ExpressionKind::SizeOfTypeParameter { parameter, pointers, is_const }
                         | ExpressionKind::AlignOfTypeParameter { parameter, pointers, is_const } => {
                             let mut marker = format!(
-                                "<$__pgrx_c_arg{parameter} as {EXPRESSION}::NativeType>::Marker"
+                                "<${} as {EXPRESSION}::NativeType>::Marker",
+                                arguments::name(analysis, *parameter)
                             );
                             for depth in 0..*pointers {
                                 marker = format!(

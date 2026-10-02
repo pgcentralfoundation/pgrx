@@ -7,7 +7,14 @@ use super::*;
 struct ParsedScope {
     statements: Vec<Statement>,
     tokens: TokenRange,
-    terminal: Option<(NodeId, TokenRange)>,
+    first_return: Option<(NodeId, TokenRange)>,
+    always_returns: bool,
+}
+
+struct ParsedStatement {
+    statement: Statement,
+    first_return: Option<(NodeId, TokenRange)>,
+    always_returns: bool,
 }
 
 impl<F: Fn(&str) -> bool> Parser<'_, F> {
@@ -16,40 +23,51 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         allow_statements: bool,
     ) -> Result<(NodeId, Option<StatementBody>), SyntaxError> {
         if !allow_statements
-            || !matches!(self.spelling(), Some("return" | "do" | "{" | ";"))
+            || !matches!(self.spelling(), Some("return" | "do" | "{" | ";" | "if"))
             || self.spelling().is_some_and(|name| self.parameters.contains_key(name))
         {
             return self.expression(0, 0).map(|root| (root, None));
         }
-        let ParsedScope { statements, tokens, terminal } = self.statement_scope(0)?;
-        let (root, return_tokens) = match terminal {
+        let requires_boundary = self.spelling() == Some("if");
+        let ParsedScope { statements, tokens, first_return, always_returns } =
+            self.statement_scope(0, true, true)?;
+        let (root, return_tokens) = match first_return {
             Some((root, tokens)) => (root, Some(tokens)),
             None => (self.push(ExpressionKind::Empty, tokens), None),
         };
-        let body = StatementBody { statements, tokens, return_tokens };
+        let body =
+            StatementBody { statements, tokens, return_tokens, always_returns, requires_boundary };
         let mut declarations = HashMap::new();
-        let mut scopes = vec![(body.statements.as_slice(), body.tokens.end)];
-        while let Some((statements, end)) = scopes.pop() {
-            for statement in statements {
-                match statement {
-                    Statement::Declaration { name, tokens, .. } => {
-                        if self.parameters.contains_key(name.as_str())
-                            || declarations.insert(name.as_str(), (tokens.start, end)).is_some()
-                        {
-                            return Err(SyntaxError {
-                                kind: SyntaxErrorKind::Statement,
-                                tokens: *tokens,
-                                message:
-                                    "local declarations cannot shadow macro formals or other locals"
-                                        .into(),
-                            });
-                        }
+        let mut scopes = body
+            .statements
+            .iter()
+            .map(|statement| (statement, body.tokens.end))
+            .collect::<Vec<_>>();
+        while let Some((statement, end)) = scopes.pop() {
+            match statement {
+                Statement::Declaration { name, tokens, .. } => {
+                    if self.parameters.contains_key(name.as_str())
+                        || declarations.insert(name.as_str(), (tokens.start, end)).is_some()
+                    {
+                        return Err(SyntaxError {
+                            kind: SyntaxErrorKind::Statement,
+                            tokens: *tokens,
+                            message:
+                                "local declarations cannot shadow macro formals or other locals"
+                                    .into(),
+                        });
                     }
-                    Statement::Block { statements, tokens } => {
-                        scopes.push((statements.as_slice(), tokens.end));
-                    }
-                    _ => {}
                 }
+                Statement::Block { statements, tokens } => {
+                    scopes.extend(statements.iter().map(|statement| (statement, tokens.end)));
+                }
+                Statement::If { then_branch, else_branch, .. } => {
+                    scopes.push((then_branch.as_ref(), end));
+                    if let Some(otherwise) = else_branch {
+                        scopes.push((otherwise.as_ref(), end));
+                    }
+                }
+                _ => {}
             }
         }
         for node in &self.nodes {
@@ -75,7 +93,12 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         Ok((root, Some(body)))
     }
 
-    fn statement_scope(&mut self, depth: usize) -> Result<ParsedScope, SyntaxError> {
+    fn statement_scope(
+        &mut self,
+        depth: usize,
+        root: bool,
+        optional_final_semicolon: bool,
+    ) -> Result<ParsedScope, SyntaxError> {
         if depth >= MAX_DEPTH {
             return Err(self.error(
                 SyntaxErrorKind::BudgetExceeded,
@@ -88,7 +111,8 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             return Ok(ParsedScope {
                 statements: Vec::new(),
                 tokens: TokenRange { start, end: start + 1 },
-                terminal: None,
+                first_return: None,
+                always_returns: false,
             });
         }
         let do_block = self.spelling() == Some("do");
@@ -97,7 +121,8 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         }
         let block = do_block || self.spelling() == Some("{");
         let mut statements = Vec::new();
-        let mut terminal = None;
+        let mut first_return = None;
+        let mut always_returns = false;
         if block {
             self.expect("{")?;
             while self.spelling() != Some("}") {
@@ -106,39 +131,37 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
                         self.error(SyntaxErrorKind::Statement, "a statement block is not closed")
                     );
                 }
-                if terminal.is_some() {
+                if always_returns {
                     return Err(self.error(
                         SyntaxErrorKind::Statement,
-                        "only a terminal return is supported; no statement may follow it",
+                        "no statement may follow an unconditional return",
                     ));
                 }
-                match self.spelling() {
-                    Some(";") => self.position += 1,
-                    Some("return") if !self.parameters.contains_key("return") => {
-                        let (statement, returned) = self.return_operand(true)?;
-                        statements.push(statement);
-                        terminal = Some(returned);
-                    }
-                    Some("{") | Some("do")
-                        if self.spelling() == Some("{") || !self.parameters.contains_key("do") =>
-                    {
-                        let ParsedScope { statements: nested, tokens, terminal: returned } =
-                            self.statement_scope(depth + 1)?;
-                        statements.push(Statement::Block { statements: nested, tokens });
-                        terminal = returned;
-                    }
-                    _ => statements.push(self.ordinary_statement()?),
+                if self.spelling() == Some(";") {
+                    self.position += 1;
+                    continue;
                 }
+                let parsed = self.statement(depth + 1, false, true)?;
+                first_return = first_return.or(parsed.first_return);
+                always_returns = parsed.always_returns;
+                statements.push(parsed.statement);
             }
         } else {
-            let (statement, returned) = self.return_operand(false)?;
-            statements.push(statement);
-            terminal = Some(returned);
+            let parsed = self.statement(depth, optional_final_semicolon, false)?;
+            statements.push(parsed.statement);
+            first_return = parsed.first_return;
+            always_returns = parsed.always_returns;
         }
         if block {
             self.expect("}")?;
         }
         if do_block {
+            if self.spelling() == Some("while") && self.parameters.contains_key("while") {
+                return Err(self.error(
+                    SyntaxErrorKind::Statement,
+                    "a do/while wrapper requires a fixed loop keyword, not a macro formal",
+                ));
+            }
             self.expect("while")?;
             self.expect("(")?;
             let Some(token) = self.tokens.get(self.position) else {
@@ -150,17 +173,115 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             {
                 return Err(self.error(
                     SyntaxErrorKind::Statement,
-                    "only a literal-zero do/while wrapper is supported for straight-line statements",
+                    "only a literal-zero do/while statement wrapper is supported",
                 ));
             }
             self.position += 1;
             self.expect(")")?;
+            if !optional_final_semicolon || self.spelling().is_some() {
+                self.expect(";")?;
+            }
         }
-        if block && self.spelling() == Some(";") {
+        if block && !do_block && root && self.spelling() == Some(";") {
             self.position += 1;
         }
         let end = self.tokens[self.position - 1].index + 1;
-        Ok(ParsedScope { statements, tokens: TokenRange { start, end }, terminal })
+        Ok(ParsedScope {
+            statements,
+            tokens: TokenRange { start, end },
+            first_return,
+            always_returns,
+        })
+    }
+
+    fn statement(
+        &mut self,
+        depth: usize,
+        optional_final_semicolon: bool,
+        allow_declaration: bool,
+    ) -> Result<ParsedStatement, SyntaxError> {
+        if depth >= MAX_DEPTH {
+            return Err(self.error(
+                SyntaxErrorKind::BudgetExceeded,
+                format!("statement nesting exceeds the {MAX_DEPTH}-level analysis budget"),
+            ));
+        }
+        let start = self.tokens.get(self.position).ok_or_else(|| self.unexpected())?.index;
+        let keyword = self.spelling().filter(|name| !self.parameters.contains_key(*name));
+        match keyword {
+            Some("if") => {
+                self.position += 1;
+                let condition_start =
+                    self.tokens.get(self.position).ok_or_else(|| self.unexpected())?.index;
+                self.expect("(")?;
+                let operand = self.expression(0, 0)?;
+                self.expect(")")?;
+                let condition = self.push(
+                    ExpressionKind::Group { operand },
+                    TokenRange {
+                        start: condition_start,
+                        end: self.tokens[self.position - 1].index + 1,
+                    },
+                );
+                let then_branch = self.statement(depth + 1, optional_final_semicolon, false)?;
+                let else_branch =
+                    if self.spelling() == Some("else") && !self.parameters.contains_key("else") {
+                        self.position += 1;
+                        Some(self.statement(depth + 1, optional_final_semicolon, false)?)
+                    } else {
+                        None
+                    };
+                let first_return = then_branch
+                    .first_return
+                    .or_else(|| else_branch.as_ref().and_then(|branch| branch.first_return));
+                let always_returns = then_branch.always_returns
+                    && else_branch.as_ref().is_some_and(|branch| branch.always_returns);
+                let end = self.tokens[self.position - 1].index + 1;
+                Ok(ParsedStatement {
+                    statement: Statement::If {
+                        condition,
+                        then_branch: Box::new(then_branch.statement),
+                        else_branch: else_branch.map(|branch| Box::new(branch.statement)),
+                        tokens: TokenRange { start, end },
+                    },
+                    first_return,
+                    always_returns,
+                })
+            }
+            Some("return") => {
+                let (statement, returned) = self.return_operand(!optional_final_semicolon)?;
+                Ok(ParsedStatement {
+                    statement,
+                    first_return: Some(returned),
+                    always_returns: true,
+                })
+            }
+            Some("{") | Some("do") => {
+                let ParsedScope { statements, tokens, first_return, always_returns } =
+                    self.statement_scope(depth, false, optional_final_semicolon)?;
+                Ok(ParsedStatement {
+                    statement: Statement::Block { statements, tokens },
+                    first_return,
+                    always_returns,
+                })
+            }
+            Some(";") => {
+                self.position += 1;
+                Ok(ParsedStatement {
+                    statement: Statement::Block {
+                        statements: Vec::new(),
+                        tokens: TokenRange { start, end: start + 1 },
+                    },
+                    first_return: None,
+                    always_returns: false,
+                })
+            }
+            _ => Ok(ParsedStatement {
+                statement: self.ordinary_statement(allow_declaration, optional_final_semicolon)?,
+                first_return: None,
+                always_returns: false,
+            }),
+        }
     }
 
     fn return_operand(
@@ -170,16 +291,26 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         let start = self.tokens[self.position].index;
         self.expect("return")?;
         let expression = self.expression(0, 0)?;
-        if needs_semicolon || self.spelling() == Some(";") {
+        if needs_semicolon || self.spelling().is_some() {
             self.expect(";")?;
         }
         let tokens = TokenRange { start, end: self.tokens[self.position - 1].index + 1 };
         Ok((Statement::Return { expression, tokens }, (expression, tokens)))
     }
 
-    fn ordinary_statement(&mut self) -> Result<Statement, SyntaxError> {
+    fn ordinary_statement(
+        &mut self,
+        allow_declaration: bool,
+        optional_final_semicolon: bool,
+    ) -> Result<Statement, SyntaxError> {
         let start = self.tokens[self.position].index;
         if let Some((name_position, type_name)) = self.local_declaration() {
+            if !allow_declaration {
+                return Err(self.error(
+                    SyntaxErrorKind::Statement,
+                    "a declaration requires a C compound block",
+                ));
+            }
             let name = self.tokens[name_position].token.spelling.clone();
             self.position = name_position + 1;
             let initializer = if self.spelling() == Some("=") {
@@ -198,7 +329,9 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             });
         }
         let expression = self.expression(0, 0)?;
-        self.expect(";")?;
+        if !optional_final_semicolon || self.spelling().is_some() {
+            self.expect(";")?;
+        }
         let end = self.tokens[self.position - 1].index + 1;
         Ok(Statement::Expression { expression, tokens: TokenRange { start, end } })
     }
