@@ -155,6 +155,118 @@ impl Drop for Fixture {
 }
 
 #[test]
+fn docsrs_exports_generated_adapter_modules_and_accepts_support_free_snapshots() {
+    let fixture = Fixture::new();
+    let postgres_module = |ident: &syn::Ident| {
+        ident
+            .to_string()
+            .strip_prefix("pg")
+            .and_then(|suffix| suffix.split('_').next())
+            .and_then(|major| major.parse::<u16>().ok())
+    };
+    let mut included = syn::parse_file(include_str!("../../pgrx-pg-sys/src/include.rs")).unwrap();
+    // Keep the actual declarations, cfgs and reexports, without unrelated
+    // PostgreSQL compatibility functions that would require complete bindings.
+    included.items.retain(|item| match item {
+        syn::Item::Mod(module) => postgres_module(&module.ident).is_some(),
+        syn::Item::Use(import) => {
+            matches!(&import.tree, syn::UseTree::Path(path) if postgres_module(&path.ident).is_some())
+        }
+        _ => false,
+    });
+    let versions = included
+        .items
+        .iter()
+        .filter_map(|item| {
+            let syn::Item::Mod(module) = item else { return None };
+            postgres_module(&module.ident)
+        })
+        .collect::<BTreeSet<_>>();
+    assert!(!versions.is_empty(), "actual binding modules must be exercised");
+    fs::write(fixture.0.join("src/include.rs"), included.into_token_stream().to_string()).unwrap();
+
+    let mut library = syn::parse_file(include_str!("../../pgrx-pg-sys/src/lib.rs")).unwrap();
+    library.attrs = vec![syn::parse_quote!(#![allow(unused_imports)])];
+    library.items.retain(|item| match item {
+        syn::Item::Mod(module) => module.ident == "include",
+        syn::Item::Use(import) => {
+            matches!(&import.tree, syn::UseTree::Path(path) if path.ident == "include")
+        }
+        _ => false,
+    });
+    assert_eq!(library.items.len(), 2, "use the defining crate's actual include/export path");
+    let library_path = fixture.0.join("src/lib.rs");
+    fs::write(&library_path, library.into_token_stream().to_string()).unwrap();
+
+    for with_support in [false, true] {
+        let kind = if with_support { "generated" } else { "support-free" };
+        let support = if with_support {
+            "#[doc(hidden)] pub mod __pgrx_c_generated { pub const ADAPTER: u32 = 12; }\n"
+        } else {
+            ""
+        };
+        let expression = if with_support {
+            "$crate::__pgrx_c_generated::ADAPTER + $crate::BINDING"
+        } else {
+            "$crate::BINDING"
+        };
+        for major in &versions {
+            fs::write(
+                fixture.0.join(format!("src/include/pg{major}.rs")),
+                format!("pub const BINDING: u32 = {major};\n"),
+            )
+            .unwrap();
+            fs::write(
+                fixture.0.join(format!("src/include/pg{major}_macros.rs")),
+                format!("{support}#[macro_export] macro_rules! SNAPSHOT_ADAPTER_VALUE {{ () => {{ {expression} }}; }}\n"),
+            )
+            .unwrap();
+            fs::write(fixture.0.join(format!("src/include/pg{major}_oids.rs")), "").unwrap();
+        }
+        for major in &versions {
+            let phase = format!("docsrs-pg{major}-{kind}");
+            let archive = fixture.0.join(format!("libdocs_snapshot_pg{major}_{kind}.rlib"));
+            fixture.successful_output(
+                Command::new("rustc")
+                    .args(["--edition=2024", "--crate-name=docs_snapshot", "--crate-type=rlib"])
+                    .args(["--cfg", "docsrs", "--cfg"])
+                    .arg(format!("feature=\"pg{major}\""))
+                    .arg(&library_path)
+                    .arg("-o")
+                    .arg(&archive),
+                &format!("{phase}-library"),
+            );
+            let adapter_assertion = if with_support {
+                "assert_eq!(renamed::__pgrx_c_generated::ADAPTER, 12);"
+            } else {
+                ""
+            };
+            let consumer = fixture.0.join(format!("{phase}.rs"));
+            fs::write(
+                &consumer,
+                format!("extern crate docs_snapshot as renamed;\nfn main() {{ {adapter_assertion} println!(\"{{}}\", renamed::SNAPSHOT_ADAPTER_VALUE!()); }}\n"),
+            )
+            .unwrap();
+            let executable = fixture.0.join(&phase);
+            fixture.successful_output(
+                Command::new("rustc")
+                    .args(["--edition=2024", "--crate-name=docs_consumer", "--extern"])
+                    .arg(format!("docs_snapshot={}", archive.display()))
+                    .arg(&consumer)
+                    .arg("-o")
+                    .arg(&executable),
+                &format!("{phase}-consumer"),
+            );
+            assert_eq!(
+                fixture.successful_output(&mut Command::new(executable), &phase),
+                format!("{}\n", u32::from(*major) + if with_support { 12 } else { 0 }),
+                "actual include exports must resolve adapter paths under docsrs"
+            );
+        }
+    }
+}
+
+#[test]
 #[ignore = "compiles isolated ordinary, release and docs.rs builds; requires native Clang and cached dependencies"]
 fn release_ships_macros_and_docsrs_uses_them_without_postgres_or_clang() {
     let fixture = Fixture::new();
@@ -211,9 +323,9 @@ esac
         format!(
             r#"
 #[derive(Clone, Copy)] pub struct Oid(pub u32);
-impl Oid {{ pub fn to_u32(self) -> u32 {{ self.0 }} }}
+impl Oid {{ pub fn to_u32(self) -> u32 {{ self.0 }} pub fn from_u32(value:u32)->Self {{ Self(value) }} }}
 #[derive(Clone, Copy)] pub struct TransactionId(pub u32);
-impl TransactionId {{ pub fn into_inner(self) -> u32 {{ self.0 }} }}
+impl TransactionId {{ pub fn into_inner(self) -> u32 {{ self.0 }} pub fn from_inner(value:u32)->Self {{ Self(value) }} }}
 pub type MultiXactId = TransactionId;
 pub struct Datum;
 pub trait PgNode {{}}

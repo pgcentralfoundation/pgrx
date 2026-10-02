@@ -135,9 +135,9 @@ typedef unsigned int TransactionId;
         format!(
             r#"
 #[derive(Clone, Copy)] pub struct Oid(u32);
-impl Oid {{ pub fn to_u32(self) -> u32 {{ self.0 }} }}
+impl Oid {{ pub fn to_u32(self) -> u32 {{ self.0 }} pub fn from_u32(value:u32)->Self {{ Self(value) }} }}
 #[derive(Clone, Copy)] pub struct TransactionId(u32);
-impl TransactionId {{ pub fn into_inner(self) -> u32 {{ self.0 }} }}
+impl TransactionId {{ pub fn into_inner(self) -> u32 {{ self.0 }} pub fn from_inner(value:u32)->Self {{ Self(value) }} }}
 pub type MultiXactId = TransactionId;
 pub struct Datum;
 pub trait PgNode {{}}
@@ -146,6 +146,7 @@ mod pg18 {{
     include!(concat!(env!("OUT_DIR"), "/pg18.rs"));
     include!(concat!(env!("OUT_DIR"), "/pg18_macros.rs"));
 }}
+pub use pg18::*;
 "#
         ),
     )

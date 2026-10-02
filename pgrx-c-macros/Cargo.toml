@@ -28,6 +28,8 @@ petgraph = "0.8.3"
 
 [dev-dependencies]
 bindgen = { version = "0.72.1", default-features = false, features = ["runtime"] }
+syn.workspace = true
+quote.workspace = true
 
 [[bin]]
 name = "pgrx-c-macros"

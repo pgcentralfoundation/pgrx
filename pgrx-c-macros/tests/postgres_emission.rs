@@ -40,6 +40,14 @@ fn generated_postgres_18_macros_match_original_c_types_values_and_occurrences() 
         .canonicalize()
         .unwrap();
     let mut rust = format!("#[path = {:?}]\npub mod __pgrx_c_macros;\n", support.to_str().unwrap());
+    let artifact = pgrx_c_macros::emit_support_artifact_with_bindings(
+        &session,
+        &names,
+        &pgrx_c_macros::BindingCatalog::default(),
+    )
+    .unwrap();
+    assert!(artifact.c_source.is_empty(), "integer PostgreSQL corpus requires no native adapters");
+    rust.push_str(&artifact.rust);
     for name in required {
         let emission = emit(&session, name);
         let EmissionStatus::Emitted { rust: generated, .. } = emission.status else {

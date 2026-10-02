@@ -9,8 +9,8 @@ mod rust_oracle;
 
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, EmissionStatus, IntegerBinding, IntegerBindingRepresentation,
-    IntegerValue, MacroScanner, SkipReasonCode, emit_batch_with_bindings, emit_with_bindings,
-    inspect, pg_sys_integer_bridges,
+    IntegerValue, MacroScanner, SkipReasonCode, emit_batch_with_bindings,
+    emit_support_artifact_with_bindings, emit_with_bindings, inspect, pg_sys_integer_bridges,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -49,6 +49,7 @@ fn uncertain_constant_folding_preserves_domain_checks() {
         assert_eq!(session.integer_constants().contains_key("REF_SIGNED_OVERFLOW"), wrapping);
         let bindings = BindingCatalog::default();
         let mut rust = format!("#[path = {support:?}] pub mod __pgrx_c_macros;\n");
+        rust.push_str(&shared_support(&session, &names, &bindings));
         for name in &names {
             rust.push_str(&source(&session, name, &bindings));
         }
@@ -70,6 +71,16 @@ fn source(session: &AnalysisSession<'_>, name: &str, bindings: &BindingCatalog) 
         EmissionStatus::Emitted { rust, .. } => rust,
         other => panic!("{name}: {other:?}"),
     }
+}
+
+fn shared_support(
+    session: &AnalysisSession<'_>,
+    names: &[&str],
+    bindings: &BindingCatalog,
+) -> String {
+    let artifact = emit_support_artifact_with_bindings(session, names, bindings).unwrap();
+    assert!(artifact.c_source.is_empty(), "integer fixtures require no native adapters");
+    artifact.rust
 }
 
 #[test]
@@ -191,7 +202,8 @@ fn references_and_fallbacks_preserve_original_c_values_types_and_precedence() {
         .canonicalize()
         .unwrap();
     let mut rust = format!("#[path = {support:?}] pub mod __pgrx_c_macros;\n");
-    rust.push_str("#[derive(Clone, Copy)] pub struct Oid(u32); impl Oid { pub fn to_u32(self) -> u32 { self.0 } }\n#[derive(Clone, Copy)] pub struct TransactionId(u32); impl TransactionId { pub fn into_inner(self) -> u32 { self.0 } }\n");
+    rust.push_str(&shared_support(&session, NAMES, &bindings));
+    rust.push_str("#[derive(Clone, Copy)] pub struct Oid(u32); impl Oid { pub fn to_u32(self) -> u32 { self.0 } pub fn from_u32(value: u32) -> Self { Self(value) } }\n#[derive(Clone, Copy)] pub struct TransactionId(u32); impl TransactionId { pub fn into_inner(self) -> u32 { self.0 } pub fn from_inner(value: u32) -> Self { Self(value) } }\n");
     rust.push_str(&pg_sys_integer_bridges(&frontend).unwrap());
     rust.push_str("pub const REF_HUGE: u64 = 9223372036854775807; pub const REF_FIRST: u32 = 17; pub const REF_ALIAS: u32 = 17; pub const REF_OID: Oid = Oid(42); pub const REF_BOOL: bool = true; pub const REF_MIN: i64 = i64::MIN; pub const REF_UNGROUPED: i32 = 3; pub const REF_ENUM_HIDDEN: i32 = 7; pub mod RefEnum { pub const REF_ENUM: u32 = 7; }\n");
     for name in NAMES {
@@ -202,8 +214,10 @@ fn references_and_fallbacks_preserve_original_c_values_types_and_precedence() {
     // Compile the independently resolved fallback, with deliberately absent Rust
     // symbols, to prove that an unavailable binding cannot affect its value.
     let missing_huge = source(&session, "REF_HUGE_VALID", &BindingCatalog::default());
+    let shared =
+        shared_support(&session, &["REF_HUGE_VALID", "REF_ENUM_ADD"], &BindingCatalog::default());
     let rust = format!(
-        "#[path = {support:?}] pub mod __pgrx_c_macros;\n{missing_huge}\n{missing}\nfn main() {{ assert_eq!(REF_HUGE_VALID!(__pgrx_c_macros::CValue::<__pgrx_c_macros::CUnsignedLong>::new(9223372036854775807)).get(), 1); assert_eq!(REF_HUGE_VALID!(__pgrx_c_macros::CValue::<__pgrx_c_macros::CUnsignedLong>::new(9223372036854775808)).get(), 0); assert_eq!(REF_ENUM_ADD!(1_i32).get(), 8); }}"
+        "#[path = {support:?}] pub mod __pgrx_c_macros;\n{shared}\n{missing_huge}\n{missing}\nfn main() {{ assert_eq!(REF_HUGE_VALID!(__pgrx_c_macros::CValue::<__pgrx_c_macros::CUnsignedLong>::new(9223372036854775807)).get(), 1); assert_eq!(REF_HUGE_VALID!(__pgrx_c_macros::CValue::<__pgrx_c_macros::CUnsignedLong>::new(9223372036854775808)).get(), 0); assert_eq!(REF_ENUM_ADD!(1_i32).get(), 8); }}"
     );
     rust_oracle::run_rust(&rust);
     oracle::run_c(

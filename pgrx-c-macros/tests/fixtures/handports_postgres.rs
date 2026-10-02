@@ -1,14 +1,20 @@
 use __pgrx_c_macros::{CInteger, CLong, CLongLong, CUnsignedLong, CUnsignedLongLong, CValue};
 use std::cell::Cell;
 
-fn record<K: CInteger>(name: &str, index: u32, value: CValue<K>, first: u32, second: u32) {
-    let kind = std::any::type_name::<K>().rsplit("::").next().unwrap();
+unsafe extern "C" {
+    fn handport_reset_backend_calls();
+    fn handport_backend_calls() -> u32;
+}
+
+fn record<T: __pgrx_c_macros::IntoCValue>(name: &str, index: u32, value: T, first: u32, second: u32) {
+    let value = value.into_c_value();
+    let kind = std::any::type_name::<T::Kind>().rsplit("::").next().unwrap();
     println!(
         "{name}\t{index}\t{kind}\t{}\t{}\t{}\t{:032x}\t{first}\t{second}",
-        K::BITS,
-        u8::from(K::SIGNED),
-        K::RANK,
-        K::encode(value.get()),
+        T::Kind::BITS,
+        u8::from(T::Kind::SIGNED),
+        T::Kind::RANK,
+        T::Kind::encode(value.get()),
     );
 }
 
@@ -123,4 +129,51 @@ fn main() {
     record("MAKE_SQLSTATE_EVAL", 0, value, first.get(), second.get());
     println!("MAKE_SQLSTATE_ARGUMENT_EVAL\t{}\t{}\t{}\t{}\t{}",
         sqlstate_evaluations[0].get(), sqlstate_evaluations[1].get(), sqlstate_evaluations[2].get(), sqlstate_evaluations[3].get(), sqlstate_evaluations[4].get());
+
+    first.set(0); second.set(0);
+    let byte_input = 7_u8;
+    let pointer = core::ptr::addr_of!(byte_input);
+    // @PAGE_VALID_CASES@
+
+    first.set(0); second.set(0);
+    // SAFETY: Byte operands point to live initialized uint8-compatible storage.
+    // The original macros only read it. The native backend stub accesses only
+    // its own counter; integer inputs are converted by the generated C prototype.
+    unsafe {
+        for byte in 0_u32..256 {
+            let mut input = byte as u8;
+            record("VARATT_NOT_PAD_BYTE_EXHAUSTIVE", byte, VARATT_NOT_PAD_BYTE!(core::ptr::addr_of_mut!(input)), 0, 0);
+        }
+        let constant_input = 255_u8;
+        record("VARATT_NOT_PAD_BYTE_CONST", 0, VARATT_NOT_PAD_BYTE!(core::ptr::addr_of!(constant_input)), 0, 0);
+        let byte_argument = || { first.set(first.get() + 1); pointer };
+        let value = VARATT_NOT_PAD_BYTE!(byte_argument());
+        record("VARATT_NOT_PAD_BYTE_EVAL", 0, value, first.get(), second.get());
+
+        for (index, input) in [0_u32, 1, 2, 3, u32::MAX].into_iter().enumerate() {
+            handport_reset_backend_calls();
+            let value = type_is_array!(input);
+            record("type_is_array_BOUNDARY", index as u32, value, 0, handport_backend_calls());
+        }
+        handport_reset_backend_calls();
+        let value = type_is_array!(-1_i32);
+        record("type_is_array_SIGNED", 0, value, 0, handport_backend_calls());
+        handport_reset_backend_calls();
+        let value = type_is_array!(CValue::<CLong>::new(-1));
+        record("type_is_array_LONG", 0, value, 0, handport_backend_calls());
+        handport_reset_backend_calls();
+        let value = type_is_array!(CValue::<CLongLong>::new(-1));
+        record("type_is_array_LONG_LONG", 0, value, 0, handport_backend_calls());
+        handport_reset_backend_calls();
+        let value = type_is_array!(u16::MAX);
+        record("type_is_array_SHORT", 0, value, 0, handport_backend_calls());
+        handport_reset_backend_calls();
+        let value = type_is_array!(true);
+        record("type_is_array_BOOL", 0, value, 0, handport_backend_calls());
+        handport_reset_backend_calls();
+        first.set(0);
+        let type_argument = || { first.set(first.get() + 1); 3_u32 };
+        let value = type_is_array!(type_argument());
+        record("type_is_array_EVAL", 0, value, first.get(), handport_backend_calls());
+    }
 }

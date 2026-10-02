@@ -79,9 +79,10 @@ int main(void) {
 const RUST_RECORDING: &str = r#"
 use __pgrx_c_macros::{CInteger, CLong, CUnsignedLong, CValue};
 use std::cell::Cell;
-fn record<K: CInteger>(name: &str, value: CValue<K>, evaluations: u32) {
-    let kind = std::any::type_name::<K>().rsplit("::").next().unwrap();
-    println!("{name}\t{kind}\t{}\t{:032x}\t{evaluations}", K::BITS, K::encode(value.get()));
+fn record<T: __pgrx_c_macros::IntoCValue>(name: &str, value: T, evaluations: u32) {
+    let value = value.into_c_value();
+    let kind = std::any::type_name::<T::Kind>().rsplit("::").next().unwrap();
+    println!("{name}\t{kind}\t{}\t{:032x}\t{evaluations}", T::Kind::BITS, T::Kind::encode(value.get()));
 }
 fn main() {
     let evaluations = Cell::new(0_u32);
@@ -95,6 +96,14 @@ fn generated_source(session: &AnalysisSession<'_>, names: &[&str]) -> String {
         .unwrap();
     let mut source =
         format!("#[path = {:?}]\npub mod __pgrx_c_macros;\n", support.to_str().unwrap());
+    let artifact = pgrx_c_macros::emit_support_artifact_with_bindings(
+        session,
+        names,
+        &pgrx_c_macros::BindingCatalog::default(),
+    )
+    .unwrap();
+    assert!(artifact.c_source.is_empty(), "character fixtures require no native adapters");
+    source.push_str(&artifact.rust);
     for name in names {
         let emission = emit(session, name);
         let EmissionStatus::Emitted { rust, const_capability } = emission.status else {

@@ -8,7 +8,8 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, EmissionStatus, FrontendError, FrontendOutput, MacroScanner, emit, inspect,
+    AnalysisSession, BindingCatalog, EmissionStatus, FrontendError, FrontendOutput, MacroScanner,
+    emit, emit_support_artifact_with_bindings, inspect,
 };
 use std::fmt::Write;
 use std::path::PathBuf;
@@ -77,6 +78,10 @@ fn compare_literals(scanner: &MacroScanner, frontend: &FrontendOutput, cases: &[
         .canonicalize()
         .unwrap();
     let mut rust = format!("#[path = {support:?}]\npub mod __pgrx_c_macros;\n");
+    let artifact =
+        emit_support_artifact_with_bindings(&session, &names, &BindingCatalog::default()).unwrap();
+    assert!(artifact.c_source.is_empty(), "literal fixtures require no native adapters");
+    rust.push_str(&artifact.rust);
     for &(name, spelling) in cases {
         let emission = emit(&session, name);
         let EmissionStatus::Emitted { rust: source, .. } = emission.status else {
@@ -89,9 +94,10 @@ fn compare_literals(scanner: &MacroScanner, frontend: &FrontendOutput, cases: &[
     rust.push_str(
         r#"
 use __pgrx_c_macros::{CInteger, CValue};
-fn record<K: CInteger>(name: &str, value: CValue<K>) {
-    let kind = std::any::type_name::<K>().rsplit("::").next().unwrap();
-    println!("{name}\t{kind}\t{}\t{:032x}", K::BITS, K::encode(value.get()));
+fn record<T: __pgrx_c_macros::IntoCValue>(name: &str, value: T) {
+    let value = value.into_c_value();
+    let kind = std::any::type_name::<T::Kind>().rsplit("::").next().unwrap();
+    println!("{name}\t{kind}\t{}\t{:032x}", T::Kind::BITS, T::Kind::encode(value.get()));
 }
 fn main() {
 "#,

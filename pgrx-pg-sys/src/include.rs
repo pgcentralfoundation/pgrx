@@ -89,6 +89,24 @@ pub use pg18::*;
 #[cfg(feature = "pg19")]
 pub use pg19::*;
 
+// Shipped macro adapters use crate-relative paths just like generated bindings.
+// Older snapshots contain only exported macros, so their glob can be empty.
+#[cfg(all(feature = "pg15", docsrs))]
+#[allow(unused_imports)]
+pub use pg15_macros::*;
+#[cfg(all(feature = "pg16", docsrs))]
+#[allow(unused_imports)]
+pub use pg16_macros::*;
+#[cfg(all(feature = "pg17", docsrs))]
+#[allow(unused_imports)]
+pub use pg17_macros::*;
+#[cfg(all(feature = "pg18", docsrs))]
+#[allow(unused_imports)]
+pub use pg18_macros::*;
+#[cfg(all(feature = "pg19", docsrs))]
+#[allow(unused_imports)]
+pub use pg19_macros::*;
+
 // feature gate each pg-specific oid module
 #[cfg(all(feature = "pg15", not(docsrs)))]
 mod pg15_oids {

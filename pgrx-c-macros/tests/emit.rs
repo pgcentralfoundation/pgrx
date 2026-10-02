@@ -6,8 +6,9 @@
 mod oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, AnalysisStatus, ConstCapability, EmissionStatus, MacroEmission, MacroScanner,
-    SkipReasonCode, emit, inspect,
+    AnalysisSession, AnalysisStatus, BindingCatalog, ConstCapability, EmissionStatus,
+    InvocationContract, MacroEmission, MacroScanner, ParameterOrigin, SkipReasonCode, emit,
+    emit_support_with_bindings, inspect,
 };
 use std::fs::{self, File};
 use std::path::{Path, PathBuf};
@@ -61,6 +62,19 @@ fn source(emission: &MacroEmission) -> &str {
     rust
 }
 
+fn public_body(source: &str) -> &str {
+    source
+        .split_once("(@__pgrx_emit_public;")
+        .unwrap()
+        .1
+        .split_once("=> {")
+        .unwrap()
+        .1
+        .split_once("\n(@__pgrx_emit_value;")
+        .unwrap()
+        .0
+}
+
 #[test]
 fn emitted_macros_keep_provenance_occurrences_names_and_structured_skips() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -79,26 +93,30 @@ fn emitted_macros_keep_provenance_occurrences_names_and_structured_skips() {
         assert!(!rust.contains("/Users/"), "emitted documentation must not contain private paths");
     }
     let repeated = emit(&session, "EMIT_REPEAT");
-    assert_eq!(source(&repeated).matches("value($__pgrx_c_arg0)").count(), 2);
+    assert_eq!(public_body(source(&repeated)).matches("$__pgrx_c_arg0").count(), 2);
     let unused = emit(&session, "EMIT_UNUSED");
-    assert_eq!(source(&unused).matches("$__pgrx_c_arg0").count(), 1);
+    assert_eq!(public_body(source(&unused)).matches("$__pgrx_c_arg0").count(), 0);
     assert!(source(&emit(&session, "match")).contains("macro_rules! r#match"));
-    for (name, code) in [
-        ("EMIT_UNGROUPED", SkipReasonCode::InvocationGrouping),
-        ("EMIT_UNKNOWN", SkipReasonCode::UnknownIdentifier),
-        ("EMIT_POINTER", SkipReasonCode::PointerOperation),
-        ("EMIT_ABSENT", SkipReasonCode::NotActive),
-    ] {
-        let emitted = emit(&session, name);
-        let EmissionStatus::Skipped { reason } = &emitted.status else {
-            panic!("unsupported {name} must remain skipped: {emitted:?}");
-        };
-        assert_eq!(reason.code, code, "{name}: {}", reason.message);
-        assert!(!reason.message.is_empty());
-        if let Some(span) = &emitted.analysis.provenance {
-            assert!(reason.spans.contains(span));
-        }
+    let ungrouped = emit(&session, "EMIT_UNGROUPED");
+    assert_eq!(ungrouped.analysis.invocation, InvocationContract::ExplicitExpressionBoundary);
+    assert!(source(&ungrouped).contains("use @__pgrx_c_expression; before its arguments"));
+    assert!(source(&ungrouped).contains("(@__pgrx_c_expression; $($raw:tt)*)"));
+    let absent = emit(&session, "EMIT_ABSENT");
+    let EmissionStatus::Skipped { reason } = &absent.status else {
+        panic!("inactive EMIT_ABSENT must remain skipped: {absent:?}");
+    };
+    assert_eq!(reason.code, SkipReasonCode::NotActive, "{}", reason.message);
+    assert!(!reason.message.is_empty());
+    if let Some(span) = &absent.analysis.provenance {
+        assert!(reason.spans.contains(span));
     }
+    let unknown = emit(&session, "EMIT_UNKNOWN");
+    assert!(source(&unknown).contains("explicit caller-scope operands"));
+    assert_eq!(unknown.analysis.parameters.last().unwrap().origin, ParameterOrigin::FreeIdentifier);
+    let pointer = emit(&session, "EMIT_POINTER");
+    assert!(matches!(pointer.analysis.status, AnalysisStatus::Candidate));
+    assert!(public_body(source(&pointer)).contains("::dereference("));
+    assert!(source(&pointer).contains("::pointee("));
 }
 
 #[test]
@@ -147,6 +165,9 @@ fn actual_support_and_emitted_macros_compile_in_a_renamed_downstream_crate() {
         .unwrap();
     let mut generated =
         format!("#[path = {:?}]\npub mod __pgrx_c_macros;\n", runtime.to_str().unwrap());
+    generated.push_str(
+        &emit_support_with_bindings(&session, EMITTED, &BindingCatalog::default()).unwrap(),
+    );
     for name in EMITTED {
         generated.push_str(source(&emit(&session, name)));
     }
@@ -194,13 +215,14 @@ _Static_assert(EMIT_COMPARE(-1, 1U) == 0, "comparison after common conversion");
 _Static_assert(EMIT_DIVIDE(-7, 3) == -2, "C division truncates toward zero");
 _Static_assert(EMIT_REMAINDER(-7, 3) == -1, "C remainder sign");
 _Static_assert(EMIT_CHOOSE(1, -1, 1U) == 4294967295U, "unchosen arm determines common type");
+_Static_assert(_Generic(EMIT_ADD(1.0, 2.0f), double: 1, default: 0), "float addition keeps C common identity");
+_Static_assert(EMIT_ADD(1.0, 2.0f) == 3.0, "noncontracting float addition");
 "#,
         &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
         false,
     );
 
     for (label, input) in [
-        ("float", "1_f64"),
         ("custom", "Custom"),
         ("ambiguous_signed", "1_i64"),
         ("ambiguous_unsigned", "1_u64"),
@@ -219,7 +241,7 @@ _Static_assert(EMIT_CHOOSE(1, -1, 1U) == 4294967295U, "unchosen arm determines c
         let (status, _, stderr) = run_bounded(&mut compiler, &directory.0, label);
         assert!(!status.success(), "unsupported {input} must fail compilation");
         assert!(
-            stderr.contains("IntoCValue"),
+            stderr.contains("IntoExpression") || stderr.contains("AllowedProfile"),
             "{input} must fail its sealed scalar constraint: {stderr}"
         );
     }
@@ -236,6 +258,84 @@ _Static_assert(EMIT_CHOOSE(1, -1, 1U) == 4294967295U, "unchosen arm determines c
         stderr.contains("non-const"),
         "runtime capability must agree with compiler rejection: {stderr}"
     );
+}
+
+#[test]
+fn atomic_argument_rules_reject_unparenthesized_multi_token_substitutions() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let frontend = inspect(&scanner, &fixture("expression_oracle.h"), &[], None).unwrap();
+    let session = AnalysisSession::prepare(&scanner, &frontend, &["EXPR_ATOMIC_POW2"]).unwrap();
+    let emission = emit(&session, "EXPR_ATOMIC_POW2");
+    assert!(source(&emission).contains("$__pgrx_c_arg0:tt"));
+
+    let directory = TemporaryDirectory::new();
+    let runtime = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../pgrx-pg-sys/src/c_macros/support.rs")
+        .canonicalize()
+        .unwrap();
+    let library = directory.0.join("atomic.rs");
+    let rlib = directory.0.join("libatomic_c_semantics.rlib");
+    fs::write(
+        &library,
+        format!(
+            "#[path = {runtime:?}]\npub mod __pgrx_c_macros;\n{}\n{}",
+            emit_support_with_bindings(&session, &["EXPR_ATOMIC_POW2"], &BindingCatalog::default())
+                .unwrap(),
+            source(&emission)
+        ),
+    )
+    .unwrap();
+    let mut compile_library = Command::new("rustc");
+    compile_library
+        .args(["--edition=2024", "--crate-type=rlib", "--crate-name=atomic_c_semantics"])
+        .arg(&library)
+        .arg("-o")
+        .arg(&rlib);
+    run_success(&mut compile_library, &directory.0, "atomic_library");
+
+    let accepted = directory.0.join("accepted.rs");
+    fs::write(
+        &accepted,
+        r#"
+fn main() {
+    let atomic_value = 16_i32;
+    let _ = renamed_generated::EXPR_ATOMIC_POW2!(atomic_value);
+    let _ = renamed_generated::EXPR_ATOMIC_POW2!(15_i32);
+    let _ = renamed_generated::EXPR_ATOMIC_POW2!((1_i32 << 1_i32));
+    let _ = renamed_generated::EXPR_ATOMIC_POW2!((-1_i32));
+}
+"#,
+    )
+    .unwrap();
+    let executable = directory.0.join("accepted");
+    run_success(
+        &mut downstream_command(&accepted, &rlib, &executable),
+        &directory.0,
+        "atomic_accepted",
+    );
+    run_success(&mut Command::new(&executable), &directory.0, "atomic_execute");
+
+    for (label, argument) in [
+        ("operator", "1_i32 << 1_i32"),
+        ("negative", "-1_i32"),
+        ("call", "std::hint::black_box(4_i32)"),
+    ] {
+        let rejected = directory.0.join(format!("{label}.rs"));
+        fs::write(
+            &rejected,
+            format!("fn main() {{ let _ = renamed_generated::EXPR_ATOMIC_POW2!({argument}); }}\n"),
+        )
+        .unwrap();
+        let mut compiler = downstream_command(&rejected, &rlib, &directory.0.join(label));
+        let (status, _, stderr) = run_bounded(&mut compiler, &directory.0, label);
+        assert!(!status.success(), "ungrouped multi-token argument {argument} must fail");
+        assert!(
+            stderr.contains("invocation contract")
+                || stderr.contains("requires a parenthesized negative literal"),
+            "argument shape must fail matching before any semantic conversion: {stderr}"
+        );
+    }
 }
 
 fn downstream_command(source: &Path, library: &Path, executable: &Path) -> Command {

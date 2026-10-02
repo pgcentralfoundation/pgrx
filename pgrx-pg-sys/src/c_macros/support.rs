@@ -2,21 +2,26 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! Integer operations for generated C macros under the checked signed-char LP64 profile.
+//! C expression support for generated macros under the checked signed-char LP64 profile.
 //!
 //! C type identity survives equal Rust representations: `long` and `long long`
 //! remain different kinds even though both store an `i64`. Raw 64-bit and
-//! pointer-sized Rust integers therefore require an explicit [`CValue`] tag.
-//! These helpers contain no FFI or unsafe code. Operations outside the accepted
-//! C value domain panic before an invalid Rust operation can occur.
+//! pointer-sized Rust integers therefore require an explicit `CValue` tag.
+//! The integer helpers reject operations outside the accepted C value domain before
+//! an invalid Rust operation can occur. The expression module additionally models
+//! typed pointers, floats, enums, record storage and unsafe places. Generated native
+//! capabilities retain their caller access and FFI obligations.
 //!
 //! The generator must validate the C profile and emit its Rust target guard.
-//! Unsigned arithmetic wraps. Signed arithmetic follows [`Undefined`] or
-//! [`Wrapping`]; division and shift-count restrictions apply independently.
+//! Unsigned arithmetic wraps. Signed arithmetic follows `Undefined` or
+//! `Wrapping`; division and shift-count restrictions apply independently.
 //! Signed right shifts use Clang's arithmetic shift implementation choice.
 //! Helpers are runtime operations; their trait calls do not establish const use.
 
 use core::marker::PhantomData;
+
+pub mod expression;
+pub mod expression_result;
 
 pub(crate) mod sealed {
     pub trait Sealed {}
@@ -26,6 +31,9 @@ pub(crate) mod sealed {
 pub trait CInteger: sealed::Sealed + Copy + core::fmt::Debug + Eq {
     type Repr: Copy + core::fmt::Debug + Eq;
     type Promoted: PromotedInteger;
+    /// Ordinary value identity after compiler-owned expression metadata is lost
+    /// at a variable or public evaluated-value boundary.
+    type Boundary: CInteger<Repr = Self::Repr>;
     const BITS: u32;
     const SIGNED: bool;
     const RANK: u8;
@@ -48,6 +56,7 @@ macro_rules! integer_kinds {
             impl CInteger for $kind {
                 type Repr = $repr;
                 type Promoted = $promoted;
+                type Boundary = Self;
                 const BITS: u32 = $bits;
                 const SIGNED: bool = $signed;
                 const RANK: u8 = $rank;
@@ -80,6 +89,7 @@ impl sealed::Sealed for CBool {}
 impl CInteger for CBool {
     type Repr = bool;
     type Promoted = CInt;
+    type Boundary = Self;
     const BITS: u32 = 8;
     const SIGNED: bool = false;
     const RANK: u8 = 0;

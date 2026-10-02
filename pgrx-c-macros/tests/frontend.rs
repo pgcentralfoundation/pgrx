@@ -4,10 +4,13 @@
 
 #[path = "support/oracle.rs"]
 mod oracle;
+#[path = "support/rust_oracle.rs"]
+mod rust_oracle;
 
 use pgrx_c_macros::{
-    ActiveProvenance, FrontendError, IntegerKind, IntegerValue, MacroKind, MacroScanner,
-    SignedOverflow, TypeCategory, inspect,
+    ActiveProvenance, AnalysisSession, BindingCatalog, EmissionStatus, FrontendError, IntegerKind,
+    IntegerValue, MacroKind, MacroScanner, SignedOverflow, TypeCategory, emit,
+    emit_support_with_bindings, inspect,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -16,6 +19,110 @@ static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
 fn fixture(name: &str) -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures").join(name)
+}
+
+#[test]
+fn protection_codegen_profiles_preserve_macro_values_and_original_arguments() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("frontend_environment.h");
+    let names = ["FRONT_REDEFINED", "FRONT_RESTORED"];
+    // CET is an x86 codegen facility. Other native targets exercise its explicit
+    // disabled form; the x86 profile below proves all enabled preprocessing modes.
+    let native_cf = if cfg!(any(target_arch = "x86", target_arch = "x86_64")) {
+        "-fcf-protection"
+    } else {
+        "-fcf-protection=none"
+    };
+    let arguments = vec!["-fstack-clash-protection".into(), native_cf.into()];
+    let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+    assert!(frontend.profile().unsupported_options.is_empty());
+    for argument in &arguments {
+        assert!(frontend.profile().arguments.contains(argument), "must retain {argument}");
+    }
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    let runtime =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../pgrx-pg-sys/src/c_macros/support.rs");
+    let mut generated = format!("#[path = {runtime:?}] pub mod __pgrx_c_macros;\n");
+    generated.push_str(
+        &emit_support_with_bindings(&session, &names, &BindingCatalog::default()).unwrap(),
+    );
+    for name in names {
+        let EmissionStatus::Emitted { rust, .. } = emit(&session, name).status else {
+            panic!("protection-only flags must permit ordinary C macros");
+        };
+        generated.push_str(&rust);
+    }
+    generated.push_str(
+        r#"
+unsafe extern "C" {
+    fn protection_redefined(value: u32) -> u32;
+    fn protection_restored(value: u32) -> u32;
+}
+fn main() {
+    for value in [0u32, 1, 100, u32::MAX - 2, u32::MAX] {
+        // SAFETY: These fixture C functions use the matching unsigned-int ABI
+        // and perform only original, defined unsigned macro arithmetic.
+        unsafe {
+            assert_eq!(FRONT_REDEFINED!(value).get(), protection_redefined(value));
+            assert_eq!(FRONT_RESTORED!(value).get(), protection_restored(value));
+        }
+    }
+}
+"#,
+    );
+    let arguments = frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>();
+    assert!(
+        rust_oracle::run_rust_linked(
+            &generated,
+            &frontend.profile().compiler.executable,
+            &header,
+            "unsigned int protection_redefined(unsigned int value) { return FRONT_REDEFINED(value); }\nunsigned int protection_restored(unsigned int value) { return FRONT_RESTORED(value); }\n",
+            &arguments,
+        )
+        .is_empty()
+    );
+
+    let x86_arguments = vec![
+        "--target=x86_64-unknown-linux-gnu".into(),
+        "-fstack-clash-protection".into(),
+        "-fcf-protection".into(),
+    ];
+    let x86 = inspect(&scanner, &header, &x86_arguments, None).unwrap();
+    assert!(x86.profile().unsupported_options.is_empty());
+    for argument in &x86_arguments {
+        assert!(x86.profile().arguments.contains(argument));
+    }
+    let session = AnalysisSession::prepare(&scanner, &x86, &names).unwrap();
+    assert!(matches!(emit(&session, names[0]).status, EmissionStatus::Emitted { .. }));
+    for (mode, expected) in [
+        ("-fcf-protection", Some("3")),
+        ("-fcf-protection=full", Some("3")),
+        ("-fcf-protection=branch", Some("1")),
+        ("-fcf-protection=return", Some("2")),
+        ("-fcf-protection=none", None),
+    ] {
+        let arguments = ["--target=x86_64-unknown-linux-gnu", "-fstack-clash-protection", mode];
+        let assertion = expected.map_or_else(
+            || "#ifdef __CET__\n#error disabled CET must not define __CET__\n#endif\n".into(),
+            |value| format!("_Static_assert(__CET__ == {value}, \"CET profile\");\n"),
+        );
+        let probe = oracle::run_c(
+            &x86.profile().compiler.executable,
+            &header,
+            &format!("{assertion}_Static_assert(FRONT_REDEFINED(10) == 12, \"original macro\");\n"),
+            &arguments,
+            false,
+        );
+        assert!(probe.is_empty());
+    }
+    let frontend = inspect(&scanner, &header, &["-fpack-struct=1".into()], None).unwrap();
+    assert_eq!(frontend.profile().unsupported_options, ["-fpack-struct=1"]);
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    let EmissionStatus::Skipped { reason } = emit(&session, names[0]).status else {
+        panic!("ABI-changing flags must retain the admission gate");
+    };
+    assert!(reason.message.contains("-fpack-struct=1"));
 }
 
 #[test]
