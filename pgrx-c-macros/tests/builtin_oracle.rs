@@ -10,8 +10,8 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, BindingCatalog, EmissionStatus, FrontendOutput, IntegerKind, MacroScanner,
-    PostgresConfig, TypeCategory, generate_with_bindings, inspect,
+    AnalysisSession, BindingCatalog, BuiltinKind, EmissionStatus, FrontendOutput, IntegerKind,
+    MacroScanner, PostgresConfig, TypeCategory, generate_with_bindings, inspect,
 };
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
@@ -328,6 +328,8 @@ const ISOLATION_HEADER: &str = r#"
 #define ISOLATED_PLAIN(value) (value)
 "#;
 const ISOLATION_NAMES: &[&str] = &["ISOLATED16", "ISOLATED32", "ISOLATED64", "ISOLATED_PLAIN"];
+const EXPECT_HEADER: &str =
+    "#define ISOLATED_EXPECT(value, expected) __builtin_expect(value, expected)";
 
 struct Directory(PathBuf);
 
@@ -453,24 +455,84 @@ fn shadowed_typeof_proof_helper_skips_builtins_and_keeps_ordinary_macros() {
     );
 }
 
-#[cfg(unix)]
 #[test]
-fn rejected_llvm_witness_is_isolated_within_four_driver_runs() {
-    use std::os::unix::fs::PermissionsExt;
-
+fn expect_uses_exact_c_long_rank_and_both_parameter_identities_in_each_profile() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let directory = Directory::new();
-    let header = directory.header("");
+    let header = directory.header(EXPECT_HEADER);
     let scanner = MacroScanner::new().expect("libclang required");
-    let baseline = profile(&scanner, &header, "-O2", false);
-    for name in ["__builtin_bswap16", "__builtin_bswap32", "__builtin_bswap64"] {
-        assert!(baseline.declarations().builtins.contains_key(name));
+    for optimization in ["-O0", "-O2"] {
+        let frontend = profile(&scanner, &header, optimization, false);
+        let info = frontend.declarations().builtins.get("__builtin_expect").unwrap_or_else(|| {
+            panic!("{optimization}: {:?}", frontend.declarations().builtin_unavailable)
+        });
+        assert_eq!(info.kind, BuiltinKind::Expect);
+        let result = &info.signature.result;
+        assert_eq!(result.category, TypeCategory::Integer(IntegerKind::Long));
+        let facts = &frontend.profile().target.integers[&IntegerKind::Long];
+        assert!(facts.signed);
+        assert_eq!(facts.rank, 4);
+        assert_eq!(result.size, Some(u64::from(facts.bits / 8)));
+        let parameters = info.signature.parameters.as_ref().unwrap();
+        assert_eq!(parameters.len(), 2);
+        assert!(parameters.iter().all(|parameter| parameter == result));
+        assert!(!info.signature.variadic);
+        assert_eq!(info.signature.calling_convention.as_deref(), Some("Cdecl"));
+        for name in ["__builtin_bswap16", "__builtin_bswap32", "__builtin_bswap64"] {
+            assert!(frontend.declarations().builtins.contains_key(name));
+        }
     }
-    let compiler = &baseline.profile().compiler.executable;
+}
+
+#[test]
+fn expect_macro_and_declaration_shadowing_are_isolated_from_byte_swaps() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang required");
+    for (prefix, explanation) in [
+        (
+            "#define __builtin_expect(value, expected) ((long)(value))",
+            "an active C macro shadows the compiler builtin",
+        ),
+        (
+            "long __builtin_expect(long, long);",
+            "an original C declaration conflicts with the compiler builtin",
+        ),
+        (
+            "#define __typeof__(expression) unsigned int",
+            "an active C macro shadows a builtin proof operation",
+        ),
+    ] {
+        let directory = Directory::new();
+        let header = directory.header(&format!("{prefix}\n{EXPECT_HEADER}"));
+        let frontend = profile(&scanner, &header, "-O2", false);
+        assert!(!frontend.declarations().builtins.contains_key("__builtin_expect"));
+        assert!(
+            frontend.declarations().builtin_unavailable["__builtin_expect"].contains(explanation)
+        );
+        if !prefix.contains("__typeof__") {
+            for name in ["__builtin_bswap16", "__builtin_bswap32", "__builtin_bswap64"] {
+                assert!(frontend.declarations().builtins.contains_key(name));
+            }
+        } else {
+            for name in ["__builtin_bswap16", "__builtin_bswap32", "__builtin_bswap64"] {
+                assert!(frontend.declarations().builtin_unavailable[name].contains(explanation));
+            }
+        }
+    }
+}
+
+#[cfg(unix)]
+fn reject_llvm_witness(
+    directory: &Directory,
+    compiler: &Path,
+    rejected: &str,
+) -> (PathBuf, PathBuf) {
+    use std::os::unix::fs::PermissionsExt;
+
     let wrapper = directory.0.join("clang-wrapper");
     let log = directory.0.join("llvm-runs");
     std::fs::write(&log, "").unwrap();
-    let shell_quote = |path: &Path| format!("'{}'", path.to_str().unwrap().replace('\'', "'\\''"));
+    let shell_quote = |text: &str| format!("'{}'", text.replace('\'', "'\\''"));
     let script = format!(
         r#"#!/bin/sh
 llvm=0
@@ -493,42 +555,62 @@ if [ "$llvm" -eq 1 ] && [ -n "$overlay" ]; then
         printf >&2 '%s\n' 'could not read the builtin witness overlay'
         exit 2
     fi
-    widths=
-    for bits in 16 32 64; do
-        if LC_ALL=C grep -q "return __builtin_bswap${{bits}}(" "$source"; then
-            widths="$widths $bits"
+    operations=
+    for operation in __builtin_bswap16 __builtin_bswap32 __builtin_bswap64 __builtin_expect; do
+        if LC_ALL=C grep -q "return $operation(" "$source"; then
+            operations="$operations $operation"
         fi
     done
-    printf '%s\n' "$widths" >> {log}
-    case " $widths " in
-        *" 32 "*) printf >&2 '%s\n' 'deliberate bswap32 LLVM witness rejection'; exit 1 ;;
+    printf '%s\n' "$operations" >> {log}
+    case " $operations " in
+        *" {rejected} "*) printf >&2 '%s\n' {diagnostic}; exit 1 ;;
     esac
 fi
 exec {compiler} "$@"
 "#,
-        log = shell_quote(&log),
-        compiler = shell_quote(compiler),
+        log = shell_quote(log.to_str().unwrap()),
+        compiler = shell_quote(compiler.to_str().unwrap()),
+        diagnostic = shell_quote(&format!("deliberate {rejected} LLVM witness rejection")),
     );
-    // The wrapper only faults dynamic LLVM witnesses. Version, resource lookup,
-    // preprocessing and typed probes retain the authentic compiler behavior.
+    // Only dynamic witnesses fail. Version/resource queries, preprocessing and
+    // typed probes retain the authentic compiler and original profile.
     std::fs::write(&wrapper, script).unwrap();
     std::fs::set_permissions(&wrapper, std::fs::Permissions::from_mode(0o700)).unwrap();
+    (wrapper, log)
+}
+
+#[cfg(unix)]
+#[test]
+fn rejected_llvm_witness_is_isolated_within_four_driver_runs() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.header("");
+    let scanner = MacroScanner::new().expect("libclang required");
+    let baseline = profile(&scanner, &header, "-O2", false);
+    for name in ["__builtin_bswap16", "__builtin_bswap32", "__builtin_bswap64"] {
+        assert!(baseline.declarations().builtins.contains_key(name));
+    }
+    let (wrapper, log) = reject_llvm_witness(
+        &directory,
+        &baseline.profile().compiler.executable,
+        "__builtin_bswap32",
+    );
     let frontend = inspect(&scanner, &header, &arguments("-O2", false), Some(&wrapper)).unwrap();
     let batches = std::fs::read_to_string(&log)
         .unwrap()
         .lines()
-        .map(|line| {
-            line.split_ascii_whitespace()
-                .map(|bits| bits.parse::<u16>().unwrap())
-                .collect::<Vec<_>>()
-        })
+        .map(|line| line.split_ascii_whitespace().map(str::to_owned).collect::<Vec<_>>())
         .collect::<Vec<_>>();
     assert!(!batches.is_empty(), "the wrapper must observe real LLVM witnesses");
     assert!(batches.len() <= 4, "driver isolation must respect its four-run budget: {batches:?}");
-    assert_eq!(batches[0], [16, 32, 64], "the original proof must batch all three operations");
-    assert!(batches.iter().any(|batch| batch.as_slice() == [16]));
-    assert!(batches.iter().any(|batch| batch.as_slice() == [64]));
-    let explanation = "deliberate bswap32 LLVM witness rejection";
+    assert_eq!(
+        batches[0],
+        ["__builtin_bswap16", "__builtin_bswap32", "__builtin_bswap64"],
+        "the original proof must batch all three operations"
+    );
+    assert!(batches.iter().any(|batch| batch.as_slice() == ["__builtin_bswap16"]));
+    assert!(batches.iter().any(|batch| batch.as_slice() == ["__builtin_bswap64"]));
+    let explanation = "deliberate __builtin_bswap32 LLVM witness rejection";
     assert!(!frontend.declarations().builtins.contains_key("__builtin_bswap32"));
     assert!(frontend.declarations().builtin_unavailable["__builtin_bswap32"].contains(explanation));
     for name in ["__builtin_bswap16", "__builtin_bswap64"] {
@@ -536,6 +618,53 @@ exec {compiler} "$@"
         assert!(!frontend.declarations().builtin_unavailable.contains_key(name));
     }
     let rust = assert_isolated_emission(&scanner, &frontend, &["ISOLATED32"], explanation);
+    assert_supported_peers_run(&rust);
+}
+
+#[cfg(unix)]
+#[test]
+fn rejected_expect_witness_keeps_all_byte_swaps_within_five_driver_runs() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.header(EXPECT_HEADER);
+    let scanner = MacroScanner::new().expect("libclang required");
+    let baseline = profile(&scanner, &header, "-O2", false);
+    assert!(baseline.declarations().builtins.contains_key("__builtin_expect"));
+    let (wrapper, log) = reject_llvm_witness(
+        &directory,
+        &baseline.profile().compiler.executable,
+        "__builtin_expect",
+    );
+    let frontend = inspect(&scanner, &header, &arguments("-O2", false), Some(&wrapper)).unwrap();
+    let batches = std::fs::read_to_string(&log)
+        .unwrap()
+        .lines()
+        .map(|line| line.split_ascii_whitespace().map(str::to_owned).collect::<Vec<_>>())
+        .collect::<Vec<_>>();
+    assert!(!batches.is_empty(), "the wrapper must observe real LLVM witnesses");
+    assert!(batches.len() <= 5, "driver isolation must respect its five-run budget: {batches:?}");
+    assert_eq!(
+        batches[0],
+        ["__builtin_bswap16", "__builtin_bswap32", "__builtin_bswap64", "__builtin_expect"],
+        "the original proof must batch all four operations"
+    );
+    let explanation = "deliberate __builtin_expect LLVM witness rejection";
+    assert!(!frontend.declarations().builtins.contains_key("__builtin_expect"));
+    assert!(frontend.declarations().builtin_unavailable["__builtin_expect"].contains(explanation));
+    for name in ["__builtin_bswap16", "__builtin_bswap32", "__builtin_bswap64"] {
+        assert!(batches.iter().any(|batch| batch.as_slice() == [name]));
+        assert!(frontend.declarations().builtins.contains_key(name), "{name} must remain proven");
+        assert!(!frontend.declarations().builtin_unavailable.contains_key(name));
+    }
+    let session = AnalysisSession::prepare(&scanner, &frontend, &["ISOLATED_EXPECT"]).unwrap();
+    let generated =
+        generate_with_bindings(&session, &["ISOLATED_EXPECT"], &BindingCatalog::default()).unwrap();
+    let emission = generated.macros.into_iter().next().unwrap();
+    let EmissionStatus::Skipped { reason } = emission.status else {
+        panic!("rejected expect witness must skip its dependent macro");
+    };
+    assert!(reason.message.contains(explanation));
+    let rust = assert_isolated_emission(&scanner, &frontend, &[], "");
     assert_supported_peers_run(&rust);
 }
 

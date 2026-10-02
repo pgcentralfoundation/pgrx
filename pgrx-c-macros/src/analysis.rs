@@ -661,11 +661,13 @@ pub(crate) fn analyze_active_with_constants(
                 result.const_capability = ConstCapability::RuntimeOnly;
             }
             if result.expression.as_ref().is_some_and(|expression| {
-                expression
-                    .syntax
-                    .nodes
-                    .iter()
-                    .any(|node| matches!(node.kind, ExpressionKind::Binary { operator, .. } if !matches!(operator, BinaryOperator::LogicalAnd | BinaryOperator::LogicalOr)))
+                expression.syntax.nodes.iter().any(|node| match &node.kind {
+                    ExpressionKind::Binary { operator, .. } => {
+                        !matches!(operator, BinaryOperator::LogicalAnd | BinaryOperator::LogicalOr)
+                    }
+                    ExpressionKind::Call { arguments, .. } => arguments.len() >= 2,
+                    _ => false,
+                })
             }) {
                 result.evaluation.requirements.push(EvaluationRequirement::UnspecifiedOperandOrder);
             }

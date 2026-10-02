@@ -70,18 +70,29 @@ pub(crate) fn probe(
                     children = [Some(*condition), Some(*then_value), Some(*else_value)];
                     pure[*condition] && pure[*then_value] && pure[*else_value]
                 }
-                ExpressionKind::Call { callee, arguments } if arguments.len() == 1 => {
+                ExpressionKind::Call { callee, arguments } if arguments.len() <= 2 => {
                     let mut callee = *callee;
                     while let ExpressionKind::Group { operand } =
                         expression.syntax.nodes[callee].kind
                     {
                         callee = operand;
                     }
-                    children[0] = Some(arguments[0]);
-                    matches!(&expression.syntax.nodes[callee].kind,
-                        ExpressionKind::Identifier { name }
-                            if session.frontend().declarations().builtins.get(name).is_some_and(|builtin| matches!(builtin.kind, crate::BuiltinKind::ByteSwap { .. })))
-                        && pure[arguments[0]]
+                    for (child, argument) in children.iter_mut().zip(arguments) {
+                        *child = Some(*argument);
+                    }
+                    let arity = match &expression.syntax.nodes[callee].kind {
+                        ExpressionKind::Identifier { name } => {
+                            session.frontend().declarations().builtins.get(name).map(|builtin| {
+                                match builtin.kind {
+                                    crate::BuiltinKind::ByteSwap { .. } => 1,
+                                    crate::BuiltinKind::Expect => 2,
+                                }
+                            })
+                        }
+                        _ => None,
+                    };
+                    arity == Some(arguments.len())
+                        && arguments.iter().all(|argument| pure[*argument])
                 }
                 _ => false,
             };
