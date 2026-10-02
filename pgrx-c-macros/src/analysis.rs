@@ -236,6 +236,9 @@ pub struct AnalyzedExpression {
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum TypeExpression {
     Void,
+    /// A compiler intrinsic admitted only as the callee of a direct call.
+    /// It has no address or first-class function value in generated Rust.
+    Builtin,
     /// A concrete non-integer C type obtained from a declaration or type operand.
     External {
         ty: TypeInfo,
@@ -462,6 +465,8 @@ pub(crate) fn analyze_active_with_constants(
                 || object_constants.contains_key(name)
                 || catalog.variables.contains_key(name)
                 || catalog.functions.contains_key(name)
+                || catalog.builtins.contains_key(name)
+                || catalog.builtin_unavailable.contains_key(name)
             {
                 continue;
             }
@@ -848,6 +853,8 @@ fn analyze_types(
         };
         if catalog.variables.contains_key(name)
             || catalog.functions.contains_key(name)
+            || catalog.builtins.contains_key(name)
+            || catalog.builtin_unavailable.contains_key(name)
             || catalog.integer_constants.contains_key(name)
             || object_constants.contains_key(name)
             || catalog.types.contains_key(name)
@@ -880,6 +887,17 @@ fn analyze_types(
     let mut constants = Vec::new();
     let mut helpers = BTreeSet::new();
     let int = target.integers[&IntegerKind::Int];
+    let mut direct_callees = vec![false; expression.nodes.len()];
+    for node in &expression.nodes {
+        let ExpressionKind::Call { mut callee, .. } = node.kind else { continue };
+        loop {
+            direct_callees[callee] = true;
+            match expression.nodes[callee].kind {
+                ExpressionKind::Group { operand } => callee = operand,
+                _ => break,
+            }
+        }
+    }
     for (index, node) in expression.nodes.iter().enumerate() {
         let ty = match &node.kind {
             ExpressionKind::Empty => TypeExpression::Void,
@@ -904,6 +922,26 @@ fn analyze_types(
                 ))? }
             }
             ExpressionKind::Identifier { name } => {
+                if let Some(reason) = catalog.builtin_unavailable.get(name) {
+                    return Err((
+                        SkipReasonCode::DynamicBuiltin,
+                        format!("{name}: {reason}"),
+                        node.tokens,
+                    ));
+                }
+                if catalog.builtins.contains_key(name) {
+                    if !direct_callees[index] {
+                        return Err((
+                            SkipReasonCode::DynamicBuiltin,
+                            format!(
+                                "{name}: compiler intrinsic is supported only in a direct call"
+                            ),
+                            node.tokens,
+                        ));
+                    }
+                    types.push(TypeExpression::Builtin);
+                    continue;
+                }
                 if let Some(ty) = locals.get(name.as_str()) {
                     types.push(declared_type(ty, target));
                     continue;
@@ -1064,12 +1102,15 @@ fn analyze_types(
                 while let ExpressionKind::Group { operand } = expression.nodes[callee].kind {
                     callee = operand;
                 }
-                let direct =
-                    if let ExpressionKind::Identifier { name } = &expression.nodes[callee].kind {
+                let direct = if let ExpressionKind::Identifier { name } =
+                    &expression.nodes[callee].kind
+                {
+                    catalog.builtins.get(name).map(|builtin| &builtin.signature).or_else(|| {
                         catalog.function_signatures.get(name).map(|function| &function.signature)
-                    } else {
-                        None
-                    };
+                    })
+                } else {
+                    None
+                };
                 let indirect = if let (None, TypeExpression::External { ty }) =
                     (direct, &types[callee])
                 {

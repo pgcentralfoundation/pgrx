@@ -22,6 +22,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 mod bitfields;
+mod builtins;
 mod definitions;
 mod types;
 pub(crate) mod zero_constants;
@@ -200,6 +201,9 @@ pub(crate) fn inspect_with_compiler_hint(
             .definition_available = true;
     }
     frontend.declarations.bitfields = bitfields::probe(scanner, &frontend)?;
+    let builtins = builtins::prove(scanner, &frontend)?;
+    frontend.declarations.builtins = builtins.supported;
+    frontend.declarations.builtin_unavailable = builtins.unavailable;
     Ok(frontend)
 }
 
@@ -1329,6 +1333,11 @@ fn build_inputs(
     mut files: BTreeSet<PathBuf>,
     compiler_search: CompilerSearch,
 ) -> Result<BuildInputs, FrontendError> {
+    // Successful header-availability searches appear in dependency output even
+    // when the header is never included. Track both its lookup spelling and
+    // canonical identity, just as we do for actual inclusions.
+    let identities = files.iter().map(|path| absolute_path(path)).collect::<Result<Vec<_>, _>>()?;
+    files.extend(identities);
     let mut directories = BTreeSet::new();
     // Quoted includes search their including file's directory before -I directories.
     for path in &files {

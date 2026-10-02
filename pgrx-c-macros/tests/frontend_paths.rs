@@ -4,7 +4,7 @@
 
 #![cfg(unix)]
 
-use pgrx_c_macros::{ActiveProvenance, MacroScanner, inspect};
+use pgrx_c_macros::{ActiveProvenance, AnalysisSession, MacroScanner, inspect};
 use std::path::PathBuf;
 use std::sync::Mutex;
 
@@ -84,4 +84,65 @@ fn repeated_inclusion_of_one_definition_is_not_ambiguous() {
         inspection.environment().active["REPEATED_FUNCTION"].provenance,
         ActiveProvenance::Resolved
     ));
+}
+
+#[test]
+fn header_availability_tracks_symlink_identity_and_rejects_changed_inputs() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let first = directory.0.join("first.h");
+    let second = directory.0.join("second.h");
+    let alias = directory.0.join("available.h");
+    let wrapper = directory.0.join("wrapper.h");
+    let contents = "#define AVAILABILITY_FILE_INCLUDED 1\n";
+    std::fs::write(&first, contents).unwrap();
+    // Identical bytes ensure symlink replacement cannot be detected merely by
+    // hashing its requested spelling; its physical identity must be recorded.
+    std::fs::write(&second, contents).unwrap();
+    std::os::unix::fs::symlink(&first, &alias).unwrap();
+    std::fs::write(
+        &wrapper,
+        "#if __has_include(\"available.h\")\n#define AVAILABLE_FUNCTION(value) ((value) + 3)\n#endif\n",
+    )
+    .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &wrapper, &[], None).unwrap();
+    let identity = first.canonicalize().unwrap();
+    let inputs = &frontend.profile().inputs;
+    assert!(inputs.files.contains(&alias));
+    assert!(inputs.files.contains(&identity));
+    assert!(inputs.fingerprints[&alias].is_some());
+    assert_eq!(inputs.fingerprints[&alias], inputs.fingerprints[&identity]);
+    assert!(frontend.environment().active.contains_key("AVAILABLE_FUNCTION"));
+    assert!(
+        !frontend.environment().active.contains_key("AVAILABILITY_FILE_INCLUDED"),
+        "availability lookup must not include the queried file"
+    );
+    assert!(
+        frontend
+            .inventory()
+            .macros
+            .iter()
+            .all(|definition| definition.name != "AVAILABILITY_FILE_INCLUDED")
+    );
+    let names = ["AVAILABLE_FUNCTION"];
+    AnalysisSession::prepare(&scanner, &frontend, &names)
+        .expect("an unchanged availability-only symlink must permit original-header probes");
+
+    std::fs::remove_file(&alias).unwrap();
+    std::os::unix::fs::symlink(&second, &alias).unwrap();
+    let replacement = AnalysisSession::prepare(&scanner, &frontend, &names)
+        .err()
+        .expect("a symlink target change must invalidate the inspected environment")
+        .to_string();
+    assert!(replacement.contains("new header dependency appeared"), "{replacement}");
+
+    std::fs::remove_file(&alias).unwrap();
+    std::os::unix::fs::symlink(&first, &alias).unwrap();
+    std::fs::write(&first, "#define AVAILABILITY_FILE_INCLUDED 2\n").unwrap();
+    let mutation = AnalysisSession::prepare(&scanner, &frontend, &names)
+        .err()
+        .expect("mutation of an availability-only dependency must invalidate inspection")
+        .to_string();
+    assert!(mutation.contains("changed after inspection"), "{mutation}");
 }

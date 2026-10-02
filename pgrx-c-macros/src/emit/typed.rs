@@ -641,6 +641,32 @@ impl<'a> Renderer<'a> {
                             {
                                 ungrouped = operand;
                             }
+                            if let ExpressionKind::Identifier { name } =
+                                &expression.syntax.nodes[ungrouped].kind
+                                && let Some(builtin) = frontend.declarations().builtins.get(name)
+                            {
+                                match builtin.kind {
+                                    crate::BuiltinKind::ByteSwap { .. } => {
+                                        let [argument] = arguments.as_slice() else {
+                                            return Err(failure(format!(
+                                                "{name}: byte swap requires one operand"
+                                            )));
+                                        };
+                                        let parameters =
+                                            builtin.signature.parameters.as_ref().expect(
+                                                "compiler proof establishes a fixed prototype",
+                                            );
+                                        let parameter =
+                                            lowering.resolve(&parameters[0]).map_err(failure)?;
+                                        let result = lowering
+                                            .resolve(&builtin.signature.result)
+                                            .map_err(failure)?;
+                                        write!(rust, "<{} as {EXPRESSION}::CType>::from_storage(<{} as {EXPRESSION}::CType>::into_storage({EXPRESSION}::implicit::<{}, _>(", result.marker, parameter.marker, parameter.marker).expect("String output");
+                                        tasks.extend([text(")).swap_bytes())"), value(*argument)]);
+                                    }
+                                }
+                                continue;
+                            }
                             let direct = match &expression.syntax.nodes[ungrouped].kind {
                                 ExpressionKind::Identifier { name }
                                     if frontend

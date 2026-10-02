@@ -790,6 +790,7 @@ fn inspect_dependency<'a>(frontend: &'a FrontendOutput, name: &'a str) -> Depend
         if token.spelling.starts_with("__")
             && !frontend.environment().active.contains_key(&token.spelling)
             && !frontend.declarations().functions.contains_key(&token.spelling)
+            && !frontend.declarations().builtins.contains_key(&token.spelling)
             && body
                 .iter()
                 .skip(index + 1)
@@ -798,7 +799,7 @@ fn inspect_dependency<'a>(frontend: &'a FrontendOutput, name: &'a str) -> Depend
         {
             return reject(
                 ExpansionSkipCode::DynamicBuiltin,
-                "unrecognized reserved compiler/preprocessing invocation needs an explicit semantic contract",
+                frontend.declarations().builtin_unavailable.get(&token.spelling).map(String::as_str).unwrap_or("unrecognized reserved compiler/preprocessing invocation needs an explicit semantic contract"),
             );
         }
         if let Some((name, _)) = frontend.environment().active.get_key_value(&token.spelling) {
