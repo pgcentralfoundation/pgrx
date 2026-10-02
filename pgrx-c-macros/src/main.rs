@@ -31,7 +31,7 @@ enum Command {
     List(ListArgs),
     /// Analyze final active PostgreSQL macros without claiming validated Rust support.
     Analyze(AnalyzeArgs),
-    /// Emit Rust macros for the supported C integer family; log skipped definitions.
+    /// Emit Rust macros for supported C expressions and statements; log skipped definitions.
     Emit(EmitArgs),
 }
 

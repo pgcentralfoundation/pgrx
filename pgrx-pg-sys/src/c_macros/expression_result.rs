@@ -93,6 +93,25 @@ pub fn finish<T: IntoExpression>(value: T) -> CExpression<T::Value> {
     CExpression(value.into_expression())
 }
 
+/// Apply C return assignment conversion to an unambiguous native result type.
+///
+/// Generated return statements use Rust's enclosing result type to select its
+/// C marker. The source value retains its null-constant identity until this
+/// conversion; normalizing it through `IntoExpression` first would lose that
+/// distinction. Equal-width native integers with ambiguous C identities use
+/// [`return_value_as`] with an explicit marker instead.
+pub fn return_value<R: NativeType, V: ImplicitTo<R::Marker>>(value: V) -> R {
+    return_value_as::<R::Marker, _>(value)
+}
+
+/// Apply C return assignment conversion to an explicit C result marker.
+///
+/// This uses implicit assignment conversion, so an ordinary runtime integer
+/// cannot become a pointer and pointer qualification cannot be discarded.
+pub fn return_value_as<M: CType, V: ImplicitTo<M>>(value: V) -> M::Storage {
+    M::into_storage(implicit::<M, _>(value))
+}
+
 #[cfg(test)]
 mod tests {
     use super::super::{CInt, Either};
@@ -108,5 +127,34 @@ mod tests {
         assert_eq!(result.get(), 7);
         let _: CValue<CInt> = result.into_value();
         assert_eq!(finish(()).get(), ());
+    }
+
+    #[test]
+    fn returns_apply_assignment_conversion_before_native_extraction() {
+        let narrowed: u8 = return_value(CValue::<CInt>::new(257));
+        assert_eq!(narrowed, 1);
+        let negative: u32 = return_value(CValue::<CInt>::new(-1));
+        assert_eq!(negative, u32::MAX);
+        let truth: bool = return_value(CValue::<CInt>::new(256));
+        assert!(truth);
+        let falsehood: bool = return_value(CValue::<CInt>::new(0));
+        assert!(!falsehood);
+        let explicit = return_value_as::<super::super::CUnsignedLong, _>(CValue::<CInt>::new(-1));
+        assert_eq!(explicit, u64::MAX);
+    }
+
+    #[test]
+    fn returns_preserve_pointer_qualification_and_null_constant_identity() {
+        let mut value = 7i32;
+        let pointer = core::ptr::addr_of_mut!(value);
+        let qualified: *const i32 = return_value(input(pointer));
+        assert_eq!(qualified, pointer.cast_const());
+        let null: *const i32 = return_value(null_constant(CValue::<CInt>::new(0)));
+        assert!(null.is_null());
+        let null_void: *mut i32 =
+            return_value(null::null_void(Pointer::<CVoid>::new(core::ptr::null_mut())));
+        assert!(null_void.is_null());
+        let nonnull: bool = return_value(input(pointer));
+        assert!(nonnull);
     }
 }

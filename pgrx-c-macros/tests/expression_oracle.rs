@@ -26,9 +26,10 @@ const SUPPORTED: &[&str] = &[
     "EXPR_LAZY_VOID",
     "EXPR_NESTED",
     "EXPR_ATOMIC_POW2",
+    "EXPR_STATEMENT",
 ];
 const EXCLUDED: &[(&str, SkipReasonCode)] = &[
-    ("EXPR_BAD_STATEMENT", SkipReasonCode::Statement),
+    ("EXPR_BAD_LOOP", SkipReasonCode::Statement),
     ("EXPR_BAD_PASTE", SkipReasonCode::TokenPaste),
     ("EXPR_BAD_STRINGIFY", SkipReasonCode::Stringification),
     ("EXPR_BAD_VARIADIC", SkipReasonCode::Variadic),
@@ -91,7 +92,7 @@ fn empty_void_and_comma_macros_match_original_c_types_values_and_evaluation() {
         true,
     );
     let generated = rust_oracle::run_rust(&rust);
-    assert_eq!(original.lines().count(), 20, "C corpus completeness");
+    assert_eq!(original.lines().count(), 21, "C corpus completeness");
     assert_eq!(
         generated, original,
         "generated macros must match original C types, bits, order and occurrence counts"

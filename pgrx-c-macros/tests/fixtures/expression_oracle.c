@@ -71,5 +71,8 @@ int main(void) {
     RECORD("atomic_parenthesized", EXPR_ATOMIC_POW2((1 + 3)));
     RECORD("atomic_signed_parenthesized", EXPR_ATOMIC_POW2((-1)));
     RECORD("atomic_unsigned", EXPR_ATOMIC_POW2(0x80000000U));
+    RESET();
+    EXPR_STATEMENT(tick(4, 7));
+    RECORD_VOID("statement", (void) 0);
     return 0;
 }

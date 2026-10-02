@@ -67,6 +67,24 @@ pub(crate) fn direct_delegation(
     let (Some(pattern), Some(candidate)) = (&callee.expression, &caller.expression) else {
         return Err("direct call has no complete compiler-analyzed expression".into());
     };
+    if pattern.syntax.statement_body.is_some() != candidate.syntax.statement_body.is_some()
+        || [&pattern.syntax, &candidate.syntax].iter().any(|syntax| {
+            syntax.statement_body.as_ref().is_some_and(|body| {
+                body.return_tokens.is_none()
+                    || body.walk().any(|statement| {
+                        !matches!(
+                            statement,
+                            crate::Statement::Return { .. } | crate::Statement::Block { .. }
+                        )
+                    })
+            })
+        })
+    {
+        return Err(
+            "root expression matching does not establish complete statement-body equivalence"
+                .into(),
+        );
+    }
     let mut arguments = vec![None; arity];
     let mut pending =
         vec![(ungroup(pattern, pattern.syntax.root), ungroup(candidate, candidate.syntax.root))];

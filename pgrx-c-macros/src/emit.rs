@@ -34,6 +34,7 @@ mod callbacks;
 mod enumerations;
 mod fields;
 mod functions;
+mod statements;
 mod typed;
 mod types;
 
@@ -724,7 +725,11 @@ fn render(
     }
     let renderer =
         typed::Renderer::new(session.frontend(), analysis, bindings, &constants, lowering);
-    let value = if empty {
+    let statement_body = expression.syntax.statement_body.as_ref();
+    let returning = statement_body.is_some_and(|body| body.return_tokens.is_some());
+    let value = if statement_body.is_some() {
+        statements::render(session, analysis, bindings, &renderer, false)?
+    } else if empty {
         String::new()
     } else {
         render_body(session, analysis, bindings, &renderer, typed::Context::Value)?
@@ -746,6 +751,17 @@ fn render(
             None,
         )
     })?);
+    if returning {
+        doc.push_str("\n\nThis macro performs a C return in the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.");
+    } else if statement_body.is_some() {
+        doc.push_str("\n\nThis macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.");
+    }
+    if statement_body.is_some_and(|body| {
+        body.walk()
+            .any(|statement| matches!(statement, crate::syntax::Statement::Declaration { .. }))
+    }) {
+        doc.push_str(" Caller argument tokens must not mention the macro's C local names, even inside groups: those invocations are rejected because C substitution can capture locals that Rust hygiene would resolve differently. The scope check also inspects forwarded expression fragments and is bounded to 4096 stringified bytes. Matches in fields, paths or strings are conservatively rejected.");
+    }
     let explicit_boundary =
         analysis.invocation == crate::InvocationContract::ExplicitExpressionBoundary;
     if explicit_boundary {
@@ -769,13 +785,45 @@ fn render(
     write!(&mut rust, "#[doc = {doc:?}]\n#[macro_export]\nmacro_rules! {identifier} {{\n")
         .expect("String output");
     let matcher = arguments::matcher(analysis);
-    let public_body = if empty {
+    let public_body = if statement_body.is_some() {
+        value.clone()
+    } else if empty {
         String::new()
     } else {
         format!("{SUPPORT}::expression_result::finish({value})")
     };
     writeln!(&mut rust, "(@__pgrx_emit_public; {matcher}) => {{ {public_body} }};")
         .expect("String output");
+    if statement_body.is_some() {
+        if returning {
+            let explicit = statements::render(session, analysis, bindings, &renderer, true)?;
+            writeln!(
+                &mut rust,
+                "(@__pgrx_emit_return_as; $__pgrx_c_return:ty, {matcher}) => {{ {explicit} }};"
+            )
+            .expect("String output");
+            writeln!(&mut rust, "(@__pgrx_c_return_as [$__pgrx_c_return:ty]; $($raw:tt)*) => {{ $crate::{identifier}!(@__pgrx_c_guard_locals __pgrx_emit_return_as [$__pgrx_c_return,]; $($raw)*) }};").expect("String output");
+        } else {
+            writeln!(&mut rust, "(@__pgrx_emit_discard; {matcher}) => {{ {value} }};\n(@__pgrx_c_discard; $($raw:tt)*) => {{ $crate::{identifier}!(@__pgrx_c_guard_locals __pgrx_emit_discard []; $($raw)*) }};").expect("String output");
+        }
+        rust.push_str(&statements::guard(analysis, &arguments.normalizer)?);
+        for mode in ["value", "place", "read_place", "size", "discard"] {
+            if mode == "discard" && !returning {
+                continue;
+            }
+            writeln!(&mut rust, "(@__pgrx_emit_{mode}; {matcher}) => {{ compile_error!(\"a C statement body is not an expression operand\") }};\n(@__pgrx_c_{mode}; $($raw:tt)*) => {{ compile_error!(\"a C statement body is not an expression operand\") }};").expect("String output");
+        }
+        writeln!(&mut rust, "($($raw:tt)*) => {{ $crate::{identifier}!(@__pgrx_c_guard_locals __pgrx_emit_public []; $($raw)*) }};\n}}").expect("String output");
+        if rust.len() > MAX_EMISSION_BYTES {
+            return Err(skip(
+                analysis,
+                SkipReasonCode::BudgetExceeded,
+                "generated statement macro exceeds the bounded output size",
+                None,
+            ));
+        }
+        return Ok(rust);
+    }
     for (mode, context) in [
         ("value", typed::Context::Value),
         ("place", typed::Context::Place),
@@ -854,35 +902,7 @@ fn render_body(
                 };
                 write!(rust, "$crate::{callee}!(@__pgrx_emit_{mode}; ").expect("String output");
                 for root in delegation.arguments {
-                    let mut ungrouped = root;
-                    while let ExpressionKind::Group { operand } =
-                        expression.syntax.nodes[ungrouped].kind
-                    {
-                        ungrouped = operand;
-                    }
-                    if let ExpressionKind::Parameter { index } =
-                        expression.syntax.nodes[ungrouped].kind
-                    {
-                        write!(rust, "$__pgrx_c_arg{index}, ").expect("String output");
-                    } else {
-                        rust.push_str("(@compiled ");
-                        for argument_context in [
-                            typed::Context::Value,
-                            typed::Context::Place,
-                            typed::Context::ReadPlace,
-                            typed::Context::Size,
-                        ] {
-                            rust.push('[');
-                            let mut argument = String::new();
-                            match renderer.render(root, argument_context, &mut argument) {
-                                Ok(()) => rust.push_str(&argument),
-                                Err(reason) => write!(rust, "compile_error!({:?})", reason.message)
-                                    .expect("String output"),
-                            }
-                            rust.push_str("] ");
-                        }
-                        rust.push_str("), ");
-                    }
+                    renderer.delegated_argument(root, &mut rust);
                 }
                 rust.push(')');
                 if integer_zero {

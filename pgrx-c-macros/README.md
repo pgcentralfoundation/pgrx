@@ -239,6 +239,11 @@ The typed expression support also covers:
   representations and evaluation modes. Floating arithmetic additionally requires
   contraction disabled; excess precision, fast-math modes and `long double`
   remain outside the modeled family.
+- Straight-line statement blocks, with optional terminal `return`, including
+  nested lexical blocks and literal-zero `do`/`while` wrappers, ordered expression
+  statements and flat typed local declarations.
+  Local reads require proved initialization; unsupported control flow and
+  declaration forms remain skips.
 
 Signed overflow follows the inspected undefined or wrapping policy. Arithmetic
 outside C's defined domain is rejected by the safe scalar support. Pointer and
@@ -248,7 +253,7 @@ thread requirements. PostgreSQL calls retain pgrx's FFI error and panic guard.
 Native adapters convert arguments and check nullable function pointers before
 entering that guard, and decode results after leaving it.
 
-Statements and initialization constructs, variadic arguments, stringification,
+Other statements and initialization constructs, variadic arguments, stringification,
 token pasting, unsupported compiler constructs and unmodeled literals remain
 explicit skips. Parser and type limitations are reported as skips. Referenced
 declarations and the final macro environment must match the inspection.
@@ -263,6 +268,38 @@ semantic value, such as `CValue<K>` or a typed pointer, and `.get()` extracts th
 native Rust storage. Integer markers keep `long` and `long long` distinct even
 when both use `i64` storage. The wrapper is an already evaluated value, not a
 deferred load or an ABI type. Empty replacements expand to an empty Rust expression.
+
+Return macros perform the return in the enclosing Rust function and apply C
+assignment conversion to that function's result type. Call them directly:
+
+```rust,ignore
+fn return_int32(value: i32) -> pgrx_pg_sys::Datum {
+    pgrx_pg_sys::PG_RETURN_INT32!(value);
+}
+```
+
+Like a Rust `return`, this exits the nearest function or closure and runs
+the caller's normal Rust cleanup.
+
+`Datum` has a verified C identity. Ambiguous native result types require an
+explicit marker, such as `RETURN!(@__pgrx_c_return_as [CUnsignedLong]; value)`
+for an original function returning C `unsigned long`. Return macros cannot
+serve as expression operands. Forms that capture caller context take explicit
+extra arguments: `PG_RETURN_NULL!(fcinfo)` and
+`SRF_RETURN_NEXT!(context, result, fcinfo)`. Their pointer operations and backend
+calls still require the caller's established safety contract.
+
+Statement macros without a return execute their full expressions in order,
+preserve nested local scopes, and yield `()`. They discard each expression's
+result without dropping its evaluation. They cannot be used as C expression
+operands.
+
+Macros introducing C locals reject arguments mentioning those local names:
+C substitution can capture a local that Rust macro hygiene would resolve
+differently. A compile-time check inspects stringified arguments, including
+forwarded expression fragments. Matches in fields, paths or strings are also
+conservatively rejected. The check admits at most 4096 stringified argument
+bytes and 64 local declarations.
 
 Raw `bool`, 8-, 16-, 32-, and 128-bit Rust integers have established C input
 identities. Raw `i64`, `u64`, `isize` and `usize` require an explicit tag, such as

@@ -10,6 +10,7 @@ use super::{BindingCatalog, MAX_EMISSION_BYTES, SUPPORT, binary_helper, render_e
 use crate::analysis::{MacroAnalysis, ResolvedConstant, SkipReason, SkipReasonCode};
 use crate::syntax::{BinaryOperator, ExpressionKind, NodeId, UnaryOperator};
 use crate::{FrontendOutput, SignedOverflow, TypeCategory, TypeInfo, TypeShapeKind};
+use std::collections::BTreeMap;
 use std::fmt::Write;
 
 #[derive(Clone, Copy)]
@@ -26,6 +27,12 @@ enum Task {
     Text(String),
 }
 
+struct Local {
+    index: usize,
+    ty: TypeInfo,
+    lowered: Result<super::types::LoweredType, String>,
+}
+
 /// Per-macro expression facts borrowing the pass's immutable storage reconciliation.
 pub(super) struct Renderer<'a> {
     frontend: &'a FrontendOutput,
@@ -36,6 +43,7 @@ pub(super) struct Renderer<'a> {
     floats: bool,
     places: Vec<bool>,
     objects: Vec<Option<TypeInfo>>,
+    locals: BTreeMap<String, Local>,
 }
 
 impl<'a> Renderer<'a> {
@@ -47,6 +55,29 @@ impl<'a> Renderer<'a> {
         lowering: &'a Lowering<'a>,
     ) -> Self {
         let expression = analysis.expression.as_ref().expect("candidate expression");
+        let locals = expression
+            .syntax
+            .statement_body
+            .iter()
+            .flat_map(|body| body.walk())
+            .filter_map(|statement| {
+                let crate::syntax::Statement::Declaration { name, type_name, .. } = statement
+                else {
+                    return None;
+                };
+                crate::analysis::resolve_type_info(
+                    type_name,
+                    frontend.declarations(),
+                    &frontend.profile().target,
+                )
+                .map(|ty| (name.clone(), ty))
+            })
+            .enumerate()
+            .map(|(index, (name, ty))| {
+                let lowered = lowering.resolve(&ty);
+                (name, Local { index, ty, lowered })
+            })
+            .collect::<BTreeMap<_, _>>();
         // Native Rust operands and public macro results are evaluated value
         // boundaries. The fully expanded arena includes contraction across
         // recovered source-level macro calls.
@@ -74,7 +105,8 @@ impl<'a> Renderer<'a> {
                 ExpressionKind::Group { operand } => places[*operand],
                 ExpressionKind::Member { base, indirect, .. } => *indirect || places[*base],
                 ExpressionKind::Identifier { name } => {
-                    frontend.declarations().variables.contains_key(name)
+                    locals.contains_key(name)
+                        || frontend.declarations().variables.contains_key(name)
                 }
                 ExpressionKind::Parameter { .. }
                 | ExpressionKind::Dereference { .. }
@@ -82,8 +114,65 @@ impl<'a> Renderer<'a> {
                 _ => false,
             });
         }
-        let objects = declared_objects(frontend, analysis, lowering);
-        Self { frontend, analysis, bindings, constants, lowering, floats, places, objects }
+        let objects = declared_objects(frontend, analysis, lowering, &locals);
+        Self { frontend, analysis, bindings, constants, lowering, floats, places, objects, locals }
+    }
+
+    pub(super) fn declare_local(
+        &self,
+        name: &str,
+        initializer: Option<NodeId>,
+        rust: &mut String,
+    ) -> Result<(), SkipReason> {
+        let local = self.locals.get(name).ok_or_else(|| {
+            skip(
+                self.analysis,
+                SkipReasonCode::UnsupportedType,
+                format!("{name}: local declaration has no established C type"),
+                None,
+            )
+        })?;
+        let lowered = local.lowered.as_ref().map_err(|message| {
+            skip(self.analysis, SkipReasonCode::UnsupportedType, message.clone(), None)
+        })?;
+        write!(
+            rust,
+            "let mut __pgrx_c_local{} = ::core::mem::MaybeUninit::<{}>::uninit(); ",
+            local.index, lowered.storage
+        )
+        .expect("String output");
+        if let Some(initializer) = initializer {
+            rust.push_str("let __pgrx_c_initializer = ");
+            self.render(initializer, Context::Value, rust)?;
+            write!(rust, "; /* SAFETY: this raw place addresses the new, aligned local slot; initialization writes without reading its previous bytes or creating a reference. */ #[allow(unused_unsafe)] unsafe {{ {EXPRESSION}::assign({EXPRESSION}::place::<{}>(::core::ptr::addr_of_mut!(__pgrx_c_local{}).cast::<{}>()), __pgrx_c_initializer); }} ", lowered.marker, local.index, lowered.storage).expect("String output");
+        }
+        Ok(())
+    }
+
+    /// Preserve each requested context lazily at a recovered macro-call boundary.
+    pub(super) fn delegated_argument(&self, root: NodeId, rust: &mut String) {
+        let expression = self.analysis.expression.as_ref().expect("candidate expression");
+        let mut ungrouped = root;
+        while let ExpressionKind::Group { operand } = expression.syntax.nodes[ungrouped].kind {
+            ungrouped = operand;
+        }
+        if let ExpressionKind::Parameter { index } = expression.syntax.nodes[ungrouped].kind {
+            write!(rust, "$__pgrx_c_arg{index}, ").expect("String output");
+            return;
+        }
+        rust.push_str("(@compiled ");
+        for context in [Context::Value, Context::Place, Context::ReadPlace, Context::Size] {
+            rust.push('[');
+            let mut argument = String::new();
+            match self.render(root, context, &mut argument) {
+                Ok(()) => rust.push_str(&argument),
+                Err(reason) => {
+                    write!(rust, "compile_error!({:?})", reason.message).expect("String output")
+                }
+            }
+            rust.push_str("] ");
+        }
+        rust.push_str("), ");
     }
 
     pub(super) fn render(
@@ -240,7 +329,21 @@ impl<'a> Renderer<'a> {
                             );
                         }
                         ExpressionKind::Identifier { name } if constants[index].is_none() => {
-                            if let Some(declaration) = frontend.declarations().variables.get(name) {
+                            if let Some(local) = self.locals.get(name) {
+                                let lowered = local
+                                    .lowered
+                                    .as_ref()
+                                    .map_err(|message| failure(message.clone()))?;
+                                if matches!(context, Context::Value) {
+                                    write!(rust, "/* SAFETY: analysis proves this local initialized before each evaluated read; its aligned storage is owned here and addressed without creating references. */ #[allow(unused_unsafe)] unsafe {{ {EXPRESSION}::load(").expect("String output");
+                                }
+                                write!(rust, "{EXPRESSION}::{}::<{}>(::core::ptr::addr_of_mut!(__pgrx_c_local{}).cast::<{}>())", if local.ty.is_const { "const_place" } else { "place" }, lowered.marker, local.index, lowered.storage).expect("String output");
+                                if matches!(context, Context::Value) {
+                                    rust.push_str(") }");
+                                }
+                            } else if let Some(declaration) =
+                                frontend.declarations().variables.get(name)
+                            {
                                 let binding = bindings.variables.get(name).ok_or_else(|| {
                                     failure(format!("{name}: no public global binding was emitted"))
                                 })?;
@@ -703,6 +806,7 @@ fn declared_objects(
     frontend: &FrontendOutput,
     analysis: &MacroAnalysis,
     lowering: &Lowering<'_>,
+    locals: &BTreeMap<String, Local>,
 ) -> Vec<Option<TypeInfo>> {
     let declarations = frontend.declarations();
     let mut objects: Vec<Option<TypeInfo>> = Vec::new();
@@ -715,7 +819,10 @@ fn declared_objects(
                 declarations,
                 &frontend.profile().target,
             ),
-            ExpressionKind::Identifier { name } => declarations.variables.get(name).cloned(),
+            ExpressionKind::Identifier { name } => locals
+                .get(name)
+                .map(|local| local.ty.clone())
+                .or_else(|| declarations.variables.get(name).cloned()),
             ExpressionKind::Dereference { operand } => objects[*operand]
                 .as_ref()
                 .and_then(|pointer| lowering.pointer_pointee(pointer).ok()),

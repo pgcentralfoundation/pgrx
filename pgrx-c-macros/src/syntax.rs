@@ -2,7 +2,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! Bounded parsing of the scalar-expression portion of C macro replacement lists.
+//! Bounded parsing of expressions and straight-line statements in C macro replacement lists.
 //!
 //! Parameters remain holes. This parser never expands a preprocessing token or guesses a
 //! declaration. The arena preserves explicit grouping and parameter occurrences, and avoids
@@ -11,6 +11,8 @@
 use crate::{Token, TokenKind};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
+
+mod statements;
 
 const MAX_TOKENS: usize = 4096;
 const MAX_DEPTH: usize = 64;
@@ -29,6 +31,46 @@ pub type NodeId = usize;
 pub struct Expression {
     pub nodes: Vec<ExpressionNode>,
     pub root: NodeId,
+    /// A complete statement replacement with expressions in this same arena.
+    /// The root is the terminal return operand, or `Empty` when there is no return.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub statement_body: Option<StatementBody>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct StatementBody {
+    pub statements: Vec<Statement>,
+    pub tokens: TokenRange,
+    pub return_tokens: Option<TokenRange>,
+}
+
+impl StatementBody {
+    /// Visit statements in source order, yielding blocks before their children.
+    /// Scopes remain explicit; callers that execute statements must honor them.
+    pub fn walk(&self) -> impl Iterator<Item = &Statement> {
+        let mut scopes = vec![self.statements.iter()];
+        std::iter::from_fn(move || {
+            loop {
+                let scope = scopes.last_mut()?;
+                if let Some(statement) = scope.next() {
+                    if let Statement::Block { statements, .. } = statement {
+                        scopes.push(statements.iter());
+                    }
+                    return Some(statement);
+                }
+                scopes.pop();
+            }
+        })
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum Statement {
+    Expression { expression: NodeId, tokens: TokenRange },
+    Declaration { name: String, type_name: String, initializer: Option<NodeId>, tokens: TokenRange },
+    Block { statements: Vec<Statement>, tokens: TokenRange },
+    Return { expression: NodeId, tokens: TokenRange },
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -160,6 +202,24 @@ pub(crate) fn parse_expression(
     parameters: &[String],
     is_type: impl Fn(&str) -> bool,
 ) -> Result<Expression, SyntaxError> {
+    parse(tokens, parameters, is_type, false)
+}
+
+/// Parse an expression or a complete, straight-line statement replacement.
+pub(crate) fn parse_replacement(
+    tokens: &[Token],
+    parameters: &[String],
+    is_type: impl Fn(&str) -> bool,
+) -> Result<Expression, SyntaxError> {
+    parse(tokens, parameters, is_type, true)
+}
+
+fn parse(
+    tokens: &[Token],
+    parameters: &[String],
+    is_type: impl Fn(&str) -> bool,
+    allow_statements: bool,
+) -> Result<Expression, SyntaxError> {
     if tokens.len() > MAX_TOKENS {
         return Err(SyntaxError {
             kind: SyntaxErrorKind::BudgetExceeded,
@@ -188,9 +248,10 @@ pub(crate) fn parse_expression(
                 tokens: TokenRange { start: 0, end: tokens.len() },
             }],
             root: 0,
+            statement_body: None,
         });
     }
-    let mut root = parser.expression(0, 0)?;
+    let (mut root, mut statement_body) = parser.replacement(allow_statements)?;
     if parser.position != parser.tokens.len() {
         return Err(parser.unexpected());
     }
@@ -214,12 +275,12 @@ pub(crate) fn parse_expression(
         // once rather than leaving orphaned value nodes and duplicate hole uses.
         parser.position = 0;
         parser.nodes.clear();
-        root = parser.expression(0, 0)?;
+        (root, statement_body) = parser.replacement(allow_statements)?;
         if parser.position != parser.tokens.len() {
             return Err(parser.unexpected());
         }
     }
-    Ok(Expression { nodes: parser.nodes, root })
+    Ok(Expression { nodes: parser.nodes, root, statement_body })
 }
 
 impl<F: Fn(&str) -> bool> Parser<'_, F> {
@@ -486,7 +547,34 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             ));
         }
         if matches!(lexeme.token.kind, TokenKind::Identifier | TokenKind::Keyword) {
-            if matches!(spelling, "do" | "if" | "for" | "while" | "return" | "goto" | "switch") {
+            // These constructs are declarations or compile-time selectors, never
+            // runtime calls. Some preprocessor token streams label their names as
+            // identifiers, so spelling is checked as well as the keyword kind.
+            if lexeme.token.kind == TokenKind::Keyword
+                || matches!(
+                    spelling,
+                    "_Static_assert" | "static_assert" | "_Generic" | "_Alignas" | "alignas"
+                )
+            {
+                return Err(self.error(
+                    SyntaxErrorKind::Statement,
+                    "compiler and declaration keywords require a dedicated syntax contract",
+                ));
+            }
+            if matches!(
+                spelling,
+                "do" | "if"
+                    | "for"
+                    | "while"
+                    | "return"
+                    | "goto"
+                    | "switch"
+                    | "break"
+                    | "continue"
+                    | "else"
+                    | "case"
+                    | "default"
+            ) {
                 return Err(self.error(
                     SyntaxErrorKind::Statement,
                     "statement and caller control-flow macros are deferred",
@@ -826,7 +914,11 @@ mod tests {
             .map(|&spelling| Token {
                 kind: if spelling.as_bytes().first().is_some_and(u8::is_ascii_digit) {
                     TokenKind::Literal
-                } else if spelling.as_bytes().first().is_some_and(u8::is_ascii_alphabetic) {
+                } else if spelling
+                    .as_bytes()
+                    .first()
+                    .is_some_and(|byte| byte.is_ascii_alphabetic() || *byte == b'_')
+                {
                     TokenKind::Identifier
                 } else {
                     TokenKind::Punctuation
@@ -1126,6 +1218,312 @@ mod tests {
             )
             .is_err(),
             "one const bit cannot represent pointer-level qualifiers"
+        );
+    }
+
+    #[test]
+    fn terminal_returns_are_statements_without_becoming_expression_operands() {
+        for body in [vec!["return", "x"], vec!["return", "x", ";"]] {
+            let parsed = parse_replacement(&tokens(&body), &["x".into()], |_| false).unwrap();
+            assert_eq!(parsed.statement_body.as_ref().unwrap().tokens.end, body.len());
+            assert!(matches!(
+                parsed.nodes[parsed.root].kind,
+                ExpressionKind::Parameter { index: 0 }
+            ));
+            assert_eq!(
+                parse_expression(&tokens(&body), &["x".into()], |_| false).unwrap_err().kind,
+                SyntaxErrorKind::Statement,
+            );
+        }
+        for body in [
+            vec!["(", "return", "x", ")"],
+            vec!["f", "(", "return", "x", ")"],
+            vec!["return", ";"],
+            vec!["return", "x", ";", "x", "++"],
+        ] {
+            assert!(parse_replacement(&tokens(&body), &["x".into()], |_| false).is_err());
+        }
+    }
+
+    #[test]
+    fn compiler_and_declaration_constructs_never_become_runtime_captures() {
+        for name in ["_Static_assert", "static_assert", "_Generic", "_Alignas", "alignas"] {
+            let invocation = [name, "(", "1", ",", "message", ")"];
+            for kind in [TokenKind::Identifier, TokenKind::Keyword] {
+                let mut root = tokens(&invocation);
+                root[0].kind = kind;
+                assert_eq!(
+                    parse_replacement(&root, &[], |_| false).unwrap_err().kind,
+                    SyntaxErrorKind::Statement,
+                    "{name} with {kind:?}",
+                );
+                let mut wrapped = tokens(&["do", "{"]);
+                wrapped.extend(root);
+                wrapped.extend(tokens(&[";", "}", "while", "(", "0", ")"]));
+                assert_eq!(
+                    parse_replacement(&wrapped, &[], |_| false).unwrap_err().kind,
+                    SyntaxErrorKind::Statement,
+                    "wrapped {name} with {kind:?}",
+                );
+            }
+        }
+        for name in ["_Atomic", "asm", "typeof", "__extension__", "int"] {
+            let input = [Token { kind: TokenKind::Keyword, spelling: name.into() }];
+            assert_eq!(
+                parse_expression(&input, &[], |_| false).unwrap_err().kind,
+                SyntaxErrorKind::Statement,
+            );
+        }
+    }
+
+    #[test]
+    fn keyword_formals_remain_expression_holes_inside_blocks() {
+        for name in ["return", "do", "_Static_assert", "_Generic"] {
+            let mut body = tokens(&["{", name, ";", "}"]);
+            body[1].kind = TokenKind::Keyword;
+            let parsed = parse_replacement(&body, &[name.into()], |_| false).unwrap();
+            let body = parsed.statement_body.unwrap();
+            assert_eq!(body.return_tokens, None);
+            assert!(matches!(
+                body.statements.as_slice(),
+                [Statement::Expression { expression, .. }]
+                    if matches!(parsed.nodes[*expression].kind, ExpressionKind::Parameter { index: 0 })
+            ));
+        }
+    }
+
+    #[test]
+    fn return_body_preserves_statement_order_arena_and_original_offsets() {
+        let mut body = tokens(&[
+            "do", "{", "int", "tmp", "=", "(", "x", ")", ";", "tmp", "+=", "1", ";", "return",
+            "tmp", ";", "}", "while", "(", "0", ")",
+        ]);
+        body.insert(2, Token { kind: TokenKind::Comment, spelling: "/* source */".into() });
+        let parsed = parse_replacement(&body, &["x".into()], |name| name == "int").unwrap();
+        let statement_body = parsed.statement_body.unwrap();
+        assert_eq!(statement_body.tokens, TokenRange { start: 0, end: 22 });
+        assert_eq!(statement_body.return_tokens, Some(TokenRange { start: 14, end: 17 }));
+        assert_eq!(
+            statement_body.statements,
+            vec![
+                Statement::Declaration {
+                    name: "tmp".into(),
+                    type_name: "int".into(),
+                    initializer: Some(1),
+                    tokens: TokenRange { start: 3, end: 10 },
+                },
+                Statement::Expression { expression: 4, tokens: TokenRange { start: 10, end: 14 } },
+                Statement::Return { expression: 5, tokens: TokenRange { start: 14, end: 17 } },
+            ]
+        );
+        assert!(matches!(parsed.nodes[1].kind, ExpressionKind::Group { operand: 0 }));
+        assert!(matches!(
+            parsed.nodes[4].kind,
+            ExpressionKind::Assignment { place: 2, value: 3, .. }
+        ));
+        assert_eq!(parsed.root, 5);
+        assert_eq!(parsed.nodes[parsed.root].tokens, TokenRange { start: 15, end: 16 });
+    }
+
+    #[test]
+    fn return_local_bindings_and_control_flow_are_bounded() {
+        for body in [
+            vec!["{", "int", "tmp", ";", "int", "tmp", ";", "return", "tmp", ";", "}"],
+            vec!["{", "int", "x", ";", "return", "x", ";", "}"],
+            vec!["{", "tmp", "=", "1", ";", "int", "tmp", ";", "return", "tmp", ";", "}"],
+            vec!["{", "if", "(", "x", ")", "return", "x", ";", "}"],
+            vec!["{", "while", "(", "x", ")", "x", "--", ";", "return", "x", ";", "}"],
+            vec!["{", "break", ";", "return", "x", ";", "}"],
+            vec!["{", "continue", ";", "return", "x", ";", "}"],
+            vec!["{", "goto", "label", ";", "return", "x", ";", "}"],
+            vec!["{", "int", "tmp", "[", "1", "]", ";", "return", "x", ";", "}"],
+            vec!["{", "int", "tmp", ",", "other", ";", "return", "x", ";", "}"],
+            vec!["{", "return", "x", ";", "x", "++", ";", "}"],
+            vec!["do", "{", "return", "x", ";", "}", "while", "(", "1", ")"],
+        ] {
+            assert!(
+                parse_replacement(&tokens(&body), &["x".into()], |name| name == "int").is_err(),
+                "{body:?}"
+            );
+        }
+        let parsed = parse_replacement(
+            &tokens(&["{", "int", "*", "tmp", ";", "return", "tmp", ";", "}"]),
+            &[],
+            |name| name == "int *",
+        )
+        .unwrap();
+        assert!(matches!(
+            &parsed.statement_body.unwrap().statements[0],
+            Statement::Declaration { type_name, initializer: None, .. } if type_name == "int *"
+        ));
+    }
+
+    #[test]
+    fn type_hole_reparse_keeps_return_statements_in_one_arena() {
+        let parsed = parse_replacement(
+            &tokens(&[
+                "{", "int", "tmp", "=", "sizeof", "(", "t", ")", ";", "return", "(", "t", ")", "(",
+                "x", ")", ";", "}",
+            ]),
+            &["t".into(), "x".into()],
+            |name| name == "int",
+        )
+        .unwrap();
+        assert!(matches!(parsed.nodes[0].kind, ExpressionKind::SizeOfTypeParameter { .. }));
+        assert_eq!(parsed.statement_body.unwrap().statements.len(), 2);
+        assert_eq!(
+            parsed
+                .nodes
+                .iter()
+                .filter(|node| matches!(node.kind, ExpressionKind::Parameter { .. }))
+                .count(),
+            1,
+        );
+    }
+
+    #[test]
+    fn nested_terminal_wrappers_keep_order_and_reject_scope_changes() {
+        let parsed = parse_replacement(
+            &tokens(&[
+                "do", "{", "int", "outer", "=", "1", ";", "do", "{", "int", "inner", "=", "2", ";",
+                "outer", "+=", "inner", ";", "return", "outer", ";", "}", "while", "(", "0", ")",
+                ";", "}", "while", "(", "0", ")",
+            ]),
+            &[],
+            |name| name == "int",
+        )
+        .unwrap();
+        let body = parsed.statement_body.unwrap();
+        assert_eq!(body.statements.len(), 2);
+        assert!(
+            matches!(&body.statements[0], Statement::Declaration { name, .. } if name == "outer")
+        );
+        let Statement::Block { statements, .. } = &body.statements[1] else {
+            panic!("the nested wrapper must retain its own C scope")
+        };
+        assert_eq!(statements.len(), 3);
+        assert!(matches!(&statements[0], Statement::Declaration { name, .. } if name == "inner"));
+        assert!(matches!(statements[1], Statement::Expression { .. }));
+        assert!(
+            matches!(statements[2], Statement::Return { expression, .. } if expression == parsed.root)
+        );
+        assert_eq!(body.walk().count(), 5);
+        assert_eq!(body.tokens, TokenRange { start: 0, end: 32 });
+        assert_eq!(body.return_tokens, Some(TokenRange { start: 18, end: 21 }));
+        for body in [
+            vec![
+                "{", "int", "local", "=", "1", ";", "{", "int", "local", "=", "2", ";", "return",
+                "local", ";", "}", "}",
+            ],
+            vec![
+                "{", "local", "=", "1", ";", "{", "int", "local", "=", "2", ";", "return", "local",
+                ";", "}", "}",
+            ],
+        ] {
+            assert_eq!(
+                parse_replacement(&tokens(&body), &[], |name| name == "int").unwrap_err().kind,
+                SyntaxErrorKind::Statement,
+            );
+        }
+    }
+
+    #[test]
+    fn straight_line_and_noop_blocks_have_a_void_root_without_a_return() {
+        for body in [
+            vec![";"],
+            vec!["{", "}"],
+            vec!["{", ";", ";", "}"],
+            vec!["do", "{", "}", "while", "(", "0", ")"],
+            vec!["do", "{", ";", "}", "while", "(", "0x0U", ")", ";"],
+        ] {
+            let parsed = parse_replacement(&tokens(&body), &[], |_| false).unwrap();
+            assert!(matches!(parsed.nodes[parsed.root].kind, ExpressionKind::Empty));
+            let statement_body = parsed.statement_body.unwrap();
+            assert!(statement_body.statements.is_empty());
+            assert_eq!(statement_body.return_tokens, None);
+            assert_eq!(statement_body.tokens.end, body.len());
+        }
+        let parsed = parse_replacement(
+            &tokens(&[
+                "do", "{", "int", "tmp", "=", "x", ";", "x", "=", "tmp", ";", "}", "while", "(",
+                "0", ")",
+            ]),
+            &["x".into()],
+            |name| name == "int",
+        )
+        .unwrap();
+        assert!(matches!(parsed.nodes[parsed.root].kind, ExpressionKind::Empty));
+        let body = parsed.statement_body.unwrap();
+        assert_eq!(body.statements.len(), 2);
+        assert!(
+            matches!(&body.statements[0], Statement::Declaration { name, .. } if name == "tmp")
+        );
+        assert!(matches!(body.statements[1], Statement::Expression { .. }));
+        assert_eq!(body.return_tokens, None);
+    }
+
+    #[test]
+    fn nested_nonterminal_scopes_preserve_order_and_local_visibility() {
+        let parsed = parse_replacement(
+            &tokens(&[
+                "{", "int", "outer", "=", "1", ";", "{", "int", "inner", "=", "2", ";", "outer",
+                "+=", "inner", ";", "}", "outer", "++", ";", "}",
+            ]),
+            &[],
+            |name| name == "int",
+        )
+        .unwrap();
+        let body = parsed.statement_body.unwrap();
+        assert_eq!(body.statements.len(), 3);
+        assert!(matches!(body.statements[1], Statement::Block { .. }));
+        assert!(matches!(body.statements[2], Statement::Expression { .. }));
+        let order = body
+            .walk()
+            .map(|statement| match statement {
+                Statement::Declaration { name, .. } => name.as_str(),
+                Statement::Block { .. } => "block",
+                Statement::Expression { .. } => "expression",
+                Statement::Return { .. } => "return",
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(order, ["outer", "block", "inner", "expression", "expression"]);
+        for body in [
+            vec!["{", "{", "int", "tmp", "=", "1", ";", "}", "tmp", "++", ";", "}"],
+            vec!["{", "{", "int", "tmp", "=", "1", ";", "}", "return", "tmp", ";", "}"],
+            vec!["{", "{", "int", "tmp", "=", "1", ";", "}", "{", "tmp", "++", ";", "}", "}"],
+            vec!["{", "tmp", "++", ";", "{", "int", "tmp", "=", "1", ";", "}", "}"],
+            vec![
+                "{", "{", "int", "tmp", "=", "1", ";", "}", "{", "int", "tmp", "=", "2", ";", "}",
+                "}",
+            ],
+        ] {
+            assert_eq!(
+                parse_replacement(&tokens(&body), &[], |name| name == "int").unwrap_err().kind,
+                SyntaxErrorKind::Statement,
+                "{body:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn nested_terminal_returns_cannot_be_followed_by_effects() {
+        for body in [
+            vec!["{", "{", "return", "x", ";", "}", "x", "++", ";", "}"],
+            vec![
+                "{", "do", "{", "return", "x", ";", "}", "while", "(", "0", ")", ";", "{", "}", "}",
+            ],
+        ] {
+            assert!(
+                parse_replacement(&tokens(&body), &["x".into()], |_| false).is_err(),
+                "{body:?}"
+            );
+        }
+        let nested = std::iter::repeat_n("{", MAX_DEPTH + 1)
+            .chain(std::iter::repeat_n("}", MAX_DEPTH + 1))
+            .collect::<Vec<_>>();
+        assert_eq!(
+            parse_replacement(&tokens(&nested), &[], |_| false).unwrap_err().kind,
+            SyntaxErrorKind::BudgetExceeded
         );
     }
 }

@@ -120,7 +120,7 @@ fn unsupported_forms_have_stable_reasons_and_original_source_spans() {
     for (name, code) in [
         ("ANALYSIS_UNGROUPED", SkipReasonCode::InvocationGrouping),
         ("ANALYSIS_ROOT_UNGROUPED", SkipReasonCode::InvocationGrouping),
-        ("ANALYSIS_STATEMENT", SkipReasonCode::Statement),
+        ("ANALYSIS_CONTROL_FLOW", SkipReasonCode::Statement),
         ("ANALYSIS_SIZEOF", SkipReasonCode::InvocationGrouping),
         ("ANALYSIS_FLOAT", SkipReasonCode::UnsupportedLiteral),
         ("ANALYSIS_UNKNOWN", SkipReasonCode::UnknownIdentifier),
@@ -136,6 +136,14 @@ fn unsupported_forms_have_stable_reasons_and_original_source_spans() {
     let absent = analyze(&frontend, "ANALYSIS_NOT_DEFINED");
     assert_skip(&absent, SkipReasonCode::NotActive);
     assert!(absent.provenance.is_none());
+
+    let statement = analyze(&frontend, "ANALYSIS_STATEMENT");
+    assert!(matches!(statement.status, AnalysisStatus::Candidate));
+    assert_eq!(statement.invocation, InvocationContract::Statements);
+    assert_eq!(statement.const_capability, ConstCapability::RuntimeOnly);
+    let expression = statement.expression.unwrap();
+    assert!(expression.syntax.statement_body.is_some());
+    assert!(matches!(expression.types[expression.syntax.root], TypeExpression::Void));
 
     let deep = inspect(&scanner, &fixture("analysis_budget.h"), &[], None).unwrap();
     assert_skip(&analyze(&deep, "ANALYSIS_DEEP"), SkipReasonCode::BudgetExceeded);
