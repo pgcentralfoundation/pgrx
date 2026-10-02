@@ -2,7 +2,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-#![cfg(pgrx_c_macros)]
+#![cfg(any(pgrx_c_macros, docsrs))]
 
 // Exercise the public exports from a downstream crate, including a renamed import.
 use pg::__pgrx_c_macros::{CInt, CUnsignedInt, CUnsignedLong, CValue};
@@ -47,4 +47,14 @@ fn expansion_hygiene_preserves_repeated_and_lazy_arguments() {
     );
     assert_eq!(value.get(), 7);
     assert_eq!(calls, 2);
+}
+
+#[cfg(not(docsrs))]
+#[test]
+fn binding_references_and_macro_calls_use_the_selected_build() {
+    // These macros use the selected build's ALIGNOF_BUFFER binding and the
+    // independently generated TYPEALIGN macros.
+    assert_eq!(pg::BUFFERALIGN!(33_i32).get(), 64);
+    assert_eq!(pg::BUFFERALIGN_DOWN!(63_i32).get(), 32);
+    assert_eq!(pg::BUFFERALIGN!(CValue::<CUnsignedLong>::new(u64::MAX)).get(), 0);
 }

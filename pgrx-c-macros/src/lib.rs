@@ -32,6 +32,8 @@ pub use postgres::{
 };
 mod model;
 pub use model::*;
+mod dependencies;
+pub use dependencies::{MacroDependencyGraph, MacroDependencyImpact};
 mod frontend;
 pub use frontend::{FrontendError, inspect};
 mod syntax;
@@ -43,8 +45,8 @@ mod analysis;
 pub use analysis::*;
 mod expansion;
 pub use expansion::{
-    ExpandedMacro, ExpansionBatch, ExpansionDependency, ExpansionLimits, ExpansionResult,
-    ExpansionSkip, ExpansionSkipCode, ParameterOccurrence, prepare_expansions,
+    ConstantFallback, ExpandedMacro, ExpansionBatch, ExpansionDependency, ExpansionLimits,
+    ExpansionResult, ExpansionSkip, ExpansionSkipCode, ParameterOccurrence, prepare_expansions,
     prepare_expansions_with_limits,
 };
 mod session;
@@ -53,6 +55,7 @@ mod support_generation;
 pub use support_generation::*;
 mod emit;
 pub use emit::*;
+mod delegation;
 
 /// An owned record of the definitions and diagnostics encountered while processing a file.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

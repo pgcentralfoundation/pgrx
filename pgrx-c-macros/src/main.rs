@@ -4,9 +4,10 @@
 
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use pgrx_c_macros::{
-    AnalysisSession, AnalysisStatus, CompilationProfile, Diagnostic, EmissionStatus, Error,
-    FrontendError, FrontendOutput, MacroAnalysis, MacroEmission, MacroScanner, PostgresConfig,
-    PostgresError, emit, postgres_function_macro_names,
+    AnalysisSession, AnalysisStatus, BindingCatalog, CompilationProfile, Diagnostic,
+    EmissionStatus, Error, FrontendError, FrontendOutput, MacroAnalysis, MacroEmission,
+    MacroScanner, PostgresConfig, PostgresError, emit_batch_with_bindings,
+    postgres_function_macro_names,
 };
 use serde::Serialize;
 use std::collections::HashSet;
@@ -309,7 +310,7 @@ fn emit_postgres(args: EmitArgs) -> Result<(), CliError> {
     let report = EmissionReport {
         postgres_version: postgres.pg_config().version().map_err(PostgresError::from)?,
         profile: inspected.profile(),
-        macros: names.iter().map(|name| emit(&session, name)).collect(),
+        macros: emit_batch_with_bindings(&session, &names, &BindingCatalog::default()),
     };
     let stdout = io::stdout();
     let mut output = BufWriter::new(stdout.lock());

@@ -2,7 +2,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-use crate::{MacroDefinition, MacroInventory, SourceSpan};
+use crate::{MacroDefinition, MacroDependencyGraph, MacroInventory, SourceSpan};
 use serde::Serialize;
 use std::collections::BTreeMap;
 use std::path::PathBuf;
@@ -14,6 +14,8 @@ pub struct FrontendOutput {
     pub(crate) environment: MacroEnvironment,
     pub(crate) declarations: DeclarationCatalog,
     pub(crate) inventory: MacroInventory,
+    #[serde(skip)]
+    pub(crate) dependencies: MacroDependencyGraph,
 }
 
 impl FrontendOutput {
@@ -31,6 +33,11 @@ impl FrontendOutput {
 
     pub fn inventory(&self) -> &MacroInventory {
         &self.inventory
+    }
+
+    /// Conservative lexical macro references in the final active environment.
+    pub fn dependencies(&self) -> &MacroDependencyGraph {
+        &self.dependencies
     }
 }
 
@@ -189,6 +196,10 @@ pub enum TypeCategory {
 pub struct IntegerConstant {
     pub ty: TypeInfo,
     pub value: IntegerValue,
+    /// Original literal spelling when the complete object expansion is a literal.
+    /// Enum values and compound expressions have no single literal to preserve.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub literal: Option<crate::IntegerLiteral>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]

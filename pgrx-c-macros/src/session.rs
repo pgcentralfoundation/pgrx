@@ -4,9 +4,10 @@
 
 use crate::{
     ActiveMacro, ActiveProvenance, AnalysisStatus, BuildInputs, ExpansionBatch, ExpansionLimits,
-    ExpansionResult, ExpansionSkipCode, FrontendError, FrontendOutput, MacroAnalysis,
-    MacroDependency, MacroScanner, SkipReason, SkipReasonCode,
+    ExpansionResult, ExpansionSkipCode, FrontendError, FrontendOutput, IntegerConstant,
+    MacroAnalysis, MacroDependency, MacroScanner, SkipReason, SkipReasonCode,
 };
+use std::collections::BTreeMap;
 
 /// An inspected C environment and compiler-expanded symbolic invocations resolved together.
 ///
@@ -16,6 +17,7 @@ use crate::{
 pub struct AnalysisSession<'a> {
     frontend: &'a FrontendOutput,
     expansions: ExpansionBatch,
+    integer_constants: BTreeMap<String, IntegerConstant>,
 }
 
 impl<'a> AnalysisSession<'a> {
@@ -33,9 +35,11 @@ impl<'a> AnalysisSession<'a> {
         names: &[impl AsRef<str>],
         limits: ExpansionLimits,
     ) -> Result<Self, FrontendError> {
-        let expansions =
+        let mut expansions =
             crate::expansion::prepare_expansions_with_limits(scanner, frontend, names, limits)?;
-        Ok(Self { frontend, expansions })
+        let integer_constants =
+            crate::expansion::retain_integer_constants(scanner, frontend, &mut expansions, limits)?;
+        Ok(Self { frontend, expansions, integer_constants })
     }
 
     pub fn frontend(&self) -> &FrontendOutput {
@@ -46,8 +50,22 @@ impl<'a> AnalysisSession<'a> {
         &self.expansions
     }
 
+    /// Referenced object macros whose integer types and values were resolved by Clang.
+    /// These facts are independent of the Rust binding representation and include
+    /// constants that had to remain expanded because their C grouping was not atomic.
+    pub fn integer_constants(&self) -> &BTreeMap<String, IntegerConstant> {
+        &self.integer_constants
+    }
+
     pub fn inputs(&self) -> &BuildInputs {
         &self.expansions.inputs
+    }
+
+    /// Check that a later generation step consumed the same inspected environment.
+    /// Changes require a fresh inspection and preparation, including C value probes.
+    pub fn verify_inputs(&self) -> Result<(), FrontendError> {
+        crate::expansion::verify_environment(self.frontend)?;
+        crate::frontend::verify_input_files(self.inputs())
     }
 
     pub fn analyze(&self, name: &str) -> MacroAnalysis {
@@ -59,8 +77,12 @@ impl<'a> AnalysisSession<'a> {
                     definition: expansion.definition.clone(),
                     provenance: ActiveProvenance::Resolved,
                 };
-                let mut analysis =
-                    crate::analysis::analyze_active(self.frontend, name, Some(&active));
+                let mut analysis = crate::analysis::analyze_active_with_constants(
+                    self.frontend,
+                    name,
+                    Some(&active),
+                    &self.integer_constants,
+                );
                 for (parameter, original_name) in
                     analysis.parameters.iter_mut().zip(&expansion.parameters)
                 {

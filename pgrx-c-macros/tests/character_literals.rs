@@ -39,6 +39,7 @@ const CONSTANTS: &[&str] = &[
     "CHARACTER_OCTAL_TWO_DIGITS",
     "CHARACTER_OCTAL_MAX",
     "CHARACTER_HEX_ZERO",
+    "CHARACTER_HEX_ONE_DIGIT",
     "CHARACTER_HEX_MAX",
     "CHARACTER_HEX_LEADING_ZEROES",
 ];
@@ -155,6 +156,39 @@ fn ordinary_character_literals_match_original_c_types_values_and_occurrences() {
     let all_names =
         names.iter().copied().chain(REJECTED.iter().map(|(name, _)| *name)).collect::<Vec<_>>();
     let session = AnalysisSession::prepare(&scanner, &frontend, &all_names).unwrap();
+    for (name, spelling) in [
+        ("CHARACTER_DIGIT", "'0'"),
+        ("CHARACTER_UPPER", "'A'"),
+        ("CHARACTER_LOWER", "'z'"),
+        ("CHARACTER_SPACE", "' '"),
+        ("CHARACTER_TILDE", "'~'"),
+        ("CHARACTER_QUOTE", r"'\''"),
+        ("CHARACTER_DOUBLE_QUOTE", r#"'\"'"#),
+        ("CHARACTER_QUESTION", "'?'"),
+        ("CHARACTER_BACKSLASH", r"'\\'"),
+        ("CHARACTER_ALERT", r"'\x07'"),
+        ("CHARACTER_BACKSPACE", r"'\x08'"),
+        ("CHARACTER_FORMFEED", r"'\x0c'"),
+        ("CHARACTER_NEWLINE", r"'\n'"),
+        ("CHARACTER_RETURN", r"'\r'"),
+        ("CHARACTER_TAB", r"'\t'"),
+        ("CHARACTER_VERTICAL_TAB", r"'\x0b'"),
+        ("CHARACTER_OCTAL_ZERO", r"'\0'"),
+        ("CHARACTER_OCTAL_ONE", r"'\x01'"),
+        ("CHARACTER_OCTAL_TWO_DIGITS", r"'\x0a'"),
+        ("CHARACTER_OCTAL_MAX", r"'\x7f'"),
+        ("CHARACTER_HEX_ZERO", r"'\x00'"),
+        ("CHARACTER_HEX_ONE_DIGIT", r"'\x07'"),
+        ("CHARACTER_HEX_MAX", r"'\x7f'"),
+        ("CHARACTER_HEX_LEADING_ZEROES", r"'\x7f'"),
+    ] {
+        let emission = emit(&session, name);
+        let EmissionStatus::Emitted { rust, .. } = emission.status else {
+            panic!("original C character macro {name} must emit: {emission:?}");
+        };
+        let body = rust.split_once("=> {").expect("generated macro rule").1;
+        assert!(body.contains(&format!("::new({spelling} as i32)")), "{name}: {body}");
+    }
     for &(name, message) in REJECTED {
         let emission = emit(&session, name);
         let EmissionStatus::Skipped { reason } = emission.status else {

@@ -20,6 +20,7 @@
 #define CHARACTER_OCTAL_TWO_DIGITS(unused) '\12'
 #define CHARACTER_OCTAL_MAX(unused) '\177'
 #define CHARACTER_HEX_ZERO(unused) '\x00'
+#define CHARACTER_HEX_ONE_DIGIT(unused) '\x7'
 #define CHARACTER_HEX_MAX(unused) '\x7f'
 #define CHARACTER_HEX_LEADING_ZEROES(unused) '\x0000000000000000000000007F'
 #define CHARACTER_OFFSET(x) (((x) - '0') & 0x3F)
