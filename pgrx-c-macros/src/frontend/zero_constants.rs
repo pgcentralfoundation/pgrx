@@ -42,6 +42,9 @@ pub(crate) fn probe(
         for (index, node) in expression.syntax.nodes.iter().enumerate() {
             let mut children = [None; 3];
             let allowed = match &node.kind {
+                ExpressionKind::OffsetOf { record: crate::OffsetRecord::Named { .. }, fields } => {
+                    fields.iter().all(|field| matches!(field, crate::OffsetComponent::Named { .. }))
+                }
                 ExpressionKind::IntegerLiteral { .. } => true,
                 ExpressionKind::Identifier { .. } => constant_nodes[index],
                 ExpressionKind::Group { operand } | ExpressionKind::Unary { operand, .. } => {

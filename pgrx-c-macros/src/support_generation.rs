@@ -19,6 +19,8 @@ pub enum SupportProfileError {
     ByteWidth(u32),
     #[error("runtime support requires 64-bit C pointers, found {0}")]
     PointerWidth(u32),
+    #[error("runtime support requires C unsigned long size_t, found {0:?}")]
+    SizeType(IntegerKind),
     #[error("runtime support currently requires signed plain char")]
     UnsignedChar,
     #[error("runtime support requires {expected:?}, found {actual:?}")]
@@ -54,6 +56,9 @@ pub fn validate_support_profile(profile: &CompilationProfile) -> Result<(), Supp
     }
     if target.pointer_bits != 64 {
         return Err(SupportProfileError::PointerWidth(target.pointer_bits));
+    }
+    if target.size_type != IntegerKind::UnsignedLong {
+        return Err(SupportProfileError::SizeType(target.size_type));
     }
     if !target.char_is_signed {
         return Err(SupportProfileError::UnsignedChar);
@@ -245,6 +250,8 @@ mod tests {
                 triple: "aarch64-apple-macosx26.0.0".into(),
                 pointer_bits: 64,
                 function_pointer: crate::PointerLayout { size: 8, alignment: 8 },
+                size_type: IntegerKind::UnsignedLong,
+                offsetof_supported: true,
                 char_bits: 8,
                 char_is_signed: true,
                 ascii_execution_charset: true,
@@ -330,6 +337,18 @@ mod tests {
         profile.target.integers.get_mut(&IntegerKind::Long).unwrap().rank = 4;
         profile.signed_overflow = SignedOverflow::Trapping;
         assert_eq!(validate_support_profile(&profile), Err(SupportProfileError::TrappingOverflow));
+    }
+
+    #[test]
+    fn size_type_gate_keeps_same_width_integer_ranks_distinct() {
+        let mut profile = profile();
+        profile.target.offsetof_supported = false;
+        assert!(validate_support_profile(&profile).is_ok());
+        profile.target.size_type = IntegerKind::UnsignedLongLong;
+        assert_eq!(
+            validate_support_profile(&profile),
+            Err(SupportProfileError::SizeType(IntegerKind::UnsignedLongLong))
+        );
     }
 
     #[test]

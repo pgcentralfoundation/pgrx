@@ -24,6 +24,10 @@ pub(super) struct FieldAdapters {
     pub markers: BTreeMap<String, String>,
     /// Compiler record spelling and field name to the rejected capability's reason.
     pub unsupported: BTreeMap<String, String>,
+    /// Compiler record and field to the nested record identity, or an offset-only leaf.
+    pub offsets: BTreeMap<String, Option<String>>,
+    /// Rejected offset capabilities, independently of field access support.
+    pub offset_unsupported: BTreeMap<String, String>,
 }
 
 /// Field names can coincide with Rust keywords or generated identifiers. Encoding
@@ -40,6 +44,7 @@ pub(super) fn generate(
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,
     used_fields: &BTreeSet<String>,
+    used_offsets: &BTreeSet<String>,
     target: &TargetFacts,
     required_types: &[TypeInfo],
 ) -> Result<FieldAdapters, String> {
@@ -56,17 +61,29 @@ pub(super) fn generate(
         c_source: String::new(),
         markers: BTreeMap::new(),
         unsupported: BTreeMap::new(),
+        offsets: BTreeMap::new(),
+        offset_unsupported: BTreeMap::new(),
     };
+    let mut layout_checks = LayoutChecks::default();
     let mut record_bridges = BTreeSet::new();
-    let mut projections = BTreeSet::new();
+    let mut projections = BTreeMap::<(String, String), Option<OffsetIdentity>>::new();
     let mut pending_records = required_types.to_vec();
+    let combined_names;
+    let used_names = if used_offsets.is_empty() {
+        used_fields
+    } else if used_fields.is_empty() {
+        used_offsets
+    } else {
+        combined_names = used_fields.union(used_offsets).cloned().collect();
+        &combined_names
+    };
     for (canonical, record) in &declarations.records {
         let mut used = Vec::new();
         collect_projections(
             canonical,
             declarations,
             &lowering,
-            used_fields,
+            used_names,
             &mut Vec::new(),
             &mut used,
             0,
@@ -82,13 +99,14 @@ pub(super) fn generate(
             Ok(resolved) => resolved.storage.replace("$crate", "crate"),
             Err(reason) => {
                 for field in used {
-                    output.unsupported.insert(
-                        format!(
-                            "{canonical}::{}",
-                            field.field.name.as_ref().expect("used fields have names")
-                        ),
-                        reason.clone(),
-                    );
+                    let name = field.field.name.as_ref().expect("used fields have names");
+                    let key = format!("{canonical}::{name}");
+                    if used_fields.contains(name) {
+                        output.unsupported.insert(key.clone(), reason.clone());
+                    }
+                    if used_offsets.contains(name) {
+                        output.offset_unsupported.insert(key, reason.clone());
+                    }
                 }
                 continue;
             }
@@ -98,7 +116,77 @@ pub(super) fn generate(
             let field = projection.field;
             let name = field.name.as_ref().expect("used fields have names");
             let key = format!("{canonical}::{name}");
-            if !projections.insert((storage.clone(), name.clone())) {
+            let (first_projection, previous_offset) = match projections
+                .entry((storage.clone(), name.clone()))
+            {
+                std::collections::btree_map::Entry::Vacant(entry) => (true, entry.insert(None)),
+                std::collections::btree_map::Entry::Occupied(entry) => (false, entry.into_mut()),
+            };
+            if used_offsets.contains(name) {
+                match offset_adapter(&projection, &lowering, declarations) {
+                    Ok(adapter) => {
+                        let identity = OffsetIdentity {
+                            record: record.identity.clone(),
+                            member: adapter
+                                .member_record
+                                .as_ref()
+                                .map(|canonical| declarations.records[canonical].identity.clone()),
+                            marker: adapter.member_marker.clone(),
+                            path: adapter.offset.clone(),
+                        };
+                        if previous_offset.as_ref().is_some_and(|previous| *previous != identity) {
+                            output.offset_unsupported.insert(
+                                key.clone(),
+                                "canonical record spellings disagree on the shared Rust offset capability".into(),
+                            );
+                            continue;
+                        }
+                        let field_marker = register_marker(&mut output, name);
+                        if record_bridges.insert(storage.clone()) {
+                            record_bridge(
+                                &mut output.rust,
+                                &mut layout_checks,
+                                &storage,
+                                binding,
+                                record.size,
+                                record.alignment,
+                            );
+                        }
+                        for layout in adapter.layouts {
+                            layout_checks.object(
+                                &mut output.rust,
+                                &layout.storage,
+                                layout.size,
+                                layout.alignment,
+                            );
+                            layout_checks.field(
+                                &mut output.rust,
+                                &layout.storage,
+                                &layout.field,
+                                layout.offset,
+                            );
+                        }
+                        if previous_offset.is_none() {
+                            writeln!(
+                                output.rust,
+                                "impl {EXPRESSION}::OffsetField<{field_marker}> for {EXPRESSION}::CRecord<{storage}> {{ type Member = {}; const OFFSET: usize = {}; }}",
+                                adapter.member_marker,
+                                adapter.offset,
+                            )
+                            .expect("String output");
+                            *previous_offset = Some(identity);
+                        }
+                        output.offsets.insert(key.clone(), adapter.member_record);
+                    }
+                    Err(reason) => {
+                        output.offset_unsupported.insert(key.clone(), reason);
+                    }
+                }
+                if output.rust.len() > MAX_ADAPTER_BYTES {
+                    return Err("generated field adapters exceed the 16 MiB source budget".into());
+                }
+            }
+            if !first_projection || !used_fields.contains(name) {
                 continue;
             }
             if field.bit_width.is_some() {
@@ -109,7 +197,6 @@ pub(super) fn generate(
                     );
                     continue;
                 }
-                let field_marker = marker_name(name);
                 match super::bitfields::generate(
                     canonical,
                     field,
@@ -120,20 +207,11 @@ pub(super) fn generate(
                     &lowering,
                 ) {
                     Ok(adapter) => {
-                        if output
-                            .markers
-                            .insert(
-                                name.clone(),
-                                format!("$crate::__pgrx_c_generated::{field_marker}"),
-                            )
-                            .is_none()
-                        {
-                            writeln!(output.rust, "#[doc(hidden)] pub struct {field_marker};")
-                                .expect("String output");
-                        }
+                        register_marker(&mut output, name);
                         if record_bridges.insert(storage.clone()) {
                             record_bridge(
                                 &mut output.rust,
+                                &mut layout_checks,
                                 &storage,
                                 binding,
                                 record.size,
@@ -164,17 +242,16 @@ pub(super) fn generate(
                         continue;
                     }
                 };
-            let field_marker = marker_name(name);
-            if output
-                .markers
-                .insert(name.clone(), format!("$crate::__pgrx_c_generated::{field_marker}"))
-                .is_none()
-            {
-                writeln!(output.rust, "#[doc(hidden)] pub struct {field_marker};")
-                    .expect("String output");
-            }
+            let field_marker = register_marker(&mut output, name);
             if record_bridges.insert(storage.clone()) {
-                record_bridge(&mut output.rust, &storage, binding, record.size, record.alignment);
+                record_bridge(
+                    &mut output.rust,
+                    &mut layout_checks,
+                    &storage,
+                    binding,
+                    record.size,
+                    record.alignment,
+                );
             }
             let mut addresses = String::new();
             let mut previous = "base.pointer().as_mut_address()".to_owned();
@@ -189,7 +266,13 @@ pub(super) fn generate(
                     .replace("$crate", "crate");
                 let offset = step.field.offset_bits.expect("validated field offset") / 8;
                 let rust_field = &step.binding.rust_name;
-                writeln!(output.rust, "const _: () = assert!(::core::mem::offset_of!({parent_storage}, {rust_field}) == {offset});").expect("String output");
+                if let Some((size, alignment)) = declarations.records[step.canonical]
+                    .size
+                    .zip(declarations.records[step.canonical].alignment)
+                {
+                    layout_checks.object(&mut output.rust, &parent_storage, size, alignment);
+                }
+                layout_checks.field(&mut output.rust, &parent_storage, rust_field, offset);
                 let address = format!("address{index}");
                 let cast = if matches!(step.binding.ty, RustBindingType::ManuallyDrop { .. }) {
                     format!(".cast::<{step_storage}>()")
@@ -200,12 +283,20 @@ pub(super) fn generate(
                 if let Some(size) = step.field.ty.size {
                     let actual =
                         lowering.storage_type(&step.binding.ty, 0)?.replace("$crate", "crate");
-                    writeln!(output.rust, "const _: () = {{ assert!(::core::mem::size_of::<{actual}>() == {size}); assert!(::core::mem::align_of::<{actual}>() == {}); }};", step.field.ty.alignment.ok_or("projected field has no compiler alignment")?).expect("String output");
+                    layout_checks.object(
+                        &mut output.rust,
+                        &actual,
+                        size,
+                        step.field
+                            .ty
+                            .alignment
+                            .ok_or("projected field has no compiler alignment")?,
+                    );
                 }
                 previous = address;
             }
             if flexible {
-                writeln!(output.rust, "const _: () = {{ assert!(::core::mem::size_of::<{projected_storage}>() == 0); assert!(::core::mem::align_of::<{projected_storage}>() == {field_alignment}); }};").expect("String output");
+                layout_checks.object(&mut output.rust, &projected_storage, 0, field_alignment);
             }
             let qualification = if projection.steps.iter().any(|step| step.field.ty.is_const) {
                 format!("{EXPRESSION}::ReadOnly")
@@ -259,7 +350,14 @@ pub(super) fn generate(
                 let Some(record) = declarations.records.get(&ty.canonical_spelling) else {
                     continue;
                 };
-                record_bridge(&mut output.rust, &storage, binding, record.size, record.alignment);
+                record_bridge(
+                    &mut output.rust,
+                    &mut layout_checks,
+                    &storage,
+                    binding,
+                    record.size,
+                    record.alignment,
+                );
             }
         }
     }
@@ -278,6 +376,153 @@ struct ProjectionStep<'a> {
 struct Projection<'a> {
     field: &'a FieldInfo,
     steps: Vec<ProjectionStep<'a>>,
+}
+
+struct OffsetAdapter {
+    layouts: Vec<OffsetLayout>,
+    offset: String,
+    member_marker: String,
+    member_record: Option<String>,
+}
+
+/// Qualified spellings may share one Rust implementation only when they retain
+/// the compiler record identities and the same anchored storage path.
+#[derive(PartialEq, Eq)]
+struct OffsetIdentity {
+    record: String,
+    member: Option<String>,
+    marker: String,
+    path: String,
+}
+
+struct OffsetLayout {
+    storage: String,
+    size: u64,
+    alignment: u64,
+    field: String,
+    offset: u64,
+}
+
+#[derive(Default)]
+struct LayoutChecks {
+    objects: BTreeSet<(String, u64, u64)>,
+    fields: BTreeSet<(String, String, u64)>,
+}
+
+impl LayoutChecks {
+    fn object(&mut self, rust: &mut String, storage: &str, size: u64, alignment: u64) {
+        if self.objects.insert((storage.to_owned(), size, alignment)) {
+            writeln!(rust, "const _: () = {{ assert!(::core::mem::size_of::<{storage}>() == {size}); assert!(::core::mem::align_of::<{storage}>() == {alignment}); }};").expect("String output");
+        }
+    }
+
+    fn field(&mut self, rust: &mut String, storage: &str, field: &str, offset: u64) {
+        if self.fields.insert((storage.to_owned(), field.to_owned(), offset)) {
+            writeln!(
+                rust,
+                "const _: () = assert!(::core::mem::offset_of!({storage}, {field}) == {offset});"
+            )
+            .expect("String output");
+        }
+    }
+}
+
+fn register_marker(output: &mut FieldAdapters, name: &str) -> String {
+    let marker = marker_name(name);
+    if output
+        .markers
+        .insert(name.to_owned(), format!("$crate::__pgrx_c_generated::{marker}"))
+        .is_none()
+    {
+        writeln!(output.rust, "#[doc(hidden)] pub struct {marker};").expect("String output");
+    }
+    marker
+}
+
+/// Offsets require the containing layout and actual field path, not a loadable
+/// leaf type. In particular, packing, volatility and flexible arrays do not
+/// create a memory-access obligation here.
+fn offset_adapter(
+    projection: &Projection<'_>,
+    lowering: &Lowering<'_>,
+    declarations: &DeclarationCatalog,
+) -> Result<OffsetAdapter, String> {
+    if projection.field.bit_width.is_some() {
+        return Err("C offsetof cannot name a bitfield".into());
+    }
+    if projection.steps.is_empty() {
+        return Err("field has no extractable compiler-anchored Rust offset path".into());
+    }
+    let mut layouts = Vec::with_capacity(projection.steps.len());
+    let mut offset = String::new();
+    let mut compiler_offset = 0u64;
+    for step in &projection.steps {
+        let parent = declarations
+            .records
+            .get(step.canonical)
+            .ok_or("offset parent has no compiler record layout")?;
+        let (size, alignment) = parent
+            .size
+            .zip(parent.alignment.filter(|alignment| *alignment > 0))
+            .ok_or("C offsetof requires a complete containing record")?;
+        let shape = declarations
+            .type_shapes
+            .get(step.canonical)
+            .ok_or("offset parent has no compiler-owned type shape")?;
+        let storage = lowering.resolve(&shape.ty)?.storage.replace("$crate", "crate");
+        let position = step.field.offset_bits.ok_or("compiler did not establish field offset")?;
+        if step.field.bit_width.is_some() || position % 8 != 0 {
+            return Err("C offsetof requires an ordinary field on a byte boundary".into());
+        }
+        let position = position / 8;
+        if position > size {
+            return Err("compiler field offset exceeds its containing record".into());
+        }
+        compiler_offset = compiler_offset
+            .checked_add(position)
+            .ok_or("promoted field offset exceeds the compiler representation")?;
+        let rust_field = &step.binding.rust_name;
+        if offset.is_empty() {
+            write!(offset, "::core::mem::offset_of!({storage}, {rust_field})")
+                .expect("String output");
+        } else {
+            write!(offset, ".checked_add(::core::mem::offset_of!({storage}, {rust_field})).expect(\"C promoted field offset exceeds usize\")").expect("String output");
+        }
+        layouts.push(OffsetLayout {
+            storage,
+            size,
+            alignment,
+            field: rust_field.clone(),
+            offset: position,
+        });
+    }
+    let root = declarations.records[projection.steps[0].canonical]
+        .size
+        .expect("each offset parent is complete");
+    if compiler_offset > root {
+        return Err("promoted field offset exceeds its containing record".into());
+    }
+    let mut member_marker = "()".to_owned();
+    let mut member_record = None;
+    if projection.field.ty.category == TypeCategory::Record
+        && declarations
+            .records
+            .get(&projection.field.ty.canonical_spelling)
+            .is_some_and(|record| record.size.is_some() && record.alignment.is_some())
+    {
+        let mut ty = projection.field.ty.clone();
+        // offsetof does not access the member. Qualifiers must not impose the
+        // value representation or access restrictions of a field projection.
+        ty.is_volatile = false;
+        if let Ok(lowered) = lowering.resolve_with_storage(
+            &ty,
+            &projection.steps.last().expect("nonempty offset path").binding.ty,
+        ) {
+            member_marker = lowered.marker.replace("$crate", "crate");
+            member_record = Some(ty.canonical_spelling);
+        }
+    }
+    Ok(OffsetAdapter { layouts, offset, member_marker, member_record })
 }
 
 fn collect_projections<'a>(
@@ -392,6 +637,7 @@ fn validate_projection(
 
 fn record_bridge(
     rust: &mut String,
+    checks: &mut LayoutChecks,
     storage: &str,
     binding: &RecordBinding,
     size: Option<u64>,
@@ -403,9 +649,9 @@ fn record_bridge(
     }
     let size = size.expect("complete record size");
     let alignment = alignment.expect("complete record alignment");
+    checks.object(rust, storage, size, alignment);
     writeln!(rust,
-        "const _: () = {{ assert!(::core::mem::size_of::<{storage}>() == {size}); assert!(::core::mem::align_of::<{storage}>() == {alignment}); }};\n\
-         impl crate::__pgrx_c_macros::sealed::Sealed for {storage} {{}}\n\
+        "impl crate::__pgrx_c_macros::sealed::Sealed for {storage} {{}}\n\
          impl {EXPRESSION}::NativeType for {storage} {{ type Marker = {EXPRESSION}::CRecord<Self>; }}").expect("String output");
     if binding.copy {
         writeln!(
@@ -433,6 +679,22 @@ mod tests {
     }
     mod rust_oracle {
         include!(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/support/rust_oracle.rs"));
+    }
+
+    #[test]
+    fn layout_checks_share_identical_facts_but_retain_disagreements() {
+        let mut checks = LayoutChecks::default();
+        let mut rust = String::new();
+        for _ in 0..2 {
+            checks.object(&mut rust, "crate::Parent", 16, 8);
+            checks.field(&mut rust, "crate::Parent", "member", 8);
+        }
+        assert_eq!(rust.matches("size_of::<crate::Parent>").count(), 1);
+        assert_eq!(rust.matches("offset_of!(crate::Parent, member)").count(), 1);
+        checks.object(&mut rust, "crate::Parent", 24, 8);
+        checks.field(&mut rust, "crate::Parent", "member", 16);
+        assert_eq!(rust.matches("size_of::<crate::Parent>").count(), 2);
+        assert_eq!(rust.matches("offset_of!(crate::Parent, member)").count(), 2);
     }
 
     fn fixture() -> PathBuf {
@@ -533,9 +795,15 @@ mod tests {
             .into_iter()
             .map(str::to_owned)
             .collect();
-        let generated =
-            generate(frontend.declarations(), &bindings(), &names, &frontend.profile().target, &[])
-                .unwrap();
+        let generated = generate(
+            frontend.declarations(),
+            &bindings(),
+            &names,
+            &BTreeSet::new(),
+            &frontend.profile().target,
+            &[],
+        )
+        .unwrap();
         assert!(generated.unsupported.values().any(|reason| reason.contains("unaligned volatile")));
         assert_eq!(generated.rust.matches("Sealed for crate::Child").count(), 1);
         let rust_bindings = bindgen::Builder::default()
@@ -634,9 +902,15 @@ int main(void) {
         bindings.records.get_mut("Outer").unwrap().fields.get_mut("count").unwrap().ty =
             RustBindingType::Integer { signed: true, bits: 32 };
         let names = ["count", "bits", "array"].into_iter().map(str::to_owned).collect();
-        let generated =
-            generate(frontend.declarations(), &bindings, &names, &frontend.profile().target, &[])
-                .unwrap();
+        let generated = generate(
+            frontend.declarations(),
+            &bindings,
+            &names,
+            &BTreeSet::new(),
+            &frontend.profile().target,
+            &[],
+        )
+        .unwrap();
         assert!(
             generated.unsupported["struct Outer::count"].contains("differs from bindgen storage")
         );
@@ -646,5 +920,115 @@ int main(void) {
         assert!(!generated.markers.contains_key("bits"));
         assert!(generated.markers.contains_key("array"));
         assert!(!generated.rust.contains("CRecord<crate::Outer>"));
+    }
+
+    #[test]
+    fn offset_capabilities_are_independent_of_loadable_leaf_storage() {
+        let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let scanner = MacroScanner::new().unwrap();
+        let arguments = arguments();
+        let frontend = inspect(&scanner, &fixture(), &arguments, None).unwrap();
+        let mut bindings = bindings();
+        bindings.records.get_mut("Outer").unwrap().fields.get_mut("count").unwrap().ty =
+            RustBindingType::Integer { signed: true, bits: 32 };
+        let names = ["count", "child", "frozen", "signal", "array", "bits"]
+            .into_iter()
+            .map(str::to_owned)
+            .collect();
+        let generated = generate(
+            frontend.declarations(),
+            &bindings,
+            &BTreeSet::new(),
+            &names,
+            &frontend.profile().target,
+            &[],
+        )
+        .unwrap();
+        assert_eq!(generated.offsets["struct Outer::child"].as_deref(), Some("struct Child"));
+        assert_eq!(generated.offsets["struct Outer::count"], None);
+        assert_eq!(generated.offsets["struct VolatilePacked::signal"], None);
+        assert_eq!(generated.offsets["struct Limitations::array"], None);
+        assert!(generated.offset_unsupported["struct Limitations::bits"].contains("bitfield"));
+        assert!(generated.unsupported.is_empty());
+        assert!(generated.c_source.is_empty());
+        assert!(!generated.rust.contains("unsafe"));
+        assert_eq!(generated.rust.matches("Sealed for crate::Outer").count(), 1);
+
+        let rust_bindings = bindgen::Builder::default()
+            .header(fixture().to_str().unwrap())
+            .clang_args(&arguments)
+            .allowlist_type("Child|Outer|Packed|Volatile|Value|Limitations|VolatilePacked")
+            .derive_default(false)
+            .layout_tests(false)
+            .generate()
+            .unwrap()
+            .to_string();
+        let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../pgrx-pg-sys/src/c_macros/support.rs")
+            .canonicalize()
+            .unwrap();
+        let rust = format!(
+            r#"
+#[path = {support:?}] pub mod __pgrx_c_macros;
+{rust_bindings}
+pub mod __pgrx_c_generated {{ {adapters} }}
+use __pgrx_c_macros::expression::*;
+fn main() {{
+    type Frozen = OffsetStep<__pgrx_c_generated::{child}, OffsetStep<__pgrx_c_generated::{frozen}, OffsetEnd>>;
+    type Count = OffsetStep<__pgrx_c_generated::{count}, OffsetEnd>;
+    type Signal = OffsetStep<__pgrx_c_generated::{signal}, OffsetEnd>;
+    type Array = OffsetStep<__pgrx_c_generated::{array}, OffsetEnd>;
+    println!("{{}},{{}},{{}},{{}}", offset_of::<CRecord<Outer>, Frozen>().get(), offset_of::<CRecord<Outer>, Count>().get(), offset_of::<CRecord<VolatilePacked>, Signal>().get(), offset_of::<CRecord<Limitations>, Array>().get());
+}}
+"#,
+            adapters = generated.rust,
+            child = marker_name("child"),
+            frozen = marker_name("frozen"),
+            count = marker_name("count"),
+            signal = marker_name("signal"),
+            array = marker_name("array"),
+        );
+        let actual = rust_oracle::run_rust(&rust);
+        let expected = oracle::run_c(
+            &frontend.profile().compiler.executable,
+            &fixture(),
+            r#"
+#include <stddef.h>
+#include <stdio.h>
+int main(void) {
+    printf("%zu,%zu,%zu,%zu\n", offsetof(struct Outer, child.frozen), offsetof(struct Outer, count), offsetof(struct VolatilePacked, signal), offsetof(struct Limitations, array));
+}
+"#,
+            &arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+            true,
+        );
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn offset_paths_reject_overflow_and_excess_depth_during_type_checking() {
+        let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../pgrx-pg-sys/src/c_macros/support.rs")
+            .canonicalize()
+            .unwrap();
+        for (offset, depth, reason) in [
+            ("usize::MAX", 2, "C offsetof path offset exceeds usize"),
+            ("0", 65, "C offsetof path exceeds the 64-field bound"),
+        ] {
+            let path = format!("{}OffsetEnd{}", "OffsetStep<F,".repeat(depth), ">".repeat(depth));
+            let source = format!(
+                r#"
+#![recursion_limit = "512"]
+#[path = {support:?}] pub mod __pgrx_c_macros;
+use __pgrx_c_macros::expression::*;
+struct F;
+impl OffsetField<F> for CRecord<()> {{ type Member = Self; const OFFSET: usize = {offset}; }}
+const INVALID: u64 = offset_of::<CRecord<()>, {path}>().get();
+fn main() {{ let _ = INVALID; }}
+"#,
+            );
+            let diagnostics = rust_oracle::reject_rust(&source);
+            assert!(diagnostics.contains(reason), "{diagnostics}");
+        }
     }
 }

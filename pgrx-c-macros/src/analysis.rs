@@ -17,8 +17,9 @@ use crate::model::{
     IntegerKind, IntegerType, IntegerValue, SignedOverflow, TargetFacts, TypeCategory, TypeInfo,
 };
 use crate::syntax::{
-    BinaryOperator, Expression, ExpressionKind, IntegerLiteral, NodeId, Statement, SyntaxError,
-    SyntaxErrorKind, TokenRange, UnaryOperator, parse_expression, parse_replacement,
+    BinaryOperator, Expression, ExpressionKind, IntegerLiteral, NodeId, OffsetComponent,
+    OffsetRecord, Statement, SyntaxError, SyntaxErrorKind, TokenRange, UnaryOperator,
+    parse_expression, parse_replacement,
 };
 use crate::{MacroKind, SourceSpan, Token, TokenKind};
 use serde::Serialize;
@@ -122,6 +123,7 @@ pub enum ParameterRole {
     Type,
     Place,
     Identifier,
+    FieldDesignator,
     Unused,
     Unknown,
 }
@@ -509,6 +511,34 @@ pub(crate) fn analyze_active_with_constants(
         }
     }
     for (index, node) in syntax.nodes.iter().enumerate() {
+        if let ExpressionKind::OffsetOf { record, fields } = &node.kind {
+            let roles = match record {
+                OffsetRecord::Parameter { index } => Some((*index, ParameterRole::Type)),
+                OffsetRecord::Named { .. } => None,
+            }
+            .into_iter()
+            .chain(fields.iter().filter_map(|field| match field {
+                OffsetComponent::Parameter { index } => {
+                    Some((*index, ParameterRole::FieldDesignator))
+                }
+                OffsetComponent::Named { .. } => None,
+            }));
+            for (parameter, role) in roles {
+                let parameter = &mut result.parameters[parameter];
+                parameter.roles.retain(|role| *role != ParameterRole::Unknown);
+                if !parameter.roles.contains(&role) {
+                    parameter.roles.push(role);
+                }
+                parameter.constraint = None;
+                for usage in &mut parameter.uses {
+                    if usage.tokens.start >= node.tokens.start
+                        && usage.tokens.end <= node.tokens.end
+                    {
+                        usage.grouped = true;
+                    }
+                }
+            }
+        }
         if let ExpressionKind::Member { field_parameter: Some(parameter), .. } = node.kind {
             let parameter = &mut result.parameters[parameter];
             parameter.roles.retain(|role| *role != ParameterRole::Unknown);
@@ -593,6 +623,7 @@ pub(crate) fn analyze_active_with_constants(
                         | ExpressionKind::Call { .. }
                         | ExpressionKind::Member { .. }
                         | ExpressionKind::Index { .. }
+                        | ExpressionKind::OffsetOf { .. }
                 );
             if expression_boundary && !compiler_expanded {
                 return result.skip(
@@ -1188,7 +1219,26 @@ fn analyze_types(
             | ExpressionKind::AlignOfType { .. }
             | ExpressionKind::SizeOfTypeParameter { .. }
             | ExpressionKind::AlignOfTypeParameter { .. } => {
-                TypeExpression::Concrete { ty: target.integers[&IntegerKind::UnsignedLong] }
+                TypeExpression::Concrete { ty: target.integers[&target.size_type] }
+            }
+            ExpressionKind::OffsetOf { record, .. } => {
+                if !target.offsetof_supported {
+                    return Err((SkipReasonCode::DynamicBuiltin, "compiler offsetof type and semantics are not established under this profile".into(), node.tokens));
+                }
+                if let OffsetRecord::Named { name } = record
+                    && resolve_type_info(name, catalog, target).is_none_or(|ty| {
+                        ty.category != TypeCategory::Record
+                            || ty.size.is_none()
+                            || ty.alignment.is_none()
+                    })
+                {
+                    return Err((
+                        SkipReasonCode::UnsupportedType,
+                        format!("{name}: offsetof requires a complete C record"),
+                        node.tokens,
+                    ));
+                }
+                TypeExpression::Concrete { ty: target.integers[&target.size_type] }
             }
             ExpressionKind::TypeParameterCast { .. } => TypeExpression::Deferred,
         };
@@ -1350,6 +1400,13 @@ fn check_local_reads(
 }
 
 fn validate_target(target: &TargetFacts) -> Result<(), String> {
+    if target
+        .integers
+        .get(&target.size_type)
+        .is_none_or(|ty| ty.signed || ty.kind == IntegerKind::Bool)
+    {
+        return Err("target facts do not establish an unsigned size_t integer identity".into());
+    }
     for kind in [
         IntegerKind::Bool,
         IntegerKind::Char,
@@ -1727,6 +1784,8 @@ mod tests {
         TargetFacts {
             triple: "fixture".into(),
             pointer_bits: 64,
+            size_type: IntegerKind::UnsignedLong,
+            offsetof_supported: true,
             function_pointer: crate::PointerLayout { size: 8, alignment: 8 },
             char_bits: 8,
             char_is_signed: true,

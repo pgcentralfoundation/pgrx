@@ -6,8 +6,8 @@
 mod oracle;
 
 use pgrx_c_macros::{
-    ArrayKind, DeclarationLinkage, FieldInfo, FloatingKind, IntegerKind, MacroScanner, RecordInfo,
-    RecordKind, TypeCategory, TypeShapeKind, inspect,
+    ArrayKind, DeclarationLinkage, FieldInfo, FloatingKind, FrontendError, IntegerKind,
+    MacroScanner, RecordInfo, RecordKind, TypeCategory, TypeShapeKind, inspect,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -16,6 +16,82 @@ static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
 fn field<'a>(record: &'a RecordInfo, name: &str) -> &'a FieldInfo {
     record.fields.iter().find(|field| field.name.as_deref() == Some(name)).unwrap()
+}
+
+#[test]
+fn compiler_size_identity_and_offset_capability_match_independent_c_assertions() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let header = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/frontend_types.h");
+    let output = inspect(&scanner, &header, &["-std=c17".into()], None).unwrap();
+    let target = &output.profile().target;
+    let spelling = match target.size_type {
+        IntegerKind::UnsignedChar => "unsigned char",
+        IntegerKind::UnsignedShort => "unsigned short",
+        IntegerKind::UnsignedInt => "unsigned int",
+        IntegerKind::UnsignedLong => "unsigned long",
+        IntegerKind::UnsignedLongLong => "unsigned long long",
+        IntegerKind::UnsignedInt128 => "unsigned __int128",
+        other => panic!("sizeof must have an unsigned canonical identity, found {other:?}"),
+    };
+    assert!(
+        target.offsetof_supported,
+        "Clang must prove its intrinsic for this ordinary C profile"
+    );
+    let record = &output.declarations().records["struct FrontNode"];
+    let matrix_offset = field(record, "matrix").offset_bits.unwrap()
+        + 5 * u64::from(target.integers[&IntegerKind::Int].bits);
+    let source = format!(
+        "_Static_assert(_Generic(sizeof(0), {spelling}: 1, default: 0), \"sizeof exact identity\");\n\
+         _Static_assert(_Generic(_Alignof(int), {spelling}: 1, default: 0), \"alignof exact identity\");\n\
+         _Static_assert(_Generic(__builtin_offsetof(struct FrontNode, matrix[1][2]), {spelling}: 1, default: 0), \"offsetof exact identity\");\n\
+         _Static_assert(__builtin_offsetof(struct FrontNode, matrix[1][2]) * __CHAR_BIT__ == {matrix_offset}, \"nested array offset\");\n"
+    );
+    assert!(
+        oracle::run_c(
+            &output.profile().compiler.executable,
+            &header,
+            &source,
+            &output.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+            false,
+        )
+        .is_empty()
+    );
+    let json = serde_json::to_value(target).unwrap();
+    assert_eq!(json["size_type"], serde_json::to_value(target.size_type).unwrap());
+    assert_eq!(json["offsetof_supported"], true);
+}
+
+#[test]
+fn intrinsic_macro_shadow_disables_only_offsets_and_cannot_spoof_required_type_proofs() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let header = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/frontend_types.h");
+    let output = inspect(
+        &scanner,
+        &header,
+        &["-std=c17".into(), "-D__builtin_offsetof(T,M)=0".into()],
+        None,
+    )
+    .unwrap();
+    assert!(!output.profile().target.offsetof_supported);
+    assert!(output.declarations().records.contains_key("struct FrontNode"));
+    assert!(output.declarations().function_signatures.contains_key("front_external"));
+    assert!(!output.profile().target.integers[&output.profile().target.size_type].signed);
+    let rewritten_field =
+        inspect(&scanner, &header, &["-std=c17".into(), "-Dfirst=0".into()], None).unwrap();
+    assert!(!rewritten_field.profile().target.offsetof_supported);
+    assert!(rewritten_field.declarations().function_signatures.contains_key("front_external"));
+    let error = inspect(
+        &scanner,
+        &header,
+        &["-std=c17".into(), "-D__builtin_types_compatible_p(a,b)=1".into()],
+        None,
+    )
+    .unwrap_err();
+    assert!(
+        matches!(error, FrontendError::Environment(message) if message.contains("unshadowed __builtin_types_compatible_p"))
+    );
 }
 
 #[test]

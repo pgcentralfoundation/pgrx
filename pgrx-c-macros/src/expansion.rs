@@ -787,10 +787,13 @@ fn inspect_dependency<'a>(frontend: &'a FrontendOutput, name: &'a str) -> Depend
             }
             _ => {}
         }
+        let modeled_intrinsic = frontend.declarations().builtins.contains_key(&token.spelling)
+            || (token.spelling == "__builtin_offsetof"
+                && frontend.profile().target.offsetof_supported);
         if token.spelling.starts_with("__")
             && !frontend.environment().active.contains_key(&token.spelling)
             && !frontend.declarations().functions.contains_key(&token.spelling)
-            && !frontend.declarations().builtins.contains_key(&token.spelling)
+            && !modeled_intrinsic
             && body
                 .iter()
                 .skip(index + 1)

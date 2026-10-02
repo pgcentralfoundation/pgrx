@@ -995,6 +995,62 @@ impl<M: CompleteObject, Q: Qualifier> SizeablePlace for Place<M, Q> {
     type Object = M;
 }
 
+/// A field offset verified against the compiler's layout and actual Rust bindings.
+/// Unlike a field projection, this capability never accesses object storage.
+pub trait OffsetField<F>: CType {
+    /// A verified nested record marker, or `()` when the path cannot continue.
+    /// Leaf fields need no supported value representation to have an offset.
+    type Member;
+    const OFFSET: usize;
+}
+
+impl<F, M: OffsetField<F>> OffsetField<F> for CVolatile<M> {
+    type Member = M::Member;
+    const OFFSET: usize = <M as OffsetField<F>>::OFFSET;
+}
+
+/// End of a compiler-verified field path.
+pub struct OffsetEnd;
+
+/// One field followed by the remaining field path.
+pub struct OffsetStep<F, Tail>(PhantomData<(F, Tail)>);
+
+/// Compose field offsets without constructing an address or evaluating an operand.
+pub trait OffsetPath<P> {
+    const OFFSET: usize;
+    const DEPTH: usize;
+}
+
+impl<M> OffsetPath<OffsetEnd> for M {
+    const OFFSET: usize = 0;
+    const DEPTH: usize = 0;
+}
+
+impl<M: OffsetField<F>, F, Tail> OffsetPath<OffsetStep<F, Tail>> for M
+where
+    M::Member: OffsetPath<Tail>,
+{
+    const DEPTH: usize = match <M::Member as OffsetPath<Tail>>::DEPTH.checked_add(1) {
+        Some(depth) => depth,
+        None => panic!("C offsetof path exceeds the 64-field bound"),
+    };
+    const OFFSET: usize = {
+        assert!(
+            <Self as OffsetPath<OffsetStep<F, Tail>>>::DEPTH <= 64,
+            "C offsetof path exceeds the 64-field bound"
+        );
+        match <M as OffsetField<F>>::OFFSET.checked_add(<M::Member as OffsetPath<Tail>>::OFFSET) {
+            Some(offset) => offset,
+            None => panic!("C offsetof path offset exceeds usize"),
+        }
+    };
+}
+
+/// Return an offset with the selected profile's verified LP64 C `size_t` identity.
+pub const fn offset_of<M: OffsetPath<P>, P>() -> CValue<super::CUnsignedLong> {
+    CValue::new(M::OFFSET as u64)
+}
+
 /// Add an inherited volatile qualification to a projected object's type.
 pub trait VolatilePlace: Copy {
     type Qualified: Copy;
@@ -2139,6 +2195,58 @@ mod tests {
         second: bool,
     }
     struct First;
+
+    #[repr(C)]
+    struct OffsetInner {
+        lead: u8,
+        value: u32,
+    }
+    #[repr(C, packed)]
+    struct OffsetOuter {
+        lead: u8,
+        nested: OffsetInner,
+        trailing: [u8; 0],
+    }
+    struct NestedOffset;
+    struct ValueOffset;
+    struct TrailingOffset;
+    struct LeadOffset;
+    impl OffsetField<NestedOffset> for CRecord<OffsetOuter> {
+        type Member = CRecord<OffsetInner>;
+        const OFFSET: usize = core::mem::offset_of!(OffsetOuter, nested);
+    }
+    impl OffsetField<ValueOffset> for CRecord<OffsetInner> {
+        type Member = ();
+        const OFFSET: usize = core::mem::offset_of!(OffsetInner, value);
+    }
+    impl OffsetField<TrailingOffset> for CRecord<OffsetOuter> {
+        type Member = ();
+        const OFFSET: usize = core::mem::offset_of!(OffsetOuter, trailing);
+    }
+    impl OffsetField<LeadOffset> for CRecord<OffsetOuter> {
+        type Member = ();
+        const OFFSET: usize = core::mem::offset_of!(OffsetOuter, lead);
+    }
+
+    #[test]
+    fn offset_paths_compose_packed_layout_without_object_storage() {
+        type Path = OffsetStep<NestedOffset, OffsetStep<ValueOffset, OffsetEnd>>;
+        const OFFSET: CValue<CUnsignedLong> = offset_of::<CRecord<OffsetOuter>, Path>();
+        assert_eq!(OFFSET.get(), core::mem::offset_of!(OffsetOuter, nested.value) as u64);
+        assert_eq!(<CRecord<OffsetOuter> as OffsetPath<Path>>::DEPTH, 2);
+        assert_eq!(offset_of::<CVolatile<CRecord<OffsetOuter>>, Path>().get(), OFFSET.get());
+    }
+
+    #[test]
+    fn offset_leaf_does_not_require_a_value_or_complete_member_type() {
+        type Trailing = OffsetStep<TrailingOffset, OffsetEnd>;
+        assert_eq!(
+            offset_of::<CRecord<OffsetOuter>, Trailing>().get(),
+            core::mem::offset_of!(OffsetOuter, trailing) as u64
+        );
+        assert_eq!(offset_of::<CRecord<OffsetOuter>, OffsetStep<LeadOffset, OffsetEnd>>().get(), 0);
+    }
+
     // SAFETY: The compiler checks the actual field type and projection. Only the
     // first field is projected, with no record read or qualification broadening.
     unsafe impl Field<First, ReadWrite> for CRecord<Partial> {

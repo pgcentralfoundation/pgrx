@@ -57,6 +57,11 @@ pub struct BindingCatalog {
     /// Generated field capabilities, populated by batch lowering from both catalogs.
     #[serde(skip)]
     pub field_capabilities: BTreeMap<String, String>,
+    /// Offset-only field metadata, independent of load or projection support.
+    #[serde(skip)]
+    pub offset_capabilities: BTreeMap<String, Option<String>>,
+    #[serde(skip)]
+    pub offset_unavailable: BTreeMap<String, String>,
     /// Optional crate-relative guard for native adapters that may call PostgreSQL.
     #[serde(skip)]
     pub ffi_boundary: Option<Vec<String>>,
@@ -191,6 +196,8 @@ fn register_adapters(capabilities: &mut BindingCatalog, adapters: &GeneratedAdap
     capabilities.enum_unavailable.extend(adapters.enumerations.unsupported.clone());
     capabilities.function_addresses.extend(adapters.addresses.bindings.clone());
     capabilities.field_capabilities.extend(adapters.fields.markers.clone());
+    capabilities.offset_capabilities.extend(adapters.fields.offsets.clone());
+    capabilities.offset_unavailable.extend(adapters.fields.offset_unsupported.clone());
     capabilities.functions.extend(adapters.functions.bindings.clone());
     capabilities.function_unavailable.extend(adapters.functions.unsupported.clone());
 }
@@ -469,10 +476,12 @@ fn generated_adapters(
 ) -> Result<GeneratedAdapters, String> {
     let frontend = session.frontend();
     let mut used_fields = BTreeSet::new();
+    let mut used_offsets = BTreeSet::new();
     let mut required_types = BTreeMap::new();
     let mut used_functions = BTreeSet::new();
     let mut used_addresses = BTreeSet::new();
     let mut parameter_fields = false;
+    let mut parameter_offsets = false;
     for name in names {
         let analysis = session.analyze(name.as_ref());
         let Some(expression) = analysis.expression else { continue };
@@ -488,6 +497,27 @@ fn generated_adapters(
         }
         for (index, node) in expression.syntax.nodes.into_iter().enumerate() {
             match node.kind {
+                ExpressionKind::OffsetOf { record, fields } => {
+                    if let crate::OffsetRecord::Named { name } = record
+                        && let Some(ty) = crate::analysis::resolve_type_info(
+                            &name,
+                            frontend.declarations(),
+                            &frontend.profile().target,
+                        )
+                    {
+                        required_types.insert(ty.canonical_spelling.clone(), ty);
+                    }
+                    for field in fields {
+                        match field {
+                            crate::OffsetComponent::Named { name } => {
+                                used_offsets.insert(name);
+                            }
+                            crate::OffsetComponent::Parameter { .. } => {
+                                parameter_offsets = true;
+                            }
+                        }
+                    }
+                }
                 ExpressionKind::Member { field, field_parameter, .. } => {
                     if field_parameter.is_some() {
                         parameter_fields = true;
@@ -536,6 +566,11 @@ fn generated_adapters(
             used_fields.extend(record.fields.iter().filter_map(|field| field.name.clone()));
         }
     }
+    if parameter_offsets {
+        for record in frontend.declarations().records.values() {
+            used_offsets.extend(record.fields.iter().filter_map(|field| field.name.clone()));
+        }
+    }
     use sha2::{Digest, Sha256};
     let profile = serde_json::to_vec(frontend.profile())
         .map_err(|error| format!("cannot fingerprint the C function profile: {error}"))?;
@@ -576,6 +611,7 @@ fn generated_adapters(
             frontend.declarations(),
             &capabilities,
             &used_fields,
+            &used_offsets,
             &frontend.profile().target,
             &required_types.into_values().collect::<Vec<_>>(),
         )?,
@@ -594,11 +630,21 @@ fn generated_adapters(
 fn field_registry(markers: &BTreeMap<String, String>) -> Result<String, String> {
     let mut rust =
         String::from("#[doc(hidden)]\n#[macro_export]\nmacro_rules! __pgrx_c_field_marker {\n");
+    rust.push_str(&format!(
+        "(@path; $($path:tt)+) => {{ $crate::__pgrx_c_field_marker!(@walk [{}]; $($path)+) }};\n\
+         (@walk [@ $($budget:tt)*]; ($($inner:tt)+) . $($rest:tt)+) => {{ $crate::__pgrx_c_field_marker!(@walk [@ $($budget)*]; $($inner)+ . $($rest)+) }};\n\
+         (@walk [@ $($budget:tt)*]; ($($inner:tt)+)) => {{ $crate::__pgrx_c_field_marker!(@walk [@ $($budget)*]; $($inner)+) }};\n\
+         (@walk [@ $($budget:tt)*]; $field:ident . $($rest:tt)+) => {{ $crate::__pgrx_c_macros::expression::OffsetStep<$crate::__pgrx_c_field_marker!($field), $crate::__pgrx_c_field_marker!(@walk [$($budget)*]; $($rest)+)> }};\n\
+         (@walk [@ $($budget:tt)*]; $field:ident) => {{ $crate::__pgrx_c_macros::expression::OffsetStep<$crate::__pgrx_c_field_marker!($field), $crate::__pgrx_c_macros::expression::OffsetEnd> }};\n\
+         (@walk []; $($rest:tt)+) => {{ compile_error!(\"offsetof member path exceeds the 64-component bound\") }};\n",
+        "@ ".repeat(64)
+    ));
     for (field, marker) in markers {
-        let Some(identifier) = rust_identifier(field) else { continue };
+        let Some(identifier) = field_identifier(field) else { continue };
         writeln!(rust, "({identifier}) => {{ {marker} }};").expect("String output");
-        if identifier.starts_with("r#") {
-            writeln!(rust, "({field}) => {{ {marker} }};").expect("String output");
+        if let Some(raw) = rust_identifier(field).filter(|identifier| identifier.starts_with("r#"))
+        {
+            writeln!(rust, "({raw}) => {{ {marker} }};").expect("String output");
         }
         if rust.len() > MAX_EMISSION_BYTES {
             return Err("generated C field registry exceeds its source budget".into());
@@ -606,6 +652,15 @@ fn field_registry(markers: &BTreeMap<String, String>) -> Result<String, String> 
     }
     rust.push_str("($($unknown:tt)*) => { compile_error!(\"field has no compiler-verified PostgreSQL binding capability\") };\n}\n");
     Ok(rust)
+}
+
+// Field tokens select a verified capability rather than declare a Rust item.
+// C members may therefore use Rust keywords such as `self` or `crate`.
+pub(super) fn field_identifier(name: &str) -> Option<&str> {
+    let mut bytes = name.bytes();
+    (bytes.next().is_some_and(|byte| byte.is_ascii_alphabetic() || byte == b'_')
+        && bytes.all(|byte| byte.is_ascii_alphanumeric() || byte == b'_'))
+    .then_some(name)
 }
 
 fn dependency_skip(
