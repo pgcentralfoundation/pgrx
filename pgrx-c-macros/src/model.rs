@@ -413,6 +413,7 @@ pub struct FunctionSignature {
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum BuiltinKind {
     ByteSwap { bits: u16 },
+    Expect,
 }
 
 /// A direct builtin call has this verified C prototype and pure operation.

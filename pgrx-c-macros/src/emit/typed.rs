@@ -666,6 +666,34 @@ impl<'a> Renderer<'a> {
                                         write!(rust, "<{} as {EXPRESSION}::CType>::from_storage(<{} as {EXPRESSION}::CType>::into_storage({EXPRESSION}::implicit::<{}, _>(", result.marker, parameter.marker, parameter.marker).expect("String output");
                                         tasks.extend([text(")).swap_bytes())"), value(*argument)]);
                                     }
+                                    crate::BuiltinKind::Expect => {
+                                        let [first, expected] = arguments.as_slice() else {
+                                            return Err(failure(format!(
+                                                "{name}: branch expectation requires two operands"
+                                            )));
+                                        };
+                                        let parameters =
+                                            builtin.signature.parameters.as_ref().expect(
+                                                "compiler proof establishes a fixed prototype",
+                                            );
+                                        let first_type =
+                                            lowering.resolve(&parameters[0]).map_err(failure)?;
+                                        let expected_type =
+                                            lowering.resolve(&parameters[1]).map_err(failure)?;
+                                        // Clang evaluates both converted operands, including the
+                                        // expected value, before returning the first. The hint has
+                                        // no value effect, but its operand can have side effects.
+                                        write!(rust, "{{ let __pgrx_c_expect_result = {EXPRESSION}::implicit::<{}, _>(", first_type.marker).expect("String output");
+                                        tasks.extend([
+                                            text("); __pgrx_c_expect_result }"),
+                                            value(*expected),
+                                            Task::Text(format!(
+                                                "); let _ = {EXPRESSION}::implicit::<{}, _>(",
+                                                expected_type.marker
+                                            )),
+                                            value(*first),
+                                        ]);
+                                    }
                                 }
                                 continue;
                             }

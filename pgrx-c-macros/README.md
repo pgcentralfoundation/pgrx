@@ -250,6 +250,9 @@ The typed expression support also covers:
   including member-path parameters. Offset metadata checks Clang's layouts
   against the actual bindings without accessing memory or requiring a loadable
   field value. Bitfields, array indices, and indirect member paths are rejected.
+- Direct `__builtin_expect` calls with a compiler-verified `long(long, long)`
+  prototype and result identity. Both operands are evaluated and converted as
+  in C; the generated expression returns the first and omits the compiler hint.
 - C enums whose compatible integer representation is established by Clang,
   including values without a named Rust enum variant.
 - `float` and `double` where the compiler profile establishes the modeled IEEE

@@ -6,7 +6,8 @@
 
 use super::{FrontendError, driver_arguments, run_compiler, tokenize_snapshot, type_info};
 use crate::{
-    BuiltinInfo, BuiltinKind, FrontendOutput, FunctionSignature, MacroScanner, TypeCategory,
+    BuiltinInfo, BuiltinKind, FrontendOutput, FunctionSignature, IntegerKind, MacroScanner,
+    TypeCategory,
 };
 use clang::{Entity, EntityKind, EntityVisitResult, Index, TypeKind};
 use std::collections::BTreeMap;
@@ -17,8 +18,12 @@ use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-const BYTE_SWAPS: &[(&str, u16)] =
-    &[("__builtin_bswap16", 16), ("__builtin_bswap32", 32), ("__builtin_bswap64", 64)];
+const OPERATIONS: &[(&str, BuiltinKind)] = &[
+    ("__builtin_bswap16", BuiltinKind::ByteSwap { bits: 16 }),
+    ("__builtin_bswap32", BuiltinKind::ByteSwap { bits: 32 }),
+    ("__builtin_bswap64", BuiltinKind::ByteSwap { bits: 64 }),
+    ("__builtin_expect", BuiltinKind::Expect),
+];
 const MAX_SOURCE_BYTES: usize = 4 * 1024 * 1024;
 const MAX_BODY_LINES: usize = 128;
 static NEXT_DIRECTORY: AtomicU64 = AtomicU64::new(0);
@@ -31,8 +36,18 @@ pub(super) struct Proof {
 
 struct Candidate {
     name: &'static str,
+    kind: BuiltinKind,
     bits: u16,
     witness: String,
+}
+
+impl Candidate {
+    fn arity(&self) -> usize {
+        match self.kind {
+            BuiltinKind::ByteSwap { .. } => 1,
+            BuiltinKind::Expect => 2,
+        }
+    }
 }
 
 struct ProbeRange {
@@ -40,7 +55,7 @@ struct ProbeRange {
     lines: std::ops::Range<u32>,
 }
 
-/// Prove at most three referenced operations. An original-file overlay preserves
+/// Prove at most four referenced operations. An original-file overlay preserves
 /// include depth, filename and optimization-dependent header branches. Typed
 /// libclang calls establish rank; the driver independently establishes result
 /// identity and pure dynamic value flow under the original flags.
@@ -58,7 +73,7 @@ pub(super) fn prove(
     {
         prefix.push('_');
     }
-    for &(name, bits) in BYTE_SWAPS {
+    for &(name, kind) in OPERATIONS {
         if !frontend
             .environment()
             .active
@@ -85,7 +100,26 @@ pub(super) fn prove(
         if let Some(reason) = unavailable {
             proof.unavailable.insert(name.into(), reason.into());
         } else {
-            candidates.push(Candidate { name, bits, witness: format!("{prefix}{bits}") });
+            let (bits, suffix) = match kind {
+                BuiltinKind::ByteSwap { bits } => (bits, bits.to_string()),
+                BuiltinKind::Expect => {
+                    let Some(bits) = frontend
+                        .profile()
+                        .target
+                        .integers
+                        .get(&IntegerKind::Long)
+                        .and_then(|facts| u16::try_from(facts.bits).ok())
+                    else {
+                        proof.unavailable.insert(
+                            name.into(),
+                            "builtin expect requires a verified C long representation".into(),
+                        );
+                        continue;
+                    };
+                    (bits, "expect".into())
+                }
+            };
+            candidates.push(Candidate { name, kind, bits, witness: format!("{prefix}{suffix}") });
         }
     }
     if candidates.is_empty() {
@@ -160,10 +194,9 @@ fn prove_inner(
         }
         match prototype(entity, candidate, frontend) {
             Ok(signature) => {
-                proof.supported.insert(
-                    candidate.name.into(),
-                    BuiltinInfo { kind: BuiltinKind::ByteSwap { bits: candidate.bits }, signature },
-                );
+                proof
+                    .supported
+                    .insert(candidate.name.into(), BuiltinInfo { kind: candidate.kind, signature });
             }
             Err(reason) => {
                 proof.unavailable.insert(candidate.name.into(), reason);
@@ -182,7 +215,7 @@ fn prove_inner(
         .iter()
         .filter(|candidate| proof.supported.contains_key(candidate.name))
         .collect::<Vec<_>>();
-    // One ordinary batch, or that batch plus at most three individual retries.
+    // One ordinary batch, or that batch plus at most four individual retries.
     // A rejected operation must not remove its unrelated peers.
     let mut pending = vec![remaining];
     let mut runs = 0;
@@ -191,15 +224,16 @@ fn prove_inner(
             continue;
         }
         runs += 1;
-        if runs > 4 {
+        if runs > 1 + OPERATIONS.len() {
             return Err(FrontendError::Output(
-                "builtin LLVM probes exceed the four-run budget".into(),
+                "builtin LLVM probes exceed the five-run budget".into(),
             ));
         }
         let selected = remaining
             .iter()
             .map(|candidate| Candidate {
                 name: candidate.name,
+                kind: candidate.kind,
                 bits: candidate.bits,
                 witness: candidate.witness.clone(),
             })
@@ -229,7 +263,9 @@ fn prove_inner(
             Err(error) => return Err(error),
         };
         for candidate in remaining {
-            if let Err(reason) = llvm_witness(&output.stdout, &candidate.witness, candidate.bits) {
+            if let Err(reason) =
+                llvm_witness(&output.stdout, &candidate.witness, candidate.bits, candidate.kind)
+            {
                 proof.supported.remove(candidate.name);
                 proof.unavailable.insert(candidate.name.into(), reason);
             }
@@ -274,16 +310,20 @@ fn prototype(
     if ty.get_calling_convention() != Some(clang::CallingConvention::Cdecl) {
         return Err("builtin prototype lacks the default C calling convention".into());
     }
-    let parameters = ty.get_argument_types().ok_or("builtin prototype has no parameter types")?;
-    let [parameter] = parameters.as_slice() else {
-        return Err("byte-swap builtin requires exactly one parameter".into());
-    };
-    let parameter = type_info(parameter.get_canonical_type());
+    let parameters = ty
+        .get_argument_types()
+        .ok_or("builtin prototype has no parameter types")?
+        .into_iter()
+        .map(|parameter| type_info(parameter.get_canonical_type()))
+        .collect::<Vec<_>>();
+    if parameters.len() != candidate.arity() {
+        return Err("compiler builtin prototype has an incompatible arity".into());
+    }
     let result = type_info(
         ty.get_result_type().ok_or("builtin prototype has no result type")?.get_canonical_type(),
     );
     let TypeCategory::Integer(kind) = result.category else {
-        return Err("byte-swap builtin result is not a fundamental integer".into());
+        return Err("compiler builtin result is not a fundamental integer".into());
     };
     let facts = frontend
         .profile()
@@ -291,23 +331,31 @@ fn prototype(
         .integers
         .get(&kind)
         .ok_or("builtin integer type is absent from target facts")?;
-    if parameter != result
+    let identity = match candidate.kind {
+        BuiltinKind::ByteSwap { .. } => !facts.signed,
+        BuiltinKind::Expect => kind == IntegerKind::Long && facts.signed && facts.rank == 4,
+    };
+    if parameters.iter().any(|parameter| parameter != &result)
         || result.is_const
         || result.is_volatile
-        || facts.signed
+        || !identity
         || facts.bits != u32::from(candidate.bits)
         || frontend.profile().target.char_bits != 8
         || result.size != Some(u64::from(candidate.bits / 8))
         || call.get_type().map(|ty| type_info(ty.get_canonical_type())) != Some(result.clone())
-        || call.get_arguments().is_none_or(|arguments| arguments.len() != 1)
+        || call.get_arguments().is_none_or(|arguments| arguments.len() != candidate.arity())
     {
-        return Err(
-            "byte-swap builtin lacks matching unsigned parameter/result identity and width".into(),
-        );
+        return Err(match candidate.kind {
+            BuiltinKind::ByteSwap { .. } => {
+                "byte-swap builtin lacks matching unsigned parameter/result identity and width"
+            }
+            BuiltinKind::Expect => "expect builtin lacks the exact C long(long, long) identity",
+        }
+        .into());
     }
     Ok(FunctionSignature {
         result,
-        parameters: Some(vec![parameter]),
+        parameters: Some(parameters),
         variadic: false,
         calling_convention: ty.get_calling_convention().map(|convention| format!("{convention:?}")),
     })
@@ -330,17 +378,32 @@ fn source(
         .map_err(|_| FrontendError::Output("builtin probe line count overflow".into()))?;
     for candidate in candidates {
         let mut probe = format!("#if __has_builtin({})\n", candidate.name);
+        let zero_arguments = vec!["0"; candidate.arity()].join(", ");
+        let result_type = format!("__typeof__({}({zero_arguments}))", candidate.name);
         if let Some(info) = signatures.get(candidate.name) {
             writeln!(
                 probe,
-                "_Static_assert(__builtin_types_compatible_p(__typeof__({}(0)), {}), \"{}\");",
-                candidate.name,
+                "_Static_assert(__builtin_types_compatible_p({result_type}, {}), \"{}\");",
                 info.signature.result.canonical_spelling,
                 prototype_message(candidate)
             )
             .expect("String output");
         }
-        writeln!(probe, "__typeof__({0}(0)) {1}(__typeof__({0}(0)) {2}value);\n__typeof__({0}(0)) {1}(__typeof__({0}(0)) {2}value) {{ return {0}({2}value); }}\n#endif", candidate.name, candidate.witness, prefix).expect("String output");
+        let values =
+            (0..candidate.arity()).map(|index| format!("{prefix}value{index}")).collect::<Vec<_>>();
+        let parameters = values
+            .iter()
+            .map(|value| format!("{result_type} {value}"))
+            .collect::<Vec<_>>()
+            .join(", ");
+        writeln!(
+            probe,
+            "{result_type} {0}({parameters});\n{result_type} {0}({parameters}) {{ return {1}({2}); }}\n#endif",
+            candidate.witness,
+            candidate.name,
+            values.join(", "),
+        )
+        .expect("String output");
         let end = line
             .checked_add(probe.bytes().filter(|byte| *byte == b'\n').count() as u32)
             .ok_or_else(|| FrontendError::Output("builtin probe line count overflow".into()))?;
@@ -464,7 +527,7 @@ fn verify_snapshot(
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Origin {
-    Parameter,
+    Parameter(usize),
     Swapped,
 }
 
@@ -473,7 +536,7 @@ struct Slot {
     alignment: Option<u64>,
 }
 
-fn llvm_witness(ir: &str, witness: &str, bits: u16) -> Result<(), String> {
+fn llvm_witness(ir: &str, witness: &str, bits: u16, kind: BuiltinKind) -> Result<(), String> {
     let marker = format!("@{witness}(");
     let mut functions = ir.lines().filter(|line| line.starts_with("define "));
     let header = functions
@@ -483,26 +546,41 @@ fn llvm_witness(ir: &str, witness: &str, bits: u16) -> Result<(), String> {
         return Err("LLVM builtin witness has no function body".into());
     }
     let (prefix, tail) = header.split_once(&marker).expect("matched witness marker");
-    let (parameter, _) = tail.split_once(')').ok_or("malformed LLVM witness parameter")?;
+    let (parameters, _) = tail.split_once(')').ok_or("malformed LLVM witness parameters")?;
     let ty = format!("i{bits}");
-    let parameter_words = parameter.split_whitespace().collect::<Vec<_>>();
-    if parameter_words.len() < 2
-        || prefix.split_whitespace().last() != Some(ty.as_str())
-        || parameter_words.first().copied() != Some(ty.as_str())
-        || parameter.contains(',')
-        || !parameter_words[1..parameter_words.len().saturating_sub(1)]
-            .iter()
-            .all(|word| matches!(*word, "noundef" | "zeroext" | "signext"))
-    {
+    if prefix.split_whitespace().last() != Some(ty.as_str()) {
         return Err("LLVM builtin witness has an incompatible parameter/result width".into());
     }
-    let parameter = parameter_words
-        .last()
-        .copied()
-        .filter(|word| word.starts_with('%'))
-        .ok_or("LLVM builtin witness has no dynamic scalar parameter")?;
+    let arity = match kind {
+        BuiltinKind::ByteSwap { .. } => 1,
+        BuiltinKind::Expect => 2,
+    };
+    let parameters = parameters.split(',').collect::<Vec<_>>();
+    if parameters.len() != arity {
+        return Err("LLVM builtin witness has an incompatible parameter arity".into());
+    }
+    let mut values = BTreeMap::new();
+    for (index, parameter) in parameters.into_iter().enumerate() {
+        let words = parameter.split_whitespace().collect::<Vec<_>>();
+        if words.len() < 2
+            || words.first().copied() != Some(ty.as_str())
+            || !words[1..words.len().saturating_sub(1)].iter().all(|word| {
+                matches!(*word, "noundef" | "zeroext" | "signext")
+                    || *word == "returned" && kind == BuiltinKind::Expect && index == 0
+            })
+        {
+            return Err("LLVM builtin witness has incompatible scalar parameter attributes".into());
+        }
+        let parameter = words
+            .last()
+            .copied()
+            .filter(|word| word.starts_with('%'))
+            .ok_or("LLVM builtin witness has no dynamic scalar parameter")?;
+        if values.insert(parameter, Origin::Parameter(index)).is_some() {
+            return Err("LLVM builtin witness repeats a scalar parameter".into());
+        }
+    }
     let body = ir.lines().skip_while(|line| *line != header).skip(1);
-    let mut values = BTreeMap::from([(parameter, Origin::Parameter)]);
     let mut slots = BTreeMap::<&str, Slot>::new();
     let mut calls = 0;
     let mut returned = false;
@@ -581,8 +659,17 @@ fn llvm_witness(ir: &str, witness: &str, bits: u16) -> Result<(), String> {
                 if access_suffix(&parts[1..])?.is_some() {
                     return Err("LLVM builtin return has unsupported operands".into());
                 }
-                if values.get(value) != Some(&Origin::Swapped) || calls != 1 {
-                    return Err("LLVM builtin return is not the single byte-swap result".into());
+                let valid = match kind {
+                    BuiltinKind::ByteSwap { .. } => {
+                        values.get(value) == Some(&Origin::Swapped) && calls == 1
+                    }
+                    BuiltinKind::Expect => values.get(value) == Some(&Origin::Parameter(0)),
+                };
+                if !valid {
+                    return Err(
+                        "LLVM builtin return does not preserve the operation's result identity"
+                            .into(),
+                    );
                 }
                 returned = true;
             }
@@ -591,28 +678,41 @@ fn llvm_witness(ir: &str, witness: &str, bits: u16) -> Result<(), String> {
                     .strip_prefix("tail ")
                     .or_else(|| operation.strip_prefix("notail "))
                     .unwrap_or(operation);
-                let Some(call) = operation.strip_prefix(&format!("call {ty} @llvm.bswap.{ty}("))
+                let intrinsic = match kind {
+                    BuiltinKind::ByteSwap { .. } => "bswap",
+                    BuiltinKind::Expect => "expect",
+                };
+                let Some(call) =
+                    operation.strip_prefix(&format!("call {ty} @llvm.{intrinsic}.{ty}("))
                 else {
                     return Err(format!(
                         "LLVM builtin witness has unsupported effects: {operation}"
                     ));
                 };
-                let (argument, suffix) =
-                    call.split_once(')').ok_or("malformed LLVM byte-swap call")?;
-                let argument = argument
-                    .strip_prefix(&format!("{ty} "))
-                    .ok_or("LLVM byte-swap call has an incompatible argument width")?;
-                if values.get(argument) != Some(&Origin::Parameter) || calls != 0 {
+                let (arguments, suffix) =
+                    call.split_once(')').ok_or("malformed LLVM builtin intrinsic call")?;
+                let arguments = arguments.split(',').collect::<Vec<_>>();
+                if arguments.len() != arity || calls != 0 {
                     return Err(
-                        "LLVM byte-swap call does not consume the dynamic parameter exactly once"
-                            .into(),
+                        "LLVM builtin intrinsic has incompatible arity or repetition".into()
                     );
+                }
+                for (index, argument) in arguments.into_iter().enumerate() {
+                    let argument = argument
+                        .trim()
+                        .strip_prefix(&format!("{ty} "))
+                        .ok_or("LLVM builtin intrinsic has an incompatible argument width")?;
+                    if values.get(argument) != Some(&Origin::Parameter(index)) {
+                        return Err(
+                            "LLVM builtin intrinsic lost its dynamic parameter identity".into()
+                        );
+                    }
                 }
                 let suffix = suffix.trim_start();
                 let suffix = if let Some(attribute) = suffix.strip_prefix('#') {
                     let digits = attribute.bytes().take_while(u8::is_ascii_digit).count();
                     if digits == 0 {
-                        return Err("LLVM byte-swap call has malformed attributes".into());
+                        return Err("LLVM builtin intrinsic has malformed attributes".into());
                     }
                     &attribute[digits..]
                 } else {
@@ -622,27 +722,32 @@ fn llvm_witness(ir: &str, witness: &str, bits: u16) -> Result<(), String> {
                 if !suffix.is_empty() {
                     let suffix = suffix
                         .strip_prefix(',')
-                        .ok_or("LLVM byte-swap call has unsupported trailing operands")?;
+                        .ok_or("LLVM builtin intrinsic has unsupported trailing operands")?;
                     if access_suffix(&suffix.split(',').map(str::trim).collect::<Vec<_>>())?
                         .is_some()
                     {
-                        return Err("LLVM byte-swap call has unsupported alignment operands".into());
+                        return Err(
+                            "LLVM builtin intrinsic has unsupported alignment operands".into()
+                        );
                     }
                 }
-                let destination = destination.ok_or("LLVM byte-swap call discards its result")?;
-                if slots.contains_key(destination)
-                    || values.insert(destination, Origin::Swapped).is_some()
-                {
+                let destination =
+                    destination.ok_or("LLVM builtin intrinsic discards its result")?;
+                let origin = match kind {
+                    BuiltinKind::ByteSwap { .. } => Origin::Swapped,
+                    BuiltinKind::Expect => Origin::Parameter(0),
+                };
+                if slots.contains_key(destination) || values.insert(destination, origin).is_some() {
                     return Err("LLVM builtin witness redefines a value".into());
                 }
                 calls += 1;
             }
         }
     }
-    if closed && returned && calls == 1 {
+    if closed && returned {
         Ok(())
     } else {
-        Err("LLVM builtin witness has no proved byte-swap return".into())
+        Err("LLVM builtin witness has no proved operation return".into())
     }
 }
 
@@ -685,6 +790,10 @@ mod tests {
         format!("define dso_local i32 @probe(i32 noundef %0) {{\n{body}\n}}\n")
     }
 
+    fn expect_witness(body: &str) -> String {
+        format!("define dso_local i64 @probe(i64 noundef %0, i64 noundef %1) {{\n{body}\n}}\n")
+    }
+
     #[test]
     fn dynamic_swap_accepts_optimized_and_initialized_o0_copies_with_debug_records() {
         for body in [
@@ -692,7 +801,7 @@ mod tests {
             "  %2 = alloca i32, align 4\n  store i32 %0, ptr %2, align 4\n  #dbg_declare(ptr %2, !1, !DIExpression(), !2)\n  %3 = load i32, ptr %2, align 4, !dbg !2\n  %4 = call i32 @llvm.bswap.i32(i32 %3), !dbg !2\n  ret i32 %4, !dbg !2",
             "entry:\n  %2 = alloca i32, align 4\n  store i32 %0, i32* %2, align 4\n  call void @llvm.dbg.declare(metadata i32* %2, metadata !1, metadata !DIExpression())\n  %3 = load i32, i32* %2, align 4\n  %4 = call i32 @llvm.bswap.i32(i32 %3)\n  ret i32 %4",
         ] {
-            llvm_witness(&witness(body), "probe", 32).unwrap();
+            llvm_witness(&witness(body), "probe", 32, BuiltinKind::ByteSwap { bits: 32 }).unwrap();
         }
     }
 
@@ -712,11 +821,28 @@ mod tests {
             "  %2 = alloca i32, align 2\n  store i32 %0, ptr %2, align 4\n  %3 = load i32, ptr %2, align 4\n  %4 = call i32 @llvm.bswap.i32(i32 %3)\n  ret i32 %4",
             "entry:\nextra:\n  %1 = call i32 @llvm.bswap.i32(i32 %0)\n  ret i32 %1",
             "  %1 = call i32 @llvm.bswap.i32(i32 %0) [ \"deopt\"() ]\n  ret i32 %1",
+            "  ret i32 %0",
         ] {
-            assert!(llvm_witness(&witness(body), "probe", 32).is_err(), "accepted {body}");
+            assert!(
+                llvm_witness(&witness(body), "probe", 32, BuiltinKind::ByteSwap { bits: 32 })
+                    .is_err(),
+                "accepted {body}"
+            );
         }
-        assert!(llvm_witness(&witness("  ret i32 %0"), "probe", 16).is_err());
-        assert!(llvm_witness(&witness("  ret i32 %0"), "missing", 32).is_err());
+        assert!(
+            llvm_witness(&witness("  ret i32 %0"), "probe", 16, BuiltinKind::ByteSwap { bits: 16 })
+                .is_err()
+        );
+        assert!(
+            llvm_witness(
+                &witness("  ret i32 %0"),
+                "missing",
+                32,
+                BuiltinKind::ByteSwap { bits: 32 }
+            )
+            .is_err()
+        );
+        assert!(llvm_witness("define i32 @probe(i32 returned %0) {\n  %1 = call i32 @llvm.bswap.i32(i32 %0)\n  ret i32 %1\n}", "probe", 32, BuiltinKind::ByteSwap { bits: 32 }).is_err());
     }
 
     #[test]
@@ -728,7 +854,61 @@ mod tests {
             "define i32 @probe(i32 %0) {\n  %1 = call i32 @llvm.bswap.i32(i32 %0)\n  ret i32 %1",
             "define i32 @probe(i32 %0) {\n  %1 = call i32 @llvm.bswap.i32(i32 %0)",
         ] {
-            assert!(llvm_witness(ir, "probe", 32).is_err(), "accepted {ir}");
+            assert!(
+                llvm_witness(ir, "probe", 32, BuiltinKind::ByteSwap { bits: 32 }).is_err(),
+                "accepted {ir}"
+            );
+        }
+    }
+
+    #[test]
+    fn expect_proves_first_operand_identity_with_stack_copies_or_a_pure_hint() {
+        for body in [
+            "  ret i64 %0",
+            "  %2 = tail call i64 @llvm.expect.i64(i64 %0, i64 %1)\n  ret i64 %2",
+            "entry:\n  %2 = alloca i64, align 8\n  %3 = alloca i64, align 8\n  store i64 %0, ptr %2, align 8\n  store i64 %1, ptr %3, align 8\n  #dbg_declare(ptr %2, !1, !DIExpression(), !2)\n  %4 = load i64, ptr %2, align 8, !dbg !2\n  %5 = load i64, ptr %3, align 8\n  ret i64 %4, !dbg !2",
+            "  %2 = alloca i64, align 8\n  %3 = alloca i64, align 8\n  store i64 %0, ptr %2, align 8\n  store i64 %1, ptr %3, align 8\n  %4 = load i64, ptr %2, align 8\n  %5 = load i64, ptr %3, align 8\n  %6 = call i64 @llvm.expect.i64(i64 %4, i64 %5) #2, !dbg !2\n  ret i64 %6",
+        ] {
+            llvm_witness(&expect_witness(body), "probe", 64, BuiltinKind::Expect).unwrap();
+        }
+        llvm_witness(
+            "define i64 @probe(i64 noundef returned %first, i64 noundef %second) {\n  ret i64 %first\n}",
+            "probe",
+            64,
+            BuiltinKind::Expect,
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn expect_rejects_reversed_identity_arithmetic_and_non_hint_effects() {
+        for body in [
+            "  ret i64 %1",
+            "  %2 = call i64 @llvm.expect.i64(i64 %1, i64 %0)\n  ret i64 %2",
+            "  %2 = add i64 %0, 0\n  ret i64 %2",
+            "  %2 = call i64 @llvm.bswap.i64(i64 %0)\n  ret i64 %2",
+            "  %2 = call i64 @llvm.expect.i64(i64 %0, i64 %1)\n  %3 = call i64 @llvm.expect.i64(i64 %0, i64 %1)\n  ret i64 %3",
+            "  %2 = call i64 @llvm.expect.i64(i64 %0, i64 1)\n  ret i64 %2",
+            "  %2 = call i64 @llvm.expect.i64(i64 %0, i64 poison)\n  ret i64 %2",
+            "  %2 = call i64 @llvm.expect.i64(i64 %0, i64 %1) [ \"deopt\"() ]\n  ret i64 %2",
+            "  %2 = alloca i64, align 8\n  %3 = load i64, ptr %2, align 8\n  ret i64 %3",
+            "  %2 = alloca i64, align 8\n  store i64 %0, ptr %2, align 8\n  store i64 %1, ptr %2, align 8\n  %3 = load i64, ptr %2, align 8\n  ret i64 %3",
+            "  store i64 %1, ptr @global, align 8\n  ret i64 %0",
+        ] {
+            assert!(
+                llvm_witness(&expect_witness(body), "probe", 64, BuiltinKind::Expect).is_err(),
+                "accepted {body}"
+            );
+        }
+        for ir in [
+            "define i64 @probe(i64 %0) {\n  ret i64 %0\n}",
+            "define i64 @probe(i64 %0, i64) {\n  ret i64 %0\n}",
+            "define i64 @probe(i64 %0, i64 %0) {\n  ret i64 %0\n}",
+            "define i64 @probe(i64 %0, i64 returned %1) {\n  ret i64 %0\n}",
+            "define i64 @probe(i64 %0, i32 %1) {\n  ret i64 %0\n}",
+            "define i64 @probe(i64 %0, i64 %1) {\n  ret i64 %0",
+        ] {
+            assert!(llvm_witness(ir, "probe", 64, BuiltinKind::Expect).is_err(), "accepted {ir}");
         }
     }
 }
