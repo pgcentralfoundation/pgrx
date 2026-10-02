@@ -9,8 +9,7 @@
 
 use super::{
     ConstantFallback, ExpansionBatch, ExpansionLimits, ExpansionResult, Prepared, ProbeDirectory,
-    extract_bodies, namespace, overlay, parameters, verify_environment,
-    verify_original_environment,
+    extract_bodies, namespace, overlay, parameters, verify_original_environment,
 };
 use crate::{
     Error, FrontendError, FrontendOutput, IntegerConstant, IntegerKind, IntegerValue, MacroKind,
@@ -33,21 +32,8 @@ struct ConstantContext<'a> {
     limits: ExpansionLimits,
 }
 
+/// The caller must verify the inspected inputs before and after this compiler phase.
 pub(crate) fn retain_integer_constants(
-    scanner: &MacroScanner,
-    frontend: &FrontendOutput,
-    batch: &mut ExpansionBatch,
-    limits: ExpansionLimits,
-) -> Result<BTreeMap<String, IntegerConstant>, FrontendError> {
-    verify_environment(frontend)?;
-    crate::frontend::verify_input_files(&frontend.profile().inputs)?;
-    let result = retain_inner(scanner, frontend, batch, limits);
-    crate::frontend::verify_input_files(&frontend.profile().inputs)?;
-    verify_environment(frontend)?;
-    result
-}
-
-fn retain_inner(
     scanner: &MacroScanner,
     frontend: &FrontendOutput,
     batch: &mut ExpansionBatch,
@@ -385,11 +371,8 @@ fn probe_values(
         &arguments,
         &["-fsyntax-only"],
     )?;
-    let constants = scanner.with_translation_unit(
-        &frontend.profile().header,
-        &arguments,
-        None,
-        |unit, _| {
+    let constants =
+        scanner.with_declarations(&frontend.profile().header, &arguments, None, |unit| {
             let mut constants = BTreeMap::new();
             unit.get_entity().visit_children(|entity, _| {
                 if entity.get_kind() != EntityKind::VarDecl {
@@ -434,8 +417,7 @@ fn probe_values(
                 EntityVisitResult::Continue
             });
             Ok(constants)
-        },
-    )?;
+        })?;
     let mut checks = original.to_vec();
     for (name, constant) in &constants {
         let TypeCategory::Integer(kind) = constant.ty.category else {

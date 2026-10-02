@@ -122,6 +122,15 @@ pub fn emit_with_bindings(
     name: &str,
     bindings: &BindingCatalog,
 ) -> MacroEmission {
+    emit_with_lowering(session, name, bindings, &mut None)
+}
+
+fn emit_with_lowering<'a>(
+    session: &'a AnalysisSession<'_>,
+    name: &str,
+    bindings: &'a BindingCatalog,
+    lowering: &mut Option<types::Lowering<'a>>,
+) -> MacroEmission {
     let analysis = session.analyze(name);
     let lowered = if let Some(reason) = binding_mismatch(session, &analysis, bindings) {
         Err(reason)
@@ -139,7 +148,16 @@ pub fn emit_with_bindings(
             .map_err(|error| {
                 skip(&analysis, SkipReasonCode::UnsupportedProfile, error.to_string(), None)
             })
-            .and_then(|assertions| render(session, &analysis, original, &assertions, bindings))
+            .and_then(|assertions| {
+                let lowering = lowering.get_or_insert_with(|| {
+                    types::Lowering::new(
+                        session.frontend().declarations(),
+                        bindings,
+                        &session.frontend().profile().target,
+                    )
+                });
+                render(session, &analysis, original, &assertions, bindings, lowering)
+            })
     };
     let status = match lowered {
         Ok(rust) => {
@@ -181,10 +199,15 @@ fn emit_prepared_batch(
     names: &[impl AsRef<str>],
     bindings: &BindingCatalog,
 ) -> Vec<MacroEmission> {
-    let initial = names
-        .iter()
-        .map(|name| emit_with_bindings(session, name.as_ref(), bindings))
-        .collect::<Vec<_>>();
+    // Each pass borrows one immutable capability catalog. Index its C/Rust
+    // storage identities once, after the first macro passes its admission gates.
+    let initial = {
+        let mut lowering = None;
+        names
+            .iter()
+            .map(|name| emit_with_lowering(session, name.as_ref(), bindings, &mut lowering))
+            .collect::<Vec<_>>()
+    };
     let mut roots = initial
         .iter()
         .filter_map(|emission| match &emission.status {
@@ -240,6 +263,7 @@ fn emit_prepared_batch(
     for name in roots.keys().map(String::as_str).chain(impacted.keys().copied()) {
         available.macros.remove(name);
     }
+    let mut available_lowering = None;
     let mut emissions = initial
         .into_iter()
         .map(|emission| {
@@ -274,7 +298,7 @@ fn emit_prepared_batch(
                     status: EmissionStatus::Skipped { reason },
                 }
             } else {
-                emit_with_bindings(session, name, &available)
+                emit_with_lowering(session, name, &available, &mut available_lowering)
             }
         })
         .collect::<Vec<_>>();
@@ -673,6 +697,7 @@ fn render(
     original: &MacroDefinition,
     assertions: &str,
     bindings: &BindingCatalog,
+    lowering: &types::Lowering<'_>,
 ) -> Result<String, SkipReason> {
     let identifier = macro_identifier(&analysis.name).ok_or_else(|| {
         skip(
@@ -697,7 +722,8 @@ fn render(
     for constant in &expression.constants {
         constants[constant.node] = Some(constant);
     }
-    let renderer = typed::Renderer::new(session.frontend(), analysis, bindings, &constants);
+    let renderer =
+        typed::Renderer::new(session.frontend(), analysis, bindings, &constants, lowering);
     let value = if empty {
         String::new()
     } else {

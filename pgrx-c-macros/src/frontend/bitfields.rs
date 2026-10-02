@@ -276,7 +276,7 @@ fn collect(
     run_compiler_with_input(&profile.compiler.executable, &arguments, Some(source.to_owned()))?;
     let header = std::env::temp_dir().join("pgrx-c-macros-bitfields.h");
     scanner
-        .with_translation_unit(&header, &profile.arguments, Some(source), |unit, _| {
+        .with_declarations(&header, &profile.arguments, Some(source), |unit| {
             let mut result = BTreeMap::new();
             unit.get_entity().visit_children(|entity, _| {
                 if entity.get_kind() == EntityKind::TypedefDecl

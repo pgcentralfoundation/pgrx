@@ -256,7 +256,7 @@ fn collect(
     }
     let header = std::env::temp_dir().join("pgrx-c-macros-integer-zeros.h");
     scanner
-        .with_translation_unit(&header, &profile.arguments, Some(source), |unit, _| {
+        .with_declarations(&header, &profile.arguments, Some(source), |unit| {
             let mut zeros = BTreeSet::new();
             unit.get_entity().visit_children(|entity, _| {
                 if entity.get_kind() == EntityKind::EnumDecl {

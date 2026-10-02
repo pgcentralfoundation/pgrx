@@ -151,7 +151,8 @@ pub fn prepare_expansions_with_limits(
     result
 }
 
-fn prepare_inner(
+/// The caller must verify the inspected inputs before and after this compiler phase.
+pub(crate) fn prepare_inner(
     scanner: &MacroScanner,
     frontend: &FrontendOutput,
     names: &[impl AsRef<str>],
