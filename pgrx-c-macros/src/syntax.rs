@@ -2,7 +2,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! Bounded parsing of expressions and straight-line statements in C macro replacement lists.
+//! Bounded parsing of expressions and structured statements in C macro replacement lists.
 //!
 //! Parameters remain holes. This parser never expands a preprocessing token or guesses a
 //! declaration. The arena preserves explicit grouping and parameter occurrences, and avoids
@@ -32,7 +32,7 @@ pub struct Expression {
     pub nodes: Vec<ExpressionNode>,
     pub root: NodeId,
     /// A complete statement replacement with expressions in this same arena.
-    /// The root is the terminal return operand, or `Empty` when there is no return.
+    /// The root is the first return operand, or `Empty` when there is no return.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub statement_body: Option<StatementBody>,
 }
@@ -41,7 +41,12 @@ pub struct Expression {
 pub struct StatementBody {
     pub statements: Vec<Statement>,
     pub tokens: TokenRange,
+    /// The first return in source order, including returns inside branches.
     pub return_tokens: Option<TokenRange>,
+    /// Every path through the supported statement tree returns from its caller.
+    pub always_returns: bool,
+    /// An unbraced root `if` needs a caller boundary to preserve C's dangling-else contract.
+    pub requires_boundary: bool,
 }
 
 impl StatementBody {
@@ -53,8 +58,15 @@ impl StatementBody {
             loop {
                 let scope = scopes.last_mut()?;
                 if let Some(statement) = scope.next() {
-                    if let Statement::Block { statements, .. } = statement {
-                        scopes.push(statements.iter());
+                    match statement {
+                        Statement::Block { statements, .. } => scopes.push(statements.iter()),
+                        Statement::If { then_branch, else_branch, .. } => {
+                            if let Some(otherwise) = else_branch {
+                                scopes.push(std::slice::from_ref(otherwise.as_ref()).iter());
+                            }
+                            scopes.push(std::slice::from_ref(then_branch.as_ref()).iter());
+                        }
+                        _ => {}
                     }
                     return Some(statement);
                 }
@@ -67,10 +79,30 @@ impl StatementBody {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum Statement {
-    Expression { expression: NodeId, tokens: TokenRange },
-    Declaration { name: String, type_name: String, initializer: Option<NodeId>, tokens: TokenRange },
-    Block { statements: Vec<Statement>, tokens: TokenRange },
-    Return { expression: NodeId, tokens: TokenRange },
+    Expression {
+        expression: NodeId,
+        tokens: TokenRange,
+    },
+    Declaration {
+        name: String,
+        type_name: String,
+        initializer: Option<NodeId>,
+        tokens: TokenRange,
+    },
+    Block {
+        statements: Vec<Statement>,
+        tokens: TokenRange,
+    },
+    Return {
+        expression: NodeId,
+        tokens: TokenRange,
+    },
+    If {
+        condition: NodeId,
+        then_branch: Box<Statement>,
+        else_branch: Option<Box<Statement>>,
+        tokens: TokenRange,
+    },
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -205,7 +237,7 @@ pub(crate) fn parse_expression(
     parse(tokens, parameters, is_type, false)
 }
 
-/// Parse an expression or a complete, straight-line statement replacement.
+/// Parse an expression or a complete structured statement replacement.
 pub(crate) fn parse_replacement(
     tokens: &[Token],
     parameters: &[String],
@@ -1226,6 +1258,8 @@ mod tests {
         for body in [vec!["return", "x"], vec!["return", "x", ";"]] {
             let parsed = parse_replacement(&tokens(&body), &["x".into()], |_| false).unwrap();
             assert_eq!(parsed.statement_body.as_ref().unwrap().tokens.end, body.len());
+            assert!(parsed.statement_body.as_ref().unwrap().always_returns);
+            assert!(!parsed.statement_body.as_ref().unwrap().requires_boundary);
             assert!(matches!(
                 parsed.nodes[parsed.root].kind,
                 ExpressionKind::Parameter { index: 0 }
@@ -1278,7 +1312,7 @@ mod tests {
 
     #[test]
     fn keyword_formals_remain_expression_holes_inside_blocks() {
-        for name in ["return", "do", "_Static_assert", "_Generic"] {
+        for name in ["return", "do", "if", "else", "while", "_Static_assert", "_Generic"] {
             let mut body = tokens(&["{", name, ";", "}"]);
             body[1].kind = TokenKind::Keyword;
             let parsed = parse_replacement(&body, &[name.into()], |_| false).unwrap();
@@ -1290,6 +1324,32 @@ mod tests {
                     if matches!(parsed.nodes[*expression].kind, ExpressionKind::Parameter { index: 0 })
             ));
         }
+        let parsed = parse_replacement(
+            &tokens(&["if", "(", "condition", ")", "else", ";"]),
+            &["condition".into(), "else".into()],
+            |_| false,
+        )
+        .unwrap();
+        let Statement::If { then_branch, else_branch: None, .. } =
+            &parsed.statement_body.unwrap().statements[0]
+        else {
+            panic!("a formal called else must be the then operand")
+        };
+        assert!(matches!(
+            then_branch.as_ref(),
+            Statement::Expression { expression, .. }
+                if matches!(parsed.nodes[*expression].kind, ExpressionKind::Parameter { index: 1 })
+        ));
+        assert_eq!(
+            parse_replacement(
+                &tokens(&["do", "{", "}", "while", "(", "0", ")"]),
+                &["while".into()],
+                |_| false,
+            )
+            .unwrap_err()
+            .kind,
+            SyntaxErrorKind::Statement,
+        );
     }
 
     #[test]
@@ -1303,6 +1363,7 @@ mod tests {
         let statement_body = parsed.statement_body.unwrap();
         assert_eq!(statement_body.tokens, TokenRange { start: 0, end: 22 });
         assert_eq!(statement_body.return_tokens, Some(TokenRange { start: 14, end: 17 }));
+        assert!(statement_body.always_returns);
         assert_eq!(
             statement_body.statements,
             vec![
@@ -1331,7 +1392,6 @@ mod tests {
             vec!["{", "int", "tmp", ";", "int", "tmp", ";", "return", "tmp", ";", "}"],
             vec!["{", "int", "x", ";", "return", "x", ";", "}"],
             vec!["{", "tmp", "=", "1", ";", "int", "tmp", ";", "return", "tmp", ";", "}"],
-            vec!["{", "if", "(", "x", ")", "return", "x", ";", "}"],
             vec!["{", "while", "(", "x", ")", "x", "--", ";", "return", "x", ";", "}"],
             vec!["{", "break", ";", "return", "x", ";", "}"],
             vec!["{", "continue", ";", "return", "x", ";", "}"],
@@ -1410,6 +1470,7 @@ mod tests {
         assert_eq!(body.walk().count(), 5);
         assert_eq!(body.tokens, TokenRange { start: 0, end: 32 });
         assert_eq!(body.return_tokens, Some(TokenRange { start: 18, end: 21 }));
+        assert!(body.always_returns);
         for body in [
             vec![
                 "{", "int", "local", "=", "1", ";", "{", "int", "local", "=", "2", ";", "return",
@@ -1441,6 +1502,8 @@ mod tests {
             let statement_body = parsed.statement_body.unwrap();
             assert!(statement_body.statements.is_empty());
             assert_eq!(statement_body.return_tokens, None);
+            assert!(!statement_body.always_returns);
+            assert!(!statement_body.requires_boundary);
             assert_eq!(statement_body.tokens.end, body.len());
         }
         let parsed = parse_replacement(
@@ -1460,6 +1523,7 @@ mod tests {
         );
         assert!(matches!(body.statements[1], Statement::Expression { .. }));
         assert_eq!(body.return_tokens, None);
+        assert!(!body.always_returns);
     }
 
     #[test]
@@ -1484,6 +1548,7 @@ mod tests {
                 Statement::Block { .. } => "block",
                 Statement::Expression { .. } => "expression",
                 Statement::Return { .. } => "return",
+                Statement::If { .. } => "if",
             })
             .collect::<Vec<_>>();
         assert_eq!(order, ["outer", "block", "inner", "expression", "expression"]);
@@ -1525,5 +1590,252 @@ mod tests {
             parse_replacement(&tokens(&nested), &[], |_| false).unwrap_err().kind,
             SyntaxErrorKind::BudgetExceeded
         );
+    }
+
+    #[test]
+    fn conditionals_attach_else_to_the_nearest_if_and_group_condition_tokens() {
+        let source = tokens(&[
+            "if", "(", "outer", ")", "if", "(", "inner", ")", "x", "++", ";", "else", "x", "--",
+            ";",
+        ]);
+        let parsed =
+            parse_replacement(&source, &["outer".into(), "inner".into(), "x".into()], |_| false)
+                .unwrap();
+        let body = parsed.statement_body.unwrap();
+        assert!(body.requires_boundary);
+        assert!(!body.always_returns);
+        assert_eq!(body.return_tokens, None);
+        assert!(matches!(parsed.nodes[parsed.root].kind, ExpressionKind::Empty));
+        let Statement::If { condition, then_branch, else_branch: None, tokens: range } =
+            &body.statements[0]
+        else {
+            panic!("the outer if must remain unmatched")
+        };
+        assert_eq!(*range, TokenRange { start: 0, end: source.len() });
+        assert_eq!(parsed.nodes[*condition].tokens, TokenRange { start: 1, end: 4 });
+        let ExpressionKind::Group { operand } = parsed.nodes[*condition].kind else {
+            panic!("the explicit condition delimiters protect its whole expression")
+        };
+        assert!(matches!(parsed.nodes[operand].kind, ExpressionKind::Parameter { index: 0 }));
+        let Statement::If { condition, else_branch: Some(_), .. } = then_branch.as_ref() else {
+            panic!("else must attach to the inner if")
+        };
+        assert_eq!(parsed.nodes[*condition].tokens, TokenRange { start: 5, end: 8 });
+        assert_eq!(body.walk().count(), 4);
+
+        let parsed = parse_replacement(
+            &tokens(&["if", "(", "x", "&&", "y", ")", ";"]),
+            &["x".into(), "y".into()],
+            |_| false,
+        )
+        .unwrap();
+        let Statement::If { condition, .. } = parsed.statement_body.unwrap().statements[0] else {
+            panic!("expected an if statement")
+        };
+        let ExpressionKind::Group { operand } = parsed.nodes[condition].kind else {
+            panic!("condition delimiters must form a group")
+        };
+        assert!(matches!(
+            parsed.nodes[operand].kind,
+            ExpressionKind::Binary { operator: BinaryOperator::LogicalAnd, .. }
+        ));
+    }
+
+    #[test]
+    fn conditional_null_branches_and_complete_wrappers_preserve_boundaries() {
+        let branch = ["if", "(", "x", ")", ";", "else", "{", "x", "++", ";", "}"];
+        for (source, requires_boundary) in [
+            (branch.to_vec(), true),
+            ([&["{"][..], &branch, &["}"]].concat(), false),
+            ([&["do", "{"][..], &branch, &["}", "while", "(", "0", ")"]].concat(), false),
+        ] {
+            let parsed = parse_replacement(&tokens(&source), &["x".into()], |_| false).unwrap();
+            let body = parsed.statement_body.unwrap();
+            assert_eq!(body.requires_boundary, requires_boundary);
+            let Statement::If { then_branch, else_branch: Some(otherwise), .. } =
+                &body.statements[0]
+            else {
+                panic!("the conditional must retain both branches")
+            };
+            assert!(matches!(
+                then_branch.as_ref(),
+                Statement::Block { statements, .. } if statements.is_empty()
+            ));
+            assert!(matches!(
+                otherwise.as_ref(),
+                Statement::Block { statements, .. } if statements.len() == 1
+            ));
+        }
+        let parsed = parse_replacement(
+            &tokens(&[
+                "if", "(", "x", ",", "y", ")", "do", "{", "x", "++", ";", "}", "while", "(", "0",
+                ")", ";", "else", "y", "++", ";",
+            ]),
+            &["x".into(), "y".into()],
+            |_| false,
+        )
+        .unwrap();
+        let Statement::If { condition, .. } = parsed.statement_body.unwrap().statements[0] else {
+            panic!("expected an if statement")
+        };
+        let ExpressionKind::Group { operand } = parsed.nodes[condition].kind else {
+            panic!("condition delimiters must form a group")
+        };
+        assert!(matches!(parsed.nodes[operand].kind, ExpressionKind::Comma { .. }));
+    }
+
+    #[test]
+    fn conditional_returns_keep_first_return_metadata_separate_from_fallthrough() {
+        for (source, always_returns, returns) in [
+            (vec!["{", "if", "(", "x", ")", "return", "1", ";", "x", "++", ";", "}"], false, 1),
+            (
+                vec![
+                    "{", "if", "(", "x", ")", "{", "return", "1", ";", "}", "x", "++", ";",
+                    "return", "2", ";", "}",
+                ],
+                true,
+                2,
+            ),
+            (vec!["if", "(", "x", ")", "return", "1", ";", "else", "return", "2", ";"], true, 2),
+        ] {
+            let parsed = parse_replacement(&tokens(&source), &["x".into()], |_| false).unwrap();
+            let body = parsed.statement_body.unwrap();
+            assert_eq!(body.always_returns, always_returns);
+            assert!(matches!(
+                &parsed.nodes[parsed.root].kind,
+                ExpressionKind::IntegerLiteral { literal } if literal.value == 1
+            ));
+            let returned = body
+                .walk()
+                .filter_map(|statement| match statement {
+                    Statement::Return { expression, tokens } => Some((*expression, *tokens)),
+                    _ => None,
+                })
+                .collect::<Vec<_>>();
+            assert_eq!(returned.len(), returns);
+            assert_eq!(returned[0], (parsed.root, body.return_tokens.unwrap()));
+        }
+        assert!(
+            parse_replacement(
+                &tokens(&[
+                    "{", "if", "(", "x", ")", "return", "1", ";", "else", "return", "2", ";", "x",
+                    "++", ";", "}",
+                ]),
+                &["x".into()],
+                |_| false,
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn conditional_block_locals_remain_lexically_scoped() {
+        let parsed = parse_replacement(
+            &tokens(&[
+                "{", "int", "outer", "=", "0", ";", "if", "(", "x", ")", "{", "int", "tmp", "=",
+                "1", ";", "outer", "+=", "tmp", ";", "}", "else", "{", "int", "other", "=", "2",
+                ";", "outer", "+=", "other", ";", "}", "outer", "++", ";", "}",
+            ]),
+            &["x".into()],
+            |name| name == "int",
+        )
+        .unwrap();
+        assert_eq!(
+            parsed
+                .statement_body
+                .unwrap()
+                .walk()
+                .filter(|statement| matches!(statement, Statement::Declaration { .. }))
+                .count(),
+            3,
+        );
+        for source in [
+            vec!["if", "(", "x", ")", "int", "tmp", "=", "1", ";"],
+            vec![
+                "if", "(", "x", ")", "{", "int", "tmp", "=", "1", ";", "}", "else", "tmp", "++",
+                ";",
+            ],
+            vec![
+                "{", "if", "(", "x", ")", "{", "int", "tmp", "=", "1", ";", "}", "tmp", "++", ";",
+                "}",
+            ],
+            vec!["if", "(", "tmp", ")", "{", "int", "tmp", "=", "1", ";", "}"],
+            vec![
+                "if", "(", "x", ")", "{", "int", "tmp", "=", "1", ";", "}", "else", "{", "int",
+                "tmp", "=", "2", ";", "}",
+            ],
+        ] {
+            assert_eq!(
+                parse_replacement(&tokens(&source), &["x".into()], |name| name == "int")
+                    .unwrap_err()
+                    .kind,
+                SyntaxErrorKind::Statement,
+                "{source:?}",
+            );
+        }
+    }
+
+    #[test]
+    fn conditional_statement_grammar_does_not_swallow_semicolons_or_missing_operands() {
+        for source in [
+            vec!["if"],
+            vec!["if", "("],
+            vec!["if", "(", "x", ")"],
+            vec!["if", "(", ")", ";"],
+            vec!["if", "(", "x", ")", ";", "else"],
+            vec!["if", "(", "x", ")", "{", "x", "++", ";", "}", ";", "else", "x", "--", ";"],
+            vec![
+                "if", "(", "x", ")", "do", "{", "x", "++", ";", "}", "while", "(", "0", ")",
+                "else", "x", "--", ";",
+            ],
+            vec!["if", "(", "x", ")", "do", "{", "x", "++", ";", "}", "while", "(", "1", ")", ";"],
+        ] {
+            assert!(
+                parse_replacement(&tokens(&source), &["x".into()], |_| false).is_err(),
+                "{source:?}",
+            );
+        }
+        let nested = std::iter::repeat_n(["if", "(", "x", ")"], MAX_DEPTH + 1)
+            .flatten()
+            .chain([";"])
+            .collect::<Vec<_>>();
+        assert_eq!(
+            parse_replacement(&tokens(&nested), &["x".into()], |_| false).unwrap_err().kind,
+            SyntaxErrorKind::BudgetExceeded,
+        );
+    }
+
+    #[test]
+    fn root_conditional_fragments_allow_a_caller_supplied_final_semicolon_only_at_eof() {
+        for source in [
+            vec!["if", "(", "x", ")", "x", "++"],
+            vec!["if", "(", "x", ")", "return", "1"],
+            vec!["if", "(", "x", ")", "x", "++", ";", "else", "x", "--"],
+            vec!["if", "(", "x", ")", "if", "(", "y", ")", "x", "++", ";", "else", "y", "--"],
+            vec![
+                "if", "(", "x", ")", "return", "1", ";", "else", "if", "(", "y", ")", "return", "2",
+            ],
+            vec!["if", "(", "x", ")", "do", "{", "}", "while", "(", "0", ")"],
+            vec!["if", "(", "x", ")", "{", "}", "else", "do", "{", "}", "while", "(", "0", ")"],
+        ] {
+            let parsed = parse_replacement(&tokens(&source), &["x".into(), "y".into()], |_| false)
+                .unwrap_or_else(|error| panic!("{source:?}: {error:?}"));
+            let body = parsed.statement_body.unwrap();
+            assert!(body.requires_boundary);
+            assert_eq!(body.tokens.end, source.len());
+        }
+        for source in [
+            vec!["if", "(", "x", ")", "x", "++", "else", "x", "--"],
+            vec!["if", "(", "x", ")", "return", "1", "else", "return", "2"],
+            vec!["{", "if", "(", "x", ")", "x", "++", "}"],
+            vec!["if", "(", "x", ")", "{", "x", "++", "}"],
+            vec!["if", "(", "x", ")", "do", "{", "}", "while", "(", "0", ")", "else", "x", "--"],
+            vec!["if", "(", "x", ")", "{", "}", ";", "else", "x", "--"],
+        ] {
+            assert!(
+                parse_replacement(&tokens(&source), &["x".into()], |_| false).is_err(),
+                "{source:?}",
+            );
+        }
     }
 }

@@ -727,8 +727,9 @@ fn render(
         typed::Renderer::new(session.frontend(), analysis, bindings, &constants, lowering);
     let statement_body = expression.syntax.statement_body.as_ref();
     let returning = statement_body.is_some_and(|body| body.return_tokens.is_some());
+    let statement_boundary = statement_body.is_some_and(|body| body.requires_boundary);
     let value = if statement_body.is_some() {
-        statements::render(session, analysis, bindings, &renderer, false)?
+        statements::render(session, analysis, bindings, &renderer, None)?
     } else if empty {
         String::new()
     } else {
@@ -752,7 +753,7 @@ fn render(
         )
     })?);
     if returning {
-        doc.push_str("\n\nThis macro performs a C return in the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.");
+        doc.push_str("\n\nC return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.");
     } else if statement_body.is_some() {
         doc.push_str("\n\nThis macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.");
     }
@@ -766,6 +767,9 @@ fn render(
         analysis.invocation == crate::InvocationContract::ExplicitExpressionBoundary;
     if explicit_boundary {
         write!(doc, "\n\nCall as `{identifier}!(@__pgrx_c_expression; arguments...)`. This explicitly requests the semantics of the parenthesized C invocation `({}(arguments...))`. The original unparenthesized replacement can interact with surrounding C operators; that textual interaction is outside this Rust invocation contract.", analysis.name).expect("String output");
+    }
+    if statement_boundary {
+        write!(doc, "\n\nCall as `{identifier}!(@__pgrx_c_statement; arguments...)`. This requests the semantics of a braced C invocation `{{ {}(arguments...); }}`. The original unbraced conditional can capture a surrounding C `else`, so the boundary is required. When specifying a return type, put `@__pgrx_c_return_as [CMarker];` after the statement boundary.", analysis.name).expect("String output");
     }
     let captures = analysis
         .parameters
@@ -795,16 +799,19 @@ fn render(
     writeln!(&mut rust, "(@__pgrx_emit_public; {matcher}) => {{ {public_body} }};")
         .expect("String output");
     if statement_body.is_some() {
+        let boundary_prefix = if statement_boundary { "@__pgrx_c_statement; " } else { "" };
         if returning {
-            let explicit = statements::render(session, analysis, bindings, &renderer, true)?;
+            let return_marker = arguments::return_marker(analysis);
+            let explicit =
+                statements::render(session, analysis, bindings, &renderer, Some(&return_marker))?;
             writeln!(
                 &mut rust,
-                "(@__pgrx_emit_return_as; $__pgrx_c_return:ty, {matcher}) => {{ {explicit} }};"
+                "(@__pgrx_emit_return_as; ${return_marker}:ty, {matcher}) => {{ {explicit} }};"
             )
             .expect("String output");
-            writeln!(&mut rust, "(@__pgrx_c_return_as [$__pgrx_c_return:ty]; $($raw:tt)*) => {{ $crate::{identifier}!(@__pgrx_c_guard_locals __pgrx_emit_return_as [$__pgrx_c_return,]; $($raw)*) }};").expect("String output");
+            writeln!(&mut rust, "({boundary_prefix}@__pgrx_c_return_as [${return_marker}:ty]; $($raw:tt)*) => {{ $crate::{identifier}!(@__pgrx_c_guard_locals __pgrx_emit_return_as [${return_marker},]; $($raw)*) }};").expect("String output");
         } else {
-            writeln!(&mut rust, "(@__pgrx_emit_discard; {matcher}) => {{ {value} }};\n(@__pgrx_c_discard; $($raw:tt)*) => {{ $crate::{identifier}!(@__pgrx_c_guard_locals __pgrx_emit_discard []; $($raw)*) }};").expect("String output");
+            writeln!(&mut rust, "(@__pgrx_emit_discard; {matcher}) => {{ {value} }};\n(@__pgrx_c_discard; {boundary_prefix}$($raw:tt)*) => {{ $crate::{identifier}!(@__pgrx_c_guard_locals __pgrx_emit_discard []; $($raw)*) }};").expect("String output");
         }
         rust.push_str(&statements::guard(analysis, &arguments.normalizer)?);
         for mode in ["value", "place", "read_place", "size", "discard"] {
@@ -813,7 +820,12 @@ fn render(
             }
             writeln!(&mut rust, "(@__pgrx_emit_{mode}; {matcher}) => {{ compile_error!(\"a C statement body is not an expression operand\") }};\n(@__pgrx_c_{mode}; $($raw:tt)*) => {{ compile_error!(\"a C statement body is not an expression operand\") }};").expect("String output");
         }
-        writeln!(&mut rust, "($($raw:tt)*) => {{ $crate::{identifier}!(@__pgrx_c_guard_locals __pgrx_emit_public []; $($raw)*) }};\n}}").expect("String output");
+        if statement_boundary {
+            writeln!(&mut rust, "(@__pgrx_c_statement; $($raw:tt)*) => {{ $crate::{identifier}!(@__pgrx_c_guard_locals __pgrx_emit_public []; $($raw)*) }};").expect("String output");
+            writeln!(&mut rust, "($($raw:tt)*) => {{ compile_error!(\"this C replacement requires an explicit braced invocation: use @__pgrx_c_statement; before its arguments\") }};\n}}").expect("String output");
+        } else {
+            writeln!(&mut rust, "($($raw:tt)*) => {{ $crate::{identifier}!(@__pgrx_c_guard_locals __pgrx_emit_public []; $($raw)*) }};\n}}").expect("String output");
+        }
         if rust.len() > MAX_EMISSION_BYTES {
             return Err(skip(
                 analysis,
@@ -977,8 +989,12 @@ fn render_expression(
                 match &node.kind {
                     ExpressionKind::Empty => {}
                     ExpressionKind::Parameter { index } => {
-                        write!(rust, "{SUPPORT}::expression::input($__pgrx_c_arg{index})")
-                            .expect("writing to a String cannot fail");
+                        write!(
+                            rust,
+                            "{SUPPORT}::expression::input(${})",
+                            arguments::name(analysis, *index)
+                        )
+                        .expect("writing to a String cannot fail");
                     }
                     ExpressionKind::IntegerLiteral { literal } => {
                         let ty = concrete_type(expression, index, analysis)?;

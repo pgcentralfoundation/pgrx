@@ -13,7 +13,7 @@ pub(super) fn render(
     analysis: &MacroAnalysis,
     bindings: &BindingCatalog,
     renderer: &typed::Renderer<'_>,
-    explicit_marker: bool,
+    explicit_marker: Option<&str>,
 ) -> Result<String, SkipReason> {
     let expression = analysis.expression.as_ref().expect("candidate statement expression");
     let body = expression.syntax.statement_body.as_ref().expect("statement body");
@@ -32,7 +32,11 @@ pub(super) fn render(
         && bindings.macros.contains(&delegation.callee)
         && let Some(callee) = macro_identifier(&delegation.callee)
     {
-        let mode = if explicit_marker { "return_as; $__pgrx_c_return, " } else { "public; " };
+        let mode = if let Some(marker) = explicit_marker {
+            format!("return_as; ${marker}, ")
+        } else {
+            String::from("public; ")
+        };
         write!(rust, "$crate::{callee}!(@__pgrx_emit_{mode}").expect("String output");
         for root in delegation.arguments {
             renderer.delegated_argument(root, &mut rust);
@@ -57,7 +61,7 @@ pub(super) fn render(
 fn render_statements(
     statements: &[Statement],
     renderer: &typed::Renderer<'_>,
-    explicit_marker: bool,
+    explicit_marker: Option<&str>,
     rust: &mut String,
 ) -> Result<(), SkipReason> {
     for statement in statements {
@@ -75,15 +79,37 @@ fn render_statements(
                 rust.push_str("} ");
             }
             Statement::Return { expression, .. } => {
-                let helper = if explicit_marker {
-                    "return_value_as::<$__pgrx_c_return, _>"
+                let helper = if let Some(marker) = explicit_marker {
+                    format!("return_value_as::<${marker}, _>")
                 } else {
-                    "return_value"
+                    String::from("return_value")
                 };
                 write!(rust, "return {SUPPORT}::expression_result::{helper}(")
                     .expect("String output");
                 renderer.render(*expression, typed::Context::Value, rust)?;
                 rust.push_str("); ");
+            }
+            Statement::If { condition, then_branch, else_branch, .. } => {
+                write!(rust, "if {SUPPORT}::expression::truth(").expect("String output");
+                renderer.render(*condition, typed::Context::Value, rust)?;
+                rust.push_str(") { ");
+                render_statements(
+                    std::slice::from_ref(then_branch.as_ref()),
+                    renderer,
+                    explicit_marker,
+                    rust,
+                )?;
+                rust.push_str("} ");
+                if let Some(else_branch) = else_branch {
+                    rust.push_str("else { ");
+                    render_statements(
+                        std::slice::from_ref(else_branch.as_ref()),
+                        renderer,
+                        explicit_marker,
+                        rust,
+                    )?;
+                    rust.push_str("} ");
+                }
             }
         }
     }

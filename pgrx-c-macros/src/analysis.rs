@@ -158,7 +158,7 @@ pub enum InvocationContract {
     /// must explicitly request the semantics of a parenthesized C invocation;
     /// surrounding textual C precedence is outside this invocation contract.
     ExplicitExpressionBoundary,
-    /// A complete terminal-return statement executes in the caller's function.
+    /// A complete statement body may return from the caller's function.
     /// Callers must supply a compatible C return type and preserve the recorded
     /// argument grouping. Introduced local names cannot occur in supplied arguments;
     /// C textual capture of those names is outside this invocation family.
@@ -166,6 +166,9 @@ pub enum InvocationContract {
     /// A complete C statement body executes in order and yields no value.
     /// Local capture and argument grouping constraints match returning statements.
     Statements,
+    /// An unbraced C statement replacement can capture a caller's `else`.
+    /// Callers explicitly request the semantics of a braced C invocation.
+    ExplicitStatementBoundary,
     NotEstablished,
 }
 
@@ -562,11 +565,18 @@ pub(crate) fn analyze_active_with_constants(
     let atomic_arguments =
         result.parameters.iter().flat_map(|parameter| &parameter.uses).any(|usage| !usage.grouped);
     match analyze_types(&syntax, catalog, &profile.target, object_constants) {
-        Ok((types, constants, helpers)) => {
+        Ok((types, constants, mut helpers)) => {
             let root = &syntax.nodes[syntax.root];
             let statements = syntax.statement_body.is_some();
             let returning =
                 syntax.statement_body.as_ref().is_some_and(|body| body.return_tokens.is_some());
+            let statement_boundary =
+                syntax.statement_body.as_ref().is_some_and(|body| body.requires_boundary);
+            if syntax.statement_body.as_ref().is_some_and(|body| {
+                body.walk().any(|statement| matches!(statement, Statement::If { .. }))
+            }) {
+                helpers.insert(HelperRequirement::CTruth);
+            }
             let expression_boundary = !statements
                 && !matches!(
                     root.kind,
@@ -593,7 +603,9 @@ pub(crate) fn analyze_active_with_constants(
                 integer_zero_constants: BTreeSet::new(),
             });
             result.required_helpers = helpers.into_iter().collect();
-            result.invocation = if returning {
+            result.invocation = if statement_boundary {
+                InvocationContract::ExplicitStatementBoundary
+            } else if returning {
                 InvocationContract::ReturningStatements
             } else if statements {
                 InvocationContract::Statements
@@ -622,7 +634,9 @@ pub(crate) fn analyze_active_with_constants(
                 result.evaluation.requirements.push(EvaluationRequirement::UnspecifiedOperandOrder);
             }
             if result.expression.as_ref().is_some_and(|expression| {
-                expression.syntax.nodes.iter().any(|node| {
+                expression.syntax.statement_body.as_ref().is_some_and(|body| {
+                    body.walk().any(|statement| matches!(statement, Statement::If { .. }))
+                }) || expression.syntax.nodes.iter().any(|node| {
                     matches!(
                         node.kind,
                         ExpressionKind::Conditional { .. }
@@ -1142,7 +1156,8 @@ fn analyze_types(
     Ok((types, constants, helpers))
 }
 
-/// Initialization is proved only at complete straight-line statement boundaries.
+/// Initialization is proved at complete statement and condition boundaries.
+/// Every path that can continue must initialize a local before its later read.
 /// Taking an address or passing it to a function does not prove that C wrote it.
 fn validate_local_initialization(
     expression: &Expression,
@@ -1151,50 +1166,94 @@ fn validate_local_initialization(
     let Some(body) = expression.statement_body.as_ref().filter(|_| !locals.is_empty()) else {
         return Ok(());
     };
+    fn check_full_expression<'a>(
+        expression: &Expression,
+        root: NodeId,
+        locals: &HashMap<&'a str, TypeInfo>,
+        initialized: &mut HashSet<&'a str>,
+    ) -> Result<(), TypeFailure> {
+        check_local_reads(expression, root, locals, initialized)?;
+        let mut root = root;
+        while let ExpressionKind::Group { operand } = expression.nodes[root].kind {
+            root = operand;
+        }
+        if let ExpressionKind::Assignment { operator: None, mut place, .. } =
+            expression.nodes[root].kind
+        {
+            while let ExpressionKind::Group { operand } = expression.nodes[place].kind {
+                place = operand;
+            }
+            if let ExpressionKind::Identifier { name } = &expression.nodes[place].kind
+                && let Some((&name, _)) = locals.get_key_value(name.as_str())
+            {
+                initialized.insert(name);
+            }
+        }
+        Ok(())
+    }
+    // A terminating path contributes no state to a later join: C never reaches it.
+    // Each surviving branch must establish every local read after the conditional.
     fn check_statements<'a>(
         expression: &Expression,
         statements: &'a [Statement],
         locals: &HashMap<&'a str, TypeInfo>,
         initialized: &mut HashSet<&'a str>,
-    ) -> Result<(), TypeFailure> {
+    ) -> Result<bool, TypeFailure> {
         for statement in statements {
             match statement {
                 Statement::Declaration { name, initializer, .. } => {
                     if let Some(initializer) = initializer {
-                        check_local_reads(expression, *initializer, locals, initialized)?;
+                        check_full_expression(expression, *initializer, locals, initialized)?;
                         initialized.insert(name.as_str());
                     }
                 }
                 Statement::Expression { expression: root, .. } => {
-                    check_local_reads(expression, *root, locals, initialized)?;
-                    let mut root = *root;
-                    while let ExpressionKind::Group { operand } = expression.nodes[root].kind {
-                        root = operand;
-                    }
-                    if let ExpressionKind::Assignment { operator: None, mut place, .. } =
-                        expression.nodes[root].kind
-                    {
-                        while let ExpressionKind::Group { operand } = expression.nodes[place].kind {
-                            place = operand;
-                        }
-                        if let ExpressionKind::Identifier { name } = &expression.nodes[place].kind
-                            && let Some((&name, _)) = locals.get_key_value(name.as_str())
-                        {
-                            initialized.insert(name);
-                        }
-                    }
+                    check_full_expression(expression, *root, locals, initialized)?;
                 }
                 Statement::Block { statements, .. } => {
-                    check_statements(expression, statements, locals, initialized)?;
+                    if check_statements(expression, statements, locals, initialized)? {
+                        return Ok(true);
+                    }
                 }
                 Statement::Return { expression: root, .. } => {
                     check_local_reads(expression, *root, locals, initialized)?;
+                    return Ok(true);
+                }
+                Statement::If { condition, then_branch, else_branch, .. } => {
+                    check_full_expression(expression, *condition, locals, initialized)?;
+                    let mut then_initialized = initialized.clone();
+                    let then_returns = check_statements(
+                        expression,
+                        std::slice::from_ref(then_branch.as_ref()),
+                        locals,
+                        &mut then_initialized,
+                    )?;
+                    let mut else_initialized = initialized.clone();
+                    let else_returns = if let Some(else_branch) = else_branch {
+                        check_statements(
+                            expression,
+                            std::slice::from_ref(else_branch.as_ref()),
+                            locals,
+                            &mut else_initialized,
+                        )?
+                    } else {
+                        false
+                    };
+                    match (then_returns, else_returns) {
+                        (true, true) => return Ok(true),
+                        (false, true) => *initialized = then_initialized,
+                        (true, false) => *initialized = else_initialized,
+                        (false, false) => {
+                            then_initialized.retain(|name| else_initialized.contains(name));
+                            *initialized = then_initialized;
+                        }
+                    }
                 }
             }
         }
-        Ok(())
+        Ok(false)
     }
-    check_statements(expression, &body.statements, locals, &mut HashSet::new())
+    check_statements(expression, &body.statements, locals, &mut HashSet::new()).map(|_| ())
 }
 
 fn check_local_reads(
@@ -1356,6 +1415,26 @@ pub(crate) fn resolve_type_info(
     if let Some(shape) = catalog.type_shapes.get(name) {
         return Some(shape.ty.clone());
     }
+    // Typedefs can carry their own qualifiers. Preserve those compiler facts
+    // before reducing a qualified integer name to its fundamental kind.
+    // Pointer declarators qualify each star separately, so only strip leaf names.
+    if !name.contains('*') {
+        let unqualified = name
+            .split_whitespace()
+            .filter(|word| !matches!(*word, "const" | "volatile"))
+            .collect::<Vec<_>>()
+            .join(" ");
+        if let Some(mut ty) = catalog
+            .types
+            .get(&unqualified)
+            .or_else(|| catalog.type_shapes.get(&unqualified).map(|shape| &shape.ty))
+            .cloned()
+        {
+            ty.is_const |= name.split_whitespace().any(|word| word == "const");
+            ty.is_volatile |= name.split_whitespace().any(|word| word == "volatile");
+            return Some(ty);
+        }
+    }
     if let Some(ty) = integer_type(name, catalog, target) {
         return Some(TypeInfo {
             spelling: name.into(),
@@ -1390,21 +1469,7 @@ pub(crate) fn resolve_type_info(
             is_volatile: name.rsplit_once('*')?.1.split_whitespace().any(|word| word == "volatile"),
         });
     }
-    let unqualified = name
-        .split_whitespace()
-        .filter(|word| !matches!(*word, "const" | "volatile"))
-        .collect::<Vec<_>>()
-        .join(" ");
-    catalog
-        .types
-        .get(&unqualified)
-        .or_else(|| catalog.type_shapes.get(&unqualified).map(|shape| &shape.ty))
-        .cloned()
-        .map(|mut ty| {
-            ty.is_const |= name.split_whitespace().any(|word| word == "const");
-            ty.is_volatile |= name.split_whitespace().any(|word| word == "volatile");
-            ty
-        })
+    None
 }
 
 pub(crate) fn integer_type(
@@ -1846,6 +1911,92 @@ mod tests {
             IntegerType { kind: IntegerKind::Int128, bits: 128, signed: true, rank: 6 },
         );
         assert!(validate_target(&target).is_err());
+    }
+
+    #[test]
+    fn qualified_integer_typedefs_retain_intrinsic_qualifiers_and_identity() {
+        let target = target(64);
+        let mut catalog = DeclarationCatalog::default();
+        for (name, canonical, kind, is_const, is_volatile, spellings) in [
+            (
+                "ConstWord",
+                "const unsigned long",
+                IntegerKind::UnsignedLong,
+                true,
+                false,
+                ["volatile ConstWord", "ConstWord volatile", "const volatile ConstWord"],
+            ),
+            (
+                "VolatileWord",
+                "volatile unsigned long long",
+                IntegerKind::UnsignedLongLong,
+                false,
+                true,
+                ["const VolatileWord", "VolatileWord const", "volatile const VolatileWord"],
+            ),
+        ] {
+            let mut expected = TypeInfo {
+                spelling: canonical.into(),
+                canonical_spelling: canonical.into(),
+                category: TypeCategory::Integer(kind),
+                size: Some(8),
+                alignment: Some(8),
+                is_const,
+                is_volatile,
+            };
+            catalog.types.insert(name.into(), expected.clone());
+            expected.is_const = true;
+            expected.is_volatile = true;
+            for spelling in spellings {
+                assert_eq!(resolve_type_info(spelling, &catalog, &target), Some(expected.clone()));
+            }
+        }
+    }
+
+    #[test]
+    fn pointer_qualifiers_apply_to_their_own_declarator_layer() {
+        let target = target(64);
+        let mut catalog = DeclarationCatalog::default();
+        catalog.types.insert(
+            "ConstWord".into(),
+            TypeInfo {
+                spelling: "const unsigned long".into(),
+                canonical_spelling: "const unsigned long".into(),
+                category: TypeCategory::Integer(IntegerKind::UnsignedLong),
+                size: Some(8),
+                alignment: Some(8),
+                is_const: true,
+                is_volatile: false,
+            },
+        );
+        for (spelling, is_const, is_volatile) in [
+            ("volatile ConstWord *", false, false),
+            ("ConstWord * volatile", false, true),
+            ("ConstWord * const", true, false),
+            ("ConstWord * const * volatile", false, true),
+        ] {
+            let ty = resolve_type_info(spelling, &catalog, &target).unwrap();
+            assert_eq!(ty.category, TypeCategory::Pointer);
+            assert_eq!((ty.is_const, ty.is_volatile), (is_const, is_volatile));
+        }
+        let leaf = resolve_type_info("volatile ConstWord", &catalog, &target).unwrap();
+        assert!(leaf.is_const && leaf.is_volatile);
+
+        let pointer_alias = TypeInfo {
+            spelling: "unsigned long *const".into(),
+            canonical_spelling: "unsigned long *const".into(),
+            category: TypeCategory::Pointer,
+            size: Some(8),
+            alignment: Some(8),
+            is_const: true,
+            is_volatile: false,
+        };
+        catalog.types.insert("ConstPointer".into(), pointer_alias.clone());
+        let qualified = resolve_type_info("volatile ConstPointer", &catalog, &target).unwrap();
+        assert!(qualified.is_const && qualified.is_volatile);
+        assert_eq!(qualified.canonical_spelling, pointer_alias.canonical_spelling);
+        let outer = resolve_type_info("volatile ConstPointer *", &catalog, &target).unwrap();
+        assert!(!outer.is_const && !outer.is_volatile);
     }
 
     #[test]

@@ -37,6 +37,7 @@ const NAMES: &[&str] = &[
     "STMT_VOID",
     "STMT_DISCARD",
     "STMT_USE",
+    "STMT_BRANCH",
 ];
 
 const NATIVE: &str = r#"
@@ -143,6 +144,9 @@ int main(void) {
     printf("%u\n", statement_signal);
     STMT_DISCARD(pointer);
     printf("%u %u\n", (unsigned int) object.byte, statement_signal);
+    STMT_BRANCH((StatementRecord *) 0);
+    STMT_BRANCH(pointer);
+    printf("%u\n", object.total);
 }
 "#;
     let consumer = r#"
@@ -184,6 +188,9 @@ fn main() {
         STMT_DISCARD!(pointer);
         let signal = core::ptr::read_volatile(core::ptr::addr_of!(statement_signal));
         println!("{} {}", object.byte, signal);
+        STMT_BRANCH!(core::ptr::null_mut::<StatementRecord>());
+        STMT_BRANCH!(pointer);
+        println!("{}", object.total);
     }
 }
 "#;
@@ -205,7 +212,7 @@ fn main() {
         &arguments,
     );
     assert_eq!(emitted, original, "statement sequencing and C conversions must match");
-    assert_eq!(emitted.lines().count(), 8);
+    assert_eq!(emitted.lines().count(), 9);
 
     for invocation in [
         "STMT_LOCAL!(pointer, temporary)",
@@ -247,12 +254,7 @@ fn unsupported_control_flow_and_uninitialized_local_reads_remain_skipped() {
     let directory = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let header = directory.join("tests/fixtures/statement_oracle.h");
     let scanner = MacroScanner::new().expect("libclang required");
-    let names = [
-        "STMT_UNINITIALIZED",
-        "STMT_UNINITIALIZED_COMPOUND",
-        "STMT_UNSUPPORTED_BRANCH",
-        "STMT_UNSUPPORTED_LOOP",
-    ];
+    let names = ["STMT_UNINITIALIZED", "STMT_UNINITIALIZED_COMPOUND", "STMT_UNSUPPORTED_LOOP"];
     let frontend = inspect(&scanner, &header, &["-std=c17".into()], None).unwrap();
     let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
     for name in names {

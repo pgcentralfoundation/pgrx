@@ -48,5 +48,5 @@ void statement_store(StatementRecord *pointer, unsigned int value);
     do { unsigned int temporary; (pointer)->total = temporary; } while (0)
 #define STMT_UNINITIALIZED_COMPOUND(pointer) \
     do { unsigned int temporary; temporary += 1; (pointer)->total = temporary; } while (0)
-#define STMT_UNSUPPORTED_BRANCH(pointer) do { if (pointer) (pointer)->total = 1; } while (0)
+#define STMT_BRANCH(pointer) do { if (pointer) (pointer)->total = 1; } while (0)
 #define STMT_UNSUPPORTED_LOOP(pointer) do { while (pointer) (pointer)->total++; } while (0)

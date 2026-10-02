@@ -189,13 +189,22 @@ script so changes to those inputs can trigger generation.
 Windows/MSVC and precomputed target-binding imports currently report macro generation
 unavailable. Other unsupported inspected profiles retain per-macro skips. The docs.rs
 path uses shipped bindings, macro definitions and input adapters without requiring
-PostgreSQL or Clang. Existing handwritten ports remain available while migration proceeds.
+PostgreSQL or Clang. Native adapter implementations are excluded from documentation
+builds because they belong to the inspected installation's platform and layouts.
+Existing handwritten ports remain available while migration proceeds.
 
 The runtime models C integer promotions, conversions, casts, comparisons, shifts,
 and lazy logical and conditional operators on checked signed-char LP64 targets.
 Emitted literals keep their radix and digit spelling. C suffixes, octal notation
 and character escapes are adjusted to Rust syntax without changing the inferred
 C type or value.
+
+Generated matchers and operands retain the original C formal parameter names.
+Verified casts name the corresponding Rust binding, such as `AclMode`, while
+the accompanying C type marker preserves integer rank, signedness and pointer
+qualifications. Unavailable or incompatible binding aliases retain the canonical
+C cast with a `/* PGRX: ... */` explanation.
+
 Binding-aware emission preserves verified names such as `$crate::MaxAllocHugeSize`
 and enum constants in their generated modules. The Rust binding supplies the
 referenced value; Clang supplies its original C integer type and independently
@@ -239,10 +248,11 @@ The typed expression support also covers:
   representations and evaluation modes. Floating arithmetic additionally requires
   contraction disabled; excess precision, fast-math modes and `long double`
   remain outside the modeled family.
-- Straight-line statement blocks, with optional terminal `return`, including
+- Statement blocks, including conditional and terminal `return`, with
   nested lexical blocks and literal-zero `do`/`while` wrappers, ordered expression
-  statements and flat typed local declarations.
-  Local reads require proved initialization; unsupported control flow and
+  statements, `if`/`else`, and flat typed local declarations.
+  Local reads require initialization on every path that can reach them;
+  unsupported control flow and
   declaration forms remain skips.
 
 Signed overflow follows the inspected undefined or wrapping policy. Arithmetic
@@ -293,6 +303,14 @@ Statement macros without a return execute their full expressions in order,
 preserve nested local scopes, and yield `()`. They discard each expression's
 result without dropping its evaluation. They cannot be used as C expression
 operands.
+
+Conditional statements evaluate their C scalar condition once and execute only
+the selected branch. A return in a branch exits the caller; other branches can
+continue through the rest of the macro. Unbraced conditional replacements require
+`MACRO!(@__pgrx_c_statement; arguments...)`, which corresponds to the braced C
+invocation `{ MACRO(arguments...); }`. This boundary prevents a caller's `else`
+from changing the macro's control flow. If a return marker is needed, put
+`@__pgrx_c_return_as [CMarker];` after the statement boundary.
 
 Macros introducing C locals reject arguments mentioning those local names:
 C substitution can capture a local that Rust macro hygiene would resolve
