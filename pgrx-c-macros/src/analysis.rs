@@ -2,18 +2,19 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! Conservative symbolic analysis for the initial C integer-expression family.
+//! Conservative symbolic analysis for supported C macro expressions.
 //!
-//! A candidate has a complete expression and constraints for C integer/bool inputs. It is
-//! pending Rust lowering and validation, not a supported generated macro. Casts never imply
+//! A candidate has a parsed expression and compiler-derived declaration and operand facts.
+//! It is pending Rust lowering and validation. Casts never imply
 //! a unique input type. Macro dependencies require compiler-owned expansion; this module
 //! deliberately does not substitute token strings or infer recursive preprocessing rules.
 //! Candidates describe invocation scopes whose referenced C bindings and final macro
-//! environment match the inspection, rather than arbitrary caller-local rebindings.
+//! environment match the inspection. Unresolved caller-scope identifiers become explicit
+//! operands; this does not permit rebinding declarations established by the compiler.
 
 use crate::model::{
     ActiveMacro, ActiveProvenance, DeclarationCatalog, FrontendOutput, IntegerConstant,
-    IntegerKind, IntegerType, IntegerValue, SignedOverflow, TargetFacts, TypeCategory,
+    IntegerKind, IntegerType, IntegerValue, SignedOverflow, TargetFacts, TypeCategory, TypeInfo,
 };
 use crate::syntax::{
     BinaryOperator, Expression, ExpressionKind, IntegerLiteral, NodeId, SyntaxError,
@@ -42,7 +43,7 @@ pub struct MacroAnalysis {
 #[derive(Clone, Debug, Serialize)]
 #[serde(tag = "status", rename_all = "snake_case")]
 pub enum AnalysisStatus {
-    /// Analyzed for the bounded integer family; Rust emission has not been validated.
+    /// Parsed and analyzed; Rust lowering and differential validation are separate steps.
     Candidate,
     Skipped {
         reason: SkipReason,
@@ -98,10 +99,20 @@ pub enum SkipReasonCode {
 #[derive(Clone, Debug, Serialize)]
 pub struct ParameterAnalysis {
     pub name: String,
+    pub origin: ParameterOrigin,
     pub roles: Vec<ParameterRole>,
     /// Every lexical replacement-list occurrence; unused arguments remain unevaluated.
     pub uses: Vec<ParameterUse>,
     pub constraint: Option<InputConstraint>,
+}
+
+/// C macro formals and caller-scope identifiers have different hygiene rules.
+/// Rust callers supply free identifiers explicitly after the original formals.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ParameterOrigin {
+    Formal,
+    FreeIdentifier,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
@@ -134,12 +145,19 @@ pub enum InputConstraint {
 #[serde(rename_all = "snake_case")]
 pub enum InvocationContract {
     /// Each value hole has explicit C parentheses, and the complete body is parenthesized
-    /// or an atomic integer literal/constant. Rust expression fragments therefore preserve
+    /// or atomic. Rust expression fragments therefore preserve
     /// grouping both inside the body and at its invocation. Referenced C typedefs and
     /// constants must resolve to the inspected declarations, and the final macro environment
     /// must match the inspected environment. Caller-local shadowing and subsequent macro
     /// redefinition/undefinition are outside this family. Type/domain constraints also apply.
     ParenthesizedScalarExpressions,
+    /// Ungrouped parameter substitutions accept one Rust token tree, corresponding
+    /// to an atomic C identifier, literal, or explicitly parenthesized expression.
+    AtomicArguments,
+    /// The original replacement is not an atomic C expression. Rust callers
+    /// must explicitly request the semantics of a parenthesized C invocation;
+    /// surrounding textual C precedence is outside this invocation contract.
+    ExplicitExpressionBoundary,
     NotEstablished,
 }
 
@@ -196,6 +214,9 @@ pub struct AnalyzedExpression {
     /// Parallel to `syntax.nodes`; references are expression node indices.
     pub types: Vec<TypeExpression>,
     pub constants: Vec<ResolvedConstant>,
+    /// Pure integer subexpressions whose zero ICE value both Clang frontends proved.
+    /// Native operands and stored values never acquire this source-level identity.
+    pub integer_zero_constants: BTreeSet<NodeId>,
 }
 
 /// Symbolic C result types retain promotion/common-type rules instead of selecting a
@@ -203,10 +224,26 @@ pub struct AnalyzedExpression {
 #[derive(Clone, Debug, Serialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum TypeExpression {
-    Concrete { ty: IntegerType },
-    Parameter { index: usize },
-    Promotion { operand: NodeId },
-    Common { left: NodeId, right: NodeId },
+    Void,
+    /// A concrete non-integer C type obtained from a declaration or type operand.
+    External {
+        ty: TypeInfo,
+    },
+    /// A generic expression whose C type is constrained by generated capabilities.
+    Deferred,
+    Concrete {
+        ty: IntegerType,
+    },
+    Parameter {
+        index: usize,
+    },
+    Promotion {
+        operand: NodeId,
+    },
+    Common {
+        left: NodeId,
+        right: NodeId,
+    },
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -231,7 +268,7 @@ pub(crate) fn analyze_active(
     name: &str,
     active: Option<&ActiveMacro>,
 ) -> MacroAnalysis {
-    analyze_active_with_constants(frontend, name, active, &BTreeMap::new())
+    analyze_active_with_constants(frontend, name, active, &BTreeMap::new(), false)
 }
 
 pub(crate) fn analyze_active_with_constants(
@@ -239,6 +276,7 @@ pub(crate) fn analyze_active_with_constants(
     name: &str,
     active: Option<&ActiveMacro>,
     object_constants: &BTreeMap<String, IntegerConstant>,
+    compiler_expanded: bool,
 ) -> MacroAnalysis {
     let profile = frontend.profile();
     let mut result = MacroAnalysis {
@@ -312,6 +350,7 @@ pub(crate) fn analyze_active_with_constants(
         .iter()
         .map(|name| ParameterAnalysis {
             name: name.clone(),
+            origin: ParameterOrigin::Formal,
             roles: vec![ParameterRole::Unused],
             uses: Vec::new(),
             constraint: None,
@@ -372,7 +411,7 @@ pub(crate) fn analyze_active_with_constants(
             None,
         );
     }
-    if let Some(dependency) = result.dependencies.first() {
+    if let Some(dependency) = result.dependencies.first().filter(|_| !compiler_expanded) {
         let tokens = dependency.uses.first().copied();
         let message = format!(
             "{} requires compiler-owned macro prescan/rescan and recursive suppression",
@@ -384,12 +423,50 @@ pub(crate) fn analyze_active_with_constants(
         return result.skip(SkipReasonCode::InvalidTarget, message, None);
     }
     let catalog = frontend.declarations();
-    let syntax = match parse_expression(body, &parameters, |name| {
+    let mut syntax = match parse_expression(body, &parameters, |name| {
         recognized_type(name, catalog, &profile.target)
     }) {
         Ok(syntax) => syntax,
         Err(error) => return result.syntax_error(error),
     };
+    // A C replacement list can capture identifiers from the invocation's scope.
+    // macro_rules hygiene prevents that capture. Expose precisely those AST
+    // value identifiers as extra holes, without confusing member names or types
+    // with values and without inventing a signature from one sample invocation.
+    if compiler_expanded {
+        let mut captures = BTreeMap::new();
+        for node in &mut syntax.nodes {
+            let ExpressionKind::Identifier { name } = &node.kind else { continue };
+            if catalog.integer_constants.contains_key(name)
+                || object_constants.contains_key(name)
+                || catalog.variables.contains_key(name)
+                || catalog.functions.contains_key(name)
+            {
+                continue;
+            }
+            let parameter = *captures.entry(name.clone()).or_insert_with(|| {
+                let index = result.parameters.len();
+                result.parameters.push(ParameterAnalysis {
+                    name: name.clone(),
+                    origin: ParameterOrigin::FreeIdentifier,
+                    roles: vec![ParameterRole::Unknown],
+                    uses: Vec::new(),
+                    constraint: None,
+                });
+                index
+            });
+            result.parameters[parameter]
+                .uses
+                .push(ParameterUse { tokens: node.tokens, grouped: true });
+            node.kind = ExpressionKind::Parameter { index: parameter };
+        }
+        if result.parameters.len() > 64 {
+            return result.skip(SkipReasonCode::BudgetExceeded, "macro formals and caller-scope identifiers exceed the 64-argument normalization budget", None);
+        }
+        for parameter in &mut result.parameters[parameters.len()..] {
+            parameter.uses.sort_by_key(|usage| usage.tokens.start);
+        }
+    }
     // Parent links establish whether each hole, rather than a larger surrounding
     // expression, is explicitly grouped. Traversal remains linear in arena size.
     let mut grouped = vec![false; syntax.nodes.len()];
@@ -397,44 +474,110 @@ pub(crate) fn analyze_active_with_constants(
         if let ExpressionKind::Group { operand } = node.kind {
             grouped[operand] = true;
         }
-    }
-    let mut next_use = vec![0; result.parameters.len()];
-    for (index, node) in syntax.nodes.iter().enumerate() {
-        if let ExpressionKind::Parameter { index: parameter } = node.kind {
-            // Leaves are parsed in lexical order, so the next recorded use is the
-            // corresponding hole. Repeated parameters do not need a linear search.
-            let usage = &mut result.parameters[parameter].uses[next_use[parameter]];
-            debug_assert_eq!(usage.tokens, node.tokens);
-            usage.grouped = grouped[index];
-            next_use[parameter] += 1;
-            result.parameters[parameter].roles = vec![ParameterRole::Value];
-            result.parameters[parameter].constraint = Some(InputConstraint::IntegerScalar);
+        if let ExpressionKind::Call { arguments, .. } = &node.kind {
+            // Call delimiters protect a whole argument's precedence. They do
+            // not protect a hole inside a larger argument, such as f(x * 2).
+            for argument in arguments {
+                grouped[*argument] = true;
+            }
         }
     }
-    if let Some(usage) =
-        result.parameters.iter().flat_map(|parameter| &parameter.uses).find(|usage| !usage.grouped)
-    {
-        let tokens = usage.tokens;
-        return result.skip(SkipReasonCode::InvocationGrouping, "a parameter occurrence is not explicitly parenthesized; Rust expr fragments would change textual C grouping", Some(tokens));
+    for (index, node) in syntax.nodes.iter().enumerate() {
+        if let ExpressionKind::Member { field_parameter: Some(parameter), .. } = node.kind {
+            let parameter = &mut result.parameters[parameter];
+            parameter.roles.retain(|role| *role != ParameterRole::Unknown);
+            if !parameter.roles.contains(&ParameterRole::Identifier) {
+                parameter.roles.push(ParameterRole::Identifier);
+            }
+            parameter.constraint = None;
+            for usage in &mut parameter.uses {
+                if usage.tokens.start + 1 == node.tokens.end {
+                    usage.grouped = true;
+                }
+            }
+        }
+        if let ExpressionKind::Parameter { index: parameter } = node.kind {
+            // Type operands consume lexical holes without creating value leaves.
+            // Uses are sorted by token offset, so locating a value leaf is bounded.
+            let occurrence = result.parameters[parameter]
+                .uses
+                .binary_search_by_key(&node.tokens.start, |usage| usage.tokens.start)
+                .expect("each parsed hole was recorded lexically");
+            let is_capture = result.parameters[parameter].origin == ParameterOrigin::FreeIdentifier;
+            let usage = &mut result.parameters[parameter].uses[occurrence];
+            debug_assert_eq!(usage.tokens, node.tokens);
+            usage.grouped = grouped[index] || is_capture;
+            if !result.parameters[parameter].roles.contains(&ParameterRole::Value) {
+                result.parameters[parameter].roles.retain(|role| *role != ParameterRole::Unknown);
+                result.parameters[parameter].roles.push(ParameterRole::Value);
+            }
+            result.parameters[parameter].constraint = Some(InputConstraint::IntegerScalar);
+        }
+        if let ExpressionKind::TypeParameterCast { parameter, operand, .. } = node.kind {
+            let parameter = &mut result.parameters[parameter];
+            parameter.roles.retain(|role| *role != ParameterRole::Unknown);
+            if !parameter.roles.contains(&ParameterRole::Type) {
+                parameter.roles.push(ParameterRole::Type);
+            }
+            parameter.constraint = None;
+            for usage in &mut parameter.uses {
+                if usage.tokens.start >= node.tokens.start
+                    && usage.tokens.end <= syntax.nodes[operand].tokens.start
+                {
+                    usage.grouped = true;
+                }
+            }
+        }
+        if let ExpressionKind::SizeOfTypeParameter { parameter, .. }
+        | ExpressionKind::AlignOfTypeParameter { parameter, .. } = node.kind
+        {
+            let parameter = &mut result.parameters[parameter];
+            parameter.roles = vec![ParameterRole::Type];
+            parameter.constraint = None;
+            for usage in &mut parameter.uses {
+                if usage.tokens.start >= node.tokens.start && usage.tokens.end <= node.tokens.end {
+                    usage.grouped = true;
+                }
+            }
+        }
     }
+    let atomic_arguments =
+        result.parameters.iter().flat_map(|parameter| &parameter.uses).any(|usage| !usage.grouped);
     match analyze_types(&syntax, catalog, &profile.target, object_constants) {
         Ok((types, constants, helpers)) => {
             let root = &syntax.nodes[syntax.root];
-            if !matches!(
+            let expression_boundary = !matches!(
                 root.kind,
                 ExpressionKind::Group { .. }
                     | ExpressionKind::IntegerLiteral { .. }
                     | ExpressionKind::Identifier { .. }
-            ) {
+                    | ExpressionKind::Empty
+                    | ExpressionKind::Parameter { .. }
+                    | ExpressionKind::Call { .. }
+                    | ExpressionKind::Member { .. }
+                    | ExpressionKind::Index { .. }
+            );
+            if expression_boundary && !compiler_expanded {
                 return result.skip(
                     SkipReasonCode::InvocationGrouping,
                     "the complete replacement expression is not parenthesized or atomic; Rust expression grouping would change its interaction with caller operators",
                     Some(root.tokens),
                 );
             }
-            result.expression = Some(AnalyzedExpression { syntax, types, constants });
+            result.expression = Some(AnalyzedExpression {
+                syntax,
+                types,
+                constants,
+                integer_zero_constants: BTreeSet::new(),
+            });
             result.required_helpers = helpers.into_iter().collect();
-            result.invocation = InvocationContract::ParenthesizedScalarExpressions;
+            result.invocation = if expression_boundary {
+                InvocationContract::ExplicitExpressionBoundary
+            } else if atomic_arguments {
+                InvocationContract::AtomicArguments
+            } else {
+                InvocationContract::ParenthesizedScalarExpressions
+            };
             result.evaluation.requirements = vec![
                 EvaluationRequirement::PreserveParameterOccurrences,
                 EvaluationRequirement::ExcludeUndefinedCOperations,
@@ -498,7 +641,6 @@ impl MacroAnalysis {
             }
         }
         let code = match error.kind {
-            SyntaxErrorKind::EmptyReplacement => SkipReasonCode::EmptyReplacement,
             SyntaxErrorKind::InvalidExpression => SkipReasonCode::InvalidExpression,
             SyntaxErrorKind::UnsupportedLiteral => SkipReasonCode::UnsupportedLiteral,
             SyntaxErrorKind::PointerOperation => SkipReasonCode::PointerOperation,
@@ -574,6 +716,21 @@ pub(crate) fn validate_constant_expression(
     let (types, _, _) = analyze_types(&expression, catalog, target, &BTreeMap::new())
         .map_err(|(_, message, _)| message)?;
     for (index, node) in expression.nodes.iter().enumerate() {
+        if !matches!(
+            node.kind,
+            ExpressionKind::IntegerLiteral { .. }
+                | ExpressionKind::Identifier { .. }
+                | ExpressionKind::Group { .. }
+                | ExpressionKind::Cast { .. }
+                | ExpressionKind::Unary { .. }
+                | ExpressionKind::Binary { .. }
+                | ExpressionKind::Conditional { .. }
+        ) || matches!(&node.kind, ExpressionKind::Identifier { name } if !catalog.integer_constants.contains_key(name))
+        {
+            return Err(
+                "constant probes cannot evaluate calls, variables, memory or mutation".into()
+            );
+        }
         let TypeExpression::Concrete { ty } = types[index] else {
             return Err("constant expression has no concrete integer type".into());
         };
@@ -647,6 +804,7 @@ fn analyze_types(
     let int = target.integers[&IntegerKind::Int];
     for (index, node) in expression.nodes.iter().enumerate() {
         let ty = match &node.kind {
+            ExpressionKind::Empty => TypeExpression::Void,
             ExpressionKind::Parameter { index } => TypeExpression::Parameter { index: *index },
             ExpressionKind::IntegerLiteral { literal } => {
                 if literal.spelling.starts_with('\'') && !target.ascii_execution_charset {
@@ -671,18 +829,34 @@ fn analyze_types(
                 let Some(constant) =
                     object_constants.get(name).or_else(|| catalog.integer_constants.get(name))
                 else {
-                    let (code, message) = if catalog.variables.contains_key(name) {
-                        (
-                            SkipReasonCode::VariableAccess,
-                            "variable access requires binding, lifetime and evaluation contracts",
-                        )
-                    } else {
-                        (
-                            SkipReasonCode::UnknownIdentifier,
-                            "identifier is not a compiler-owned integer constant",
-                        )
-                    };
-                    return Err((code, format!("{name}: {message}"), node.tokens));
+                    if let Some(ty) =
+                        catalog.variables.get(name).or_else(|| catalog.functions.get(name))
+                    {
+                        if ty.category == TypeCategory::Other
+                            && !matches!(
+                                catalog
+                                    .type_shapes
+                                    .get(&ty.canonical_spelling)
+                                    .map(|shape| &shape.kind),
+                                Some(crate::TypeShapeKind::Array { .. })
+                            )
+                        {
+                            return Err((
+                                SkipReasonCode::UnsupportedType,
+                                format!("{name}: declaration has an unmodeled compiler type"),
+                                node.tokens,
+                            ));
+                        }
+                        types.push(declared_type(ty, target));
+                        continue;
+                    }
+                    return Err((
+                        SkipReasonCode::UnknownIdentifier,
+                        format!(
+                            "{name}: identifier has no compiler-owned declaration or integer constant"
+                        ),
+                        node.tokens,
+                    ));
                 };
                 let TypeCategory::Integer(kind) = constant.ty.category else {
                     return Err((
@@ -711,17 +885,25 @@ fn analyze_types(
             }
             ExpressionKind::Group { operand } => types[*operand].clone(),
             ExpressionKind::Cast { type_name, .. } => {
+                if type_name == "void" {
+                    types.push(TypeExpression::Void);
+                    continue;
+                }
                 let Some(ty) = integer_type(type_name, catalog, target) else {
-                    let code = if type_name.contains('*') {
-                        SkipReasonCode::PointerOperation
-                    } else {
-                        SkipReasonCode::UnsupportedType
-                    };
+                    if let Some(info) = resolve_type_info(type_name, catalog, target) {
+                        if info.category == TypeCategory::Other {
+                            return Err((
+                                SkipReasonCode::UnsupportedType,
+                                format!("cast type {type_name:?} has an unmodeled compiler type"),
+                                node.tokens,
+                            ));
+                        }
+                        types.push(declared_type(&info, target));
+                        continue;
+                    }
                     return Err((
-                        code,
-                        format!(
-                            "cast type {type_name:?} is outside the established integer family"
-                        ),
+                        SkipReasonCode::UnsupportedType,
+                        format!("cast type {type_name:?} has no established compiler type"),
                         node.tokens,
                     ));
                 };
@@ -794,6 +976,98 @@ fn analyze_types(
                 helpers.insert(HelperRequirement::UsualArithmeticConversions);
                 common_type(&types, *then_value, *else_value, target)
             }
+            ExpressionKind::Comma { right, .. } => types[*right].clone(),
+            ExpressionKind::Call { callee, arguments } => {
+                let mut callee = *callee;
+                while let ExpressionKind::Group { operand } = expression.nodes[callee].kind {
+                    callee = operand;
+                }
+                let direct =
+                    if let ExpressionKind::Identifier { name } = &expression.nodes[callee].kind {
+                        catalog.function_signatures.get(name).map(|function| &function.signature)
+                    } else {
+                        None
+                    };
+                let indirect = if let (None, TypeExpression::External { ty }) =
+                    (direct, &types[callee])
+                {
+                    let ty = match catalog
+                        .type_shapes
+                        .get(&ty.canonical_spelling)
+                        .map(|shape| &shape.kind)
+                    {
+                        Some(crate::TypeShapeKind::Pointer { pointee }) => pointee,
+                        _ => ty,
+                    };
+                    match catalog.type_shapes.get(&ty.canonical_spelling).map(|shape| &shape.kind) {
+                        Some(crate::TypeShapeKind::Function { signature }) => Some(signature),
+                        _ => {
+                            return Err((
+                                SkipReasonCode::Call,
+                                "callee's compiler-owned type is not a function pointer".into(),
+                                node.tokens,
+                            ));
+                        }
+                    }
+                } else {
+                    None
+                };
+                if let Some(signature) = direct.or(indirect) {
+                    if signature.parameters.is_none() {
+                        return Err((
+                            SkipReasonCode::Call,
+                            "callee has no complete C prototype".into(),
+                            node.tokens,
+                        ));
+                    }
+                    if signature.variadic {
+                        return Err((
+                            SkipReasonCode::Variadic,
+                            "variadic calls require a separate argument promotion contract".into(),
+                            node.tokens,
+                        ));
+                    }
+                    if signature
+                        .parameters
+                        .as_ref()
+                        .is_none_or(|parameters| parameters.len() != arguments.len())
+                    {
+                        return Err((
+                            SkipReasonCode::Call,
+                            "invocation does not match a complete C prototype".into(),
+                            node.tokens,
+                        ));
+                    }
+                    declared_type(&signature.result, target)
+                } else if matches!(
+                    types[callee],
+                    TypeExpression::Concrete { .. } | TypeExpression::Void
+                ) {
+                    return Err((
+                        SkipReasonCode::Call,
+                        "callee is a noncallable C scalar expression".into(),
+                        node.tokens,
+                    ));
+                } else {
+                    // Generic arguments and field projections acquire their exact
+                    // prototype through generated, compiler-owned Call capabilities.
+                    TypeExpression::Deferred
+                }
+            }
+            ExpressionKind::Member { .. }
+            | ExpressionKind::Index { .. }
+            | ExpressionKind::Dereference { .. }
+            | ExpressionKind::AddressOf { .. } => TypeExpression::Deferred,
+            ExpressionKind::Assignment { place, .. } => types[*place].clone(),
+            ExpressionKind::Update { operand, .. } => types[*operand].clone(),
+            ExpressionKind::SizeOfType { .. }
+            | ExpressionKind::SizeOfExpression { .. }
+            | ExpressionKind::AlignOfType { .. }
+            | ExpressionKind::SizeOfTypeParameter { .. }
+            | ExpressionKind::AlignOfTypeParameter { .. } => {
+                TypeExpression::Concrete { ty: target.integers[&IntegerKind::UnsignedLong] }
+            }
+            ExpressionKind::TypeParameterCast { .. } => TypeExpression::Deferred,
         };
         types.push(ty);
     }
@@ -885,16 +1159,80 @@ fn validate_target(target: &TargetFacts) -> Result<(), String> {
 }
 
 fn recognized_type(name: &str, catalog: &DeclarationCatalog, target: &TargetFacts) -> bool {
-    integer_type(name, catalog, target).is_some()
-        || catalog.types.contains_key(name)
-        || matches!(name, "void" | "float" | "double" | "long double")
-        || name.contains('*')
-            && name.split_whitespace().next().is_some_and(|first| {
-                integer_type(first, catalog, target).is_some() || catalog.types.contains_key(first)
-            })
+    resolve_type_info(name, catalog, target).is_some()
 }
 
-fn integer_type(
+fn declared_type(info: &TypeInfo, target: &TargetFacts) -> TypeExpression {
+    match info.category {
+        TypeCategory::Integer(kind) => TypeExpression::Concrete { ty: target.integers[&kind] },
+        TypeCategory::Void => TypeExpression::Void,
+        _ => TypeExpression::External { ty: info.clone() },
+    }
+}
+
+pub(crate) fn resolve_type_info(
+    name: &str,
+    catalog: &DeclarationCatalog,
+    target: &TargetFacts,
+) -> Option<TypeInfo> {
+    if let Some(info) = catalog.types.get(name) {
+        return Some(info.clone());
+    }
+    if let Some(shape) = catalog.type_shapes.get(name) {
+        return Some(shape.ty.clone());
+    }
+    if let Some(ty) = integer_type(name, catalog, target) {
+        return Some(TypeInfo {
+            spelling: name.into(),
+            canonical_spelling: name.into(),
+            category: TypeCategory::Integer(ty.kind),
+            size: Some(u64::from(ty.bits / target.char_bits)),
+            alignment: None,
+            is_const: name.split_whitespace().any(|word| word == "const"),
+            is_volatile: name.split_whitespace().any(|word| word == "volatile"),
+        });
+    }
+    if name == "void" {
+        return Some(TypeInfo {
+            spelling: name.into(),
+            canonical_spelling: name.into(),
+            category: TypeCategory::Void,
+            size: None,
+            alignment: None,
+            is_const: false,
+            is_volatile: false,
+        });
+    }
+    if let Some((pointee, _)) = name.rsplit_once('*') {
+        resolve_type_info(pointee.trim(), catalog, target)?;
+        return Some(TypeInfo {
+            spelling: name.into(),
+            canonical_spelling: name.into(),
+            category: TypeCategory::Pointer,
+            size: Some(u64::from(target.pointer_bits / target.char_bits)),
+            alignment: None,
+            is_const: name.rsplit_once('*')?.1.split_whitespace().any(|word| word == "const"),
+            is_volatile: name.rsplit_once('*')?.1.split_whitespace().any(|word| word == "volatile"),
+        });
+    }
+    let unqualified = name
+        .split_whitespace()
+        .filter(|word| !matches!(*word, "const" | "volatile"))
+        .collect::<Vec<_>>()
+        .join(" ");
+    catalog
+        .types
+        .get(&unqualified)
+        .or_else(|| catalog.type_shapes.get(&unqualified).map(|shape| &shape.ty))
+        .cloned()
+        .map(|mut ty| {
+            ty.is_const |= name.split_whitespace().any(|word| word == "const");
+            ty.is_volatile |= name.split_whitespace().any(|word| word == "volatile");
+            ty
+        })
+}
+
+pub(crate) fn integer_type(
     name: &str,
     catalog: &DeclarationCatalog,
     target: &TargetFacts,
@@ -1043,6 +1381,7 @@ fn common_type(
     target: &TargetFacts,
 ) -> TypeExpression {
     match (&types[left], &types[right]) {
+        (TypeExpression::Void, TypeExpression::Void) => TypeExpression::Void,
         (TypeExpression::Concrete { ty: left }, TypeExpression::Concrete { ty: right }) => {
             let left = promotion(*left, target);
             let right = promotion(*right, target);
@@ -1107,12 +1446,14 @@ mod tests {
         TargetFacts {
             triple: "fixture".into(),
             pointer_bits: 64,
+            function_pointer: crate::PointerLayout { size: 8, alignment: 8 },
             char_bits: 8,
             char_is_signed: true,
             ascii_execution_charset: true,
             byte_order: ByteOrder::Little,
             c_standard: Some(201710),
             integers,
+            floating_point: Default::default(),
         }
     }
 
@@ -1269,8 +1610,8 @@ mod tests {
         for (body, expected) in [
             (vec!["x", "+", "1"], SkipReasonCode::InvocationGrouping),
             (vec!["(", "x", ")", "?", "1", ":", "2"], SkipReasonCode::InvocationGrouping),
-            (vec!["(", "unused", ")", "(", "x", ")"], SkipReasonCode::TypeParameter),
-            (vec!["(", "char", "*", ")", "(", "x", ")"], SkipReasonCode::PointerOperation),
+            (vec!["(", "unused", ")", "(", "x", ")"], SkipReasonCode::InvocationGrouping),
+            (vec!["(", "char", "*", ")", "(", "x", ")"], SkipReasonCode::InvocationGrouping),
         ] {
             let AnalysisStatus::Skipped { reason } = analyze(&frontend(&body), "F").status else {
                 panic!("unsupported syntax must skip")

@@ -8,8 +8,8 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, BindingCatalog, EmissionStatus, MacroScanner, emit, emit_with_bindings,
-    inspect,
+    AnalysisSession, BindingCatalog, EmissionStatus, MacroScanner, emit,
+    emit_support_with_bindings, emit_with_bindings, inspect,
 };
 use std::fmt::Write;
 use std::path::PathBuf;
@@ -70,6 +70,19 @@ fn emitted(source: pgrx_c_macros::MacroEmission) -> String {
     }
 }
 
+fn public_body(source: &str) -> &str {
+    source
+        .split_once("(@__pgrx_emit_public;")
+        .unwrap()
+        .1
+        .split_once("=> {")
+        .unwrap()
+        .1
+        .split_once("\n(@__pgrx_emit_value;")
+        .unwrap()
+        .0
+}
+
 fn bindings() -> BindingCatalog {
     BindingCatalog {
         macros: NAMES
@@ -101,25 +114,25 @@ fn direct_calls_preserve_shape_and_explain_fallbacks() {
         ("DELEGATE_KEYWORD", "r#match"),
     ] {
         let source = emitted(emit_with_bindings(&session, caller, &bindings));
-        let body = source.split_once("=> {").unwrap().1;
+        let body = public_body(&source);
         assert!(body.contains(&format!("$crate::{callee}!(")), "{caller}: {body}");
     }
     let source = emitted(emit_with_bindings(&session, "DELEGATE_BUFFERALIGN", &bindings));
-    let body = source.split_once("=> {").unwrap().1;
+    let body = public_body(&source);
     assert!(!body.contains("::bitand("), "wrapper must retain its callee: {body}");
 
     for (caller, callee, explanation) in [
         ("DELEGATE_UNUSED_WRAPPER", "DELEGATE_UNUSED", "unused"),
-        ("DELEGATE_GROUPING_FIXED", "DELEGATE_UNGROUPED", "supported"),
+        ("DELEGATE_GROUPING_FIXED", "DELEGATE_UNGROUPED", "set of emitted Rust macros"),
     ] {
         let source = emitted(emit_with_bindings(&session, caller, &bindings));
-        let body = source.split_once("=> {").unwrap().1;
+        let body = public_body(&source);
         assert!(!body.contains(&format!("$crate::{callee}!")), "{body}");
         assert!(body.contains("/* PGRX:"), "fallback must explain expansion: {body}");
         assert!(body.contains(explanation), "{body}");
     }
     let source = emitted(emit(&session, "DELEGATE_BUFFERALIGN"));
-    let body = source.split_once("=> {").unwrap().1;
+    let body = public_body(&source);
     assert!(!body.contains("$crate::DELEGATE_TYPEALIGN!"));
     assert!(body.contains("/* PGRX:"));
 }
@@ -136,15 +149,17 @@ fn preserved_macro_calls_match_original_c_types_values_and_evaluation() {
         .canonicalize()
         .unwrap();
     let mut rust = format!("#[path = {support:?}]\npub mod __pgrx_c_macros;\n");
+    rust.push_str(&emit_support_with_bindings(&session, NAMES, &bindings).unwrap());
     for &name in NAMES.iter().filter(|&&name| name != "DELEGATE_UNGROUPED") {
         rust.push_str(&emitted(emit_with_bindings(&session, name, &bindings)));
     }
     rust.push_str(
         r#"
 use __pgrx_c_macros::{CInteger, CValue, CUnsignedLong};
-fn record<K: CInteger>(name: &str, value: CValue<K>) {
-    let kind = std::any::type_name::<K>().rsplit("::").next().unwrap();
-    println!("{name}\t{kind}\t{}\t{:032x}", K::BITS, K::encode(value.get()));
+fn record<T: __pgrx_c_macros::IntoCValue>(name: &str, value: T) {
+    let value = value.into_c_value();
+    let kind = std::any::type_name::<T::Kind>().rsplit("::").next().unwrap();
+    println!("{name}\t{kind}\t{}\t{:032x}", T::Kind::BITS, T::Kind::encode(value.get()));
 }
 fn main() {
 "#,

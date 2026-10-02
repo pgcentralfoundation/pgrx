@@ -3,7 +3,8 @@
 A library and command-line tool for discovering C macros in the headers used by
 pgrx. The CLI lists PostgreSQL function-like macros; the library retains other
 definitions separately as conversion context. Analysis and translation into Rust
-`macro_rules!` currently cover a bounded C integer expression family.
+`macro_rules!` cover supported C expressions, with generated type and storage
+adapters derived from Clang declarations and the corresponding Rust bindings.
 
 ## Command-line use
 
@@ -160,14 +161,18 @@ Each generated macro's documentation includes its source location and full unexp
 C definition in a fenced `text` block. As in `list` output, whitespace is normalized
 and line comments are omitted.
 The bindgen build pipeline generates these definitions alongside the bindings.
-Each selected version gets `pgN_macros.rs` and `pgN_macro_report.json` in `OUT_DIR`.
+Each selected version gets `pgN_macros.rs` and `pgN_macro_report.json` in `OUT_DIR`,
+plus native support source and an archive when the generated adapters require them.
 The report records the C profile, input dependencies, emitted source and explicit
 skip reasons, along with independently resolved constants and their Rust binding
 paths. The active version's macros are exported from `pgrx-pg-sys`.
 Setting `PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1` also writes `pgN_macros.rs`
 to `pgrx-pg-sys/src/include`, alongside the shipped bindings and OIDs. These
-documentation snapshots include the generated input adapters. Their target guards
+documentation snapshots include the generated adapters. Their target guards
 remain active outside `docsrs`; normal builds regenerate macros for their own C profile.
+Generate release snapshots on Linux with the matching PostgreSQL bindings. The
+snapshot values and layouts describe that release target, not the build host of
+a later user.
 
 Binding and macro inspection share the complete flags, target, include directories
 and compiler resource directory. Recorded CFLAGS precede CPPFLAGS, and bindgen's
@@ -186,7 +191,7 @@ unavailable. Other unsupported inspected profiles retain per-macro skips. The do
 path uses shipped bindings, macro definitions and input adapters without requiring
 PostgreSQL or Clang. Existing handwritten ports remain available while migration proceeds.
 
-The first supported family covers integer expressions, casts, comparisons, shifts,
+The runtime models C integer promotions, conversions, casts, comparisons, shifts,
 and lazy logical and conditional operators on checked signed-char LP64 targets.
 Emitted literals keep their radix and digit spelling. C suffixes, octal notation
 and character escapes are adjusted to Rust syntax without changing the inferred
@@ -218,25 +223,63 @@ catalog, named constants use documented fallbacks.
 Ordinary character literals support a bounded ASCII subset after compiler and
 libclang probes verify the execution character set; wide, multi-character and
 unmodeled encoding forms remain explicit skips.
-Signed overflow follows the inspected undefined or wrapping policy. Pointer access,
-mutation, statements, arbitrary calls, variadic arguments, stringification and
-token pasting are skipped. Arithmetic outside C's defined domain is rejected by
-the safe Rust support. Referenced typedefs, constants and macro definitions must
-match the inspected environment; caller-local C shadowing is outside this family.
+The typed expression support also covers:
 
-Results retain C type identity in `CValue<K>`. This keeps `long` and `long long`
-distinct through composition even though both use `i64` storage. `.get()` extracts
-the Rust representation. Raw `bool`, 8-, 16-, 32-, and 128-bit Rust integers have
-established C input identities. Raw `i64`, `u64`, `isize` and `usize` require an
-explicit tag, such as `CValue::<CUnsignedLong>::new(value)`, because their C identity
-is otherwise ambiguous. The input traits are sealed; user-defined arithmetic
-cannot substitute for C operations. Generated macros currently support runtime
-expressions and report `RuntimeOnly` rather than const compatibility.
+- Qualified pointers, array decay, indexing, pointer arithmetic and casts, with
+  C pointee identity retained across compositions.
+- Record and union fields, packed fields, compiler-described bitfields, volatile
+  accesses, assignment, compound assignment, and prefix and postfix mutation.
+- Unevaluated `sizeof` and alignment expressions, comma expressions, type and
+  field-name parameters, unused arguments, and empty replacements.
+- Calls through complete C prototypes, including static inline functions and
+  nullable function pointers, and addresses of original C functions.
+- C enums whose compatible integer representation is established by Clang,
+  including values without a named Rust enum variant.
+- `float` and `double` where the compiler profile establishes the modeled IEEE
+  representations and evaluation modes. Floating arithmetic additionally requires
+  contraction disabled; excess precision, fast-math modes and `long double`
+  remain outside the modeled family.
 
-Generated adapters accept `pgrx-pg-sys::Oid` and `TransactionId` only after their
-original C typedef identities and 32-bit storage are checked. Pointer-backed `Datum`
-requires separate provenance support. C comparisons return a tagged C `int`, so
-extract the value and compare it to zero when a Rust `bool` is needed:
+Signed overflow follows the inspected undefined or wrapping policy. Arithmetic
+outside C's defined domain is rejected by the safe scalar support. Pointer and
+storage operations require the caller's `unsafe` context; the generated macro does
+not discharge allocation bounds, initialization, aliasing, provenance or backend
+thread requirements. PostgreSQL calls retain pgrx's FFI error and panic guard.
+Native adapters convert arguments and check nullable function pointers before
+entering that guard, and decode results after leaving it.
+
+Statements and initialization constructs, variadic arguments, stringification,
+token pasting, unsupported compiler constructs and unmodeled literals remain
+explicit skips. Parser and type limitations are reported as skips. Referenced
+declarations and the final macro environment must match the inspection.
+Compatible function pointer types
+with distinct generated signature markers are conservatively rejected in
+operations that would require a proof relating those signatures.
+
+## Calling generated macros
+
+Public expression results use `CExpression<V>`. Its `.into_value()` retains the
+semantic value, such as `CValue<K>` or a typed pointer, and `.get()` extracts the
+native Rust storage. Integer markers keep `long` and `long long` distinct even
+when both use `i64` storage. The wrapper is an already evaluated value, not a
+deferred load or an ABI type. Empty replacements expand to an empty Rust expression.
+
+Raw `bool`, 8-, 16-, 32-, and 128-bit Rust integers have established C input
+identities. Raw `i64`, `u64`, `isize` and `usize` require an explicit tag, such as
+`CValue::<CUnsignedLong>::new(value)`, because their C identity is ambiguous.
+Raw pointers likewise require an established pointee identity; equal Rust widths
+do not establish equal C types. Supply explicit tags or literal suffixes when
+Rust cannot infer the intended type. Some generic conditional expressions still
+require a suffix even where the corresponding C literal defaults to `int`.
+The sealed input traits accept only the modeled C value families; Rust operator
+implementations do not change the C arithmetic rules.
+
+Generated adapters accept `pgrx-pg-sys::Oid` and `TransactionId` after checking
+their original C typedef identities and storage. The verified `Datum` adapter
+preserves exposed pointer provenance when converting its pointer-backed Rust
+storage to and from the C pointer-width integer representation. C comparisons
+return a tagged C `int`, so extract the value and compare it to zero when a Rust
+`bool` is needed:
 
 ```rust,ignore
 use pgrx_pg_sys as pg_sys;
@@ -246,8 +289,37 @@ let aligned = pg_sys::TYPEALIGN!(8_i32, CValue::<CUnsignedLong>::new(13_u64)).ge
 let normal = pg_sys::TransactionIdIsNormal!(pg_sys::TransactionId::from_inner(3)).get() != 0;
 ```
 
-`PGSIXBIT` and `MAKE_SQLSTATE` now emit at runtime, but existing enum discriminants
-still need const-capable lowering before they can migrate.
+Nested generated macro operands carry the C context requested by each use:
+value, place, size or discard. This preserves repeated evaluation, lazy branches,
+array identity in `sizeof`, and mutations through an inner macro's place. The
+normalizer recognizes generated macro invocations in a bounded token grammar;
+it does not parse arbitrary Rust expressions as C. To pass an unrelated Rust
+macro invocation as a native value, wrap that argument as
+`(@__pgrx_c_native [some_rust_macro!(argument)])`.
+
+An ungrouped C parameter accepts only an atomic token tree or an explicitly
+parenthesized argument. If the original replacement is itself unparenthesized,
+the generated documentation requires
+`MACRO!(@__pgrx_c_expression; arguments...)`. This requests the semantics of the
+parenthesized C invocation, rather than attempting to reproduce interaction with
+operators outside the invocation. Caller-scope identifiers that are absent from
+the declaration catalog become additional explicit arguments, listed in each
+macro's documentation after its original parameters.
+
+Original C aggregate results travel as `RawRecordValue<R>` backed by
+`MaybeUninit<R>`. Reading one initialized field does not materialize neighboring
+uninitialized fields or invalid Rust bool/enum values. `.get()` returns
+`MaybeUninit<R>`; `unsafe assume_initialized()` requires proof that the entire
+record satisfies Rust's validity and ownership rules. C enum expression values
+retain nominal enum identity but extract their compatible integer storage, so
+unnamed C values never require construction of an invalid Rust enum.
+
+Generation and helpers currently support runtime expressions and report
+`RuntimeOnly`, rather than promising const evaluation. `PGSIXBIT` and
+`MAKE_SQLSTATE` emit at runtime; existing enum discriminants still need
+const-capable lowering before they can migrate.
+
+## Binding generator integration
 
 Library callers inspect once with `PostgresConfig::inspect` or `inspect`, then
 prepare an `AnalysisSession` for a batch of names. The session couples immutable
@@ -257,23 +329,47 @@ require another inspection. `session.analyze(name)` and `emit(&session, name)`
 return owned reports. No macro signature list is required.
 `session.integer_constants()` exposes the probed C object constants.
 `emit_with_bindings` accepts a `BindingCatalog` of actual Rust constant paths,
-values, storage representations and available macro names. It checks every
-constant value against C before emitting a reference; callers must supply the
-catalog from the defining crate's generated bindings.
-Generators should use `emit_batch_with_bindings` to establish available callees
-and propagate value-mismatch failures through the shared dependency graph.
+values, storage representations and declarations for functions, records, enums,
+variables and aliases. It checks every referenced constant value against C before
+emitting a reference; callers must supply the catalog from the defining crate's
+generated bindings.
+Generators should use `generate_with_bindings` to prepare the macro set and its
+shared adapters together. Its `MacroGeneration` contains the per-macro emissions
+and a `MacroSupportArtifact` with Rust source and optional C source. Include the
+Rust support once in the defining crate. Write the C source to disk, compile and
+archive it with `compile_native_support` under the inspected profile, and link
+the archive into that crate. The C source must include the inspected header.
+These access and ABI primitives support field operations and original functions;
+they do not substitute whole C macro bodies for Rust translation.
+
+Set `BindingCatalog::ffi_boundary` to the defining crate's PostgreSQL FFI guard
+when generating native adapters that can call PostgreSQL. The pgrx bindgen pipeline
+supplies this path. Standalone callers must establish an equivalent boundary if
+their C functions can perform PostgreSQL nonlocal error jumps or callbacks.
+`emit_support_with_bindings` is only suitable when no native C artifact is needed;
+it returns an error otherwise. `emit_batch_with_bindings` remains available for
+callers managing support separately, and propagates value-mismatch failures
+through the shared dependency graph.
 `frontend.dependencies()` exposes that graph, its direct and reverse edges,
 and affected callers for auditing.
 
-The tests compile original C and emitted Rust separately, comparing integer type
-identities, values and evaluation counts. Downstream tests also cover `$crate`
-hygiene and rejection of unsupported inputs. Handwritten ports identify test targets;
-all expected types, values and evaluation counts come from C. Installation-dependent
-comparisons and the isolated successive-build test run explicitly with:
+## Validation
+
+Ordinary `cargo test -p pgrx-c-macros` runs native fixtures using Clang and libclang.
+The tests compile original C and emitted Rust separately and compare types,
+values, mutations and evaluation counts. They cover partial aggregate initialization,
+enum values, callback ABI and guards, packed and volatile storage, unevaluated
+operands, nested macro contexts, `$crate` hygiene and invalid invocations. These
+checks use the original C definitions as the oracle. Handwritten pgrx ports only
+identify additional test targets.
+
+Installation-dependent comparisons and isolated build/release/docs.rs tests run
+explicitly with:
 
 ```text
 cargo test -p pgrx-c-macros --test postgres_emission -- --ignored
 cargo test -p pgrx-c-macros --test postgres_handports -- --ignored
 cargo test -p pgrx-c-macros --test character_literals -- --include-ignored
 cargo test -p pgrx-bindgen --test macro_build -- --ignored
+cargo test -p pgrx-bindgen --test shipped_macros -- --ignored
 ```

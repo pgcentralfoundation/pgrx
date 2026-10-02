@@ -10,7 +10,7 @@
 
 use crate::{Token, TokenKind};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 const MAX_TOKENS: usize = 4096;
 const MAX_DEPTH: usize = 64;
@@ -40,6 +40,7 @@ pub struct ExpressionNode {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum ExpressionKind {
+    Empty,
     Parameter { index: usize },
     IntegerLiteral { literal: IntegerLiteral },
     Identifier { name: String },
@@ -48,6 +49,20 @@ pub enum ExpressionKind {
     Binary { operator: BinaryOperator, left: NodeId, right: NodeId },
     Cast { type_name: String, operand: NodeId },
     Conditional { condition: NodeId, then_value: NodeId, else_value: NodeId },
+    Comma { left: NodeId, right: NodeId },
+    Call { callee: NodeId, arguments: Vec<NodeId> },
+    Member { base: NodeId, field: String, field_parameter: Option<usize>, indirect: bool },
+    Index { base: NodeId, index: NodeId },
+    Dereference { operand: NodeId },
+    AddressOf { operand: NodeId },
+    Assignment { operator: Option<BinaryOperator>, place: NodeId, value: NodeId },
+    Update { operand: NodeId, increment: bool, postfix: bool },
+    SizeOfType { type_name: String },
+    SizeOfExpression { operand: NodeId },
+    AlignOfType { type_name: String },
+    SizeOfTypeParameter { parameter: usize, pointers: u8, is_const: bool },
+    AlignOfTypeParameter { parameter: usize, pointers: u8, is_const: bool },
+    TypeParameterCast { parameter: usize, pointers: u8, is_const: bool, operand: NodeId },
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -112,7 +127,6 @@ pub(crate) struct SyntaxError {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SyntaxErrorKind {
-    EmptyReplacement,
     InvalidExpression,
     UnsupportedLiteral,
     PointerOperation,
@@ -134,6 +148,7 @@ struct Parser<'a, F> {
     tokens: Vec<Lexeme<'a>>,
     position: usize,
     parameters: HashMap<&'a str, usize>,
+    type_parameters: HashSet<usize>,
     nodes: Vec<ExpressionNode>,
     is_type: F,
     original_len: usize,
@@ -161,16 +176,48 @@ pub(crate) fn parse_expression(
             .collect(),
         position: 0,
         parameters: parameters.iter().enumerate().map(|(i, name)| (name.as_str(), i)).collect(),
+        type_parameters: HashSet::new(),
         nodes: Vec::new(),
         is_type,
         original_len: tokens.len(),
     };
     if parser.tokens.is_empty() {
-        return Err(parser.error(SyntaxErrorKind::EmptyReplacement, "empty replacement list"));
+        return Ok(Expression {
+            nodes: vec![ExpressionNode {
+                kind: ExpressionKind::Empty,
+                tokens: TokenRange { start: 0, end: tokens.len() },
+            }],
+            root: 0,
+        });
     }
-    let root = parser.expression(0, 0)?;
+    let mut root = parser.expression(0, 0)?;
     if parser.position != parser.tokens.len() {
         return Err(parser.unexpected());
+    }
+    parser.type_parameters = parser
+        .nodes
+        .iter()
+        .filter_map(|node| match node.kind {
+            ExpressionKind::TypeParameterCast { parameter, .. }
+            | ExpressionKind::SizeOfTypeParameter { parameter, .. }
+            | ExpressionKind::AlignOfTypeParameter { parameter, .. } => Some(parameter),
+            _ => None,
+        })
+        .collect();
+    if !parser.type_parameters.is_empty()
+        && parser
+            .nodes
+            .iter()
+            .any(|node| matches!(node.kind, ExpressionKind::SizeOfExpression { .. }))
+    {
+        // A later type-only use can establish an earlier sizeof operand. Reparse
+        // once rather than leaving orphaned value nodes and duplicate hole uses.
+        parser.position = 0;
+        parser.nodes.clear();
+        root = parser.expression(0, 0)?;
+        if parser.position != parser.tokens.len() {
+            return Err(parser.unexpected());
+        }
     }
     Ok(Expression { nodes: parser.nodes, root })
 }
@@ -185,11 +232,105 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         }
         let mut left = self.prefix(depth)?;
         loop {
-            if self.spelling() == Some("?") && minimum <= 1 {
+            if minimum <= 15 {
+                let start = self.nodes[left].tokens.start;
+                match self.spelling() {
+                    Some("(") => {
+                        self.position += 1;
+                        let mut arguments = Vec::new();
+                        if self.spelling() != Some(")") {
+                            loop {
+                                arguments.push(self.expression(1, depth + 1)?);
+                                if self.spelling() != Some(",") {
+                                    break;
+                                }
+                                self.position += 1;
+                            }
+                        }
+                        self.expect(")")?;
+                        let end = self.tokens[self.position - 1].index + 1;
+                        left = self.push(
+                            ExpressionKind::Call { callee: left, arguments },
+                            TokenRange { start, end },
+                        );
+                        continue;
+                    }
+                    Some(".") | Some("->") => {
+                        let indirect = self.spelling() == Some("->");
+                        self.position += 1;
+                        let Some(field) = self.tokens.get(self.position) else {
+                            return Err(self
+                                .error(SyntaxErrorKind::InvalidExpression, "missing member name"));
+                        };
+                        if !matches!(field.token.kind, TokenKind::Identifier | TokenKind::Keyword) {
+                            return Err(self.unexpected());
+                        }
+                        let name = field.token.spelling.clone();
+                        let end = field.index + 1;
+                        self.position += 1;
+                        left = self.push(
+                            ExpressionKind::Member {
+                                base: left,
+                                field_parameter: self.parameters.get(name.as_str()).copied(),
+                                field: name,
+                                indirect,
+                            },
+                            TokenRange { start, end },
+                        );
+                        continue;
+                    }
+                    Some("[") => {
+                        self.position += 1;
+                        let index = self.expression(0, depth + 1)?;
+                        self.expect("]")?;
+                        let end = self.tokens[self.position - 1].index + 1;
+                        left = self.push(
+                            ExpressionKind::Index { base: left, index },
+                            TokenRange { start, end },
+                        );
+                        continue;
+                    }
+                    Some("++") | Some("--") => {
+                        let increment = self.spelling() == Some("++");
+                        let end = self.tokens[self.position].index + 1;
+                        self.position += 1;
+                        left = self.push(
+                            ExpressionKind::Update { operand: left, increment, postfix: true },
+                            TokenRange { start, end },
+                        );
+                        continue;
+                    }
+                    _ => {}
+                }
+            }
+            if self.spelling() == Some(",") && minimum == 0 {
+                self.position += 1;
+                let right = self.expression(1, depth + 1)?;
+                let tokens = TokenRange {
+                    start: self.nodes[left].tokens.start,
+                    end: self.nodes[right].tokens.end,
+                };
+                left = self.push(ExpressionKind::Comma { left, right }, tokens);
+                continue;
+            }
+            if let Some(operator) = self.spelling().and_then(assignment_operator)
+                && minimum <= 1
+            {
+                self.position += 1;
+                let value = self.expression(1, depth + 1)?;
+                let tokens = TokenRange {
+                    start: self.nodes[left].tokens.start,
+                    end: self.nodes[value].tokens.end,
+                };
+                left =
+                    self.push(ExpressionKind::Assignment { operator, place: left, value }, tokens);
+                continue;
+            }
+            if self.spelling() == Some("?") && minimum <= 2 {
                 self.position += 1;
                 let then_value = self.expression(0, depth + 1)?;
                 self.expect(":")?;
-                let else_value = self.expression(1, depth + 1)?;
+                let else_value = self.expression(2, depth + 1)?;
                 let tokens = TokenRange {
                     start: self.nodes[left].tokens.start,
                     end: self.nodes[else_value].tokens.end,
@@ -203,6 +344,7 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             let Some((operator, precedence)) = self.spelling().and_then(binary_operator) else {
                 break;
             };
+            let precedence = precedence + 2;
             if precedence < minimum {
                 break;
             }
@@ -238,7 +380,7 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             _ => None,
         } {
             self.position += 1;
-            let operand = self.expression(12, depth + 1)?;
+            let operand = self.expression(14, depth + 1)?;
             let tokens = TokenRange { start, end: self.nodes[operand].tokens.end };
             return Ok(self.push(ExpressionKind::Unary { operator, operand }, tokens));
         }
@@ -246,16 +388,23 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             "(" => {
                 if let Some((end, type_name)) = self.cast_type() {
                     self.position = end + 1;
-                    let operand = self.expression(12, depth + 1)?;
+                    let operand = self.expression(14, depth + 1)?;
                     let tokens = TokenRange { start, end: self.nodes[operand].tokens.end };
                     return Ok(self.push(ExpressionKind::Cast { type_name, operand }, tokens));
                 }
-                if let Some(tokens) = self.type_parameter() {
-                    return Err(SyntaxError {
-                        kind: SyntaxErrorKind::TypeParameter,
+                if let Some((end, parameter, pointers, is_const)) = self.type_parameter() {
+                    self.position = end + 1;
+                    let operand = self.expression(14, depth + 1)?;
+                    let tokens = TokenRange { start, end: self.nodes[operand].tokens.end };
+                    return Ok(self.push(
+                        ExpressionKind::TypeParameterCast {
+                            parameter,
+                            pointers,
+                            is_const,
+                            operand,
+                        },
                         tokens,
-                        message: "a macro parameter occupies a possible C type position".into(),
-                    });
+                    ));
                 }
                 self.position += 1;
                 let operand = self.expression(0, depth + 1)?;
@@ -264,16 +413,66 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
                 return Ok(self.push(ExpressionKind::Group { operand }, TokenRange { start, end }));
             }
             "*" | "&" => {
-                return Err(self.error(
-                    SyntaxErrorKind::PointerOperation,
-                    "dereference and address-of require a memory contract",
-                ));
+                let address = spelling == "&";
+                self.position += 1;
+                let operand = self.expression(14, depth + 1)?;
+                let tokens = TokenRange { start, end: self.nodes[operand].tokens.end };
+                let kind = if address {
+                    ExpressionKind::AddressOf { operand }
+                } else {
+                    ExpressionKind::Dereference { operand }
+                };
+                return Ok(self.push(kind, tokens));
+            }
+            "++" | "--" => {
+                let increment = spelling == "++";
+                self.position += 1;
+                let operand = self.expression(14, depth + 1)?;
+                let tokens = TokenRange { start, end: self.nodes[operand].tokens.end };
+                return Ok(self
+                    .push(ExpressionKind::Update { operand, increment, postfix: false }, tokens));
             }
             "sizeof" | "_Alignof" | "__alignof__" | "__alignof" => {
-                return Err(self.error(
-                    SyntaxErrorKind::UnevaluatedExpression,
-                    "size/alignment expressions require an unevaluated-operand contract",
-                ));
+                let alignment = spelling != "sizeof";
+                self.position += 1;
+                if self.spelling() == Some("(")
+                    && let Some((end, type_name)) = self.cast_type()
+                {
+                    self.position = end + 1;
+                    let tokens = TokenRange { start, end: self.tokens[end].index + 1 };
+                    let kind = if alignment {
+                        ExpressionKind::AlignOfType { type_name }
+                    } else {
+                        ExpressionKind::SizeOfType { type_name }
+                    };
+                    return Ok(self.push(kind, tokens));
+                }
+                if self.spelling() == Some("(")
+                    && let Some((end, parameter, pointers, is_const)) =
+                        self.parenthesized_type_parameter()
+                    && (alignment
+                        || pointers != 0
+                        || is_const
+                        || self.type_parameters.contains(&parameter))
+                {
+                    self.position = end + 1;
+                    let tokens = TokenRange { start, end: self.tokens[end].index + 1 };
+                    let kind = if alignment {
+                        ExpressionKind::AlignOfTypeParameter { parameter, pointers, is_const }
+                    } else {
+                        ExpressionKind::SizeOfTypeParameter { parameter, pointers, is_const }
+                    };
+                    return Ok(self.push(kind, tokens));
+                }
+                if alignment {
+                    return Err(self.error(
+                        SyntaxErrorKind::UnevaluatedExpression,
+                        "alignment expression requires an established type operand",
+                    ));
+                }
+                let operand = self.expression(14, depth + 1)?;
+                let tokens = TokenRange { start, end: self.nodes[operand].tokens.end };
+                return Ok(self.push(ExpressionKind::SizeOfExpression { operand }, tokens));
             }
             _ => {}
         }
@@ -328,29 +527,40 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         (self.is_type)(&type_name).then_some((end, type_name))
     }
 
-    fn type_parameter(&self) -> Option<TokenRange> {
+    fn type_parameter(&self) -> Option<(usize, usize, u8, bool)> {
+        let (end, parameter, pointers, is_const) = self.parenthesized_type_parameter()?;
+        let next = self.tokens.get(end + 1)?;
+        (matches!(next.token.kind, TokenKind::Identifier | TokenKind::Keyword | TokenKind::Literal)
+            || matches!(next.token.spelling.as_str(), "(" | "~" | "!")
+            || ((pointers != 0 || is_const || self.type_parameters.contains(&parameter))
+                && matches!(next.token.spelling.as_str(), "+" | "-" | "*" | "&" | "++" | "--")))
+        .then_some((end, parameter, pointers, is_const))
+    }
+
+    fn parenthesized_type_parameter(&self) -> Option<(usize, usize, u8, bool)> {
         let mut end = self.position + 1;
         let mut has_parameter = false;
+        let mut parameter = 0;
+        let mut pointers = 0_u8;
+        let mut is_const = false;
         while let Some(token) = self.tokens.get(end) {
             match token.token.spelling.as_str() {
                 ")" => break,
-                "const" | "volatile" | "*" => {}
-                name if self.parameters.contains_key(name) && !has_parameter => {
-                    has_parameter = true
+                "const" if pointers == 0 && !self.parameters.contains_key("const") => {
+                    is_const = true
+                }
+                "*" if has_parameter => pointers = pointers.checked_add(1)?,
+                name if self.parameters.contains_key(name) && !has_parameter && pointers == 0 => {
+                    has_parameter = true;
+                    parameter = self.parameters[name];
                 }
                 _ => return None,
             }
             end += 1;
         }
         let close = self.tokens.get(end)?;
-        let next = self.tokens.get(end + 1)?;
-        (has_parameter
-            && close.token.spelling == ")"
-            && (matches!(
-                next.token.kind,
-                TokenKind::Identifier | TokenKind::Keyword | TokenKind::Literal
-            ) || matches!(next.token.spelling.as_str(), "(" | "~" | "!")))
-        .then_some(TokenRange { start: self.tokens[self.position].index, end: close.index + 1 })
+        (has_parameter && close.token.spelling == ")")
+            .then_some((end, parameter, pointers, is_const))
     }
 
     fn push(&mut self, kind: ExpressionKind, tokens: TokenRange) -> NodeId {
@@ -431,6 +641,23 @@ fn binary_operator(spelling: &str) -> Option<(BinaryOperator, u8)> {
         "*" => (BinaryOperator::Multiply, 11),
         "/" => (BinaryOperator::Divide, 11),
         "%" => (BinaryOperator::Remainder, 11),
+        _ => return None,
+    })
+}
+
+fn assignment_operator(spelling: &str) -> Option<Option<BinaryOperator>> {
+    Some(match spelling {
+        "=" => None,
+        "+=" => Some(BinaryOperator::Add),
+        "-=" => Some(BinaryOperator::Subtract),
+        "*=" => Some(BinaryOperator::Multiply),
+        "/=" => Some(BinaryOperator::Divide),
+        "%=" => Some(BinaryOperator::Remainder),
+        "<<=" => Some(BinaryOperator::ShiftLeft),
+        ">>=" => Some(BinaryOperator::ShiftRight),
+        "&=" => Some(BinaryOperator::BitAnd),
+        "^=" => Some(BinaryOperator::BitXor),
+        "|=" => Some(BinaryOperator::BitOr),
         _ => return None,
     })
 }
@@ -762,18 +989,24 @@ mod tests {
 
     #[test]
     fn complete_expressions_and_budgets() {
-        assert_eq!(
-            parse_expression(&tokens(&["x", "(", "1", ")"]), &["x".into()], |_| false)
-                .unwrap_err()
-                .kind,
-            SyntaxErrorKind::Call
+        let call =
+            parse_expression(&tokens(&["x", "(", "1", ")"]), &["x".into()], |_| false).unwrap();
+        assert!(
+            matches!(call.nodes[call.root].kind, ExpressionKind::Call { callee: 0, ref arguments } if arguments == &[1])
         );
-        assert_eq!(
+        let cast =
             parse_expression(&tokens(&["(", "t", ")", "x"]), &["t".into(), "x".into()], |_| false)
-                .unwrap_err()
-                .kind,
-            SyntaxErrorKind::TypeParameter
-        );
+                .unwrap();
+        assert!(matches!(
+            cast.nodes[cast.root].kind,
+            ExpressionKind::TypeParameterCast { parameter: 0, operand: 0, pointers: 0, .. }
+        ));
+        for malformed in [vec!["x", "(", "1", ",", ")"], vec!["1", "2"], vec!["x", "[", "0"]] {
+            assert_eq!(
+                parse_expression(&tokens(&malformed), &["x".into()], |_| false).unwrap_err().kind,
+                SyntaxErrorKind::InvalidExpression
+            );
+        }
         let mut deep = vec!["("; 70];
         deep.push("1");
         deep.extend(vec![")"; 70]);
@@ -790,19 +1023,109 @@ mod tests {
     }
 
     #[test]
-    fn unsupported_constructs_inside_grouping_keep_their_categories() {
+    fn postfix_places_calls_and_comma_keep_their_structure_inside_grouping() {
         for (body, expected) in [
-            (vec!["(", "(", "x", ")", ".", "field", ")"], SyntaxErrorKind::PointerOperation),
-            (vec!["(", "x", "->", "field", ")"], SyntaxErrorKind::PointerOperation),
-            (vec!["(", "x", "[", "0", "]", ")"], SyntaxErrorKind::PointerOperation),
-            (vec!["(", "x", "++", ")"], SyntaxErrorKind::Mutation),
-            (vec!["(", "x", ",", "1", ")"], SyntaxErrorKind::CommaExpression),
-            (vec!["(", "x", "(", "1", ")", ")"], SyntaxErrorKind::Call),
+            (vec!["(", "(", "x", ")", ".", "field", ")"], "member"),
+            (vec!["(", "x", "->", "field", ")"], "member"),
+            (vec!["(", "x", "[", "0", "]", ")"], "index"),
+            (vec!["(", "x", "++", ")"], "update"),
+            (vec!["(", "x", ",", "1", ")"], "comma"),
+            (vec!["(", "x", "(", "1", ")", ")"], "call"),
         ] {
-            assert_eq!(
-                parse_expression(&tokens(&body), &["x".into()], |_| false).unwrap_err().kind,
-                expected
+            let parsed = parse_expression(&tokens(&body), &["x".into()], |_| false).unwrap();
+            let ExpressionKind::Group { operand } = parsed.nodes[parsed.root].kind else {
+                panic!("outer group must remain")
+            };
+            let actual = match parsed.nodes[operand].kind {
+                ExpressionKind::Member { .. } => "member",
+                ExpressionKind::Index { .. } => "index",
+                ExpressionKind::Update { .. } => "update",
+                ExpressionKind::Comma { .. } => "comma",
+                ExpressionKind::Call { .. } => "call",
+                _ => panic!("wrong postfix expression: {parsed:?}"),
+            };
+            assert_eq!(actual, expected);
+        }
+    }
+
+    #[test]
+    fn sizeof_keeps_ambiguous_value_holes_until_another_use_establishes_a_type() {
+        let value = parse_expression(&tokens(&["sizeof", "(", "t", ")"]), &["t".into()], |_| false)
+            .unwrap();
+        assert!(matches!(value.nodes[value.root].kind, ExpressionKind::SizeOfExpression { .. }));
+        assert!(
+            value
+                .nodes
+                .iter()
+                .any(|node| matches!(node.kind, ExpressionKind::Parameter { index: 0 }))
+        );
+        let typed = parse_expression(
+            &tokens(&["(", "sizeof", "(", "t", ")", "+", "_Alignof", "(", "t", ")", ")"]),
+            &["t".into()],
+            |_| false,
+        )
+        .unwrap();
+        assert!(typed.nodes.iter().any(|node| matches!(
+            node.kind,
+            ExpressionKind::SizeOfTypeParameter { parameter: 0, pointers: 0, is_const: false }
+        )));
+        assert!(typed.nodes.iter().any(|node| matches!(
+            node.kind,
+            ExpressionKind::AlignOfTypeParameter { parameter: 0, pointers: 0, is_const: false }
+        )));
+        assert!(
+            !typed.nodes.iter().any(|node| matches!(node.kind, ExpressionKind::Parameter { .. })),
+            "reparsing must not leave orphaned value holes"
+        );
+        let cast = parse_expression(
+            &tokens(&["(", "sizeof", "(", "t", ")", ",", "(", "t", ")", "(", "x", ")", ")"]),
+            &["t".into(), "x".into()],
+            |_| false,
+        )
+        .unwrap();
+        assert!(cast.nodes.iter().any(|node| matches!(
+            node.kind,
+            ExpressionKind::SizeOfTypeParameter { parameter: 0, .. }
+        )));
+        assert_eq!(
+            cast.nodes
+                .iter()
+                .filter(|node| matches!(node.kind, ExpressionKind::Parameter { .. }))
+                .count(),
+            1
+        );
+    }
+
+    #[test]
+    fn explicit_pointer_and_const_size_operands_preserve_type_holes_and_qualifiers() {
+        for (body, pointers, is_const) in [
+            (vec!["sizeof", "(", "t", "*", ")"], 1, false),
+            (vec!["sizeof", "(", "const", "t", "*", "*", ")"], 2, true),
+            (vec!["sizeof", "(", "t", "const", ")"], 0, true),
+        ] {
+            let parsed = parse_expression(&tokens(&body), &["t".into()], |_| false).unwrap();
+            assert!(
+                matches!(parsed.nodes[parsed.root].kind, ExpressionKind::SizeOfTypeParameter { parameter: 0, pointers: actual_pointers, is_const: actual_const } if actual_pointers == pointers && actual_const == is_const)
             );
         }
+        let alignment = parse_expression(
+            &tokens(&["_Alignof", "(", "const", "t", "*", ")"]),
+            &["t".into()],
+            |_| false,
+        )
+        .unwrap();
+        assert!(matches!(
+            alignment.nodes[alignment.root].kind,
+            ExpressionKind::AlignOfTypeParameter { parameter: 0, pointers: 1, is_const: true }
+        ));
+        assert!(
+            parse_expression(
+                &tokens(&["(", "t", "*", "const", ")", "x"]),
+                &["t".into(), "x".into()],
+                |_| false
+            )
+            .is_err(),
+            "one const bit cannot represent pointer-level qualifiers"
+        );
     }
 }

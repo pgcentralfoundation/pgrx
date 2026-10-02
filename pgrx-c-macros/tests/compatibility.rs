@@ -183,8 +183,8 @@ impl Sources {
         let mut rust = generated;
         rust.push_str(
             "use __pgrx_c_macros::*;\ntrait KindId { const ID: usize; }\n\
-             fn record<K: CInteger + KindId>(label: &str, value: CValue<K>) {\n\
-             println!(\"{} {} {:032x}\", label, K::ID, K::encode(value.get()));\n}\n",
+             fn record<T: IntoCValue>(label: &str, value: T) where T::Kind: KindId {\n\
+             println!(\"{} {} {:032x}\", label, T::Kind::ID, T::Kind::encode(value.into_c_value().get()));\n}\n",
         );
         for (index, kind) in KINDS.iter().enumerate() {
             if index != 0 {
@@ -438,6 +438,14 @@ fn original_c_and_emitted_rust_match_integer_types_values_and_evaluation() {
         let session = AnalysisSession::prepare(&scanner, &frontend, &references).unwrap();
         let mut generated =
             format!("#[path = {:?}]\npub mod __pgrx_c_macros;\n", runtime.to_str().unwrap());
+        let artifact = pgrx_c_macros::emit_support_artifact_with_bindings(
+            &session,
+            &references,
+            &pgrx_c_macros::BindingCatalog::default(),
+        )
+        .unwrap();
+        assert!(artifact.c_source.is_empty(), "integer corpus requires no native adapters");
+        generated.push_str(&artifact.rust);
         for name in &names {
             let emission = emit(&session, name);
             let EmissionStatus::Emitted { rust, .. } = &emission.status else {

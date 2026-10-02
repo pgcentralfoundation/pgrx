@@ -2,6 +2,8 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+// Individual integration-test crates use different parts of this shared harness.
+
 use std::fs::{self, File};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -13,6 +15,7 @@ const OUTPUT_LIMIT: u64 = 8 * 1024 * 1024;
 static NEXT_DIRECTORY: AtomicU64 = AtomicU64::new(0);
 
 /// Compile actual emitted Rust and semantic support in an isolated standalone program.
+#[allow(dead_code)]
 pub fn run_rust(source: &str) -> String {
     let directory = TemporaryDirectory::new();
     let program = directory.0.join("oracle.rs");
@@ -28,6 +31,90 @@ pub fn run_rust(source: &str) -> String {
     run_tool(&mut Command::new(executable), "execute")
 }
 
+/// Link emitted Rust with the original C functions under the inspected compilation profile.
+#[allow(dead_code)]
+pub fn run_rust_linked(
+    source: &str,
+    c_compiler: &Path,
+    header: &Path,
+    c_source: &str,
+    arguments: &[&str],
+) -> String {
+    let directory = TemporaryDirectory::new();
+    let native = directory.0.join("native.c");
+    let object = directory.0.join("native.o");
+    fs::write(&native, c_source).expect("write original C function definitions");
+    let mut compiler = Command::new(c_compiler);
+    compiler
+        .args(["-x", "c"])
+        .args(arguments)
+        .arg("-include")
+        .arg(header)
+        .arg("-c")
+        .arg(&native)
+        .arg("-o")
+        .arg(&object);
+    run_bounded(&mut compiler, &directory.0, "compile_native");
+    let rust = directory.0.join("linked.rs");
+    let executable = directory.0.join("linked");
+    fs::write(&rust, source).expect("write emitted Rust call oracle");
+    let mut compiler = Command::new("rustc");
+    compiler
+        .args(["--edition=2024", "-O", "-C", "overflow-checks=yes", "-C"])
+        .arg(format!("link-arg={}", object.display()))
+        .arg(&rust)
+        .arg("-o")
+        .arg(&executable);
+    // Installed PostgreSQL headers can emit unused routines whose backend
+    // symbols have no standalone definition. Keep only reachable C sections.
+    #[cfg(target_os = "macos")]
+    compiler.args(["-C", "link-arg=-Wl,-dead_strip"]);
+    #[cfg(target_os = "linux")]
+    compiler.args(["-C", "link-arg=-Wl,--gc-sections"]);
+    run_bounded(&mut compiler, &directory.0, "compile_linked");
+    run_bounded(&mut Command::new(executable), &directory.0, "execute_linked")
+}
+
+/// Require downstream type checking to reject an invalid invocation before any linking.
+#[allow(dead_code)]
+pub fn reject_rust(source: &str) -> String {
+    let directory = TemporaryDirectory::new();
+    let rust = directory.0.join("rejected.rs");
+    fs::write(&rust, source).expect("write a rejected Rust invocation");
+    let mut compiler = Command::new("rustc");
+    compiler
+        .args(["--edition=2024", "--emit=metadata"])
+        .arg(&rust)
+        .arg("-o")
+        .arg(directory.0.join("rejected.rmeta"));
+    let (status, stdout, stderr) = run_process(&mut compiler, &directory.0, "reject");
+    assert!(!status.success(), "invalid macro invocation compiled: {stdout}");
+    stderr
+}
+
+#[allow(dead_code)]
+pub fn reject_c_invocation(
+    compiler: &Path,
+    header: &Path,
+    source: &str,
+    arguments: &[&str],
+) -> String {
+    let directory = TemporaryDirectory::new();
+    let c = directory.0.join("rejected.c");
+    fs::write(&c, source).expect("write a rejected original C invocation");
+    let mut compiler = Command::new(compiler);
+    compiler
+        .args(["-x", "c"])
+        .args(arguments)
+        .args(["-fsyntax-only", "-Werror"])
+        .arg("-include")
+        .arg(header)
+        .arg(&c);
+    let (status, stdout, stderr) = run_process(&mut compiler, &directory.0, "reject_c");
+    assert!(!status.success(), "invalid original C invocation compiled: {stdout}");
+    stderr
+}
+
 /// Resolve a read-only tool input using the same process and output bounds as the oracle.
 pub fn run_tool(command: &mut Command, phase: &str) -> String {
     let directory = TemporaryDirectory::new();
@@ -35,6 +122,16 @@ pub fn run_tool(command: &mut Command, phase: &str) -> String {
 }
 
 fn run_bounded(command: &mut Command, directory: &Path, phase: &str) -> String {
+    let (status, stdout, stderr) = run_process(command, directory, phase);
+    assert!(status.success(), "Rust oracle {phase} failed ({status}):\n{stderr}\n{stdout}");
+    stdout
+}
+
+fn run_process(
+    command: &mut Command,
+    directory: &Path,
+    phase: &str,
+) -> (std::process::ExitStatus, String, String) {
     let stdout_path = directory.join(format!("{phase}.stdout"));
     let stderr_path = directory.join(format!("{phase}.stderr"));
     let mut child = command
@@ -66,8 +163,7 @@ fn run_bounded(command: &mut Command, directory: &Path, phase: &str) -> String {
     }
     let stdout = fs::read_to_string(stdout_path).expect("read Rust oracle stdout");
     let stderr = fs::read_to_string(stderr_path).expect("read Rust oracle stderr");
-    assert!(status.success(), "Rust oracle {phase} failed ({status}):\n{stderr}\n{stdout}");
-    stdout
+    (status, stdout, stderr)
 }
 
 struct TemporaryDirectory(PathBuf);

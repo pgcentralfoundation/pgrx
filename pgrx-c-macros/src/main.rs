@@ -333,7 +333,7 @@ fn emit_postgres(args: EmitArgs) -> Result<(), CliError> {
                 }
             }
             eprintln!(
-                "{emitted} emitted (runtime integer family), {} skipped",
+                "{emitted} emitted (runtime C expressions), {} skipped",
                 report.macros.len() - emitted
             );
         }

@@ -23,6 +23,18 @@
 
 static unsigned first_evaluations;
 static unsigned second_evaluations;
+/* A deterministic native callee measures the original macro's conversions and
+ * calls without opening a backend. The macro still comes from the PG header. */
+Oid get_element_type(Oid type) {
+    ++second_evaluations;
+    return type > 1 ? type - 1 : InvalidOid;
+}
+void handport_reset_backend_calls(void) { second_evaluations = 0; }
+unsigned handport_backend_calls(void) { return second_evaluations; }
+static uint8 byte_input = 7;
+static uint8 *byte_argument(void) { ++first_evaluations; return &byte_input; }
+static Page page_argument(void) { ++first_evaluations; return (Page)&byte_input; }
+static Oid type_argument(void) { ++first_evaluations; return 3; }
 static int alignment_argument(void) { ++first_evaluations; return 8; }
 static uintptr_t length_argument(void) { ++second_evaluations; return 13; }
 static Buffer buffer_argument(void) { ++first_evaluations; return -7; }
@@ -47,6 +59,7 @@ static vartag_external vartag_argument(void) { ++first_evaluations; return (vart
         (unsigned long long)bits, first_evaluations, second_evaluations); \
 } while (0)
 
+#ifndef PGRX_HANDPORT_NO_MAIN
 int main(void) {
     /* Configuration is input selection for the paired runner, never a pgrx expectation. */
     printf("BLOCK_SIZE\t%u\n", (unsigned)BLCKSZ);
@@ -202,5 +215,42 @@ int main(void) {
         MAKE_SQLSTATE(sqlstate_argument(0), sqlstate_argument(1), sqlstate_argument(2), sqlstate_argument(3), sqlstate_argument(4)));
     printf("MAKE_SQLSTATE_ARGUMENT_EVAL\t%u\t%u\t%u\t%u\t%u\n",
         sqlstate_evaluations[0], sqlstate_evaluations[1], sqlstate_evaluations[2], sqlstate_evaluations[3], sqlstate_evaluations[4]);
+
+    first_evaluations = second_evaluations = 0;
+#ifdef ORACLE_PAGE_SIZE_MACRO
+    RECORD("PageIsValid_NULL_MUTABLE", 0, PageIsValid((Page)NULL));
+    RECORD("PageIsValid_NULL_CONST", 0, PageIsValid((const char *)NULL));
+    RECORD("PageIsValid_MUTABLE", 0, PageIsValid((Page)&byte_input));
+    RECORD("PageIsValid_CONST", 0, PageIsValid((const char *)&byte_input));
+    RECORD("PageIsValid_EVAL", 0, PageIsValid(page_argument()));
+#endif
+
+    first_evaluations = second_evaluations = 0;
+    for (unsigned byte = 0; byte < 256; ++byte) {
+        uint8 input = byte;
+        RECORD("VARATT_NOT_PAD_BYTE_EXHAUSTIVE", byte, VARATT_NOT_PAD_BYTE(&input));
+    }
+    const uint8 constant_input = 255;
+    RECORD("VARATT_NOT_PAD_BYTE_CONST", 0, VARATT_NOT_PAD_BYTE(&constant_input));
+    RECORD("VARATT_NOT_PAD_BYTE_EVAL", 0, VARATT_NOT_PAD_BYTE(byte_argument()));
+
+    const Oid types[] = { 0, 1, 2, 3, UINT_MAX };
+    for (unsigned index = 0; index < sizeof(types) / sizeof(types[0]); ++index) {
+        first_evaluations = second_evaluations = 0;
+        RECORD("type_is_array_BOUNDARY", index, type_is_array(types[index]));
+    }
+    first_evaluations = second_evaluations = 0;
+    RECORD("type_is_array_SIGNED", 0, type_is_array(-1));
+    first_evaluations = second_evaluations = 0;
+    RECORD("type_is_array_LONG", 0, type_is_array(-1L));
+    first_evaluations = second_evaluations = 0;
+    RECORD("type_is_array_LONG_LONG", 0, type_is_array(-1LL));
+    first_evaluations = second_evaluations = 0;
+    RECORD("type_is_array_SHORT", 0, type_is_array((unsigned short)USHRT_MAX));
+    first_evaluations = second_evaluations = 0;
+    RECORD("type_is_array_BOOL", 0, type_is_array((_Bool)1));
+    first_evaluations = second_evaluations = 0;
+    RECORD("type_is_array_EVAL", 0, type_is_array(type_argument()));
     return 0;
 }
+#endif

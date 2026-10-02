@@ -7,7 +7,7 @@ use crate::{
     ExpansionResult, ExpansionSkipCode, FrontendError, FrontendOutput, IntegerConstant,
     MacroAnalysis, MacroDependency, MacroScanner, SkipReason, SkipReasonCode,
 };
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 /// An inspected C environment and compiler-expanded symbolic invocations resolved together.
 ///
@@ -18,6 +18,7 @@ pub struct AnalysisSession<'a> {
     frontend: &'a FrontendOutput,
     expansions: ExpansionBatch,
     integer_constants: BTreeMap<String, IntegerConstant>,
+    integer_zero_constants: BTreeMap<String, BTreeSet<crate::NodeId>>,
 }
 
 impl<'a> AnalysisSession<'a> {
@@ -39,7 +40,16 @@ impl<'a> AnalysisSession<'a> {
             crate::expansion::prepare_expansions_with_limits(scanner, frontend, names, limits)?;
         let integer_constants =
             crate::expansion::retain_integer_constants(scanner, frontend, &mut expansions, limits)?;
-        Ok(Self { frontend, expansions, integer_constants })
+        let mut session = Self {
+            frontend,
+            expansions,
+            integer_constants,
+            integer_zero_constants: BTreeMap::new(),
+        };
+        session.verify_inputs()?;
+        session.integer_zero_constants = crate::frontend::zero_constants::probe(scanner, &session)?;
+        session.verify_inputs()?;
+        Ok(session)
     }
 
     pub fn frontend(&self) -> &FrontendOutput {
@@ -82,11 +92,16 @@ impl<'a> AnalysisSession<'a> {
                     name,
                     Some(&active),
                     &self.integer_constants,
+                    true,
                 );
                 for (parameter, original_name) in
                     analysis.parameters.iter_mut().zip(&expansion.parameters)
                 {
                     parameter.name.clone_from(original_name);
+                }
+                if let Some(expression) = &mut analysis.expression {
+                    expression.integer_zero_constants =
+                        self.integer_zero_constants.get(name).cloned().unwrap_or_default();
                 }
                 analysis.dependencies = expansion
                     .dependencies

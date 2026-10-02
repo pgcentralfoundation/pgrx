@@ -13,12 +13,17 @@
 //!
 //! [`PostgresConfig::inspect`] also obtains the final active macro map, declaration catalog,
 //! and target facts under the installation's recorded compiler flags. [`analyze`] identifies
-//! a bounded family of integer expressions and records explicit reasons for other macros.
+//! supported expression constructs and records explicit reasons for other macros.
 //! [`AnalysisSession`] expands a batch with the matched compiler while preserving the main
-//! file's preprocessing context. [`emit`] produces Rust macros for a bounded integer family,
-//! using the C integer support in `pgrx-pg-sys`. Emitted source preserves C type identity,
-//! argument occurrences, lazy branches and the inspected signed-overflow policy. It is
-//! runtime-only, and individual invocation equivalence still requires validation.
+//! file's preprocessing context. [`generate_with_bindings`] reconciles those C declarations
+//! with actual Rust binding storage, producing Rust macros and shared Rust/C adapters.
+//! [`emit`] is available without a binding catalog for expressions that need no such adapters.
+//! Generated macros use the semantic support in `pgrx-pg-sys`, retaining C type identity,
+//! argument occurrences, lazy branches, places and unevaluated operands. Native operations
+//! require the caller's unsafe obligations and the binding generator's FFI guard; partly
+//! initialized aggregate results remain in `MaybeUninit` storage. Unsupported profiles,
+//! declarations and constructs are explicit skips. Emission is runtime-only and does not
+//! itself establish differential validation against C for every possible invocation.
 
 use clang::{Clang, EntityKind, EntityVisitResult, Index};
 use serde::{Deserialize, Serialize};
@@ -35,7 +40,7 @@ pub use model::*;
 mod dependencies;
 pub use dependencies::{MacroDependencyGraph, MacroDependencyImpact};
 mod frontend;
-pub use frontend::{FrontendError, inspect};
+pub use frontend::{FrontendError, compile_native_support, inspect};
 mod syntax;
 pub use syntax::{
     BinaryOperator, Expression, ExpressionKind, ExpressionNode, IntegerLiteral, IntegerSuffix,
@@ -55,6 +60,8 @@ mod support_generation;
 pub use support_generation::*;
 mod emit;
 pub use emit::*;
+mod bindings;
+pub use bindings::*;
 mod delegation;
 
 /// An owned record of the definitions and diagnostics encountered while processing a file.

@@ -1,22 +1,23 @@
 use __pgrx_c_macros::{CInteger, CUnsignedLong, CValue};
 use std::cell::Cell;
 
-fn record<K: CInteger>(
+fn record<T: __pgrx_c_macros::IntoCValue>(
     name: &str,
     alignment: u32,
     length: u32,
-    value: CValue<K>,
+    value: T,
     first: u32,
     second: u32,
 ) where
-    K::Repr: std::fmt::Display,
+    <T::Kind as CInteger>::Repr: std::fmt::Display,
 {
-    let kind = std::any::type_name::<K>().rsplit("::").next().unwrap();
+    let value = value.into_c_value();
+    let kind = std::any::type_name::<T::Kind>().rsplit("::").next().unwrap();
     println!(
         "{name}\t{alignment}\t{length}\t{kind}\t{}\t{}\t{}\t{}\t{first}\t{second}",
-        K::BITS,
-        u8::from(K::SIGNED),
-        K::RANK,
+        T::Kind::BITS,
+        u8::from(T::Kind::SIGNED),
+        T::Kind::RANK,
         value.get(),
     );
 }

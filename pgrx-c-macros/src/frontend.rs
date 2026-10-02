@@ -6,9 +6,10 @@
 
 use crate::{
     ActiveMacro, ActiveProvenance, BuildInputs, ByteOrder, CompilationProfile, CompilerIdentity,
-    DeclarationCatalog, Error, FrontendOutput, IntegerConstant, IntegerKind, IntegerType,
-    IntegerValue, MacroDefinition, MacroDependencyGraph, MacroEnvironment, MacroInventory,
-    MacroKind, MacroScanner, SignedOverflow, TargetFacts, TokenKind, TypeCategory, TypeInfo,
+    DeclarationCatalog, Error, FloatingKind, FloatingPointFacts, FloatingType, FrontendOutput,
+    IntegerConstant, IntegerKind, IntegerType, IntegerValue, MacroDefinition, MacroDependencyGraph,
+    MacroEnvironment, MacroInventory, MacroKind, MacroScanner, SignedOverflow, TargetFacts,
+    TokenKind, TypeCategory, TypeInfo,
 };
 use clang::{EntityKind, EntityVisitResult, TranslationUnit, Type, TypeKind};
 use sha2::{Digest, Sha256};
@@ -19,6 +20,11 @@ use std::process::{Child, Command, ExitStatus, Stdio};
 use std::sync::mpsc;
 use std::thread;
 use std::time::{Duration, Instant};
+
+mod bitfields;
+mod definitions;
+mod types;
+pub(crate) mod zero_constants;
 
 const OUTPUT_LIMIT: u64 = 16 * 1024 * 1024;
 const COMPILER_TIMEOUT: Duration = Duration::from_secs(60);
@@ -153,13 +159,8 @@ pub(crate) fn inspect_with_compiler_hint(
         )));
     }
     let predefines = verify_predefines(scanner, &compiler, &arguments)?;
-    let target = target_facts(
-        &predefines.macros,
-        predefines.integers,
-        target.triple,
-        target.pointer_width,
-        predefines.ascii_execution_charset,
-    )?;
+    let target =
+        target_facts(predefines, target.triple, target.pointer_width, &preprocessing.stderr)?;
     let environment = join_active(live, &inventory);
     let macro_dependencies = MacroDependencyGraph::from_environment_with_constants(
         &environment,
@@ -175,7 +176,7 @@ pub(crate) fn inspect_with_compiler_hint(
         input_files.insert(absolute_path(library.path())?);
     }
     let inputs = build_inputs(&arguments, &preprocessing.stderr, input_files, search)?;
-    Ok(FrontendOutput {
+    let mut frontend = FrontendOutput {
         profile: CompilationProfile {
             header,
             compiler: CompilerIdentity { executable: compiler, version, libclang_version },
@@ -189,7 +190,17 @@ pub(crate) fn inspect_with_compiler_hint(
         declarations,
         inventory,
         dependencies: macro_dependencies,
-    })
+    };
+    for name in definitions::prove(scanner, &frontend)? {
+        frontend
+            .declarations
+            .function_signatures
+            .get_mut(&name)
+            .expect("definition proof refers to a catalogued declaration")
+            .definition_available = true;
+    }
+    frontend.declarations.bitfields = bitfields::probe(scanner, &frontend)?;
+    Ok(frontend)
 }
 
 fn absolute_path(path: &Path) -> Result<PathBuf, FrontendError> {
@@ -533,6 +544,7 @@ fn collect_declarations(unit: &TranslationUnit<'_>) -> (DeclarationCatalog, BTre
         }
         EntityVisitResult::Continue
     });
+    types::collect(unit, &mut catalog);
     (catalog, included)
 }
 
@@ -559,8 +571,8 @@ pub(crate) fn type_info(ty: Type<'_>) -> TypeInfo {
         category,
         size: ty.get_sizeof().ok().map(|size| size as u64),
         alignment: ty.get_alignof().ok().map(|size| size as u64),
-        is_const: ty.is_const_qualified(),
-        is_volatile: ty.is_volatile_qualified(),
+        is_const: ty.is_const_qualified() || canonical.is_const_qualified(),
+        is_volatile: ty.is_volatile_qualified() || canonical.is_volatile_qualified(),
     }
 }
 
@@ -575,7 +587,24 @@ fn has_type_attributes(mut ty: Type<'_>) -> bool {
             return false;
         };
         if declaration.has_attributes() {
-            return true;
+            let attributes = declaration
+                .get_children()
+                .into_iter()
+                .filter(|child| child.is_attribute())
+                .collect::<Vec<_>>();
+            // Record field offsets, size and alignment describe these layout
+            // attributes. Arithmetic typedef attributes still need their own model.
+            if ty.get_canonical_type().get_kind() != TypeKind::Record
+                || attributes.is_empty()
+                || attributes.iter().any(|attribute| {
+                    !matches!(
+                        attribute.get_kind(),
+                        EntityKind::PackedAttr | EntityKind::AlignedAttr
+                    )
+                })
+            {
+                return true;
+            }
         }
         if ty.get_kind() != TypeKind::Typedef {
             return false;
@@ -612,6 +641,9 @@ struct VerifiedPredefines {
     macros: Vec<MacroDefinition>,
     integers: BTreeMap<IntegerKind, IntegerType>,
     ascii_execution_charset: bool,
+    floating_types: BTreeMap<FloatingKind, (u64, Option<u64>)>,
+    evaluation_method: i32,
+    function_pointer: crate::PointerLayout,
 }
 
 fn verify_predefines(
@@ -646,6 +678,11 @@ typedef long __pgrx_c_long;\n\
 typedef unsigned long __pgrx_c_ulong;\n\
 typedef long long __pgrx_c_llong;\n\
 typedef unsigned long long __pgrx_c_ullong;\n\
+typedef float __pgrx_c_float;\n\
+typedef double __pgrx_c_double;\n\
+typedef long double __pgrx_c_ldouble;\n\
+typedef void (*__pgrx_c_function_pointer)(void);\n\
+enum { __pgrx_c_float_eval_method = __FLT_EVAL_METHOD__ };\n\
 #ifdef __SIZEOF_INT128__\n\
 typedef __int128 __pgrx_c_i128;\n\
 typedef unsigned __int128 __pgrx_c_u128;\n\
@@ -666,37 +703,73 @@ _Static_assert((((unsigned __int128)-1) >> 127) == 1, \"unsupported __int128 pre
         }
         Err(error) => return Err(error),
     };
-    let (inventory, (widths, library_ascii)) = scanner.with_translation_unit(
-        &header,
-        &without_includes,
-        Some(&fundamental_source),
-        |unit, inventory| {
-            let mut widths = BTreeMap::new();
-            let mut library_ascii = false;
-            unit.get_entity().visit_children(|entity, _| {
-                if entity.get_kind() == EntityKind::EnumDecl {
-                    entity.visit_children(|constant, _| {
-                        if constant.get_name().as_deref() == Some("__pgrx_c_ascii") {
-                            library_ascii = constant
-                                .get_enum_constant_value()
-                                .is_some_and(|(value, _)| value == 1);
+    let (inventory, (widths, floating_types, library_ascii, evaluation_method, function_pointer)) =
+        scanner.with_translation_unit(
+            &header,
+            &without_includes,
+            Some(&fundamental_source),
+            |unit, inventory| {
+                let mut widths = BTreeMap::new();
+                let mut library_ascii = false;
+                let mut floating_types = BTreeMap::new();
+                let mut evaluation_method = None;
+                let mut function_pointer = None;
+                unit.get_entity().visit_children(|entity, _| {
+                    if entity.get_kind() == EntityKind::EnumDecl {
+                        entity.visit_children(|constant, _| {
+                            if constant.get_name().as_deref() == Some("__pgrx_c_ascii") {
+                                library_ascii = constant
+                                    .get_enum_constant_value()
+                                    .is_some_and(|(value, _)| value == 1);
+                            } else if constant.get_name().as_deref()
+                                == Some("__pgrx_c_float_eval_method")
+                            {
+                                evaluation_method = constant
+                                    .get_enum_constant_value()
+                                    .and_then(|(value, _)| i32::try_from(value).ok());
+                            }
+                            EntityVisitResult::Continue
+                        });
+                    }
+                    if entity.get_kind() == EntityKind::TypedefDecl
+                        && entity.get_name().is_some_and(|name| name.starts_with("__pgrx_c_"))
+                        && let Some(ty) =
+                            entity.get_typedef_underlying_type().map(|ty| ty.get_canonical_type())
+                    {
+                        if entity.get_name().as_deref() == Some("__pgrx_c_function_pointer")
+                            && let (Ok(size), Ok(alignment)) = (ty.get_sizeof(), ty.get_alignof())
+                        {
+                            function_pointer = Some(crate::PointerLayout {
+                                size: size as u64,
+                                alignment: alignment as u64,
+                            });
                         }
-                        EntityVisitResult::Continue
-                    });
-                }
-                if entity.get_kind() == EntityKind::TypedefDecl
-                    && entity.get_name().is_some_and(|name| name.starts_with("__pgrx_c_"))
-                    && let Some(ty) =
-                        entity.get_typedef_underlying_type().map(|ty| ty.get_canonical_type())
-                    && let (Some(kind), Ok(size)) = (integer_kind(ty.get_kind()), ty.get_sizeof())
-                {
-                    widths.insert(kind, (size, ty.get_kind() == TypeKind::CharS));
-                }
-                EntityVisitResult::Continue
-            });
-            Ok((inventory, (widths, library_ascii)))
-        },
-    )?;
+                        if let (Some(kind), Ok(size)) =
+                            (integer_kind(ty.get_kind()), ty.get_sizeof())
+                        {
+                            widths.insert(kind, (size, ty.get_kind() == TypeKind::CharS));
+                        }
+                        let kind = match ty.get_kind() {
+                            TypeKind::Float => Some(FloatingKind::Float),
+                            TypeKind::Double => Some(FloatingKind::Double),
+                            TypeKind::LongDouble => Some(FloatingKind::LongDouble),
+                            _ => None,
+                        };
+                        if let (Some(kind), Ok(size)) = (kind, ty.get_sizeof()) {
+                            floating_types.insert(
+                                kind,
+                                (size as u64, ty.get_alignof().ok().map(|align| align as u64)),
+                            );
+                        }
+                    }
+                    EntityVisitResult::Continue
+                });
+                Ok((
+                    inventory,
+                    (widths, floating_types, library_ascii, evaluation_method, function_pointer),
+                ))
+            },
+        )?;
     let mut expected: BTreeMap<_, _> =
         inventory.macros.iter().map(|definition| (definition.name.as_str(), definition)).collect();
     let mut overrides = BTreeMap::new();
@@ -740,6 +813,36 @@ _Static_assert((((unsigned __int128)-1) >> 127) == 1, \"unsupported __int128 pre
             differing.join(", ")
         )));
     }
+    let evaluation_method = evaluation_method.ok_or_else(|| {
+        FrontendError::Output("libclang did not establish __FLT_EVAL_METHOD__".into())
+    })?;
+    let function_pointer = function_pointer.ok_or_else(|| {
+        FrontendError::Output("libclang did not establish the C function-pointer layout".into())
+    })?;
+    let mut float_source = format!(
+        "_Static_assert(__FLT_EVAL_METHOD__ == {evaluation_method}, \"pgrx_float_evaluation_method\");\n"
+    );
+    float_source.push_str(&format!("typedef void (*__pgrx_c_function_pointer)(void);\n_Static_assert(sizeof(__pgrx_c_function_pointer) == {}, \"pgrx_function_pointer_size\");\n_Static_assert(_Alignof(__pgrx_c_function_pointer) == {}, \"pgrx_function_pointer_alignment\");\n", function_pointer.size, function_pointer.alignment));
+    for (kind, spelling) in [
+        (FloatingKind::Float, "float"),
+        (FloatingKind::Double, "double"),
+        (FloatingKind::LongDouble, "long double"),
+    ] {
+        if let Some(&(size, alignment)) = floating_types.get(&kind) {
+            float_source.push_str(&format!(
+                "_Static_assert(sizeof({spelling}) == {size}, \"pgrx_float_size\");\n"
+            ));
+            if let Some(alignment) = alignment {
+                float_source.push_str(&format!("_Static_assert(_Alignof({spelling}) == {alignment}, \"pgrx_float_alignment\");\n"));
+            }
+        }
+    }
+    run_compiler_with_input(compiler, &probe, Some(float_source)).map_err(|error| match error {
+        FrontendError::CompilerFailed { diagnostics, .. } => FrontendError::Environment(format!(
+            "compiler floating-point facts differ from libclang: {diagnostics}"
+        )),
+        error => error,
+    })?;
     let bits = macro_number(&actual, "__CHAR_BIT__")?
         .try_into()
         .map_err(|_| FrontendError::Output("invalid CHAR_BIT".into()))?;
@@ -774,6 +877,9 @@ _Static_assert((((unsigned __int128)-1) >> 127) == 1, \"unsupported __int128 pre
         macros: predefines,
         integers,
         ascii_execution_charset: driver_ascii && library_ascii,
+        floating_types,
+        evaluation_method,
+        function_pointer,
     })
 }
 
@@ -832,12 +938,19 @@ fn macro_number(
 }
 
 fn target_facts(
-    predefines: &[MacroDefinition],
-    integers: BTreeMap<IntegerKind, IntegerType>,
+    verified: VerifiedPredefines,
     triple: String,
     pointer_width: usize,
-    ascii_execution_charset: bool,
+    verbose: &str,
 ) -> Result<TargetFacts, FrontendError> {
+    let VerifiedPredefines {
+        macros: predefines,
+        integers,
+        ascii_execution_charset,
+        floating_types,
+        evaluation_method,
+        function_pointer,
+    } = verified;
     let macros = predefines
         .iter()
         .map(|definition| (definition.name.as_str(), definition))
@@ -918,29 +1031,161 @@ fn target_facts(
     } else {
         None
     };
+    let floating_point =
+        floating_point_facts(&macros, floating_types, char_bits, evaluation_method, verbose)?;
     Ok(TargetFacts {
         triple,
         pointer_bits,
+        function_pointer,
         char_bits,
         char_is_signed,
         ascii_execution_charset,
         byte_order,
         c_standard,
         integers,
+        floating_point,
     })
+}
+
+fn floating_point_facts(
+    macros: &BTreeMap<&str, &MacroDefinition>,
+    layouts: BTreeMap<FloatingKind, (u64, Option<u64>)>,
+    char_bits: u32,
+    evaluation_method: i32,
+    verbose: &str,
+) -> Result<FloatingPointFacts, FrontendError> {
+    let radix = u32::try_from(macro_number(macros, "__FLT_RADIX__")?)
+        .map_err(|_| FrontendError::Output("invalid floating-point radix".into()))?;
+    let mut types = BTreeMap::new();
+    for (kind, prefix, sizeof) in [
+        (FloatingKind::Float, "__FLT", "__SIZEOF_FLOAT__"),
+        (FloatingKind::Double, "__DBL", "__SIZEOF_DOUBLE__"),
+        (FloatingKind::LongDouble, "__LDBL", "__SIZEOF_LONG_DOUBLE__"),
+    ] {
+        let Some(&(size, alignment)) = layouts.get(&kind) else { continue };
+        if macro_number(macros, sizeof)? != size {
+            return Err(FrontendError::Environment(format!(
+                "compiler {sizeof} differs from libclang type layout"
+            )));
+        }
+        let storage_bits = size
+            .checked_mul(u64::from(char_bits))
+            .and_then(|bits| u32::try_from(bits).ok())
+            .ok_or_else(|| FrontendError::Output("invalid floating-point width".into()))?;
+        let mantissa_digits = u32::try_from(macro_number(macros, &format!("{prefix}_MANT_DIG__"))?)
+            .map_err(|_| FrontendError::Output("invalid floating-point precision".into()))?;
+        types.insert(
+            kind,
+            FloatingType {
+                storage_bits,
+                alignment,
+                radix,
+                mantissa_digits,
+                min_exponent: macro_signed_number(macros, &format!("{prefix}_MIN_EXP__"))?,
+                max_exponent: macro_signed_number(macros, &format!("{prefix}_MAX_EXP__"))?,
+                has_subnormals: macro_number(macros, &format!("{prefix}_HAS_DENORM__"))? == 1,
+                has_infinity: macro_number(macros, &format!("{prefix}_HAS_INFINITY__"))? == 1,
+                has_quiet_nan: macro_number(macros, &format!("{prefix}_HAS_QUIET_NAN__"))? == 1,
+            },
+        );
+    }
+    let effective_options = frontend_arguments(verbose)?
+        .into_iter()
+        .filter(|option| {
+            option.starts_with("-ffp-")
+                || option.starts_with("-fexcess-precision=")
+                || option.starts_with("-fdenormal-fp-math")
+                || matches!(
+                    option.as_str(),
+                    "-frounding-math"
+                        | "-fno-rounding-math"
+                        | "-ffast-math"
+                        | "-ffinite-math-only"
+                        | "-funsafe-math-optimizations"
+                        | "-fno-signed-zeros"
+                        | "-freciprocal-math"
+                        | "-fapprox-func"
+                        | "-menable-no-nans"
+                        | "-menable-no-infs"
+                        | "-menable-unsafe-fp-math"
+                        | "-fno-strict-float-cast-overflow"
+                )
+        })
+        .collect::<Vec<_>>();
+    let unsupported_options = effective_options
+        .iter()
+        .filter(|option| {
+            !matches!(
+                option.as_str(),
+                "-ffp-contract=off"
+                    | "-fno-rounding-math"
+                    | "-ffp-exception-behavior=ignore"
+                    | "-ffp-eval-method=source"
+                    | "-fexcess-precision=standard"
+                    | "-fdenormal-fp-math=ieee"
+                    | "-fdenormal-fp-math=ieee,ieee"
+                    | "-fdenormal-fp-math-f32=ieee"
+                    | "-fdenormal-fp-math-f32=ieee,ieee"
+            )
+        })
+        .cloned()
+        .collect();
+    Ok(FloatingPointFacts {
+        types,
+        evaluation_method: Some(evaluation_method),
+        fast_math: macros.contains_key("__FAST_MATH__"),
+        finite_math_only: macro_number(macros, "__FINITE_MATH_ONLY__")? != 0,
+        effective_options,
+        unsupported_options,
+    })
+}
+
+fn macro_signed_number(
+    macros: &BTreeMap<&str, &MacroDefinition>,
+    name: &str,
+) -> Result<i32, FrontendError> {
+    let definition = macros
+        .get(name)
+        .ok_or_else(|| FrontendError::Output(format!("missing compiler macro {name}")))?;
+    let tokens = definition
+        .tokens
+        .iter()
+        .skip(1)
+        .filter(|token| token.kind != TokenKind::Comment)
+        .map(|token| token.spelling.as_str())
+        .collect::<Vec<_>>();
+    let tokens = match tokens.as_slice() {
+        ["(", rest @ .., ")"] => rest,
+        tokens => tokens,
+    };
+    let (negative, digits) = match tokens {
+        [digits] => (false, *digits),
+        ["-", digits] => (true, *digits),
+        _ => {
+            return Err(FrontendError::Output(format!(
+                "compiler macro {name} is not a signed integer"
+            )));
+        }
+    };
+    let value = digits.trim_end_matches(['u', 'U', 'l', 'L']).parse::<i32>().map_err(|_| {
+        FrontendError::Output(format!("compiler macro {name} has an invalid exponent"))
+    })?;
+    Ok(if negative { -value } else { value })
+}
+
+fn frontend_arguments(verbose: &str) -> Result<Vec<String>, FrontendError> {
+    verbose
+        .lines()
+        .filter_map(shlex::split)
+        .find(|arguments| arguments.iter().any(|argument| argument == "-cc1"))
+        .ok_or_else(|| FrontendError::Output("missing effective Clang frontend arguments".into()))
 }
 
 fn semantic_options(
     arguments: &[String],
     verbose: &str,
 ) -> Result<(SignedOverflow, Vec<String>), FrontendError> {
-    let frontend = verbose
-        .lines()
-        .filter_map(shlex::split)
-        .find(|arguments| arguments.iter().any(|argument| argument == "-cc1"))
-        .ok_or_else(|| {
-            FrontendError::Output("missing effective Clang frontend arguments".into())
-        })?;
+    let frontend = frontend_arguments(verbose)?;
     // The driver resolves option overrides. Clang's trap mode takes precedence over
     // wrapping; interpreting GCC's ordering rules here would produce a different policy.
     let overflow = if frontend.iter().any(|argument| argument == "-ftrapv") {
@@ -953,6 +1198,7 @@ fn semantic_options(
     let mut unsupported = Vec::new();
     for argument in arguments {
         if argument.starts_with("-f")
+            && !is_floating_point_option(argument)
             && !matches!(
                 argument.as_str(),
                 "-fwrapv"
@@ -971,7 +1217,6 @@ fn semantic_options(
                     | "-fomit-frame-pointer"
                     | "-fno-common"
                     | "-fcommon"
-                    | "-fexcess-precision=standard"
                     | "-ffunction-sections"
                     | "-fdata-sections"
                     | "-fno-asynchronous-unwind-tables"
@@ -982,10 +1227,24 @@ fn semantic_options(
                     | "-fstack-protector-strong"
                     | "-fstack-protector-all"
                     | "-fno-stack-protector"
+                    // These add stack-page/control-flow instrumentation without
+                    // changing C values, types or access qualification. Keep
+                    // their original arguments for native helper compilation.
+                    | "-fstack-clash-protection"
+                    | "-fno-stack-clash-protection"
+                    | "-fcf-protection"
+                    | "-fcf-protection=full"
+                    | "-fcf-protection=branch"
+                    | "-fcf-protection=return"
+                    | "-fcf-protection=none"
                     | "-fno-lto"
                     | "-fsyntax-only"
                     | "-funsigned-char"
                     | "-fsigned-char"
+                    // Every enum's compatible integer, size and alignment is
+                    // obtained from the compiler and reconciled with bindgen.
+                    | "-fshort-enums"
+                    | "-fno-short-enums"
             )
             || argument == "-Ofast"
         {
@@ -993,6 +1252,39 @@ fn semantic_options(
         }
     }
     Ok((overflow, unsupported))
+}
+
+fn is_floating_point_option(argument: &str) -> bool {
+    argument.starts_with("-ffp-")
+        || argument.starts_with("-fdenormal-fp-math")
+        || argument.starts_with("-fexcess-precision=")
+        || matches!(
+            argument,
+            "-ffast-math"
+                | "-fno-fast-math"
+                | "-ffinite-math-only"
+                | "-fno-finite-math-only"
+                | "-frounding-math"
+                | "-fno-rounding-math"
+                | "-funsafe-math-optimizations"
+                | "-fno-unsafe-math-optimizations"
+                | "-fassociative-math"
+                | "-fno-associative-math"
+                | "-freciprocal-math"
+                | "-fno-reciprocal-math"
+                | "-fsigned-zeros"
+                | "-fno-signed-zeros"
+                | "-fhonor-nans"
+                | "-fno-honor-nans"
+                | "-fhonor-infinities"
+                | "-fno-honor-infinities"
+                | "-fapprox-func"
+                | "-fno-approx-func"
+                | "-ftrapping-math"
+                | "-fno-trapping-math"
+                | "-fstrict-float-cast-overflow"
+                | "-fno-strict-float-cast-overflow"
+        )
 }
 
 pub(crate) fn parse_dependencies(output: &str) -> Result<BTreeSet<PathBuf>, FrontendError> {
@@ -1201,6 +1493,38 @@ pub(crate) fn run_compiler(
     arguments: &[String],
 ) -> Result<CompilerOutput, FrontendError> {
     run_compiler_with_input(compiler, arguments, None)
+}
+
+/// Compile and archive generated access primitives under the inspected C flags.
+/// The source must include the same inspected header; callers retain the source
+/// and archive alongside their other generated bindings. Both tools have the
+/// frontend's bounded diagnostics and timeout, and failed children are reaped.
+pub fn compile_native_support(
+    profile: &CompilationProfile,
+    source: &Path,
+    object: &Path,
+    archive: &Path,
+) -> Result<(), FrontendError> {
+    let path = |path: &Path| {
+        path.to_str().map(str::to_owned).ok_or_else(|| {
+            FrontendError::Output(format!("native support path is not UTF-8: {}", path.display()))
+        })
+    };
+    let mut args = profile.arguments.clone();
+    args.extend([
+        "-x".into(),
+        "c".into(),
+        "-c".into(),
+        "-fPIC".into(),
+        path(source)?,
+        "-o".into(),
+        path(object)?,
+    ]);
+    run_compiler(&profile.compiler.executable, &args)?;
+    let adjacent = profile.compiler.executable.with_file_name("llvm-ar");
+    let archiver = if adjacent.is_file() { adjacent } else { PathBuf::from("ar") };
+    run_compiler(&archiver, &["crs".into(), path(archive)?, path(object)?])?;
+    Ok(())
 }
 
 fn run_compiler_with_input(
@@ -1455,6 +1779,36 @@ fn validate_fact_override(value: &str) -> Result<(), FrontendError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn protection_codegen_options_require_exact_reviewed_spellings() {
+        let verbose = "clang -cc1 -fwrapv\n";
+        for argument in [
+            "-fstack-clash-protection",
+            "-fno-stack-clash-protection",
+            "-fcf-protection",
+            "-fcf-protection=full",
+            "-fcf-protection=branch",
+            "-fcf-protection=return",
+            "-fcf-protection=none",
+        ] {
+            let (overflow, unsupported) = semantic_options(&[argument.into()], verbose).unwrap();
+            assert_eq!(overflow, SignedOverflow::Wrapping);
+            assert!(unsupported.is_empty(), "reviewed codegen option: {argument}");
+        }
+        for argument in [
+            "-fstack-clash-protection=other",
+            "-fno-stack-clash-protection-other",
+            "-fcf-protection=check",
+            "-fcf-protection=unknown",
+            "-fno-cf-protection",
+            "-fstack-check",
+            "-fpack-struct=1",
+        ] {
+            let (_, unsupported) = semantic_options(&[argument.into()], verbose).unwrap();
+            assert_eq!(unsupported, [argument], "unreviewed/ABI option must stay gated");
+        }
+    }
 
     #[cfg(unix)]
     mod compiler_selection {

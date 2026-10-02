@@ -2,7 +2,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! The checked boundary between inspected C target facts and the first runtime support family.
+//! Check inspected C target facts against the runtime's modeled representations and policies.
 
 use crate::model::{
     ByteOrder, CompilationProfile, FrontendOutput, IntegerKind, IntegerType, SignedOverflow,
@@ -31,6 +31,8 @@ pub enum SupportProfileError {
         "pg-sys {name} requires an unqualified C unsigned int typedef with 4-byte storage, found {actual:?}"
     )]
     PgSysIntegerType { name: &'static str, actual: Option<TypeInfo> },
+    #[error("pg-sys Datum requires an unqualified pointer-width unsigned C integer, found {0:?}")]
+    PgSysDatumType(Option<TypeInfo>),
 }
 
 /// Require the complete integer representation and compiler policy implemented by the helpers.
@@ -100,11 +102,13 @@ pub fn support_abi_assertions(profile: &CompilationProfile) -> Result<String, Su
 ///
 /// The C declarations establish each identity independently. Rust's `Oid` and
 /// `TransactionId` expose exactly 32 bits of numeric storage; no adapter is
-/// emitted unless that storage matches the inspected C typedef. `Datum` is
-/// deliberately absent because its Rust representation carries pointer provenance.
+/// emitted unless that storage matches the inspected C typedef. Datum's pointer
+/// storage uses exposed provenance when crossing its C integer representation.
 pub fn pg_sys_integer_bridges(frontend: &FrontendOutput) -> Result<String, SupportProfileError> {
     let mut rust = support_abi_assertions(frontend.profile())?;
-    for (name, accessor) in [("Oid", "to_u32"), ("TransactionId", "into_inner")] {
+    for (name, accessor, constructor) in
+        [("Oid", "to_u32", "from_u32"), ("TransactionId", "into_inner", "from_inner")]
+    {
         let actual = frontend.declarations().types.get(name);
         if !actual.is_some_and(|ty| {
             ty.category == TypeCategory::Integer(IntegerKind::UnsignedInt)
@@ -123,7 +127,55 @@ pub fn pg_sys_integer_bridges(frontend: &FrontendOutput) -> Result<String, Suppo
                  }}\n\
              }}\n"
         ));
+        rust.push_str(&format!(
+            "impl crate::__pgrx_c_macros::expression::IntegerStorage<crate::__pgrx_c_macros::CUnsignedInt> for crate::{name} {{\n\
+               fn decode(self) -> crate::__pgrx_c_macros::CValue<crate::__pgrx_c_macros::CUnsignedInt> {{ crate::__pgrx_c_macros::CValue::new(self.{accessor}()) }}\n\
+               fn encode(value: crate::__pgrx_c_macros::CValue<crate::__pgrx_c_macros::CUnsignedInt>) -> Self {{ Self::{constructor}(value.get()) }}\n\
+             }}\n\
+             impl crate::__pgrx_c_macros::expression::NativeType for crate::{name} {{ type Marker = crate::__pgrx_c_macros::expression::CIntegerStorage<crate::__pgrx_c_macros::CUnsignedInt, Self>; }}\n\
+             impl crate::__pgrx_c_macros::expression::IntoExpression for crate::{name} {{ type Value = crate::__pgrx_c_macros::CValue<crate::__pgrx_c_macros::CUnsignedInt>; fn into_expression(self) -> Self::Value {{ crate::__pgrx_c_macros::IntoCValue::into_c_value(self) }} }}\n"
+        ));
     }
+    let datum = frontend.declarations().types.get("Datum");
+    if datum.is_none() {
+        return Ok(rust);
+    }
+    let datum_kind = datum
+        .and_then(|ty| match ty.category {
+            TypeCategory::Integer(
+                kind @ (IntegerKind::UnsignedLong | IntegerKind::UnsignedLongLong),
+            ) if ty.size == Some(u64::from(frontend.profile().target.pointer_bits / 8))
+                && ty.alignment == Some(8)
+                && !ty.is_const
+                && !ty.is_volatile =>
+            {
+                Some(kind)
+            }
+            _ => None,
+        })
+        .ok_or_else(|| SupportProfileError::PgSysDatumType(datum.cloned()))?;
+    let marker = match datum_kind {
+        IntegerKind::UnsignedLong => "CUnsignedLong",
+        IntegerKind::UnsignedLongLong => "CUnsignedLongLong",
+        _ => unreachable!(
+            "the Datum representation gate admits only pointer-width unsigned integers"
+        ),
+    };
+    rust.push_str(&format!(
+        "// C Datum is an integer that can retain an exposed Rust pointer's provenance.\n\
+         const _: () = {{ assert!(::core::mem::size_of::<crate::Datum>() == 8); assert!(::core::mem::align_of::<crate::Datum>() == 8); }};\n\
+         impl crate::__pgrx_c_macros::sealed::Sealed for crate::Datum {{}}\n\
+         impl crate::__pgrx_c_macros::IntoCValue for crate::Datum {{\n\
+           type Kind = crate::__pgrx_c_macros::{marker};\n\
+           fn into_c_value(self) -> crate::__pgrx_c_macros::CValue<Self::Kind> {{ crate::__pgrx_c_macros::CValue::new(self.cast_mut_ptr::<()>().expose_provenance() as u64) }}\n\
+         }}\n\
+         impl crate::__pgrx_c_macros::expression::IntegerStorage<crate::__pgrx_c_macros::{marker}> for crate::Datum {{\n\
+           fn decode(self) -> crate::__pgrx_c_macros::CValue<crate::__pgrx_c_macros::{marker}> {{ crate::__pgrx_c_macros::IntoCValue::into_c_value(self) }}\n\
+           fn encode(value: crate::__pgrx_c_macros::CValue<crate::__pgrx_c_macros::{marker}>) -> Self {{ Self::from(::core::ptr::with_exposed_provenance_mut::<()>(value.get() as usize)) }}\n\
+         }}\n\
+         impl crate::__pgrx_c_macros::expression::NativeType for crate::Datum {{ type Marker = crate::__pgrx_c_macros::expression::CIntegerStorage<crate::__pgrx_c_macros::{marker}, Self>; }}\n\
+         impl crate::__pgrx_c_macros::expression::IntoExpression for crate::Datum {{ type Value = crate::__pgrx_c_macros::CValue<crate::__pgrx_c_macros::{marker}>; fn into_expression(self) -> Self::Value {{ crate::__pgrx_c_macros::IntoCValue::into_c_value(self) }} }}\n"
+    ));
     Ok(rust)
 }
 
@@ -192,12 +244,14 @@ mod tests {
             target: TargetFacts {
                 triple: "aarch64-apple-macosx26.0.0".into(),
                 pointer_bits: 64,
+                function_pointer: crate::PointerLayout { size: 8, alignment: 8 },
                 char_bits: 8,
                 char_is_signed: true,
                 ascii_execution_charset: true,
                 byte_order: ByteOrder::Little,
                 c_standard: Some(201710),
                 integers,
+                floating_point: Default::default(),
             },
             signed_overflow: SignedOverflow::Wrapping,
             unsupported_options: Vec::new(),
@@ -231,11 +285,24 @@ mod tests {
                 },
             );
         }
+        frontend.declarations.types.insert(
+            "Datum".into(),
+            TypeInfo {
+                spelling: "Datum".into(),
+                canonical_spelling: "unsigned long".into(),
+                category: TypeCategory::Integer(IntegerKind::UnsignedLong),
+                size: Some(8),
+                alignment: Some(8),
+                is_const: false,
+                is_volatile: false,
+            },
+        );
         let rust = pg_sys_integer_bridges(&frontend).unwrap();
         assert!(rust.contains("for crate::Oid"));
         assert!(rust.contains("self.to_u32()"));
         assert!(rust.contains("self.into_inner()"));
-        assert!(!rust.contains("Datum"));
+        assert!(rust.contains("with_exposed_provenance_mut"));
+        assert!(rust.contains("expose_provenance"));
         frontend.declarations.types.get_mut("TransactionId").unwrap().category =
             TypeCategory::Integer(IntegerKind::UnsignedLong);
         assert!(matches!(

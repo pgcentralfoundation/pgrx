@@ -8,7 +8,8 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, EmissionStatus, MacroScanner, PostgresConfig, SignedOverflow, emit,
+    AnalysisSession, BindingCatalog, EmissionStatus, MacroScanner, PostgresConfig, SignedOverflow,
+    generate_with_bindings,
 };
 use std::collections::BTreeSet;
 use std::path::PathBuf;
@@ -47,7 +48,7 @@ fn handwritten_function_names() -> BTreeSet<String> {
 
 #[test]
 #[ignore = "requires configured native PostgreSQL 15 through 19 installations"]
-fn every_emittable_integer_handport_matches_each_original_postgres_version() {
+fn every_emittable_handport_matches_each_original_postgres_version() {
     let scanner = MacroScanner::new().expect("libclang must be available");
     let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../pgrx-pg-sys/src/c_macros/support.rs")
@@ -80,9 +81,14 @@ fn every_emittable_integer_handport_matches_each_original_postgres_version() {
         let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
         let mut rust =
             format!("#[path = {:?}]\npub mod __pgrx_c_macros;\n", support.to_str().unwrap());
+        let generation =
+            generate_with_bindings(&session, &names, &BindingCatalog::default()).unwrap();
+        let artifact = generation.support;
+        rust.push_str(&artifact.rust);
         let mut emitted = BTreeSet::new();
-        for name in names {
-            if let EmissionStatus::Emitted { rust: generated, .. } = emit(&session, name).status {
+        for emission in generation.macros {
+            if let EmissionStatus::Emitted { rust: generated, .. } = emission.status {
+                let name = emission.analysis.name;
                 assert!(emitted.insert(name), "a handport must have one primary definition");
                 rust.push_str(&generated);
             }
@@ -92,18 +98,22 @@ fn every_emittable_integer_handport_matches_each_original_postgres_version() {
             "MAXALIGN",
             "BufferIsLocal",
             "TransactionIdIsNormal",
+            "VARATT_NOT_PAD_BYTE",
+            "type_is_array",
             "PGSIXBIT",
             "MAKE_SQLSTATE",
         ]);
         if major == 15 {
             expected.insert("PageSizeIsValid");
+            expected.insert("PageIsValid");
         }
         expected.extend(TRIGGERS.iter().copied());
         if major < 19 {
             expected.insert("VARTAG_IS_EXPANDED");
         }
         assert_eq!(
-            emitted, expected,
+            emitted.iter().map(String::as_str).collect::<BTreeSet<_>>(),
+            expected,
             "PG{major}: every emittable handport needs an original-C case"
         );
 
@@ -211,16 +221,42 @@ record("PageSizeIsValid_EVAL", 0, value, first.get(), second.get());
         } else {
             ""
         };
+        // PostgreSQL replaced PageIsValid's macro with a static inline function
+        // after PG15, so it is no longer part of macro discovery there.
+        let page_valid_cases = if major == 15 {
+            r#"
+record("PageIsValid_NULL_MUTABLE", 0, PageIsValid!(core::ptr::null_mut::<u8>()), 0, 0);
+record("PageIsValid_NULL_CONST", 0, PageIsValid!(core::ptr::null::<u8>()), 0, 0);
+record("PageIsValid_MUTABLE", 0, PageIsValid!(pointer.cast_mut()), 0, 0);
+record("PageIsValid_CONST", 0, PageIsValid!(pointer), 0, 0);
+let page_argument = || { first.set(first.get() + 1); pointer.cast_mut() };
+let value = PageIsValid!(page_argument());
+record("PageIsValid_EVAL", 0, value, first.get(), second.get());
+"#
+        } else {
+            ""
+        };
         rust.push_str(
             &include_str!("fixtures/handports_postgres.rs")
                 .replace("/* @BLOCK_SIZE@ */", &format!("{block_size}_u32"))
                 .replace("// @WRAPPING_CASES@", wrapping_case)
                 .replace("// @PAGE_SIZE_CASES@", page_cases)
+                .replace("// @PAGE_VALID_CASES@", page_valid_cases)
                 .replace("// @TRIGGER_CASES@", &triggers)
                 .replace("// @VARTAG_METADATA@", &vartag_metadata)
                 .replace("// @VARTAG_CASES@", &vartag_cases),
         );
-        let generated = rust_oracle::run_rust(&rust);
+        let generated = rust_oracle::run_rust_linked(
+            &rust,
+            &profile.compiler.executable,
+            &profile.header,
+            &format!(
+                "{}\n#define PGRX_HANDPORT_NO_MAIN 1\n{}",
+                artifact.c_source,
+                include_str!("fixtures/handports_postgres.c")
+            ),
+            &profile.arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        );
         let expected_rows = 1
             + 20
             + 2 * 4096
@@ -235,12 +271,15 @@ record("PageSizeIsValid_EVAL", 0, value, first.get(), second.get());
             + 7
             + 4096
             + 5
-            + 3;
+            + 3
+            + if major == 15 { 5 } else { 0 }
+            + 258
+            + 11;
         assert_eq!(original.lines().count(), expected_rows, "PG{major}: C corpus completeness");
         assert_eq!(generated.lines().count(), expected_rows, "PG{major}: Rust corpus completeness");
         for (index, (c, rust)) in original.lines().zip(generated.lines()).enumerate() {
             assert_eq!(rust, c, "PG{major}: original C vs generated Rust record {index}");
         }
-        eprintln!("PG{major}: {} integer handports, {expected_rows} C/Rust records", emitted.len());
+        eprintln!("PG{major}: {} handports, {expected_rows} C/Rust records", emitted.len());
     }
 }

@@ -14,7 +14,7 @@ use eyre::{WrapErr, eyre};
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, BuildInputs, CompilationProfile, Diagnostic, EmissionStatus,
     IntegerConstant, MacroEmission, MacroScanner, PostgresConfig, SkipReasonCode,
-    emit_batch_with_bindings, pg_sys_integer_bridges, postgres_function_macro_names,
+    generate_with_bindings, pg_sys_integer_bridges, postgres_function_macro_names,
 };
 use pgrx_pg_config::{PgConfig, PgMinorVersion, PgVersion, Pgrx, SUPPORTED_VERSIONS};
 use quote::{ToTokens, quote};
@@ -46,6 +46,8 @@ const YANKED_POSTGRES_VERSIONS: &[PgVersion] = &[
 ];
 
 mod binding_symbols;
+mod macro_support;
+use macro_support::compile_macro_support;
 pub(super) mod clang;
 
 #[derive(Debug)]
@@ -1085,15 +1087,46 @@ fn generate_macros(
     };
     let bindings = generate_bindings(binder_arguments)?;
     session.verify_inputs().wrap_err("C inputs changed during binding generation")?;
-    let parsed_bindings =
+    let mut parsed_bindings =
         syn::parse_file(&bindings).wrap_err("could not parse bindings for C symbol references")?;
+    // Callback storage facts must reflect the same ABI rewrite as the final
+    // bindings, while foreign function guards are still generated afterward.
+    rewrite_c_abi_to_c_unwind(&mut parsed_bindings);
     let mut symbols = binding_symbols::collect_bindings(
         &parsed_bindings,
         session.integer_constants(),
         frontend.declarations(),
         &frontend.profile().target,
     );
-    let emissions = emit_batch_with_bindings(&session, &names, &symbols);
+    symbols.ffi_boundary = Some(vec!["ffi".into(), "pg_guard_ffi_boundary".into()]);
+    if integer_bridge_unavailable.is_none() {
+        symbols.integer_storage.extend([
+            ("Oid".into(), pgrx_c_macros::IntegerKind::UnsignedInt),
+            ("TransactionId".into(), pgrx_c_macros::IntegerKind::UnsignedInt),
+            ("MultiXactId".into(), pgrx_c_macros::IntegerKind::UnsignedInt),
+        ]);
+        if let Some(pgrx_c_macros::TypeInfo {
+            category: pgrx_c_macros::TypeCategory::Integer(kind),
+            ..
+        }) = frontend.declarations().types.get("Datum")
+        {
+            symbols.integer_storage.insert("Datum".into(), *kind);
+        }
+    }
+    let pgrx_c_macros::MacroGeneration { macros: emissions, support } =
+        generate_with_bindings(&session, &names, &symbols).map_err(|message| eyre!(message))?;
+    source.push_str(&support.rust);
+    if !support.c_source.is_empty() {
+        compile_macro_support(
+            pg_config.major_version()?,
+            frontend.profile(),
+            &support.c_source,
+            out_dir,
+        )?;
+    }
+    // Native access primitives reread the original headers. Do not publish Rust
+    // facts from one snapshot alongside C object code compiled from another.
+    session.verify_inputs().wrap_err("C inputs changed during macro support generation")?;
     let mut emitted = 0;
     let mut skipped = 0;
     for emission in &emissions {

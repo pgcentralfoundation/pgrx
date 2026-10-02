@@ -15,7 +15,7 @@
 )]
 std::compile_error!("exactly one feature must be provided (pg15, pg16, pg17, pg18, pg19)");
 
-/// Integer semantics used by generated PostgreSQL C macros.
+/// C expression semantics and storage capabilities used by generated PostgreSQL macros.
 #[doc(hidden)]
 #[path = "c_macros/support.rs"]
 pub mod __pgrx_c_macros;

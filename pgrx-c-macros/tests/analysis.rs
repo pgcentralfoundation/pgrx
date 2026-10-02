@@ -6,8 +6,9 @@
 mod oracle;
 
 use pgrx_c_macros::{
-    AnalysisStatus, ConstCapability, FrontendError, InputConstraint, InvocationContract,
-    MacroAnalysis, MacroScanner, ParameterRole, SkipReasonCode, analyze, inspect,
+    AnalysisSession, AnalysisStatus, ConstCapability, EmissionStatus, ExpressionKind,
+    FrontendError, InputConstraint, InvocationContract, MacroAnalysis, MacroScanner, ParameterRole,
+    SkipReasonCode, TypeCategory, TypeExpression, analyze, emit, inspect,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -52,6 +53,8 @@ fn complete_integer_expressions_are_candidates_with_inferred_value_constraints()
         "ANALYSIS_LAZY",
         "ANALYSIS_CHOOSE",
         "ANALYSIS_CHAR",
+        "ANALYSIS_COMMA",
+        "ANALYSIS_EMPTY",
     ] {
         let analysis = analyze(&frontend, name);
         assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{name}: {analysis:?}");
@@ -73,6 +76,16 @@ fn complete_integer_expressions_are_candidates_with_inferred_value_constraints()
     }
     assert_eq!(analyze(&frontend, "ANALYSIS_REPEAT").parameters[0].uses.len(), 2);
     assert!(analyze(&frontend, "ANALYSIS_UNUSED").parameters[0].uses.is_empty());
+    let empty = analyze(&frontend, "ANALYSIS_EMPTY");
+    let empty = empty.expression.unwrap();
+    assert!(matches!(empty.syntax.nodes[empty.syntax.root].kind, ExpressionKind::Empty));
+    assert!(matches!(empty.types[empty.syntax.root], TypeExpression::Void));
+    let comma = analyze(&frontend, "ANALYSIS_COMMA");
+    let comma = comma.expression.unwrap();
+    assert!(
+        comma.syntax.nodes.iter().any(|node| matches!(node.kind, ExpressionKind::Comma { .. }))
+    );
+    assert!(matches!(comma.types[comma.syntax.root], TypeExpression::Parameter { index: 1 }));
 
     // Concrete instantiations are checked by C, without constructing an expected syntax tree.
     // In particular the cast result does not constrain the original input to FrontByte.
@@ -107,20 +120,10 @@ fn unsupported_forms_have_stable_reasons_and_original_source_spans() {
     for (name, code) in [
         ("ANALYSIS_UNGROUPED", SkipReasonCode::InvocationGrouping),
         ("ANALYSIS_ROOT_UNGROUPED", SkipReasonCode::InvocationGrouping),
-        ("ANALYSIS_POINTER", SkipReasonCode::PointerOperation),
-        ("ANALYSIS_MEMBER", SkipReasonCode::PointerOperation),
-        ("ANALYSIS_SUBSCRIPT", SkipReasonCode::PointerOperation),
-        ("ANALYSIS_MUTATION", SkipReasonCode::Mutation),
-        ("ANALYSIS_ASSIGN", SkipReasonCode::Mutation),
-        ("ANALYSIS_CALL", SkipReasonCode::Call),
         ("ANALYSIS_STATEMENT", SkipReasonCode::Statement),
-        ("ANALYSIS_SIZEOF", SkipReasonCode::UnevaluatedExpression),
-        ("ANALYSIS_TYPE_PARAMETER", SkipReasonCode::TypeParameter),
-        ("ANALYSIS_COMMA", SkipReasonCode::CommaExpression),
+        ("ANALYSIS_SIZEOF", SkipReasonCode::InvocationGrouping),
         ("ANALYSIS_FLOAT", SkipReasonCode::UnsupportedLiteral),
         ("ANALYSIS_UNKNOWN", SkipReasonCode::UnknownIdentifier),
-        ("ANALYSIS_VARIABLE", SkipReasonCode::VariableAccess),
-        ("ANALYSIS_EMPTY", SkipReasonCode::EmptyReplacement),
         ("ANALYSIS_STRINGIFY", SkipReasonCode::Stringification),
         ("ANALYSIS_PASTE", SkipReasonCode::TokenPaste),
         ("ANALYSIS_VARIADIC", SkipReasonCode::Variadic),
@@ -136,6 +139,154 @@ fn unsupported_forms_have_stable_reasons_and_original_source_spans() {
 
     let deep = inspect(&scanner, &fixture("analysis_budget.h"), &[], None).unwrap();
     assert_skip(&analyze(&deep, "ANALYSIS_DEEP"), SkipReasonCode::BudgetExceeded);
+}
+
+#[test]
+fn typed_expression_candidates_preserve_parameters_and_original_c_expression_types() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("analysis_scalar.h");
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    for name in [
+        "ANALYSIS_POINTER",
+        "ANALYSIS_MEMBER",
+        "ANALYSIS_SUBSCRIPT",
+        "ANALYSIS_MUTATION",
+        "ANALYSIS_ASSIGN",
+        "ANALYSIS_VARIABLE",
+        "ANALYSIS_CALL",
+    ] {
+        let analysis = analyze(&frontend, name);
+        assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{name}: {analysis:?}");
+        let expression = analysis.expression.as_ref().expect("candidate retains its shared IR");
+        assert!(
+            expression.syntax.nodes.iter().any(|node| match (&node.kind, name) {
+                (ExpressionKind::Dereference { .. }, "ANALYSIS_POINTER") => true,
+                (ExpressionKind::Member { field, indirect: true, .. }, "ANALYSIS_MEMBER") =>
+                    field == "field",
+                (ExpressionKind::Index { .. }, "ANALYSIS_SUBSCRIPT") => true,
+                (
+                    ExpressionKind::Update { increment: true, postfix: false, .. },
+                    "ANALYSIS_MUTATION",
+                ) => true,
+                (ExpressionKind::Assignment { operator: None, .. }, "ANALYSIS_ASSIGN") => true,
+                (ExpressionKind::Identifier { name: symbol }, "ANALYSIS_VARIABLE") =>
+                    symbol == "front_const_variable",
+                (ExpressionKind::Call { arguments, .. }, "ANALYSIS_CALL") => arguments.len() == 1,
+                _ => false,
+            }),
+            "{name} must preserve its C operation in the shared IR"
+        );
+        if matches!(name, "ANALYSIS_POINTER" | "ANALYSIS_MEMBER" | "ANALYSIS_SUBSCRIPT") {
+            assert!(matches!(expression.types[expression.syntax.root], TypeExpression::Deferred));
+        }
+        assert_eq!(analysis.parameters.len(), 1);
+        assert!(analysis.parameters[0].uses.iter().all(|usage| usage.grouped));
+        assert_eq!(analysis.invocation, InvocationContract::ParenthesizedScalarExpressions);
+    }
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        r#"
+#define TYPE_IS(value, type) _Static_assert(_Generic((value), type: 1, default: 0), #value)
+void verify_original_types(void) {
+    int value = 0;
+    int array[3] = {0};
+    struct { int field; } record = {0};
+    TYPE_IS(ANALYSIS_POINTER(&value), int);
+    TYPE_IS(ANALYSIS_MEMBER(&record), int);
+    TYPE_IS(ANALYSIS_SUBSCRIPT(array), int);
+    TYPE_IS(ANALYSIS_MUTATION(value), int);
+    TYPE_IS(ANALYSIS_ASSIGN(value), int);
+    TYPE_IS(ANALYSIS_VARIABLE(value), int);
+    TYPE_IS(ANALYSIS_CALL(value), int);
+}
+
+"#,
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty());
+}
+
+#[test]
+fn type_argument_casts_retain_deferred_types_and_concrete_pointer_casts_use_compiler_facts() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let scalar = inspect(&scanner, &fixture("analysis_scalar.h"), &[], None).unwrap();
+    let analysis = analyze(&scalar, "ANALYSIS_TYPE_PARAMETER");
+    assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{analysis:?}");
+    let expression = analysis.expression.as_ref().expect("candidate retains its shared IR");
+    let (cast, operand) = expression
+        .syntax
+        .nodes
+        .iter()
+        .enumerate()
+        .find_map(|(index, node)| match node.kind {
+            ExpressionKind::TypeParameterCast {
+                parameter: 0,
+                pointers: 0,
+                is_const: false,
+                operand,
+            } => Some((index, operand)),
+            _ => None,
+        })
+        .expect("the type argument remains a symbolic cast, not a sampled signature");
+    assert!(matches!(expression.types[cast], TypeExpression::Deferred));
+    assert!(matches!(expression.syntax.nodes[operand].kind, ExpressionKind::Group { .. }));
+    assert_eq!(analysis.parameters[0].constraint, None);
+    assert_eq!(analysis.parameters[0].roles, [ParameterRole::Type]);
+    assert_eq!(analysis.parameters[0].uses.len(), 1);
+    assert_eq!(analysis.parameters[1].uses.len(), 1);
+    assert!(analysis.parameters[1].uses[0].grouped);
+
+    let header = fixture("expression_oracle.h");
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let analysis = analyze(&frontend, "EXPR_POINTER_CAST");
+    assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{analysis:?}");
+    let expression = analysis.expression.as_ref().unwrap();
+    let TypeExpression::External { ty } = &expression.types[expression.syntax.root] else {
+        panic!("the concrete pointer cast needs its original compiler type: {expression:?}");
+    };
+    assert_eq!(ty.category, TypeCategory::Pointer);
+    assert_eq!(ty.canonical_spelling, "char *");
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        "_Static_assert(_Generic(EXPR_POINTER_CAST((void *) 0), char *: 1, default: 0), \"original cast type\");\n",
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty());
+}
+
+#[test]
+fn ungrouped_parameter_uses_require_atomic_arguments_without_changing_the_c_body() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("expression_oracle.h");
+    let frontend = inspect(&scanner, &header, &[], None).expect("inspect original atomic macro");
+    let analysis = analyze(&frontend, "EXPR_ATOMIC_POW2");
+    assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{analysis:?}");
+    assert_eq!(analysis.invocation, InvocationContract::AtomicArguments);
+    assert_eq!(analysis.parameters[0].constraint, Some(InputConstraint::IntegerScalar));
+    assert_eq!(analysis.parameters[0].uses.len(), 3);
+    assert!(!analysis.parameters[0].uses[0].grouped);
+    assert!(analysis.parameters[0].uses[1..].iter().all(|usage| usage.grouped));
+
+    // Unrestricted C substitution really changes grouping, even though the entire
+    // macro body is parenthesized. The Rust matcher must reject this argument shape.
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        r#"
+_Static_assert(EXPR_ATOMIC_POW2(1 ? 7 : 2) != EXPR_ATOMIC_POW2((1 ? 7 : 2)), "textual argument grouping affects semantics");
+_Static_assert(EXPR_ATOMIC_POW2(16) == EXPR_ATOMIC_POW2((16)), "atomic grouping preserves semantics");
+"#,
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty());
 }
 
 #[test]
@@ -247,7 +398,17 @@ fn attributed_integer_typedefs_and_their_aliases_need_a_separate_semantic_contra
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().unwrap();
     let frontend = inspect(&scanner, &fixture("analysis_profile.h"), &[], None).unwrap();
-    for name in ["ANALYSIS_ATTRIBUTED", "ANALYSIS_ATTRIBUTED_ALIAS"] {
+    for name in ["AnalysisAttributed", "AnalysisAttributedAlias"] {
+        assert_eq!(frontend.declarations().types[name].category, TypeCategory::Other);
+    }
+    let names = ["ANALYSIS_ATTRIBUTED", "ANALYSIS_ATTRIBUTED_ALIAS"];
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    for name in names {
         assert_skip(&analyze(&frontend, name), SkipReasonCode::UnsupportedType);
+        let emission = emit(&session, name);
+        let EmissionStatus::Skipped { reason } = emission.status else {
+            panic!("unmodeled attributed typedef {name} must not emit: {emission:?}");
+        };
+        assert_eq!(reason.code, SkipReasonCode::UnsupportedType, "{name}: {reason:?}");
     }
 }
