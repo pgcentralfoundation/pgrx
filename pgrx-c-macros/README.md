@@ -253,6 +253,12 @@ The typed expression support also covers:
 - Direct `__builtin_expect` calls with a compiler-verified `long(long, long)`
   prototype and result identity. Both operands are evaluated and converted as
   in C; the generated expression returns the first and omits the compiler hint.
+- Closed token pastes resolved by Clang, including literal suffixes and fixed
+  type, field, function, enum and helper names. Separate compiler probes reject
+  pastes that depend on caller operands and discover synthesized dependencies
+  before rescanning can hide them. Empty-side pastes that preserve an operand
+  unchanged are supported. The validation currently recognizes upstream Clang
+  versions 6 through 21 and fails closed on unfamiliar diagnostics.
 - C enums whose compatible integer representation is established by Clang,
   including values without a named Rust enum variant.
 - `float` and `double` where the compiler profile establishes the modeled IEEE
@@ -275,7 +281,7 @@ Native adapters convert arguments and check nullable function pointers before
 entering that guard, and decode results after leaving it.
 
 Other statements and initialization constructs, variadic arguments, stringification,
-token pasting, unsupported compiler constructs and unmodeled literals remain
+operand-dependent token pasting, unsupported compiler constructs and unmodeled literals remain
 explicit skips. Parser and type limitations are reported as skips. Referenced
 declarations and the final macro environment must match the inspection.
 Compatible function pointer types

@@ -17,6 +17,7 @@ use std::collections::{BTreeMap, BTreeSet};
 pub struct AnalysisSession<'a> {
     frontend: &'a FrontendOutput,
     expansions: ExpansionBatch,
+    dependencies: Option<crate::MacroDependencyGraph>,
     integer_constants: BTreeMap<String, IntegerConstant>,
     integer_zero_constants: BTreeMap<String, BTreeSet<crate::NodeId>>,
 }
@@ -49,9 +50,15 @@ impl<'a> AnalysisSession<'a> {
         crate::frontend::verify_input_files(&frontend.profile().inputs)?;
         crate::expansion::verify_environment(frontend)?;
         let integer_constants = integer_constants?;
+        let dependencies = (!expansions.discovered_dependencies.is_empty()).then(|| {
+            frontend
+                .dependencies()
+                .with_expansions(&expansions, &frontend.declarations().integer_constants)
+        });
         let mut session = Self {
             frontend,
             expansions,
+            dependencies,
             integer_constants,
             integer_zero_constants: BTreeMap::new(),
         };
@@ -66,6 +73,11 @@ impl<'a> AnalysisSession<'a> {
 
     pub fn expansions(&self) -> &ExpansionBatch {
         &self.expansions
+    }
+
+    /// Lexical references augmented with this batch's compiler-resolved references.
+    pub fn dependencies(&self) -> &crate::MacroDependencyGraph {
+        self.dependencies.as_ref().unwrap_or_else(|| self.frontend.dependencies())
     }
 
     /// Referenced object macros whose integer types and values were resolved by Clang.

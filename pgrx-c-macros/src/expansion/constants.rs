@@ -39,6 +39,24 @@ pub(crate) fn retain_integer_constants(
     batch: &mut ExpansionBatch,
     limits: ExpansionLimits,
 ) -> Result<BTreeMap<String, IntegerConstant>, FrontendError> {
+    // Record pasted enum references before retained object bindings can hide
+    // them. Ordinary references already have lexical edges; flattening those
+    // would replace the original dependency paths in skip explanations.
+    for result in batch.results.values() {
+        let ExpansionResult::Expanded { expansion } = result else { continue };
+        if !batch.discovered_dependencies.contains_key(&expansion.name) {
+            continue;
+        }
+        let (_, start) =
+            parameters(&expansion.definition).expect("prepared function signatures remain intact");
+        record_integer_references(
+            frontend,
+            &expansion.name,
+            &expansion.definition.tokens[start..],
+            &expansion.symbolic_parameters,
+            &mut batch.discovered_dependencies,
+        );
+    }
     let names = batch
         .results
         .values()
@@ -75,18 +93,32 @@ pub(crate) fn retain_integer_constants(
     let directory = ProbeDirectory::new()?;
     verify_original_environment(scanner, frontend, &directory.0, &original, &batch.inputs)?;
     let prefix = namespace(frontend);
-    let mut source = original.clone();
+    let mut source_bytes = original.len();
     let mut prepared = Vec::new();
+    let mut dependencies =
+        super::Dependencies { frontend, nodes: HashMap::new(), tokens: 0, limits };
     for (index, name) in names.iter().enumerate() {
-        let definition = &frontend.environment().active[name].definition;
+        let (active_name, active) = frontend
+            .environment()
+            .active
+            .get_key_value(name)
+            .expect("object dependencies are active macros");
+        let definition = &active.definition;
+        let (closure, pastes) = match dependencies.closure(active_name) {
+            Ok(closure) => closure,
+            Err(reason) => {
+                rejected.insert(name.clone(), reason.message);
+                continue;
+            }
+        };
         let begin = format!("{prefix}constant_begin_{index}");
         let end = format!("{prefix}constant_end_{index}");
         let invocation = format!("{begin}\n{name}\n{end}\n");
-        if source.len().saturating_add(invocation.len()) > limits.source_bytes {
+        if source_bytes.saturating_add(invocation.len()) > limits.source_bytes {
             rejected.insert(name.clone(), "constant expansion exceeds its source budget".into());
             continue;
         }
-        source.extend_from_slice(invocation.as_bytes());
+        source_bytes += invocation.len();
         prepared.push(Prepared {
             definition,
             parameters: Vec::new(),
@@ -94,8 +126,68 @@ pub(crate) fn retain_integer_constants(
             markers: Vec::new(),
             begin,
             end,
-            dependencies: Vec::new(),
+            dependencies: closure,
+            pastes,
         });
+    }
+    let mut proof =
+        super::paste::prove(frontend, &directory.0, &original, &prefix, &prepared, limits)?;
+    for (&index, references) in &proof.dependencies {
+        batch
+            .discovered_dependencies
+            .entry(prepared[index].definition.name.clone())
+            .or_default()
+            .extend(references.iter().cloned());
+        let mut merged = prepared[index]
+            .dependencies
+            .iter()
+            .map(|dependency| dependency.name.clone())
+            .collect::<BTreeSet<_>>();
+        for reference in references {
+            let (active_name, _) = frontend
+                .environment()
+                .active
+                .get_key_value(reference)
+                .expect("paste discovery returns active macro names");
+            match dependencies.closure(active_name) {
+                Ok((closure, _)) => {
+                    merged.insert(reference.clone());
+                    merged.extend(closure.into_iter().map(|dependency| dependency.name));
+                }
+                Err(reason) => {
+                    proof.rejected.insert(index, (reason.code, reason.message));
+                    break;
+                }
+            }
+        }
+        if merged.len().saturating_add(1) > limits.dependencies_per_macro {
+            proof.rejected.insert(
+                index,
+                (
+                    super::ExpansionSkipCode::BudgetExceeded,
+                    "synthesized object-macro dependencies exceed their budget".into(),
+                ),
+            );
+        }
+    }
+    for (&index, (_, reason)) in &proof.rejected {
+        rejected.insert(prepared[index].definition.name.clone(), reason.clone());
+    }
+    prepared = prepared
+        .into_iter()
+        .enumerate()
+        .filter_map(|(index, item)| (!proof.rejected.contains_key(&index)).then_some(item))
+        .collect();
+    // Rebuild without the rejected probes; use only this clean ordinary output.
+    let mut source = original.clone();
+    for item in &prepared {
+        source.extend_from_slice(
+            format!("{}\n{}\n{}\n", item.begin, item.definition.name, item.end).as_bytes(),
+        );
+    }
+    if prepared.is_empty() {
+        record_fallbacks(batch, &rejected);
+        return Ok(BTreeMap::new());
     }
     let bodies = match expand_bodies(scanner, frontend, &directory.0, &source, &prepared, limits) {
         Ok(bodies) => bodies,
@@ -109,6 +201,15 @@ pub(crate) fn retain_integer_constants(
     let mut supported = BTreeMap::new();
     for (item, tokens) in prepared.iter().zip(bodies) {
         let name = &item.definition.name;
+        if item.pastes {
+            record_integer_references(
+                frontend,
+                name,
+                &tokens,
+                &[],
+                &mut batch.discovered_dependencies,
+            );
+        }
         if let Err(reason) = crate::analysis::validate_constant_expression(frontend, &tokens) {
             rejected.insert(
                 name.clone(),
@@ -160,6 +261,28 @@ pub(crate) fn retain_integer_constants(
 fn reject_all(names: &BTreeSet<String>, rejected: &mut BTreeMap<String, String>, reason: &str) {
     for name in names {
         rejected.insert(name.clone(), reason.into());
+    }
+}
+
+fn record_integer_references(
+    frontend: &FrontendOutput,
+    name: &str,
+    tokens: &[Token],
+    parameters: &[String],
+    references: &mut BTreeMap<String, BTreeSet<String>>,
+) {
+    let Ok(expression) = crate::syntax::parse_expression(tokens, parameters, |name| {
+        frontend.declarations().types.contains_key(name)
+    }) else {
+        return;
+    };
+    for node in expression.nodes {
+        if let crate::ExpressionKind::Identifier { name: reference } = node.kind
+            && !frontend.environment().active.contains_key(&reference)
+            && frontend.declarations().integer_constants.contains_key(&reference)
+        {
+            references.entry(name.into()).or_default().insert(reference);
+        }
     }
 }
 
@@ -478,7 +601,7 @@ fn mask_constants(
     let mut source = original.to_vec();
     let mut markers = HashMap::new();
     for (index, name) in eligible.keys().enumerate() {
-        let marker = format!("{prefix}constant_ref_{index}");
+        let marker = super::constant_marker(prefix, index);
         let definition = format!("#undef {name}\n#define {name} {marker}\n");
         if source.len().saturating_add(definition.len()) > limits.source_bytes {
             for name in eligible.keys() {
@@ -523,6 +646,7 @@ fn mask_constants(
             begin,
             end,
             dependencies: Vec::new(),
+            pastes: false,
         });
     }
     let bodies = if source.len() > limits.source_bytes {
@@ -572,7 +696,14 @@ fn mask_constants(
             || total_tokens > limits.total_tokens
             || !reconstructed.into_iter().eq(expected)
         {
-            for name in retained {
+            let affected = expansion
+                .dependencies
+                .iter()
+                .map(|dependency| dependency.name.as_str())
+                .filter(|name| eligible.contains_key(*name))
+                .chain(retained.iter().copied())
+                .collect::<BTreeSet<_>>();
+            for name in affected {
                 expansion.constant_fallbacks.push(ConstantFallback {
                     name: name.into(),
                     reason: "retaining this constant did not reproduce the original compiler-expanded token stream".into(),

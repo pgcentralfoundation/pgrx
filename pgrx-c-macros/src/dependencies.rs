@@ -2,19 +2,22 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! One shared graph of lexical references among final active macro definitions.
+//! Conservative references among final active macros and compiler-resolved constants.
 
-use crate::{IntegerConstant, MacroDefinition, MacroEnvironment, MacroKind, TokenKind};
+use crate::{
+    ExpansionBatch, IntegerConstant, MacroDefinition, MacroEnvironment, MacroKind, TokenKind,
+};
 use petgraph::Direction::{Incoming, Outgoing};
 use petgraph::graph::{DiGraph, NodeIndex};
 use serde::Serialize;
-use std::collections::{BTreeMap, HashSet, VecDeque};
+use std::collections::{BTreeMap, BTreeSet, HashSet, VecDeque};
 
 /// Conservative macro references, including object macros and external context.
 ///
 /// An edge runs from a macro to an active macro named in its replacement tokens.
 /// Formal parameters, comments and literals never create edges. A lexical edge
 /// does not prove that preprocessing expands the referenced macro at an invocation.
+/// Prepared sessions also add dependencies synthesized by compiler token pasting.
 #[derive(Clone, Debug)]
 pub struct MacroDependencyGraph {
     // Nodes remain in lexical name order; no node can be inserted or removed
@@ -36,6 +39,49 @@ pub struct MacroDependencyImpact {
 }
 
 impl MacroDependencyGraph {
+    /// Keep the inspected lexical graph immutable, adding the compiler's
+    /// synthesized references for this prepared batch. Rebuild sorted edges so
+    /// dependency explanations stay deterministic after augmentation.
+    pub(crate) fn with_expansions(
+        &self,
+        batch: &ExpansionBatch,
+        constants: &BTreeMap<String, IntegerConstant>,
+    ) -> Self {
+        let mut edges = self
+            .graph
+            .raw_edges()
+            .iter()
+            .map(|edge| (edge.source().index(), edge.target().index()))
+            .collect::<BTreeSet<_>>();
+        let mut users = self
+            .constant_users
+            .iter()
+            .map(|(name, nodes)| (name.clone(), nodes.iter().copied().collect::<BTreeSet<_>>()))
+            .collect::<BTreeMap<_, _>>();
+        for (name, references) in &batch.discovered_dependencies {
+            let Some(caller) = self.node(name) else { continue };
+            for reference in references {
+                if let Some(target) = self.node(reference) {
+                    edges.insert((caller.index(), target.index()));
+                } else if constants.contains_key(reference) {
+                    users.entry(reference.clone()).or_default().insert(caller);
+                }
+            }
+        }
+        let mut graph = self.graph.clone();
+        graph.clear_edges();
+        for (caller, target) in edges.into_iter().rev() {
+            graph.add_edge(NodeIndex::new(caller), NodeIndex::new(target), ());
+        }
+        Self {
+            graph,
+            constant_users: users
+                .into_iter()
+                .map(|(name, users)| (name, users.into_iter().collect()))
+                .collect(),
+        }
+    }
+
     #[cfg(test)]
     pub(crate) fn from_environment(environment: &MacroEnvironment) -> Self {
         Self::from_environment_with_constants(environment, &BTreeMap::new())
@@ -97,7 +143,7 @@ impl MacroDependencyGraph {
         self.graph.node_count()
     }
 
-    /// Number of distinct directed lexical references.
+    /// Number of distinct directed macro references.
     pub fn edge_count(&self) -> usize {
         self.graph.edge_count()
     }

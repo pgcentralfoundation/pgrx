@@ -2329,6 +2329,7 @@ dependencies = [
  "pgrx-macros",
  "pgrx-sql-entity-graph",
  "serde",
+ "serde_json",
 ]
 
 [[package]]

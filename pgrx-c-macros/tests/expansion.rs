@@ -136,6 +136,24 @@ fn clang_expands_nested_late_prescanned_rescanned_and_suppressed_macros_as_one_b
 }
 
 #[test]
+fn malformed_ordinary_probes_are_isolated_before_using_clean_output() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("ordinary-errors.h");
+    std::fs::write(
+        &header,
+        "#define EXPECTS_TWO(a,b) ((a)+(b))\n#define BAD(x) EXPECTS_TWO(x)\n#define HEALTHY(x) ((x)+1)\n",
+    )
+    .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let batch = prepare_expansions(&scanner, &frontend, &["BAD", "HEALTHY"]).unwrap();
+    assert_skip(&batch, "BAD", ExpansionSkipCode::CompilerRejected);
+    assert_eq!(body(expanded(&batch, "HEALTHY")), ["(", "(", "x", ")", "+", "1", ")"]);
+    assert_eq!(expanded(&batch, "HEALTHY").occurrences.len(), 1);
+}
+
+#[test]
 fn parameter_markers_do_not_invent_grouping_and_cannot_collide_with_header_symbols() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().unwrap();
@@ -230,6 +248,128 @@ fn expansion_budgets_and_compiler_rejection_are_structured_skips() {
     }
     let batch = prepare_expansions(&scanner, &frontend, &["EXP_BAD_ARITY"]).unwrap();
     assert_skip(&batch, "EXP_BAD_ARITY", ExpansionSkipCode::CompilerRejected);
+}
+
+#[test]
+fn closed_pastes_reject_erased_operands_dynamic_helpers_and_probe_collisions() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("paste.h");
+    let definitions = r#"
+int __paste_native(int);
+#define CAT(a,b) a##b
+#define CAT3(a,b,c) a##b##c
+#define DROP(x) 0
+#define PRESCAN(x) DROP(x)
+#define UNPAREN(x) x
+#define STRIP(x) UNPAREN x
+#define P_STRING(x) #x
+#define P_VARIADIC(...) 0
+#define pre___pgrx_c_expand_0_parameter_0_0 99
+#define P_CLOSED(x) ((x)+CAT(0xFF,U))
+#define P_REAL(x) CAT(__paste_,native)(x)
+#define P_EMPTY_LEFT(x) (CAT(,x))
+#define P_EMPTY_RIGHT(x) (CAT(x,))
+#define P_ERASED_PREFIX(x) PRESCAN(CAT(prefix_,x))
+#define P_ERASED_SUFFIX(x) PRESCAN(CAT(x,_suffix))
+#define P_ERASED_STRIP(x) PRESCAN(CAT(STRIP(x),_suffix))
+#define P_HIDDEN_COUNTER(x) PRESCAN(CAT(__COUN,TER__))
+#define P_HIDDEN_LINE(x) CAT(__LI,NE__)
+#define P_HIDDEN_PRAGMA(x) PRESCAN(CAT(_Pr,agma)("GCC poison P_CLOSED"))
+#define P_HIDDEN_QUERY(x) PRESCAN(CAT(__has_in,clude)("never-created.h"))
+#define P_UNKNOWN(x) CAT(__builtin_,constant_p)(x)
+#define P_SYNTH_STRING(x) PRESCAN(CAT(P_STR,ING)(x))
+#define P_SYNTH_VARIADIC(x) PRESCAN(CAT(P_VARI,ADIC)(x))
+#define P_FORGED_PARAMETER(x) PRESCAN(CAT3(__pgrx_,c_expand_1_,parameter_0_0))
+#define P_FORGED_BOUNDARY(x) PRESCAN(CAT3(__pgrx_,c_expand_1_,end_0))
+#define P_FORGED_CONSTANT(x) PRESCAN(CAT3(__pgrx_,c_expand_1_,c0))
+#pragma clang diagnostic ignored "-Winvalid-token-paste"
+#pragma clang diagnostic ignored "-Wgnu-line-marker"
+"#;
+    // Preserve real definition provenance, then leave the original main file in
+    // system-header status. The generator must reset that status for its probes.
+    std::fs::write(&header, format!("{definitions}\n# 1 {:?} 3\n", header.to_str().unwrap()))
+        .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let good = ["P_CLOSED", "P_REAL", "P_EMPTY_LEFT", "P_EMPTY_RIGHT"];
+    let bad = [
+        "P_ERASED_PREFIX",
+        "P_ERASED_SUFFIX",
+        "P_ERASED_STRIP",
+        "P_HIDDEN_COUNTER",
+        "P_HIDDEN_LINE",
+        "P_HIDDEN_PRAGMA",
+        "P_HIDDEN_QUERY",
+        "P_UNKNOWN",
+        "P_SYNTH_STRING",
+        "P_SYNTH_VARIADIC",
+        "P_FORGED_PARAMETER",
+        "P_FORGED_BOUNDARY",
+        "P_FORGED_CONSTANT",
+    ];
+    for arguments in [
+        vec!["-std=c17".into()],
+        vec!["-std=c17".into(), "-fms-extensions".into(), "-Wno-everything".into()],
+        vec!["-std=c17".into(), "-Werror".into()],
+        vec!["-std=c17".into(), "-pedantic-errors".into()],
+    ] {
+        let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+        let original = frontend.inventory().clone();
+        let names = good.iter().chain(&bad).copied().collect::<Vec<_>>();
+        let batch = prepare_expansions(&scanner, &frontend, &names).unwrap();
+        for name in good {
+            let expansion = expanded(&batch, name);
+            assert_eq!(expansion.occurrences.len(), 1, "{name}: {arguments:?}");
+            assert!(expansion.symbolic_parameters[0].starts_with("__pgrx_c_expand_1_"));
+        }
+        assert!(body(expanded(&batch, "P_CLOSED")).contains(&"0xFFU"));
+        for name in bad {
+            let ExpansionResult::Skipped { reason } = &batch.results[name] else {
+                panic!("{name} must reject under {arguments:?}");
+            };
+            assert!(!reason.message.is_empty());
+            assert!(!reason.spans.is_empty());
+        }
+        for (name, helper, code) in [
+            ("P_SYNTH_STRING", "P_STRING", ExpansionSkipCode::Stringification),
+            ("P_SYNTH_VARIADIC", "P_VARIADIC", ExpansionSkipCode::Variadic),
+        ] {
+            assert_skip(&batch, name, code);
+            let ExpansionResult::Skipped { reason } = &batch.results[name] else { unreachable!() };
+            assert_eq!(reason.dependency.as_deref(), Some(helper));
+            assert_eq!(reason.spans.len(), 2);
+        }
+        assert_eq!(frontend.inventory(), &original);
+        assert!(!frontend.environment().active.keys().any(|name| name.contains("paste_forbidden")));
+    }
+}
+
+#[test]
+fn malformed_paste_probes_cannot_swallow_a_later_operand_validation() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("swallowed.h");
+    std::fs::write(
+        &header,
+        r#"
+#define CAT(a,b) a##b
+#define ARG(x) x
+#define OPEN() ARG(
+#define DROP(x) 0
+#define PRESCAN(x) DROP(x)
+#define A_OPEN(x) CAT(0,U) OPEN()
+#define B_ERASED(x) PRESCAN(CAT(x,_suffix))
+#define C_HEALTHY(x) ((x)+CAT(1,U))
+"#,
+    )
+    .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let batch =
+        prepare_expansions(&scanner, &frontend, &["A_OPEN", "B_ERASED", "C_HEALTHY"]).unwrap();
+    assert_skip(&batch, "A_OPEN", ExpansionSkipCode::TokenPaste);
+    assert_skip(&batch, "B_ERASED", ExpansionSkipCode::TokenPaste);
+    assert_eq!(expanded(&batch, "C_HEALTHY").occurrences.len(), 1);
 }
 
 #[test]
