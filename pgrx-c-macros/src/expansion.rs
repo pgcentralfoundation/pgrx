@@ -19,13 +19,19 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 
 mod constants;
+mod paste;
 pub(crate) use constants::retain_integer_constants;
+
+const PROBE_PRAGMAS: &str = "\n\n#pragma clang diagnostic ignored \"-Wgnu-line-marker\"\n#pragma clang diagnostic error \"-Winvalid-token-paste\"\n";
 
 const NAMESPACE: &str = "__pgrx_c_expand_";
 
 #[derive(Clone, Debug, Serialize)]
 pub struct ExpansionBatch {
     pub results: BTreeMap<String, ExpansionResult>,
+    /// Additional macro and integer-constant references observed during preprocessing.
+    /// Empty entries identify candidates checked for closed token pasting.
+    pub discovered_dependencies: BTreeMap<String, BTreeSet<String>>,
     /// Expansion consumes the inspected inputs; temporary probe files are not build inputs.
     pub inputs: BuildInputs,
 }
@@ -159,6 +165,7 @@ pub(crate) fn prepare_inner(
     limits: ExpansionLimits,
 ) -> Result<ExpansionBatch, FrontendError> {
     let mut results = BTreeMap::new();
+    let mut discovered_dependencies = BTreeMap::new();
     let mut dependencies = Dependencies { frontend, nodes: HashMap::new(), tokens: 0, limits };
     let names = names.iter().map(|name| name.as_ref().to_owned()).collect::<BTreeSet<_>>();
     let file = std::fs::File::open(&frontend.profile().header).map_err(|source| {
@@ -188,12 +195,18 @@ pub(crate) fn prepare_inner(
                 frontend,
             );
         }
-        return Ok(ExpansionBatch { results, inputs: frontend.profile().inputs.clone() });
+        return Ok(ExpansionBatch {
+            results,
+            discovered_dependencies,
+            inputs: frontend.profile().inputs.clone(),
+        });
     }
+    let directory = ProbeDirectory::new()?;
     let prefix = namespace(frontend);
-    let mut source = original.clone();
-    // Two newlines isolate the probes from a possible final line splice/comment.
-    source.extend_from_slice(b"\n\n");
+    let mut source_bytes = original.len();
+    // Separate a possible final splice/comment, and enforce the validation
+    // diagnostic after any header pragmas under MS compatibility modes too.
+    source_bytes = source_bytes.saturating_add(PROBE_PRAGMAS.len());
     let mut prepared = Vec::new();
     for name in names {
         let Some((active_name, active)) = frontend.environment().active.get_key_value(&name) else {
@@ -245,7 +258,7 @@ pub(crate) fn prepare_inner(
                 continue;
             }
         };
-        let closure = match dependencies.closure(active_name) {
+        let (closure, pastes) = match dependencies.closure(active_name) {
             Ok(closure) => closure,
             Err(reason) => {
                 record_skip(&mut results, &name, reason, frontend);
@@ -260,8 +273,10 @@ pub(crate) fn prepare_inner(
             .collect::<Vec<_>>();
         let begin = format!("{prefix}begin_{index}");
         let end = format!("{prefix}end_{index}");
-        let invocation = format!("{begin}\n{name}({})\n{end}\n", markers.join(","));
-        if source.len().saturating_add(invocation.len()) > limits.source_bytes {
+        let tag = probe_tag(&directory.0, index)?;
+        // GNU markers without flags reset inherited system-header status.
+        let invocation = format!("# 1 {tag:?}\n{begin}\n{name}({})\n{end}\n", markers.join(","));
+        if source_bytes.saturating_add(invocation.len()) > limits.source_bytes {
             record_skip(
                 &mut results,
                 &name,
@@ -275,7 +290,7 @@ pub(crate) fn prepare_inner(
             );
             continue;
         }
-        source.extend_from_slice(invocation.as_bytes());
+        source_bytes += invocation.len();
         prepared.push(Prepared {
             definition: &active.definition,
             parameters,
@@ -284,60 +299,102 @@ pub(crate) fn prepare_inner(
             begin,
             end,
             dependencies: closure,
+            pastes,
         });
     }
     let inputs = frontend.profile().inputs.clone();
     if prepared.is_empty() {
-        return Ok(ExpansionBatch { results, inputs });
+        return Ok(ExpansionBatch { results, discovered_dependencies, inputs });
     }
-    let directory = ProbeDirectory::new()?;
     verify_original_environment(scanner, frontend, &directory.0, &original, &inputs)?;
-    let path = directory.0.join("expansion.c");
-    std::fs::write(&path, source)
-        .map_err(|source| FrontendError::CompilerIo { compiler: path.clone(), source })?;
-    let overlay = overlay(&directory.0, &frontend.profile().header, &path)?;
-    let mut arguments = frontend.profile().arguments.clone();
-    arguments.extend([
-        "-ivfsoverlay".into(),
-        overlay
-            .to_str()
-            .ok_or_else(|| FrontendError::Arguments("probe path is not UTF-8".into()))?
-            .into(),
-    ]);
-    let output = match crate::frontend::preprocess(
-        &frontend.profile().compiler.executable,
-        &frontend.profile().header,
-        &arguments,
-        &["-E", "-P"],
-    ) {
-        Ok(output) => output,
-        Err(FrontendError::CompilerFailed { diagnostics, .. }) => {
-            skip_prepared(
+    let proof = paste::prove(frontend, &directory.0, &original, &prefix, &prepared, limits)?;
+    let mut rejected = proof.rejected;
+    for (&index, discovered) in &proof.dependencies {
+        let item = &mut prepared[index];
+        discovered_dependencies.insert(item.definition.name.clone(), discovered.clone());
+        let mut merged = item
+            .dependencies
+            .iter()
+            .map(|dependency| (dependency.name.clone(), dependency.clone()))
+            .collect::<BTreeMap<_, _>>();
+        for name in discovered {
+            let (active_name, active) = frontend
+                .environment()
+                .active
+                .get_key_value(name)
+                .expect("paste proof only returns active macro identifiers");
+            match dependencies.closure(active_name) {
+                Ok((closure, _)) => {
+                    merged.insert(
+                        name.clone(),
+                        ExpansionDependency {
+                            name: name.clone(),
+                            kind: active.definition.kind,
+                            provenance: active.definition.provenance.clone(),
+                        },
+                    );
+                    merged.extend(
+                        closure.into_iter().map(|dependency| (dependency.name.clone(), dependency)),
+                    );
+                }
+                Err(reason) => {
+                    record_skip(&mut results, &item.definition.name, reason, frontend);
+                    rejected.insert(
+                        index,
+                        (
+                            ExpansionSkipCode::CompilerRejected,
+                            "synthesized dependency failed admission".into(),
+                        ),
+                    );
+                    break;
+                }
+            }
+        }
+        if merged.len().saturating_add(1) > limits.dependencies_per_macro {
+            rejected.insert(
+                index,
+                (
+                    ExpansionSkipCode::BudgetExceeded,
+                    "synthesized macro dependency closure exceeds its budget".into(),
+                ),
+            );
+        }
+        item.dependencies = merged.into_values().collect();
+    }
+    for (&index, (code, message)) in &rejected {
+        let item = &prepared[index];
+        // Keep the precise helper provenance rejection from closure inspection.
+        if !results.contains_key(&item.definition.name) {
+            record_skip(
                 &mut results,
-                &prepared,
-                ExpansionSkipCode::CompilerRejected,
-                format!("Clang rejected the symbolic batch: {diagnostics}"),
+                &item.definition.name,
+                skip(*code, message, Some(&item.definition.name), frontend),
                 frontend,
             );
-            return Ok(ExpansionBatch { results, inputs });
         }
-        Err(FrontendError::OutputLimit(_) | FrontendError::Timeout(_)) => {
-            skip_prepared(
-                &mut results,
-                &prepared,
-                ExpansionSkipCode::BudgetExceeded,
-                "symbolic preprocessing exceeded its output or time budget".into(),
-                frontend,
-            );
-            return Ok(ExpansionBatch { results, inputs });
-        }
-        Err(error) => return Err(error),
+    }
+    prepared = prepared
+        .into_iter()
+        .enumerate()
+        .filter_map(|(index, item)| (!rejected.contains_key(&index)).then_some(item))
+        .collect();
+    let Some((prepared, output)) = preprocess_prepared(
+        frontend,
+        &directory.0,
+        &original,
+        prepared,
+        limits,
+        proof.runs,
+        &mut results,
+    )?
+    else {
+        return Ok(ExpansionBatch { results, discovered_dependencies, inputs });
     };
-    let bodies = match extract_bodies(&output.stdout, &prepared, limits.expanded_bytes) {
+    let bodies = match extract_bodies(&output, &prepared, limits.expanded_bytes) {
         Ok(bodies) => bodies,
         Err((code, message)) => {
             skip_prepared(&mut results, &prepared, code, message, frontend);
-            return Ok(ExpansionBatch { results, inputs });
+            return Ok(ExpansionBatch { results, discovered_dependencies, inputs });
         }
     };
     let mut snapshot = String::new();
@@ -394,7 +451,7 @@ pub(crate) fn prepare_inner(
             }
         }
         if body.iter().any(|token| {
-            token.spelling.starts_with(&prefix) && !markers.contains_key(token.spelling.as_str())
+            token.spelling.contains(&prefix) && !markers.contains_key(token.spelling.as_str())
         }) {
             record_skip(
                 &mut results,
@@ -402,6 +459,40 @@ pub(crate) fn prepare_inner(
                 skip(
                     ExpansionSkipCode::UnrecognizedOutput,
                     "unexpected probe identifier survived expansion",
+                    Some(&item.definition.name),
+                    frontend,
+                ),
+                frontend,
+            );
+            continue;
+        }
+        if let Some(token) = body.iter().enumerate().find_map(|(index, token)| {
+            if markers.contains_key(token.spelling.as_str()) {
+                return None;
+            }
+            let modeled = frontend.declarations().builtins.contains_key(&token.spelling)
+                || (token.spelling == "__builtin_offsetof"
+                    && frontend.profile().target.offsetof_supported);
+            let reserved_call = token.spelling.starts_with("__")
+                && !frontend.environment().active.contains_key(&token.spelling)
+                && !frontend.declarations().functions.contains_key(&token.spelling)
+                && !modeled
+                && body
+                    .iter()
+                    .skip(index + 1)
+                    .find(|next| next.kind != TokenKind::Comment)
+                    .is_some_and(|next| next.spelling == "(");
+            (dynamic_builtin(&token.spelling) || reserved_call).then_some(token)
+        }) {
+            record_skip(
+                &mut results,
+                &item.definition.name,
+                skip(
+                    ExpansionSkipCode::DynamicBuiltin,
+                    format!(
+                        "expanded {} needs an explicit compiler/preprocessing semantic contract",
+                        token.spelling
+                    ),
                     Some(&item.definition.name),
                     frontend,
                 ),
@@ -439,7 +530,7 @@ pub(crate) fn prepare_inner(
             },
         );
     }
-    Ok(ExpansionBatch { results, inputs })
+    Ok(ExpansionBatch { results, discovered_dependencies, inputs })
 }
 
 pub(crate) fn verify_environment(frontend: &FrontendOutput) -> Result<(), FrontendError> {
@@ -466,6 +557,160 @@ pub(crate) fn verify_environment(frontend: &FrontendOutput) -> Result<(), Fronte
         }
     }
     Ok(())
+}
+
+fn probe_tag(directory: &Path, index: usize) -> Result<String, FrontendError> {
+    directory
+        .join(format!("probe-{index}"))
+        .to_str()
+        .map(str::to_owned)
+        .ok_or_else(|| FrontendError::Arguments("probe path is not UTF-8".into()))
+}
+
+// Retention and paste validation must use the same finite marker spelling.
+fn constant_marker(prefix: &str, index: usize) -> String {
+    format!("{prefix}c{index}")
+}
+
+/// Remove only uniquely attributed failures, then require a clean compiler pass.
+/// Each retry rebuilds the original main file, so a rejected invocation cannot
+/// alter the macro environment for the accepted batch.
+fn preprocess_prepared<'a>(
+    frontend: &FrontendOutput,
+    directory: &Path,
+    original: &[u8],
+    prepared: Vec<Prepared<'a>>,
+    limits: ExpansionLimits,
+    mut runs: usize,
+    results: &mut BTreeMap<String, ExpansionResult>,
+) -> Result<Option<(Vec<Prepared<'a>>, String)>, FrontendError> {
+    let mut pending = (0..prepared.len()).collect::<BTreeSet<_>>();
+    let path = directory.join("expansion.c");
+    let overlay = overlay(directory, &frontend.profile().header, &path)?;
+    let mut arguments = paste::normalized_arguments(&frontend.profile().arguments);
+    arguments.extend([
+        "-ivfsoverlay".into(),
+        overlay
+            .to_str()
+            .ok_or_else(|| FrontendError::Arguments("probe path is not UTF-8".into()))?
+            .into(),
+    ]);
+    while !pending.is_empty() {
+        if runs >= paste::MAX_CPP_RUNS {
+            for &index in &pending {
+                let item = &prepared[index];
+                record_skip(
+                    results,
+                    &item.definition.name,
+                    skip(
+                        ExpansionSkipCode::BudgetExceeded,
+                        "symbolic preprocessing exhausted its bounded batch retries",
+                        Some(&item.definition.name),
+                        frontend,
+                    ),
+                    frontend,
+                );
+            }
+            return Ok(None);
+        }
+        let mut source = original.to_vec();
+        source.extend_from_slice(PROBE_PRAGMAS.as_bytes());
+        let mut locations = BTreeMap::new();
+        for &index in &pending {
+            let item = &prepared[index];
+            let tag = probe_tag(directory, index)?;
+            let invocation = format!(
+                "# 1 {tag:?}\n{}\n{}({})\n{}\n",
+                item.begin,
+                item.definition.name,
+                item.markers.join(","),
+                item.end
+            );
+            if source.len().saturating_add(invocation.len()) > limits.source_bytes {
+                for &index in &pending {
+                    let item = &prepared[index];
+                    record_skip(
+                        results,
+                        &item.definition.name,
+                        skip(
+                            ExpansionSkipCode::BudgetExceeded,
+                            "symbolic invocation source exceeds its byte budget",
+                            Some(&item.definition.name),
+                            frontend,
+                        ),
+                        frontend,
+                    );
+                }
+                return Ok(None);
+            }
+            source.extend_from_slice(invocation.as_bytes());
+            locations.insert(tag, index);
+        }
+        std::fs::write(&path, source)
+            .map_err(|source| FrontendError::CompilerIo { compiler: path.clone(), source })?;
+        runs += 1;
+        match crate::frontend::preprocess(
+            &frontend.profile().compiler.executable,
+            &frontend.profile().header,
+            &arguments,
+            &["-E", "-P"],
+        ) {
+            Ok(output) => {
+                let selected = prepared
+                    .into_iter()
+                    .enumerate()
+                    .filter_map(|(index, item)| pending.contains(&index).then_some(item))
+                    .collect();
+                return Ok(Some((selected, output.stdout)));
+            }
+            Err(FrontendError::CompilerFailed { diagnostics, .. }) => {
+                let summaries = match paste::failed_probe_summaries(&diagnostics, &locations) {
+                    Ok(summaries) if summaries.keys().all(|index| pending.contains(index)) => {
+                        summaries
+                    }
+                    Err(reason) => pending.iter().map(|&index| (index, reason.clone())).collect(),
+                    _ => pending
+                        .iter()
+                        .map(|&index| (index, "Clang returned an unexpected probe owner".into()))
+                        .collect(),
+                };
+                for (index, message) in summaries {
+                    let item = &prepared[index];
+                    record_skip(
+                        results,
+                        &item.definition.name,
+                        skip(
+                            ExpansionSkipCode::CompilerRejected,
+                            format!("Clang rejected symbolic preprocessing: {message}"),
+                            Some(&item.definition.name),
+                            frontend,
+                        ),
+                        frontend,
+                    );
+                    pending.remove(&index);
+                }
+            }
+            Err(FrontendError::OutputLimit(_) | FrontendError::Timeout(_)) => {
+                for &index in &pending {
+                    let item = &prepared[index];
+                    record_skip(
+                        results,
+                        &item.definition.name,
+                        skip(
+                            ExpansionSkipCode::BudgetExceeded,
+                            "symbolic preprocessing exceeded its output or time budget",
+                            Some(&item.definition.name),
+                            frontend,
+                        ),
+                        frontend,
+                    );
+                }
+                return Ok(None);
+            }
+            Err(error) => return Err(error),
+        }
+    }
+    Ok(None)
 }
 
 fn verify_original_environment(
@@ -662,11 +907,13 @@ struct Prepared<'a> {
     begin: String,
     end: String,
     dependencies: Vec<ExpansionDependency>,
+    pastes: bool,
 }
 
 struct DependencyNode<'a> {
     dependencies: Vec<&'a str>,
     rejection: Option<ExpansionSkip>,
+    pastes: bool,
 }
 
 struct Dependencies<'a> {
@@ -677,9 +924,13 @@ struct Dependencies<'a> {
 }
 
 impl<'a> Dependencies<'a> {
-    fn closure(&mut self, root: &'a str) -> Result<Vec<ExpansionDependency>, ExpansionSkip> {
+    fn closure(
+        &mut self,
+        root: &'a str,
+    ) -> Result<(Vec<ExpansionDependency>, bool), ExpansionSkip> {
         let mut pending = vec![root];
         let mut visited = HashSet::new();
+        let mut pastes = false;
         while let Some(name) = pending.pop() {
             if !visited.insert(name) {
                 continue;
@@ -709,21 +960,25 @@ impl<'a> Dependencies<'a> {
             if let Some(rejection) = &node.rejection {
                 return Err(rejection.clone());
             }
+            pastes |= node.pastes;
             pending.extend(node.dependencies.iter().copied());
         }
         let mut names = visited.into_iter().filter(|name| *name != root).collect::<Vec<_>>();
         names.sort_unstable();
-        Ok(names
-            .into_iter()
-            .map(|name| {
-                let definition = &self.frontend.environment().active[name].definition;
-                ExpansionDependency {
-                    name: name.into(),
-                    kind: definition.kind,
-                    provenance: definition.provenance.clone(),
-                }
-            })
-            .collect())
+        Ok((
+            names
+                .into_iter()
+                .map(|name| {
+                    let definition = &self.frontend.environment().active[name].definition;
+                    ExpansionDependency {
+                        name: name.into(),
+                        kind: definition.kind,
+                        provenance: definition.provenance.clone(),
+                    }
+                })
+                .collect(),
+            pastes,
+        ))
     }
 }
 
@@ -732,6 +987,7 @@ fn inspect_dependency<'a>(frontend: &'a FrontendOutput, name: &'a str) -> Depend
     let reject = |code, message: &str| DependencyNode {
         dependencies: Vec::new(),
         rejection: Some(skip(code, message, Some(name), frontend)),
+        pastes: false,
     };
     match &active.provenance {
         ActiveProvenance::Resolved => {}
@@ -764,6 +1020,7 @@ fn inspect_dependency<'a>(frontend: &'a FrontendOutput, name: &'a str) -> Depend
     }
     let parameters = parameters.iter().map(String::as_str).collect::<HashSet<_>>();
     let mut dependencies = BTreeSet::new();
+    let mut pastes = false;
     let body = &active.definition.tokens[start..];
     for (index, token) in body.iter().enumerate() {
         if token.kind == TokenKind::Comment || parameters.contains(token.spelling.as_str()) {
@@ -771,7 +1028,8 @@ fn inspect_dependency<'a>(frontend: &'a FrontendOutput, name: &'a str) -> Depend
         }
         match token.spelling.as_str() {
             "##" | "%:%:" => {
-                return reject(ExpansionSkipCode::TokenPaste, "dependency uses token pasting");
+                pastes = true;
+                continue;
             }
             "#" | "%:" => {
                 return reject(
@@ -809,7 +1067,7 @@ fn inspect_dependency<'a>(frontend: &'a FrontendOutput, name: &'a str) -> Depend
             dependencies.insert(name.as_str());
         }
     }
-    DependencyNode { dependencies: dependencies.into_iter().collect(), rejection: None }
+    DependencyNode { dependencies: dependencies.into_iter().collect(), rejection: None, pastes }
 }
 
 fn dynamic_builtin(name: &str) -> bool {
@@ -830,6 +1088,8 @@ fn dynamic_builtin(name: &str) -> bool {
                 | "__TIMESTAMP__"
                 | "__VA_ARGS__"
                 | "__VA_OPT__"
+                | "__identifier"
+                | "__FLT_EVAL_METHOD__"
                 | "__is_identifier"
                 | "__building_module"
                 | "__MODULE__"
@@ -917,12 +1177,14 @@ fn namespace(frontend: &FrontendOutput) -> String {
         .chain(frontend.declarations().variables.keys().map(String::as_str))
         .chain(frontend.declarations().functions.keys().map(String::as_str))
     {
-        if let Some(number) = spelling
-            .strip_prefix(NAMESPACE)
-            .and_then(|suffix| suffix.split('_').next())
-            .and_then(|number| number.parse::<usize>().ok())
-        {
-            occupied.insert(number);
+        for (start, _) in spelling.match_indices(NAMESPACE) {
+            // Include embedded names: rescan can consume a prefixed argument hole.
+            let offset = start + NAMESPACE.len();
+            if let Some(number) =
+                spelling[offset..].split('_').next().and_then(|number| number.parse::<usize>().ok())
+            {
+                occupied.insert(number);
+            }
         }
     }
     let mut number = 0;

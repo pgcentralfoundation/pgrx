@@ -52,6 +52,9 @@ cee-scape = "0.2"
 [build-dependencies]
 pgrx-bindgen.workspace = true
 
+[dev-dependencies]
+serde_json.workspace = true
+
 [lints.rust]
 # we allow improper_ctypes just to eliminate these warnings:
 #      = note: `#[warn(improper_ctypes)]` on by default

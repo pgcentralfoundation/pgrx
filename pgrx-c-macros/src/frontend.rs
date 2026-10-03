@@ -1837,7 +1837,7 @@ fn start_reader(
         .map(|_| ())
 }
 
-fn version_major(version: &str) -> Option<u32> {
+pub(crate) fn version_major(version: &str) -> Option<u32> {
     let (_, version) = version.split_once("clang version ")?;
     version.split('.').next()?.parse().ok()
 }

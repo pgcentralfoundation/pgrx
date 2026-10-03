@@ -227,7 +227,7 @@ fn emit_prepared_batch(
             _ => None,
         })
         .collect::<BTreeMap<_, _>>();
-    let graph = session.frontend().dependencies();
+    let graph = session.dependencies();
     // Seed failures from the entire active environment, not only requested
     // functions: a retained object binding can hide a callee's enum identifier.
     for (name, binding) in &bindings.integer_constants {
