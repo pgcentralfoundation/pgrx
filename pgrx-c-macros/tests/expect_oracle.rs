@@ -8,6 +8,9 @@
 //! Separate code-generation witnesses inspect successor paths and branch weights,
 //! including a cross-crate consumer, so successful values alone cannot hide a lost
 //! or reversed hint.
+//!
+//! Generated consumers use the runtime's Linux/macOS host family and still validate
+//! the inspected C ABI. Frontend, parser, and pre-emission rejection checks remain portable.
 
 /// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
 /// in production generation.
@@ -15,25 +18,79 @@
 mod binding_symbols;
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 mod oracle;
 /// Compile generated consumers and paired negative cases through the bounded Rust oracle
 /// harness.
 #[path = "support/rust_oracle.rs"]
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 mod rust_oracle;
 
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, EvaluationRequirement, FrontendOutput, MacroScanner,
     generate_with_bindings, inspect,
 };
 use std::collections::{BTreeMap, BTreeSet};
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 use std::fs;
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 use std::path::{Path, PathBuf};
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 use std::process::Command;
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 use std::sync::Mutex;
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Serialize libclang-backed inspection within this test process because its safe runtime
 /// permits one active owner.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
 /// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary
@@ -46,6 +103,12 @@ fn is_builtin_oid(name: &str) -> bool {
 
 /// Selected fixture macro names; explicit selection also exercises demand-driven adapter
 /// generation.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 const NAMES: &[&str] = &[
     "EXPECT_RAW",
     "EXPECT_TYPE_CAST",
@@ -93,6 +156,12 @@ const NAMES: &[&str] = &[
 ];
 /// Fixture candidates deliberately outside the supported contract; each must retain an
 /// explained skip.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 const REJECTED: &[&str] = &[
     "EXPECT_WRONG0",
     "EXPECT_WRONG1",
@@ -103,6 +172,12 @@ const REJECTED: &[&str] = &[
     "EXPECT_CALLBACK",
 ];
 /// Fixture binding or native-support source paired with the unchanged C oracle.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 const NATIVE: &str = r#"
 unsigned int expect_value_calls;
 unsigned int expect_hint_calls;
@@ -123,6 +198,12 @@ void expect_process_interrupts(void) {
 "#;
 /// Original C recorder source whose header invocations establish expected semantic
 /// observations.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 const ORIGINAL: &str = r#"
 #include <stdio.h>
 #include <limits.h>
@@ -203,6 +284,12 @@ int main(void) {
 }
 "#;
 /// Rust consumer source exercising actual generated macros and adapters.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 const CONSUMER: &str = r#"
 fn rank<K: __pgrx_c_macros::CInteger>(_: __pgrx_c_macros::CValue<K>) -> u8 { K::RANK }
 fn long(value:i64) -> __pgrx_c_macros::CValue<__pgrx_c_macros::CLong> { __pgrx_c_macros::CValue::new(value) }
@@ -327,6 +414,12 @@ fn main() {
 // Different sink tags keep LLVM's function-merging pass from combining wrappers
 // whose runtime behavior agrees but whose expectation directions are opposite.
 /// Original C functions used as compiler witnesses for branch-prediction direction.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 const C_CODEGEN: &str = r#"
 void expect_codegen_likely(int value) {
     if(EXPECT_LIKELY(value)) expect_branch_yes(1); else expect_branch_no(1);
@@ -421,6 +514,12 @@ void expect_codegen_source_size(long value) {
 "#;
 
 /// Generated Rust consumer functions used to inspect retained LLVM branch weights.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 const RUST_CODEGEN: &str = r#"
 /// # Safety
 /// Linked sinks must implement the fixture's C scalar-only prototypes and must
@@ -679,6 +778,12 @@ pub unsafe extern "C" fn expect_codegen_typed_dynamic(value:core::ffi::c_long,hi
 
 /// Construct the C invocation used for both inspection and the native oracle, so
 /// compiler-profile differences cannot explain a mismatch.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 fn arguments(optimization: &str, shadow: bool) -> Vec<String> {
     let mut arguments = vec!["-std=c17".into(), optimization.into(), "-ffp-contract=off".into()];
     if shadow {
@@ -697,6 +802,12 @@ fn arguments(optimization: &str, shadow: bool) -> Vec<String> {
 
 /// Build the fixture binding catalog used to validate symbolic references and native adapters
 /// against compiler facts.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 fn bindings(frontend: &FrontendOutput) -> String {
     bindgen::Builder::default()
         .rust_target(bindgen::RustTarget::stable(85, 0).unwrap())
@@ -718,6 +829,12 @@ fn bindings(frontend: &FrontendOutput) -> String {
 
 /// Assemble the Rust oracle prelude with real support and this fixture's generated bindings and
 /// adapters.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 fn rust_base(directory: &Path, bindings: &str, support: &str) -> String {
     let runtime = directory.join("../pgrx-pg-sys/src/c_macros/support.rs").canonicalize().unwrap();
     format!(
@@ -726,6 +843,12 @@ fn rust_base(directory: &Path, bindings: &str, support: &str) -> String {
 }
 
 /// Checks that expectation builtins preserve long identity and both operand evaluations.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 #[test]
 fn expectation_builtins_preserve_long_identity_and_both_operand_evaluations() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -893,6 +1016,12 @@ fn expectation_builtins_preserve_long_identity_and_both_operand_evaluations() {
 }
 
 /// Checks that expectation builtins preserve native branch weight directions.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 #[test]
 fn expectation_builtins_preserve_native_branch_weight_directions() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -1249,6 +1378,12 @@ exit:
 
 /// Own isolated compiler inputs and outputs so oracle runs cannot reuse stale artifacts or
 /// leave a growing target tree.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 struct TemporaryDirectory(
     /// Owned fixture path used for isolated inputs and cleanup.
     PathBuf,
@@ -1256,6 +1391,12 @@ struct TemporaryDirectory(
 
 /// Allocate isolated compiler artifacts with process-local uniqueness and deterministic cleanup
 /// ownership.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 impl TemporaryDirectory {
     /// Create owned, uniquely named fixture storage so this test's headers and compiler outputs
     /// cannot collide with another invocation.
@@ -1270,6 +1411,12 @@ impl TemporaryDirectory {
 
 /// Release only temporary artifacts owned by this fixture, including on failed compiler or
 /// assertion paths.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 impl Drop for TemporaryDirectory {
     /// Remove only this fixture's owned temporary storage after the test or oracle completes.
     fn drop(&mut self) {

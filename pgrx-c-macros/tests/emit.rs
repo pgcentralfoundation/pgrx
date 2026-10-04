@@ -7,6 +7,15 @@
 //! The suite checks provenance and parameter occurrences, inspects complete C
 //! source documentation, and compiles generated macros in a renamed consumer.
 //! Negative cases enforce the atomic-argument boundary imposed by C substitution.
+//! These positive emission tests require the runtime's supported LP64 targets;
+//! frontend tests separately verify rejection of incompatible C target profiles.
+
+#![cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos")
+))]
 
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
@@ -269,7 +278,9 @@ fn actual_support_and_emitted_macros_compile_in_a_renamed_downstream_crate() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().expect("libclang must be available");
     let header = fixture("emit_scalar.h");
-    let frontend = inspect(&scanner, &header, &["-fwrapv".into()], None).unwrap();
+    let mut arguments = oracle::native_arguments();
+    arguments.push("-fwrapv".into());
+    let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
     let session = AnalysisSession::prepare(&scanner, &frontend, EMITTED).unwrap();
     let directory = TemporaryDirectory::new();
     let runtime = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -303,7 +314,8 @@ fn actual_support_and_emitted_macros_compile_in_a_renamed_downstream_crate() {
     run_success(&mut Command::new(&executable), &directory.0, "execute");
 
     // C validates facts about the original header, independently of the Rust tree.
-    // No library headers or native link step are needed under the exact profile.
+    // Type facts are integer constant expressions; floating value checks execute
+    // because C does not require them to be valid _Static_assert operands.
     oracle::run_c(
         &frontend.profile().compiler.executable,
         &header,
@@ -329,10 +341,14 @@ _Static_assert(EMIT_DIVIDE(-7, 3) == -2, "C division truncates toward zero");
 _Static_assert(EMIT_REMAINDER(-7, 3) == -1, "C remainder sign");
 _Static_assert(EMIT_CHOOSE(1, -1, 1U) == 4294967295U, "unchosen arm determines common type");
 _Static_assert(_Generic(EMIT_ADD(1.0, 2.0f), double: 1, default: 0), "float addition keeps C common identity");
-_Static_assert(EMIT_ADD(1.0, 2.0f) == 3.0, "noncontracting float addition");
+int main(void) {
+    volatile double left = 1.0;
+    volatile float right = 2.0f;
+    return EMIT_ADD(left, right) == 3.0 ? 0 : 1;
+}
 "#,
         &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
-        false,
+        true,
     );
 
     for (label, input) in [

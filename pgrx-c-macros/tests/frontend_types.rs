@@ -5,8 +5,9 @@
 //! Check compiler-derived type, layout, and floating-point evidence.
 //!
 //! Independent static C assertions establish size, alignment, offsets, type edges,
-//! and prototypes. Shadowed helpers must isolate capabilities, and floating modes
-//! that Rust cannot reproduce must be rejected before emission.
+//! and prototypes; executable C checks establish floating-point rounding.
+//! Shadowed helpers must isolate capabilities, and floating modes that Rust cannot
+//! reproduce must be rejected before emission.
 
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
@@ -259,7 +260,9 @@ fn verified_float_profile_preserves_c_representation_and_evaluation_facts() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().expect("libclang must be available");
     let header = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/frontend_types.h");
-    let output = inspect(&scanner, &header, &["-std=c17".into(), "-ffp-contract=off".into()], None)
+    let mut arguments = oracle::native_arguments();
+    arguments.extend(["-std=c17".into(), "-ffp-contract=off".into()]);
+    let output = inspect(&scanner, &header, &arguments, None)
         .expect("inspect a noncontracting C float profile");
     let profile = output.profile();
     profile.supports_float_values().expect("verified float representations and conversions");
@@ -299,8 +302,17 @@ fn verified_float_profile_preserves_c_representation_and_evaluation_facts() {
 _Static_assert(__FLT_EVAL_METHOD__ == 0, "no excess precision");
 _Static_assert(_Generic(1.0f + 1, float: 1, default: 0), "integer converts to float");
 _Static_assert(_Generic(1.0f + 1.0, double: 1, default: 0), "usual conversion to double");
-_Static_assert(((1.0f + 16777216.0f) - 16777216.0f) == 0.0f, "binary32 rounding");
-_Static_assert(((1.0 + 9007199254740992.0) - 9007199254740992.0) == 0.0, "binary64 rounding");
+/* Floating comparisons are not integer constant expressions in standard C.
+ * Volatile inputs also prevent constant folding from replacing this runtime proof. */
+int main(void) {
+    volatile float binary32 = 16777216.0f;
+    volatile double binary64 = 9007199254740992.0;
+    if (((1.0f + binary32) - binary32) != 0.0f)
+        return 1;
+    if (((1.0 + binary64) - binary64) != 0.0)
+        return 2;
+    return 0;
+}
 "#,
     );
     assert!(
@@ -309,7 +321,7 @@ _Static_assert(((1.0 + 9007199254740992.0) - 9007199254740992.0) == 0.0, "binary
             &header,
             &original,
             &profile.arguments.iter().map(String::as_str).collect::<Vec<_>>(),
-            false
+            true
         )
         .is_empty()
     );
@@ -374,7 +386,17 @@ fn floating_point_modes_that_rust_operators_cannot_preserve_are_rejected() {
             .profile()
             .supports_float_expressions()
             .expect_err("unmodeled float semantics must reject");
-        assert!(error.contains(explanation), "{options:?}: {error}");
+        let facts = &output.profile().target.floating_point;
+        if options.iter().any(|option| option == "-ffast-math") {
+            assert!(facts.fast_math, "the compiler must report effective fast-math");
+            // Some Clang targets also make FLT_EVAL_METHOD indeterminate under
+            // fast-math. That independent rejection precedes the fast-math gate.
+            let first_reason =
+                if facts.evaluation_method == Some(0) { explanation } else { "excess precision" };
+            assert!(error.contains(first_reason), "{options:?}: {error}");
+        } else {
+            assert!(error.contains(explanation), "{options:?}: {error}");
+        }
         if options == ["-std=c17"] {
             output.profile().supports_float_values().unwrap();
         } else {

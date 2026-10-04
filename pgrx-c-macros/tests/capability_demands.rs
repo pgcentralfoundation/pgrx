@@ -7,6 +7,16 @@
 //! A synthetic header contains several callback and enum families. Emission may
 //! omit unused adapters, but open operands and multiple call sites must retain
 //! all compatible identities. Executed C and Rust observations check the result.
+//!
+//! These generated consumers use the runtime's Linux/macOS host family. Emission
+//! still validates the inspected C ABI and flags; unsupported-profile checks remain portable.
+
+#![cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 
 /// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
 /// in production generation.

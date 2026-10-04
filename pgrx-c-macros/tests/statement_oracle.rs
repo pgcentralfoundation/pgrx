@@ -7,6 +7,9 @@
 //! Original C and emitted Rust compare assignment conversion, sequencing, and
 //! local effects. Unsupported control flow and reads without definite
 //! initialization must stay structured skips rather than speculative translations.
+//!
+//! Generated consumers use the runtime's Linux/macOS host family and still validate
+//! the inspected C ABI. Frontend, parser, and pre-emission rejection checks remain portable.
 
 /// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
 /// in production generation.
@@ -14,15 +17,33 @@
 mod binding_symbols;
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 mod oracle;
 /// Compile generated consumers and paired negative cases through the bounded Rust oracle
 /// harness.
 #[path = "support/rust_oracle.rs"]
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 mod rust_oracle;
 
+use pgrx_c_macros::{AnalysisSession, EmissionStatus, MacroScanner, inspect};
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 use pgrx_c_macros::{
-    AnalysisSession, EmissionStatus, MacroScanner, ParameterOrigin, emit_batch_with_bindings,
-    emit_support_artifact_with_bindings, inspect,
+    ParameterOrigin, emit_batch_with_bindings, emit_support_artifact_with_bindings,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -41,6 +62,12 @@ fn is_builtin_oid(name: &str) -> bool {
 
 /// Selected fixture macro names; explicit selection also exercises demand-driven adapter
 /// generation.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 const NAMES: &[&str] = &[
     "STMT_ASSIGN",
     "STMT_LOCAL",
@@ -58,6 +85,12 @@ const NAMES: &[&str] = &[
 ];
 
 /// Fixture binding or native-support source paired with the unchanged C oracle.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 const NATIVE: &str = r#"
 unsigned int statement_trace;
 unsigned int statement_calls;
@@ -75,6 +108,12 @@ void statement_store(StatementRecord *pointer, unsigned int value) {
 "#;
 
 /// Checks that statement blocks preserve C assignment conversion order and local storage.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 #[test]
 fn statement_blocks_preserve_c_assignment_conversion_order_and_local_storage() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);

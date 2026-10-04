@@ -6,6 +6,16 @@
 //! A Rust expression fragment cannot reproduce every textual C substitution.
 //! The oracle checks that unsupported argument shapes are rejected instead of
 //! inventing parentheses or evaluating a different expression at the call site.
+//!
+//! These generated consumers use the runtime's Linux/macOS host family. Emission
+//! still validates the inspected C ABI and flags; unsupported-profile checks remain portable.
+
+#![cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]

@@ -6,6 +6,16 @@
 //! A field parameter is resolved through the generated registry at the invocation
 //! site. The tests compare valid operations with C and reject wrong owner or
 //! storage combinations rather than selecting by spelling alone.
+//!
+//! These generated consumers use the runtime's Linux/macOS host family. Emission
+//! still validates the inspected C ABI and flags; unsupported-profile checks remain portable.
+
+#![cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 
 /// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
 /// in production generation.

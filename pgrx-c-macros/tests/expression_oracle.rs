@@ -7,6 +7,16 @@
 //! Original C and emitted Rust report type, value, and evaluation effects. The
 //! consumer deliberately uses contexts that distinguish discarding a value from
 //! an unevaluated operand; unsupported cases remain explicit exclusions.
+//!
+//! These generated consumers use the runtime's Linux/macOS host family. Emission
+//! still validates the inspected C ABI and flags; unsupported-profile checks remain portable.
+
+#![cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]

@@ -8,6 +8,9 @@
 //! builtin types and effects. Conflicts or shadowed proof helpers must disable
 //! only the affected capabilities; unrelated macro translations must survive.
 //! Configured PostgreSQL checks additionally cover its actual Datum storage.
+//!
+//! Generated consumers use the runtime's Linux/macOS host family and still validate
+//! the inspected C ABI. Frontend, parser, and pre-emission rejection checks remain portable.
 
 /// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
 /// in production generation.
@@ -15,15 +18,35 @@
 mod binding_symbols;
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 mod oracle;
 /// Compile generated consumers and paired negative cases through the bounded Rust oracle
 /// harness.
 #[path = "support/rust_oracle.rs"]
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 mod rust_oracle;
 
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 use pgrx_c_macros::{
-    AnalysisSession, BindingCatalog, BuiltinKind, EmissionStatus, FrontendOutput, IntegerKind,
-    MacroScanner, PostgresConfig, TypeCategory, generate_with_bindings, inspect,
+    AnalysisSession, BindingCatalog, EmissionStatus, PostgresConfig, generate_with_bindings,
+};
+use pgrx_c_macros::{
+    BuiltinKind, FrontendOutput, IntegerKind, MacroScanner, TypeCategory, inspect,
 };
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
@@ -42,6 +65,12 @@ fn is_builtin_oid(name: &str) -> bool {
 
 /// Selected fixture macro names; explicit selection also exercises demand-driven adapter
 /// generation.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 const NAMES: &[&str] = &[
     "BUILTIN_SWAP16",
     "BUILTIN_SWAP32",
@@ -62,6 +91,12 @@ const NAMES: &[&str] = &[
 ];
 /// Fixture candidates deliberately outside the supported contract; each must retain an
 /// explained skip.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 const REJECTED: &[&str] = &[
     "BUILTIN_WRONG0",
     "BUILTIN_WRONG2",
@@ -71,6 +106,12 @@ const REJECTED: &[&str] = &[
     "BUILTIN_CALLBACK",
 ];
 /// Fixture binding or native-support source paired with the unchanged C oracle.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 const NATIVE: &str = r#"
 unsigned int builtin_evaluations;
 volatile unsigned int builtin_signal;
@@ -82,6 +123,12 @@ unsigned int builtin_use_callback(BuiltinCallback callback) { return callback(17
 "#;
 /// Original C recorder source whose header invocations establish expected semantic
 /// observations.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 const ORIGINAL: &str = r#"
 #include <stdio.h>
 #define C_RANK(value) _Generic((value), unsigned short: 2, unsigned int: 3, unsigned long: 4, unsigned long long: 5, default: 0)
@@ -118,6 +165,12 @@ int main(void) {
 }
 "#;
 /// Rust consumer source exercising actual generated macros and adapters.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 const CONSUMER: &str = r#"
 fn rank<K: __pgrx_c_macros::CInteger>(_: __pgrx_c_macros::CValue<K>) -> u8 { K::RANK }
 fn main() {
@@ -203,6 +256,12 @@ fn arguments(optimization: &str, shadow: bool) -> Vec<String> {
 
 /// Build the fixture binding catalog used to validate symbolic references and native adapters
 /// against compiler facts.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 fn bindings(frontend: &FrontendOutput) -> String {
     bindgen::Builder::default()
         .rust_target(bindgen::RustTarget::stable(85, 0).unwrap())
@@ -224,6 +283,12 @@ fn bindings(frontend: &FrontendOutput) -> String {
 
 /// Assemble a standalone Rust producer with the real semantic support and generated adapter
 /// definitions.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 fn base(directory: &Path, bindings: &str, support: &str) -> String {
     let runtime = directory.join("../pgrx-pg-sys/src/c_macros/support.rs").canonicalize().unwrap();
     format!(
@@ -233,6 +298,12 @@ fn base(directory: &Path, bindings: &str, support: &str) -> String {
 
 /// Checks that compiler builtins preserve prototypes evaluation null constants and macro
 /// shadowing.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 #[test]
 fn compiler_builtins_preserve_prototypes_evaluation_null_constants_and_macro_shadowing() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -364,6 +435,12 @@ const ISOLATION_HEADER: &str = r#"
 #define ISOLATED_PLAIN(value) (value)
 "#;
 /// Builtin and ordinary peers selected together for probe-isolation assertions.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 const ISOLATION_NAMES: &[&str] = &["ISOLATED16", "ISOLATED32", "ISOLATED64", "ISOLATED_PLAIN"];
 /// C input providing a branch-hint operation alongside independent builtin capabilities.
 const EXPECT_HEADER: &str =
@@ -411,6 +488,12 @@ impl Drop for Directory {
 }
 
 /// Require a failed capability witness to leave ordinary supported macros emitted.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 fn assert_isolated_emission(
     scanner: &MacroScanner,
     frontend: &FrontendOutput,
@@ -445,6 +528,12 @@ fn assert_isolated_emission(
 }
 
 /// Execute the surviving builtin peers against C after one capability is deliberately rejected.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 fn assert_supported_peers_run(rust: &str) {
     let output = rust_oracle::run_rust(&format!(
         r#"{rust}
@@ -460,6 +549,7 @@ fn main() {{
 }
 
 /// Checks that original builtin declaration conflict does not remove other operations.
+/// Catalog isolation is checked on every target; surviving emitted peers run only under LP64.
 #[test]
 fn original_builtin_declaration_conflict_does_not_remove_other_operations() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -478,11 +568,20 @@ fn original_builtin_declaration_conflict_does_not_remove_other_operations() {
     }
     let explanation = "an original C declaration conflicts with the compiler builtin";
     assert!(declarations.builtin_unavailable["__builtin_bswap32"].contains(explanation));
-    let rust = assert_isolated_emission(&scanner, &frontend, &["ISOLATED32"], explanation);
-    assert_supported_peers_run(&rust);
+    #[cfg(all(
+        target_pointer_width = "64",
+        target_endian = "little",
+        any(target_arch = "x86_64", target_arch = "aarch64"),
+        any(target_os = "linux", target_os = "macos"),
+    ))]
+    {
+        let rust = assert_isolated_emission(&scanner, &frontend, &["ISOLATED32"], explanation);
+        assert_supported_peers_run(&rust);
+    }
 }
 
 /// Checks that shadowed typeof proof helper skips builtins and keeps ordinary macros.
+/// Compiler proof refusals remain portable; the ordinary emitted peer requires the LP64 runtime.
 #[test]
 fn shadowed_typeof_proof_helper_skips_builtins_and_keeps_ordinary_macros() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -495,18 +594,26 @@ fn shadowed_typeof_proof_helper_skips_builtins_and_keeps_ordinary_macros() {
         assert!(!frontend.declarations().builtins.contains_key(name));
         assert!(frontend.declarations().builtin_unavailable[name].contains(explanation));
     }
-    let rust = assert_isolated_emission(
-        &scanner,
-        &frontend,
-        &["ISOLATED16", "ISOLATED32", "ISOLATED64"],
-        explanation,
-    );
-    assert!(
-        rust_oracle::run_rust(&format!(
-            "{rust}\nfn main() {{ assert_eq!(ISOLATED_PLAIN!(31_i32).get(), 31); }}"
-        ))
-        .is_empty()
-    );
+    #[cfg(all(
+        target_pointer_width = "64",
+        target_endian = "little",
+        any(target_arch = "x86_64", target_arch = "aarch64"),
+        any(target_os = "linux", target_os = "macos"),
+    ))]
+    {
+        let rust = assert_isolated_emission(
+            &scanner,
+            &frontend,
+            &["ISOLATED16", "ISOLATED32", "ISOLATED64"],
+            explanation,
+        );
+        assert!(
+            rust_oracle::run_rust(&format!(
+                "{rust}\nfn main() {{ assert_eq!(ISOLATED_PLAIN!(31_i32).get(), 31); }}"
+            ))
+            .is_empty()
+        );
+    }
 }
 
 /// Checks that expect uses exact C long rank and both parameter identities in each profile.
@@ -638,7 +745,12 @@ exec {compiler} "$@"
 }
 
 /// Checks that rejected LLVM witness is isolated within four driver runs.
-#[cfg(unix)]
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 #[test]
 fn rejected_llvm_witness_is_isolated_within_four_driver_runs() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -681,7 +793,12 @@ fn rejected_llvm_witness_is_isolated_within_four_driver_runs() {
 }
 
 /// Checks that rejected expect witness keeps all byte swaps within five driver runs.
-#[cfg(unix)]
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 #[test]
 fn rejected_expect_witness_keeps_all_byte_swaps_within_five_driver_runs() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -730,7 +847,12 @@ fn rejected_expect_witness_keeps_all_byte_swaps_within_five_driver_runs() {
 
 /// Find the configured PG19 installation for a real-header oracle, allowing environments
 /// without it to omit that optional case.
-#[cfg(target_pointer_width = "64")]
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 fn configured_pg19() -> Option<PostgresConfig> {
     use pgrx_pg_config::Pgrx;
 
@@ -769,7 +891,12 @@ fn configured_pg19() -> Option<PostgresConfig> {
 
 /// Checks that configured pg19 datum conversion matches original C without entering backend
 /// guards.
-#[cfg(target_pointer_width = "64")]
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 #[test]
 fn configured_pg19_datum_conversion_matches_original_c_without_entering_backend_guards() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);

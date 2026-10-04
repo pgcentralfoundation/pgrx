@@ -7,6 +7,16 @@
 //! The configured installation supplies headers, flags, and compiler facts. A
 //! standalone Rust consumer and an original-header C oracle record types, values,
 //! and operand counts; checked-in bindings and handwritten ports supply no truth.
+//!
+//! These generated consumers use the runtime's Linux/macOS host family. Emission
+//! still validates the inspected C ABI and flags; unsupported-profile checks remain portable.
+
+#![cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]

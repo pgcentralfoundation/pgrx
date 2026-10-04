@@ -7,6 +7,9 @@
 //! Generated consumers exercise lazy branches, caller returns, local scopes, and
 //! assignment conversions. Negative cases enforce initialization on every path
 //! and reject floating profiles that Rust operators cannot reproduce faithfully.
+//!
+//! Generated consumers use the runtime's Linux/macOS host family and still validate
+//! the inspected C ABI. Frontend, parser, and pre-emission rejection checks remain portable.
 
 /// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
 /// in production generation.
@@ -14,16 +17,34 @@
 mod binding_symbols;
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 mod oracle;
 /// Compile generated consumers and paired negative cases through the bounded Rust oracle
 /// harness.
 #[path = "support/rust_oracle.rs"]
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 mod rust_oracle;
 
+use pgrx_c_macros::{AnalysisSession, EmissionStatus, MacroScanner, inspect};
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 use pgrx_c_macros::{
-    AnalysisSession, EmissionStatus, EvaluationRequirement, HelperRequirement, InvocationContract,
-    MacroScanner, ParameterOrigin, emit_batch_with_bindings, emit_support_artifact_with_bindings,
-    inspect,
+    EvaluationRequirement, HelperRequirement, InvocationContract, ParameterOrigin,
+    emit_batch_with_bindings, emit_support_artifact_with_bindings,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -41,6 +62,12 @@ fn is_builtin_oid(name: &str) -> bool {
 }
 
 /// Fixture binding or native-support source paired with the unchanged C oracle.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 const NATIVE: &str = r#"
 unsigned int conditional_trace;
 unsigned int conditional_calls;
@@ -73,6 +100,12 @@ double *conditional_float_place(double *pointer) {
 
 /// Retain generated Rust, native support, and the exact inspected C profile for paired
 /// execution.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 struct Generated {
     /// Complete translated consumer source paired with the C program.
     rust: String,
@@ -87,6 +120,12 @@ struct Generated {
 }
 
 /// Run paired native and generated consumers under one retained inspected profile.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 impl Generated {
     /// Execute the original C program and generated Rust consumer and require their
     /// observations to agree.
@@ -113,12 +152,24 @@ impl Generated {
 
 /// Inspect fixture input, collect bindings, and prepare generated consumers for C/Rust
 /// comparison.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 fn generate(names: &[&str]) -> Generated {
     generate_with_arguments(names, &["-ffp-contract=off"])
 }
 
 /// Generate both consumer inputs under an explicit C profile, allowing profile-sensitive
 /// behavior to be tested.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 fn generate_with_arguments(names: &[&str], extra_arguments: &[&str]) -> Generated {
     let directory = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let header = directory.join("tests/fixtures/conditional_oracle.h");
@@ -207,6 +258,12 @@ fn generate_with_arguments(names: &[&str], extra_arguments: &[&str]) -> Generate
 }
 
 /// Checks that conditional statements preserve C truth lazy effects and scopes.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 #[test]
 fn conditional_statements_preserve_c_truth_lazy_effects_and_scopes() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -367,6 +424,12 @@ fn main() {
 }
 
 /// Checks that conditional returns exit the caller and convert only the selected value.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 #[test]
 fn conditional_returns_exit_the_caller_and_convert_only_the_selected_value() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -504,6 +567,12 @@ fn main() {
 }
 
 /// Checks that compound floating conditions require a profile without contraction.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 #[test]
 fn compound_floating_conditions_require_a_profile_without_contraction() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);

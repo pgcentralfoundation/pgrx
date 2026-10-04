@@ -7,9 +7,17 @@
 //! Compiler-derived record identity and bindgen storage constrain offsets. The
 //! oracle compares values and type identities while ensuring operand expressions
 //! are not evaluated and unsupported offset forms remain rejected.
+//!
+//! These generated consumers use the runtime's Linux/macOS host family. Emission
+//! still validates the inspected C ABI and flags; unsupported-profile checks remain portable.
 
 // offsetof initially requires the compiler-proven LP64 size_t identity.
-#![cfg(all(target_pointer_width = "64", not(target_os = "windows")))]
+#![cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 
 /// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
 /// in production generation.

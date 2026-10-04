@@ -7,8 +7,16 @@
 //! The suite resolves identities from actual emitted selectors rather than
 //! reimplementing their allocation. Selection, skips, keyword fields, and foreign
 //! impl rejection ensure a field's spelling cannot impersonate another owner.
+//!
+//! These generated consumers use the runtime's Linux/macOS host family. Emission
+//! still validates the inspected C ABI and flags; unsupported-profile checks remain portable.
 
-#![cfg(all(target_pointer_width = "64", not(target_os = "windows")))]
+#![cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 
 /// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
 /// in production generation.

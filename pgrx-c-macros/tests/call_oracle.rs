@@ -7,6 +7,16 @@
 //! The C oracle supplies ABI, conversion, value, and evaluation behavior. Rust
 //! consumer runs exercise the generated adapters; negative compilations require
 //! unsafe call sites and reject incompatible prototypes rather than coercing them.
+//!
+//! These generated consumers use the runtime's Linux/macOS host family. Emission
+//! still validates the inspected C ABI and flags; unsupported-profile checks remain portable.
+
+#![cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 
 /// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
 /// in production generation.

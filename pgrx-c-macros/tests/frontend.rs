@@ -7,6 +7,9 @@
 //! Independent C probes establish target and declaration facts. Inventory history,
 //! restoration, ambiguity, and argument rejection checks ensure later phases use
 //! the selected invocation rather than a guessed or partially replayed profile.
+//!
+//! Inspection also covers unsupported runtime ABIs. Only the native generated
+//! consumer below requires the checked Linux/macOS LP64 target family.
 
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
@@ -14,13 +17,26 @@ mod oracle;
 /// Compile generated consumers and paired negative cases through the bounded Rust oracle
 /// harness.
 #[path = "support/rust_oracle.rs"]
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    ActiveProvenance, AnalysisSession, BindingCatalog, EmissionStatus, FrontendError, IntegerKind,
-    IntegerValue, MacroKind, MacroScanner, SignedOverflow, TypeCategory, emit,
-    emit_support_with_bindings, inspect,
+    ActiveProvenance, AnalysisSession, AnalysisStatus, EmissionStatus, FrontendError, IntegerKind,
+    IntegerValue, MacroKind, MacroScanner, SignedOverflow, SkipReasonCode, SupportProfileError,
+    TypeCategory, emit, inspect, validate_support_profile,
 };
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
+use pgrx_c_macros::{BindingCatalog, emit_support_with_bindings};
 use std::path::PathBuf;
 use std::sync::Mutex;
 
@@ -48,27 +64,35 @@ fn protection_codegen_profiles_preserve_macro_values_and_original_arguments() {
     } else {
         "-fcf-protection=none"
     };
-    let arguments = vec!["-fstack-clash-protection".into(), native_cf.into()];
+    let mut arguments = oracle::native_arguments();
+    arguments.extend(["-fstack-clash-protection".into(), native_cf.into()]);
     let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
     assert!(frontend.profile().unsupported_options.is_empty());
     for argument in &arguments {
         assert!(frontend.profile().arguments.contains(argument), "must retain {argument}");
     }
-    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
-    let runtime =
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../pgrx-pg-sys/src/c_macros/support.rs");
-    let mut generated = format!("#[path = {runtime:?}] pub mod __pgrx_c_macros;\n");
-    generated.push_str(
-        &emit_support_with_bindings(&session, &names, &BindingCatalog::default()).unwrap(),
-    );
-    for name in names {
-        let EmissionStatus::Emitted { rust, .. } = emit(&session, name).status else {
-            panic!("protection-only flags must permit ordinary C macros");
-        };
-        generated.push_str(&rust);
-    }
-    generated.push_str(
-        r#"
+    #[cfg(all(
+        target_pointer_width = "64",
+        target_endian = "little",
+        any(target_arch = "x86_64", target_arch = "aarch64"),
+        any(target_os = "linux", target_os = "macos"),
+    ))]
+    {
+        let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+        let runtime = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../pgrx-pg-sys/src/c_macros/support.rs");
+        let mut generated = format!("#[path = {runtime:?}] pub mod __pgrx_c_macros;\n");
+        generated.push_str(
+            &emit_support_with_bindings(&session, &names, &BindingCatalog::default()).unwrap(),
+        );
+        for name in names {
+            let EmissionStatus::Emitted { rust, .. } = emit(&session, name).status else {
+                panic!("protection-only flags must permit ordinary C macros");
+            };
+            generated.push_str(&rust);
+        }
+        generated.push_str(
+            r#"
 unsafe extern "C" {
     fn protection_redefined(value: u32) -> u32;
     fn protection_restored(value: u32) -> u32;
@@ -84,18 +108,19 @@ fn main() {
     }
 }
 "#,
-    );
-    let arguments = frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>();
-    assert!(
-        rust_oracle::run_rust_linked(
-            &generated,
-            &frontend.profile().compiler.executable,
-            &header,
-            "unsigned int protection_redefined(unsigned int value) { return FRONT_REDEFINED(value); }\nunsigned int protection_restored(unsigned int value) { return FRONT_RESTORED(value); }\n",
-            &arguments,
-        )
-        .is_empty()
-    );
+        );
+        let arguments = frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>();
+        assert!(
+            rust_oracle::run_rust_linked(
+                &generated,
+                &frontend.profile().compiler.executable,
+                &header,
+                "unsigned int protection_redefined(unsigned int value) { return FRONT_REDEFINED(value); }\nunsigned int protection_restored(unsigned int value) { return FRONT_RESTORED(value); }\n",
+                &arguments,
+            )
+            .is_empty()
+        );
+    }
 
     let x86_arguments = vec![
         "--target=x86_64-unknown-linux-gnu".into(),
@@ -323,4 +348,62 @@ fn compiler_profile_and_declarations_match_an_independent_native_c_probe() {
     let default =
         inspect(&scanner, &header, &[], None).expect("inspect the default overflow profile");
     assert_eq!(default.profile().signed_overflow, SignedOverflow::Undefined);
+}
+
+/// Prove that inspection retains real Windows LLP64 facts while runtime emission rejects them.
+/// No system headers or target linker are needed, so every host can exercise this ABI boundary.
+#[test]
+fn inspected_llp64_types_remain_available_but_runtime_macros_are_rejected() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("frontend_llp64.h");
+    let arguments = ["--target=x86_64-pc-windows-msvc".into(), "-std=c17".into()];
+    let frontend = inspect(&scanner, &header, &arguments, None)
+        .expect("driver and libclang must agree on the header-only LLP64 profile");
+    let profile = frontend.profile();
+    assert_eq!(profile.target.pointer_bits, 64);
+    assert_eq!(profile.target.size_type, IntegerKind::UnsignedLongLong);
+    assert_eq!(profile.target.integers[&IntegerKind::Long].bits, 32);
+    assert_eq!(profile.target.integers[&IntegerKind::LongLong].bits, 64);
+    assert_eq!(
+        validate_support_profile(profile),
+        Err(SupportProfileError::SizeType(IntegerKind::UnsignedLongLong))
+    );
+
+    let original = oracle::run_c(
+        &profile.compiler.executable,
+        &header,
+        r#"
+_Static_assert(sizeof(void *) == 8 && sizeof(long) == 4 && sizeof(long long) == 8,
+               "original compiler's LLP64 layout");
+_Static_assert(__builtin_types_compatible_p(__typeof__(sizeof(0)), unsigned long long),
+               "original sizeof identity");
+_Static_assert(_Generic(FRONT_LLP64_LONG(1), long: 1, default: 0),
+               "original long cast identity");
+_Static_assert(_Generic(FRONT_LLP64_SIZE(1), unsigned long long: 1, default: 0),
+               "original macro sizeof identity");
+"#,
+        &profile.arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(original.is_empty());
+
+    let names = ["FRONT_LLP64_LONG", "FRONT_LLP64_SIZE"];
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    for name in names {
+        assert!(matches!(session.analyze(name).status, AnalysisStatus::Candidate));
+        let emission = emit(&session, name);
+        let EmissionStatus::Skipped { reason } = emission.status else {
+            panic!(
+                "LLP64 candidate must not claim compatibility with the LP64 runtime: {emission:?}"
+            );
+        };
+        assert_eq!(reason.code, SkipReasonCode::UnsupportedProfile);
+        assert_eq!(emission.analysis.name, name);
+        assert_eq!(
+            reason.message,
+            "runtime support requires C unsigned long size_t, found UnsignedLongLong"
+        );
+        assert!(reason.spans.contains(emission.analysis.provenance.as_ref().unwrap()));
+    }
 }

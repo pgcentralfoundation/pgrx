@@ -7,6 +7,16 @@
 //! The tests preserve original integer identities and operator precedence while
 //! checking that binding paths are used only when verified. Domain checks must
 //! survive constant folding, and the unmodified header remains the value oracle.
+//!
+//! These generated consumers use the runtime's Linux/macOS host family. Emission
+//! still validates the inspected C ABI and flags; unsupported-profile checks remain portable.
+
+#![cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
 
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]

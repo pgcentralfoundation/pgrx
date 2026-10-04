@@ -16,6 +16,24 @@ const OUTPUT_LIMIT: u64 = 8 * 1024 * 1024;
 /// Allocate process-local unique directory suffixes for concurrent isolated oracle runs.
 static NEXT_DIRECTORY: AtomicU64 = AtomicU64::new(0);
 
+/// Supply the installed macOS SDK explicitly when a fixture needs native linking.
+/// A standalone LLVM Clang may not discover it; inspection and execution must use
+/// the same SDK. Other hosts need no additional arguments.
+#[allow(dead_code)]
+pub fn native_arguments() -> Vec<String> {
+    #[cfg(target_os = "macos")]
+    {
+        let directory = TemporaryDirectory::new();
+        let sdk =
+            run_bounded(Command::new("xcrun").arg("--show-sdk-path"), &directory.0, "SDK lookup");
+        let sdk = sdk.trim();
+        assert!(!sdk.is_empty() && Path::new(sdk).is_dir(), "expected an installed macOS SDK");
+        vec!["-isysroot".into(), sdk.into()]
+    }
+    #[cfg(not(target_os = "macos"))]
+    Vec::new()
+}
+
 /// Each runner includes the original header; it never reconstructs its macro definitions.
 /// Without execution, compiler-owned static assertions need no native linker or runtime.
 pub fn run_c(
