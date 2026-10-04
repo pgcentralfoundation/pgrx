@@ -12,7 +12,7 @@
 //! collide with indexes, directories, keywords, or reserved support files.
 
 use eyre::{WrapErr, eyre};
-use pgrx_c_macros::{EmissionStatus, MacroEmission};
+use pgrx_c_macros::{EmissionStatus, MacroAnalysis, MacroEmission};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write;
 use std::path::{Component, Path, PathBuf};
@@ -55,73 +55,84 @@ impl MacroFiles {
     ) -> eyre::Result<Self> {
         let mut files = BTreeMap::new();
         let shared = partition_support(&support, &mut files)?;
+        let mut index = String::new();
+        for fragment in shared {
+            writeln!(index, "include!({:?});", source_path(&fragment)?).expect("String output");
+        }
         let mut tree = Directory::default();
-        let mut root = None;
-        let mut resolved = BTreeMap::<PathBuf, PathBuf>::new();
+        let mut headers = HeaderPaths::new(header_root);
         let mut public_names = BTreeSet::new();
         let mut ordered = emissions.iter().collect::<Vec<_>>();
         ordered.sort_unstable_by(|left, right| left.analysis.name.cmp(&right.analysis.name));
         for emission in ordered {
-            let EmissionStatus::Emitted { rust, .. } = &emission.status else { continue };
-            let provenance = emission.analysis.provenance.as_ref().ok_or_else(|| {
-                eyre!("emitted macro {} has no defining header", emission.analysis.name)
-            })?;
-            if root.is_none() {
-                root = Some(header_root.canonicalize().wrap_err_with(|| {
-                    format!("could not resolve PostgreSQL header root {}", header_root.display())
-                })?);
-            }
-            let root = root.as_ref().expect("initialized header root");
-            if !resolved.contains_key(&provenance.file) {
-                let canonical = provenance.file.canonicalize().wrap_err_with(|| {
-                    format!("could not resolve macro header {}", provenance.file.display())
-                })?;
-                let relative = canonical.strip_prefix(root).wrap_err_with(|| {
-                    format!(
-                        "macro {} comes from outside the PostgreSQL header root",
-                        emission.analysis.name
-                    )
-                })?;
-                resolved.insert(provenance.file.clone(), relative.to_owned());
-            }
-            let source = resolved.get(&provenance.file).expect("resolved source path");
-            let public = public_identifier(rust).wrap_err_with(|| {
-                format!("could not identify generated macro {}", emission.analysis.name)
-            })?;
+            let EmissionStatus::Emitted { rust, documentation, .. } = &emission.status else {
+                continue;
+            };
+            let source = headers.relative(&emission.analysis)?;
+            let public = &documentation.identifier;
             if !public_names.insert(public.clone()) {
                 return Err(eyre!("generated macro identifier {public} occurs more than once"));
             }
-            let header = tree.header_mut(source)?;
+            let header = tree.header_mut(&source)?;
             header.source.push_str(rust);
             header.source.push('\n');
-            header.exports.insert(public);
+            header.exports.insert(public.clone(), BTreeSet::new());
         }
-        tree.write(&PathBuf::new(), Some(&shared), &mut files)?;
+        tree.write(&PathBuf::new(), &index, "", &BTreeSet::new(), &mut files)?;
         Ok(Self { sources: files })
     }
 }
 
-/// Read the final exported macro's actual Rust identifier so reexports honor keyword escaping
-/// rather than guessing from the C name.
-fn public_identifier(source: &str) -> eyre::Result<String> {
-    let file = syn::parse_file(source).wrap_err("generated macro source is invalid Rust")?;
-    let item = file
-        .items
-        .iter()
-        .rev()
-        .find_map(|item| match item {
-            Item::Macro(item) if item.mac.path.is_ident("macro_rules") => Some(item),
-            _ => None,
-        })
-        .filter(|item| item.attrs.iter().any(|attribute| attribute.path().is_ident("macro_export")))
-        .ok_or_else(|| eyre!("generated macro source has no exported final definition"))?;
-    item.ident.as_ref().map(ToString::to_string).ok_or_else(|| eyre!("exported macro has no name"))
+/// Resolve macro provenance to header paths below the PostgreSQL server include root.
+pub(super) struct HeaderPaths<'a> {
+    /// Server include directory as configured.
+    root: &'a Path,
+    /// Canonical form of `root`, resolved on first use.
+    canonical_root: Option<PathBuf>,
+    /// Relative paths already resolved for each provenance file.
+    resolved: BTreeMap<PathBuf, PathBuf>,
+}
+
+/// Resolve each distinct header once, rejecting headers outside the root.
+impl<'a> HeaderPaths<'a> {
+    /// Prepare a resolver without touching the filesystem, so empty output needs no root.
+    pub(super) fn new(root: &'a Path) -> Self {
+        Self { root, canonical_root: None, resolved: BTreeMap::new() }
+    }
+
+    /// Return the macro's defining header relative to the root.
+    pub(super) fn relative(&mut self, analysis: &MacroAnalysis) -> eyre::Result<PathBuf> {
+        let provenance = analysis
+            .provenance
+            .as_ref()
+            .ok_or_else(|| eyre!("emitted macro {} has no defining header", analysis.name))?;
+        if let Some(relative) = self.resolved.get(&provenance.file) {
+            return Ok(relative.clone());
+        }
+        if self.canonical_root.is_none() {
+            self.canonical_root = Some(self.root.canonicalize().wrap_err_with(|| {
+                format!("could not resolve PostgreSQL header root {}", self.root.display())
+            })?);
+        }
+        let root = self.canonical_root.as_ref().expect("initialized header root");
+        let canonical = provenance.file.canonicalize().wrap_err_with(|| {
+            format!("could not resolve macro header {}", provenance.file.display())
+        })?;
+        let relative = canonical
+            .strip_prefix(root)
+            .wrap_err_with(|| {
+                format!("macro {} comes from outside the PostgreSQL header root", analysis.name)
+            })?
+            .to_owned();
+        self.resolved.insert(provenance.file.clone(), relative.clone());
+        Ok(relative)
+    }
 }
 
 /// Retain the physical header directory tree so provenance determines readable, collision-free
 /// Rust modules.
 #[derive(Default)]
-struct Directory {
+pub(super) struct Directory {
     /// Child header directories, preserving physical provenance instead of flattening
     /// basenames.
     directories: BTreeMap<String, Directory>,
@@ -131,11 +142,20 @@ struct Directory {
 
 /// Accumulate one header's translated definitions and their public Rust export names.
 #[derive(Default)]
-struct Header {
-    /// Translated definitions belonging to this header, kept in deterministic name order.
-    source: String,
-    /// Actual emitted Rust identifiers to forward from the header leaf.
-    exports: BTreeSet<String>,
+pub(super) struct Header {
+    /// Rendered definitions in deterministic name order, including any `cfg` attributes.
+    pub(super) source: String,
+    /// Exported Rust identifiers and the PostgreSQL versions that define them. An empty
+    /// version set means the tree describes a single build and needs no `cfg`.
+    pub(super) exports: BTreeMap<String, BTreeSet<u16>>,
+}
+
+/// Collect the versions defined by one header's exports.
+impl Header {
+    /// Every version that defines at least one export of this header.
+    fn versions(&self) -> BTreeSet<u16> {
+        self.exports.values().flatten().copied().collect()
+    }
 }
 
 /// Resolve header provenance into one collision-checked module tree and render its public
@@ -143,7 +163,7 @@ struct Header {
 impl Directory {
     /// Find or create the header leaf using normal relative components, keeping equal basenames
     /// in separate directories.
-    fn header_mut(&mut self, source: &Path) -> eyre::Result<&mut Header> {
+    pub(super) fn header_mut(&mut self, source: &Path) -> eyre::Result<&mut Header> {
         let components = source
             .components()
             .map(|component| match component {
@@ -163,81 +183,153 @@ impl Directory {
         Ok(directory.headers.entry(name.clone()).or_default())
     }
 
-    /// Render directory indexes, header leaves, and reexports while encoding names that collide
-    /// with modules or reserved support paths.
-    fn write(
+    /// Every version that defines at least one export below this directory.
+    fn versions(&self) -> BTreeSet<u16> {
+        let mut versions = BTreeSet::new();
+        for directory in self.directories.values() {
+            versions.extend(directory.versions());
+        }
+        for header in self.headers.values() {
+            versions.extend(header.versions());
+        }
+        versions
+    }
+
+    /// Render directory indexes, header leaves, and reexports.
+    ///
+    /// `index` starts this directory's `mod.rs`, and `preamble` starts every file.
+    /// Modules and exports defined by only some of `all` versions are gated by `cfg`.
+    pub(super) fn write(
         &self,
         path: &Path,
-        support: Option<&[PathBuf]>,
+        index: &str,
+        preamble: &str,
+        all: &BTreeSet<u16>,
         files: &mut BTreeMap<PathBuf, String>,
     ) -> eyre::Result<()> {
-        let mut index = String::new();
-        if let Some(support) = support {
-            for fragment in support {
-                writeln!(index, "include!({:?});", source_path(fragment)?).expect("String output");
-            }
-        }
-        let directory_names = self
-            .directories
-            .keys()
-            .map(|name| module_identifier(name, "directory"))
-            .collect::<BTreeSet<_>>();
-        let mut stems = BTreeMap::<String, usize>::new();
-        for name in self.headers.keys() {
-            *stems.entry(header_stem(name)?.to_owned()).or_default() += 1;
-        }
+        let mut index = format!("{preamble}{index}");
+        let (directory_names, header_names) = module_names(self)?;
         for (name, directory) in &self.directories {
-            let identifier = module_identifier(name, "directory");
-            let filename = if name.starts_with("__pgrx_c_") || name == "mod.rs" {
-                encoded_name(name, "directory")
-            } else {
-                name.clone()
-            };
-            check_component(&filename)?;
-            directory.write(&path.join(&filename), None, files)?;
-            write_module(&mut index, &identifier, &format!("{filename}/mod.rs"));
+            let (identifier, filename) = &directory_names[name.as_str()];
+            check_component(filename)?;
+            directory.write(&path.join(filename), "", preamble, all, files)?;
+            let cfg = cfg_attribute(&directory.versions(), all);
+            write_module(&mut index, &cfg, identifier, &format!("{filename}/mod.rs"));
         }
         for (name, header) in &self.headers {
-            let stem = header_stem(name)?;
-            let natural_identifier = module_identifier(stem, "header");
-            let identifier = if directory_names.contains(&natural_identifier) || stems[stem] > 1 {
-                encoded_name(name, "header")
-            } else {
-                natural_identifier
-            };
-            let filename = if stem == "mod"
-                || stem.starts_with("__pgrx_c_")
-                || stems[stem] > 1
-                || self.directories.contains_key(&format!("{stem}.rs"))
-            {
-                format!("{}.rs", encoded_name(name, "header"))
-            } else {
-                format!("{stem}.rs")
-            };
-            check_component(&filename)?;
-            let mut source = String::new();
+            let (identifier, filename) = &header_names[name.as_str()];
+            check_component(filename)?;
+            let mut source = String::from(preamble);
             let comment_name = name.replace(['\n', '\r'], " ");
             writeln!(source, "// C macros from {comment_name}.\n").expect("String output");
             source.push_str(&header.source);
-            for export in &header.exports {
+            for (export, versions) in &header.exports {
                 // Absolute paths to macro_export definitions made by include!
                 // trigger rustc's macro-expanded absolute-path lint. Reexport
                 // the colocated definition and let indexes forward that import.
-                writeln!(source, "pub use {export};").expect("String output");
+                let cfg = cfg_attribute(versions, all);
+                writeln!(source, "{cfg}pub use {export};").expect("String output");
             }
-            insert_file(files, path.join(&filename), source)?;
-            write_module(&mut index, &identifier, &filename);
+            insert_file(files, path.join(filename), source)?;
+            let cfg = cfg_attribute(&header.versions(), all);
+            write_module(&mut index, &cfg, identifier, filename);
         }
         insert_file(files, path.join("mod.rs"), index)
     }
 }
 
+/// Gate an item to the PostgreSQL features in `versions`.
+///
+/// Exactly one `pgNN` feature is enabled in any build, so mutually exclusive
+/// definitions of one name can coexist. Unversioned items and items defined in every
+/// version of `all` need no attribute.
+pub(super) fn cfg_attribute(versions: &BTreeSet<u16>, all: &BTreeSet<u16>) -> String {
+    if versions.is_empty() || versions == all {
+        return String::new();
+    }
+    let features =
+        versions.iter().map(|version| format!("feature = \"pg{version}\"")).collect::<Vec<_>>();
+    if let [feature] = features.as_slice() {
+        format!("#[cfg({feature})]\n")
+    } else {
+        format!("#[cfg(any({}))]\n", features.join(", "))
+    }
+}
+
+/// Choose module identifiers and paths for one directory's children.
+///
+/// Subdirectories keep their names. A header uses its stem (`acl.h` becomes `acl`)
+/// unless that collides with a subdirectory, another header, or a reserved name; it then
+/// uses its whole filename (`port.h` becomes `port_h`). Only names that are still
+/// ambiguous are hex-encoded.
+#[allow(clippy::type_complexity)] // Two parallel name maps, one per child kind.
+fn module_names(
+    directory: &Directory,
+) -> eyre::Result<(BTreeMap<&str, (String, String)>, BTreeMap<&str, (String, String)>)> {
+    let mut directories = BTreeMap::new();
+    for name in directory.directories.keys() {
+        let filename = if name.starts_with("__pgrx_c_") || name == "mod.rs" {
+            encoded_name(name, "directory")
+        } else {
+            name.clone()
+        };
+        directories.insert(name.as_str(), (module_identifier(name, "directory"), filename));
+    }
+    let mut taken =
+        directories.values().map(|(identifier, _)| identifier.clone()).collect::<BTreeSet<_>>();
+    // A candidate is usable when it is a readable identifier, its filename cannot
+    // replace the index or a subdirectory, and no other child wants it.
+    let usable = |identifier: &str| {
+        let filename = format!("{}.rs", identifier.trim_start_matches("r#"));
+        !identifier.starts_with("__pgrx_c_")
+            && filename != "mod.rs"
+            && !directory.directories.contains_key(&filename)
+    };
+    let mut headers = BTreeMap::new();
+    let mut remaining = directory.headers.keys().map(String::as_str).collect::<Vec<_>>();
+    let candidates: [fn(&str) -> eyre::Result<String>; 2] = [
+        |name| Ok(module_identifier(header_stem(name)?, "header")),
+        |name| {
+            let readable = name
+                .chars()
+                .map(|character| if character.is_ascii_alphanumeric() { character } else { '_' })
+                .collect::<String>();
+            Ok(module_identifier(&readable, "header"))
+        },
+    ];
+    for candidate in candidates {
+        let mut proposed = BTreeMap::new();
+        let mut counts = BTreeMap::<String, usize>::new();
+        for name in &remaining {
+            let identifier = candidate(name)?;
+            if usable(&identifier) {
+                *counts.entry(identifier.clone()).or_default() += 1;
+                proposed.insert(*name, identifier);
+            }
+        }
+        for (name, identifier) in proposed {
+            if counts[&identifier] == 1 && !taken.contains(&identifier) {
+                taken.insert(identifier.clone());
+                let filename = format!("{}.rs", identifier.trim_start_matches("r#"));
+                headers.insert(name, (identifier, filename));
+            }
+        }
+        remaining.retain(|name| !headers.contains_key(name));
+    }
+    for name in remaining {
+        let identifier = encoded_name(name, "header");
+        let filename = format!("{identifier}.rs");
+        headers.insert(name, (identifier, filename));
+    }
+    Ok((directories, headers))
+}
+
 /// Add a private module declaration and public forwarding import without using absolute paths
 /// to included macro_export definitions.
-fn write_module(index: &mut String, identifier: &str, filename: &str) {
+fn write_module(index: &mut String, cfg: &str, identifier: &str, filename: &str) {
     writeln!(
         index,
-        "#[path = {filename:?}]\nmod {identifier};\n#[allow(unused_imports)]\npub use {identifier}::*;"
+        "{cfg}#[path = {filename:?}]\nmod {identifier};\n{cfg}#[allow(unused_imports)]\npub use {identifier}::*;"
     )
     .expect("String output");
 }
@@ -286,7 +378,7 @@ fn check_component(component: &str) -> eyre::Result<()> {
 
 /// Insert one generated source path and reject collisions instead of silently replacing a
 /// previous leaf.
-fn insert_file(
+pub(super) fn insert_file(
     files: &mut BTreeMap<PathBuf, String>,
     path: PathBuf,
     source: String,
@@ -525,7 +617,7 @@ mod tests {
     use super::*;
     use pgrx_c_macros::{
         AnalysisStatus, ConstCapability, EvaluationContract, InvocationContract, MacroAnalysis,
-        SignedOverflow, SourceSpan,
+        MacroDocumentation, SignedOverflow, SourceSpan,
     };
     use std::fs;
     use std::process::Command;
@@ -581,8 +673,21 @@ mod tests {
                         "// C macro {name}\n// ```text\n// #define {name}(x) (x)\n// ```\n#[macro_export]\nmacro_rules! {name} {{ ($x:expr) => {{ /* PGRX: retained */ $x }}; }}\n"
                     ),
                     const_capability: ConstCapability::RuntimeOnly,
+                    documentation: Box::new(documentation(name)),
                 },
             }
+        }
+    }
+
+    /// Documentation for a fixture macro exported as `identifier`.
+    fn documentation(identifier: &str) -> MacroDocumentation {
+        MacroDocumentation {
+            identifier: identifier.into(),
+            title: format!("C macro {identifier}"),
+            location: Some("example.h:1".into()),
+            body: String::new(),
+            forms: vec!["$x:expr".into()],
+            hidden: false,
         }
     }
 
@@ -692,19 +797,32 @@ mod tests {
         let index = &files.sources[Path::new("mod.rs")];
         syn::parse_file(index).unwrap();
         assert!(index.contains("mod foo;"));
-        assert!(index.contains(&format!("mod {};", encoded_name("foo.h", "header"))));
         assert!(index.contains("mod r#match;"));
         assert!(index.contains("mod a_b;"));
-        assert!(index.contains(&format!("mod {};", encoded_name("a-b", "header"))));
         assert!(!files.sources.contains_key(&PathBuf::from("foo.rs")));
-        for header in ["foo.h", "mod.h", "shared.h", "shared.hpp"] {
-            assert!(
-                files
-                    .sources
-                    .contains_key(&PathBuf::from(format!("{}.rs", encoded_name(header, "header"))))
-            );
+        // Colliding or reserved stems fall back to the readable whole filename.
+        for module in ["foo_h", "mod_h", "a_b_h", "shared_h", "shared_hpp"] {
+            assert!(index.contains(&format!("mod {module};")), "{module}");
+            assert!(files.sources.contains_key(&PathBuf::from(format!("{module}.rs"))));
         }
         assert!(!files.sources.contains_key(Path::new("__pgrx_c_support/mod.rs")));
+    }
+
+    /// Checks that a header whose readable filename is already taken is hex-encoded.
+    #[test]
+    fn taken_readable_header_names_are_encoded() {
+        let fixture = Fixture::new();
+        let emissions = [
+            fixture.emission("x.h", "ROOT_X"),
+            fixture.emission("x/inner.h", "NESTED_X"),
+            fixture.emission("x_h.h", "READABLE_X"),
+        ];
+        let files = MacroFiles::new(String::new(), &emissions, &fixture.0).unwrap();
+        let index = &files.sources[Path::new("mod.rs")];
+        assert!(index.contains("mod x;"));
+        assert!(index.contains("mod x_h;"));
+        assert!(index.contains(&format!("mod {};", encoded_name("x.h", "header"))));
+        assert!(files.sources[Path::new("x_h.rs")].contains("pub use READABLE_X;"));
     }
 
     /// Checks that missing, external, or unrepresentable provenance fails before publication.
@@ -738,6 +856,7 @@ mod tests {
         emission.status = EmissionStatus::Emitted {
             rust: rust.into(),
             const_capability: ConstCapability::RuntimeOnly,
+            documentation: Box::new(documentation("__pgrx_c_macro_73656c66")),
         };
         let files = MacroFiles::new(String::new(), &[emission], &fixture.0).unwrap();
         let source = &files.sources[Path::new("keyword.rs")];

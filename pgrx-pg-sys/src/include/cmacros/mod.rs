@@ -1,14 +1,14 @@
 //! Expose the selected PostgreSQL version's generated C macro module tree.
 //!
 //! Ordinary builds include freshly generated modules from OUT_DIR, reflecting the
-//! current installation, compiler flags, and target. Documentation builds use
-//! versioned snapshots stored beside this selector. Their values describe the
-//! release-generation installation and are not inputs to ordinary transpilation.
-//! Reexports make macro definitions and their hidden adapters available through
-//! pgrx-pg-sys and ultimately the pgrx crate root.
+//! current installation, compiler flags, and target. Documentation builds use the
+//! snapshot stored beside this selector instead. It holds every supported version's
+//! macro documentation, gated by the `pgNN` features, with arms that only show the
+//! accepted invocations. Reexports make macro definitions and their hidden adapters
+//! available through pgrx-pg-sys and ultimately the pgrx crate root.
 
 // PostgreSQL macros are generated from the selected installation for builds.
-// Documentation uses the versioned snapshots alongside this module.
+// Documentation uses the snapshot alongside this module.
 #![allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
 
 /// Label Rust operands with their original C scalar identity before generated
@@ -52,10 +52,7 @@ mod pg15 {
 
     include!(concat!(env!("OUT_DIR"), "/cmacros/pg15/mod.rs"));
 }
-/// Expose the stored PG15 macro snapshot solely for documentation builds.
-#[cfg(all(feature = "pg15", docsrs))]
-mod pg15;
-#[cfg(feature = "pg15")]
+#[cfg(all(feature = "pg15", not(docsrs)))]
 pub use pg15::*;
 
 /// Compile fresh PG16 macro tree from OUT_DIR for the selected installation and target.
@@ -69,10 +66,7 @@ mod pg16 {
 
     include!(concat!(env!("OUT_DIR"), "/cmacros/pg16/mod.rs"));
 }
-/// Expose the stored PG16 macro snapshot solely for documentation builds.
-#[cfg(all(feature = "pg16", docsrs))]
-mod pg16;
-#[cfg(feature = "pg16")]
+#[cfg(all(feature = "pg16", not(docsrs)))]
 pub use pg16::*;
 
 /// Compile fresh PG17 macro tree from OUT_DIR for the selected installation and target.
@@ -86,10 +80,7 @@ mod pg17 {
 
     include!(concat!(env!("OUT_DIR"), "/cmacros/pg17/mod.rs"));
 }
-/// Expose the stored PG17 macro snapshot solely for documentation builds.
-#[cfg(all(feature = "pg17", docsrs))]
-mod pg17;
-#[cfg(feature = "pg17")]
+#[cfg(all(feature = "pg17", not(docsrs)))]
 pub use pg17::*;
 
 /// Compile fresh PG18 macro tree from OUT_DIR for the selected installation and target.
@@ -103,10 +94,7 @@ mod pg18 {
 
     include!(concat!(env!("OUT_DIR"), "/cmacros/pg18/mod.rs"));
 }
-/// Expose the stored PG18 macro snapshot solely for documentation builds.
-#[cfg(all(feature = "pg18", docsrs))]
-mod pg18;
-#[cfg(feature = "pg18")]
+#[cfg(all(feature = "pg18", not(docsrs)))]
 pub use pg18::*;
 
 /// Compile fresh PG19 macro tree from OUT_DIR for the selected installation and target.
@@ -120,8 +108,11 @@ mod pg19 {
 
     include!(concat!(env!("OUT_DIR"), "/cmacros/pg19/mod.rs"));
 }
-/// Expose the stored PG19 macro snapshot solely for documentation builds.
-#[cfg(all(feature = "pg19", docsrs))]
-mod pg19;
-#[cfg(feature = "pg19")]
+#[cfg(all(feature = "pg19", not(docsrs)))]
 pub use pg19::*;
+
+/// Document every supported version's generated macros without generating them.
+#[cfg(docsrs)]
+mod snapshot;
+#[cfg(docsrs)]
+pub use snapshot::*;

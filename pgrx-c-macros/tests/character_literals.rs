@@ -134,7 +134,7 @@ fn generated_source(session: &AnalysisSession<'_>, names: &[&str]) -> String {
     source.push_str(&artifact.rust);
     for name in names {
         let emission = emit(session, name);
-        let EmissionStatus::Emitted { rust, const_capability } = emission.status else {
+        let EmissionStatus::Emitted { rust, const_capability, .. } = emission.status else {
             panic!("original C macro {name} must emit: {emission:?}");
         };
         assert_eq!(const_capability, ConstCapability::RuntimeOnly);

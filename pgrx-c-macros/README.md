@@ -204,18 +204,19 @@ module scope to preserve private adapter access. Macro definitions receive
 multiline layout before rustfmt, including repetitions and internal token syntax
 that rustfmt leaves untouched. This preserves literal spellings and source comments
 in both library and CLI output. When available, rustfmt formats
-every generated Rust file, including the documentation snapshots.
+every generated Rust file, including the documentation snapshot.
 The report records the C profile, input dependencies, emitted source and explicit
 skip reasons, along with independently resolved constants and their Rust binding
 paths. The active version's macros are exported from `pgrx-pg-sys` and reexported
 at the `pgrx` crate root, so callers can use `pgrx::TYPEALIGN!(...)`.
-Setting `PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1` also writes the module tree
-to `pgrx-pg-sys/src/include/cmacros/pgN/`, alongside the shipped bindings and OIDs. These
-documentation snapshots include the generated adapters. Their target guards
-remain active outside `docsrs`; normal builds regenerate macros for their own C profile.
-Generate release snapshots alongside matching PostgreSQL bindings on the
-selected release target. Their values and layouts describe that target, not the
-build host of a later user.
+Setting `PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1` also writes one documentation
+snapshot to `pgrx-pg-sys/src/include/cmacros/snapshot/`, alongside the shipped bindings
+and OIDs. It covers every configured supported version: each macro keeps its
+documentation and invocation forms, without its implementation or native support, and
+definitions shared by several versions are written once behind `cfg(any(feature = ...))`.
+Only `docsrs` builds use it; normal builds regenerate macros for their own C profile.
+Generate the snapshot alongside matching PostgreSQL bindings on the selected release
+target, since the emitted set and its documentation describe that target.
 
 Ordinary bindgen and the fallback C shim retain their established target,
 CPPFLAGS and include settings. Optional macro inspection additionally observes

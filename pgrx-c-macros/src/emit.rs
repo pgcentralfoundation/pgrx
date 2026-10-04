@@ -216,6 +216,9 @@ pub enum EmissionStatus {
         rust: String,
         /// Advertised evaluation capability; emission currently produces runtime expressions.
         const_capability: ConstCapability,
+        /// Rustdoc-facing parts used to publish a documentation snapshot.
+        #[serde(skip)]
+        documentation: Box<MacroDocumentation>,
     },
     /// No definition is available; callers must propagate the reason to dependent macros.
     Skipped {
@@ -282,9 +285,11 @@ fn emit_with_lowering<'a>(
             })
     };
     let status = match lowered {
-        Ok(rust) => {
-            EmissionStatus::Emitted { rust, const_capability: ConstCapability::RuntimeOnly }
-        }
+        Ok((rust, documentation)) => EmissionStatus::Emitted {
+            rust,
+            const_capability: ConstCapability::RuntimeOnly,
+            documentation: Box::new(documentation),
+        },
         Err(reason) => EmissionStatus::Skipped { reason },
     };
     MacroEmission { analysis, status }
@@ -494,6 +499,8 @@ pub struct MacroSupportArtifact {
     pub rust: String,
     /// Same-profile C primitives that the caller must compile when nonempty.
     pub c_source: String,
+    /// Binding-relative paths of the `__pgrx_c_callbacks` typedef aliases in `rust`.
+    pub callback_typedefs: BTreeSet<Vec<String>>,
 }
 
 /// Emit only an all-unavailable classifier when authoritative C inspection cannot run.
@@ -582,7 +589,7 @@ fn render_adapters(
     adapters: GeneratedAdapters,
     macros: &[MacroEmission],
 ) -> Result<MacroSupportArtifact, String> {
-    let callback_typedefs = adapters.callbacks.has_typedefs;
+    let callback_typedefs = adapters.callbacks.typedefs;
     let body = format!(
         "{}\n{}\n{}\n{}\n{}",
         adapters.callbacks.rust,
@@ -598,7 +605,7 @@ fn render_adapters(
             "#[doc(hidden)]\n#[allow(non_snake_case, non_camel_case_types)]\npub mod __pgrx_c_generated {{\nuse crate::__pgrx_c_macros as c;\n{body}\n}}\n"
         )
     };
-    if callback_typedefs {
+    if !callback_typedefs.is_empty() {
         rust.push_str(
             "/// Explicit callback typedef identities validated against the current C profile.\n\
              #[doc(hidden)]\npub use self::__pgrx_c_generated::__pgrx_c_callbacks;\n",
@@ -628,6 +635,7 @@ fn render_adapters(
         )
         .trim()
         .into(),
+        callback_typedefs,
     })
 }
 
@@ -859,7 +867,7 @@ fn render(
     assertions: &str,
     bindings: &BindingCatalog,
     lowering: &types::Lowering<'_>,
-) -> Result<String, SkipReason> {
+) -> Result<(String, MacroDocumentation), SkipReason> {
     let identifier = macro_identifier(&analysis.name).ok_or_else(|| {
         skip(
             analysis,
@@ -911,18 +919,19 @@ fn render(
     if let Some(arguments) = &arguments {
         rust.push_str(&arguments.rust);
     }
-    let mut comment = match original {
+    let title = match original {
         InvocationSource::Macro(_) => format!("C macro {}", analysis.name),
         InvocationSource::Inline(_) => {
             format!("Typed call adapter for C inline function {}", analysis.name)
         }
     };
-    if let Some(span) = &analysis.provenance
-        && let Some(file) = span.file.file_name()
-    {
-        write!(&mut comment, " from {}:{}", file.to_string_lossy(), span.start_line)
-            .expect("String output");
-    }
+    let location = analysis.provenance.as_ref().and_then(|span| {
+        let file = span.file.file_name()?.to_string_lossy();
+        Some(format!("{file}:{}", span.start_line))
+    });
+    // The title and location stay separate so documentation snapshots can merge
+    // the locations of identical definitions from several PostgreSQL versions.
+    let mut comment = String::new();
     let definition = match original {
         InvocationSource::Macro(definition) => definition_comment(definition),
         InvocationSource::Inline(definition) => {
@@ -1043,15 +1052,25 @@ fn render(
         }
         comment.push_str("These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.");
     }
-    write_doc_comments(&mut rust, &comment).ok_or_else(|| {
-        skip(
-            analysis,
-            SkipReasonCode::BudgetExceeded,
-            "original C macro source comment exceeds the bounded output size",
-            None,
-        )
-    })?;
-    if matches!(analysis.name.as_str(), "_" | "self" | "Self" | "super" | "crate") {
+    let hidden = matches!(analysis.name.as_str(), "_" | "self" | "Self" | "super" | "crate");
+    let documentation = MacroDocumentation {
+        identifier: identifier.clone(),
+        title,
+        location,
+        body: comment,
+        forms: documentation_forms(analysis, returning, statement_boundary, explicit_boundary),
+        hidden,
+    };
+    write_doc_comments(&mut rust, &documentation.comment(documentation.location.as_deref()))
+        .ok_or_else(|| {
+            skip(
+                analysis,
+                SkipReasonCode::BudgetExceeded,
+                "original C macro source comment exceeds the bounded output size",
+                None,
+            )
+        })?;
+    if hidden {
         rust.push_str("#[doc(hidden)]\n");
     }
     write!(&mut rust, "#[macro_export]\nmacro_rules! {identifier} {{\n").expect("String output");
@@ -1190,7 +1209,108 @@ fn render(
             None,
         ));
     }
-    Ok(rust)
+    Ok((rust, documentation))
+}
+
+/// Rustdoc-facing parts of one emitted macro.
+///
+/// A documentation snapshot shows these instead of the generated implementation.
+/// The defining location is kept apart from the rest of the comment, so identical
+/// definitions from several PostgreSQL versions can share one documented macro.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MacroDocumentation {
+    /// Exported Rust macro identifier.
+    pub identifier: String,
+    /// First documentation line before the location, such as `C macro TYPEALIGN`.
+    pub title: String,
+    /// Defining header filename and first line, such as `c.h:801`.
+    pub location: Option<String>,
+    /// Documentation after the title line: original definition and invocation contract.
+    pub body: String,
+    /// Invocation matchers for the forms the generated macro accepts.
+    pub forms: Vec<String>,
+    /// Whether the generated macro is hidden from documentation.
+    pub hidden: bool,
+}
+
+/// Body of every documentation-shell arm. Rustdoc shows arm bodies as `{ ... }`.
+const DOCUMENTATION_SHELL_BODY: &str = "::core::unimplemented!(\"pgrx documentation snapshot; C macros are generated for each build\")";
+
+/// Render documentation comments and shell macros for snapshots.
+impl MacroDocumentation {
+    /// Complete doc comment, using `location` in place of this macro's own location.
+    pub fn comment(&self, location: Option<&str>) -> String {
+        match location {
+            Some(location) => format!("{} from {location}{}", self.title, self.body),
+            None => format!("{}{}", self.title, self.body),
+        }
+    }
+
+    /// Render a documentation-only macro that shows the supported invocation forms.
+    ///
+    /// Each arm expands to `unimplemented!()`, so a documentation build of a crate
+    /// that calls the macro inside a function body still succeeds. `attributes` is
+    /// written before the doc comment, for example a `#[cfg(...)]` line.
+    pub fn render_shell(&self, location: Option<&str>, attributes: &str) -> Option<String> {
+        let mut rust = String::from(attributes);
+        write_doc_comments(&mut rust, &self.comment(location))?;
+        if self.hidden {
+            rust.push_str("#[doc(hidden)]\n");
+        }
+        writeln!(rust, "#[macro_export]\nmacro_rules! {} {{", self.identifier)
+            .expect("String output");
+        for form in &self.forms {
+            writeln!(rust, "    ({form}) => {{\n        {DOCUMENTATION_SHELL_BODY}\n    }};")
+                .expect("String output");
+        }
+        rust.push_str("}\n");
+        Some(rust)
+    }
+}
+
+/// Invocation matchers matching the public arms of the generated macro.
+///
+/// Required boundary markers and the explicit return-type form are shown as in
+/// the generated macro; ordinary operands are shown as expressions.
+fn documentation_forms(
+    analysis: &MacroAnalysis,
+    returning: bool,
+    statement_boundary: bool,
+    explicit_boundary: bool,
+) -> Vec<String> {
+    let mut operands = String::new();
+    for (index, parameter) in analysis.parameters.iter().enumerate() {
+        if index != 0 {
+            operands.push_str(", ");
+        }
+        let fragment = match parameter.roles.as_slice() {
+            [crate::ParameterRole::Type] => "ty",
+            [crate::ParameterRole::Identifier] => "ident",
+            _ => "expr",
+        };
+        write!(operands, "${}:{fragment}", arguments::name(analysis, index))
+            .expect("String output");
+    }
+    if !analysis.parameters.is_empty() {
+        operands.push_str(" $(,)?");
+    }
+    let boundary = if statement_boundary {
+        "@__pgrx_c_statement; "
+    } else if explicit_boundary {
+        "@__pgrx_c_expression; "
+    } else {
+        ""
+    };
+    let mut forms = vec![format!("{boundary}{operands}").trim_end().to_owned()];
+    if returning {
+        let marker = arguments::return_marker(analysis);
+        forms.push(
+            format!("{boundary}@__pgrx_c_return_as [${marker}:ty]; {operands}")
+                .trim_end()
+                .to_owned(),
+        );
+    }
+    forms
 }
 
 /// Render a compiler-owned expression in the context its C caller requests.

@@ -1225,7 +1225,8 @@ cross-compilation. This format/tool selection is not evidence of a working
 Windows PostgreSQL backend.
 
 Only the active Cargo PostgreSQL major gets a native archive linked. Release
-generation may still emit Rust snapshots for all configured supported versions.
+generation still inspects every configured supported version to publish the
+documentation snapshot.
 Bindgen static-inline wrappers are emitted unconditionally. When `cshim` is
 enabled, compile it with the wrappers, macro primitives and metadata in one
 translation unit:
@@ -1384,12 +1385,19 @@ Typical output layout is:
  pgrx-pg-sys/src/include/
    pgNN.rs                      # documentation snapshot
    pgNN_oids.rs
-   cmacros/pgNN/...              # same organization, release generation
+   cmacros/snapshot/            # every version's macro docs, release generation
+     mod.rs
+     c.rs
+     utils/
+       mod.rs
+       acl.rs
 ```
 
-Header-relative directories and filenames determine modules. Escape Rust
-keywords and invalid filename characters deterministically, handle sanitized
-name collisions, and reject duplicate exported macro identifiers. Each public
+Header-relative directories and filenames determine modules. A header uses its
+stem (`acl.h` is `acl`); when that collides with a subdirectory, another header
+or a reserved name it uses its whole filename (`port.h` is `port_h`), and only a
+name that is still ambiguous is hex-encoded. Escape Rust keywords, and reject
+duplicate exported macro identifiers. Each public
 macro receives `///` documentation with physical header/line provenance and a
 fenced `text` block containing its normalized original C definition.
 
@@ -1409,18 +1417,40 @@ rustup missing-component diagnostic permits unformatted output; genuine
 formatting/source failures remain errors.
 
 Write changed content stably and remove obsolete files only within the owned
-version's generated macro tree. Publish documentation snapshots when
-`PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1` selects release generation. Normal
-builds compile current `OUT_DIR` files; checked-in snapshots are not current
-platform inputs. Documentation compatibility is a separate validation pass.
-Snapshots retain generated adapter modules and typedef exports; only target
-`compile_error!` items are excluded under docsrs. Native interfaces can be
-type-checked without PostgreSQL or Clang, but calling their C symbols still
-requires a matching archive. Documentation layouts remain release-target facts.
+generated macro tree. Normal builds compile current `OUT_DIR` files; the
+checked-in snapshot is not a platform input.
+
+`PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1` also publishes one documentation
+snapshot covering every configured supported version. docs.rs builds have no
+PostgreSQL or Clang, so the snapshot keeps only what rustdoc shows. Each emitted
+macro becomes a shell with its generated documentation and one arm per accepted
+invocation form; every arm expands to `unimplemented!()`. The generated
+implementation, native support and target guards are left out. The snapshot
+merges versions:
+
+1. A shell whose documentation and forms are identical in several versions is
+   written once, gated by `#[cfg(any(feature = "pgNN", ...))]`, and its location
+   names each version's defining line.
+2. Different definitions of one macro sit next to each other in their header's
+   module, so a reader of the source sees how the macro changed.
+3. A header or directory defined by only some versions is gated as a module.
+4. Selecting each version from the merged tree must reproduce exactly that
+   version's macros, locations, `__pgrx_c_types` aliases and callback names, and
+   one macro's gates must be disjoint and cover the versions defining it.
+
+The snapshot root also defines an availability-only `__pgrx_c_classify` for
+`if_c_macro!`, each version's `__pgrx_c_types` aliases, and `__pgrx_c_callbacks`
+names that alias an uninhabited placeholder. These keep item signatures in
+documented crates resolvable. Rustdoc does not type-check function bodies, so a
+documented crate's macro calls are accepted. A crate that docs.rs compiles as a
+dependency, rather than documents, cannot call methods such as `.get()` on a
+shell's result. If any version's macros are unavailable during release
+generation, the existing snapshot is kept and a warning names the missing
+versions.
 
 `pgrx-pg-sys/src/include.rs` exposes the `cmacros` selector in
-`src/include/cmacros/mod.rs`, which includes the selected `OUT_DIR` tree or
-documentation snapshot. `#[macro_export]` defines crate-root macro identifiers;
+`src/include/cmacros/mod.rs`, which includes the selected `OUT_DIR` tree or, for
+`docsrs`, the documentation snapshot. `#[macro_export]` defines crate-root macro identifiers;
 header modules reexport those identifiers, their parent modules collect them, and
 `pgrx/src/lib.rs` uses `pub use pg_sys::cmacros::*`. Thus callers can use
 `pgrx::MACRO_NAME!` without caring which header module owns its definition.
@@ -1716,8 +1746,8 @@ cargo test -p pgrx --test c_macros --no-default-features --features pg18,cshim
 cargo test -p pgrx-pg-sys --lib --no-default-features --features pg18,cshim
 ```
 
-Documentation snapshots require their own release/docs.rs validation. Their
-existence is not a substitute for current-platform generation. Tests demonstrate
+The documentation snapshot requires its own release/docs.rs validation. It is
+not a substitute for current-platform generation. Tests demonstrate
 specific properties; neither successful emission nor a finite oracle sample
 proves every possible invocation correct. The type and safety arguments must
 stand independently.
