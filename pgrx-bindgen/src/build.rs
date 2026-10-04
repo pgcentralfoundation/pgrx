@@ -29,7 +29,7 @@ use std::process::{Command, Output};
 use std::rc::Rc;
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicU64, Ordering};
-use syn::{Item, ItemConst, spanned::Spanned};
+use syn::{Item, ItemConst};
 
 const BLOCKLISTED_TYPES: [&str; 4] = ["Datum", "NullableDatum", "Oid", "TransactionId"];
 
@@ -58,6 +58,8 @@ const YANKED_POSTGRES_VERSIONS: &[PgVersion] = &[
 mod binding_symbols;
 /// Render provenance-derived header modules and same-scope support fragments for publication.
 mod macro_files;
+/// Merge every version's macro documentation into the docs.rs snapshot.
+mod macro_snapshot;
 /// Compile generated native access helpers under the already verified C invocation profile.
 mod macro_support;
 /// Recover module and function ABI records by invoking PostgreSQL's original declaration macros.
@@ -65,6 +67,7 @@ mod metadata_support;
 /// Carry matching fresh bindings, macro adapters and native code across target builds.
 mod target_artifacts;
 use macro_files::MacroFiles;
+use macro_snapshot::SnapshotVersion;
 use macro_support::{NativeBuild, compile_macro_support, link_macro_support};
 
 #[derive(Debug)]
@@ -224,7 +227,7 @@ pub fn main() -> eyre::Result<()> {
         }
     }
 
-    std::thread::scope(|scope| {
+    let snapshots = std::thread::scope(|scope| {
         // This is pretty much either always 1 (normally) or 5 (for releases),
         // but in the future if we ever have way more, we should consider
         // chunking `pg_configs` based on `thread::available_parallelism()`.
@@ -247,9 +250,13 @@ pub fn main() -> eyre::Result<()> {
         let results = threads
             .into_iter()
             .map(|thread| thread.join().expect("thread panicked while generating bindings"))
-            .collect::<Vec<eyre::Result<()>>>();
-        results.into_iter().collect::<eyre::Result<()>>()
-    })
+            .collect::<Vec<eyre::Result<_>>>();
+        results.into_iter().collect::<eyre::Result<Vec<_>>>()
+    })?;
+    if is_for_release() {
+        write_macro_snapshot(snapshots.into_iter().flatten().collect(), &build_paths)?;
+    }
+    Ok(())
 }
 
 fn cshim_static_wrapper_name(major_version: u16) -> String {
@@ -296,14 +303,15 @@ fn emit_rerun_if_changed() {
 }
 
 /// Write the selected version's bindings, OIDs, macro module tree, and skip report, publishing
-/// documentation snapshots only during release generation.
+/// binding snapshots only during release generation. Return the version's macro documentation
+/// when release generation produced it.
 fn generate_bindings(
     major_version: u16,
     pg_config: &PgConfig,
     build_paths: &BuildPaths,
     is_for_release: bool,
     enable_cshim: bool,
-) -> eyre::Result<()> {
+) -> eyre::Result<Option<SnapshotVersion>> {
     let mut include_h = build_paths.manifest_dir.clone();
     include_h.push("include");
     include_h.push(format!("pg{major_version}.h"));
@@ -367,11 +375,6 @@ fn generate_bindings(
     )?;
     remove_legacy_macro_file(&build_paths.out_dir, major_version)?;
     if is_for_release {
-        write_macro_files(
-            &macros.files,
-            &build_paths.src_dir.join(format!("cmacros/pg{major_version}")),
-            true,
-        )?;
         remove_legacy_macro_file(&build_paths.src_dir, major_version)?;
     }
     let report = build_paths.out_dir.join(format!("pg{major_version}_macro_report.json"));
@@ -403,7 +406,16 @@ fn generate_bindings(
         "cargo:rustc-link-search={}",
         lib_dir.to_str().ok_or_else(|| eyre!("{lib_dir:?} is not valid UTF-8 string"))?
     );
-    Ok(())
+    Ok(macros.snapshot)
+}
+
+/// Publish the docs.rs macro snapshot for every version generated in this release run.
+fn write_macro_snapshot(
+    versions: Vec<SnapshotVersion>,
+    build_paths: &BuildPaths,
+) -> eyre::Result<()> {
+    let files = macro_snapshot::snapshot_files(&versions)?;
+    write_macro_files(&files, &build_paths.src_dir.join("cmacros/snapshot"), true)
 }
 
 /// Keep normal binding builds quiet while allowing developers to inspect macro
@@ -446,43 +458,8 @@ impl BuildPaths {
     }
 }
 
-/// Add documentation-only guards to installation-specific target checks
-/// while preserving original source comments and macro templates.
-fn macro_snapshot(source: &str) -> eyre::Result<String> {
-    let file = syn::parse_file(source).wrap_err("could not parse generated C macros")?;
-    let mut guards = BTreeMap::new();
-    for item in &file.items {
-        if let Item::Macro(item) = item
-            && item.mac.path.is_ident("compile_error")
-        {
-            // Shipped bindings describe the generation installation, which may
-            // differ from docs.rs's target. Keep the original target guard for
-            // anyone including this snapshot outside documentation builds.
-            guards.insert(
-                item.mac.path.span().start().line,
-                ("compile_error!", "C macro target guard"),
-            );
-        }
-    }
-    // Keep the original source: passing through a token stream would discard the
-    // PGRX comments that explain why a named symbol or macro remains expanded.
-    let mut snapshot = String::from(
-        "/* Automatically generated by pgrx-c-macros. Do not hand-edit.\n\nThis code is generated for documentation purposes, so that it is easy to reference on docs.rs. C macros and their support code are regenerated for your build of pgrx, and your Postgres configuration may differ.\n*/\n",
-    );
-    for (index, line) in source.split_inclusive('\n').enumerate() {
-        if let Some((prefix, item)) = guards.get(&(index + 1)) {
-            if !line.trim_start().starts_with(*prefix) {
-                return Err(eyre!("{item} does not start on its own line"));
-            }
-            snapshot.push_str("#[cfg(not(docsrs))]\n");
-        }
-        snapshot.push_str(line);
-    }
-    Ok(snapshot)
-}
-
 /// Publish the macro tree with stable writes, then remove only stale Rust leaves owned by this
-/// version. Documentation snapshots are staged and formatted first because they are checked in.
+/// version. The documentation snapshot is staged and formatted first because it is checked in.
 fn write_macro_files(
     files: &MacroFiles,
     directory: &Path,
@@ -504,7 +481,7 @@ fn write_macro_files(
             if let Some(parent) = path.parent() {
                 fs::create_dir_all(parent)?;
             }
-            fs::write(&path, macro_snapshot(source)?)?;
+            fs::write(&path, source)?;
             paths.push(path);
         }
         let rustfmt = env_tracked("RUSTFMT").unwrap_or_else(|| "rustfmt".into());
@@ -1374,6 +1351,8 @@ struct MacroOutput {
     cflags_dropped: Vec<String>,
     /// Verified scalar identity choices for the active defining runtime.
     runtime_cfg: Vec<String>,
+    /// Documentation for the docs.rs snapshot, collected only during release generation.
+    snapshot: Option<SnapshotVersion>,
 }
 
 /// Serialize the verified C invocation, fresh binding facts, and per-macro results for build
@@ -1640,6 +1619,21 @@ fn generate_macros(
         }
     }
     let files = MacroFiles::new(source, &emissions, postgres.server_include_dir())?;
+    let snapshot = if is_for_release() {
+        let typedefs = pgrx_c_macros::integer_typedef_markers(&frontend)
+            .into_iter()
+            .map(|(name, marker)| (name.to_owned(), marker))
+            .collect();
+        Some(SnapshotVersion::new(
+            major_version,
+            &emissions,
+            postgres.server_include_dir(),
+            typedefs,
+            support.callback_typedefs.clone(),
+        )?)
+    } else {
+        None
+    };
     let report = serde_json::to_vec_pretty(&MacroReport {
         postgres_major_version: major_version,
         status: "generated",
@@ -1660,7 +1654,10 @@ fn generate_macros(
         link_macro_support(major_version, native.out_dir);
     }
     let cflags_dropped = cflags.dropped.clone();
-    Ok((bindings, MacroOutput { files, report, emitted, skipped, cflags_dropped, runtime_cfg }))
+    Ok((
+        bindings,
+        MacroOutput { files, report, emitted, skipped, cflags_dropped, runtime_cfg, snapshot },
+    ))
 }
 
 /// Match bindgen 0.72's target-specific lookup and malformed-quoting fallback.
@@ -2335,56 +2332,6 @@ mod macro_build_tests {
         );
     }
 
-    /// Keep documentation target guards while retaining macro adapters needed by pgrx callers.
-    #[test]
-    fn documentation_snapshots_guard_native_support_and_preserve_macro_templates() {
-        let source = r#"#[cfg(not(target_pointer_width = "64"))]
-compile_error!("C macro target does not match the generation installation");
-pub const PROFILE: usize = 64;
-#[doc(hidden)]
-#[allow(non_snake_case, non_camel_case_types)]
-pub mod __pgrx_c_generated {
-    const _: () = assert!(::core::mem::size_of::<usize>() == 8);
-    pub struct Field;
-}
-pub mod documentation_helpers {}
-/// C macro EXAMPLE from example.h:1
-///
-/// ```text
-/// #define EXAMPLE(x) NESTED(x)
-/// ```
-#[macro_export]
-macro_rules! EXAMPLE {
-    ($argument:expr) => {
-        /* PGRX: NESTED remains expanded because its binding is unavailable. */
-        $crate::__pgrx_c_generated::Field
-    };
-}
-"#;
-        let snapshot = macro_snapshot(source).unwrap();
-        assert!(snapshot.contains("This code is generated for documentation purposes"));
-        assert!(
-            snapshot.contains(
-                "/* PGRX: NESTED remains expanded because its binding is unavailable. */"
-            )
-        );
-        let mut expected = syn::parse_file(source).unwrap();
-        let documentation_guard: syn::Attribute = syn::parse_quote!(#[cfg(not(docsrs))]);
-        let Item::Macro(target_guard) = &mut expected.items[0] else {
-            panic!("fixture target guard must be a macro item");
-        };
-        target_guard.attrs.push(documentation_guard);
-        assert_eq!(syn::parse_file(&snapshot).unwrap(), expected);
-    }
-
-    /// Checks that documentation snapshots require guarded items on their own lines.
-    #[test]
-    fn documentation_snapshots_require_guarded_items_on_their_own_lines() {
-        let source = "const PROFILE: () = (); compile_error!(\"wrong target\");";
-        let error = macro_snapshot(source).unwrap_err().to_string();
-        assert_eq!(error, "C macro target guard does not start on its own line");
-    }
-
     /// Checks that environment arguments match bindgen priority and shell quoting.
     #[test]
     fn environment_arguments_match_bindgen_priority_and_shell_quoting() {
@@ -2758,7 +2705,7 @@ macro_rules! EXAMPLE {
         assert!(version.join("mod.rs").exists(), "an empty module still loads");
     }
 
-    /// Checked-in documentation snapshots are formatted before their stable writes. OUT_DIR
+    /// The checked-in documentation snapshot is formatted before its stable writes. OUT_DIR
     /// trees are compiler input that nobody edits: formatting tens of megabytes there cost
     /// seconds per build-script run for cosmetic changes, so they keep the generator's bytes.
     #[test]
@@ -2779,8 +2726,7 @@ macro_rules! EXAMPLE {
                 assert!(leaf.contains("pub fn example(value: u32) -> u32 {"));
                 assert!(leaf.contains("/// #define EXAMPLE(x) (x)"));
                 assert!(leaf.contains("/* PGRX: preserve this comment */"));
-                let expected = macro_snapshot(original).unwrap();
-                assert_eq!(syn::parse_file(&leaf).unwrap(), syn::parse_file(&expected).unwrap());
+                assert_eq!(syn::parse_file(&leaf).unwrap(), syn::parse_file(original).unwrap());
             } else {
                 assert_eq!(leaf, original, "OUT_DIR trees are published as generated");
             }
@@ -2959,29 +2905,6 @@ macro_rules! EXAMPLE {
         drop(staging);
         assert!(!staging_path.exists());
         assert!(directory.0.exists(), "cleanup only removes its own directory");
-    }
-
-    /// Checks that macro snapshots guard each leaf and do not duplicate native guards.
-    #[test]
-    fn macro_snapshots_guard_each_leaf_and_do_not_duplicate_native_guards() {
-        let directory = TemporaryDirectory::new();
-        let files = MacroFiles {
-            sources: BTreeMap::from([
-                (PathBuf::from("mod.rs"), "mod c;\n".into()),
-                (
-                    PathBuf::from("c.rs"),
-                    "#[cfg(not(target_pointer_width = \"64\"))]\ncompile_error!(\"wrong target\");\n/// C macro EXAMPLE from c.h:1\n/// ```text\n/// #define EXAMPLE(x) (x)\n/// ```\n#[macro_export]\nmacro_rules! EXAMPLE { ($x:expr) => { $x }; }\n".into(),
-                ),
-            ]),
-        };
-        write_macro_files(&files, &directory.0, true).unwrap();
-        let leaf = fs::read_to_string(directory.0.join("c.rs")).unwrap();
-        assert!(leaf.contains("#[cfg(not(docsrs))]"));
-        assert!(leaf.contains("/// #define EXAMPLE(x) (x)"));
-        assert!(!leaf.contains("#[doc ="));
-        let guarded = "#[cfg(not(docsrs))]\n#[doc(hidden)]\npub mod __pgrx_c_generated {}\n";
-        let snapshot = macro_snapshot(guarded).unwrap();
-        assert_eq!(snapshot.matches("#[cfg(not(docsrs))]").count(), 1);
     }
 
     /// Checks that absent files watch existing parents without perpetually dirty file

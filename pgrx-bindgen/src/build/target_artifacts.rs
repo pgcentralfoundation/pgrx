@@ -266,6 +266,7 @@ pub(super) fn import(
             // An import compiles no C, so this build applies and drops no CFLAGS.
             cflags_dropped: Vec::new(),
             runtime_cfg: manifest.runtime_cfg,
+            snapshot: None,
         },
     ))
 }
@@ -699,6 +700,7 @@ mod tests {
                 "pgrx_c_size_type=\"unsigned_long\"".into(),
                 "pgrx_c_ptrdiff_type=\"long\"".into(),
             ],
+            snapshot: None,
         };
         (directory, domain, macros)
     }
