@@ -26,10 +26,11 @@ pub(super) fn generate(
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,
     used_functions: &BTreeSet<String>,
+    called_functions: &BTreeSet<String>,
     target: &TargetFacts,
     profile_identity: &str,
 ) -> Result<FunctionAdapters, String> {
-    let lowering = Lowering::new(declarations, bindings, target);
+    let lowering = Lowering::new_native(declarations, bindings, target);
     let mut result = FunctionAdapters {
         rust: String::new(),
         c_source: String::new(),
@@ -61,7 +62,16 @@ pub(super) fn generate(
         if bindings.functions.contains_key(name) && !by_value_object {
             continue;
         }
-        match adapter(name, function, declarations, bindings, &lowering, target, &profile_hash) {
+        match adapter(
+            name,
+            function,
+            declarations,
+            bindings,
+            &lowering,
+            target,
+            &profile_hash,
+            called_functions.contains(name),
+        ) {
             Ok((rust, c_source, binding)) => {
                 result.rust.push_str(&rust);
                 result.c_source.push_str(&c_source);
@@ -78,6 +88,7 @@ pub(super) fn generate(
     Ok(result)
 }
 
+#[allow(clippy::too_many_arguments)] // One ABI proof owns declaration, storage, profile and demand.
 fn adapter(
     name: &str,
     function: &FunctionInfo,
@@ -86,6 +97,7 @@ fn adapter(
     lowering: &Lowering<'_>,
     target: &TargetFacts,
     profile_hash: &[u8],
+    emit_call: bool,
 ) -> Result<(String, String, FunctionBinding), String> {
     if !c_identifier(name) {
         return Err("C function has no usable identifier".into());
@@ -186,6 +198,16 @@ fn adapter(
     let symbol = format!("__pgrx_inline_{suffix}");
     let wrapper = format!("Inline_{suffix}");
     let raw = format!("raw_inline_{suffix}");
+    let binding = FunctionBinding {
+        path: vec!["__pgrx_c_generated".into(), wrapper.clone()],
+        parameters: parameter_storage,
+        result: result_storage,
+        abi: "C-unwind".into(),
+        variadic: false,
+        link_name: symbol.clone(),
+        guarded: bindings.ffi_boundary.is_some(),
+        uses_cshim: true,
+    };
     let mut c_source = String::new();
     let mut rust = String::new();
     let mut c_parameters = Vec::new();
@@ -227,6 +249,15 @@ fn adapter(
         abi_assertions(&mut rust, &rust_result, &signature.result);
         alias
     };
+    if !emit_call {
+        // Address getters need the complete native storage witness and ABI
+        // assertions, but their callback shells contain no callable thunk.
+        for storage in &rust_parameters {
+            writeln!(rust, "const _: () = assert!(!::core::mem::needs_drop::<{storage}>());")
+                .expect("String output");
+        }
+        return Ok((rust, c_source, binding));
+    }
     let c_parameters =
         if c_parameters.is_empty() { "void".into() } else { c_parameters.join(", ") };
     let arguments = arguments.join(", ");
@@ -262,20 +293,7 @@ fn adapter(
         writeln!(rust, "// SAFETY: The caller establishes the original C function's contract.\nunsafe {{ {native_call} }}").expect("String output");
     }
     rust.push_str("}\n");
-    Ok((
-        rust,
-        c_source,
-        FunctionBinding {
-            path: vec!["__pgrx_c_generated".into(), wrapper],
-            parameters: parameter_storage,
-            result: result_storage,
-            abi: "C-unwind".into(),
-            variadic: false,
-            link_name: symbol,
-            guarded: bindings.ffi_boundary.is_some(),
-            uses_cshim: true,
-        },
-    ))
+    Ok((rust, c_source, binding))
 }
 
 fn enum_abi_type<'a>(

@@ -7,13 +7,36 @@ mod oracle;
 
 use pgrx_c_macros::{
     AnalysisSession, AnalysisStatus, ConstCapability, EmissionStatus, ExpressionKind,
-    FrontendError, InputConstraint, InvocationContract, MacroAnalysis, MacroScanner, ParameterRole,
-    SkipReasonCode, TypeCategory, TypeExpression, analyze, emit, inspect,
+    FrontendError, InvocationContract, MacroAnalysis, MacroScanner, ParameterRole, SkipReasonCode,
+    TypeCategory, TypeExpression, analyze, emit, inspect,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
 
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
+
+#[test]
+fn parameter_metadata_does_not_claim_unproved_integer_only_inputs() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let frontend = inspect(&scanner, &fixture("analysis_scalar.h"), &[], None).unwrap();
+    for name in ["ANALYSIS_MEMBER", "ANALYSIS_ADD", "ANALYSIS_CAST", "ANALYSIS_UNARY"] {
+        let analysis = analyze(&frontend, name);
+        assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{name}: {analysis:?}");
+        let metadata = serde_json::to_value(&analysis.parameters[0]).unwrap();
+        assert!(metadata.get("constraint").is_none(), "{name}: {metadata}");
+    }
+    assert!(
+        oracle::run_c(
+            &frontend.profile().compiler.executable,
+            &fixture("analysis_scalar.h"),
+            "_Static_assert(_Generic(ANALYSIS_ADD(1.25, 2.0), double: 1, default: 0), \"floating invocation is valid C\");\n",
+            &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+            false,
+        )
+        .is_empty()
+    );
+}
 
 fn fixture(name: &str) -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures").join(name)
@@ -32,7 +55,7 @@ fn assert_skip(analysis: &MacroAnalysis, expected: SkipReasonCode) {
 }
 
 #[test]
-fn complete_integer_expressions_are_candidates_with_inferred_value_constraints() {
+fn complete_integer_expressions_are_candidates_with_value_roles() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().expect("libclang must be available");
     let header = fixture("analysis_scalar.h");
@@ -66,10 +89,8 @@ fn complete_integer_expressions_are_candidates_with_inferred_value_constraints()
         for parameter in &analysis.parameters {
             if parameter.uses.is_empty() {
                 assert_eq!(parameter.roles, [ParameterRole::Unused]);
-                assert_eq!(parameter.constraint, None);
             } else {
                 assert_eq!(parameter.roles, [ParameterRole::Value]);
-                assert_eq!(parameter.constraint, Some(InputConstraint::IntegerScalar));
                 assert!(parameter.uses.iter().all(|usage| usage.grouped));
             }
         }
@@ -222,7 +243,37 @@ fn type_argument_casts_retain_deferred_types_and_concrete_pointer_casts_use_comp
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().expect("libclang must be available");
     let scalar = inspect(&scanner, &fixture("analysis_scalar.h"), &[], None).unwrap();
-    let analysis = analyze(&scalar, "ANALYSIS_TYPE_PARAMETER");
+    for name in ["ANALYSIS_TYPE_PARAMETER", "ANALYSIS_FORMAL_CALL", "ANALYSIS_ALIGN_APPLICATION"] {
+        let analysis = analyze(&scalar, name);
+        assert_skip(&analysis, SkipReasonCode::TypeParameter);
+        let AnalysisStatus::Skipped { reason } = analysis.status else {
+            panic!("a formal application must not guess the formal's C namespace: {analysis:?}");
+        };
+        assert!(reason.message.contains("cast type or callable value"), "{reason:?}");
+        assert!(
+            analysis.parameters.iter().all(|parameter| parameter.roles == [ParameterRole::Unknown])
+        );
+    }
+    assert!(
+        oracle::run_c(
+            &scalar.profile().compiler.executable,
+            &fixture("analysis_scalar.h"),
+            r#"
+typedef int (*AnalysisCallback)(int);
+extern AnalysisCallback analysis_callback;
+_Static_assert(_Generic(ANALYSIS_TYPE_PARAMETER(unsigned char,257), unsigned char: 1, default: 0), "formal application can be a cast");
+_Static_assert(_Generic(ANALYSIS_TYPE_PARAMETER(analysis_function,7), int: 1, default: 0), "the same replacement can call a function");
+_Static_assert(_Generic(ANALYSIS_FORMAL_CALL(unsigned char,257), unsigned char: 1, default: 0), "a callback-shaped formal can be a cast type");
+_Static_assert(_Generic(ANALYSIS_FORMAL_CALL(analysis_function,7), int: 1, default: 0), "a callback-shaped formal can call a function");
+_Static_assert(_Generic(ANALYSIS_ALIGN_APPLICATION(unsigned char,257), unsigned char: 1, default: 0), "bare alignment permits a cast type family");
+_Static_assert(_Generic(ANALYSIS_ALIGN_APPLICATION(analysis_callback,7), int: 1, default: 0), "GNU alignment permits the same replacement to call a function pointer value");
+"#,
+            &scalar.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+            false,
+        )
+        .is_empty()
+    );
+    let analysis = analyze(&scalar, "ANALYSIS_PROVEN_TYPE_PARAMETER");
     assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{analysis:?}");
     let expression = analysis.expression.as_ref().expect("candidate retains its shared IR");
     let (cast, operand) = expression
@@ -242,9 +293,8 @@ fn type_argument_casts_retain_deferred_types_and_concrete_pointer_casts_use_comp
         .expect("the type argument remains a symbolic cast, not a sampled signature");
     assert!(matches!(expression.types[cast], TypeExpression::Deferred));
     assert!(matches!(expression.syntax.nodes[operand].kind, ExpressionKind::Group { .. }));
-    assert_eq!(analysis.parameters[0].constraint, None);
     assert_eq!(analysis.parameters[0].roles, [ParameterRole::Type]);
-    assert_eq!(analysis.parameters[0].uses.len(), 1);
+    assert_eq!(analysis.parameters[0].uses.len(), 2);
     assert_eq!(analysis.parameters[1].uses.len(), 1);
     assert!(analysis.parameters[1].uses[0].grouped);
 
@@ -277,7 +327,6 @@ fn ungrouped_parameter_uses_require_atomic_arguments_without_changing_the_c_body
     let analysis = analyze(&frontend, "EXPR_ATOMIC_POW2");
     assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{analysis:?}");
     assert_eq!(analysis.invocation, InvocationContract::AtomicArguments);
-    assert_eq!(analysis.parameters[0].constraint, Some(InputConstraint::IntegerScalar));
     assert_eq!(analysis.parameters[0].uses.len(), 3);
     assert!(!analysis.parameters[0].uses[0].grouped);
     assert!(analysis.parameters[0].uses[1..].iter().all(|usage| usage.grouped));

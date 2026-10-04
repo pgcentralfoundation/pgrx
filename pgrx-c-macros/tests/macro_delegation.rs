@@ -70,17 +70,23 @@ fn emitted(source: pgrx_c_macros::MacroEmission) -> String {
     }
 }
 
-fn public_body(source: &str) -> &str {
+fn arm_boundary(source: &str, marker: &str) -> usize {
     source
-        .split_once("(@__pgrx_emit_public;")
-        .unwrap()
-        .1
-        .split_once("=> {")
-        .unwrap()
-        .1
-        .split_once("\n(@__pgrx_emit_value;")
-        .unwrap()
-        .0
+        .match_indices('\n')
+        .find_map(|(offset, _)| {
+            source[offset + 1..]
+                .lines()
+                .next()
+                .is_some_and(|line| line.trim_start().starts_with(marker))
+                .then_some(offset)
+        })
+        .expect("generated normalized macro arm")
+}
+
+fn value_body(source: &str) -> &str {
+    let value_arm = &source[arm_boundary(source, "(@__pgrx_emit_value;") + 1..];
+    let body = value_arm.split_once("=> {").expect("generated macro rule").1;
+    &body[..arm_boundary(body, "(@__pgrx_c_value;")]
 }
 
 fn bindings() -> BindingCatalog {
@@ -114,11 +120,11 @@ fn direct_calls_preserve_shape_and_explain_fallbacks() {
         ("DELEGATE_KEYWORD", "r#match"),
     ] {
         let source = emitted(emit_with_bindings(&session, caller, &bindings));
-        let body = public_body(&source);
+        let body = value_body(&source);
         assert!(body.contains(&format!("$crate::{callee}!(")), "{caller}: {body}");
     }
     let source = emitted(emit_with_bindings(&session, "DELEGATE_BUFFERALIGN", &bindings));
-    let body = public_body(&source);
+    let body = value_body(&source);
     assert!(!body.contains("::bitand("), "wrapper must retain its callee: {body}");
 
     for (caller, callee, explanation) in [
@@ -126,13 +132,13 @@ fn direct_calls_preserve_shape_and_explain_fallbacks() {
         ("DELEGATE_GROUPING_FIXED", "DELEGATE_UNGROUPED", "set of emitted Rust macros"),
     ] {
         let source = emitted(emit_with_bindings(&session, caller, &bindings));
-        let body = public_body(&source);
+        let body = value_body(&source);
         assert!(!body.contains(&format!("$crate::{callee}!")), "{body}");
         assert!(body.contains("/* PGRX:"), "fallback must explain expansion: {body}");
         assert!(body.contains(explanation), "{body}");
     }
     let source = emitted(emit(&session, "DELEGATE_BUFFERALIGN"));
-    let body = public_body(&source);
+    let body = value_body(&source);
     assert!(!body.contains("$crate::DELEGATE_TYPEALIGN!"));
     assert!(body.contains("/* PGRX:"));
 }

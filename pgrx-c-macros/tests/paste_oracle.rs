@@ -175,8 +175,8 @@ fn main() {
 }
 "#;
 
-fn macro_body(source: &str, name: &str) -> String {
-    syn::parse_file(source)
+fn value_body(source: &str, name: &str) -> String {
+    let tokens = syn::parse_file(source)
         .unwrap()
         .items
         .into_iter()
@@ -184,11 +184,17 @@ fn macro_body(source: &str, name: &str) -> String {
             syn::Item::Macro(item)
                 if item.ident.as_ref().is_some_and(|identifier| identifier == name) =>
             {
-                Some(item.mac.tokens.to_string().replace(' ', ""))
+                Some(item.mac.tokens.into_iter().collect::<Vec<_>>())
             }
             _ => None,
         })
-        .unwrap()
+        .unwrap();
+    tokens
+        .chunks_exact(5)
+        .find(|arm| arm[0].to_string().replace(' ', "").contains("@__pgrx_emit_value"))
+        .expect("expression macros have a semantic value arm")[3]
+        .to_string()
+        .replace(' ', "")
 }
 
 #[test]
@@ -252,7 +258,7 @@ fn closed_pastes_preserve_literal_spelling_c_identity_symbols_and_evaluation() {
             let EmissionStatus::Emitted { rust: definition, .. } = &emission.status else {
                 panic!("closed paste must emit under {optimization}: {emission:?}");
             };
-            let body = macro_body(definition, &emission.analysis.name);
+            let body = value_body(definition, &emission.analysis.name);
             match emission.analysis.name.as_str() {
                 "PASTE_UL" | "PASTE_ULL" => assert!(
                     body.contains("0xFFFFFFFFFFFFFFFF"),

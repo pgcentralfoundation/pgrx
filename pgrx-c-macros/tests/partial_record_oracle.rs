@@ -32,6 +32,9 @@ const NAMES: &[&str] = &[
     "PARTIAL_CHOOSE",
     "PARTIAL_SIZE",
     "PARTIAL_TEMP_INNER",
+    "PARTIAL_DISCARD_RECORD",
+    "PARTIAL_DISCARD",
+    "PARTIAL_DISCARD_VALUE",
 ];
 
 #[test]
@@ -60,6 +63,7 @@ fn aggregate_native_calls_copy_uninitialized_fields_without_materializing_them()
         .allowlist_type("Partial.*")
         .allowlist_function("partial_.*")
         .rustified_enum("PartialState")
+        .no_copy("PartialDiscardRecord")
         .layout_tests(false)
         .generate_comments(false)
         .formatter(bindgen::Formatter::None)
@@ -72,10 +76,12 @@ fn aggregate_native_calls_copy_uninitialized_fields_without_materializing_them()
         frontend.declarations(),
         &frontend.profile().target,
     );
+    assert!(!bindings.records["PartialDiscardRecord"].copy);
     bindings.ffi_boundary = Some(vec!["ffi".into(), "boundary".into()]);
     let artifact = emit_support_artifact_with_bindings(&session, NAMES, &bindings)
         .expect("derive raw aggregate call adapters");
     assert!(artifact.rust.contains("MaybeUninit<crate::PartialRecord>"));
+    assert!(artifact.rust.contains("MaybeUninit<crate::PartialDiscardRecord>"));
     assert!(!artifact.c_source.contains("PARTIAL_"), "native helpers must not forward C macros");
     let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../pgrx-pg-sys/src/c_macros/support.rs")
@@ -85,7 +91,7 @@ fn aggregate_native_calls_copy_uninitialized_fields_without_materializing_them()
         "#![deny(unsafe_op_in_unsafe_fn)]\n#![allow(non_snake_case,non_camel_case_types,dead_code,unused_parens)]\n#[path={support:?}]pub mod __pgrx_c_macros;\n{source}\n{}\n",
         artifact.rust
     );
-    for emission in emit_batch_with_bindings(&session, NAMES, &bindings) {
+    for emission in emit_batch_with_bindings(&session, NAMES, &bindings).unwrap() {
         let EmissionStatus::Emitted { rust: definition, .. } = emission.status else {
             panic!("aggregate macro must emit: {emission:?}")
         };
@@ -112,7 +118,8 @@ fn aggregate_native_calls_copy_uninitialized_fields_without_materializing_them()
         &arguments,
         true,
     );
-    assert_eq!(original.lines().count(), 29, "native aggregate corpus completeness");
+    assert_eq!(original.lines().count(), 30, "native aggregate corpus completeness");
+    assert!(original.ends_with("discard 2 2\n"), "void casts must preserve operand side effects");
     assert_eq!(translated, original, "raw aggregate values must match selected original C fields");
     let guard = "mod ffi{pub unsafe fn boundary<R,F:FnOnce()->R>(call:F)->R{call()}}";
     for body in [

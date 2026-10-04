@@ -24,7 +24,9 @@ serde.workspace = true
 thiserror.workspace = true
 clap = { version = "4.4.2", features = ["derive"], optional = true }
 serde_json.workspace = true
+tempfile = "3.27"
 petgraph = "0.8.3"
+proc-macro2.workspace = true
 
 [dev-dependencies]
 bindgen = { version = "0.72.1", default-features = false, features = ["runtime"] }

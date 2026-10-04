@@ -310,7 +310,8 @@ fn emit_postgres(args: EmitArgs) -> Result<(), CliError> {
     let report = EmissionReport {
         postgres_version: postgres.pg_config().version().map_err(PostgresError::from)?,
         profile: inspected.profile(),
-        macros: emit_batch_with_bindings(&session, &names, &BindingCatalog::default()),
+        macros: emit_batch_with_bindings(&session, &names, &BindingCatalog::default())
+            .map_err(FrontendError::Output)?,
     };
     let stdout = io::stdout();
     let mut output = BufWriter::new(stdout.lock());

@@ -59,7 +59,7 @@ int main(void) {
     RESET(); RECORD("bit_post_size", CTX_SIZE(CTX_POST(CTX_BIT(context_base(pointer)))));
     RESET(); RECORD("bit_comma_size", CTX_SIZE(CTX_COMMA(0, CTX_BIT(context_base(pointer)))));
     RESET(); RECORD("array_address", CTX_ADDRESS(CTX_ARRAY(context_base(pointer))) == &record.array);
-    RESET(); RECORD("type_hole", CTX_TYPE(unsigned short, 65537u));
+    RESET(); RECORD("type_hole", CTX_TYPE_PROVEN(unsigned short, 65537u));
     RESET(); RECORD("atomic_identifier", CTX_ATOMIC(record.field));
     RESET(); RECORD("atomic_grouped_expression", CTX_ATOMIC((1 + 2)));
     RESET(); CTX_IGNORE(context_base(pointer)); RECORD("unused", 0);
@@ -75,7 +75,7 @@ int main(void) {
     RESET(); RECORD_TYPE("type_repeat", CTX_REPEAT(CTX_FIELD(context_base(pointer))));
     RESET(); RECORD_TYPE("type_conditional", CTX_LAZY(1, CTX_FIELD(context_base(pointer)), CTX_FIELD(context_base(pointer))));
     RESET(); RECORD_TYPE("type_comma", CTX_COMMA(0, CTX_FIELD(context_base(pointer))));
-    RESET(); RECORD_TYPE("type_cast", CTX_TYPE(unsigned short, 65537u));
+    RESET(); RECORD_TYPE("type_cast", CTX_TYPE_PROVEN(unsigned short, 65537u));
     RESET(); RECORD_TYPE("type_size", CTX_SIZE(CTX_FIELD(context_base(pointer))));
     return 0;
 }

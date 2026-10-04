@@ -88,7 +88,12 @@ fn compare_literals(scanner: &MacroScanner, frontend: &FrontendOutput, cases: &[
             panic!("original C macro {name} must emit: {emission:?}");
         };
         let body = source.split_once("=> {").expect("generated macro rule").1;
-        assert!(body.contains(&format!("::new({spelling}")), "{name}: {body}");
+        assert!(
+            body.split("::new(")
+                .skip(1)
+                .any(|argument| argument.trim_start().starts_with(spelling)),
+            "{name}: {body}"
+        );
         rust.push_str(&source);
     }
     rust.push_str(

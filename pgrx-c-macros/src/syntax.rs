@@ -238,6 +238,7 @@ struct Parser<'a, F> {
     position: usize,
     parameters: HashMap<&'a str, usize>,
     type_parameters: HashSet<usize>,
+    ambiguous_casts: HashSet<NodeId>,
     nodes: Vec<ExpressionNode>,
     is_type: F,
     original_len: usize,
@@ -284,6 +285,7 @@ fn parse(
         position: 0,
         parameters: parameters.iter().enumerate().map(|(i, name)| (name.as_str(), i)).collect(),
         type_parameters: HashSet::new(),
+        ambiguous_casts: HashSet::new(),
         nodes: Vec::new(),
         is_type,
         original_len: tokens.len(),
@@ -305,26 +307,62 @@ fn parse(
     parser.type_parameters = parser
         .nodes
         .iter()
-        .filter_map(|node| match node.kind {
+        .enumerate()
+        .filter_map(|(index, node)| match node.kind {
             ExpressionKind::TypeParameterCast { parameter, .. }
-            | ExpressionKind::SizeOfTypeParameter { parameter, .. }
-            | ExpressionKind::AlignOfTypeParameter { parameter, .. } => Some(parameter),
+                if !parser.ambiguous_casts.contains(&index) =>
+            {
+                Some(parameter)
+            }
+            ExpressionKind::TypeParameterCast { .. } => None,
+            ExpressionKind::SizeOfTypeParameter { parameter, .. } => Some(parameter),
+            ExpressionKind::AlignOfTypeParameter { parameter, pointers, is_const }
+                if pointers != 0 || is_const =>
+            {
+                Some(parameter)
+            }
             ExpressionKind::OffsetOf { record: OffsetRecord::Parameter { index }, .. } => {
                 Some(index)
             }
             _ => None,
         })
         .collect();
-    if !parser.type_parameters.is_empty()
-        && parser
-            .nodes
-            .iter()
-            .any(|node| matches!(node.kind, ExpressionKind::SizeOfExpression { .. }))
+    if let Some(&index) = parser
+        .ambiguous_casts
+        .iter()
+        .filter(|&&index| {
+            let ExpressionKind::TypeParameterCast { parameter, .. } = parser.nodes[index].kind
+            else {
+                unreachable!("only provisional formal casts enter the ambiguity set")
+            };
+            !parser.type_parameters.contains(&parameter)
+        })
+        .min()
     {
-        // A later type-only use can establish an earlier sizeof operand. Reparse
-        // once rather than leaving orphaned value nodes and duplicate hole uses.
+        return Err(SyntaxError {
+            kind: SyntaxErrorKind::TypeParameter,
+            tokens: parser.nodes[index].tokens,
+            message: "parenthesized macro parameter may be a C cast type or callable value; its role is not established".into(),
+        });
+    }
+    // GNU alignment also accepts expressions, so bare alignment cannot prove
+    // that an ambiguous application is a cast. Its existing admitted type
+    // family can still resolve sizeof operands after that ambiguity check.
+    parser.type_parameters.extend(parser.nodes.iter().filter_map(|node| match node.kind {
+        ExpressionKind::AlignOfTypeParameter { parameter, .. } => Some(parameter),
+        _ => None,
+    }));
+    if !parser.type_parameters.is_empty()
+        && (!parser.ambiguous_casts.is_empty()
+            || parser
+                .nodes
+                .iter()
+                .any(|node| matches!(node.kind, ExpressionKind::SizeOfExpression { .. })))
+    {
+        // Reparse once so later type uses also resolve earlier sizeof operands.
         parser.position = 0;
         parser.nodes.clear();
+        parser.ambiguous_casts.clear();
         (root, statement_body) = parser.replacement(allow_statements)?;
         if parser.position != parser.tokens.len() {
             return Err(parser.unexpected());
@@ -505,10 +543,14 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
                     return Ok(self.push(ExpressionKind::Cast { type_name, operand }, tokens));
                 }
                 if let Some((end, parameter, pointers, is_const)) = self.type_parameter() {
+                    let ambiguous = pointers == 0
+                        && !is_const
+                        && !self.type_parameters.contains(&parameter)
+                        && self.tokens[end + 1].token.spelling == "(";
                     self.position = end + 1;
                     let operand = self.expression(14, depth + 1)?;
                     let tokens = TokenRange { start, end: self.nodes[operand].tokens.end };
-                    return Ok(self.push(
+                    let node = self.push(
                         ExpressionKind::TypeParameterCast {
                             parameter,
                             pointers,
@@ -516,7 +558,11 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
                             operand,
                         },
                         tokens,
-                    ));
+                    );
+                    if ambiguous {
+                        self.ambiguous_casts.insert(node);
+                    }
+                    return Ok(node);
                 }
                 self.position += 1;
                 let operand = self.expression(0, depth + 1)?;
@@ -628,7 +674,7 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             ) {
                 return Err(self.error(
                     SyntaxErrorKind::Statement,
-                    "statement and caller control-flow macros are deferred",
+                    "unsupported statement or caller control-flow shape",
                 ));
             }
             let kind = ExpressionKind::Identifier { name: spelling.into() };
@@ -806,20 +852,16 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
     fn unexpected(&self) -> SyntaxError {
         let spelling = self.spelling().unwrap_or("end of replacement list");
         let (kind, message) = match spelling {
-            "[" | "." | "->" => (
-                SyntaxErrorKind::PointerOperation,
-                "array/member access requires a memory contract",
-            ),
+            "[" | "." | "->" => {
+                (SyntaxErrorKind::PointerOperation, "unsupported array or member access shape")
+            }
             "++" | "--" | "=" | "+=" | "-=" | "*=" | "/=" | "%=" | "<<=" | ">>=" | "&=" | "^="
             | "|=" => {
-                (SyntaxErrorKind::Mutation, "mutation and place-valued expressions are deferred")
+                (SyntaxErrorKind::Mutation, "unsupported mutation or place-valued expression shape")
             }
-            "{" | "}" | ";" => (SyntaxErrorKind::Statement, "statement macros are deferred"),
-            "(" => (
-                SyntaxErrorKind::Call,
-                "calls require preprocessing/declaration and evaluation contracts",
-            ),
-            "," => (SyntaxErrorKind::CommaExpression, "comma expressions are deferred"),
+            "{" | "}" | ";" => (SyntaxErrorKind::Statement, "unexpected statement token"),
+            "(" => (SyntaxErrorKind::Call, "unsupported call shape"),
+            "," => (SyntaxErrorKind::CommaExpression, "unexpected comma expression"),
             _ => (SyntaxErrorKind::InvalidExpression, "not a complete supported C expression"),
         };
         self.error(kind, format!("{message}: {spelling:?}"))
@@ -1370,7 +1412,7 @@ mod tests {
             "reparsing must not leave orphaned value holes"
         );
         let cast = parse_expression(
-            &tokens(&["(", "sizeof", "(", "t", ")", ",", "(", "t", ")", "(", "x", ")", ")"]),
+            &tokens(&["(", "sizeof", "(", "t", ")", ",", "(", "t", ")", "x", ")"]),
             &["t".into(), "x".into()],
             |_| false,
         )
@@ -1386,6 +1428,120 @@ mod tests {
                 .count(),
             1
         );
+    }
+
+    #[test]
+    fn parenthesized_formal_application_does_not_establish_its_own_type_role() {
+        for body in [
+            vec!["(", "t", ")", "(", "x", ")"],
+            vec!["(", "t", ")", "(", "x", ",", "y", ")"],
+            vec!["sizeof", "(", "t", ")", ",", "(", "t", ")", "(", "x", ")"],
+            vec!["(", "t", ")", "(", "x", ")", "+", "(", "t", ")", "(", "y", ")"],
+            vec!["_Alignof", "(", "u", ")", ",", "(", "t", ")", "(", "x", ")"],
+            vec!["_Alignof", "(", "t", ")", ",", "(", "t", ")", "(", "x", ")"],
+            vec!["(", "t", ")", "(", "x", ")", ",", "_Alignof", "(", "t", ")"],
+            vec![
+                "sizeof", "(", "t", ")", ",", "_Alignof", "(", "t", ")", ",", "(", "t", ")", "(",
+                "x", ")",
+            ],
+            vec![
+                "_Alignof", "(", "t", ")", ",", "sizeof", "(", "t", ")", ",", "(", "t", ")", "(",
+                "x", ")",
+            ],
+        ] {
+            let error = parse_expression(
+                &tokens(&body),
+                &["t".into(), "x".into(), "y".into(), "u".into()],
+                |_| false,
+            )
+            .unwrap_err();
+            assert_eq!(error.kind, SyntaxErrorKind::TypeParameter, "{body:?}");
+            assert!(error.message.contains("cast type or callable value"), "{error:?}");
+            assert_eq!(&body[error.tokens.start..error.tokens.start + 3], &["(", "t", ")"]);
+        }
+    }
+
+    #[test]
+    fn independent_type_uses_resolve_formal_applications_in_either_source_order() {
+        for proof in [
+            vec!["_Alignof", "(", "t", "*", ")"],
+            vec!["_Alignof", "(", "const", "t", ")"],
+            vec!["sizeof", "(", "t", "*", ")"],
+            vec!["(", "t", "*", ")", "x"],
+            vec!["(", "const", "t", ")", "x"],
+            vec!["(", "t", ")", "x"],
+            vec!["(", "t", ")", "1"],
+            vec!["__builtin_offsetof", "(", "t", ",", "field", ")"],
+        ] {
+            let application = ["(", "t", ")", "(", "x", ")"];
+            for first in [true, false] {
+                let body = if first {
+                    [proof.as_slice(), &[","], application.as_slice()].concat()
+                } else {
+                    [application.as_slice(), &[","], proof.as_slice()].concat()
+                };
+                let expression =
+                    parse_expression(&tokens(&body), &["t".into(), "x".into()], |_| false).unwrap();
+                assert!(
+                    expression.nodes.iter().any(|node| matches!(
+                        node.kind,
+                        ExpressionKind::TypeParameterCast { parameter: 0, pointers: 0, .. }
+                    )),
+                    "{body:?}"
+                );
+                assert!(
+                    !expression
+                        .nodes
+                        .iter()
+                        .any(|node| matches!(node.kind, ExpressionKind::Parameter { index: 0 })),
+                    "a proven type must not leave a value hole: {body:?}"
+                );
+            }
+        }
+        let expression = parse_expression(
+            &tokens(&[
+                "sizeof", "(", "t", ")", ",", "(", "t", ")", "(", "x", ")", ",", "sizeof", "(",
+                "t", "*", ")",
+            ]),
+            &["t".into(), "x".into()],
+            |_| false,
+        )
+        .unwrap();
+        assert!(expression.nodes.iter().any(|node| matches!(
+            node.kind,
+            ExpressionKind::SizeOfTypeParameter { parameter: 0, .. }
+        )));
+        assert_eq!(
+            expression
+                .nodes
+                .iter()
+                .filter(|node| matches!(node.kind, ExpressionKind::Parameter { .. }))
+                .count(),
+            1,
+            "reparsing must not leave the earlier sizeof value hole"
+        );
+    }
+
+    #[test]
+    fn unambiguous_callable_grouping_and_catalog_casts_keep_their_roles() {
+        for body in [vec!["fn", "(", "x", ")"], vec!["(", "(", "fn", ")", ")", "(", "x", ")"]] {
+            let expression =
+                parse_expression(&tokens(&body), &["fn".into(), "x".into()], |_| false).unwrap();
+            assert!(matches!(expression.nodes[expression.root].kind, ExpressionKind::Call { .. }));
+            assert!(
+                !expression
+                    .nodes
+                    .iter()
+                    .any(|node| matches!(node.kind, ExpressionKind::TypeParameterCast { .. }))
+            );
+        }
+        let expression = parse_expression(
+            &tokens(&["(", "KnownType", ")", "(", "x", ")"]),
+            &["x".into()],
+            |name| name == "KnownType",
+        )
+        .unwrap();
+        assert!(matches!(expression.nodes[expression.root].kind, ExpressionKind::Cast { .. }));
     }
 
     #[test]
@@ -1590,8 +1746,8 @@ mod tests {
     fn type_hole_reparse_keeps_return_statements_in_one_arena() {
         let parsed = parse_replacement(
             &tokens(&[
-                "{", "int", "tmp", "=", "sizeof", "(", "t", ")", ";", "return", "(", "t", ")", "(",
-                "x", ")", ";", "}",
+                "{", "int", "tmp", "=", "sizeof", "(", "t", ")", "+", "sizeof", "(", "t", "*", ")",
+                ";", "return", "(", "t", ")", "(", "x", ")", ";", "}",
             ]),
             &["t".into(), "x".into()],
             |name| name == "int",

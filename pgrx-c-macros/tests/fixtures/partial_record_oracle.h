@@ -8,9 +8,16 @@ typedef struct PartialRecord {
     PartialState state;
     PartialInner inner;
 } PartialRecord;
+typedef struct PartialDiscardRecord {
+    int first;
+    _Bool untouched;
+    PartialState state;
+} PartialDiscardRecord;
 PartialRecord partial_record(int value);
 PartialRecord partial_identity(PartialRecord value);
 int partial_take(PartialRecord value);
+PartialDiscardRecord partial_discard_record(int value);
+int partial_discard_count(void);
 
 #define PARTIAL_RECORD(x) partial_record((x))
 #define PARTIAL_IDENTITY(x) partial_identity((x))
@@ -22,3 +29,6 @@ int partial_take(PartialRecord value);
 #define PARTIAL_CHOOSE(c,x,y) ((c) ? (x) : (y))
 #define PARTIAL_SIZE(x) (sizeof(x))
 #define PARTIAL_TEMP_INNER(x) (partial_record((x)).inner.value)
+#define PARTIAL_DISCARD_RECORD(x) partial_discard_record((x))
+#define PARTIAL_DISCARD(x) ((void) partial_discard_record((x)))
+#define PARTIAL_DISCARD_VALUE(x) ((void)(x))

@@ -60,7 +60,7 @@ fn emitted(emission: &MacroEmission) -> &str {
     rust
 }
 
-fn public_body(source: &str, name: &str) -> String {
+fn value_body(source: &str, name: &str) -> String {
     let parsed = syn::parse_file(source).unwrap();
     let item = parsed
         .items
@@ -77,7 +77,7 @@ fn public_body(source: &str, name: &str) -> String {
     let tokens = item.mac.tokens.clone().into_iter().collect::<Vec<_>>();
     tokens
         .chunks_exact(5)
-        .find(|arm| arm[0].to_string().replace(' ', "").contains("@__pgrx_emit_public"))
+        .find(|arm| arm[0].to_string().replace(' ', "").contains("@__pgrx_emit_value"))
         .unwrap()[3]
         .to_string()
         .replace(' ', "")
@@ -153,12 +153,12 @@ fn verified_alias_names_retain_c_type_identity_qualifiers_layout_and_null_tags()
             assert!(source.contains("/* PGRX:") && source.contains("AliasEnumChain"));
             assert!(source.contains("the C type has no corresponding named Rust binding"));
             assert!(
-                !public_body(source, "ALIAS_ENUM_CHAIN")
+                !value_body(source, "ALIAS_ENUM_CHAIN")
                     .contains("::cast_as::<$crate::AliasEnumChain,")
             );
         }
         if let Some((_, alias)) = CASTS.iter().find(|(name, _)| *name == emission.analysis.name) {
-            let body = public_body(source, &emission.analysis.name);
+            let body = value_body(source, &emission.analysis.name);
             assert!(
                 body.contains(&format!("::cast_as::<{alias},")),
                 "the first cast_as type argument must name the actual binding: {body}"
@@ -339,7 +339,7 @@ fn check_fallback(
     }
     let generated = generate_with_bindings(session, &["ALIAS_MODE"], &catalog).unwrap();
     let source = emitted(&generated.macros[0]);
-    let body = public_body(source, "ALIAS_MODE");
+    let body = value_body(source, "ALIAS_MODE");
     assert!(
         source.contains("/* PGRX:") && source.contains("AclMode"),
         "fallback must explain its source typedef: {source}"

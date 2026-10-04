@@ -210,6 +210,18 @@ pointer_sized_integer_storage!(
 pub trait NativeType: sealed::Sealed + Sized {
     type Marker: CType<Storage = Self>;
 }
+/// Native storage for a complete, compiler/bindgen-verified C record.
+/// Generated layout witnesses establish its size, alignment and field types.
+/// This does not require a whole record to be initialized or `Copy`; native
+/// value inputs separately require `Copy`, while raw places retain their unsafe
+/// access contract.
+// Registration stays within the defining crate. A public registration trait
+// paired with blanket sealing would let callers bypass the native type gate.
+pub(crate) trait NativeRecord: Sized {}
+impl<R: NativeRecord> sealed::Sealed for R {}
+impl<R: NativeRecord> NativeType for R {
+    type Marker = CRecord<Self>;
+}
 impl<K: CInteger> NativeType for CValue<K> {
     type Marker = CStoredInteger<K>;
 }
@@ -235,6 +247,12 @@ native_integer_types!(
 pub trait IntoExpression: sealed::Sealed {
     type Value: CExprValue;
     fn into_expression(self) -> Self::Value;
+}
+impl<R: NativeRecord + Copy> IntoExpression for R {
+    type Value = RecordValue<Self>;
+    fn into_expression(self) -> Self::Value {
+        RecordValue::new(self)
+    }
 }
 impl<K: CInteger> IntoExpression for CValue<K> {
     type Value = CValue<K::Boundary>;
@@ -281,6 +299,25 @@ where
     value
 }
 
+/// Preserve a verified C `__builtin_expect` value and its fixed expectation.
+///
+/// The emitter converts and evaluates both operands once before this call.
+/// A mismatch is a cold path, including for non-Boolean `long` expectations;
+/// it does not change the returned value or impose a safety precondition.
+/// The emitter leaves dynamic expectations unhinted and suppresses nested
+/// hints when an enclosing expectation takes precedence through groups or casts.
+#[inline(always)]
+pub fn expect(value: CValue<super::CLong>, expected: CValue<super::CLong>) -> CValue<super::CLong> {
+    if value.get() == expected.get() {
+        // Distinct equivalent returns retain the hinted branch until the
+        // surrounding C conversions and consuming condition have inlined.
+        expected
+    } else {
+        core::hint::cold_path();
+        value
+    }
+}
+
 #[derive(Clone, Copy, Debug)]
 pub struct ReadOnly;
 #[derive(Clone, Copy, Debug)]
@@ -290,11 +327,14 @@ impl sealed::Sealed for ReadWrite {}
 
 /// Pointer qualification is retained independently from its pointee identity.
 pub trait Qualifier: sealed::Sealed + Copy {
+    /// Combine the base and declared access without granting additional writes.
+    type Narrow<Declared: Qualifier>: Qualifier;
     type Raw<T>: Copy;
     fn into_mut<T>(pointer: Self::Raw<T>) -> *mut T;
     fn from_mut<T>(pointer: *mut T) -> Self::Raw<T>;
 }
 impl Qualifier for ReadOnly {
+    type Narrow<Declared: Qualifier> = ReadOnly;
     type Raw<T> = *const T;
     fn into_mut<T>(pointer: *const T) -> *mut T {
         pointer.cast_mut()
@@ -304,6 +344,7 @@ impl Qualifier for ReadOnly {
     }
 }
 impl Qualifier for ReadWrite {
+    type Narrow<Declared: Qualifier> = Declared;
     type Raw<T> = *mut T;
     fn into_mut<T>(pointer: *mut T) -> *mut T {
         pointer
@@ -413,9 +454,39 @@ pub trait FunctionSignature: sealed::Sealed + Copy {
     fn address(pointer: Self::Pointer) -> *const ();
 }
 
+/// Shared null/address operations for one physical Rust function-pointer shape.
+/// Generated local families vary over native argument/result storage, ABI and
+/// arity. These operations do not call the function or inspect its value types;
+/// the concrete C signature separately owns compiler and binding validation.
+pub trait PhysicalFunctionPointer: sealed::Sealed {
+    type Pointer: Copy;
+    fn null() -> Self::Pointer;
+    fn address(pointer: Self::Pointer) -> *const ();
+}
+
+/// An exact compiler-owned C identity using shared physical-pointer operations.
+/// Its physical family is instantiated with the original binding storage;
+/// distinct C prototypes retain separate identities even when that storage is
+/// equal. Family bounds verify the stored pointer's precise Rust ABI and arity.
+pub trait NativeFunctionSignature: sealed::Sealed + Copy {
+    type Physical: PhysicalFunctionPointer;
+}
+
+impl<S: NativeFunctionSignature> FunctionSignature for S {
+    type Pointer = <S::Physical as PhysicalFunctionPointer>::Pointer;
+
+    fn null() -> Self::Pointer {
+        S::Physical::null()
+    }
+
+    fn address(pointer: Self::Pointer) -> *const () {
+        S::Physical::address(pointer)
+    }
+}
+
 /// A generated exact-signature adapter for an indirect native C call.
 /// Conversion and null checks occur before entering the PostgreSQL error guard;
-/// only Copy ABI storage belongs inside that guard, with result decoding after.
+/// captured ABI storage must have no destructors, with result decoding after.
 pub trait Call<Args>: FunctionSignature {
     type Output: CExprValue;
     /// # Safety
@@ -727,6 +798,40 @@ pub fn native_place<T: NativeType>(address: *mut T) -> Place<T::Marker> {
 pub fn native_const_place<T: NativeType>(address: *const T) -> Place<T::Marker, ReadOnly> {
     const_place(address)
 }
+
+/// Preserve a native raw dereference's qualification during read projection.
+///
+/// Borrowing a raw pointer retains its pointee permissions without accessing
+/// the allocation. Other Rust dereference owners retain shared read access.
+/// Returned places borrow no owner: callers must keep the dereference operand
+/// alive until every unsafe access and satisfy the place's access contract.
+#[doc(hidden)]
+pub trait NativeDerefRead {
+    type Output: Copy;
+    fn __pgrx_c_read_deref_place(self) -> Self::Output;
+}
+
+impl<T: NativeType> NativeDerefRead for &*mut T {
+    type Output = Place<T::Marker>;
+    fn __pgrx_c_read_deref_place(self) -> Self::Output {
+        native_place(*self)
+    }
+}
+
+impl<T: NativeType> NativeDerefRead for &*const T {
+    type Output = Place<T::Marker, ReadOnly>;
+    fn __pgrx_c_read_deref_place(self) -> Self::Output {
+        native_const_place(*self)
+    }
+}
+
+impl<D: core::ops::Deref<Target: NativeType> + ?Sized> NativeDerefRead for &&D {
+    type Output = Place<<D::Target as NativeType>::Marker, ReadOnly>;
+    fn __pgrx_c_read_deref_place(self) -> Self::Output {
+        native_const_place(core::ptr::from_ref(core::ops::Deref::deref(*self)))
+    }
+}
+
 pub fn pointee<M: CType, Q: Qualifier>(pointer: Pointer<M, Q>) -> Place<M, Q> {
     Place::new(pointer.get(), pointer.access())
 }
@@ -1075,6 +1180,75 @@ pub unsafe trait Field<F, Q: Qualifier>: CType {
     /// the accessed field needs initialization when the returned place is loaded.
     unsafe fn project(place: Place<Self, Q>) -> Self::Output;
 }
+
+/// Function shape for uncalled witnesses of exact native field storage.
+/// Runtime field projection never executes these compile-time type checks.
+///
+/// # Safety
+/// Calling a function requires a base pointer into a live containing
+/// allocation that permits the field address in bounds, or the permitted
+/// one-past address of a flexible-array field. It forms no reference and reads
+/// no storage, so the containing record need not be initialized. Its raw result
+/// may be unaligned and grants no additional read or write permissions.
+pub type FieldProjection<Owner, Storage> = unsafe fn(*mut Owner) -> *mut Storage;
+
+/// Exact metadata for an ordinary field of a compiler-established C record.
+///
+/// # Safety
+/// `OFFSET` must designate the field's actual storage within the containing
+/// record, with `Member::Storage` matching its full C/Rust representation.
+/// Implementations must prove each promoted field's type and layout, including
+/// transparent storage wrappers. `ACCESS` must retain packing and volatile
+/// requirements; `ALIGNMENT` must be the nonzero declared member alignment.
+/// The defaults require the record and member storage alignments to equal their
+/// compiler-established C alignments, and `Member::VOLATILE` to include every
+/// enclosing volatile member. These follow from the generated layout and type
+/// witnesses; different storage representations must override the constants.
+/// `Declared` must be ReadOnly when any enclosing member is const, otherwise
+/// ReadWrite. Its composition with the containing place must never broaden
+/// write access.
+pub unsafe trait OrdinaryField<F>: CType {
+    type Member: CType;
+    type Declared: Qualifier;
+    const OFFSET: usize;
+    const ALIGNMENT: usize = core::mem::align_of::<<Self::Member as CType>::Storage>();
+    const ACCESS: Access = Access {
+        volatile: <Self::Member as CType>::VOLATILE,
+        unaligned: core::mem::align_of::<Self::Storage>() < Self::ALIGNMENT
+            || !Self::OFFSET.is_multiple_of(Self::ALIGNMENT),
+    };
+}
+
+// SAFETY: OrdinaryField proves the exact typed field representation and layout.
+// This projection keeps the caller's allocation provenance and access metadata,
+// narrows qualification as established by that proof, and reads no storage.
+unsafe impl<R, F, Q: Qualifier> Field<F, Q> for CRecord<R>
+where
+    Self: OrdinaryField<F>,
+{
+    type Output =
+        Place<<Self as OrdinaryField<F>>::Member, Q::Narrow<<Self as OrdinaryField<F>>::Declared>>;
+    unsafe fn project(base: Place<Self, Q>) -> Self::Output {
+        // SAFETY: The caller provides the containing allocation and permits this
+        // in-bounds (or flexible-array one-past) field projection. OrdinaryField
+        // proves its byte offset and exact storage type. No reference is formed.
+        let address = unsafe {
+            base.pointer()
+                .as_mut_address()
+                .cast::<u8>()
+                .add(<Self as OrdinaryField<F>>::OFFSET)
+                .cast()
+        };
+        Place::new(
+            Q::Narrow::<<Self as OrdinaryField<F>>::Declared>::from_mut(address),
+            Access {
+                volatile: base.access().volatile || <Self as OrdinaryField<F>>::ACCESS.volatile,
+                unaligned: (<Self as OrdinaryField<F>>::ALIGNMENT > 1 && base.access().unaligned)
+                    || <Self as OrdinaryField<F>>::ACCESS.unaligned,
+            },
+        )
+    }
+}
 // SAFETY: Retagging the base preserves storage and access metadata. The underlying
 // Field contract requires its projection to preserve inherited volatile access.
 unsafe impl<F, M: Field<F, Q>, Q: Qualifier> Field<F, Q> for CVolatile<M>
@@ -1099,7 +1273,7 @@ pub unsafe fn project<F, M: Field<F, Q>, Q: Qualifier>(place: Place<M, Q>) -> M:
     unsafe { M::project(place) }
 }
 
-/// Read a field from a fully initialized, copied C record value.
+/// Read the selected field from a copied C record's raw storage.
 ///
 /// # Safety
 /// The field's declared C access must be valid, including a union's active member
@@ -1155,7 +1329,7 @@ impl<K: CInteger, R: IntegerStorage<K>, V: CastTo<K>> CastTo<CIntegerStorage<K, 
         <V as CastTo<K>>::cast_to(self)
     }
 }
-impl<V: CExprValue + Copy> CastTo<CVoid> for V {
+impl<V: CExprValue> CastTo<CVoid> for V {
     fn cast_to(self) {
         let _ = self;
     }
@@ -1780,16 +1954,30 @@ impl<M: CompleteObject, Q: Qualifier, K: CInteger, P: OverflowPolicy> Subtract<C
         .with_access(self.access())
     }
 }
-impl<M: CompleteObject, L: Qualifier, R: Qualifier, P: OverflowPolicy> Subtract<Pointer<M, R>, P>
-    for Pointer<M, L>
+impl<
+    M: CompleteObject + PointeeIdentity,
+    N: CompleteObject + PointeeIdentity,
+    L: Qualifier,
+    R: Qualifier,
+    P: OverflowPolicy,
+> Subtract<Pointer<N, R>, P> for Pointer<M, L>
+where
+    M::Identity: CompatibleIdentity<N::Identity> + NonVoidIdentity,
+    N::Identity: NonVoidIdentity,
 {
     type Output = CValue<super::CLong>;
-    fn sub(self, rhs: Pointer<M, R>) -> Self::Output {
+    fn sub(self, rhs: Pointer<N, R>) -> Self::Output {
         let size = core::mem::size_of::<M::Storage>();
+        assert_eq!(
+            size,
+            core::mem::size_of::<N::Storage>(),
+            "C pointer subtraction needs identical storage strides"
+        );
         assert!(size != 0, "C pointer subtraction needs nonempty storage");
         // Addresses are sufficient for the numeric result. Unlike offset_from,
         // this does not perform an unsafe Rust operation for different allocations.
-        // Analysis admits only C invocations whose pointers are in the same array.
+        // The original C invocation requires elements of the same array (or its
+        // one-past endpoint); callers retain that domain obligation.
         let bytes = (self.as_mut_address().addr() as i128) - (rhs.as_mut_address().addr() as i128);
         assert!(bytes % size as i128 == 0, "C pointer subtraction needs a whole element distance");
         CValue::new(i64::try_from(bytes / size as i128).expect("C ptrdiff_t overflow"))
@@ -1946,14 +2134,13 @@ macro_rules! float_integer_compare {
 }
 float_integer_compare!(CFloat);
 float_integer_compare!(CDouble);
-/// Ordering requires compatible complete object pointees; void and unrelated
+/// Ordering requires compatible object pointees; void and unrelated
 /// object identities cannot gain ordering from the equality void conversion.
-pub trait SameIdentity<Target> {}
-impl<I> SameIdentity<I> for I {}
 impl<M: PointeeIdentity, Q: Qualifier, N: PointeeIdentity, R: Qualifier> Compare<Pointer<N, R>>
     for Pointer<M, Q>
 where
-    M::Identity: SameIdentity<N::Identity> + NonVoidIdentity,
+    M::Identity: CompatibleIdentity<N::Identity> + NonVoidIdentity,
+    N::Identity: NonVoidIdentity,
 {
     native_compare_methods!(|v: Self| v.as_mut_address().addr(), |v: Pointer<N, R>| v.as_mut_address().addr(), Pointer<N, R>);
 }
@@ -2061,17 +2248,8 @@ float_integer_select!(CDouble);
 pub trait CommonQualifier<Rhs: Qualifier>: Qualifier {
     type Output: Qualifier;
 }
-impl CommonQualifier<ReadWrite> for ReadWrite {
-    type Output = ReadWrite;
-}
-impl CommonQualifier<ReadOnly> for ReadWrite {
-    type Output = ReadOnly;
-}
-impl CommonQualifier<ReadWrite> for ReadOnly {
-    type Output = ReadOnly;
-}
-impl CommonQualifier<ReadOnly> for ReadOnly {
-    type Output = ReadOnly;
+impl<L: Qualifier, R: Qualifier> CommonQualifier<R> for L {
+    type Output = L::Narrow<R>;
 }
 impl<M: CType, Q: CommonQualifier<R>, R: Qualifier> Select<Pointer<M, R>> for Pointer<M, Q> {
     type Output = Pointer<M, Q::Output>;
@@ -2195,6 +2373,7 @@ mod tests {
         second: bool,
     }
     struct First;
+    struct Second;
 
     #[repr(C)]
     struct OffsetInner {
@@ -2249,14 +2428,50 @@ mod tests {
 
     // SAFETY: The compiler checks the actual field type and projection. Only the
     // first field is projected, with no record read or qualification broadening.
-    unsafe impl Field<First, ReadWrite> for CRecord<Partial> {
-        type Output = Place<CUnsignedInt>;
-        unsafe fn project(base: Place<Self>) -> Self::Output {
-            // SAFETY: The caller supplies an allocation containing Partial. A
-            // raw field projection doesn't require the other field initialized.
-            let address = unsafe { &raw mut (*base.pointer().get()).first };
-            place(address).with_access(base.access())
-        }
+    unsafe impl OrdinaryField<First> for CRecord<Partial> {
+        type Member = CUnsignedInt;
+        type Declared = ReadWrite;
+        const OFFSET: usize = core::mem::offset_of!(Partial, first);
+    }
+
+    // SAFETY: This uncalled witness verifies the metadata's exact Rust member type.
+    const _: unsafe fn(*mut Partial) -> *mut u32 =
+        |base| unsafe { core::ptr::addr_of_mut!((*base).first) };
+
+    // SAFETY: Partial's repr(C) bool field has its verified native bool storage,
+    // byte alignment and declared offset. Qualification only narrows to read access.
+    unsafe impl OrdinaryField<Second> for CRecord<Partial> {
+        type Member = super::super::CBool;
+        type Declared = ReadOnly;
+        const OFFSET: usize = core::mem::offset_of!(Partial, second);
+    }
+
+    // SAFETY: This uncalled witness verifies the metadata's exact Rust member type.
+    const _: unsafe fn(*mut Partial) -> *mut bool =
+        |base| unsafe { core::ptr::addr_of_mut!((*base).second) };
+
+    #[test]
+    fn ordinary_field_metadata_preserves_inherited_access_and_narrows_qualification() {
+        let mut record = Partial { first: 17, second: true };
+        let base = place::<CRecord<Partial>>(&raw mut record)
+            .with_access(Access { volatile: true, unaligned: true });
+        // SAFETY: The live record provides both declared field allocation extents.
+        let first: Place<CUnsignedInt> = unsafe { project::<First, _, _>(base) };
+        assert!(first.access().volatile && first.access().unaligned);
+        // SAFETY: As above. A byte-aligned field needs no inherited unaligned access.
+        let second: Place<super::super::CBool, ReadOnly> = unsafe { project::<Second, _, _>(base) };
+        assert!(second.access().volatile && !second.access().unaligned);
+        // SAFETY: The initialized bool remains live and may be read with volatile access.
+        assert!(unsafe { load(second) }.get());
+        let base = const_place::<CRecord<Partial>>(&raw const record);
+        // SAFETY: The initialized live first field permits read-only projection.
+        let first: Place<CUnsignedInt, ReadOnly> = unsafe { project::<First, _, _>(base) };
+        // SAFETY: The first field is initialized and alive with aligned read access.
+        assert_eq!(unsafe { load(first) }.get(), 17);
+        // SAFETY: The live bool remains readable through both const qualifiers.
+        let second: Place<super::super::CBool, ReadOnly> = unsafe { project::<Second, _, _>(base) };
+        // SAFETY: The bool is initialized, aligned, and readable for this load.
+        assert!(unsafe { load(second) }.get());
     }
 
     #[test]
@@ -2469,6 +2684,53 @@ mod tests {
         // SAFETY: The immutable array's third element is initialized and alive.
         assert_eq!(unsafe { load(index(input(2_i32), pointer)) }.get(), 41);
         let _: Pointer<CInt, ReadOnly> = pointer;
+    }
+
+    #[test]
+    fn native_dereference_reads_retain_raw_pointer_qualifiers_and_borrow_rust_owners() {
+        let mut values = [17_i32, 23];
+        let mutable = &raw mut values;
+        let target: Place<CArray<CInt, 2>> = (&mutable).__pgrx_c_read_deref_place();
+        // SAFETY: The live mutable array is designated without element reads.
+        let decayed: Pointer<CInt> = unsafe { load(target) };
+        // SAFETY: The second initialized i32 is writable within that allocation.
+        unsafe { assign(index(input(1_i32), decayed), input(31_i32)) };
+        assert_eq!(values[1], 31);
+        let immutable = &raw const values;
+        let target: Place<CArray<CInt, 2>, ReadOnly> = (&immutable).__pgrx_c_read_deref_place();
+        // SAFETY: The array remains alive; decay computes only its address.
+        let _: Pointer<CInt, ReadOnly> = unsafe { load(target) };
+
+        let boxed = Box::new(41_i32);
+        let target: Place<CInt, ReadOnly> = (&boxed).__pgrx_c_read_deref_place();
+        // SAFETY: The owner stays alive and its i32 is initialized.
+        assert_eq!(unsafe { load(target) }.get(), 41);
+        assert_eq!(*boxed, 41, "the operand was borrowed rather than moved");
+        let mut scalar = 43_i32;
+        let reference = &mut scalar;
+        let target: Place<CInt, ReadOnly> = (&reference).__pgrx_c_read_deref_place();
+        // SAFETY: Shared projection of the live initialized reference is readable.
+        assert_eq!(unsafe { load(target) }.get(), 43);
+
+        struct Owner<'a> {
+            value: i32,
+            dereferences: &'a core::cell::Cell<usize>,
+        }
+        impl core::ops::Deref for Owner<'_> {
+            type Target = i32;
+            fn deref(&self) -> &i32 {
+                self.dereferences.set(self.dereferences.get() + 1);
+                &self.value
+            }
+        }
+        let dereferences = core::cell::Cell::new(0);
+        let owner = Owner { value: 47, dereferences: &dereferences };
+        // SAFETY: The owner remains alive and its field is initialized. The
+        // adapter performs the native Rust dereference exactly once.
+        assert_eq!(unsafe { load((&owner).__pgrx_c_read_deref_place()) }.get(), 47);
+        assert_eq!(dereferences.get(), 1);
+        // SAFETY: The Box temporary survives through the complete load expression.
+        assert_eq!(unsafe { load((&Box::new(53_i32)).__pgrx_c_read_deref_place()) }.get(), 53);
     }
 
     #[test]
@@ -3104,6 +3366,25 @@ int main(void) {
     }
 
     #[test]
+    fn native_record_inputs_require_copy_but_pointers_do_not() {
+        #[repr(C)]
+        struct NonCopyRecord(u32);
+        impl NativeRecord for NonCopyRecord {}
+
+        #[derive(Clone, Copy)]
+        #[repr(C)]
+        struct CopyRecord(u32);
+        impl NativeRecord for CopyRecord {}
+
+        let mut value = NonCopyRecord(7);
+        let mutable: Pointer<CRecord<NonCopyRecord>> = input(&raw mut value);
+        let readonly: Pointer<CRecord<NonCopyRecord>, ReadOnly> = input(&raw const value);
+        assert_eq!(mutable.get().cast_const(), readonly.get());
+        let copied: RecordValue<CopyRecord> = input(CopyRecord(11));
+        assert_eq!(copied.get().0, 11);
+    }
+
+    #[test]
     fn access_qualification_and_explicit_unsafe_boundaries_are_checked_by_rustc() {
         let directory = OracleDirectory::new();
         let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
@@ -3130,7 +3411,27 @@ int main(void) {
                 "let v=1_i32; let p=expression::const_place::<CInt>(&raw const v); unsafe { let _=expression::assign(p,expression::input(2_i32)); }",
                 "E0277",
             ),
+            (
+                "native_deref_const_array_store",
+                "use expression::NativeDerefRead; let v=[1_i32,2]; let raw=&raw const v; let place=(&raw).__pgrx_c_read_deref_place(); unsafe { let pointer=expression::load(place); let _=expression::assign(expression::index(expression::input(0_i32),pointer),expression::input(3_i32)); }",
+                "E0277",
+            ),
+            (
+                "native_deref_shared_reference_store",
+                "use expression::NativeDerefRead; let mut v=1_i32; let reference=&mut v; let place=(&reference).__pgrx_c_read_deref_place(); unsafe { let _=expression::assign(place,expression::input(3_i32)); }",
+                "E0277",
+            ),
             ("ambiguous_rank", "let _=expression::input(1_u64);", "E0277"),
+            (
+                "non_copy_native_record_input",
+                "#[repr(C)] struct R(u32); impl expression::NativeRecord for R{} let _=expression::input(R(1));",
+                "E0277",
+            ),
+            (
+                "copy_opaque_record_input",
+                "#[derive(Clone,Copy)] struct R; impl sealed::Sealed for R{} impl expression::NativeType for R{type Marker=expression::COpaque<Self>;} let _=expression::input(R);",
+                "E0277",
+            ),
             (
                 "unverified_float_profile",
                 "let _=expression::profile_input::<false,_>(1.0_f64);",

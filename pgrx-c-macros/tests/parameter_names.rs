@@ -27,6 +27,7 @@ const NAMES: &[&str] = &[
     "NAME_REPEAT",
     "NAME_UNUSED",
     "NAME_CAST",
+    "NAME_CAST_PROVEN",
     "NAME_FIELD",
     "NAME_KEYWORDS",
     "NAME_RUST_SPECIAL",
@@ -85,6 +86,13 @@ fn original_c_parameter_names_survive_matchers_bodies_and_argument_normalization
         generation.support.rust,
     );
     for emission in generation.macros {
+        if emission.analysis.name == "NAME_CAST" {
+            let EmissionStatus::Skipped { reason } = emission.status else {
+                panic!("a formal application alone cannot establish a cast type: {emission:?}")
+            };
+            assert!(reason.message.contains("cast type or callable value"));
+            continue;
+        }
         if emission.analysis.name == "NAME_RESERVED" {
             let EmissionStatus::Skipped { reason } = emission.status else {
                 panic!("the reserved Rust $crate formal cannot be silently renamed: {emission:?}")
@@ -118,16 +126,18 @@ fn original_c_parameter_names_survive_matchers_bodies_and_argument_normalization
         let doc = item
             .attrs
             .iter()
-            .find_map(|attribute| match &attribute.meta {
+            .filter_map(|attribute| match &attribute.meta {
                 syn::Meta::NameValue(meta) if meta.path.is_ident("doc") => match &meta.value {
                     syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(value), .. }) => {
-                        Some(value.value())
+                        let line = value.value();
+                        Some(line.strip_prefix(' ').unwrap_or(&line).to_owned())
                     }
                     _ => None,
                 },
                 _ => None,
             })
-            .expect("C source documentation");
+            .collect::<Vec<_>>()
+            .join("\n");
         let original = frontend
             .inventory()
             .macros
@@ -135,16 +145,24 @@ fn original_c_parameter_names_survive_matchers_bodies_and_argument_normalization
             .find(|original| original.name == emission.analysis.name)
             .unwrap();
         assert!(
-            doc.contains(&format!("\n```text\n{original}\n```\n")),
-            "renaming Rust bookkeeping must leave the original C definition untouched: {doc}"
+            definition.contains(&format!("/// ```text\n/// {original}\n/// ```\n")),
+            "renaming Rust bookkeeping must leave the original C definition untouched: {definition}"
+        );
+        assert!(
+            doc.contains(&format!("\n```text\n{original}\n```")),
+            "the original C definition must also remain available to Rustdoc: {doc}"
         );
 
         // Inspect the semantic arms rather than pinning the normalizer's private
         // bookkeeping names. Rust compilation below also detects duplicate
         // matcher bindings when a C name collides with that bookkeeping.
         let tokens = item.mac.tokens.clone().into_iter().collect::<Vec<_>>();
+        let has_value_arm = tokens
+            .chunks_exact(5)
+            .any(|arm| arm[0].to_string().replace(' ', "").contains("@__pgrx_emit_value"));
         let mut semantic_arms = 0;
         let mut public_arms = 0;
+        let mut evaluation_arms = 0;
         for arm in tokens.chunks_exact(5) {
             let matcher = arm[0].to_string().replace(' ', "");
             if !matcher.contains("@__pgrx_emit_") {
@@ -155,6 +173,11 @@ fn original_c_parameter_names_survive_matchers_bodies_and_argument_normalization
             if matcher.contains("@__pgrx_emit_public") {
                 public_arms += 1;
             }
+            // Public expressions forward normalized tokens, including unused
+            // operands, to the shared value body without evaluating them.
+            let evaluates = matcher.contains("@__pgrx_emit_value")
+                || (!has_value_arm && matcher.contains("@__pgrx_emit_public"));
+            evaluation_arms += usize::from(evaluates);
             for parameter in &emission.analysis.parameters {
                 // Explicit captures may need a fresh Rust name when nested C
                 // expansion gives them the same spelling as an outer formal.
@@ -173,7 +196,7 @@ fn original_c_parameter_names_survive_matchers_bodies_and_argument_normalization
                     emission.analysis.name,
                     parameter.name,
                 );
-                if matcher.contains("@__pgrx_emit_public") {
+                if evaluates {
                     assert_eq!(
                         body.contains(&format!("${}", parameter.name)),
                         !parameter.uses.is_empty(),
@@ -190,6 +213,7 @@ fn original_c_parameter_names_survive_matchers_bodies_and_argument_normalization
         }
         assert!(semantic_arms > 0, "source assertions must inspect actual semantic arms");
         assert_eq!(public_arms, 1);
+        assert_eq!(evaluation_arms, 1, "inspect the body that evaluates C operands");
         rust.push_str(&definition);
     }
     let native = format!(
@@ -206,7 +230,7 @@ int main(void) {
     unsigned int b = NAME_PAIR(3U, 4U);
     unsigned int c = NAME_REPEAT(parameter_record(29));
     unsigned int d = NAME_UNUSED(7U, unknown_identifier);
-    unsigned int e = NAME_CAST(unsigned char, parameter_record(257));
+    unsigned int e = NAME_CAST_PROVEN(unsigned char, parameter_record(257));
     ParameterRecord object = {37, 41};
     unsigned int f = NAME_FIELD(&object, state);
     unsigned int g = NAME_KEYWORDS(1U, 2U);
@@ -242,7 +266,7 @@ fn main() {
         let b = NAME_PAIR!(3_u32, 4_u32).get();
         let c = NAME_REPEAT!(parameter_record(29)).get();
         let d = NAME_UNUSED!(7_u32, unknown_identifier).get();
-        let e = NAME_CAST!(u8, parameter_record(257)).get();
+        let e = NAME_CAST_PROVEN!(u8, parameter_record(257)).get();
         let f = NAME_FIELD!(pointer, state).get();
         let g = NAME_KEYWORDS!(1_u32, 2_u32).get();
         let h = NAME_RUST_SPECIAL!(1_u32, 2_u32, 3_u32, 4_u32).get();

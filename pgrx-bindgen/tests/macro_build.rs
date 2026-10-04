@@ -4,6 +4,7 @@
 
 #![cfg(unix)]
 
+use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
@@ -68,10 +69,36 @@ impl Fixture {
         fs::read_dir(root)
             .unwrap()
             .filter_map(Result::ok)
-            .map(|entry| entry.path().join("out/pg18_macros.rs"))
+            .map(|entry| entry.path().join("out/cmacros/pg18/mod.rs"))
             .find(|path| path.exists())
             .expect("macro output must exist")
     }
+
+    fn out_dir(&self) -> PathBuf {
+        self.macros().ancestors().nth(3).unwrap().to_path_buf()
+    }
+}
+
+fn macro_timestamps(directory: &Path) -> BTreeMap<PathBuf, SystemTime> {
+    let mut result = BTreeMap::new();
+    let mut directories = vec![directory.to_path_buf()];
+    while let Some(current) = directories.pop() {
+        for entry in fs::read_dir(current).unwrap() {
+            let entry = entry.unwrap();
+            let path = entry.path();
+            let kind = entry.file_type().unwrap();
+            if kind.is_dir() {
+                directories.push(path);
+            } else if kind.is_file() && path.extension().is_some_and(|extension| extension == "rs")
+            {
+                let name = path.strip_prefix(directory).unwrap().to_path_buf();
+                assert!(
+                    result.insert(name, fs::metadata(path).unwrap().modified().unwrap()).is_none()
+                );
+            }
+        }
+    }
+    result
 }
 
 impl Drop for Fixture {
@@ -144,9 +171,12 @@ pub trait PgNode {{}}
 #[path = {support:?}] pub mod __pgrx_c_macros;
 mod pg18 {{
     include!(concat!(env!("OUT_DIR"), "/pg18.rs"));
-    include!(concat!(env!("OUT_DIR"), "/pg18_macros.rs"));
 }}
 pub use pg18::*;
+pub mod cmacros {{
+    include!(concat!(env!("OUT_DIR"), "/cmacros/pg18/mod.rs"));
+}}
+pub use cmacros::*;
 "#
         ),
     )
@@ -155,12 +185,12 @@ pub use pg18::*;
     let flags = format!("-fwrapv -fsigned-char -I{}", source.join("shadow").display());
     assert_eq!(successful(fixture.build(&flags, "")), "11\n");
     let macros = fixture.macros();
-    let modified = fs::metadata(&macros).unwrap().modified().unwrap();
-    let build_output = macros.parent().unwrap().parent().unwrap().join("output");
+    let modified = macro_timestamps(macros.parent().unwrap());
+    let build_output = fixture.out_dir().parent().unwrap().join("output");
     let first_build = fs::metadata(&build_output).unwrap().modified().unwrap();
     assert_eq!(successful(fixture.build(&flags, "")), "11\n");
     assert_eq!(
-        fs::metadata(&macros).unwrap().modified().unwrap(),
+        macro_timestamps(macros.parent().unwrap()),
         modified,
         "an unchanged build must not rewrite generated macros"
     );
@@ -196,10 +226,14 @@ pub use pg18::*;
         .output()
         .unwrap();
     assert_eq!(successful(output), "precomputed\n");
-    assert_eq!(fs::read_to_string(&macros).unwrap(), "");
-    let report: serde_json::Value =
-        serde_json::from_slice(&fs::read(macros.with_file_name("pg18_macro_report.json")).unwrap())
-            .unwrap();
+    let precomputed = macro_timestamps(macros.parent().unwrap());
+    assert_eq!(precomputed.len(), 1, "precomputed builds remove stale macro leaves");
+    assert!(precomputed.contains_key(Path::new("mod.rs")));
+    assert!(syn::parse_file(&fs::read_to_string(&macros).unwrap()).unwrap().items.is_empty());
+    let report: serde_json::Value = serde_json::from_slice(
+        &fs::read(fixture.out_dir().join("pg18_macro_report.json")).unwrap(),
+    )
+    .unwrap();
     assert_eq!(report["status"], "unavailable");
     assert!(report.get("profile").is_none(), "precomputed bindings must not infer a host profile");
     assert!(report["reason"].as_str().unwrap().contains("precomputed target bindings"));

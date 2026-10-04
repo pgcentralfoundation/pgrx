@@ -104,7 +104,7 @@ fn main() {
                 == core::ptr::addr_of_mut!((*pointer).array),
         );
         context_reset();
-        record("type_hole", CTX_TYPE!(u16, 65537_u32));
+        record("type_hole", CTX_TYPE_PROVEN!(u16, 65537_u32));
         context_reset();
         record("atomic_identifier", CTX_ATOMIC!(((*pointer).field)));
         context_reset();
@@ -141,7 +141,7 @@ fn main() {
         context_reset();
         record_type("type_comma", CTX_COMMA!(0_i32, CTX_FIELD!(context_base(pointer))));
         context_reset();
-        record_type("type_cast", CTX_TYPE!(u16, 65537_u32));
+        record_type("type_cast", CTX_TYPE_PROVEN!(u16, 65537_u32));
         context_reset();
         record_type("type_size", CTX_SIZE!(CTX_FIELD!(context_base(pointer))));
         CTX_IGNORE!(these tokens are not a Rust expression);

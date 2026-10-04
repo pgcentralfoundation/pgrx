@@ -146,7 +146,7 @@ unsafe fn native_state() -> (u32, u32) {
     );
     rust.push_str(&pg_sys_integer_bridges(&frontend).unwrap());
     rust.push_str(&artifact.rust);
-    for emission in emit_batch_with_bindings(&session, names, &catalog) {
+    for emission in emit_batch_with_bindings(&session, names, &catalog).unwrap() {
         let EmissionStatus::Emitted { rust: definition, .. } = &emission.status else {
             panic!("caller-return macro must emit: {emission:?}")
         };

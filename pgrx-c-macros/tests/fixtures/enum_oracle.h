@@ -5,6 +5,7 @@ typedef enum EnumSmall { SmallZero = 0, SmallOne = 1 } EnumSmall;
 typedef enum EnumOther { OtherZero = 0, OtherOne = 1 } EnumOther;
 typedef enum EnumSigned { SignedNegative = -1, SignedPositive = 2 } EnumSigned;
 typedef enum EnumWide { WideZero = 0, WideMaximum = 0xFFFFFFFFFFFFFFFFul } EnumWide;
+typedef struct EnumOpaque EnumOpaque;
 typedef struct EnumRecord {
     EnumSmall small;
     EnumSigned signed_value;
@@ -48,6 +49,11 @@ typedef struct EnumKeywordRecord {
 #define ENUM_CONSTANT(v) ((v) + SmallOne)
 #define ENUM_CONSTANT_USE(v) ((EnumSigned)((v) + SignedNegative))
 #define ENUM_CONSTANT_ZERO(p) ((p) == SmallZero)
+#define ENUM_ORDER(left, right) \
+    (((left) < (right)) | (((left) <= (right)) << 1) | \
+     (((left) > (right)) << 2) | (((left) >= (right)) << 3))
+#define ENUM_DIFFERENCE(left, right) ((left) - (right))
+#define ENUM_QUALIFIED_POINTER(p) ((const volatile EnumSmall *)(p))
 
 static inline EnumSmall enum_inline_identity(EnumSmall value) { return value; }
 #define ENUM_INLINE(v) enum_inline_identity((EnumSmall)(v))

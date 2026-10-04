@@ -104,7 +104,6 @@ pub struct ParameterAnalysis {
     pub roles: Vec<ParameterRole>,
     /// Every lexical replacement-list occurrence; unused arguments remain unevaluated.
     pub uses: Vec<ParameterUse>,
-    pub constraint: Option<InputConstraint>,
 }
 
 /// C macro formals and caller-scope identifiers have different hygiene rules.
@@ -121,7 +120,6 @@ pub enum ParameterOrigin {
 pub enum ParameterRole {
     Value,
     Type,
-    Place,
     Identifier,
     FieldDesignator,
     Unused,
@@ -133,14 +131,6 @@ pub struct ParameterUse {
     pub tokens: TokenRange,
     /// Established from a complete parsed expression, never neighboring-token heuristics.
     pub grouped: bool,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum InputConstraint {
-    /// Target-supported C integer or bool values; pointers, floats and arbitrary Rust
-    /// operator implementations are outside this candidate family.
-    IntegerScalar,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
@@ -177,7 +167,6 @@ pub enum InvocationContract {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ConstCapability {
-    KnownConst,
     RuntimeOnly,
     /// Integer syntax alone cannot establish const-compatible Rust helper calls.
     NotEstablished,
@@ -369,7 +358,6 @@ pub(crate) fn analyze_active_with_constants(
             origin: ParameterOrigin::Formal,
             roles: vec![ParameterRole::Unused],
             uses: Vec::new(),
-            constraint: None,
         })
         .collect();
     let mut dependencies = BTreeMap::<String, MacroDependency>::new();
@@ -479,7 +467,6 @@ pub(crate) fn analyze_active_with_constants(
                     origin: ParameterOrigin::FreeIdentifier,
                     roles: vec![ParameterRole::Unknown],
                     uses: Vec::new(),
-                    constraint: None,
                 });
                 index
             });
@@ -529,7 +516,6 @@ pub(crate) fn analyze_active_with_constants(
                 if !parameter.roles.contains(&role) {
                     parameter.roles.push(role);
                 }
-                parameter.constraint = None;
                 for usage in &mut parameter.uses {
                     if usage.tokens.start >= node.tokens.start
                         && usage.tokens.end <= node.tokens.end
@@ -545,7 +531,6 @@ pub(crate) fn analyze_active_with_constants(
             if !parameter.roles.contains(&ParameterRole::Identifier) {
                 parameter.roles.push(ParameterRole::Identifier);
             }
-            parameter.constraint = None;
             for usage in &mut parameter.uses {
                 if usage.tokens.start + 1 == node.tokens.end {
                     usage.grouped = true;
@@ -567,7 +552,6 @@ pub(crate) fn analyze_active_with_constants(
                 result.parameters[parameter].roles.retain(|role| *role != ParameterRole::Unknown);
                 result.parameters[parameter].roles.push(ParameterRole::Value);
             }
-            result.parameters[parameter].constraint = Some(InputConstraint::IntegerScalar);
         }
         if let ExpressionKind::TypeParameterCast { parameter, operand, .. } = node.kind {
             let parameter = &mut result.parameters[parameter];
@@ -575,7 +559,6 @@ pub(crate) fn analyze_active_with_constants(
             if !parameter.roles.contains(&ParameterRole::Type) {
                 parameter.roles.push(ParameterRole::Type);
             }
-            parameter.constraint = None;
             for usage in &mut parameter.uses {
                 if usage.tokens.start >= node.tokens.start
                     && usage.tokens.end <= syntax.nodes[operand].tokens.start
@@ -589,7 +572,6 @@ pub(crate) fn analyze_active_with_constants(
         {
             let parameter = &mut result.parameters[parameter];
             parameter.roles = vec![ParameterRole::Type];
-            parameter.constraint = None;
             for usage in &mut parameter.uses {
                 if usage.tokens.start >= node.tokens.start && usage.tokens.end <= node.tokens.end {
                     usage.grouped = true;
@@ -711,16 +693,7 @@ impl MacroAnalysis {
         self
     }
 
-    fn syntax_error(mut self, error: SyntaxError) -> Self {
-        if error.kind == SyntaxErrorKind::TypeParameter {
-            for parameter in &mut self.parameters {
-                if parameter.uses.iter().any(|usage| {
-                    usage.tokens.start >= error.tokens.start && usage.tokens.end <= error.tokens.end
-                }) {
-                    parameter.roles = vec![ParameterRole::Type];
-                }
-            }
-        }
+    fn syntax_error(self, error: SyntaxError) -> Self {
         let code = match error.kind {
             SyntaxErrorKind::InvalidExpression => SkipReasonCode::InvalidExpression,
             SyntaxErrorKind::UnsupportedLiteral => SkipReasonCode::UnsupportedLiteral,
@@ -1945,14 +1918,12 @@ mod tests {
         assert!(matches!(analysis.status, AnalysisStatus::Candidate));
         assert_eq!(analysis.parameters[0].uses.len(), 2);
         assert!(analysis.parameters[0].uses.iter().all(|usage| usage.grouped));
-        assert_eq!(analysis.parameters[0].constraint, Some(InputConstraint::IntegerScalar));
         assert_eq!(analysis.parameters[1].roles, vec![ParameterRole::Unused]);
-        assert!(analysis.parameters[1].constraint.is_none());
         assert_eq!(analysis.const_capability, ConstCapability::NotEstablished);
         for (body, expected) in [
             (vec!["x", "+", "1"], SkipReasonCode::InvocationGrouping),
             (vec!["(", "x", ")", "?", "1", ":", "2"], SkipReasonCode::InvocationGrouping),
-            (vec!["(", "unused", ")", "(", "x", ")"], SkipReasonCode::InvocationGrouping),
+            (vec!["(", "unused", ")", "(", "x", ")"], SkipReasonCode::TypeParameter),
             (vec!["(", "char", "*", ")", "(", "x", ")"], SkipReasonCode::InvocationGrouping),
         ] {
             let AnalysisStatus::Skipped { reason } = analyze(&frontend(&body), "F").status else {

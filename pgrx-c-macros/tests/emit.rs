@@ -62,17 +62,37 @@ fn source(emission: &MacroEmission) -> &str {
     rust
 }
 
-fn public_body(source: &str) -> &str {
-    source
-        .split_once("(@__pgrx_emit_public;")
-        .unwrap()
-        .1
-        .split_once("=> {")
-        .unwrap()
-        .1
-        .split_once("\n(@__pgrx_emit_value;")
-        .unwrap()
-        .0
+fn value_body(source: &str) -> &str {
+    let body = source.split_once("(@__pgrx_emit_value;").unwrap().1.split_once("=> {").unwrap().1;
+    let end = body
+        .match_indices('\n')
+        .find(|(index, _)| {
+            body[index + 1..].trim_start_matches([' ', '\t']).starts_with("(@__pgrx_c_value;")
+        })
+        .expect("the next macro arm must start on its own line")
+        .0;
+    &body[..end]
+}
+
+fn documentation(item: &syn::ItemMacro) -> String {
+    let lines = item
+        .attrs
+        .iter()
+        .filter_map(|attribute| match &attribute.meta {
+            syn::Meta::NameValue(meta) if meta.path.is_ident("doc") => match &meta.value {
+                syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(value), .. }) => {
+                    let line = value.value();
+                    Some(line.strip_prefix(' ').unwrap_or(&line).to_owned())
+                }
+                _ => None,
+            },
+            _ => None,
+        })
+        .collect::<Vec<_>>();
+    assert!(!lines.is_empty(), "public macro must retain Rustdoc metadata");
+    let mut documentation = lines.join("\n");
+    documentation.push('\n');
+    documentation
 }
 
 #[test]
@@ -88,14 +108,15 @@ fn emitted_macros_keep_provenance_occurrences_names_and_structured_skips() {
         let rust = source(&emission);
         assert!(rust.contains("$crate::__pgrx_c_macros::"), "{name}: {rust}");
         assert!(rust.contains("emit_scalar.h:"), "source line must survive lowering");
-        assert!(rust.contains("```text\\n#define "), "original C definition is plain text");
+        assert!(rust.contains("/// ```text\n/// #define "), "original C definition is plain text");
+        assert!(!rust.contains("#[doc ="), "C source headers must use literal /// doc comments");
         assert!(rust.contains("compile_error!"), "standalone emissions need their ABI guard");
         assert!(!rust.contains("/Users/"), "emitted documentation must not contain private paths");
     }
     let repeated = emit(&session, "EMIT_REPEAT");
-    assert_eq!(public_body(source(&repeated)).matches("$value").count(), 2);
+    assert_eq!(value_body(source(&repeated)).matches("$value").count(), 2);
     let unused = emit(&session, "EMIT_UNUSED");
-    assert_eq!(public_body(source(&unused)).matches("$value").count(), 0);
+    assert_eq!(value_body(source(&unused)).matches("$value").count(), 0);
     assert!(source(&emit(&session, "match")).contains("macro_rules! r#match"));
     let ungrouped = emit(&session, "EMIT_UNGROUPED");
     assert_eq!(ungrouped.analysis.invocation, InvocationContract::ExplicitExpressionBoundary);
@@ -115,12 +136,12 @@ fn emitted_macros_keep_provenance_occurrences_names_and_structured_skips() {
     assert_eq!(unknown.analysis.parameters.last().unwrap().origin, ParameterOrigin::FreeIdentifier);
     let pointer = emit(&session, "EMIT_POINTER");
     assert!(matches!(pointer.analysis.status, AnalysisStatus::Candidate));
-    assert!(public_body(source(&pointer)).contains("::dereference("));
+    assert!(value_body(source(&pointer)).contains("::dereference("));
     assert!(source(&pointer).contains("::pointee("));
 }
 
 #[test]
-fn documented_definition_keeps_unexpanded_calls_parameters_and_fenced_comments() {
+fn doc_commented_definition_keeps_unexpanded_calls_parameters_and_fenced_comments() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().unwrap();
     let frontend = inspect(&scanner, &fixture("emit_scalar.h"), &[], None).unwrap();
@@ -128,14 +149,39 @@ fn documented_definition_keeps_unexpanded_calls_parameters_and_fenced_comments()
     let emission = emit(&session, "EMIT_DOCUMENTED");
     let rust = source(&emission);
     assert!(
-        rust.contains("\\n\\n``````text\\n#define EMIT_DOCUMENTED( value ) EMIT_ADD ( value ,")
+        rust.contains(
+            "///\n/// ``````text\n/// #define EMIT_DOCUMENTED( value ) EMIT_ADD ( value ,"
+        )
     );
-    assert!(rust.contains("/* ``` \\\"quoted\\\" \\\\\\\\ backslash\\n`````\\n"));
-    assert!(rust.contains("*/ 1 )\\n``````\\n\""));
+    assert!(rust.contains("/* ``` \"quoted\" \\\\ backslash\n/// `````\n"));
+    assert!(rust.contains("///     */ 1 )\n/// ``````\n"));
     assert!(!rust.contains("#define EMIT_DOCUMENTED( __pgrx_c_"));
 
-    // Check the generated Rust doc attribute and ensure the C fence creates no
-    // Rust doctest, even when its original comment contains shorter fences.
+    let parsed = syn::parse_file(rust).expect("retained C comments must remain valid Rust source");
+    let public = parsed
+        .items
+        .iter()
+        .find_map(|item| match item {
+            syn::Item::Macro(item)
+                if item.ident.as_ref().is_some_and(|name| name == "EMIT_DOCUMENTED") =>
+            {
+                Some(item)
+            }
+            _ => None,
+        })
+        .expect("find the public generated macro");
+    let doc = documentation(public);
+    assert!(doc.starts_with("C macro EMIT_DOCUMENTED from emit_scalar.h:"));
+    let original = frontend
+        .inventory()
+        .macros
+        .iter()
+        .find(|original| original.name == "EMIT_DOCUMENTED")
+        .unwrap();
+    assert!(doc.contains(&format!("\n``````text\n{original}\n``````\n")));
+
+    // C source doc comments create no Rust doctests, even when the original block
+    // comment contains backticks, quotes, backslashes and physical newlines.
     let directory = TemporaryDirectory::new();
     let runtime = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../pgrx-pg-sys/src/c_macros/support.rs")

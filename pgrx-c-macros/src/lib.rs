@@ -48,6 +48,9 @@ pub use syntax::{
 };
 mod analysis;
 pub use analysis::*;
+
+#[cfg(test)]
+pub(crate) static SCANNER_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
 mod expansion;
 pub use expansion::{
     ConstantFallback, ExpandedMacro, ExpansionBatch, ExpansionDependency, ExpansionLimits,
@@ -63,6 +66,8 @@ pub use emit::*;
 mod bindings;
 pub use bindings::*;
 mod delegation;
+mod formatting;
+pub use formatting::format_rust_macros;
 
 /// An owned record of the definitions and diagnostics encountered while processing a file.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

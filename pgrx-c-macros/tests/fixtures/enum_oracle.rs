@@ -2,7 +2,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 fn main() {
-    use __pgrx_c_macros::{CUnsignedLong, CValue};
+    use __pgrx_c_macros::{CUnsignedInt, CUnsignedLong, CValue};
     let mut record = core::mem::MaybeUninit::<EnumRecord>::uninit();
     let pointer = record.as_mut_ptr();
     // SAFETY: Only the selected enum integer bytes are initialized and accessed.
@@ -59,6 +59,24 @@ fn main() {
             )
             .get()
         );
+        // Only addresses are compared/subtracted. All pointers retain one array's
+        // provenance, including its one-past endpoint; enum fields are never read.
+        let mut values = core::mem::MaybeUninit::<[EnumSmall; 4]>::uninit();
+        let first = values.as_mut_ptr().cast::<EnumSmall>();
+        let end = first.add(4).cast::<EnumSmallStorage>();
+        println!("orderforward\t{}", ENUM_ORDER!(first, end).get());
+        println!("orderreverse\t{}", ENUM_ORDER!(end, first).get());
+        println!("orderequal\t{}", ENUM_ORDER!(first, first.cast::<EnumSmallStorage>()).get());
+        println!("orderqualified\t{}", ENUM_ORDER!(ENUM_QUALIFIED_POINTER!(first.add(1)), end).get());
+        println!("differenceforward\t{}", ENUM_DIFFERENCE!(end, first).get());
+        println!("differencereverse\t{}", ENUM_DIFFERENCE!(first, end).get());
+        println!("differencezero\t{}", ENUM_DIFFERENCE!(first, first.cast::<EnumSmallStorage>()).get());
+        println!("differencequalified\t{}", ENUM_DIFFERENCE!(ENUM_QUALIFIED_POINTER!(first.add(1)), end).get());
+        let mut integer_values = [CValue::<CUnsignedInt>::new(0); 4];
+        let stored_first = integer_values.as_mut_ptr();
+        let primitive_end = stored_first.add(4).cast::<u32>();
+        println!("storedifference\t{}", ENUM_DIFFERENCE!(primitive_end, stored_first).get());
+        println!("storereversedifference\t{}", ENUM_DIFFERENCE!(stored_first, primitive_end).get());
         for i in 0..256_i32 {
             println!("boundary{i}\t{}", ENUM_SET!(pointer, i).get() as u64);
         }

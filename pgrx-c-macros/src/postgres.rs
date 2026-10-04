@@ -218,14 +218,7 @@ impl PostgresConfig {
         let mut sources = HashMap::new();
         for definition in macros {
             let postgres = if let Some(span) = &definition.provenance {
-                if let Some(postgres) = sources.get(&span.file) {
-                    *postgres
-                } else {
-                    let postgres =
-                        canonicalize_header_path(&span.file)?.starts_with(&server_include_dir);
-                    sources.insert(span.file.clone(), postgres);
-                    postgres
-                }
+                owns_source(&span.file, &server_include_dir, &mut sources)?
             } else {
                 false
             };

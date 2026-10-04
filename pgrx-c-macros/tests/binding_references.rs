@@ -138,7 +138,7 @@ fn references_and_fallbacks_preserve_original_c_values_types_and_precedence() {
 
     let mut wrong = bindings.clone();
     wrong.integer_constants.get_mut("REF_HUGE").unwrap().value = IntegerValue::Unsigned(0);
-    let emissions = emit_batch_with_bindings(&session, NAMES, &wrong);
+    let emissions = emit_batch_with_bindings(&session, NAMES, &wrong).unwrap();
     for (name, expected_code) in [
         ("REF_HUGE_VALID", SkipReasonCode::BindingValueMismatch),
         ("REF_HUGE_WRAPPER", SkipReasonCode::DependencySkipped),
@@ -169,7 +169,7 @@ fn references_and_fallbacks_preserve_original_c_values_types_and_precedence() {
         emit_with_bindings(&session, "REF_ENUM_HIDDEN_ADD", &wrong_enum).status,
         EmissionStatus::Emitted { .. }
     ));
-    let emissions = emit_batch_with_bindings(&session, NAMES, &wrong_enum);
+    let emissions = emit_batch_with_bindings(&session, NAMES, &wrong_enum).unwrap();
     let hidden =
         emissions.iter().find(|emission| emission.analysis.name == "REF_ENUM_HIDDEN_ADD").unwrap();
     let EmissionStatus::Skipped { reason } = &hidden.status else {
@@ -181,7 +181,7 @@ fn references_and_fallbacks_preserve_original_c_values_types_and_precedence() {
     // Only request the final caller: its unrequested callee must still seed the
     // same failure from the full active environment.
     let subset = AnalysisSession::prepare(&scanner, &frontend, &["REF_ENUM_HIDDEN_ADD"]).unwrap();
-    let emitted = emit_batch_with_bindings(&subset, &["REF_ENUM_HIDDEN_ADD"], &wrong_enum);
+    let emitted = emit_batch_with_bindings(&subset, &["REF_ENUM_HIDDEN_ADD"], &wrong_enum).unwrap();
     assert!(matches!(&emitted[0].status, EmissionStatus::Skipped { reason }
         if reason.code == SkipReasonCode::DependencySkipped
             && reason.message.contains("REF_ENUM_ADD")

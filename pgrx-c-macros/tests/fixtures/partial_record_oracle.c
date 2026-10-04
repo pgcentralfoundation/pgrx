@@ -13,5 +13,9 @@ int main(void) {
         int taken = PARTIAL_TAKE(PARTIAL_CHOOSE(i & 1, result, assigned));
         printf("record %d %d %d %d %d %zu %d\n", i, first, inner, changed, taken, PARTIAL_SIZE(PARTIAL_RECORD(++i)), PARTIAL_TEMP_INNER(i));
     }
+    int evaluated = 0;
+    PARTIAL_DISCARD(++evaluated);
+    PARTIAL_DISCARD_VALUE(PARTIAL_DISCARD_RECORD(++evaluated));
+    printf("discard %d %d\n", evaluated, partial_discard_count());
     return 0;
 }
