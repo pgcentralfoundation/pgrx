@@ -11,8 +11,6 @@
 //! Emitted target assertions protect consumers from using an artifact on a different Rust
 //! target; opaque pg-sys integer bridges preserve the verified C identity.
 
-/// Use owned C profile and declaration facts instead of reconstructing compiler identities from Rust
-/// storage.
 use crate::model::{
     ByteOrder, CompilationProfile, FrontendOutput, IntegerKind, IntegerType, SignedOverflow,
     TypeCategory, TypeInfo,
@@ -270,13 +268,8 @@ fn rust_target(
 /// headers or weakening the C identity and evaluation contracts.
 #[cfg(test)]
 mod tests {
-    /// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same
-    /// validation and input contract.
     use super::*;
-    /// Use owned C profile and declaration facts instead of reconstructing compiler identities from
-    /// Rust storage.
     use crate::model::{BuildInputs, CompilerIdentity, TargetFacts};
-    /// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
     use std::collections::BTreeMap;
 
     /// Construct a reviewed C target profile for support gates without depending on the host
@@ -332,7 +325,6 @@ mod tests {
     /// Checks pg-sys bridges require the original typedef identity and storage.
     #[test]
     fn pg_sys_bridges_require_the_original_typedef_identity_and_storage() {
-        /// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
         use crate::{DeclarationCatalog, MacroEnvironment, MacroInventory};
         let environment = MacroEnvironment::default();
         let dependencies = crate::MacroDependencyGraph::from_environment(&environment);

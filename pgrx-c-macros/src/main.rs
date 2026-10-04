@@ -8,26 +8,17 @@
 //! the selected profile for auditing, diagnostics go to stderr, and broken output pipes are
 //! treated as successful termination for ordinary shell pipelines.
 
-/// Parse cargo-pgrx-style command selections and explicit output formats at the executable boundary.
 use clap::{Args, Parser, Subcommand, ValueEnum};
-/// Use the library’s coherent inspection/session/emission pipeline instead of duplicating compiler
-/// semantics in the CLI.
 use pgrx_c_macros::{
     AnalysisSession, AnalysisStatus, BindingCatalog, CompilationProfile, Diagnostic,
     EmissionStatus, Error, FrontendError, FrontendOutput, MacroAnalysis, MacroEmission,
     MacroScanner, PostgresConfig, PostgresError, emit_batch_with_bindings,
     postgres_function_macro_names,
 };
-/// Serialize owned inspection/analysis facts without borrowing from compiler translation units.
 use serde::Serialize;
-/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::HashSet;
-/// Read/write owned probe or report streams while preserving I/O errors at the phase boundary.
 use std::io::{self, BufWriter, Write};
-/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
-/// tracking.
 use std::path::{Path, PathBuf};
-/// Run compiler tools with explicit owned process and stream boundaries.
 use std::process::ExitCode;
 
 /// Top-level clap grammar shared by the inventory, analysis, and emission commands.

@@ -7,20 +7,10 @@
 
 #![cfg(all(feature = "cli", unix))]
 
-/// Make fixture compiler or pg_config wrappers executable so process failures can be tested
-/// directly.
 use std::os::unix::fs::PermissionsExt;
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::{Path, PathBuf};
-/// Invoke independent compilers and consumers and inspect their actual exit status rather than
-/// trusting generated source alone.
 use std::process::{Command, Output};
-/// Allocate unique fixture paths or record process-local effects across concurrent test
-/// invocations.
 use std::sync::atomic::{AtomicU64, Ordering};
-/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
-/// artifacts.
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Allocate unique fake-configuration paths for concurrent CLI invocations.

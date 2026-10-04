@@ -16,13 +16,8 @@ mod oracle;
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
-/// Use the production scanner, analysis, and emission contracts so these checks exercise the
-/// actual C macro pipeline.
 use pgrx_c_macros::{AnalysisSession, EmissionStatus, MacroScanner, emit, inspect};
-/// Append complete paired source and observation records without ad hoc string replacement.
 use std::fmt::Write;
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::PathBuf;
 
 /// Describe one C integer family with explicit oracle spelling and Rust semantic marker for the

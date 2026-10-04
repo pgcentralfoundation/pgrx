@@ -10,16 +10,12 @@
 //! separately because computing an offset must not require reading the member or
 //! constructing a fully initialized record.
 
-/// Reuse compiler-anchored type and binding paths for member projection witnesses.
 use super::types::{Lowering, rust_path};
-/// Pair compiler member layouts with actual record, array, and field binding storage.
 use crate::{
     ArrayKind, BindingCatalog, DeclarationCatalog, FieldBinding, FieldInfo, TargetFacts,
     TypeCategory, TypeInfo, TypeShapeKind,
 };
-/// Keep capability catalogs ordered and deduplicated, with work queues for bounded dependency traversal.
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
-/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
 /// Private runtime namespace used by generated member and record capabilities.
@@ -910,13 +906,9 @@ fn record_bridge(
 /// Layout, nominal field identity, and C-oracle checks for projections and offset-only capabilities.
 #[cfg(test)]
 mod tests {
-    /// Exercise the private field identity and layout helpers directly in regression tests.
     use super::*;
-    /// Serialize fixture Clang use with the crate’s shared scanner test lock.
     use crate::SCANNER_LOCK;
-    /// Construct independent compiler and binding fixtures for the lowering invariants exercised here.
     use crate::{FieldBinding, MacroScanner, RecordBinding, RecordKind, RustBindingType, inspect};
-    /// Resolve original C fixture headers from the crate’s manifest directory.
     use std::path::PathBuf;
 
     /// C oracle compilation support used to compare generated access against the original header.
@@ -1078,7 +1070,6 @@ mod tests {
     /// Check the shared projection alias reduces repeated pointer/function AST shapes in layout witnesses.
     #[test]
     fn projection_alias_removes_repeated_function_shape_types() {
-        /// Inspect generated projection witnesses structurally to measure redundant Rust type syntax.
         use syn::visit_mut::{self, VisitMut};
         /// AST counter measuring witness type-shape duplication without compiling generated snippets.
         #[derive(Default)]

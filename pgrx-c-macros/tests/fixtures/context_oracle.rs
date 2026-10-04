@@ -1,12 +1,3 @@
-/// Standalone Rust consumer for the context oracle C comparison.
-///
-/// The harness appends this consumer after generated bindings, semantic support,
-/// and macro definitions. Its observations preserve types and operand effects
-/// for comparison with the original C header; helpers instrument those effects
-/// without replacing any C macro definition.
-///
-/// Use the production semantic markers and expression wrappers to retain exact C type identity
-/// in the consumer.
 use __pgrx_c_macros::{CInteger, IntoCValue};
 
 /// Print the observation format consumed by the paired oracle, retaining C kind and value
@@ -43,8 +34,6 @@ mod native {
             $value
         };
     }
-    /// Expose the unrelated same-spelled fixture macro to test the explicit native escape
-    /// route.
     pub(crate) use native_field as CTX_FIELD;
 }
 

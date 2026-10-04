@@ -11,10 +11,7 @@
 #![cfg(any(pgrx_c_macros, docsrs))]
 
 // Exercise the public exports from a downstream crate, including a renamed import.
-/// Use the production semantic markers and expression wrappers to retain exact C type identity
-/// in the consumer.
 use pg::__pgrx_c_macros::{CInt, CUnsignedInt, CUnsignedLong, CValue};
-/// Exercise the selected build's public bindings and macro exports from a downstream consumer.
 use pgrx_pg_sys as pg;
 
 /// Extract the C int storage used by assertions on public generated predicates.

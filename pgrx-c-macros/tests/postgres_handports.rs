@@ -16,17 +16,11 @@ mod oracle;
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
-/// Use the production scanner, analysis, and emission contracts so these checks exercise the
-/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, EmissionStatus, MacroScanner, PostgresConfig, SignedOverflow,
     generate_with_bindings,
 };
-/// Keep catalogs, output maps, and observation sets deterministic for exact selection and
-/// publication comparisons.
 use std::collections::BTreeSet;
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::PathBuf;
 
 /// Representative macro families used alongside discovered handport names for

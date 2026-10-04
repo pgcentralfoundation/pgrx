@@ -20,13 +20,9 @@ mod oracle;
 #[allow(dead_code)] // This oracle requires no native support library.
 mod rust_oracle;
 
-/// Use the production scanner, analysis, and emission contracts so these checks exercise the
-/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, MacroScanner, ParameterRole, generate_with_bindings, inspect,
 };
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::PathBuf;
 
 /// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary

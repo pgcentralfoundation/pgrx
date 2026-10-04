@@ -9,17 +9,12 @@
 //! internal declarations with available definitions, and verifies the callback ABI
 //! before exposing a tagged Rust function value.
 
-/// Resolve callback storage using the same compiler/binding reconciliation as callable adapters.
 use super::types::Lowering;
-/// Require compiler linkage and callback identity facts before generating original-function getters.
 use crate::{
     BindingCatalog, DeclarationCatalog, DeclarationLinkage, FunctionAddressBinding, TargetFacts,
 };
-/// Fingerprint compiler identity and profile facts for deterministic, collision-resistant native symbols.
 use sha2::{Digest, Sha256};
-/// Keep symbol catalogs and requested capability names deterministic and deduplicated.
 use std::collections::{BTreeMap, BTreeSet};
-/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
 /// Original-function address getters and their verified macro-facing bindings.

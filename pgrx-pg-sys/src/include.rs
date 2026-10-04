@@ -112,8 +112,6 @@ pub use pg19::*;
 // The selected version exports its macros and hidden native adapters here.
 /// Select and expose the generated C macro tree for this build's enabled PostgreSQL version.
 pub mod cmacros;
-/// Forward the selected generated macro tree and hidden adapters through the ordinary pg_sys
-/// binding exports.
 #[allow(unused_imports)]
 pub use cmacros::*;
 

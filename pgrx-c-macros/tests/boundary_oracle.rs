@@ -16,14 +16,10 @@ mod oracle;
 #[allow(dead_code)] // This oracle requires no native support library.
 mod rust_oracle;
 
-/// Use the production scanner, analysis, and emission contracts so these checks exercise the
-/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, EmissionStatus, InvocationContract, MacroScanner,
     generate_with_bindings, inspect,
 };
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::PathBuf;
 
 /// Checks that non atomic replacements require an explicit C invocation boundary.

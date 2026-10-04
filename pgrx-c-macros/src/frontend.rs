@@ -10,7 +10,6 @@
 //! inline definitions. Input fingerprints and recorded searches make later generation reject
 //! a changed environment rather than silently mixing compiler observations.
 
-/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     ActiveMacro, ActiveProvenance, BuildInputs, ByteOrder, CompilationProfile, CompilerIdentity,
     DeclarationCatalog, Error, FloatingKind, FloatingPointFacts, FloatingType, FrontendOutput,
@@ -18,26 +17,14 @@ use crate::{
     MacroEnvironment, MacroInventory, MacroKind, MacroScanner, SignedOverflow, TargetFacts,
     TokenKind, TypeCategory, TypeInfo,
 };
-/// Use live Clang AST/preprocessing handles only while the enclosing scanner owns the runtime.
 use clang::{EntityKind, EntityVisitResult, TranslationUnit, Type, TypeKind};
-/// Fingerprint consumed input bytes so subsequent phases reject changed compiler environments.
 use sha2::{Digest, Sha256};
-/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
-/// Read/write owned probe or report streams while preserving I/O errors at the phase boundary.
 use std::io::{self, Read, Write};
-/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
-/// tracking.
 use std::path::{Path, PathBuf};
-/// Run compiler tools with explicit owned process and stream boundaries.
 use std::process::{Child, Command, ExitStatus, Stdio};
-/// Share owned runtime/process observations while retaining the enclosing thread or fixture ownership
-/// rules.
 use std::sync::mpsc;
-/// Drain compiler streams concurrently so one full pipe cannot block the other.
 use std::thread;
-/// Bound compiler work or distinguish owned probe directories without assuming timing proves
-/// semantics.
 use std::time::{Duration, Instant};
 
 /// Probe implementation-specific field promotions and access units before admitting native bitfield
@@ -1826,8 +1813,6 @@ pub(crate) fn fingerprint_files<'a>(
             }
             digest.update(&buffer[..length]);
         }
-        /// Format owned report text or bounded probe source without changing the original semantic
-        /// tokens.
         use std::fmt::Write as _;
         let mut fingerprint = String::with_capacity(64);
         for byte in digest.finalize() {
@@ -2237,8 +2222,6 @@ fn validate_fact_override(value: &str) -> Result<(), FrontendError> {
 /// headers or weakening the C identity and evaluation contracts.
 #[cfg(test)]
 mod tests {
-    /// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same
-    /// validation and input contract.
     use super::*;
 
     /// Checks optional offsetof failures cannot hide required fact errors.
@@ -2292,15 +2275,9 @@ mod tests {
     /// executables.
     #[cfg(unix)]
     mod compiler_selection {
-        /// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same
-        /// validation and input contract.
         use super::*;
-        /// Create and inspect only fixture/probe files owned by the enclosing phase.
         use std::fs;
-        /// Set synthetic executable permissions needed to exercise real driver lookup behavior.
         use std::os::unix::fs::PermissionsExt;
-        /// Share owned runtime/process observations while retaining the enclosing thread or fixture
-        /// ownership rules.
         use std::sync::atomic::{AtomicU64, Ordering};
 
         /// Give compiler-selection tests unique owned temporary directory names.

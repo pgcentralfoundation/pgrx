@@ -15,7 +15,6 @@
 //! from an arbitrary equal-width Rust integer, and raw enum access retains the
 //! allocation, initialization, aliasing, and access-qualification obligations.
 
-/// Reuse the surrounding C identity and conversion capabilities so this module shares the sealed runtime model.
 use super::*;
 
 /// A canonical enum declaration established by the C compiler.

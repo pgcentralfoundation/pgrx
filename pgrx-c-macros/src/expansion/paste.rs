@@ -16,15 +16,9 @@
 //! one failed invocation from validating another. Run/source budgets and bounded summaries
 //! keep this proof finite and make rejected constructs explicit.
 
-/// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same validation
-/// and input contract.
 use super::{ExpansionLimits, ExpansionSkipCode, PROBE_PRAGMAS, Prepared, overlay, probe_tag};
-/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{FrontendError, FrontendOutput, MacroKind};
-/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{BTreeMap, BTreeSet};
-/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
-/// tracking.
 use std::path::Path;
 
 /// Bound the total preprocessing passes spent proving closed token pasting.
@@ -756,8 +750,6 @@ fn identifier(spelling: &str) -> bool {
 /// headers or weakening the C identity and evaluation contracts.
 #[cfg(test)]
 mod tests {
-    /// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same
-    /// validation and input contract.
     use super::*;
 
     /// Construct minimal original macro definitions for paste instrumentation tests.

@@ -16,14 +16,10 @@ mod oracle;
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
-/// Use the production scanner, analysis, and emission contracts so these checks exercise the
-/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, EmissionStatus, MacroScanner, SkipReasonCode, emit,
     emit_support_with_bindings, inspect,
 };
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::PathBuf;
 
 /// Fixture macros whose emitted behavior is compared with the original header.

@@ -8,22 +8,11 @@
 //! callbacks are active. Inventory checks and generated declarations establish
 //! that neither participant silently replaces or invalidates the other's runtime.
 
-/// Generate the fixture's actual Rust storage and callbacks for reconciliation with
-/// compiler-owned C facts.
 use bindgen::callbacks::{MacroParsingBehavior, ParseCallbacks};
-/// Use the production scanner, analysis, and emission contracts so these checks exercise the
-/// actual C macro pipeline.
 use pgrx_c_macros::{MacroInventory, MacroScanner};
-/// Record callback or operand observations without changing the generated C expression types.
 use std::cell::{Cell, RefCell};
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::PathBuf;
-/// Share discovery callback observations with the test without transferring Clang runtime
-/// ownership.
 use std::rc::Rc;
-/// Share discovery callback observations with the test without transferring Clang runtime
-/// ownership.
 use std::sync::Arc;
 
 /// Resolve fixture input relative to the crate, keeping tests independent of the invocation

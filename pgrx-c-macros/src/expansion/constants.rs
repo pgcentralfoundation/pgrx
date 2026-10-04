@@ -13,27 +13,18 @@
 //! Missing proofs leave the compiler expansion intact and record an explanatory fallback;
 //! these C facts are later compared against actual Rust bindings before emission.
 
-/// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same validation
-/// and input contract.
 use super::{
     ConstantFallback, ExpansionBatch, ExpansionLimits, ExpansionResult, Prepared, ProbeDirectory,
     extract_bodies, namespace, overlay, parameters, verify_original_environment,
 };
-/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     Error, FrontendError, FrontendOutput, IntegerConstant, IntegerKind, IntegerValue, MacroKind,
     MacroScanner, Token, TokenKind, TypeCategory,
 };
-/// Use live Clang AST/preprocessing handles only while the enclosing scanner owns the runtime.
 use clang::{EntityKind, EntityVisitResult, EvaluationResult};
-/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{BTreeMap, BTreeSet, HashMap};
-/// Format owned report text or bounded probe source without changing the original semantic tokens.
 use std::fmt::Write;
-/// Read/write owned probe or report streams while preserving I/O errors at the phase boundary.
 use std::io::Read;
-/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
-/// tracking.
 use std::path::Path;
 
 /// Bound retry isolation during optional object-constant proof so malformed candidates cannot cause

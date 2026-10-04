@@ -14,17 +14,9 @@
 #[allow(dead_code)]
 mod rust_oracle;
 
-/// Read original fixtures and manage only the owned inputs and outputs used by generation
-/// checks.
 use std::fs;
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::PathBuf;
-/// Invoke independent compilers and consumers and inspect their actual exit status rather than
-/// trusting generated source alone.
 use std::process::Command;
-/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
-/// artifacts.
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Consumer registration declarations used to exercise native record sealing and valid

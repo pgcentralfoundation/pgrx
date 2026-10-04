@@ -9,18 +9,13 @@
 //! anchor both sides of the ABI; Rust argument conversions stay outside the guarded
 //! native call so PostgreSQL error jumps cannot cross conversion-owned destructors.
 
-/// Share verified storage lowering and path rendering with the other native capability passes.
 use super::types::{Lowering, rust_path};
-/// Validate native linkage and prototypes against binding storage and compiler target facts.
 use crate::{
     BindingCatalog, DeclarationCatalog, DeclarationLinkage, FunctionBinding, FunctionInfo,
     IntegerKind, RustBindingType, TargetFacts, TypeCategory, TypeInfo, TypeShapeKind,
 };
-/// Fingerprint compiler identity and profile facts for deterministic, collision-resistant native symbols.
 use sha2::{Digest, Sha256};
-/// Keep symbol catalogs and requested capability names deterministic and deduplicated.
 use std::collections::{BTreeMap, BTreeSet};
-/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
 /// Bound the combined Rust/C native thunk source emitted by this capability family.

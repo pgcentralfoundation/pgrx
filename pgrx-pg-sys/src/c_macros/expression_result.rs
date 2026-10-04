@@ -11,7 +11,6 @@
 //! apply C assignment conversion before extraction, including pointer qualifier
 //! and source-proved null-constant rules.
 
-/// Reuse the surrounding C identity and conversion capabilities so this module shares the sealed runtime model.
 use super::{CInteger, CValue, IntoCValue, expression::*, sealed};
 
 /// Native result extraction, including C void, for the sealed value families.
@@ -165,9 +164,7 @@ pub fn return_value_as<M: CType, V: ImplicitTo<M>>(value: V) -> M::Storage {
 /// Pointer tests retain qualification and source-proved null identity through assignment conversion.
 #[cfg(test)]
 mod tests {
-    /// Use the fixture, process, or value primitives needed to exercise this module's C semantic contract.
     use super::super::{CInt, Either};
-    /// Use the fixture, process, or value primitives needed to exercise this module's C semantic contract.
     use super::*;
 
     /// Check the public result wrapper supports unsuffixed integer inference while preserving tagged conditional results.

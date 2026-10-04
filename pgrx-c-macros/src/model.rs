@@ -10,14 +10,9 @@
 //! proofs. FrontendOutput bundles the facts established by one inspection so downstream
 //! phases cannot casually mix environments.
 
-/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{MacroDefinition, MacroDependencyGraph, MacroInventory, SourceSpan};
-/// Serialize owned inspection/analysis facts without borrowing from compiler translation units.
 use serde::Serialize;
-/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::BTreeMap;
-/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
-/// tracking.
 use std::path::PathBuf;
 
 /// An inspection whose profile, macro environment, and declarations were resolved together.

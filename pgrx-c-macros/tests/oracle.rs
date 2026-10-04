@@ -12,11 +12,7 @@
 #[path = "support/oracle.rs"]
 mod oracle;
 
-/// Keep catalogs, output maps, and observation sets deterministic for exact selection and
-/// publication comparisons.
 use std::collections::BTreeMap;
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::{Path, PathBuf};
 
 /// Represent one independent C result together with its type and evaluation count.
@@ -190,8 +186,6 @@ int main(void) {
 #[test]
 #[ignore = "requires a configured native PostgreSQL 18 installation"]
 fn configured_postgres_18_original_headers_establish_scalar_semantics() {
-    /// Use the production scanner, analysis, and emission contracts so these checks exercise
-    /// the actual C macro pipeline.
     use pgrx_c_macros::{MacroScanner, PostgresConfig};
 
     let postgres = PostgresConfig::resolve("pg18").expect("a native PG18 must be configured");

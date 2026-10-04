@@ -11,15 +11,9 @@
 
 #![cfg(not(target_os = "windows"))]
 
-/// Exercise the selected build's public bindings and macro exports from a downstream consumer.
 use extension::pg_sys;
-/// Use the production semantic markers and expression wrappers to retain exact C type identity
-/// in the consumer.
 use extension::pg_sys::__pgrx_c_macros::{CUnsignedInt, CValue};
-/// Rename the consumer crate to test that generated macro paths remain hygienic across pgrx
-/// reexports.
 use pgrx as extension;
-/// Import public macro aliases to test invocation through the pgrx crate root.
 use pgrx::{
     ACL_GRANT_OPTION_FOR as grant_options, BUFFERALIGN as buffer_align, Max as c_max, Min as c_min,
     TYPEALIGN as type_align,

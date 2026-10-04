@@ -15,20 +15,11 @@
 #[path = "../../pgrx-c-macros/tests/support/oracle.rs"]
 mod oracle;
 
-/// Record callback or operand observations without changing the generated C expression types.
 use core::cell::Cell;
-/// Provide owned raw record storage so tests can initialize only fields that a C macro actually
-/// accesses.
 use core::mem::MaybeUninit;
-/// Address selected C fields without creating references to an incompletely initialized record.
 use core::ptr::addr_of_mut;
-/// Exercise the selected build's public bindings and macro exports from a downstream consumer.
 use pgrx_pg_sys as pg;
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::PathBuf;
-/// Cache the independent native oracle once while sharing its immutable observations across
-/// integration tests.
 use std::sync::OnceLock;
 
 /// Read the selected build's macro audit report to configure an independent original-header C

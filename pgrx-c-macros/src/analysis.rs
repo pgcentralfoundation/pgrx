@@ -18,24 +18,17 @@
 //! are valid. A parsed candidate is not a claim of successful lowering or differential proof;
 //! unsupported constructs carry structured reasons instead.
 
-/// Use owned C profile and declaration facts instead of reconstructing compiler identities from Rust
-/// storage.
 use crate::model::{
     ActiveMacro, ActiveProvenance, DeclarationCatalog, FrontendOutput, IntegerConstant,
     IntegerKind, IntegerType, IntegerValue, SignedOverflow, TargetFacts, TypeCategory, TypeInfo,
 };
-/// Use the shared source arena and token ranges so this phase preserves the parser’s structural
-/// evidence.
 use crate::syntax::{
     BinaryOperator, Expression, ExpressionKind, IntegerLiteral, NodeId, OffsetComponent,
     OffsetRecord, Statement, SyntaxError, SyntaxErrorKind, TokenRange, UnaryOperator,
     parse_expression, parse_replacement,
 };
-/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{MacroKind, SourceSpan, Token, TokenKind};
-/// Serialize owned inspection/analysis facts without borrowing from compiler translation units.
 use serde::Serialize;
-/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
 /// Analysis of one final active definition under the inspected compilation profile.
@@ -1810,7 +1803,6 @@ fn fundamental_kind(words: &[&str]) -> Option<IntegerKind> {
 /// Select a literal C type using radix, suffix, value, and the target-specific standard candidate
 /// order.
 fn literal_type(literal: &IntegerLiteral, target: &TargetFacts) -> Option<IntegerType> {
-    /// Name the standard C literal candidates in their mandated radix/suffix selection order.
     use IntegerKind::{Int, Long, LongLong, UnsignedInt, UnsignedLong, UnsignedLongLong};
     let decimal = literal.radix == 10;
     let candidates: &[IntegerKind] = match (literal.suffix.unsigned, literal.suffix.long, decimal) {
@@ -1912,15 +1904,10 @@ fn unsigned_kind(kind: IntegerKind) -> IntegerKind {
 /// headers or weakening the C identity and evaluation contracts.
 #[cfg(test)]
 mod tests {
-    /// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same
-    /// validation and input contract.
     use super::*;
-    /// Use owned C profile and declaration facts instead of reconstructing compiler identities from
-    /// Rust storage.
     use crate::model::{
         ActiveMacro, BuildInputs, ByteOrder, CompilationProfile, CompilerIdentity, MacroEnvironment,
     };
-    /// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
     use crate::{MacroDefinition, MacroInventory};
 
     /// Construct explicit LP64 integer facts for pure analysis tests rather than borrowing the host

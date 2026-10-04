@@ -4,28 +4,10 @@
 
 // Individual integration-test crates use different parts of this shared harness.
 
-/// Compile and execute generated Rust consumers independently of the generator.
-///
-/// The harness can link original C functions, require invalid C or Rust programs
-/// to be rejected, and run auxiliary compiler tools. Every process has bounded
-/// runtime and output and uses owned temporary files. Separate integration-test
-/// crates import only the helpers they need; the macro support implementation
-/// itself remains the same source that pgrx-pg-sys compiles.
-///
-/// Read original fixtures and manage only the owned inputs and outputs used by generation
-/// checks.
 use std::fs::{self, File};
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::{Path, PathBuf};
-/// Invoke independent compilers and consumers and inspect their actual exit status rather than
-/// trusting generated source alone.
 use std::process::{Command, Stdio};
-/// Allocate unique fixture paths or record process-local effects across concurrent test
-/// invocations.
 use std::sync::atomic::{AtomicU64, Ordering};
-/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
-/// artifacts.
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 /// Maximum compiler or consumer runtime before the oracle kills a stalled process.

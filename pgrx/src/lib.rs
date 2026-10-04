@@ -120,8 +120,6 @@ pub mod pg_sys;
 
 // and re-export these
 pub use pg_sys::PgBuiltInOids;
-/// Expose the selected build's generated C macros at the pgrx crate root while their hygienic
-/// paths retain pg_sys ownership.
 #[allow(unused_imports)]
 pub use pg_sys::cmacros::*;
 pub use pg_sys::elog::PgLogLevel;

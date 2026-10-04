@@ -11,8 +11,6 @@
 /// Exercise the generated definitions and print observations for the paired original-C oracle;
 /// assertions cover cases with no scalar output.
 fn main() {
-    /// Use the production semantic markers and expression wrappers to retain exact C type
-    /// identity in the consumer.
     use __pgrx_c_macros::{CUnsignedInt, CUnsignedLong, CValue};
     let mut record = core::mem::MaybeUninit::<EnumRecord>::uninit();
     let pointer = record.as_mut_ptr();
@@ -101,8 +99,6 @@ fn main() {
             println!("boundary{i}\t{}", ENUM_SET!(pointer, i).get() as u64);
         }
     }
-    /// Use the production semantic markers and expression wrappers to retain exact C type
-    /// identity in the consumer.
     use __pgrx_c_macros::expression::{CType, NativeType, cast, input};
     /// Keep the explicit C enum identity used by the consumer's cast and native-storage checks.
     type Marker = <EnumSmall as NativeType>::Marker;

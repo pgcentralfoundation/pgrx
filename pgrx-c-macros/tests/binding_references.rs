@@ -16,17 +16,12 @@ mod oracle;
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
-/// Use the production scanner, analysis, and emission contracts so these checks exercise the
-/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, EmissionStatus, IntegerBinding, IntegerBindingRepresentation,
     IntegerValue, MacroScanner, SkipReasonCode, emit_batch_with_bindings,
     emit_support_artifact_with_bindings, emit_with_bindings, inspect, pg_sys_integer_bridges,
 };
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::PathBuf;
-/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
 /// Serialize libclang-backed inspection within this test process because its safe runtime

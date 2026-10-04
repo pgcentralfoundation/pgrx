@@ -12,23 +12,11 @@
 
 #![cfg(unix)]
 
-/// Keep catalogs, output maps, and observation sets deterministic for exact selection and
-/// publication comparisons.
 use std::collections::BTreeMap;
-/// Read original fixtures and manage only the owned inputs and outputs used by generation
-/// checks.
 use std::fs;
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::{Path, PathBuf};
-/// Invoke independent compilers and consumers and inspect their actual exit status rather than
-/// trusting generated source alone.
 use std::process::{Command, Output};
-/// Allocate unique fixture paths or record process-local effects across concurrent test
-/// invocations.
 use std::sync::atomic::{AtomicU64, Ordering};
-/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
-/// artifacts.
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Allocate unique isolated consumer paths without sharing Cargo outputs between tests.

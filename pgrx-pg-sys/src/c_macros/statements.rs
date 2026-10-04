@@ -71,7 +71,6 @@ const fn identifier_byte(byte: u8) -> bool {
 /// The fixture macros exercise the same stringification path used by generated statement guards.
 #[cfg(test)]
 mod tests {
-    /// Use the fixture, process, or value primitives needed to exercise this module's C semantic contract.
     use super::*;
 
     /// Reject captured local names inside token groups and raw identifiers while accepting longer identifier spellings.

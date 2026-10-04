@@ -9,13 +9,11 @@
 //! these passes so a session never intentionally combines facts from different header states.
 //! The borrowed frontend owns the profile; the session owns observations specific to its batch.
 
-/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     ActiveMacro, ActiveProvenance, AnalysisStatus, BuildInputs, ExpansionBatch, ExpansionLimits,
     ExpansionResult, ExpansionSkipCode, FrontendError, FrontendOutput, IntegerConstant,
     MacroAnalysis, MacroDependency, MacroScanner, SkipReason, SkipReasonCode,
 };
-/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{BTreeMap, BTreeSet};
 
 /// An inspected C environment and compiler-expanded symbolic invocations resolved together.

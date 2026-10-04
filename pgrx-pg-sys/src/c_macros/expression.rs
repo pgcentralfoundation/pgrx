@@ -20,9 +20,7 @@
 //! explicit unsafe contracts; numeric domain checks cannot establish provenance,
 //! initialization, aliasing permissions, or PostgreSQL backend-thread eligibility.
 
-/// Reuse the surrounding C identity and conversion capabilities so this module shares the sealed runtime model.
 use super::{CInteger, CValue, IntoCValue, OverflowPolicy, PromotedInteger, sealed};
-/// Use zero-cost marker or raw-storage primitives without adding ownership to C values.
 use core::marker::PhantomData;
 
 /// Preserve caller literal zero facts until expression/storage boundaries remove source-only metadata.
@@ -31,12 +29,10 @@ pub mod literal;
 /// Model source-proved `(void *)0` separately from ordinary void-pointer values.
 /// This preserves the C conversions to object and function pointers without widening pointer capabilities.
 pub mod null;
-/// Reuse the surrounding C identity and conversion capabilities so this module shares the sealed runtime model.
 pub use literal::ZeroInteger;
 /// Retain nominal C enum identities and compatible integer storage.
 /// Raw enum access avoids materializing values outside a Rust binding's valid discriminants.
 pub mod enumeration;
-/// Reuse the surrounding C identity and conversion capabilities so this module shares the sealed runtime model.
 pub use enumeration::{CEnum, CEnumObject, EnumIdentity, EnumStorage};
 
 /// A compiler-established C identity and its binding storage representation.
@@ -1010,7 +1006,6 @@ impl<R: Copy> IntoExpression for RecordValue<R> {
 /// Keep partial aggregate copies in raw storage until selected fields are accessed.
 /// This supports C value copying without requiring the whole Rust record to be initialized or `Copy`.
 pub mod record;
-/// Reuse the surrounding C identity and conversion capabilities so this module shares the sealed runtime model.
 pub use record::{CRawRecord, RawRecordValue, RecordExpression};
 
 /// The binding placeholder for a compiler-proven incomplete record.
@@ -3300,21 +3295,14 @@ mod tests {
     //! compile-fail consumers prove that invalid operand families do not acquire
     //! capabilities merely because their native representations have equal widths.
 
-    /// Reuse explicit C integer markers and the checked signed-overflow policy in expression fixtures.
     use super::super::{
         CBool, CInt, CLong, CLongLong, CUnsignedChar, CUnsignedInt, CUnsignedLong, Undefined,
     };
-    /// Exercise private typed expression and place helpers directly in runtime fixtures.
     use super::*;
-    /// Count observable reads, writes, and callback effects without changing fixture ownership.
     use std::cell::Cell;
-    /// Assemble temporary Rust consumers for compilation and capability-rejection checks.
     use std::fmt::Write;
-    /// Keep partially initialized record bytes outside whole Rust value-validity requirements.
     use std::mem::MaybeUninit;
-    /// Locate scratch compiler inputs and native oracle artifacts owned by the fixture.
     use std::path::PathBuf;
-    /// Assign unique scratch-directory identities when compiler tests run concurrently.
     use std::sync::atomic::{AtomicU64, Ordering};
 
     /// Provide a record with independently initialized fields to test address-only projection and raw aggregate copies.

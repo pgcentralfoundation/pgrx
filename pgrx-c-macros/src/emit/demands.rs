@@ -13,24 +13,17 @@
 //! Missing facts retain possible capabilities; they never justify excluding a valid
 //! caller type or replace the checks performed by lowering.
 
-/// Plan requests in the capability families consumed by the emission pipeline.
 use super::{BindingCatalog, callbacks, enumerations, fields, typed, types::Lowering};
-/// Consume trusted analysis facts and preserve structured rejection context during lowering.
 use crate::analysis::{AnalysisStatus, MacroAnalysis};
-/// Match analyzed C arena nodes and operators without reparsing header tokens during emission.
 use crate::syntax::{
     BinaryOperator, ExpressionKind, NodeId, OffsetComponent, OffsetRecord, UnaryOperator,
 };
-/// Use trusted declaration shapes and target facts to constrain caller families conservatively.
 use crate::{
     AnalysisSession, DeclarationCatalog, FrontendOutput, TargetFacts, TypeCategory, TypeInfo,
     TypeShapeKind,
 };
-/// Memoize pure family and compatibility queries through shared immutable planner access.
 use std::cell::RefCell;
-/// Keep capability catalogs ordered and deduplicated, with work queues for bounded dependency traversal.
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
-/// Share immutable finite source families instead of cloning every type for cached queries.
 use std::rc::Rc;
 
 /// Batch requirements consumed by native adapter generation rather than inferred from sample invocations.
@@ -1572,7 +1565,6 @@ impl RecordIndex {
         fields: &'a BTreeMap<String, TypeInfo>,
         name: Option<&str>,
     ) -> std::collections::btree_map::Range<'a, String, TypeInfo> {
-        /// Select one indexed member or the complete wildcard range without cloning field catalogs.
         use std::ops::Bound::{Included, Unbounded};
         let bounds = name.map_or((Unbounded, Unbounded), |name| (Included(name), Included(name)));
         fields.range::<str, _>(bounds)
@@ -1664,7 +1656,6 @@ fn common_category(left: u8, right: u8) -> u8 {
 }
 /// Model C operator category combinations used to propagate conservative operand restrictions.
 fn binary_category(operator: BinaryOperator, left: u8, right: u8) -> u8 {
-    /// Use trusted declaration shapes and target facts to constrain caller families conservatively.
     use BinaryOperator::*;
     match operator {
         LogicalAnd | LogicalOr | Less | LessEqual | Greater | GreaterEqual | Equal | NotEqual => {
@@ -1699,9 +1690,7 @@ fn binary_category(operator: BinaryOperator, left: u8, right: u8) -> u8 {
 /// Regressions proving conservative type-family selection preserves qualifiers and unknown compiler facts.
 #[cfg(test)]
 mod tests {
-    /// Exercise the private type-family constraint helpers directly in regression tests.
     use super::*;
-    /// Construct independent compiler and binding fixtures for the lowering invariants exercised here.
     use crate::{ArrayKind, IntegerKind, TypeShape};
 
     /// Check indexed named selection keeps wildcard behavior and returns no fabricated missing member.

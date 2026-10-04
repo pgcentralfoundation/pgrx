@@ -1039,10 +1039,7 @@ fn compiler_flags_from_known_properties_preserve_the_recorded_value() {
 #[cfg(unix)]
 #[test]
 fn failed_pg_config_queries_do_not_accept_partial_stdout() {
-    /// Make fixture compiler or pg_config wrappers executable so process failures can be tested
-    /// directly.
     use std::os::unix::fs::PermissionsExt;
-    /// Give the temporary pg_config fixture a unique name without reusing files from a prior run.
     use std::time::{SystemTime, UNIX_EPOCH};
 
     let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();

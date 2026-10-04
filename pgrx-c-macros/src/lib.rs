@@ -31,49 +31,36 @@
 //! and analysis to that same input snapshot, and emission checks actual Rust binding storage
 //! before producing macros and the adapters they need.
 
-/// Use live Clang AST/preprocessing handles only while the enclosing scanner owns the runtime.
 use clang::{Clang, EntityKind, EntityVisitResult, Index};
-/// Serialize owned inspection/analysis facts without borrowing from compiler translation units.
 use serde::{Deserialize, Serialize};
-/// Format owned report text or bounded probe source without changing the original semantic tokens.
 use std::fmt;
-/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
-/// tracking.
 use std::path::{Path, PathBuf};
-/// Share owned runtime/process observations while retaining the enclosing thread or fixture ownership
-/// rules.
 use std::sync::Arc;
 
 /// Resolve pgrx-managed installations and separate PostgreSQL-owned macros from retained expansion
 /// context.
 mod postgres;
-/// Expose installation resolution and PostgreSQL ownership filtering to bindgen and CLI clients.
 pub use postgres::{
     PostgresConfig, PostgresError, PostgresInventory, postgres_function_macro_names,
 };
 /// Own compiler profiles, preprocessing state, and declaration identities independently of Clang
 /// handles.
 mod model;
-/// Expose the owned C profile and declaration vocabulary shared by pipeline clients.
 pub use model::*;
 /// Build deterministic macro/constant reference graphs for ordering and refusal propagation.
 mod dependencies;
-/// Expose deterministic dependency lookup and affected-caller explanations for generation failures.
 pub use dependencies::{MacroDependencyGraph, MacroDependencyImpact};
 /// Establish one agreed compiler environment and copied C catalog before expansion or analysis.
 mod frontend;
-/// Expose coherent inspection and native support compilation at the library boundary.
 pub use frontend::{FrontendError, compile_native_support, inspect};
 /// Parse bounded source syntax while preserving formal holes, grouping, and structural operands.
 mod syntax;
-/// Expose structural syntax facts for analysis reports and binding-aware emission.
 pub use syntax::{
     BinaryOperator, Expression, ExpressionKind, ExpressionNode, IntegerLiteral, IntegerSuffix,
     NodeId, OffsetComponent, OffsetRecord, Statement, StatementBody, TokenRange, UnaryOperator,
 };
 /// Describe symbolic C types and invocation contracts before Rust lowering claims support.
 mod analysis;
-/// Expose symbolic candidate contracts and structured refusals independently of Rust lowering.
 pub use analysis::*;
 
 /// Serialize tests using libclang because its wrapper allows only one live runtime handle per
@@ -82,7 +69,6 @@ pub use analysis::*;
 pub(crate) static SCANNER_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
 /// Use the matched compiler to preserve preprocessing semantics and surviving formal occurrences.
 mod expansion;
-/// Expose bounded compiler expansion and its owned result/dependency vocabulary.
 pub use expansion::{
     ConstantFallback, ExpandedMacro, ExpansionBatch, ExpansionDependency, ExpansionLimits,
     ExpansionResult, ExpansionSkip, ExpansionSkipCode, ParameterOccurrence, prepare_expansions,
@@ -90,26 +76,21 @@ pub use expansion::{
 };
 /// Tie expansion, constant proofs, and analysis to one verified inspection snapshot.
 mod session;
-/// Expose the preparation boundary that keeps expansion and analysis tied to one inspection.
 pub use session::AnalysisSession;
 /// Gate runtime helper compatibility and produce target guards and opaque pg-sys integer bridges.
 mod support_generation;
-/// Expose target support gates and pg-sys bridge generation to the binding generator.
 pub use support_generation::*;
 /// Lower analyzed candidates using verified binding storage and shared C-semantic runtime
 /// capabilities.
 mod emit;
-/// Expose binding-aware lowering and the generated artifact/result vocabulary.
 pub use emit::*;
 /// Record actual target bindgen storage independently of authoritative C type identities.
 mod bindings;
-/// Expose actual Rust binding storage facts for compiler-to-binding reconciliation.
 pub use bindings::*;
 /// Retain direct macro calls only after comparing independently expanded structures and C type facts.
 mod delegation;
 /// Lay out generated macro token trees while preserving source spellings and semantic structure.
 mod formatting;
-/// Expose source-preserving macro layout to generated file writers.
 pub use formatting::format_rust_macros;
 
 /// An owned record of the definitions and diagnostics encountered while processing a file.

@@ -10,14 +10,8 @@
 //! link it. Native helpers cover operations whose C layout or calling convention
 //! cannot be inferred from Rust storage alone.
 
-/// Preserve contextual generation and filesystem failures through the binding-build error
-/// contract.
 use eyre::{WrapErr, eyre};
-/// Use the emitter catalog and result types that connect C inspection to generated binding
-/// publication.
 use pgrx_c_macros::CompilationProfile;
-/// Keep provenance roots and generated relative paths explicit across module rendering and
-/// publication.
 use std::path::Path;
 
 /// Compile and archive generated C access primitives with the inspected invocation profile,

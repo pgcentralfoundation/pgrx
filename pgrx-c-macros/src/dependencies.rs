@@ -10,17 +10,12 @@
 //! separate, allowing a binding disagreement to seed affected callers without inventing a
 //! macro definition for a declaration constant.
 
-/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     ExpansionBatch, IntegerConstant, MacroDefinition, MacroEnvironment, MacroKind, TokenKind,
 };
-/// Represent immutable caller-to-dependency edges and traverse them in deterministic order.
 use petgraph::Direction::{Incoming, Outgoing};
-/// Represent immutable caller-to-dependency edges and traverse them in deterministic order.
 use petgraph::graph::{DiGraph, NodeIndex};
-/// Serialize owned inspection/analysis facts without borrowing from compiler translation units.
 use serde::Serialize;
-/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{BTreeMap, BTreeSet, HashSet, VecDeque};
 
 /// Conservative macro references, including object macros and external context.
@@ -269,10 +264,7 @@ fn signature(definition: &MacroDefinition) -> (HashSet<&str>, usize) {
 /// headers or weakening the C identity and evaluation contracts.
 #[cfg(test)]
 mod tests {
-    /// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same
-    /// validation and input contract.
     use super::*;
-    /// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
     use crate::{ActiveMacro, ActiveProvenance, Token};
 
     /// Create identifier tokens for dependency fixtures with explicit lexical categories.
@@ -488,7 +480,6 @@ mod tests {
     /// Checks constant users are sorted unique and respect formal and macro shadowing.
     #[test]
     fn constant_users_are_sorted_unique_and_respect_formal_and_macro_shadowing() {
-        /// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
         use crate::{IntegerKind, IntegerValue, TypeCategory, TypeInfo};
         let constant = IntegerConstant {
             ty: TypeInfo {

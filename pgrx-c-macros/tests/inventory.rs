@@ -4,14 +4,9 @@
 //! boundaries establish exact tokens and line spans. The scanner must retain
 //! preprocessor syntax and report invalid inputs rather than output partial facts.
 
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::{Path, PathBuf};
-/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
-/// Use the production scanner, analysis, and emission contracts so these checks exercise the
-/// actual C macro pipeline.
 use pgrx_c_macros::{
     DiagnosticSeverity, Error, MacroDefinition, MacroKind, MacroScanner, TokenKind,
 };
@@ -345,8 +340,6 @@ fn preserves_spliced_macro_syntax_and_physical_locations_and_rejects_invalid_inp
     assert!(matches!(scanner.scan(Path::new("header\0.h"), &[]), Err(Error::InvalidInput(_))));
     #[cfg(unix)]
     {
-        /// Construct non-UTF-8 fixture paths to test scanner diagnostics at the filesystem
-        /// boundary.
         use std::os::unix::ffi::OsStringExt;
         let non_utf8 = PathBuf::from(std::ffi::OsString::from_vec(b"header\xff.h".to_vec()));
         assert!(matches!(scanner.scan(&non_utf8, &[]), Err(Error::InvalidInput(_))));

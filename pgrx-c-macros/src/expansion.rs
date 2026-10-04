@@ -15,19 +15,13 @@
 //! closed token pasting and atomic constant retention. Temporary overlays preserve the main
 //! file context, and original-environment checks reject observations from changed inputs.
 
-/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     ActiveProvenance, BuildInputs, FrontendError, FrontendOutput, MacroDefinition, MacroKind,
     MacroScanner, SourceSpan, TokenKind,
 };
-/// Serialize owned inspection/analysis facts without borrowing from compiler translation units.
 use serde::Serialize;
-/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
-/// Read/write owned probe or report streams while preserving I/O errors at the phase boundary.
 use std::io::Read;
-/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
-/// tracking.
 use std::path::{Path, PathBuf};
 
 /// Retain readable object-macro symbols only after independent atomicity, type, value, and
@@ -36,7 +30,6 @@ mod constants;
 /// Prove closed token pasting and attribute synthesized dependencies with bounded owned
 /// instrumentation.
 mod paste;
-/// Expose independently verified constant retention to the preparation phase.
 pub(crate) use constants::retain_integer_constants;
 
 /// Probe-only diagnostic policy that accepts source markers and makes invalid token pasting an error.

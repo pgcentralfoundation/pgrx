@@ -11,9 +11,7 @@
 //! the complete binding record remains an explicit unsafe operation with
 //! separate validity, ownership, aliasing, and lifetime obligations.
 
-/// Reuse the surrounding C identity and conversion capabilities so this module shares the sealed runtime model.
 use super::*;
-/// Use zero-cost marker or raw-storage primitives without adding ownership to C values.
 use core::mem::MaybeUninit;
 
 /// Identify aggregate value storage that may contain uninitialized fields and is never loaded as `R`.
@@ -370,9 +368,7 @@ unsafe impl<R> WritePlace for Place<CRawRecord<R>> {
 /// A destructor counter separately checks that raw storage cannot drop its hidden non-Copy record.
 #[cfg(test)]
 mod tests {
-    /// Use the fixture, process, or value primitives needed to exercise this module's C semantic contract.
     use super::super::super::CUnsignedInt;
-    /// Use the fixture, process, or value primitives needed to exercise this module's C semantic contract.
     use super::*;
 
     /// Provide a record with independently initialized fields to test address-only projection and raw aggregate copies.
@@ -444,7 +440,6 @@ mod tests {
     /// Use a destructor counter to prove raw aggregate wrappers never run the hidden record destructor.
     #[test]
     fn raw_storage_does_not_drop_r_even_when_r_is_not_copy() {
-        /// Use the fixture, process, or value primitives needed to exercise this module's C semantic contract.
         use core::sync::atomic::{AtomicUsize, Ordering};
         /// Count forbidden hidden-record destruction in the raw aggregate storage regression.
         static DROPS: AtomicUsize = AtomicUsize::new(0);

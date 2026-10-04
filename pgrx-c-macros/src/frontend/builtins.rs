@@ -10,32 +10,18 @@
 //! unsupported witnesses produce reasons. Temporary overlays preserve the original source
 //! context while isolating instrumentation.
 
-/// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same validation
-/// and input contract.
 use super::{FrontendError, driver_arguments, run_compiler, tokenize_snapshot, type_info};
-/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     BuiltinInfo, BuiltinKind, FrontendOutput, FunctionSignature, IntegerKind, MacroScanner,
     TypeCategory,
 };
-/// Use live Clang AST/preprocessing handles only while the enclosing scanner owns the runtime.
 use clang::{Entity, EntityKind, EntityVisitResult, Index, TypeKind};
-/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::BTreeMap;
-/// Format owned report text or bounded probe source without changing the original semantic tokens.
 use std::fmt::Write;
-/// Create and inspect only fixture/probe files owned by the enclosing phase.
 use std::fs;
-/// Read/write owned probe or report streams while preserving I/O errors at the phase boundary.
 use std::io::Read;
-/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
-/// tracking.
 use std::path::PathBuf;
-/// Share owned runtime/process observations while retaining the enclosing thread or fixture ownership
-/// rules.
 use std::sync::atomic::{AtomicU64, Ordering};
-/// Bound compiler work or distinguish owned probe directories without assuming timing proves
-/// semantics.
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// The reviewed builtin names and operation identities eligible for signature and effect proof.
@@ -860,8 +846,6 @@ fn local_pointer<'a>(part: Option<&'a str>, ty: &str) -> Result<&'a str, String>
 /// headers or weakening the C identity and evaluation contracts.
 #[cfg(test)]
 mod tests {
-    /// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same
-    /// validation and input contract.
     use super::*;
 
     /// Build a byte-swap LLVM test body for the production witness recognizer.

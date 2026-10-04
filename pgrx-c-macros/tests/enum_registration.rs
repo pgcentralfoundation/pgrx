@@ -14,8 +14,6 @@
 #[allow(dead_code)]
 mod rust_oracle;
 
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::PathBuf;
 
 /// Assemble emitted macro definitions for the consumer, failing the test if an expected

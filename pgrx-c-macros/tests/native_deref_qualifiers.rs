@@ -21,19 +21,11 @@ mod oracle;
 #[allow(dead_code)]
 mod rust_oracle;
 
-/// Use the production scanner, analysis, and emission contracts so these checks exercise the
-/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, MacroScanner, generate_with_bindings, inspect,
 };
-/// Read original fixtures and manage only the owned inputs and outputs used by generation
-/// checks.
 use std::fs;
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::PathBuf;
-/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
-/// artifacts.
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Classify PostgreSQL OID constants so fixture bindgen uses the same checked-wrapper boundary

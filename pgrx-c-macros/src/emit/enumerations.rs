@@ -8,18 +8,13 @@
 //! identity separately from numeric arithmetic and emits checked storage bridges
 //! only after the compiler-compatible integer and binding layout agree.
 
-/// Resolve compatible integer storage without conflating enum identity with native representation.
 use super::types::{LoweredType, Lowering, enum_key};
-/// Reconcile compiler enum identities and values with actual binding constructors and storage.
 use crate::{
     BindingCatalog, DeclarationCatalog, EnumBinding, IntegerValue, RustBindingType, TargetFacts,
     TypeInfo, TypeShapeKind,
 };
-/// Derive stable nominal enum marker names from the compiler declaration identity.
 use sha2::{Digest, Sha256};
-/// Keep symbol catalogs and requested capability names deterministic and deduplicated.
 use std::collections::{BTreeMap, BTreeSet};
-/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
 /// Private expression runtime path shared by the generated enum support module.
@@ -194,9 +189,7 @@ fn integer_literal(value: IntegerValue) -> String {
 /// Regressions for enum identity selection, checked storage bridges, and layout-witness sharing.
 #[cfg(test)]
 mod tests {
-    /// Exercise the private enum representation helpers directly in regression tests.
     use super::*;
-    /// Construct independent compiler and binding fixtures for the lowering invariants exercised here.
     use crate::{
         AliasBinding, ByteOrder, IntegerKind, IntegerType, PointerLayout, TypeCategory, TypeShape,
     };

@@ -8,11 +8,7 @@
 //! protect literals and documentation. Repetitions, contexts, nested definitions,
 //! and trailing comments exercise formatting cases rustfmt cannot reliably handle.
 
-/// Use the production scanner, analysis, and emission contracts so these checks exercise the
-/// actual C macro pipeline.
 use pgrx_c_macros::format_rust_macros;
-/// Inspect token structure and spacing needed to distinguish preserved macro semantics from
-/// formatting changes.
 use proc_macro2::{Delimiter, Spacing, TokenStream, TokenTree};
 
 /// Normalize meaningful token structure for formatting comparisons while ignoring inserted

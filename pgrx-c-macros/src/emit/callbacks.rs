@@ -9,18 +9,13 @@
 //! pruning requested operations, rejects ambiguous raw-input bridges, and shares
 //! physical call machinery without merging distinct C identities.
 
-/// Share nominal type reconciliation and path rendering with field and function adapters.
 use super::types::{LoweredType, Lowering, rust_path};
-/// Compare compiler prototypes with fresh binding representations and selected target ABI facts.
 use crate::{
     BindingCatalog, CallbackBinding, DeclarationCatalog, FunctionSignature, RustBindingType,
     TargetFacts, TypeCategory, TypeInfo, TypeShapeKind,
 };
-/// Fingerprint matched compiler prototypes and storage for deterministic callback identity markers.
 use sha2::{Digest, Sha256};
-/// Keep capability catalogs ordered and deduplicated, with work queues for bounded dependency traversal.
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
-/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
 /// Private semantic runtime path shared by the native callback support module.
@@ -1108,9 +1103,7 @@ fn abi_assertions(output: &mut String, storage: &str, ty: &TypeInfo) {
 /// Synthetic-catalog regressions for callback identity, complete witness validation, and demand pruning.
 #[cfg(test)]
 mod tests {
-    /// Exercise the private callback witness and selection helpers directly in regression tests.
     use super::*;
-    /// Construct independent compiler and binding fixtures for the lowering invariants exercised here.
     use crate::{AliasBinding, ByteOrder, IntegerKind, IntegerType, PointerLayout, TypeShape};
 
     /// Construct a fixed-width C int witness for synthetic callback catalogs.

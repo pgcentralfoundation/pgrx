@@ -9,13 +9,9 @@
 //! compiler, while Rust capability markers track mutability, volatility, and access
 //! alignment. Bindgen and Clang layout witnesses must agree before emission.
 
-/// Resolve actual record storage and hygienic paths before admitting original-C bitfield access.
 use super::types::{Lowering, rust_path};
-/// Match compiler field facts with actual binding storage and record constructors.
 use crate::{BindingCatalog, DeclarationCatalog, FieldInfo, RecordBinding, TypeCategory};
-/// Fingerprint compiler field and record facts for stable native bitfield primitive symbols.
 use sha2::{Digest, Sha256};
-/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
 /// Private runtime namespace used by same-crate bitfield support items.

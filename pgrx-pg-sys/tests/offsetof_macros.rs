@@ -10,7 +10,6 @@
 #![cfg(all(pgrx_c_macros, not(docsrs)))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
-/// Exercise the selected build's public bindings and macro exports from a downstream consumer.
 use pgrx_pg_sys as pg;
 
 pg::__pgrx_c_classify! { @if_available SizeForFunctionCallInfo {
@@ -57,11 +56,7 @@ pg::__pgrx_c_classify! { @if_available SizeOfGinPostingList {
 /// Checks that generated gin posting list size reads only its initialized length.
 #[test]
 fn generated_gin_posting_list_size_reads_only_its_initialized_length() {
-    /// Provide owned raw record storage so tests can initialize only fields that a C macro
-    /// actually accesses.
     use core::mem::MaybeUninit;
-    /// Address selected C fields without creating references to an incompletely initialized
-    /// record.
     use core::ptr::addr_of_mut;
 
     let mut storage=MaybeUninit::<pg::GinPostingList>::uninit();
@@ -89,11 +84,7 @@ pg::__pgrx_c_classify! { @if_available GinNextPostingListSegment {
 /// Checks that generated gin segment advance stays within owned uninitialized storage.
 #[test]
 fn generated_gin_segment_advance_stays_within_owned_uninitialized_storage() {
-    /// Provide owned raw record storage so tests can initialize only fields that a C macro
-    /// actually accesses.
     use core::mem::MaybeUninit;
-    /// Address selected C fields without creating references to an incompletely initialized
-    /// record.
     use core::ptr::addr_of_mut;
 
     let mut storage=MaybeUninit::<[pg::GinPostingList;16]>::uninit();

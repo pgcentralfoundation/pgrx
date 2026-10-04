@@ -10,11 +10,9 @@
 //! rank and promotion remain those of the underlying kind, while evaluated
 //! input and storage boundaries erase the source-only identity.
 
-/// Reuse the surrounding C identity and conversion capabilities so this module shares the sealed runtime model.
 use super::{
     CExprValue, CInteger, CNullConstant, CValue, FloatType, FloatValue, IntoExpression, sealed,
 };
-/// Use zero-cost marker or raw-storage primitives without adding ownership to C values.
 use core::marker::PhantomData;
 
 /// A source-proved zero integer constant expression, rather than a runtime zero.

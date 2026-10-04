@@ -16,7 +16,6 @@
 //! arguments that cannot be recovered, and statement bodies outside the proof are rejected,
 //! leaving ordinary emission to preserve the compiler-expanded definition.
 
-/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     AnalysisSession, AnalysisStatus, AnalyzedExpression, ExpressionKind, MacroAnalysis,
     MacroDefinition, MacroKind, NodeId, TokenKind, TypeExpression,

@@ -8,8 +8,6 @@
 //! unsupported scope-changing constructs fail rather than becoming textual Rust substitutions.
 //! Root boundary metadata preserves the C dangling-else contract during emission.
 
-/// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same validation
-/// and input contract.
 use super::*;
 
 /// Parsed source-order statements with first-return and all-paths-return metadata for one lexical

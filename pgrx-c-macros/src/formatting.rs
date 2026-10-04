@@ -11,9 +11,7 @@
 //! estimates select compact or indented forms; formatting does not change the emitted macro
 //! contract or reinterpret C semantics.
 
-/// Inspect generated Rust token groups without reinterpreting their original source spellings.
 use proc_macro2::{Delimiter, Group, TokenStream, TokenTree};
-/// Keep source byte ranges explicit while laying out generated token trees.
 use std::ops::Range;
 
 /// The preferred generated macro-body width used by source-preserving layout decisions.

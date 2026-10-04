@@ -15,8 +15,6 @@ mod ffi {
     //! The enclosing selector or oracle owns this scope; generated paths must retain that
     //! ownership when expanded from a downstream consumer.
 
-    /// Allocate unique fixture paths or record process-local effects across concurrent test
-    /// invocations.
     use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
     /// Record whether the fixture is inside its native guard when an argument conversion
     /// occurs.

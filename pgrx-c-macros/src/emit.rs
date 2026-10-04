@@ -16,24 +16,17 @@
 //! reconciles them with the fresh Rust bindings, and propagates rejected dependencies
 //! so exported macros never call a missing generated definition.
 
-/// Consume trusted analysis facts and preserve structured rejection context during lowering.
 use crate::analysis::{
     AnalysisStatus, AnalyzedExpression, ConstCapability, MacroAnalysis, ResolvedConstant,
     SkipReason, SkipReasonCode, TypeExpression,
 };
-/// Preserve target integer width, rank, literal value, and overflow semantics in emitted helpers.
 use crate::model::{IntegerKind, IntegerType, IntegerValue, SignedOverflow};
-/// Match analyzed C arena nodes and operators without reparsing header tokens during emission.
 use crate::syntax::{
     BinaryOperator, ExpressionKind, IntegerLiteral, NodeId, TokenRange, UnaryOperator,
 };
-/// Combine immutable session provenance with target ABI assertions before producing reviewable source.
 use crate::{AnalysisSession, MacroDefinition, support_generation::support_abi_assertions};
-/// Serialize emission outcomes and binding facts for CLI reports and generation consumers.
 use serde::Serialize;
-/// Keep symbol catalogs and requested capability names deterministic and deduplicated.
 use std::collections::{BTreeMap, BTreeSet};
-/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
 /// Hygienic path to the defining crate’s C semantic runtime used by exported expansions.
@@ -583,7 +576,6 @@ fn generated_adapters(
     bindings: &BindingCatalog,
 ) -> Result<GeneratedAdapters, String> {
     let frontend = session.frontend();
-    /// Fingerprint compiler identity and profile facts for deterministic, collision-resistant native symbols.
     use sha2::{Digest, Sha256};
     let profile = serde_json::to_vec(frontend.profile())
         .map_err(|error| format!("cannot fingerprint the C function profile: {error}"))?;
@@ -1668,16 +1660,13 @@ fn macro_identifier(name: &str) -> Option<String> {
 /// Regression tests for output bounds, inert source documentation, hygienic names, and batch errors.
 #[cfg(test)]
 mod tests {
-    /// Exercise the private rendering and budget helpers directly in regression tests.
     use super::{MAX_EMISSION_BYTES, definition_comment, rust_identifier, write_doc_comments};
-    /// Construct independent compiler and binding fixtures for the lowering invariants exercised here.
     use crate::{MacroDefinition, MacroKind, Token, TokenKind};
 
     /// Check that batch generation propagates profile serialization errors instead of emitting partial support.
     #[cfg(unix)]
     #[test]
     fn batch_emission_reports_shared_profile_fingerprint_errors() {
-        /// Construct a non-UTF-8 tracked-input path to exercise profile fingerprint error propagation.
         use std::os::unix::ffi::OsStringExt;
         let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
         let scanner = crate::MacroScanner::new().expect("libclang required");

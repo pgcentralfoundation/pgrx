@@ -6,23 +6,13 @@
 
 #![cfg(unix)]
 
-/// Use the production scanner, analysis, and emission contracts so these checks exercise the
-/// actual C macro pipeline.
 use pgrx_c_macros::{
     DiagnosticSeverity, MacroDefinition, MacroScanner, PostgresConfig, PostgresError,
 };
-/// Resolve configured PostgreSQL installations through the same metadata used by ordinary pgrx
-/// builds.
 use pgrx_pg_config::PgConfig;
-/// Create isolated filesystem aliases used to verify physical provenance and input identity.
 use std::os::unix::fs::{PermissionsExt, symlink};
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::{Path, PathBuf};
-/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
-/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
-/// artifacts.
 use std::time::{SystemTime, UNIX_EPOCH};
 
 // The clang wrapper permits one live Clang instance in a process.

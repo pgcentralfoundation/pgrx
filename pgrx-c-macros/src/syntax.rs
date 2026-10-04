@@ -14,11 +14,8 @@
 //! expression tree. Structured statement parsing shares that arena and tracks scopes, returns,
 //! and invocation boundaries needed by later analysis and emission.
 
-/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{Token, TokenKind};
-/// Serialize owned inspection/analysis facts without borrowing from compiler translation units.
 use serde::{Deserialize, Serialize};
-/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{HashMap, HashSet};
 
 /// Parse ordered blocks, conditionals, locals, and returns within the shared bounded expression
@@ -1402,8 +1399,6 @@ fn parse_character_literal(spelling: &str) -> Result<IntegerLiteral, String> {
 /// headers or weakening the C identity and evaluation contracts.
 #[cfg(test)]
 mod tests {
-    /// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same
-    /// validation and input contract.
     use super::*;
 
     /// Construct lexer-category fixtures for parser regressions without requiring a live Clang

@@ -9,19 +9,14 @@
 //! pointers, arrays, and function signatures. Record identity, field offsets, qualifiers, and
 //! linkage survive the copy so native adapters can check layout and C compatibility later.
 
-/// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same validation
-/// and input contract.
 use super::type_info;
-/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     ArrayKind, DeclarationCatalog, DeclarationLinkage, FieldInfo, FunctionInfo, FunctionSignature,
     RecordInfo, RecordKind, TypeShape, TypeShapeKind,
 };
-/// Use live Clang AST/preprocessing handles only while the enclosing scanner owns the runtime.
 use clang::{
     Entity, EntityKind, EntityVisitResult, Linkage, StorageClass, TranslationUnit, Type, TypeKind,
 };
-/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::BTreeSet;
 
 /// Visit declarations and copy all reachable C type relationships while translation-unit handles are

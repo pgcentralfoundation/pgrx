@@ -11,26 +11,12 @@
 
 #![cfg(unix)]
 
-/// Render parsed fixture syntax for the independent generated consumer without rewriting
-/// semantic declarations.
 use quote::ToTokens;
-/// Keep catalogs, output maps, and observation sets deterministic for exact selection and
-/// publication comparisons.
 use std::collections::{BTreeMap, BTreeSet};
-/// Read original fixtures and manage only the owned inputs and outputs used by generation
-/// checks.
 use std::fs::{self, File};
-/// Make fixture compiler or pg_config wrappers executable so process failures can be tested
-/// directly.
 use std::os::unix::fs::PermissionsExt;
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::{Path, PathBuf};
-/// Invoke independent compilers and consumers and inspect their actual exit status rather than
-/// trusting generated source alone.
 use std::process::{Command, Stdio};
-/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
-/// artifacts.
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 /// Own an isolated consumer or header tree whose generated artifacts can be inspected without

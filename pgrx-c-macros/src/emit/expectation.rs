@@ -9,11 +9,8 @@
 //! effect-free evaluation, carries advice through supported casts, and lets an
 //! enclosing expectation override inner advice without removing either operand.
 
-/// Consume trusted analysis facts and preserve structured rejection context during lowering.
 use crate::analysis::{MacroAnalysis, resolve_type_info};
-/// Match analyzed C arena nodes and operators without reparsing header tokens during emission.
 use crate::syntax::{ExpressionKind, NodeId, OffsetRecord};
-/// Recognize verified compiler builtins and object categories while planning optimization advice.
 use crate::{BuiltinKind, FrontendOutput, TypeCategory};
 
 /// Advice classification for one expression node, separate from the evaluation it still requires.
@@ -143,9 +140,7 @@ pub(super) fn plan(frontend: &FrontendOutput, analysis: &MacroAnalysis) -> Vec<D
 /// Arena-planning regressions for fixed expectations, nested advice, casts, and unevaluated capabilities.
 #[cfg(test)]
 mod tests {
-    /// Exercise the private expectation planning helpers directly in regression tests.
     use super::*;
-    /// Construct independent compiler and binding fixtures for the lowering invariants exercised here.
     use crate::{
         ActiveMacro, ActiveProvenance, AnalysisStatus, BuildInputs, BuiltinInfo, ByteOrder,
         CompilationProfile, CompilerIdentity, DeclarationCatalog, FunctionInfo, FunctionSignature,

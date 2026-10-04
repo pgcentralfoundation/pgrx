@@ -1,15 +1,4 @@
-/// Standalone downstream consumer for generated macro hygiene and C expression capabilities.
-///
-/// The harness links this consumer to a renamed producer containing generated
-/// definitions and production semantic support. Assertions cover integer ranks,
-/// floating inputs, repeated and lazy operands, and caller-local names that must
-/// not capture the generated helpers.
-///
-/// Use the production semantic markers and expression wrappers to retain exact C type identity
-/// in the consumer.
 use renamed_generated::__pgrx_c_macros::expression_result::CExpression;
-/// Use the production semantic markers and expression wrappers to retain exact C type identity
-/// in the consumer.
 use renamed_generated::__pgrx_c_macros::{
     CBool, CInt, CLong, CLongLong, CShort, CUnsignedChar, CUnsignedInt, CUnsignedLong,
     CUnsignedLongLong, CUnsignedShort, CValue,

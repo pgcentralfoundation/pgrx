@@ -12,29 +12,16 @@
 #[path = "support/oracle.rs"]
 mod oracle;
 
-/// Use the production scanner, analysis, and emission contracts so these checks exercise the
-/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, AnalysisStatus, BindingCatalog, ConstCapability, EmissionStatus,
     InvocationContract, MacroEmission, MacroScanner, ParameterOrigin, SkipReasonCode, emit,
     emit_support_with_bindings, inspect,
 };
-/// Read original fixtures and manage only the owned inputs and outputs used by generation
-/// checks.
 use std::fs::{self, File};
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::{Path, PathBuf};
-/// Invoke independent compilers and consumers and inspect their actual exit status rather than
-/// trusting generated source alone.
 use std::process::{Command, ExitStatus, Stdio};
-/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
-/// Allocate unique fixture paths or record process-local effects across concurrent test
-/// invocations.
 use std::sync::atomic::{AtomicU64, Ordering};
-/// Bound compiler processes and choose isolated temporary names without reusing prior oracle
-/// artifacts.
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 /// Serialize libclang-backed inspection within this test process because its safe runtime

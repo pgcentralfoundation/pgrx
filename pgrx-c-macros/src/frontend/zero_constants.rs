@@ -10,16 +10,10 @@
 //! session into emission; native loads, caller operands, and side effects do not acquire this
 //! source-level identity by numerical coincidence.
 
-/// Reuse the enclosing phase’s compiler/parser primitives so this subphase shares the same validation
-/// and input contract.
 use super::{FrontendError, driver_arguments, run_compiler_with_input};
-/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{AnalysisSession, ExpressionKind, MacroScanner, NodeId, TypeCategory, TypeExpression};
-/// Use live Clang AST/preprocessing handles only while the enclosing scanner owns the runtime.
 use clang::{EntityKind, EntityVisitResult};
-/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{BTreeMap, BTreeSet};
-/// Format owned report text or bounded probe source without changing the original semantic tokens.
 use std::fmt::Write;
 
 /// Bound declaration or expression candidates before constructing a compiler proof batch.

@@ -18,7 +18,6 @@
 //! Signed right shifts use Clang's arithmetic shift implementation choice.
 //! Helpers are runtime operations; their trait calls do not establish const use.
 
-/// Use zero-cost marker or raw-storage primitives without adding ownership to C values.
 use core::marker::PhantomData;
 
 /// Extend scalar C arithmetic with typed values, raw places, and declaration-driven native capabilities.
@@ -574,7 +573,6 @@ mod tests {
     //! and common-result identity; rejection cases cover arithmetic outside the
     //! supported C domain, and counters retain lazy conditional evaluation.
 
-    /// Exercise promotion, cast, arithmetic-domain, and conditional helpers directly.
     use super::*;
 
     /// Verify small-integer promotions and keep equal-width `long` and `long long` as distinct C ranks.

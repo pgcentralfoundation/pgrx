@@ -11,7 +11,6 @@
 #![cfg(all(pgrx_c_macros, not(docsrs)))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
-/// Exercise the selected build's public bindings and macro exports from a downstream consumer.
 use pgrx_pg_sys as pg;
 
 // Evaluated through port/pg_bswap.h from the installed PostgreSQL headers under

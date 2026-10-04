@@ -15,8 +15,6 @@ mod ffi {
     //! The enclosing selector or oracle owns this scope; generated paths must retain that
     //! ownership when expanded from a downstream consumer.
 
-    /// Allocate unique fixture paths or record process-local effects across concurrent test
-    /// invocations.
     use std::sync::atomic::{AtomicUsize, Ordering};
     /// Count fixture guard entries to compare callback boundary behavior with native
     /// observations.
@@ -36,14 +34,8 @@ fn nominal_enum<I: __pgrx_c_macros::expression::EnumIdentity, K: __pgrx_c_macros
 /// Exercise the generated definitions and print observations for the paired original-C oracle;
 /// assertions cover cases with no scalar output.
 fn main() {
-    /// Use the production semantic markers and expression wrappers to retain exact C type
-    /// identity in the consumer.
     use __pgrx_c_macros::expression::*;
-    /// Use the production semantic markers and expression wrappers to retain exact C type
-    /// identity in the consumer.
     use __pgrx_c_macros::{CLong, CLongLong, CValue};
-    /// Allocate unique fixture paths or record process-local effects across concurrent test
-    /// invocations.
     use std::sync::atomic::Ordering;
     // SAFETY: Every callback comes from the original live C table; pointers refer
     // to initialized local storage, and this fixture has no PostgreSQL backend.

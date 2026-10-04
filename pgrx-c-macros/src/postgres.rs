@@ -9,18 +9,12 @@
 //! external-header definitions remain context for expansion. Canonical path identities enforce
 //! ownership without changing include lookup spelling.
 
-/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{
     ActiveProvenance, Error, FrontendOutput, MacroDefinition, MacroInventory, MacroKind,
     MacroScanner,
 };
-/// Resolve installations and recorded compiler flags through the same pgrx configuration system as
-/// cargo-pgrx.
 use pgrx_pg_config::{PgConfig, Pgrx};
-/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::{HashMap, HashSet};
-/// Retain filesystem spellings separately from canonical identities for inspection and rebuild
-/// tracking.
 use std::path::{Path, PathBuf};
 
 /// PostgreSQL function macros and the other definitions needed to interpret them.

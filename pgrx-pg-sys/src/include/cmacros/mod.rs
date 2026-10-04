@@ -25,7 +25,6 @@ mod pg15 {
 /// Expose the stored PG15 macro snapshot solely for documentation builds.
 #[cfg(all(feature = "pg15", docsrs))]
 mod pg15;
-/// Forward only the enabled PostgreSQL version's generated macro exports and hidden adapters.
 #[cfg(feature = "pg15")]
 pub use pg15::*;
 
@@ -43,7 +42,6 @@ mod pg16 {
 /// Expose the stored PG16 macro snapshot solely for documentation builds.
 #[cfg(all(feature = "pg16", docsrs))]
 mod pg16;
-/// Forward only the enabled PostgreSQL version's generated macro exports and hidden adapters.
 #[cfg(feature = "pg16")]
 pub use pg16::*;
 
@@ -61,7 +59,6 @@ mod pg17 {
 /// Expose the stored PG17 macro snapshot solely for documentation builds.
 #[cfg(all(feature = "pg17", docsrs))]
 mod pg17;
-/// Forward only the enabled PostgreSQL version's generated macro exports and hidden adapters.
 #[cfg(feature = "pg17")]
 pub use pg17::*;
 
@@ -79,7 +76,6 @@ mod pg18 {
 /// Expose the stored PG18 macro snapshot solely for documentation builds.
 #[cfg(all(feature = "pg18", docsrs))]
 mod pg18;
-/// Forward only the enabled PostgreSQL version's generated macro exports and hidden adapters.
 #[cfg(feature = "pg18")]
 pub use pg18::*;
 
@@ -97,6 +93,5 @@ mod pg19 {
 /// Expose the stored PG19 macro snapshot solely for documentation builds.
 #[cfg(all(feature = "pg19", docsrs))]
 mod pg19;
-/// Forward only the enabled PostgreSQL version's generated macro exports and hidden adapters.
 #[cfg(feature = "pg19")]
 pub use pg19::*;

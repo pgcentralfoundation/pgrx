@@ -21,16 +21,11 @@ mod oracle;
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
 
-/// Use the production scanner, analysis, and emission contracts so these checks exercise the
-/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, BuiltinKind, EmissionStatus, FrontendOutput, IntegerKind,
     MacroScanner, PostgresConfig, TypeCategory, generate_with_bindings, inspect,
 };
-/// Keep fixture and generated-output locations explicit so consumer builds remain independent
-/// of the working directory.
 use std::path::{Path, PathBuf};
-/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
 
 /// Serialize libclang-backed inspection within this test process because its safe runtime
@@ -590,8 +585,6 @@ fn reject_llvm_witness(
     compiler: &Path,
     rejected: &str,
 ) -> (PathBuf, PathBuf) {
-    /// Make fixture compiler or pg_config wrappers executable so process failures can be tested
-    /// directly.
     use std::os::unix::fs::PermissionsExt;
 
     let wrapper = directory.0.join("clang-wrapper");
@@ -739,8 +732,6 @@ fn rejected_expect_witness_keeps_all_byte_swaps_within_five_driver_runs() {
 /// without it to omit that optional case.
 #[cfg(target_pointer_width = "64")]
 fn configured_pg19() -> Option<PostgresConfig> {
-    /// Resolve configured PostgreSQL installations through the same metadata used by ordinary
-    /// pgrx builds.
     use pgrx_pg_config::Pgrx;
 
     let explicit_pg_config = match std::env::var("PGRX_PG_CONFIG_PATH") {

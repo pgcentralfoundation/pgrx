@@ -14,11 +14,8 @@
 //! those facts with C identities before crossing a native boundary; matching Rust widths alone
 //! never establishes matching C integer rank or callback identity.
 
-/// Connect this phase to the crate’s owned compiler facts and shared pipeline result types.
 use crate::{IntegerValue, RecordKind};
-/// Serialize owned inspection/analysis facts without borrowing from compiler translation units.
 use serde::Serialize;
-/// Keep catalog lookup and report ordering deterministic while bounding repeated traversal.
 use std::collections::BTreeMap;
 
 /// A generated function signature with a verified binding storage ABI.

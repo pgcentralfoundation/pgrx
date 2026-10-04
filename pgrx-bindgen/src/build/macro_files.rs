@@ -11,22 +11,11 @@
 //! and removes obsolete leaves. Names are encoded when natural header names would
 //! collide with indexes, directories, keywords, or reserved support files.
 
-/// Preserve contextual generation and filesystem failures through the binding-build error
-/// contract.
 use eyre::{WrapErr, eyre};
-/// Use the emitter catalog and result types that connect C inspection to generated binding
-/// publication.
 use pgrx_c_macros::{EmissionStatus, MacroEmission};
-/// Keep binding catalogs, header trees, and output maps ordered for deterministic generation
-/// and collision checks.
 use std::collections::{BTreeMap, BTreeSet};
-/// Render complete source fragments and module indexes into the versioned output map.
 use std::fmt::Write;
-/// Keep provenance roots and generated relative paths explicit across module rendering and
-/// publication.
 use std::path::{Component, Path, PathBuf};
-/// Inspect actual Rust syntax and spans instead of reconstructing binding or generated-item
-/// facts from names.
 use syn::{Item, spanned::Spanned};
 
 /// Reserved generated subtree holding same-scope support fragments, separated from public
@@ -530,20 +519,12 @@ mod tests {
     //! directives. Temporary input trees make success and rejection conditions explicit without
     //! relying on a configured server.
 
-    /// Exercise the private implementation directly in its unit tests without widening the
-    /// production API.
     use super::*;
-    /// Use the emitter catalog and result types that connect C inspection to generated binding
-    /// publication.
     use pgrx_c_macros::{
         AnalysisStatus, ConstCapability, EvaluationContract, InvocationContract, MacroAnalysis,
         SignedOverflow, SourceSpan,
     };
-    /// Read original fixtures and manage only the owned inputs and outputs used by generation
-    /// checks.
     use std::fs;
-    /// Allocate unique fixture paths or record process-local effects across concurrent test
-    /// invocations.
     use std::sync::atomic::{AtomicU64, Ordering};
 
     /// Allocate process-local unique directory suffixes for concurrent isolated oracle runs.

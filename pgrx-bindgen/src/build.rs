@@ -11,8 +11,6 @@ use crate::{detect_pg_config, env_tracked, is_for_release};
 use bindgen::NonCopyUnionStyle;
 use bindgen::callbacks::{DeriveTrait, EnumVariantValue, ImplementsTrait, MacroParsingBehavior};
 use eyre::{WrapErr, eyre};
-/// Use the production scanner, analysis, and emission contracts so these checks exercise the
-/// actual C macro pipeline.
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, BuildInputs, CompilationProfile, Diagnostic, EmissionStatus,
     IntegerConstant, MacroEmission, MacroScanner, PostgresConfig, SkipReasonCode,
@@ -20,7 +18,6 @@ use pgrx_c_macros::{
 };
 use pgrx_pg_config::{PgConfig, PgMinorVersion, PgVersion, Pgrx, SUPPORTED_VERSIONS};
 use quote::{ToTokens, quote};
-/// Serialize compiler facts and per-macro results for the build audit report.
 use serde::Serialize;
 use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
@@ -28,13 +25,8 @@ use std::fs;
 use std::path::{self, Path, PathBuf}; // disambiguate path::Path and syn::Type::Path
 use std::process::{Command, Output};
 use std::rc::Rc;
-/// Serialize shared Clang runtime ownership for scanner-backed tests in this process.
 use std::sync::Mutex;
-/// Allocate unique fixture paths or record process-local effects across concurrent test
-/// invocations.
 use std::sync::atomic::{AtomicU64, Ordering};
-/// Inspect actual Rust syntax and spans instead of reconstructing binding or generated-item
-/// facts from names.
 use syn::{Item, ItemConst, spanned::Spanned};
 
 const BLOCKLISTED_TYPES: [&str; 4] = ["Datum", "NullableDatum", "Oid", "TransactionId"];
@@ -66,10 +58,7 @@ mod binding_symbols;
 mod macro_files;
 /// Compile generated native access helpers under the already verified C invocation profile.
 mod macro_support;
-/// Use the complete versioned source map produced from header provenance and adapter
-/// partitioning.
 use macro_files::MacroFiles;
-/// Compile generated native access helpers with the frontend's verified invocation profile.
 use macro_support::compile_macro_support;
 pub(super) mod clang;
 
@@ -1966,12 +1955,8 @@ mod macro_build_tests {
     //! directives. Temporary input trees make success and rejection conditions explicit without
     //! relying on a configured server.
 
-    /// Exercise private generation and dependency helpers without broadening their public API.
     use super::*;
-    /// Allocate unique fixture paths or record process-local effects across concurrent test
-    /// invocations.
     use std::sync::atomic::{AtomicU64, Ordering};
-    /// Measure stable artifact timestamps and choose isolated fixture directory names.
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
     /// Allocate process-local unique directory suffixes for concurrent isolated oracle runs.

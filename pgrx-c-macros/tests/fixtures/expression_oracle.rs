@@ -2,17 +2,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-/// Standalone Rust consumer for the expression oracle C comparison.
-///
-/// The harness appends this consumer after generated bindings, semantic support,
-/// and macro definitions. Its observations preserve types and operand effects
-/// for comparison with the original C header; helpers instrument those effects
-/// without replacing any C macro definition.
-///
-/// Use the production semantic markers and expression wrappers to retain exact C type identity
-/// in the consumer.
 use __pgrx_c_macros::{CInteger, CLong, CUnsignedLongLong, CValue};
-/// Record callback or operand observations without changing the generated C expression types.
 use std::cell::Cell;
 
 /// Print the observation format consumed by the paired oracle, retaining C kind and value

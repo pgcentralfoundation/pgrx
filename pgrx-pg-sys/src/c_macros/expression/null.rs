@@ -8,7 +8,6 @@
 //! pointer, even with null storage, has no such implicit conversion. Public and
 //! native value boundaries deliberately erase this source-expression identity.
 
-/// Reuse the surrounding C identity and conversion capabilities so this module shares the sealed runtime model.
 use super::{
     AllowedProfile, CExprValue, CFunction, CInteger, CPointer, CType, CValue, CVoid, CastTo,
     CompleteObject, Equality, FunctionSignature, FunctionValue, IntoExpression, Pointer, Qualifier,

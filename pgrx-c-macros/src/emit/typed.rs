@@ -10,23 +10,15 @@
 //! explicit work tasks keep expression traversal bounded without recursively
 //! copying large rendered subtrees.
 
-/// Reuse contextual operand descriptors and the shared storage reconciliation during arena rendering.
 use super::arguments::{self, ArgumentContext};
-/// Reuse contextual operand descriptors and the shared storage reconciliation during arena rendering.
 use super::types::{EXPRESSION, Lowering, rust_path};
-/// Reuse contextual operand descriptors and the shared storage reconciliation during arena rendering.
 use super::{BindingCatalog, MAX_EMISSION_BYTES, SUPPORT, binary_helper, render_expression, skip};
-/// Consume trusted analysis facts and preserve structured rejection context during lowering.
 use crate::analysis::{MacroAnalysis, ResolvedConstant, SkipReason, SkipReasonCode};
-/// Match analyzed C arena nodes and operators without reparsing header tokens during emission.
 use crate::syntax::{
     BinaryOperator, ExpressionKind, NodeId, OffsetComponent, OffsetRecord, UnaryOperator,
 };
-/// Preserve compiler profile, qualifiers, and structural C type facts during contextual rendering.
 use crate::{FrontendOutput, SignedOverflow, TypeCategory, TypeInfo, TypeShapeKind};
-/// Index compiler-owned local facts by source name for reuse during contextual rendering.
 use std::collections::BTreeMap;
-/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
 /// The C use-site contract requested for one occurrence of an expression-arena node.
@@ -253,7 +245,6 @@ impl<'a> Renderer<'a> {
     /// Argument substitution can make a callee's dynamic expectation fixed.
     /// Keep that compiler-owned information when recovering a Rust macro call.
     pub(super) fn preserves_expectations(&self, callee: impl FnOnce() -> MacroAnalysis) -> bool {
-        /// Distinguish retained and overridden compiler advice when recovering a cross-macro call.
         use super::expectation::Decision;
         if self.expectations.is_empty() {
             return true;

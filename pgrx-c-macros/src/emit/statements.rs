@@ -9,11 +9,8 @@
 //! Delegation is limited to proved whole-body wrappers, and a token guard rejects
 //! arguments whose local-name capture would differ under Rust macro hygiene.
 
-/// Combine contextual expression rendering with macro delegation and fallback diagnostics.
 use super::{BindingCatalog, SUPPORT, macro_identifier, typed, write_fallback};
-/// Match analyzed C arena nodes and operators without reparsing header tokens during emission.
 use crate::{AnalysisSession, MacroAnalysis, SkipReason, syntax::Statement};
-/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
 /// Lower an entire admitted statement body, preserving ordered effects and return context.

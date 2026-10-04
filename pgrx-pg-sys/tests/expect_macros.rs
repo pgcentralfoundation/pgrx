@@ -11,14 +11,9 @@
 #![cfg(all(pgrx_c_macros, not(docsrs)))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
-/// Record callback or operand observations without changing the generated C expression types.
 use core::cell::Cell;
-/// Provide owned raw record storage so tests can initialize only fields that a C macro actually
-/// accesses.
 use core::mem::MaybeUninit;
-/// Address selected C fields without creating references to an incompletely initialized record.
 use core::ptr::{addr_of_mut, read, write};
-/// Exercise the selected build's public bindings and macro exports from a downstream consumer.
 use pgrx_pg_sys as pg;
 
 /// Expose the semantic C rank for assertions that branch-hint truth results remain C long.

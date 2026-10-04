@@ -11,18 +11,12 @@
 //! rather than repaired, so the transpiler can report a skip without changing
 //! bindgen's output. Checked-in documentation bindings are not semantic inputs.
 
-/// Use the emitter catalog and result types that connect C inspection to generated binding
-/// publication.
 use pgrx_c_macros::{
     AliasBinding, BindingCatalog, BitfieldBinding, DeclarationCatalog, EnumBinding, FieldBinding,
     FunctionBinding, IntegerBinding, IntegerBindingRepresentation, IntegerConstant, IntegerKind,
     IntegerValue, RecordBinding, RecordKind, RustBindingType, TargetFacts, VariableBinding,
 };
-/// Keep binding catalogs, header trees, and output maps ordered for deterministic generation
-/// and collision checks.
 use std::collections::{BTreeMap, BTreeSet};
-/// Inspect actual Rust syntax and spans instead of reconstructing binding or generated-item
-/// facts from names.
 use syn::{Expr, Item, Lit, Type, UnOp};
 
 /// Discover bindgen's actual values and paths without changing its bindings.
@@ -1037,14 +1031,8 @@ mod tests {
     //! directives. Temporary input trees make success and rejection conditions explicit without
     //! relying on a configured server.
 
-    /// Exercise the private implementation directly in its unit tests without widening the
-    /// production API.
     use super::*;
-    /// Use the emitter catalog and result types that connect C inspection to generated binding
-    /// publication.
     use pgrx_c_macros::{ByteOrder, IntegerType, TypeCategory, TypeInfo};
-    /// Render parsed fixture syntax for the independent generated consumer without rewriting
-    /// semantic declarations.
     use quote::ToTokens;
 
     /// Construct explicit target integer facts for collector tests so storage checks do not

@@ -12,15 +12,10 @@
 //! parameters, unused operands, and C argument spelling. Value, place, sizeof, and
 //! discard uses consume the descriptor differently without eagerly evaluating it.
 
-/// Reuse emission budgets and identifier checks while building contextual argument normalization.
 use super::{MAX_EMISSION_BYTES, macro_identifier, skip};
-/// Use analyzed formal roles and expansion provenance to normalize each C operand correctly.
 use crate::{MacroAnalysis, ParameterOrigin, ParameterRole, SkipReason, SkipReasonCode};
-/// Borrow formal operand names and allocate only when hygienic expansion captures require a new spelling.
 use std::borrow::Cow;
-/// Deduplicate emitted macro names used by the shared operand classifier.
 use std::collections::BTreeSet;
-/// Write source fragments directly into the output buffer without intermediate formatting streams.
 use std::fmt::Write;
 
 /// Cap per-macro normalization stages so pathological parameter lists fail predictably.

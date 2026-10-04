@@ -10,14 +10,11 @@
 //! and renders distinct paths for exported macro expansions and native support
 //! items in the defining crate.
 
-/// Retain the defining crate’s binding catalog and semantic integer marker names.
 use super::{BindingCatalog, SUPPORT, marker};
-/// Reconcile C structural and nominal facts with actual binding constructors and storage shapes.
 use crate::{
     ArrayKind, DeclarationCatalog, EnumBinding, FieldBinding, RecordBinding, RustBindingType,
     TargetFacts, TypeCategory, TypeInfo, TypeShapeKind,
 };
-/// Keep capability catalogs ordered and deduplicated, with work queues for bounded dependency traversal.
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 /// Hygienic exported-macro path to contextual C expression capabilities.
@@ -1125,7 +1122,6 @@ pub(super) fn rust_path(path: &[String]) -> Result<String, String> {
 /// Regressions for runtime path hygiene and unambiguous C-to-bindgen member-name reconciliation.
 #[cfg(test)]
 mod tests {
-    /// Exercise the private storage reconciliation helpers directly in regression tests.
     use super::*;
 
     /// Check native helper imports remain local while exported macros and binding storage retain correct crate paths.

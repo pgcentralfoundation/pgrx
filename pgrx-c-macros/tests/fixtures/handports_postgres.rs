@@ -1,14 +1,4 @@
-/// Standalone Rust consumer for the handports postgres C comparison.
-///
-/// The harness appends this consumer after generated bindings, semantic support,
-/// and macro definitions. Its observations preserve types and operand effects
-/// for comparison with the original C header; helpers instrument those effects
-/// without replacing any C macro definition.
-///
-/// Use the production semantic markers and expression wrappers to retain exact C type identity
-/// in the consumer.
 use __pgrx_c_macros::{CInteger, CLong, CLongLong, CUnsignedLong, CUnsignedLongLong, CValue};
-/// Record callback or operand observations without changing the generated C expression types.
 use std::cell::Cell;
 
 /// Declare process-local counters implemented by the original C oracle fixture.
