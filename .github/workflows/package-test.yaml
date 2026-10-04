@@ -3,8 +3,7 @@ name: verify package can build
 on:
   push:
     branches: [ develop ]
-  pull_request:
-    branches: [ develop ]
+  pull_request: {}
 
 env:
   CARGO_TERM_COLOR: always
