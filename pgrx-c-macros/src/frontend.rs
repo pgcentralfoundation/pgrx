@@ -1578,7 +1578,17 @@ fn semantic_options(
                     | "-fcf-protection=branch"
                     | "-fcf-protection=return"
                     | "-fcf-protection=none"
+                    // LTO controls optimization and object representation, not
+                    // C expression types or values. Native support still needs
+                    // ordinary object code for the Rust linker's toolchain.
+                    | "-flto"
+                    | "-flto=full"
+                    | "-flto=thin"
+                    | "-flto=auto"
+                    | "-flto=jobserver"
                     | "-fno-lto"
+                    | "-ffat-lto-objects"
+                    | "-fno-fat-lto-objects"
                     | "-funsigned-char"
                     | "-fsigned-char"
                     // Every enum's compatible integer, size and alignment is
@@ -1629,7 +1639,12 @@ fn is_floating_point_option(argument: &str) -> bool {
         )
 }
 
-/// Decode Clang makefile dependencies, preserving escaped paths for later input tracking.
+/// Decode Clang's dependency filename quoting for later input tracking.
+///
+/// Clang emits native Windows separators without escaping ordinary backslashes. It
+/// doubles dollars, escapes hashes, and doubles preceding backslashes only when
+/// escaping a space. Decode that format instead of treating every backslash as a
+/// shell escape; otherwise valid header paths lose their directory separators.
 pub(crate) fn parse_dependencies(output: &str) -> Result<BTreeSet<PathBuf>, FrontendError> {
     let (_, paths) = output
         .split_once(':')
@@ -1639,14 +1654,40 @@ pub(crate) fn parse_dependencies(output: &str) -> Result<BTreeSet<PathBuf>, Fron
     let mut characters = paths.chars().peekable();
     while let Some(character) = characters.next() {
         match character {
-            '\\' => match characters.next() {
-                Some('\n') => {}
-                Some('\r') if characters.peek() == Some(&'\n') => {
+            '\\' => {
+                let mut backslashes = 1;
+                while characters.peek() == Some(&'\\') {
                     characters.next();
+                    backslashes += 1;
                 }
-                Some(character) => word.push(character),
-                None => return Err(FrontendError::Output("unfinished dependency escape".into())),
-            },
+                match characters.peek().copied() {
+                    Some(' ') if backslashes % 2 == 1 => {
+                        word.extend(std::iter::repeat_n('\\', backslashes / 2));
+                        word.push(' ');
+                        characters.next();
+                    }
+                    Some('#') => {
+                        word.extend(std::iter::repeat_n('\\', backslashes - 1));
+                        word.push('#');
+                        characters.next();
+                    }
+                    Some('\n') if backslashes == 1 && word.is_empty() => {
+                        characters.next();
+                    }
+                    Some('\r') if backslashes == 1 && word.is_empty() => {
+                        characters.next();
+                        if characters.next() != Some('\n') {
+                            return Err(FrontendError::Output(
+                                "unfinished dependency line continuation".into(),
+                            ));
+                        }
+                    }
+                    Some(_) => word.extend(std::iter::repeat_n('\\', backslashes)),
+                    None => {
+                        return Err(FrontendError::Output("unfinished dependency escape".into()));
+                    }
+                }
+            }
             '$' if characters.peek() == Some(&'$') => {
                 characters.next();
                 word.push('$');
@@ -1854,6 +1895,9 @@ pub(crate) fn run_compiler(
 /// frontend's bounded diagnostics and timeout, and failed children are reaped.
 /// Fresh staged outputs are checked before publication; publication errors can
 /// leave the object updated without replacing the archive.
+/// Backend output flags keep the archive independent of Clang's LLVM version
+/// and allow the linker to discard unused PostgreSQL entry points without
+/// changing the inspected C language, ABI, or preprocessing options.
 pub fn compile_native_support(
     profile: &CompilationProfile,
     source: &Path,
@@ -1902,6 +1946,9 @@ pub fn compile_native_support(
         "c".into(),
         "-c".into(),
         "-fPIC".into(),
+        "-fno-lto".into(),
+        "-ffunction-sections".into(),
+        "-fdata-sections".into(),
         path(source)?,
         "-o".into(),
         path(&staged_object)?,
@@ -2224,6 +2271,76 @@ fn validate_fact_override(value: &str) -> Result<(), FrontendError> {
 mod tests {
     use super::*;
 
+    /// Preserve native drive, UNC, and ordinary backslash spellings in Clang dependencies.
+    #[test]
+    fn dependency_paths_retain_native_backslash_separators() {
+        let paths = [
+            r"D:\a\pgrx\pgrx\pgrx-c-macros\tests\fixtures\field_adapters.h",
+            r"\\server\share\postgres\header.h",
+            r"/tmp/literal\backslash.h",
+        ];
+        let output = format!("pgrx_c_macros: {}\n", paths.join(" "));
+        let actual = parse_dependencies(&output).unwrap();
+        let expected = paths
+            .into_iter()
+            .map(|path| input_path(Path::new(path)).unwrap())
+            .collect::<BTreeSet<_>>();
+        assert_eq!(actual, expected);
+    }
+
+    /// Undo only Clang's filename escapes, including separators immediately before spaces or hashes.
+    #[test]
+    fn dependency_paths_decode_clang_space_hash_and_dollar_quoting() {
+        let output = concat!(
+            r"pgrx_c_macros: C:\Program\ Files\postgres.h ",
+            r"C:\root\\\ leading.h ",
+            r"C:\root\\#header.h ",
+            r"/tmp/dollar$$name.h ",
+            r"/tmp/literal\\slashes.h ",
+            r"/tmp/many\\\\\ spaces.h ",
+            r"/tmp/backslash\$$dollar.h",
+            "\n",
+        );
+        let paths = [
+            r"C:\Program Files\postgres.h",
+            r"C:\root\ leading.h",
+            r"C:\root\#header.h",
+            r"/tmp/dollar$name.h",
+            r"/tmp/literal\\slashes.h",
+            r"/tmp/many\\ spaces.h",
+            r"/tmp/backslash\$dollar.h",
+        ];
+        let actual = parse_dependencies(output).unwrap();
+        let expected = paths
+            .into_iter()
+            .map(|path| input_path(Path::new(path)).unwrap())
+            .collect::<BTreeSet<_>>();
+        assert_eq!(actual, expected);
+    }
+
+    /// Accept wrapped LF/CRLF dependency lists without treating filename backslashes as continuations.
+    #[test]
+    fn dependency_line_continuations_are_separate_from_filename_backslashes() {
+        let output = "pgrx_c_macros: first.h \\\n second.h \\\r\n third.h\n";
+        let actual = parse_dependencies(output).unwrap();
+        let expected = ["first.h", "second.h", "third.h"]
+            .into_iter()
+            .map(|path| input_path(Path::new(path)).unwrap())
+            .collect::<BTreeSet<_>>();
+        assert_eq!(actual, expected);
+
+        let actual = parse_dependencies("pgrx_c_macros: /tmp/ends\\\n").unwrap();
+        assert_eq!(actual, BTreeSet::from([input_path(Path::new(r"/tmp/ends\")).unwrap()]));
+    }
+
+    /// Refuse incomplete dependency structure instead of tracking a truncated or fabricated input.
+    #[test]
+    fn dependency_output_rejects_missing_target_and_unfinished_continuations() {
+        for output in ["missing-target.h", "pgrx_c_macros: \\", "pgrx_c_macros: \\\rbroken.h"] {
+            assert!(matches!(parse_dependencies(output), Err(FrontendError::Output(_))));
+        }
+    }
+
     /// Checks optional offsetof failures cannot hide required fact errors.
     #[test]
     fn optional_offsetof_failures_cannot_hide_required_fact_errors() {
@@ -2268,6 +2385,30 @@ mod tests {
         ] {
             let (_, unsupported) = semantic_options(&[argument.into()], verbose).unwrap();
             assert_eq!(unsupported, [argument], "unreviewed/ABI option must stay gated");
+        }
+    }
+
+    /// Check that reviewed LTO representation flags do not reject an otherwise supported C profile.
+    #[test]
+    fn lto_codegen_options_require_exact_reviewed_spellings() {
+        let verbose = "clang -cc1 -fwrapv -flto=full\n";
+        for argument in [
+            "-flto",
+            "-flto=full",
+            "-flto=thin",
+            "-flto=auto",
+            "-flto=jobserver",
+            "-fno-lto",
+            "-ffat-lto-objects",
+            "-fno-fat-lto-objects",
+        ] {
+            let (overflow, unsupported) = semantic_options(&[argument.into()], verbose).unwrap();
+            assert_eq!(overflow, SignedOverflow::Wrapping);
+            assert!(unsupported.is_empty(), "reviewed LTO option: {argument}");
+        }
+        for argument in ["-flto=unknown", "-ffat-lto-objects=unknown", "-fwhole-program"] {
+            let (_, unsupported) = semantic_options(&[argument.into()], verbose).unwrap();
+            assert_eq!(unsupported, [argument], "unreviewed option must stay gated");
         }
     }
 

@@ -719,16 +719,11 @@ fn poisoned_name<'a>(lines: &[&'a str]) -> Result<&'a str, String> {
         if location(prefix)? != "<scratch space>" {
             return Err("Clang poison note has an unexpected spelling origin".into());
         }
-        let spelling = lines.get(index + 1).and_then(|line| {
-            let (number, spelling) = line.split_once('|')?;
-            (number.trim().parse::<usize>().ok()? > 0).then_some(spelling.trim())
-        });
-        let caret = lines.get(index + 2).and_then(|line| line.trim().strip_prefix('|'));
-        let valid_caret = caret.is_some_and(|caret| {
-            let caret = caret.trim();
-            caret.starts_with('^') && caret[1..].bytes().all(|byte| byte == b'~')
-        });
-        let Some(spelling) = spelling.filter(|spelling| identifier(spelling) && valid_caret) else {
+        let spelling = lines
+            .get(index + 1)
+            .zip(lines.get(index + 2))
+            .and_then(|(source, caret)| poisoned_excerpt(source, caret));
+        let Some(spelling) = spelling else {
             return Err("Clang poison note lacks one complete identifier and caret excerpt".into());
         };
         if found.replace(spelling).is_some() {
@@ -736,6 +731,24 @@ fn poisoned_name<'a>(lines: &[&'a str]) -> Result<&'a str, String> {
         }
     }
     found.ok_or_else(|| "Clang poison diagnostic lacks its pasted spelling origin".into())
+}
+
+/// Read a whole pasted identifier from either Clang's numbered gutter or legacy plain excerpt.
+///
+/// Source and caret lines must share the same layout. Accepting plain excerpts supports older
+/// Apple Clang without accepting multiple tokens, missing carets, or a partial spelling origin.
+fn poisoned_excerpt<'a>(source: &'a str, caret: &str) -> Option<&'a str> {
+    let (spelling, caret) = if let Some((number, spelling)) = source.split_once('|') {
+        if number.trim().parse::<usize>().ok()? == 0 {
+            return None;
+        }
+        (spelling, caret.trim_start().strip_prefix('|')?)
+    } else {
+        (source, caret)
+    };
+    let spelling = spelling.trim();
+    let underline = caret.trim().strip_prefix('^')?;
+    (identifier(spelling) && underline.bytes().all(|byte| byte == b'~')).then_some(spelling)
 }
 
 /// Check a pasted name belongs to the ordinary C identifier grammar admitted by this proof.
@@ -791,6 +804,13 @@ mod tests {
         )
     }
 
+    /// Render the plain source excerpts emitted by older Apple Clang and by disabled line numbers.
+    fn plain_poison(index: usize, name: &str) -> String {
+        format!(
+            "/tmp/probe-{index}:1:1: error: attempt to use a poisoned identifier\nentry\n^\n/header.h:5:2: note: expanded from macro 'CAT'\na##b\n ^\n<scratch space>:3:1: note: expanded from here\n{name}\n^\n"
+        )
+    }
+
     /// Completion marker expected by paste-proof fixtures so partial diagnostics cannot establish
     /// success.
     const COMPLETE: &str = "/tmp/complete:1:2: error: DONE\n    1 | #error DONE\n      |  ^\n";
@@ -806,45 +826,80 @@ mod tests {
         )
     }
 
-    /// Checks poison dependencies preserve probe ownership and completion.
+    /// Check that numbered and plain excerpts retain synthesized dependencies and exact ownership.
     #[test]
     fn poison_dependencies_preserve_probe_ownership_and_completion() {
-        let text = format!(
-            "{}{}{}{COMPLETE}",
-            poison(0, "HELPER"),
-            poison(0, "OBJECT"),
-            poison(1, "HELPER")
-        );
-        let pass = parse(&text).unwrap();
-        assert!(pass.failed.is_empty());
-        assert_eq!(pass.pasted[&0], BTreeSet::from(["HELPER".into(), "OBJECT".into()]));
-        assert_eq!(pass.pasted[&1], BTreeSet::from(["HELPER".into()]));
+        for render in [poison, plain_poison] {
+            let text = format!(
+                "{}{}{}{COMPLETE}",
+                render(0, "HELPER"),
+                render(0, "OBJECT"),
+                render(1, "HELPER")
+            );
+            let pass = parse(&text).unwrap();
+            assert!(pass.failed.is_empty());
+            assert_eq!(pass.pasted[&0], BTreeSet::from(["HELPER".into(), "OBJECT".into()]));
+            assert_eq!(pass.pasted[&1], BTreeSet::from(["HELPER".into()]));
+        }
+        let mixed = format!("{}{}{COMPLETE}", poison(0, "HELPER"), plain_poison(1, "OBJECT"));
+        let pass = parse(&mixed).unwrap();
+        assert_eq!(pass.pasted[&0], BTreeSet::from(["HELPER".into()]));
+        assert_eq!(pass.pasted[&1], BTreeSet::from(["OBJECT".into()]));
     }
 
-    /// Checks proof requires complete and unambiguous diagnostics.
+    /// Check that both display layouts reject incomplete, unowned, or ambiguous paste proofs.
     #[test]
     fn proof_requires_complete_and_unambiguous_diagnostics() {
-        let valid = format!("{}{COMPLETE}", poison(0, "HELPER"));
-        for text in [
-            poison(0, "HELPER"),
-            valid.replace("/tmp/probe-0", "/unowned/header.h"),
-            valid.replace("HELPER", "UNKNOWN"),
-            valid.replace("    3 | HELPER", "    3 | HELPER OTHER"),
-            valid.replace("      | ^\n", ""),
-            valid.replace(": note: expanded from here", ": note: unknown spelling origin"),
-            format!("{valid}{COMPLETE}"),
-            format!("{COMPLETE}{}", poison(0, "HELPER")),
-            format!("{valid}/tmp/probe-1:1:1: fatal error: stopped\n"),
-            format!("{}{COMPLETE}", poison(0, "HELPER").replace("<scratch space>", "/header.h")),
-        ] {
-            assert!(parse(&text).is_err(), "accepted {text}");
+        for render in [poison, plain_poison] {
+            let valid = format!("{}{COMPLETE}", render(0, "HELPER"));
+            for text in [
+                render(0, "HELPER"),
+                valid.replace("/tmp/probe-0", "/unowned/header.h"),
+                valid.replace("HELPER", "UNKNOWN"),
+                valid.replace("HELPER\n", "HELPER OTHER\n"),
+                valid.replace("^\n", "\n"),
+                valid.replace(": note: expanded from here", ": note: unknown spelling origin"),
+                format!("{valid}{COMPLETE}"),
+                format!("{COMPLETE}{}", render(0, "HELPER")),
+                format!("{valid}/tmp/probe-1:1:1: fatal error: stopped\n"),
+                format!(
+                    "{}{COMPLETE}",
+                    render(0, "HELPER").replace("<scratch space>", "/header.h")
+                ),
+            ] {
+                assert!(parse(&text).is_err(), "accepted {text}");
+            }
+            let mut multiple = render(0, "HELPER");
+            multiple.push_str(
+                "<scratch space>:4:1: note: expanded from here\n    4 | OBJECT\n      | ^\n",
+            );
+            multiple.push_str(COMPLETE);
+            assert!(parse(&multiple).is_err());
         }
-        let mut multiple = poison(0, "HELPER");
-        multiple
-            .push_str("<scratch space>:4:1: note: expanded from here\n    4 | OBJECT\n      | ^\n");
-        multiple.push_str(COMPLETE);
-        assert!(parse(&multiple).is_err());
         assert!(parse(COMPLETE).unwrap().pasted.is_empty());
+    }
+
+    /// Require matched source/caret layouts and one complete identifier before retaining a name.
+    #[test]
+    fn poison_excerpts_reject_mixed_or_incomplete_layouts() {
+        for (source, caret) in [("    3 | HELPER", "      | ^"), ("HELPER", "^~~~~~")] {
+            assert_eq!(poisoned_excerpt(source, caret), Some("HELPER"));
+        }
+        for (source, caret) in [
+            ("HELPER OTHER", "^"),
+            ("HELPER", ""),
+            ("HELPER", "^ other"),
+            ("HELPER", "      | ^"),
+            ("    3 | HELPER", "^"),
+            ("    3 | HELPER", "      | "),
+            ("    0 | HELPER", "      | ^"),
+            ("three | HELPER", "      | ^"),
+            ("    3 | HELPER OTHER", "      | ^"),
+            ("    3 | HELPER", "      | ~^"),
+            ("    3 | HELPER", "      | ^^"),
+        ] {
+            assert_eq!(poisoned_excerpt(source, caret), None, "{source:?}: {caret:?}");
+        }
     }
 
     /// Checks recoverable operand error rejects only its owned probe.

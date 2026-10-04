@@ -4645,7 +4645,7 @@ int main(void) {
             (
                 "unrelated_record_pointer_ordering",
                 "struct A;struct B;let a=expression::Pointer::<expression::CRecord<A>>::new(core::ptr::null_mut());let b=expression::Pointer::<expression::CRecord<B>>::new(core::ptr::null_mut());let _=expression::lt(a,b);",
-                "E0271",
+                "E0277",
             ),
             (
                 "void_pointer_load",

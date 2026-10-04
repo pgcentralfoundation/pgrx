@@ -81,6 +81,53 @@ fn syntax_only_profile_cannot_rearchive_a_stale_native_object() {
     assert_eq!(std::fs::read(&archive).unwrap(), old_archive);
 }
 
+/// Prove recorded LTO settings cannot leave compiler-version-specific LLVM
+/// bitcode in the native archive: a normal C link must consume it without any
+/// LTO plugin or matching Rust LLVM toolchain.
+#[test]
+fn native_support_with_lto_flags_produces_a_regular_linkable_object() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("native.h");
+    let source = directory.0.join("native.c");
+    let object = directory.0.join("native.o");
+    let archive = directory.0.join("native.a");
+    std::fs::write(&header, "int native_version(void);\n").unwrap();
+    std::fs::write(
+        &source,
+        format!("#include \"{}\"\nint native_version(void) {{ return 42; }}\n", header.display()),
+    )
+    .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &["-flto".into()], None).unwrap();
+    let profile = frontend.profile();
+    compile_native_support(profile, &source, &object, &archive).unwrap();
+    let bytes = std::fs::read(&object).unwrap();
+    assert!(!bytes.starts_with(b"BC\xc0\xde"), "native object must not contain raw LLVM bitcode");
+    assert!(
+        !bytes.starts_with(&[0xde, 0xc0, 0x17, 0x0b]),
+        "native object must not contain wrapped LLVM bitcode"
+    );
+    let main = directory.0.join("main.c");
+    let executable = directory.0.join("native-test");
+    std::fs::write(
+        &main,
+        "int native_version(void);\nint main(void) { return native_version() == 42 ? 0 : 1; }\n",
+    )
+    .unwrap();
+    // An ordinary host link must consume the inspected Clang's archive without
+    // depending on its LLVM release or direct driver's system-runtime lookup.
+    let output = std::process::Command::new("cc")
+        .arg(&main)
+        .arg(&archive)
+        .arg("-o")
+        .arg(&executable)
+        .output()
+        .unwrap();
+    assert!(output.status.success(), "{}", String::from_utf8_lossy(&output.stderr));
+    assert!(std::process::Command::new(&executable).status().unwrap().success());
+}
+
 /// Checks that native support requires fresh outputs and preserves existing artifacts on tool
 /// failure.
 #[test]

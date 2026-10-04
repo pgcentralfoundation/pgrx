@@ -59,7 +59,7 @@ mod macro_files;
 /// Compile generated native access helpers under the already verified C invocation profile.
 mod macro_support;
 use macro_files::MacroFiles;
-use macro_support::compile_macro_support;
+use macro_support::{NativeBuild, compile_macro_support};
 pub(super) mod clang;
 
 #[derive(Debug)]
@@ -210,7 +210,7 @@ pub fn main() -> eyre::Result<()> {
         }
     }
 
-    std::thread::scope(|scope| {
+    let integrated_cshims = std::thread::scope(|scope| {
         // This is pretty much either always 1 (normally) or 5 (for releases),
         // but in the future if we ever have way more, we should consider
         // chunking `pg_configs` based on `thread::available_parallelism()`.
@@ -225,6 +225,7 @@ pub fn main() -> eyre::Result<()> {
                         is_for_release(),
                         compile_cshim,
                     )
+                    .map(|integrated| (*pg_major_ver, integrated))
                 })
             })
             .collect::<Vec<_>>();
@@ -234,7 +235,7 @@ pub fn main() -> eyre::Result<()> {
             .into_iter()
             .map(|thread| thread.join().expect("thread panicked while generating bindings"))
             .collect::<Vec<eyre::Result<_>>>();
-        results.into_iter().try_for_each(|r| r)
+        results.into_iter().collect::<eyre::Result<Vec<_>>>()
     })?;
 
     if compile_cshim {
@@ -246,7 +247,12 @@ pub fn main() -> eyre::Result<()> {
             .ok_or_else(|| {
                 eyre!("could not find pg_config for active feature pg{active_major_version}")
             })?;
-        build_shim(&build_paths.shim_src, &build_paths.shim_dst, pg_config)?;
+        if !integrated_cshims
+            .iter()
+            .any(|(major, integrated)| *major == active_major_version && *integrated)
+        {
+            build_shim(&build_paths.shim_src, &build_paths.shim_dst, pg_config)?;
+        }
     }
 
     Ok(())
@@ -314,20 +320,28 @@ fn emit_rerun_if_changed() {
 }
 
 /// Write the selected version's bindings, OIDs, macro module tree, and skip report, publishing
-/// documentation snapshots only during release generation.
+/// documentation snapshots only during release generation. Return whether this
+/// version's native artifact already includes the C shim so it is built only once.
 fn generate_bindings(
     major_version: u16,
     pg_config: &PgConfig,
     build_paths: &BuildPaths,
     is_for_release: bool,
     enable_cshim: bool,
-) -> eyre::Result<()> {
+) -> eyre::Result<bool> {
     let mut include_h = build_paths.manifest_dir.clone();
     include_h.push("include");
     include_h.push(format!("pg{major_version}.h"));
 
-    let (bindgen_output, macros) = get_bindings(major_version, pg_config, &include_h, enable_cshim)
-        .wrap_err_with(|| format!("bindgen failed for pg{major_version}"))?;
+    let active = env_tracked(&format!("CARGO_FEATURE_PG{major_version}")).is_some();
+    let native = NativeBuild {
+        out_dir: &build_paths.out_dir,
+        active,
+        cshim: (active && enable_cshim).then_some(build_paths.shim_src.as_path()),
+    };
+    let (bindgen_output, macros) =
+        get_bindings(major_version, pg_config, &include_h, enable_cshim, native)
+            .wrap_err_with(|| format!("bindgen failed for pg{major_version}"))?;
 
     let oids = extract_oids(&bindgen_output);
     let rewritten_items = rewrite_items(bindgen_output, &oids)
@@ -408,7 +422,7 @@ fn generate_bindings(
         "cargo:rustc-link-search={}",
         lib_dir.to_str().ok_or_else(|| eyre!("{lib_dir:?} is not valid UTF-8 string"))?
     );
-    Ok(())
+    Ok(macros.integrated_cshim)
 }
 
 #[derive(Debug, Clone)]
@@ -580,8 +594,25 @@ impl Drop for MacroFormattingDirectory {
     }
 }
 
+/// Recognize rustup's missing-component diagnostic separately from Rust source formatting errors.
+///
+/// A rustup proxy can exist even when its selected toolchain has no rustfmt component. Only
+/// that specific leading diagnostic is an availability failure; another error remains fatal.
+fn missing_rustfmt_component(stderr: &[u8]) -> bool {
+    let diagnostic = String::from_utf8_lossy(stderr);
+    let mut lines = diagnostic.lines();
+    let Some(toolchain) = lines.next().and_then(|line| {
+        line.strip_prefix("error: 'rustfmt' is not installed for the toolchain '")
+    }) else {
+        return false;
+    };
+    let toolchain = toolchain.strip_suffix('.').unwrap_or(toolchain);
+    toolchain.strip_suffix('\'').is_some_and(|name| !name.is_empty() && !name.contains('\''))
+        && !lines.any(|line| line.starts_with("error:"))
+}
+
 /// Format generated leaves together while preventing child traversal; tolerate an absent
-/// rustfmt executable but propagate formatter failures.
+/// executable or rustup component, but propagate actual formatter failures.
 fn format_macro_files(paths: &[PathBuf], rustfmt: &Path) -> eyre::Result<()> {
     if paths.is_empty() {
         return Ok(());
@@ -590,6 +621,11 @@ fn format_macro_files(paths: &[PathBuf], rustfmt: &Path) -> eyre::Result<()> {
     command.args(paths).args(["--edition", "2024", "--config", "skip_children=true"]);
     match run_command(&mut command, "C macro formatting") {
         Ok(output) if output.status.success() => Ok(()),
+        Ok(output) if missing_rustfmt_component(&output.stderr) => {
+            // The rustup proxy failed before invoking a formatter, so the staged
+            // original sources remain suitable for optional unformatted output.
+            Ok(())
+        }
         Ok(output) => Err(eyre!(
             "could not format generated C macros: {}",
             String::from_utf8_lossy(&output.stderr)
@@ -1066,6 +1102,7 @@ fn get_bindings(
     pg_config: &PgConfig,
     include_h: &path::Path,
     enable_cshim: bool,
+    native: NativeBuild<'_>,
 ) -> eyre::Result<(syn::File, MacroOutput)> {
     let (bindings, macros) = if let Some(info_dir) =
         target_env_tracked(&format!("PGRX_TARGET_INFO_PATH_PG{major_version}"))
@@ -1079,7 +1116,8 @@ fn get_bindings(
         println!("cargo:warning=pg{major_version}: {reason}");
         (bindings, MacroOutput::unavailable(major_version, reason)?)
     } else {
-        let (bindings, macros) = run_bindgen(major_version, pg_config, include_h, enable_cshim)?;
+        let (bindings, macros) =
+            run_bindgen(major_version, pg_config, include_h, enable_cshim, native)?;
         if let Some(path) = env_tracked("PGRX_PG_SYS_EXTRA_OUTPUT_PATH") {
             std::fs::write(path, &bindings)?;
         }
@@ -1097,6 +1135,7 @@ fn run_bindgen(
     pg_config: &PgConfig,
     include_h: &path::Path,
     enable_cshim: bool,
+    native: NativeBuild<'_>,
 ) -> eyre::Result<(String, MacroOutput)> {
     eprintln!("Generating bindings for pg{major_version}");
     let configure = pg_config.configure()?;
@@ -1175,7 +1214,7 @@ fn run_bindgen(
             arguments,
             &environment_arguments,
             explicit_clang.as_deref(),
-            &out_path,
+            native,
             generate,
         )
     }
@@ -1194,6 +1233,9 @@ struct MacroOutput {
     /// Whether authoritative C inspection succeeded, distinguishing unavailability from an
     /// empty selection.
     inspected: bool,
+    /// Whether the active version's macro artifact owns the C shim as well,
+    /// preventing a second object from defining the same header functions.
+    integrated_cshim: bool,
 }
 
 /// Represent unavailable authoritative C inspection without publishing guessed
@@ -1207,7 +1249,14 @@ impl MacroOutput {
             "status": "unavailable",
             "reason": reason,
         }))?;
-        Ok(Self { files: MacroFiles::empty(), report, emitted: 0, skipped: 0, inspected: false })
+        Ok(Self {
+            files: MacroFiles::empty(),
+            report,
+            emitted: 0,
+            skipped: 0,
+            inspected: false,
+            integrated_cshim: false,
+        })
     }
 }
 
@@ -1243,7 +1292,7 @@ fn generate_macros(
     binder_arguments: Vec<String>,
     environment_arguments: &[String],
     preferred_clang: Option<&Path>,
-    out_dir: &Path,
+    native: NativeBuild<'_>,
     generate_bindings: impl FnOnce(Vec<String>) -> eyre::Result<String>,
 ) -> eyre::Result<(String, MacroOutput)> {
     let _lock = MACRO_SCANNER.lock().map_err(|_| eyre!("C macro scanner lock was poisoned"))?;
@@ -1272,7 +1321,7 @@ fn generate_macros(
     }
     let names = postgres_function_macro_names(&frontend, postgres.server_include_dir())?;
     let session = AnalysisSession::prepare(&scanner, &frontend, &names)?;
-    emit_macro_rerun_inputs(session.inputs(), out_dir)?;
+    emit_macro_rerun_inputs(session.inputs(), native.out_dir)?;
     let mut source = String::new();
     let integer_bridge_unavailable = match pg_sys_integer_bridges(&frontend) {
         Ok(bridges) => {
@@ -1312,14 +1361,16 @@ fn generate_macros(
     let pgrx_c_macros::MacroGeneration { macros: emissions, support } =
         generate_with_bindings(&session, &names, &symbols).map_err(|message| eyre!(message))?;
     source.push_str(&support.rust);
-    if !support.c_source.is_empty() {
+    let integrated_cshim = if native.active && !support.c_source.is_empty() {
         compile_macro_support(
             pg_config.major_version()?,
             frontend.profile(),
             &support.c_source,
-            out_dir,
-        )?;
-    }
+            &native,
+        )?
+    } else {
+        false
+    };
     // Native access primitives reread the original headers. Do not publish Rust
     // facts from one snapshot alongside C object code compiled from another.
     session.verify_inputs().wrap_err("C inputs changed during macro support generation")?;
@@ -1354,7 +1405,10 @@ fn generate_macros(
         integer_bindings: &symbols,
         integer_bridge_unavailable,
     })?;
-    Ok((bindings, MacroOutput { files, report, emitted, skipped, inspected: true }))
+    Ok((
+        bindings,
+        MacroOutput { files, report, emitted, skipped, inspected: true, integrated_cshim },
+    ))
 }
 
 /// Place inspected resource options before bindgen's environment tail and require inspection to
@@ -2199,6 +2253,72 @@ macro_rules! EXAMPLE {
         fs::write(&path, original).unwrap();
         format_macro_files(std::slice::from_ref(&path), &directory.0.join("missing-rustfmt"))
             .unwrap();
+        assert_eq!(fs::read_to_string(path).unwrap(), original);
+    }
+
+    /// Check that only rustup's specific missing-component error permits optional formatting.
+    #[test]
+    fn missing_rustfmt_component_diagnostic_excludes_formatting_errors() {
+        for diagnostic in [
+            "error: 'rustfmt' is not installed for the toolchain '1.96.0-x86_64-unknown-linux-gnu'\n",
+            "error: 'rustfmt' is not installed for the toolchain 'nightly-aarch64-apple-darwin'.\nhelp: run `rustup component add rustfmt`\n",
+        ] {
+            assert!(missing_rustfmt_component(diagnostic.as_bytes()), "{diagnostic}");
+        }
+        for diagnostic in [
+            "error: expected expression, found `;`\n",
+            "error: unable to find rustfmt configuration\n",
+            "error: 'clippy' is not installed for the toolchain '1.96.0-x86_64-unknown-linux-gnu'\n",
+            "warning: 'rustfmt' is not installed for the toolchain '1.96.0-x86_64-unknown-linux-gnu'\n",
+            "error: 'rustfmt' is not installed for the toolchain ''\n",
+            "error: 'rustfmt' is not installed for the toolchain 'fixture'\nerror: unrelated failure\n",
+        ] {
+            assert!(!missing_rustfmt_component(diagnostic.as_bytes()), "{diagnostic}");
+        }
+    }
+
+    /// Build an isolated failing formatter proxy whose stderr is independent of source content.
+    #[cfg(unix)]
+    fn failing_macro_formatter(directory: &Path, diagnostic: &str) -> PathBuf {
+        use std::os::unix::fs::PermissionsExt;
+
+        let formatter = directory.join("fixture-rustfmt");
+        fs::write(&formatter, "#!/bin/sh\ncat \"$0.stderr\" >&2\nexit 1\n").unwrap();
+        fs::write(directory.join("fixture-rustfmt.stderr"), diagnostic).unwrap();
+        fs::set_permissions(&formatter, fs::Permissions::from_mode(0o700)).unwrap();
+        formatter
+    }
+
+    /// Check that an executable rustup proxy with a missing component preserves staged sources.
+    #[cfg(unix)]
+    #[test]
+    fn unavailable_rustfmt_component_preserves_original_sources() {
+        let directory = TemporaryDirectory::new();
+        let path = directory.0.join("original.rs");
+        let original = "pub const VALUE:u32=18;\n";
+        fs::write(&path, original).unwrap();
+        let formatter = failing_macro_formatter(
+            &directory.0,
+            "error: 'rustfmt' is not installed for the toolchain '1.96.0-x86_64-unknown-linux-gnu'\nhelp: run `rustup component add rustfmt`\n",
+        );
+        format_macro_files(std::slice::from_ref(&path), &formatter).unwrap();
+        assert_eq!(fs::read_to_string(path).unwrap(), original);
+    }
+
+    /// Check that real formatter failures remain fatal rather than publishing unformatted sources.
+    #[cfg(unix)]
+    #[test]
+    fn macro_formatter_failure_propagates_its_diagnostic() {
+        let directory = TemporaryDirectory::new();
+        let path = directory.0.join("original.rs");
+        let original = "pub const VALUE:u32=18;\n";
+        fs::write(&path, original).unwrap();
+        let diagnostic = "error: expected expression, found `;`\n";
+        let formatter = failing_macro_formatter(&directory.0, diagnostic);
+        let error =
+            format_macro_files(std::slice::from_ref(&path), &formatter).unwrap_err().to_string();
+        assert!(error.contains("could not format generated C macros"), "{error}");
+        assert!(error.contains(diagnostic.trim()), "{error}");
         assert_eq!(fs::read_to_string(path).unwrap(), original);
     }
 
