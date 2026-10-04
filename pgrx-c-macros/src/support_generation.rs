@@ -313,14 +313,9 @@ pub fn pg_sys_integer_bridges(frontend: &FrontendOutput) -> Result<String, Suppo
     for (name, ty) in &frontend.declarations().types {
         let TypeCategory::Integer(kind) = ty.category else { continue };
         // C type spellings with spaces or declarator syntax are not typedef
-        // identifiers and cannot form a Rust alias. Parse identifiers rather
-        // than interpolating arbitrary compiler spellings into source.
-        if !name.parse::<proc_macro2::TokenStream>().ok().is_some_and(|tokens| {
-            let mut tokens = tokens.into_iter();
-            matches!(tokens.next(), Some(proc_macro2::TokenTree::Ident(_)))
-                && tokens.next().is_none()
-        }) || matches!(name.as_str(), "self" | "Self" | "super" | "crate")
-        {
+        // identifiers and cannot form a Rust alias. Share the emitter's checks
+        // for names, including special tokens that raw identifiers cannot fix.
+        if crate::emit::rust_identifier(name).is_none() {
             continue;
         }
         let Some(layout) = frontend.profile().target.integers.get(&kind) else { continue };
@@ -542,7 +537,7 @@ mod tests {
             inventory: MacroInventory { macros: Vec::new(), diagnostics: Vec::new() },
             dependencies,
         };
-        for name in ["Oid", "TransactionId"] {
+        for name in ["Oid", "TransactionId", "_", "type"] {
             frontend.declarations.types.insert(
                 name.into(),
                 TypeInfo {
@@ -569,6 +564,10 @@ mod tests {
             },
         );
         let rust = pg_sys_integer_bridges(&frontend).unwrap();
+        // Valid C typedefs can be Rust keywords or the unusable standalone underscore.
+        // Parse the complete generated source so alias spelling failures are caught here.
+        syn::parse_file(&rust).expect("integer bridges must remain valid Rust syntax");
+        assert!(rust.contains("pub type r#type ="));
         assert!(rust.contains("for crate::Oid"));
         assert!(rust.contains("self.to_u32()"));
         assert!(rust.contains("self.into_inner()"));

@@ -1786,7 +1786,7 @@ fn binary_helper(operator: BinaryOperator) -> &'static str {
 }
 
 /// Render a usable Rust item name, rejecting special keywords that raw identifiers cannot fix.
-fn rust_identifier(name: &str) -> Option<String> {
+pub(super) fn rust_identifier(name: &str) -> Option<String> {
     let mut bytes = name.bytes();
     if !bytes.next().is_some_and(|byte| byte.is_ascii_alphabetic() || byte == b'_')
         || !bytes.all(|byte| byte.is_ascii_alphanumeric() || byte == b'_')

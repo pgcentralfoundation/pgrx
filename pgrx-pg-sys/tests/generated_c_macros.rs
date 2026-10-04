@@ -11,7 +11,7 @@
 #![cfg(any(pgrx_c_macros, docsrs))]
 
 // Exercise the public exports from a downstream crate, including a renamed import.
-use pg::__pgrx_c_macros::{CInt, CUnsignedInt, CUnsignedLong, CValue};
+use pg::__pgrx_c_macros::{CInt, CUnsignedInt, CValue};
 use pgrx_pg_sys as pg;
 
 /// Extract the C int storage used by assertions on public generated predicates.
@@ -22,9 +22,9 @@ fn c_int(value: CValue<CInt>) -> i32 {
 /// Checks C wrapping alignment and integer predicates through downstream public macro exports.
 #[test]
 fn generated_handports_preserve_c_results_through_the_public_bindings() {
-    let size = CValue::<CUnsignedLong>::new(u64::MAX);
-    assert_eq!(pg::TYPEALIGN!(8_i32, size).get(), 0_u64);
-    assert_eq!(pg::MAXALIGN!(size).get(), 0_u64);
+    let size = CValue::<pg::__pgrx_c_types::uintptr_t>::new(usize::MAX as _);
+    assert_eq!(pg::TYPEALIGN!(8_i32, size).get(), 0);
+    assert_eq!(pg::MAXALIGN!(size).get(), 0);
     assert_eq!(c_int(pg::BufferIsLocal!(-1).into_value()), 1);
     assert_eq!(c_int(pg::BufferIsLocal!(0).into_value()), 0);
     assert_eq!(c_int(pg::BufferIsLocal!(i32::MIN).into_value()), 1);
@@ -73,7 +73,10 @@ fn binding_references_and_macro_calls_use_the_selected_build() {
     // independently generated TYPEALIGN macros.
     assert_eq!(pg::BUFFERALIGN!(33_i32).get(), 64);
     assert_eq!(pg::BUFFERALIGN_DOWN!(63_i32).get(), 32);
-    assert_eq!(pg::BUFFERALIGN!(CValue::<CUnsignedLong>::new(u64::MAX)).get(), 0);
+    assert_eq!(
+        pg::BUFFERALIGN!(CValue::<pg::__pgrx_c_types::uintptr_t>::new(usize::MAX as _)).get(),
+        0
+    );
 }
 
 /// Checks raw enum bytes and union fields without materializing invalid Rust record or enum
