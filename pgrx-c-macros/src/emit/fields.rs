@@ -1457,7 +1457,9 @@ int main(void) {
             &arguments.iter().map(String::as_str).collect::<Vec<_>>(),
             true,
         );
-        assert_eq!(actual, expected);
+        // Windows C stdio translates line endings; numeric oracle data must
+        // match Rust's output without treating that stream convention as C semantics.
+        assert_eq!(actual, expected.replace("\r\n", "\n"));
     }
 
     /// Check mismatched field storage and incomplete access layouts yield explicit capability rejections.
@@ -1580,7 +1582,9 @@ int main(void) {
             &arguments.iter().map(String::as_str).collect::<Vec<_>>(),
             true,
         );
-        assert_eq!(actual, expected);
+        // Preserve every offset and separator while normalizing C stdio's
+        // Windows text-mode line endings to Rust's LF output.
+        assert_eq!(actual, expected.replace("\r\n", "\n"));
     }
 
     /// Check Rust type checking rejects overflowing offset sums and overlong designator paths.

@@ -1895,9 +1895,12 @@ pub(crate) fn run_compiler(
 /// frontend's bounded diagnostics and timeout, and failed children are reaped.
 /// Fresh staged outputs are checked before publication; publication errors can
 /// leave the object updated without replacing the archive.
+/// Preprocess with the original flags before compiling the fixed token stream
+/// as position-independent machine code. This preserves header branches that
+/// depend on PIC/PIE predefines even when native backend flags differ from the
+/// inspected mode, and prevents forced includes from running a second time.
 /// Backend output flags keep the archive independent of Clang's LLVM version
-/// and allow the linker to discard unused PostgreSQL entry points without
-/// changing the inspected C language, ABI, or preprocessing options.
+/// and allow the linker to discard unused PostgreSQL entry points.
 pub fn compile_native_support(
     profile: &CompilationProfile,
     source: &Path,
@@ -1940,16 +1943,27 @@ pub fn compile_native_support(
         .path()
         .join(object.file_name().expect("native output identity validated its filename"));
     let staged_archive = archive_stage.path().join("support.a");
+    // Keep the input beside the fixed archive name, separate from the object
+    // staging directory whose filename is chosen by the caller.
+    let staged_source = archive_stage.path().join("support.i");
+    let mut preprocessing = profile.arguments.clone();
+    preprocessing.extend(["-x".into(), "c".into(), "-E".into(), path(source)?]);
+    let expanded = run_compiler(&profile.compiler.executable, &preprocessing)?;
+    std::fs::write(&staged_source, expanded.stdout)
+        .map_err(|source| FrontendError::NativeIo { path: staged_source.clone(), source })?;
     let mut args = profile.arguments.clone();
     args.extend([
         "-x".into(),
-        "c".into(),
+        "cpp-output".into(),
+        // Preprocessor-only flags already took effect. Clang ignores them for
+        // cpp-output; suppress its unused-argument diagnostic even with -Werror.
+        "-Qunused-arguments".into(),
         "-c".into(),
         "-fPIC".into(),
         "-fno-lto".into(),
         "-ffunction-sections".into(),
         "-fdata-sections".into(),
-        path(source)?,
+        path(&staged_source)?,
         "-o".into(),
         path(&staged_object)?,
     ]);

@@ -128,6 +128,147 @@ fn native_support_with_lto_flags_produces_a_regular_linkable_object() {
     assert!(std::process::Command::new(&executable).status().unwrap().success());
 }
 
+/// Compare original static-inline C behavior with consumed native archives for
+/// effective PIC/PIE modes and flag ordering. Forced includes must run once even
+/// under `-Werror`, and each resulting archive must link into a shared library
+/// while reading an external global through position-independent relocations.
+#[test]
+fn native_support_preserves_original_preprocessing_with_pic_codegen() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("native.h");
+    let context = directory.0.join("context.h");
+    let source = directory.0.join("native.c");
+    let oracle = directory.0.join("oracle.c");
+    let consumer = directory.0.join("consumer.c");
+    let shared = directory.0.join("shared.c");
+    // The unguarded definition also catches a second forced include during the
+    // backend phase, independently of whether a platform distinguishes modes.
+    std::fs::write(&context, "struct NativeContext { int value; };\n#define FORCED_VALUE 7\n")
+        .unwrap();
+    std::fs::write(
+        &header,
+        "\
+#ifndef FORCED_VALUE\n\
+#include \"context.h\"\n\
+#endif\n\
+extern int original_data;\n\
+static inline int original_mode(void) {\n\
+    int mode = FORCED_VALUE * EXPLICIT_FACTOR;\n\
+#ifdef __PIC__\n\
+    mode += __PIC__;\n\
+#endif\n\
+#ifdef __PIE__\n\
+    mode += __PIE__ * 16;\n\
+#endif\n\
+    return mode + original_data;\n\
+}\n\
+#define ORIGINAL_MODE() original_mode()\n",
+    )
+    .unwrap();
+    std::fs::write(
+        &source,
+        "#include \"native.h\"\nint original_data = 0;\nint native_mode(void) { return ORIGINAL_MODE(); }\n",
+    )
+    .unwrap();
+    std::fs::write(
+        &oracle,
+        "#include \"native.h\"\nint original_data = 0;\nint main(void) { return ORIGINAL_MODE(); }\n",
+    )
+    .unwrap();
+    std::fs::write(&consumer, "int native_mode(void);\nint main(void) { return native_mode(); }\n")
+        .unwrap();
+    std::fs::write(
+        &shared,
+        "int native_mode(void);\nint observe_native_mode(void) { return native_mode(); }\n",
+    )
+    .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let modes: &[&[&str]] = &[
+        &[],
+        &["-fpic"],
+        &["-fPIC"],
+        &["-fpie"],
+        &["-fPIE"],
+        &["-fpic", "-fPIE"],
+        &["-fPIE", "-fpic"],
+        &["-fno-pic"],
+        &["-fno-pie"],
+        &["-fPIC", "-fno-pic"],
+        &["-fPIE", "-fno-pie"],
+        &["-fno-pic", "-fpic"],
+        &["-fno-pie", "-fPIE"],
+    ];
+    for (index, mode) in modes.iter().enumerate() {
+        let mut arguments = vec!["-DEXPLICIT_FACTOR=1".into(), "-Werror".into()];
+        arguments.extend(mode.iter().map(|flag| (*flag).to_owned()));
+        // Inspection may retain an unsupported semantic option (such as a
+        // negative PIC flag). Native compilation still preserves those exact
+        // original flags rather than pretending they were an admitted profile.
+        let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+        let mut profile = frontend.profile().clone();
+        if index == 0 {
+            // Also exercise the native API's forced-include handling directly.
+            // Inspection sees this same context through the ordinary include;
+            // both native compilation and its C oracle receive the added flag.
+            profile.arguments.extend(["-include".into(), context.to_str().unwrap().into()]);
+        }
+        // A caller-selected filename must not alias the staged preprocessed
+        // source, even when it happens to use that source's conventional name.
+        let object = directory.0.join(if index == 0 {
+            "support.i".into()
+        } else {
+            format!("native-{index}.o")
+        });
+        let archive = directory.0.join(format!("native-{index}.a"));
+        compile_native_support(&profile, &source, &object, &archive).unwrap();
+        let oracle_object = directory.0.join(format!("oracle-{index}.o"));
+        let output = std::process::Command::new(&profile.compiler.executable)
+            .args(&profile.arguments)
+            .args(["-x", "c", "-c"])
+            .arg(&oracle)
+            .arg("-o")
+            .arg(&oracle_object)
+            .output()
+            .unwrap();
+        assert!(output.status.success(), "{mode:?}: {}", String::from_utf8_lossy(&output.stderr));
+        let oracle_executable = directory.0.join(format!("oracle-{index}"));
+        let consumer_executable = directory.0.join(format!("consumer-{index}"));
+        for (input, executable) in
+            [(&oracle_object, &oracle_executable), (&consumer, &consumer_executable)]
+        {
+            // The system driver supplies the host runtime; all original-C
+            // compilation and native archive production use inspected Clang.
+            let mut linker = std::process::Command::new("cc");
+            linker.arg(input);
+            if input == &consumer {
+                linker.arg(&archive);
+            }
+            let output = linker.arg("-o").arg(executable).output().unwrap();
+            assert!(
+                output.status.success(),
+                "{mode:?}: {}",
+                String::from_utf8_lossy(&output.stderr)
+            );
+        }
+        let original = std::process::Command::new(&oracle_executable).status().unwrap();
+        let translated = std::process::Command::new(&consumer_executable).status().unwrap();
+        assert!(original.code().is_some(), "{mode:?}: original C oracle terminated abnormally");
+        assert_eq!(translated.code(), original.code(), "{mode:?}: changed native header semantics");
+        let library = directory.0.join(format!("shared-{index}.so"));
+        let output = std::process::Command::new("cc")
+            .arg(if cfg!(target_os = "macos") { "-dynamiclib" } else { "-shared" })
+            .arg(&shared)
+            .arg(&archive)
+            .arg("-o")
+            .arg(&library)
+            .output()
+            .unwrap();
+        assert!(output.status.success(), "{mode:?}: {}", String::from_utf8_lossy(&output.stderr));
+        assert!(std::fs::metadata(&library).unwrap().len() > 0);
+    }
+}
+
 /// Checks that native support requires fresh outputs and preserves existing artifacts on tool
 /// failure.
 #[test]
