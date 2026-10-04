@@ -107,7 +107,9 @@ pub fn reject_c_invocation(
 ) -> String {
     let directory = TemporaryDirectory::new();
     let c = directory.0.join("rejected.c");
-    fs::write(&c, source).expect("write a rejected original C invocation");
+    // Strict compilers must reject the invocation's constraints rather than
+    // diagnose a missing final newline in the generated translation unit.
+    fs::write(&c, format!("{source}\n")).expect("write a rejected original C invocation");
     let mut compiler = Command::new(compiler);
     compiler
         .args(["-x", "c"])

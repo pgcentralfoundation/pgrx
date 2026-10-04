@@ -3300,7 +3300,6 @@ mod tests {
     };
     use super::*;
     use std::cell::Cell;
-    use std::fmt::Write;
     use std::mem::MaybeUninit;
     use std::path::PathBuf;
     use std::sync::atomic::{AtomicU64, Ordering};
@@ -4122,8 +4121,18 @@ mod tests {
     }
 
     /// Compare runtime expression types, values, mutations, and scalar bit patterns with an independently compiled C oracle.
+    /// This native comparison requires the generator's supported LP64 targets;
+    /// frontend tests separately prove rejection of incompatible target profiles.
+    #[cfg(all(
+        target_pointer_width = "64",
+        target_endian = "little",
+        any(target_arch = "x86_64", target_arch = "aarch64"),
+        any(target_os = "linux", target_os = "macos")
+    ))]
     #[test]
     fn runtime_expression_families_match_independent_original_c() {
+        use std::fmt::Write;
+
         let directory = OracleDirectory::new();
         let source = directory.0.join("original.c");
         let binary = directory.0.join("original");
@@ -4135,6 +4144,9 @@ mod tests {
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+_Static_assert(sizeof(int) == 4 && sizeof(long) == 8 && sizeof(long long) == 8 && sizeof(void *) == 8,
+               "original C must match the runtime's LP64 storage");
+_Static_assert(_Generic(sizeof(0), unsigned long:1, default:0), "original sizeof identity");
 #define ASSIGN(x,v) ((x)=(v))
 #define COMPOUND(x,v) ((x)+=(v))
 #define POST(x) ((x)++)
@@ -4441,11 +4453,11 @@ int main(void) {
             let source = directory.0.join(format!("{case}.c"));
             std::fs::write(
                 &source,
-                format!("typedef int Fn(int); void fixture(Fn *function) {{{body}}}"),
+                format!("typedef int Fn(int); void fixture(Fn *function) {{{body}}}\n"),
             )
             .unwrap();
             let output = std::process::Command::new("clang")
-                .args(["-std=c11", "-Werror", "-pedantic-errors", "-fsyntax-only"])
+                .args(["-std=c11", "-Werror", "-pedantic-errors", "-Wnewline-eof", "-fsyntax-only"])
                 .arg(&source)
                 .output()
                 .expect("check original C function-pointer conversion constraints");
