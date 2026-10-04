@@ -214,13 +214,18 @@ through libclang and driver `_Static_assert` witnesses. Function-pointer layout
 is a separate witness from object-pointer layout. Optional `offsetof` probes
 must not hide a failed required fundamental witness. Protect proof operations
 and fundamental fact macros against caller forgery.
-The actual-inclusion comparison uses driver `-H` observations plus the main
-file. `-M` availability dependencies are separate rebuild inputs. Remove
-`-include` and `-imacros` from independent target probes so forced headers cannot
-supply forged fundamental target facts. The current `-H` comparison can
-conservatively reject a forced-include profile if the driver omits a header that
-libclang reports; inspection fails rather than assuming those inclusion sets
-agree. Supporting such profiles requires a complete independent inclusion witness.
+The macro-dump pass also writes an owned `-header-include-file` witness with
+system headers enabled. Clang's complete inclusion callback records forced
+`-include` and `-imacros` roots as well as ordinary includes; its `-H` display
+omits roots processed before the main file. Bound this witness with the same
+16 MiB output limit, decode Clang's escaped backslashes and double quotes, and
+compare its canonical physical paths plus the main file with libclang exactly.
+Refuse truncated records or ambiguous newline filename encodings. Neither argv
+filenames nor `-M` availability dependencies establish that a header was included;
+availability dependencies remain separate rebuild inputs. Remove `-include` and
+`-imacros` from independent target probes so forced headers cannot supply forged
+fundamental target facts. The witness is temporary output, not a profile input,
+and is removed on success and failure.
 
 Normalize arguments so the inspected language is C and required probe actions
 can run without accepting options that write unrelated outputs or replace the

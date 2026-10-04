@@ -273,9 +273,13 @@ fn collect(
         None,
     );
     arguments.push("-".into());
-    let driver =
-        run_compiler_with_input(&profile.compiler.executable, &arguments, Some(source.to_owned()))?
-            .stdout;
+    let driver = run_compiler_with_input(
+        &profile.compiler.executable,
+        &arguments,
+        Some(source.to_owned()),
+        None,
+    )?
+    .stdout;
     let mut driver_zeros = BTreeSet::<usize>::new();
     let driver_type =
         format!("constant i{} ", profile.target.integers[&crate::IntegerKind::Int].bits);

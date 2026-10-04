@@ -54,6 +54,74 @@ impl Drop for Directory {
     }
 }
 
+/// Inspect forced roots and their system includes directly, retaining exact paths and symlink inputs.
+#[test]
+fn forced_include_and_imacros_profiles_have_complete_physical_witnesses() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let system = directory.0.join("system headers");
+    std::fs::create_dir(&system).unwrap();
+    let first = system.join("first.h");
+    let second = system.join("second.h");
+    let alias = system.join("forced space.h");
+    let nested = system.join("nested.h");
+    let leaf = system.join("leaf\"quote.h");
+    let available = system.join("available.h");
+    let wrapper = directory.0.join("wrapper.h");
+    let contents = "#include <nested.h>\n#define ROOT_NUMBER 41\n#define FORCED_FUNCTION(value) ((value) + ROOT_NUMBER + LEAF_NUMBER)\n";
+    std::fs::write(&first, contents).unwrap();
+    std::fs::write(&second, contents).unwrap();
+    // Quoted header names cannot contain double quotes, including those synthesized
+    // for -include. An angle header name can, so test the writer's escaping here.
+    std::fs::write(&nested, "#include <leaf\"quote.h>\n").unwrap();
+    std::fs::write(&leaf, "#define LEAF_NUMBER 1\n").unwrap();
+    std::fs::write(&available, "#define AVAILABILITY_ONLY_INCLUDED 1\n").unwrap();
+    std::fs::write(
+        &wrapper,
+        "#if !__has_include(<available.h>)\n#error missing availability fixture\n#endif\n#ifndef ROOT_NUMBER\n#error forced root was not processed\n#endif\n",
+    )
+    .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    for option in ["-include", "-imacros"] {
+        std::os::unix::fs::symlink(&first, &alias).unwrap();
+        // The driver resolves this basename through its actual system search;
+        // the verifier cannot obtain the physical header from argv alone.
+        let arguments = [
+            "-isystem".into(),
+            system.to_str().unwrap().into(),
+            option.into(),
+            alias.file_name().unwrap().to_str().unwrap().into(),
+        ];
+        let frontend = inspect(&scanner, &wrapper, &arguments, None).unwrap_or_else(|error| {
+            panic!("{option} inspection must admit complete includes: {error}")
+        });
+        let inputs = &frontend.profile().inputs;
+        for path in [&alias, &nested, &leaf, &available] {
+            assert!(inputs.files.contains(path), "{option} must track {}", path.display());
+            assert!(inputs.files.contains(&path.canonicalize().unwrap()));
+        }
+        // Track the target's canonical identity and the observed alias spelling,
+        // without inventing a second lookup spelling for the symlink target.
+        assert!(inputs.files.contains(&first.canonicalize().unwrap()));
+        assert!(frontend.environment().active.contains_key("FORCED_FUNCTION"));
+        assert!(frontend.environment().active.contains_key("LEAF_NUMBER"));
+        assert!(!frontend.environment().active.contains_key("AVAILABILITY_ONLY_INCLUDED"));
+        let session = AnalysisSession::prepare(&scanner, &frontend, &["FORCED_FUNCTION"])
+            .expect("forced-header macros must remain coherent during later compiler probes");
+        assert!(matches!(
+            session.analyze("FORCED_FUNCTION").status,
+            pgrx_c_macros::AnalysisStatus::Candidate
+        ));
+
+        // Identical text cannot hide a changed physical forced-root target.
+        std::fs::remove_file(&alias).unwrap();
+        std::os::unix::fs::symlink(&second, &alias).unwrap();
+        let error = session.verify_inputs().unwrap_err().to_string();
+        assert!(error.contains("target changed after inspection"), "{option}: {error}");
+        std::fs::remove_file(&alias).unwrap();
+    }
+}
+
 /// Checks that syntax only profile cannot rearchive a stale native object.
 #[test]
 fn syntax_only_profile_cannot_rearchive_a_stale_native_object() {

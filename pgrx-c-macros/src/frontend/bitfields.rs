@@ -218,9 +218,13 @@ fn volatile_units(
     let mut arguments =
         driver_arguments(&profile.arguments, &["-S", "-emit-llvm", "-O1", "-o", "-"], None);
     arguments.push("-".into());
-    let ir =
-        run_compiler_with_input(&profile.compiler.executable, &arguments, Some(source.to_owned()))?
-            .stdout;
+    let ir = run_compiler_with_input(
+        &profile.compiler.executable,
+        &arguments,
+        Some(source.to_owned()),
+        None,
+    )?
+    .stdout;
     let mut functions = BTreeMap::new();
     let mut current = None;
     for line in ir.lines() {
@@ -285,7 +289,12 @@ fn collect(
     let profile = frontend.profile();
     let mut arguments = driver_arguments(&profile.arguments, &["-fsyntax-only"], None);
     arguments.push("-".into());
-    run_compiler_with_input(&profile.compiler.executable, &arguments, Some(source.to_owned()))?;
+    run_compiler_with_input(
+        &profile.compiler.executable,
+        &arguments,
+        Some(source.to_owned()),
+        None,
+    )?;
     let header = std::env::temp_dir().join("pgrx-c-macros-bitfields.h");
     scanner
         .with_declarations(&header, &profile.arguments, Some(source), |unit| {

@@ -46,7 +46,7 @@ mod types;
 /// runtime values.
 pub(crate) mod zero_constants;
 
-/// Bound each captured compiler pipe so pathological diagnostics or output cannot exhaust memory.
+/// Bound compiler pipes and the owned inclusion witness so output cannot exhaust memory or disk.
 const OUTPUT_LIMIT: u64 = 16 * 1024 * 1024;
 /// Bound one tool invocation so failed or stuck compiler phases release their owned child process.
 const COMPILER_TIMEOUT: Duration = Duration::from_secs(60);
@@ -229,7 +229,39 @@ pub(crate) fn inspect_with_compiler_hint(
         let resource = input_path(Path::new(resource.stdout.trim()))?;
         arguments.push(format!("-resource-dir={}", path_string(&resource)?));
     }
-    let preprocessing = preprocess(&compiler, &header, &arguments, &["-E", "-dM", "-v", "-H"])?;
+    let witness = tempfile::Builder::new()
+        .prefix("pgrx-c-macros-includes-")
+        .tempfile()
+        .map_err(|source| FrontendError::CompilerIo { compiler: compiler.clone(), source })?;
+    // Unlike -H, this compiler callback includes headers processed in the
+    // predefines stage, including -include and -imacros roots. Its output goes
+    // to an owned file so diagnostics cannot be mistaken for physical paths.
+    let options = [
+        "-E",
+        "-dM",
+        "-v",
+        "-Xclang",
+        "-header-include-file",
+        "-Xclang",
+        path_string(witness.path())?,
+        "-Xclang",
+        "-sys-header-deps",
+    ];
+    let preprocessing = run_compiler_with_input(
+        &compiler,
+        &driver_arguments(&arguments, &options, Some(&header)),
+        None,
+        Some(witness.path()),
+    )?;
+    let mut witnessed = Vec::new();
+    std::fs::File::open(witness.path())
+        .and_then(|file| file.take(OUTPUT_LIMIT + 1).read_to_end(&mut witnessed))
+        .map_err(|source| FrontendError::CompilerIo { compiler: compiler.clone(), source })?;
+    if witnessed.len() as u64 > OUTPUT_LIMIT {
+        return Err(FrontendError::OutputLimit(compiler));
+    }
+    let witnessed = String::from_utf8(witnessed)
+        .map_err(|error| FrontendError::Output(format!("non-UTF-8 header witness: {error}")))?;
     validate_driver_configuration(&preprocessing.stderr)?;
     let live = tokenize_snapshot(scanner, &preprocessing.stdout, &arguments)?;
     let dependencies = preprocess(&compiler, &header, &arguments, &["-M", "-MT", "pgrx_c_macros"])?;
@@ -253,7 +285,7 @@ pub(crate) fn inspect_with_compiler_hint(
         .collect::<Result<BTreeSet<_>, _>>()?;
     // Dependency output also includes successful header-availability searches.
     // Compare actual inclusions separately, retaining every dependency for rebuilds.
-    let driver_identities = parse_include_trace(&preprocessing.stderr)?
+    let driver_identities = parse_header_witness(&witnessed)?
         .iter()
         .chain(std::iter::once(&header))
         .map(|path| absolute_path(path))
@@ -532,15 +564,39 @@ pub(crate) fn compiler_triple(verbose: &str) -> Result<String, FrontendError> {
     Err(FrontendError::Output("Clang verbose output did not identify its frontend target".into()))
 }
 
-/// Read actual driver inclusions so inspection can compare them with libclang, separately from
-/// availability searches.
-fn parse_include_trace(verbose: &str) -> Result<BTreeSet<PathBuf>, FrontendError> {
+/// Decode the compiler's complete physical inclusion witness, separately from availability searches.
+///
+/// Clang's textual header writer applies Lexer::Stringify without surrounding
+/// quotes: backslashes and double quotes are escaped, but spaces remain literal.
+/// Newline/carriage-return paths have an ambiguous encoding and are refused.
+fn parse_header_witness(witness: &str) -> Result<BTreeSet<PathBuf>, FrontendError> {
+    if !witness.is_empty() && !witness.ends_with('\n') {
+        return Err(FrontendError::Output("unfinished header inclusion witness".into()));
+    }
     let mut included = BTreeSet::new();
-    for line in verbose.lines() {
-        let depth = line.bytes().take_while(|byte| *byte == b'.').count();
-        if depth != 0 && line.as_bytes().get(depth) == Some(&b' ') {
-            included.insert(input_path(Path::new(&line[depth + 1..]))?);
+    for line in witness.lines() {
+        let mut path = String::with_capacity(line.len());
+        let mut characters = line.chars();
+        while let Some(character) = characters.next() {
+            match character {
+                '\\' => match characters.next() {
+                    Some(escaped @ ('\\' | '"')) => path.push(escaped),
+                    _ => {
+                        return Err(FrontendError::Output(
+                            "unsupported or unfinished header filename escape".into(),
+                        ));
+                    }
+                },
+                '"' | '\r' | '\0' => {
+                    return Err(FrontendError::Output("invalid header filename witness".into()));
+                }
+                character => path.push(character),
+            }
         }
+        if path.is_empty() {
+            return Err(FrontendError::Output("empty header filename witness".into()));
+        }
+        included.insert(input_path(Path::new(&path))?);
     }
     Ok(included)
 }
@@ -986,7 +1042,7 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
     );
     probe.push("-".into());
     let source = format!("_Static_assert(({ascii}), \"pgrx_ascii_execution_charset\");\n");
-    let driver_ascii = match run_compiler_with_input(compiler, &probe, Some(source)) {
+    let driver_ascii = match run_compiler_with_input(compiler, &probe, Some(source), None) {
         Ok(_) => true,
         Err(FrontendError::CompilerFailed { diagnostics, .. })
             if diagnostics.contains("pgrx_ascii_execution_charset") =>
@@ -1322,22 +1378,23 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
             ));
         }
     }
-    let offsetof_supported = match run_compiler_with_input(compiler, &probe, Some(float_source)) {
-        Ok(_) => offsetof.is_some(),
-        Err(FrontendError::CompilerFailed { diagnostics, status, .. })
-            if status.code().is_some()
-                && offsetof.is_some()
-                && only_offsetof_errors(&diagnostics) =>
-        {
-            false
-        }
-        Err(FrontendError::CompilerFailed { diagnostics, .. }) => {
-            return Err(FrontendError::Environment(format!(
-                "compiler fundamental type facts differ from libclang: {diagnostics}"
-            )));
-        }
-        Err(error) => return Err(error),
-    };
+    let offsetof_supported =
+        match run_compiler_with_input(compiler, &probe, Some(float_source), None) {
+            Ok(_) => offsetof.is_some(),
+            Err(FrontendError::CompilerFailed { diagnostics, status, .. })
+                if status.code().is_some()
+                    && offsetof.is_some()
+                    && only_offsetof_errors(&diagnostics) =>
+            {
+                false
+            }
+            Err(FrontendError::CompilerFailed { diagnostics, .. }) => {
+                return Err(FrontendError::Environment(format!(
+                    "compiler fundamental type facts differ from libclang: {diagnostics}"
+                )));
+            }
+            Err(error) => return Err(error),
+        };
     let bits = macro_number(&actual, "__CHAR_BIT__")?
         .try_into()
         .map_err(|_| FrontendError::Output("invalid CHAR_BIT".into()))?;
@@ -2154,7 +2211,7 @@ pub(crate) fn run_compiler(
     compiler: &Path,
     arguments: &[String],
 ) -> Result<CompilerOutput, FrontendError> {
-    run_compiler_with_input(compiler, arguments, None)
+    run_compiler_with_input(compiler, arguments, None, None)
 }
 
 /// Compile and archive generated access primitives under the inspected C flags.
@@ -2348,12 +2405,14 @@ fn require_native_artifact(path: &Path, kind: &str) -> Result<(), FrontendError>
     Ok(())
 }
 
-/// Feed an optional owned probe to the driver while enforcing output/time limits and reaping failed
-/// children.
+/// Feed an optional owned probe while bounding pipes, an optional witness file, and execution time.
+/// The owner keeps the witness alive through the call; a growing file above the
+/// shared output budget stops and reaps the child like an overflowing pipe.
 fn run_compiler_with_input(
     compiler: &Path,
     arguments: &[String],
     source: Option<String>,
+    witness: Option<&Path>,
 ) -> Result<CompilerOutput, FrontendError> {
     let failure = |source| FrontendError::CompilerIo { compiler: compiler.into(), source };
     let mut child = RunningCompiler(
@@ -2394,6 +2453,15 @@ fn run_compiler_with_input(
     let mut stderr = None;
     let mut status = None;
     'result: loop {
+        if let Some(witness) = witness {
+            match std::fs::metadata(witness) {
+                Ok(metadata) if metadata.len() > OUTPUT_LIMIT => {
+                    break Err(FrontendError::OutputLimit(compiler.into()));
+                }
+                Ok(_) => {}
+                Err(error) => break Err(failure(error)),
+            }
+        }
         while let Ok((is_stdout, result)) = receiver.try_recv() {
             let bytes = match result {
                 Ok(bytes) => bytes,
@@ -2886,6 +2954,68 @@ mod tests {
         }
     }
 
+    /// Undo only Clang's actual textual filename escaping, keeping Windows separators and spaces.
+    #[test]
+    fn inclusion_witness_preserves_escaped_physical_paths() {
+        let paths = [
+            r"C:\Program Files\PostgreSQL\include\postgres.h",
+            r"\\server\share\header.h",
+            r#"quote"name.h"#,
+            r"literal\n.h",
+            "space and ünicode.h",
+        ];
+        let witness = paths
+            .iter()
+            .map(|path| path.replace('\\', "\\\\").replace('"', "\\\""))
+            .collect::<Vec<_>>()
+            .join("\r\n")
+            + "\r\n";
+        let expected = paths
+            .into_iter()
+            .map(|path| input_path(Path::new(path)).unwrap())
+            .collect::<BTreeSet<_>>();
+        assert_eq!(parse_header_witness(&witness).unwrap(), expected);
+        assert!(parse_header_witness("").unwrap().is_empty());
+    }
+
+    /// Refuse truncated, malformed and ambiguous newline encodings instead of guessing filenames.
+    #[test]
+    fn inclusion_witness_rejects_unproved_filename_spellings() {
+        for witness in [
+            "unfinished.h",
+            "unfinished\\\n",
+            "bad\\z.h\n",
+            "bad\\n.h\n",
+            "bad\"name.h\n",
+            "bad\0name.h\n",
+            "\n",
+        ] {
+            assert!(
+                matches!(parse_header_witness(witness), Err(FrontendError::Output(_))),
+                "{witness:?}"
+            );
+        }
+    }
+
+    /// Stop a still-running writer when its witness exceeds the shared output budget.
+    #[cfg(unix)]
+    #[test]
+    fn inclusion_witness_limit_reaps_a_live_writer() {
+        let witness = tempfile::NamedTempFile::new().unwrap();
+        // Shell builtins keep the writer in the owned process: killing it cannot
+        // leave a grandchild appending to the temporary file after this test.
+        let script = format!("while :; do printf '%s' '{}' >> \"$1\"; done", "x".repeat(4096));
+        let arguments = [
+            "-c".into(),
+            script,
+            "pgrx-inclusion-limit".into(),
+            witness.path().to_str().unwrap().into(),
+        ];
+        let result =
+            run_compiler_with_input(Path::new("/bin/sh"), &arguments, None, Some(witness.path()));
+        assert!(matches!(result, Err(FrontendError::OutputLimit(_))));
+    }
+
     /// Compile a real versioned-MSVC COFF object and exercise production archive selection.
     /// No Windows SDK, Windows linker or llvm-lib installation is needed on a Unix host.
     #[test]
@@ -3268,7 +3398,7 @@ mod tests {
             let selection = find_compiler(None, None, &clang::get_version()).unwrap();
             let args = driver_arguments(&[], &["-fsyntax-only", "-"], None);
             run_compiler_with_input(&selection.executable, &args,
-                Some("enum Probe { ZERO };\n_Static_assert(sizeof(enum Probe) == sizeof(int), \"driver override must not shorten enum\");\n".into())).unwrap();
+                Some("enum Probe { ZERO };\n_Static_assert(sizeof(enum Probe) == sizeof(int), \"driver override must not shorten enum\");\n".into()), None).unwrap();
             drop(scanner);
             return;
         }
