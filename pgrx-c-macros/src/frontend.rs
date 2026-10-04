@@ -66,6 +66,7 @@ const VALUE_OPTIONS: &[&str] = &[
     "-imacros",
     "-std",
     "-B",
+    "-ccc-gcc-name",
     "--gcc-toolchain",
     "-gcc-toolchain",
     "--gcc-install-dir",
@@ -2651,6 +2652,30 @@ mod tests {
             "-std=c11".into(),
         ])
         .unwrap();
+    }
+
+    /// Preserve a cross GCC driver's name as one option value while rejecting missing operands,
+    /// embedded NUL bytes, and unrelated extra inputs.
+    #[test]
+    fn cross_gcc_driver_names_are_option_values_not_analysis_inputs() {
+        validate_arguments(&[
+            "-target".into(),
+            "aarch64-unknown-linux-gnu".into(),
+            "-ccc-gcc-name".into(),
+            "aarch64-linux-gnu-gcc".into(),
+        ])
+        .unwrap();
+        for arguments in [
+            vec!["-ccc-gcc-name"],
+            vec!["-ccc-gcc-name", "aarch64-linux-gnu-gcc\0"],
+            vec!["-ccc-gcc-name", "aarch64-linux-gnu-gcc", "extra.c"],
+        ] {
+            let arguments = arguments.into_iter().map(str::to_owned).collect::<Vec<_>>();
+            assert!(
+                matches!(validate_arguments(&arguments), Err(FrontendError::Arguments(_))),
+                "{arguments:?}"
+            );
+        }
     }
 
     /// Checks automatically loaded driver configuration is rejected.

@@ -350,6 +350,53 @@ fn compiler_profile_and_declarations_match_an_independent_native_c_probe() {
     assert_eq!(default.profile().signed_overflow, SignedOverflow::Undefined);
 }
 
+/// Preserve cross compiler selection through driver and libclang inspection, then verify the
+/// target's C widths and macro result identities independently without a target linker or SDK.
+#[test]
+fn cross_gcc_driver_selection_preserves_the_inspected_aarch64_target() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("frontend_cross_target.h");
+    let include = header.parent().unwrap().to_str().unwrap();
+    let arguments = [
+        "-target".into(),
+        "aarch64-unknown-linux-gnu".into(),
+        "-isystem".into(),
+        include.into(),
+        "-ccc-gcc-name".into(),
+        "aarch64-linux-gnu-gcc".into(),
+        "-std=c17".into(),
+    ];
+    let frontend = inspect(&scanner, &header, &arguments, None)
+        .expect("driver and libclang must agree on the cross GCC selection profile");
+    let profile = frontend.profile();
+    assert_eq!(&profile.arguments[..arguments.len()], &arguments);
+    assert!(profile.target.triple.starts_with("aarch64-"), "{:?}", profile.target);
+    assert_eq!(profile.target.pointer_bits, 64);
+    assert_eq!(profile.target.integers[&IntegerKind::Long].bits, 64);
+    assert_eq!(profile.target.size_type, IntegerKind::UnsignedLong);
+    assert!(
+        oracle::run_c(
+            &profile.compiler.executable,
+            &header,
+            r#"
+#ifndef __aarch64__
+#error original C must use the requested AArch64 target
+#endif
+_Static_assert(sizeof(void *) == 8 && sizeof(long) == 8 && sizeof(int) == 4,
+               "original compiler's AArch64 LP64 layout");
+_Static_assert(_Generic(FRONT_CROSS_LONG(1), long: 1, default: 0),
+               "original long cast identity");
+_Static_assert(_Generic(FRONT_CROSS_SIZE(1), unsigned long: 1, default: 0),
+               "original macro sizeof identity");
+"#,
+            &profile.arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+            false,
+        )
+        .is_empty()
+    );
+}
+
 /// Prove that inspection retains real Windows LLP64 facts while runtime emission rejects them.
 /// No system headers or target linker are needed, so every host can exercise this ABI boundary.
 #[test]
