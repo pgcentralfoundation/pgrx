@@ -39,6 +39,60 @@ pub unsafe trait EnumStorage<I: EnumIdentity, K: CInteger>: Sized {
     fn encode(value: K::Repr) -> Self;
 }
 
+/// The exact compatible integer kind established for a generated enum identity.
+pub(crate) trait NumericEnum: EnumIdentity {
+    type Compatible: CInteger;
+}
+
+// Registration permits exactly the compiler-established integer identity in
+// either pointer-compatibility direction. Concrete primitive roots preserve
+// nominal enum distinctions and remain disjoint from reflexive compatibility.
+macro_rules! numeric_enum_compatibility {
+    ($($kind:ty),+ $(,)?) => {$(
+        impl<I: NumericEnum<Compatible = $kind>> CompatibleIdentity<$kind>
+            for CEnum<I, $kind>
+        {}
+        impl<I: NumericEnum<Compatible = $kind>> CompatibleIdentity<CEnum<I, $kind>>
+            for $kind
+        {}
+    )+};
+}
+numeric_enum_compatibility!(
+    super::super::CBool,
+    super::super::CChar,
+    super::super::CSignedChar,
+    super::super::CUnsignedChar,
+    super::super::CShort,
+    super::super::CUnsignedShort,
+    super::super::CInt,
+    super::super::CUnsignedInt,
+    super::super::CLong,
+    super::super::CUnsignedLong,
+    super::super::CLongLong,
+    super::super::CUnsignedLongLong,
+    super::super::CInt128,
+    super::super::CUnsignedInt128,
+);
+
+macro_rules! numeric_enum_storage {
+    ($($repr:ty),+ $(,)?) => {$(
+        // SAFETY: Registration fixes the compatible kind, whose representation
+        // is exactly this primitive. The identity conversion preserves every
+        // valid storage value and cannot create an invalid Rust enum variant.
+        unsafe impl<I: NumericEnum<Compatible = K>, K: CInteger<Repr = $repr>>
+            EnumStorage<I, K> for $repr
+        {
+            fn decode(value: Self) -> $repr {
+                value
+            }
+            fn encode(value: $repr) -> Self {
+                value
+            }
+        }
+    )+};
+}
+numeric_enum_storage!(bool, i8, u8, i16, u16, i32, u32, i64, u64, i128, u128);
+
 /// An enum object whose raw storage can contain C-valid, unnamed enum values.
 /// Reads and writes use the compatible integer representation, never `R` loads.
 pub struct CEnumObject<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>>(PhantomData<(I, K, R)>);
@@ -92,6 +146,11 @@ impl<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>, V: ImplicitTo<CEnum<I, 
     }
 }
 
+/// # Safety
+/// `address` must have provenance and readable bounds for initialized `K::Repr`
+/// bytes. It must be aligned unless `access.unaligned` is set. The access must
+/// obey aliasing and concurrency rules, and `access.volatile` must describe the
+/// C object's qualification. Unaligned volatile access is rejected.
 unsafe fn read_enum<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>>(
     address: *mut R,
     access: Access,
@@ -115,6 +174,13 @@ unsafe fn read_enum<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>>(
     };
     CValue::new(value)
 }
+/// # Safety
+/// `address` must have provenance and writable bounds for `K::Repr` bytes. It
+/// must be aligned unless `access.unaligned` is set. The access must obey
+/// aliasing and concurrency rules, and `access.volatile` must describe the C
+/// object's qualification. Unaligned volatile access is rejected. The write
+/// can leave an invalid Rust enum discriminant; no `R` value or reference may
+/// be materialized until the stored bytes form a valid `R`.
 unsafe fn write_enum<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>>(
     address: *mut R,
     access: Access,

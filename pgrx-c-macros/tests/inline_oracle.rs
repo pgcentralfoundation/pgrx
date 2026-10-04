@@ -103,7 +103,7 @@ fn generated_inline_adapters_preserve_native_coercions_and_guard_boundaries() {
     assert!(!catalog.functions.contains_key("inline_byte"));
     assert!(frontend.declarations().function_signatures["inline_byte"].definition_available);
     assert!(!frontend.declarations().function_signatures["inline_undefined"].definition_available);
-    for emission in emit_batch_with_bindings(&session, &rejected, &catalog) {
+    for emission in emit_batch_with_bindings(&session, &rejected, &catalog).unwrap() {
         let EmissionStatus::Skipped { reason } = emission.status else {
             panic!("unproven inline capability must be rejected: {emission:?}");
         };
@@ -130,7 +130,7 @@ fn generated_inline_adapters_preserve_native_coercions_and_guard_boundaries() {
         "#![deny(unsafe_op_in_unsafe_fn)]\n#![allow(non_snake_case,non_camel_case_types,unused_parens,dead_code)]\n#[path={support:?}] pub mod __pgrx_c_macros;\n{bindings}\n{}\n",
         artifact.rust
     );
-    for emission in emit_batch_with_bindings(&session, NAMES, &catalog) {
+    for emission in emit_batch_with_bindings(&session, NAMES, &catalog).unwrap() {
         let EmissionStatus::Emitted { rust: definition, .. } = emission.status else {
             panic!("inline macro {} must emit: {emission:?}", emission.analysis.name);
         };

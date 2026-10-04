@@ -37,7 +37,7 @@ const SUPPORTED: &[&str] = &[
     "CTX_LAZY",
     "CTX_REPEAT",
     "CTX_ATOMIC",
-    "CTX_TYPE",
+    "CTX_TYPE_PROVEN",
     "CTX_IGNORE",
 ];
 
@@ -112,7 +112,7 @@ fn emitted_source(
         .expect("derive compiler-verified context and native bitfield adapters");
     assert!(!artifact.c_source.is_empty(), "bitfield primitives must use original C accessors");
     rust.push_str(&artifact.rust);
-    for emission in emit_batch_with_bindings(session, SUPPORTED, catalog) {
+    for emission in emit_batch_with_bindings(session, SUPPORTED, catalog).unwrap() {
         let EmissionStatus::Emitted { rust: definition, .. } = emission.status else {
             panic!("context macro must emit: {emission:?}")
         };

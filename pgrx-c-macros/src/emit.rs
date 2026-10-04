@@ -31,7 +31,9 @@ mod addresses;
 mod arguments;
 mod bitfields;
 mod callbacks;
+mod demands;
 mod enumerations;
+mod expectation;
 mod fields;
 mod functions;
 mod statements;
@@ -178,16 +180,18 @@ fn emit_with_lowering<'a>(
 ///
 /// A disagreement never changes bindgen's output. Reverse dependency traversal
 /// also prevents callers from hiding a skipped macro by expanding its body.
+/// Shared capability-generation failures are returned instead of being mistaken
+/// for individual unsupported macros.
 pub fn emit_batch_with_bindings(
     session: &AnalysisSession<'_>,
     names: &[impl AsRef<str>],
     bindings: &BindingCatalog,
-) -> Vec<MacroEmission> {
+) -> Result<Vec<MacroEmission>, String> {
     let mut capabilities = bindings.clone();
-    if let Ok(adapters) = generated_adapters(session, names, bindings) {
-        register_adapters(&mut capabilities, &adapters);
-    }
-    emit_prepared_batch(session, names, &capabilities)
+    let requests = demands::plan(session, names, bindings);
+    let adapters = generated_adapters(session, &requests, bindings)?;
+    register_adapters(&mut capabilities, &adapters);
+    Ok(emit_prepared_batch(session, names, &capabilities))
 }
 
 fn register_adapters(capabilities: &mut BindingCatalog, adapters: &GeneratedAdapters) {
@@ -408,10 +412,22 @@ pub fn generate_with_bindings(
     names: &[impl AsRef<str>],
     bindings: &BindingCatalog,
 ) -> Result<MacroGeneration, String> {
-    let adapters = generated_adapters(session, names, bindings)?;
+    let requests = demands::plan(session, names, bindings);
+    let mut adapters = generated_adapters(session, &requests, bindings)?;
     let mut capabilities = bindings.clone();
     register_adapters(&mut capabilities, &adapters);
     let macros = emit_prepared_batch(session, names, &capabilities);
+    let admitted = macros
+        .iter()
+        .filter(|emission| matches!(emission.status, EmissionStatus::Emitted { .. }))
+        .map(|emission| emission.analysis.name.as_str())
+        .collect::<Vec<_>>();
+    let final_requests = demands::plan(session, &admitted, bindings);
+    if final_requests != requests {
+        // Rejected roots cannot retain support that no emitted macro can use.
+        // Marker identities depend on C/ABI facts, not the requested root set.
+        adapters = generated_adapters(session, &final_requests, bindings)?;
+    }
     let support = render_adapters(adapters, &macros)?;
     Ok(MacroGeneration { macros, support })
 }
@@ -440,7 +456,7 @@ fn render_adapters(
         String::new()
     } else {
         format!(
-            "#[doc(hidden)]\n#[allow(non_snake_case, non_camel_case_types)]\npub mod __pgrx_c_generated {{\n{body}\n}}\n"
+            "#[doc(hidden)]\n#[allow(non_snake_case, non_camel_case_types)]\npub mod __pgrx_c_generated {{\nuse crate::__pgrx_c_macros as c;\n{body}\n}}\n"
         )
     };
     let exports = macros
@@ -448,8 +464,19 @@ fn render_adapters(
         .filter(|emission| matches!(emission.status, EmissionStatus::Emitted { .. }))
         .filter_map(|emission| macro_identifier(&emission.analysis.name))
         .collect::<BTreeSet<_>>();
-    rust.push_str(&arguments::shared(&exports)?);
-    rust.push_str(&field_registry(&adapters.fields.markers)?);
+    if macros.iter().any(|emission| {
+        matches!(emission.status, EmissionStatus::Emitted { .. })
+            && emission
+                .analysis
+                .parameters
+                .iter()
+                .any(|parameter| parameter.roles.contains(&crate::ParameterRole::Value))
+    }) {
+        rust.push_str(&crate::format_rust_macros(&arguments::shared(&exports)?)?);
+    }
+    if !adapters.fields.markers.is_empty() {
+        rust.push_str(&crate::format_rust_macros(&field_registry(&adapters.fields.markers)?)?);
+    }
     Ok(MacroSupportArtifact {
         rust,
         c_source: format!(
@@ -471,106 +498,10 @@ struct GeneratedAdapters {
 
 fn generated_adapters(
     session: &AnalysisSession<'_>,
-    names: &[impl AsRef<str>],
+    requests: &demands::Requests,
     bindings: &BindingCatalog,
 ) -> Result<GeneratedAdapters, String> {
     let frontend = session.frontend();
-    let mut used_fields = BTreeSet::new();
-    let mut used_offsets = BTreeSet::new();
-    let mut required_types = BTreeMap::new();
-    let mut used_functions = BTreeSet::new();
-    let mut used_addresses = BTreeSet::new();
-    let mut parameter_fields = false;
-    let mut parameter_offsets = false;
-    for name in names {
-        let analysis = session.analyze(name.as_ref());
-        let Some(expression) = analysis.expression else { continue };
-        let mut callees = BTreeSet::new();
-        for node in &expression.syntax.nodes {
-            if let ExpressionKind::Call { callee, .. } = node.kind {
-                let mut callee = callee;
-                while let ExpressionKind::Group { operand } = expression.syntax.nodes[callee].kind {
-                    callee = operand;
-                }
-                callees.insert(callee);
-            }
-        }
-        for (index, node) in expression.syntax.nodes.into_iter().enumerate() {
-            match node.kind {
-                ExpressionKind::OffsetOf { record, fields } => {
-                    if let crate::OffsetRecord::Named { name } = record
-                        && let Some(ty) = crate::analysis::resolve_type_info(
-                            &name,
-                            frontend.declarations(),
-                            &frontend.profile().target,
-                        )
-                    {
-                        required_types.insert(ty.canonical_spelling.clone(), ty);
-                    }
-                    for field in fields {
-                        match field {
-                            crate::OffsetComponent::Named { name } => {
-                                used_offsets.insert(name);
-                            }
-                            crate::OffsetComponent::Parameter { .. } => {
-                                parameter_offsets = true;
-                            }
-                        }
-                    }
-                }
-                ExpressionKind::Member { field, field_parameter, .. } => {
-                    if field_parameter.is_some() {
-                        parameter_fields = true;
-                    } else {
-                        used_fields.insert(field);
-                    }
-                }
-                ExpressionKind::Cast { type_name, .. }
-                | ExpressionKind::SizeOfType { type_name }
-                | ExpressionKind::AlignOfType { type_name } => {
-                    if let Some(ty) = crate::analysis::resolve_type_info(
-                        &type_name,
-                        frontend.declarations(),
-                        &frontend.profile().target,
-                    ) {
-                        required_types.insert(ty.canonical_spelling.clone(), ty);
-                    }
-                }
-                ExpressionKind::Identifier { name } => {
-                    if let Some(ty) = frontend.declarations().variables.get(&name) {
-                        required_types.insert(ty.canonical_spelling.clone(), ty.clone());
-                    }
-                    if let Some(function) = frontend.declarations().function_signatures.get(&name) {
-                        if !callees.contains(&index) {
-                            used_addresses.insert(name.clone());
-                        }
-                        used_functions.insert(name);
-                        required_types.insert(
-                            function.signature.result.canonical_spelling.clone(),
-                            function.signature.result.clone(),
-                        );
-                        for ty in function.signature.parameters.iter().flatten() {
-                            required_types.insert(ty.canonical_spelling.clone(), ty.clone());
-                        }
-                    }
-                }
-                _ => {}
-            }
-        }
-    }
-    if parameter_fields {
-        // The caller supplies the field token. Register each compiler-owned
-        // public field once; Field implementations still prove its specific
-        // record, offset, qualification and binding representation.
-        for record in frontend.declarations().records.values() {
-            used_fields.extend(record.fields.iter().filter_map(|field| field.name.clone()));
-        }
-    }
-    if parameter_offsets {
-        for record in frontend.declarations().records.values() {
-            used_offsets.extend(record.fields.iter().filter_map(|field| field.name.clone()));
-        }
-    }
     use sha2::{Digest, Sha256};
     let profile = serde_json::to_vec(frontend.profile())
         .map_err(|error| format!("cannot fingerprint the C function profile: {error}"))?;
@@ -580,7 +511,8 @@ fn generated_adapters(
         frontend.declarations(),
         bindings,
         &frontend.profile().target,
-        &used_functions,
+        &requests.functions,
+        &callbacks::CallbackRequests::default(),
     )?;
     let mut capabilities = bindings.clone();
     capabilities.callback_capabilities.extend(callbacks.markers.clone());
@@ -588,7 +520,8 @@ fn generated_adapters(
     let functions = functions::generate(
         frontend.declarations(),
         &capabilities,
-        &used_functions,
+        &requests.functions,
+        &requests.called_functions,
         &frontend.profile().target,
         &profile_identity,
     )?;
@@ -597,28 +530,44 @@ fn generated_adapters(
         frontend.declarations(),
         &capabilities,
         &frontend.profile().target,
-        &used_functions,
+        &requests.functions,
+        &requests.callbacks,
     )?;
     capabilities.callback_capabilities.extend(callbacks.markers.clone());
     capabilities.callback_unavailable.extend(callbacks.unsupported.clone());
+    let mut required_types = requests.types.values().cloned().collect::<Vec<_>>();
+    required_types.extend(callbacks.required_types.iter().cloned());
+    let mut enum_requests = enumerations::EnumRequests {
+        types: requests.enums.types.clone(),
+        open_scalar: requests.enums.open_scalar,
+    };
+    let lowering =
+        types::Lowering::new(frontend.declarations(), &capabilities, &frontend.profile().target);
+    demands::type_dependencies(
+        frontend.declarations(),
+        &lowering,
+        &required_types,
+        &mut enum_requests.types,
+        &mut BTreeSet::new(),
+    );
     Ok(GeneratedAdapters {
         enumerations: enumerations::generate(
             frontend.declarations(),
             &capabilities,
             &frontend.profile().target,
+            &enum_requests,
         )?,
         fields: fields::generate(
             frontend.declarations(),
             &capabilities,
-            &used_fields,
-            &used_offsets,
+            &requests.fields,
             &frontend.profile().target,
-            &required_types.into_values().collect::<Vec<_>>(),
+            &required_types,
         )?,
         addresses: addresses::generate(
             frontend.declarations(),
             &capabilities,
-            &used_addresses,
+            &requests.addresses,
             &frontend.profile().target,
             &profile_identity,
         )?,
@@ -783,6 +732,18 @@ fn render(
     let statement_body = expression.syntax.statement_body.as_ref();
     let returning = statement_body.is_some_and(|body| body.return_tokens.is_some());
     let statement_boundary = statement_body.is_some_and(|body| body.requires_boundary);
+    let normalizer = arguments.as_ref().map(|arguments| arguments.normalizer.as_str());
+    let local_guard =
+        if statement_body.is_some() { statements::guard(analysis, normalizer)? } else { None };
+    let invoke = |mode: &str, prefix: &str| match normalizer {
+        None => format!("$crate::{identifier}!(@{mode}; {prefix}$($raw)*)"),
+        Some(_) if local_guard.is_some() => {
+            format!("$crate::{identifier}!(@__pgrx_c_guard_locals {mode} [{prefix}]; $($raw)*)")
+        }
+        Some(normalizer) => {
+            format!("$crate::{normalizer}!(@collect {mode} [{prefix}]; $($raw)*)")
+        }
+    };
     let value = if statement_body.is_some() {
         statements::render(session, analysis, bindings, &renderer, None)?
     } else if empty {
@@ -791,40 +752,50 @@ fn render(
         render_body(session, analysis, bindings, &renderer, typed::Context::Value)?
     };
     let mut rust = String::from(assertions);
-    rust.push_str(&arguments.rust);
-    let mut doc = format!("C macro {}", analysis.name);
+    if let Some(arguments) = &arguments {
+        rust.push_str(&arguments.rust);
+    }
+    let mut comment = format!("C macro {}", analysis.name);
     if let Some(span) = &analysis.provenance
         && let Some(file) = span.file.file_name()
     {
-        write!(&mut doc, " from {}:{}", file.to_string_lossy(), span.start_line)
+        write!(&mut comment, " from {}:{}", file.to_string_lossy(), span.start_line)
             .expect("String output");
     }
-    doc.push_str(&definition_doc(original).ok_or_else(|| {
+    comment.push_str(&definition_comment(original).ok_or_else(|| {
         skip(
             analysis,
             SkipReasonCode::BudgetExceeded,
-            "original C macro documentation exceeds the bounded output size",
+            "original C macro source comment exceeds the bounded output size",
             None,
         )
     })?);
     if returning {
-        doc.push_str("\n\nC return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.");
+        comment.push_str("\n\nC return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.");
     } else if statement_body.is_some() {
-        doc.push_str("\n\nThis macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.");
+        comment.push_str("\n\nThis macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.");
     }
-    if statement_body.is_some_and(|body| {
-        body.walk()
-            .any(|statement| matches!(statement, crate::syntax::Statement::Declaration { .. }))
-    }) {
-        doc.push_str(" Caller argument tokens must not mention the macro's C local names, even inside groups: those invocations are rejected because C substitution can capture locals that Rust hygiene would resolve differently. The scope check also inspects forwarded expression fragments and is bounded to 4096 stringified bytes. Matches in fields, paths or strings are conservatively rejected.");
+    if local_guard.is_some() {
+        comment.push_str(" Caller argument tokens must not mention the macro's C local names, even inside groups: those invocations are rejected because C substitution can capture locals that Rust hygiene would resolve differently. The scope check also inspects forwarded expression fragments and is bounded to 4096 stringified bytes. Matches in fields, paths or strings are conservatively rejected.");
     }
     let explicit_boundary =
         analysis.invocation == crate::InvocationContract::ExplicitExpressionBoundary;
+    let boundary_error = if statement_boundary {
+        Some(
+            "this C replacement requires an explicit braced invocation: use @__pgrx_c_statement; before its arguments",
+        )
+    } else if explicit_boundary {
+        Some(
+            "this C replacement requires an explicit parenthesized invocation: use @__pgrx_c_expression; before its arguments",
+        )
+    } else {
+        None
+    };
     if explicit_boundary {
-        write!(doc, "\n\nCall as `{identifier}!(@__pgrx_c_expression; arguments...)`. This explicitly requests the semantics of the parenthesized C invocation `({}(arguments...))`. The original unparenthesized replacement can interact with surrounding C operators; that textual interaction is outside this Rust invocation contract.", analysis.name).expect("String output");
+        write!(comment, "\n\nCall as `{identifier}!(@__pgrx_c_expression; arguments...)`. This explicitly requests the semantics of the parenthesized C invocation `({}(arguments...))`. The original unparenthesized replacement can interact with surrounding C operators; that textual interaction is outside this Rust invocation contract.", analysis.name).expect("String output");
     }
     if statement_boundary {
-        write!(doc, "\n\nCall as `{identifier}!(@__pgrx_c_statement; arguments...)`. This requests the semantics of a braced C invocation `{{ {}(arguments...); }}`. The original unbraced conditional can capture a surrounding C `else`, so the boundary is required. When specifying a return type, put `@__pgrx_c_return_as [CMarker];` after the statement boundary.", analysis.name).expect("String output");
+        write!(comment, "\n\nCall as `{identifier}!(@__pgrx_c_statement; arguments...)`. This requests the semantics of a braced C invocation `{{ {}(arguments...); }}`. The original unbraced conditional can capture a surrounding C `else`, so the boundary is required. When specifying a return type, put `@__pgrx_c_return_as [CMarker];` after the statement boundary.", analysis.name).expect("String output");
     }
     let captures = analysis
         .parameters
@@ -832,24 +803,37 @@ fn render(
         .filter(|parameter| parameter.origin == crate::ParameterOrigin::FreeIdentifier)
         .collect::<Vec<_>>();
     if !captures.is_empty() {
-        write!(doc, "\n\nRust callers supply {} arguments: the {} original C parameters, followed by explicit caller-scope operands in this order: ", analysis.parameters.len(), analysis.parameters.len() - captures.len()).expect("String output");
+        write!(comment, "\n\nRust callers supply {} arguments: the {} original C parameters, followed by explicit caller-scope operands in this order: ", analysis.parameters.len(), analysis.parameters.len() - captures.len()).expect("String output");
         for (index, parameter) in captures.iter().enumerate() {
             if index != 0 {
-                doc.push_str(", ");
+                comment.push_str(", ");
             }
-            write!(doc, "`{}`", parameter.name).expect("String output");
+            write!(comment, "`{}`", parameter.name).expect("String output");
         }
-        doc.push_str(". Each operand must preserve its C type and place requirements.");
+        comment.push_str(". Each operand must preserve its C type and place requirements.");
     }
-    write!(&mut rust, "#[doc = {doc:?}]\n#[macro_export]\nmacro_rules! {identifier} {{\n")
-        .expect("String output");
+    write_doc_comments(&mut rust, &comment).ok_or_else(|| {
+        skip(
+            analysis,
+            SkipReasonCode::BudgetExceeded,
+            "original C macro source comment exceeds the bounded output size",
+            None,
+        )
+    })?;
+    write!(&mut rust, "#[macro_export]\nmacro_rules! {identifier} {{\n").expect("String output");
     let matcher = arguments::matcher(analysis);
+    let operands = (0..analysis.parameters.len())
+        .map(|index| format!("${}", arguments::name(analysis, index)))
+        .collect::<Vec<_>>()
+        .join(", ");
     let public_body = if statement_body.is_some() {
         value.clone()
     } else if empty {
         String::new()
     } else {
-        format!("{SUPPORT}::expression_result::finish({value})")
+        format!(
+            "{SUPPORT}::expression_result::finish($crate::{identifier}!(@__pgrx_emit_value; {operands}))"
+        )
     };
     writeln!(&mut rust, "(@__pgrx_emit_public; {matcher}) => {{ {public_body} }};")
         .expect("String output");
@@ -864,71 +848,105 @@ fn render(
                 "(@__pgrx_emit_return_as; ${return_marker}:ty, {matcher}) => {{ {explicit} }};"
             )
             .expect("String output");
-            writeln!(&mut rust, "({boundary_prefix}@__pgrx_c_return_as [${return_marker}:ty]; $($raw:tt)*) => {{ $crate::{identifier}!(@__pgrx_c_guard_locals __pgrx_emit_return_as [${return_marker},]; $($raw)*) }};").expect("String output");
+            let call = invoke("__pgrx_emit_return_as", &format!("${return_marker},"));
+            writeln!(&mut rust, "({boundary_prefix}@__pgrx_c_return_as [${return_marker}:ty]; $($raw:tt)*) => {{ {call} }};").expect("String output");
         } else {
-            writeln!(&mut rust, "(@__pgrx_emit_discard; {matcher}) => {{ {value} }};\n(@__pgrx_c_discard; {boundary_prefix}$($raw:tt)*) => {{ $crate::{identifier}!(@__pgrx_c_guard_locals __pgrx_emit_discard []; $($raw)*) }};").expect("String output");
+            let call = invoke("__pgrx_emit_discard", "");
+            writeln!(&mut rust, "(@__pgrx_emit_discard; {matcher}) => {{ $crate::{identifier}!(@__pgrx_emit_public; {operands}) }};\n(@__pgrx_c_discard; {boundary_prefix}$($raw:tt)*) => {{ {call} }};").expect("String output");
         }
-        rust.push_str(&statements::guard(analysis, &arguments.normalizer)?);
-        for mode in ["value", "place", "read_place", "size", "discard"] {
-            if mode == "discard" && !returning {
-                continue;
-            }
-            writeln!(&mut rust, "(@__pgrx_emit_{mode}; {matcher}) => {{ compile_error!(\"a C statement body is not an expression operand\") }};\n(@__pgrx_c_{mode}; $($raw:tt)*) => {{ compile_error!(\"a C statement body is not an expression operand\") }};").expect("String output");
+        if let Some(guard) = &local_guard {
+            rust.push_str(guard);
         }
         if statement_boundary {
-            writeln!(&mut rust, "(@__pgrx_c_statement; $($raw:tt)*) => {{ $crate::{identifier}!(@__pgrx_c_guard_locals __pgrx_emit_public []; $($raw)*) }};").expect("String output");
-            writeln!(&mut rust, "($($raw:tt)*) => {{ compile_error!(\"this C replacement requires an explicit braced invocation: use @__pgrx_c_statement; before its arguments\") }};\n}}").expect("String output");
-        } else {
-            writeln!(&mut rust, "($($raw:tt)*) => {{ $crate::{identifier}!(@__pgrx_c_guard_locals __pgrx_emit_public []; $($raw)*) }};\n}}").expect("String output");
+            let call = invoke("__pgrx_emit_public", "");
+            writeln!(&mut rust, "(@__pgrx_c_statement; $($raw:tt)*) => {{ {call} }};")
+                .expect("String output");
         }
-        if rust.len() > MAX_EMISSION_BYTES {
-            return Err(skip(
-                analysis,
-                SkipReasonCode::BudgetExceeded,
-                "generated statement macro exceeds the bounded output size",
-                None,
-            ));
-        }
-        return Ok(rust);
-    }
-    for (mode, context) in [
-        ("value", typed::Context::Value),
-        ("place", typed::Context::Place),
-        ("read_place", typed::Context::ReadPlace),
-        ("size", typed::Context::Size),
-        ("discard", typed::Context::Discard),
-    ] {
-        let body = if empty {
-            "compile_error!(\"an empty C macro has no expression operand\")".into()
-        } else if mode == "value" {
-            value.clone()
-        } else {
-            match render_body(session, analysis, bindings, &renderer, context) {
-                Ok(body) => body,
-                Err(reason) => format!("compile_error!({:?})", reason.message),
+        if arguments.is_none() {
+            for mode in
+                if returning { &["public", "return_as"][..] } else { &["public", "discard"][..] }
+            {
+                writeln!(&mut rust, "(@__pgrx_emit_{mode}; $($invalid:tt)*) => {{ compile_error!(\"arguments do not satisfy this C macro's invocation contract\") }};").expect("String output");
             }
-        };
-        writeln!(&mut rust, "(@__pgrx_emit_{mode}; {matcher}) => {{ {body} }};")
+        }
+        if !returning && let Some(message) = boundary_error {
+            writeln!(
+                &mut rust,
+                "(@__pgrx_c_discard; $($raw:tt)*) => {{ compile_error!({message:?}) }};"
+            )
             .expect("String output");
-        let boundary_prefix = if explicit_boundary { "@__pgrx_c_expression; " } else { "" };
-        writeln!(&mut rust, "(@__pgrx_c_{mode}; {boundary_prefix}$($raw:tt)*) => {{ $crate::{}!(@collect __pgrx_emit_{mode} []; $($raw)*) }};", arguments.normalizer).expect("String output");
-    }
-    if explicit_boundary {
-        writeln!(&mut rust, "(@__pgrx_c_expression; $($raw:tt)*) => {{ $crate::{}!(@collect __pgrx_emit_public []; $($raw)*) }};", arguments.normalizer).expect("String output");
-        writeln!(&mut rust, "($($raw:tt)*) => {{ compile_error!(\"this C replacement requires an explicit parenthesized invocation: use @__pgrx_c_expression; before its arguments\") }};\n}}").expect("String output");
+        }
+        writeln!(&mut rust, "(@$mode:ident; $($raw:tt)*) => {{ compile_error!(\"a C statement body is not an expression operand\") }};").expect("String output");
     } else {
-        writeln!(
-            &mut rust,
-            "($($raw:tt)*) => {{ $crate::{}!(@collect __pgrx_emit_public []; $($raw)*) }};\n}}",
-            arguments.normalizer
-        )
-        .expect("String output");
+        for (mode, context) in [
+            ("value", typed::Context::Value),
+            ("place", typed::Context::Place),
+            ("read_place", typed::Context::ReadPlace),
+            ("size", typed::Context::Size),
+            ("discard", typed::Context::Discard),
+        ] {
+            let body = if empty {
+                "compile_error!(\"an empty C macro has no expression operand\")".into()
+            } else if mode == "value" {
+                value.clone()
+            } else {
+                match render_body(session, analysis, bindings, &renderer, context) {
+                    Ok(body) => body,
+                    Err(reason) => format!("compile_error!({:?})", reason.message),
+                }
+            };
+            writeln!(&mut rust, "(@__pgrx_emit_{mode}; {matcher}) => {{ {body} }};")
+                .expect("String output");
+            let boundary_prefix = if explicit_boundary { "@__pgrx_c_expression; " } else { "" };
+            let call = invoke(&format!("__pgrx_emit_{mode}"), "");
+            writeln!(
+                &mut rust,
+                "(@__pgrx_c_{mode}; {boundary_prefix}$($raw:tt)*) => {{ {call} }};"
+            )
+            .expect("String output");
+            if arguments.is_none()
+                && let Some(message) = boundary_error
+            {
+                writeln!(
+                    &mut rust,
+                    "(@__pgrx_c_{mode}; $($raw:tt)*) => {{ compile_error!({message:?}) }};"
+                )
+                .expect("String output");
+            }
+        }
+        if explicit_boundary {
+            let call = invoke("__pgrx_emit_public", "");
+            writeln!(&mut rust, "(@__pgrx_c_expression; $($raw:tt)*) => {{ {call} }};")
+                .expect("String output");
+        }
+        if arguments.is_none() {
+            writeln!(&mut rust, "(@$mode:ident; $($invalid:tt)*) => {{ compile_error!(\"arguments do not satisfy this C macro's invocation contract\") }};").expect("String output");
+        }
     }
+    if let Some(message) = boundary_error {
+        writeln!(&mut rust, "($($raw:tt)*) => {{ compile_error!({message:?}) }};\n}}")
+            .expect("String output");
+    } else if arguments.is_none() {
+        writeln!(&mut rust, "() => {{ $crate::{identifier}!(@__pgrx_emit_public;) }};\n($($invalid:tt)*) => {{ compile_error!(\"arguments do not satisfy this C macro's invocation contract\") }};\n}}").expect("String output");
+    } else {
+        let call = invoke("__pgrx_emit_public", "");
+        writeln!(&mut rust, "($($raw:tt)*) => {{ {call} }};\n}}").expect("String output");
+    }
+    if rust.len() > MAX_EMISSION_BYTES {
+        let message = if statement_body.is_some() {
+            "generated statement macro exceeds the bounded output size"
+        } else {
+            "generated macro exceeds the bounded output size"
+        };
+        return Err(skip(analysis, SkipReasonCode::BudgetExceeded, message, None));
+    }
+    let rust = crate::format_rust_macros(&rust)
+        .map_err(|message| skip(analysis, SkipReasonCode::InvalidExpression, message, None))?;
     if rust.len() > MAX_EMISSION_BYTES {
         return Err(skip(
             analysis,
             SkipReasonCode::BudgetExceeded,
-            "generated macro exceeds the bounded output size",
+            "formatted macro exceeds the bounded output size",
             None,
         ));
     }
@@ -954,6 +972,15 @@ fn render_body(
     }
     match crate::delegation::direct_delegation(session, analysis) {
         Ok(Some(delegation)) if bindings.macros.contains(&delegation.callee) => {
+            if !renderer.preserves_expectations(|| session.analyze(&delegation.callee)) {
+                write_fallback(
+                    &mut rust,
+                    &delegation.callee,
+                    "preserving its call would lose a fixed expectation or retain an overridden nested branch hint",
+                );
+                renderer.render(expression.syntax.root, context, &mut rust)?;
+                return Ok(rust);
+            }
             if let Some(callee) = macro_identifier(&delegation.callee) {
                 let integer_zero = matches!(context, typed::Context::Value)
                     && expression.integer_zero_constants.contains(&expression.syntax.root);
@@ -1289,7 +1316,28 @@ fn write_fallback(rust: &mut String, name: &str, reason: &str) {
     .expect("writing to a String cannot fail");
 }
 
-fn definition_doc(definition: &MacroDefinition) -> Option<String> {
+fn write_doc_comments(rust: &mut String, comment: &str) -> Option<()> {
+    // Prefix every physical line, including those inside retained C block
+    // comments or filenames. Header text must never become Rust source.
+    let bytes =
+        comment.lines().flat_map(|line| line.split('\r')).fold(rust.len(), |bytes, line| {
+            bytes.saturating_add(line.len()).saturating_add(if line.is_empty() { 4 } else { 5 })
+        });
+    if bytes > MAX_EMISSION_BYTES {
+        return None;
+    }
+    for line in comment.lines().flat_map(|line| line.split('\r')) {
+        rust.push_str("///");
+        if !line.is_empty() {
+            rust.push(' ');
+            rust.push_str(line);
+        }
+        rust.push('\n');
+    }
+    Some(())
+}
+
+fn definition_comment(definition: &MacroDefinition) -> Option<String> {
     // Bound normalization before allocating: one retained comment can be much
     // larger than the token count suggests. Display adds at most one separator
     // per token, and omits the repeated name token and line comments.
@@ -1503,11 +1551,34 @@ fn macro_identifier(name: &str) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-    use super::{MAX_EMISSION_BYTES, definition_doc, rust_identifier};
+    use super::{MAX_EMISSION_BYTES, definition_comment, rust_identifier, write_doc_comments};
     use crate::{MacroDefinition, MacroKind, Token, TokenKind};
 
+    #[cfg(unix)]
     #[test]
-    fn documentation_budget_includes_comment_bytes_and_markdown_fences() {
+    fn batch_emission_reports_shared_profile_fingerprint_errors() {
+        use std::os::unix::ffi::OsStringExt;
+        let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let scanner = crate::MacroScanner::new().expect("libclang required");
+        let header = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/emit_scalar.h");
+        let mut frontend = crate::inspect(&scanner, &header, &[], None).unwrap();
+        // A missing tracked input is a valid recorded state, but this spelling
+        // cannot be serialized into the shared profile's JSON fingerprint.
+        let input = std::path::PathBuf::from(std::ffi::OsString::from_vec(vec![0xff]));
+        frontend.profile.inputs.fingerprints.insert(input, None);
+        let session = crate::AnalysisSession::prepare(&scanner, &frontend, &["EMIT_ID"]).unwrap();
+        let error = super::emit_batch_with_bindings(
+            &session,
+            &["EMIT_ID"],
+            &crate::BindingCatalog::default(),
+        )
+        .unwrap_err();
+        assert!(error.contains("cannot fingerprint the C function profile"), "{error}");
+    }
+
+    #[test]
+    fn source_comment_budget_includes_comment_bytes_and_markdown_fences() {
         for comment in [
             format!("/* {} */", "x".repeat(MAX_EMISSION_BYTES)),
             format!("/* {} */", "`".repeat(MAX_EMISSION_BYTES / 2)),
@@ -1532,8 +1603,52 @@ mod tests {
                 builtin: false,
                 main_file: true,
             };
-            assert!(definition_doc(&definition).is_none());
+            assert!(definition_comment(&definition).is_none());
         }
+    }
+
+    #[test]
+    fn doc_comments_cover_every_physical_line_and_cannot_inject_rust_items() {
+        let mut rust = String::new();
+        write_doc_comments(
+            &mut rust,
+            "C macro F from file.h:1\r\npub fn injected() {}\rpub fn also_injected() {}\n\n/* C comment */",
+        )
+        .unwrap();
+        assert!(rust.lines().all(|line| line.starts_with("///")));
+        assert!(rust.contains("/// pub fn injected() {}\n"));
+        assert!(rust.contains("/// pub fn also_injected() {}\n"));
+        rust.push_str("pub const ORIGINAL: () = ();\n");
+        let parsed = syn::parse_file(&rust).unwrap();
+        assert_eq!(parsed.items.len(), 1, "header text cannot introduce Rust items");
+        let syn::Item::Const(item) = &parsed.items[0] else {
+            panic!("doc comments must attach to the original item");
+        };
+        assert_eq!(item.ident, "ORIGINAL");
+        let documentation = item
+            .attrs
+            .iter()
+            .filter_map(|attribute| match &attribute.meta {
+                syn::Meta::NameValue(meta) if meta.path.is_ident("doc") => match &meta.value {
+                    syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(value), .. }) => {
+                        Some(value.value())
+                    }
+                    _ => None,
+                },
+                _ => None,
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
+        assert!(documentation.contains("pub fn injected() {}"));
+        assert!(documentation.contains("pub fn also_injected() {}"));
+    }
+
+    #[test]
+    fn source_comment_budget_includes_per_line_prefixes_without_writing_partial_output() {
+        let mut rust = String::from("existing Rust source\n");
+        let before = rust.clone();
+        assert!(write_doc_comments(&mut rust, &"\n".repeat(MAX_EMISSION_BYTES / 4)).is_none());
+        assert_eq!(rust, before);
     }
 
     #[test]

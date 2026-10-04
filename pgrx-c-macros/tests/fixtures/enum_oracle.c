@@ -41,6 +41,20 @@ int main(void) {
     printf("constantuse\t%lld\n", (long long)ENUM_CONSTANT_USE(2));
     printf("constantzero\t%d\n", ENUM_CONSTANT_ZERO((EnumSmall *)0));
     printf("compare\t%d\n", ENUM_COMPARE(&record, (EnumSmallStorage *)&record.small));
+    EnumSmall values[4];
+    EnumSmall *first = values;
+    EnumSmallStorage *end = (EnumSmallStorage *)(values + 4);
+    printf("orderforward\t%d\n", ENUM_ORDER(first, end));
+    printf("orderreverse\t%d\n", ENUM_ORDER(end, first));
+    printf("orderequal\t%d\n", ENUM_ORDER(first, (EnumSmallStorage *)first));
+    printf("orderqualified\t%d\n", ENUM_ORDER(ENUM_QUALIFIED_POINTER(first + 1), end));
+    printf("differenceforward\t%ld\n", (long)ENUM_DIFFERENCE(end, first));
+    printf("differencereverse\t%ld\n", (long)ENUM_DIFFERENCE(first, end));
+    printf("differencezero\t%ld\n", (long)ENUM_DIFFERENCE(first, (EnumSmallStorage *)first));
+    printf("differencequalified\t%ld\n", (long)ENUM_DIFFERENCE(ENUM_QUALIFIED_POINTER(first + 1), end));
+    unsigned int integer_values[4];
+    printf("storedifference\t%ld\n", (long)ENUM_DIFFERENCE(integer_values + 4, integer_values));
+    printf("storereversedifference\t%ld\n", (long)ENUM_DIFFERENCE(integer_values, integer_values + 4));
     for (unsigned int i = 0; i < 256; ++i) {
         printf("boundary%u\t%llu\n", i, (unsigned long long)ENUM_SET(&record, i));
     }

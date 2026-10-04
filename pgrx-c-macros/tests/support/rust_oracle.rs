@@ -121,6 +121,18 @@ pub fn run_tool(command: &mut Command, phase: &str) -> String {
     run_bounded(command, &directory.0, phase)
 }
 
+/// Require a tool to reject an input under the oracle's process and output bounds.
+#[allow(dead_code)]
+pub fn reject_tool(command: &mut Command, phase: &str) -> String {
+    let directory = TemporaryDirectory::new();
+    let (status, stdout, stderr) = run_process(command, &directory.0, phase);
+    assert!(
+        !status.success(),
+        "Rust oracle {phase} unexpectedly succeeded ({status}):\n{stderr}\n{stdout}"
+    );
+    stderr
+}
+
 fn run_bounded(command: &mut Command, directory: &Path, phase: &str) -> String {
     let (status, stdout, stderr) = run_process(command, directory, phase);
     assert!(status.success(), "Rust oracle {phase} failed ({status}):\n{stderr}\n{stdout}");

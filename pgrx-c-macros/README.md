@@ -157,17 +157,26 @@ object macros remain context.
 `emit` writes Rust source to stdout and skip reasons to stderr. JSON output contains
 the compilation profile, analysis, source, and structured skips. Emitted source
 uses `$crate::__pgrx_c_macros`, provided by `pgrx-pg-sys`, and includes a target guard.
-Each generated macro's documentation includes its source location and full unexpanded
+Each generated macro's `///` doc comments include its source location and full unexpanded
 C definition in a fenced `text` block. As in `list` output, whitespace is normalized
 and line comments are omitted.
 The bindgen build pipeline generates these definitions alongside the bindings.
-Each selected version gets `pgN_macros.rs` and `pgN_macro_report.json` in `OUT_DIR`,
-plus native support source and an archive when the generated adapters require them.
+Each selected version gets a `cmacros/pgN/` module tree and
+`pgN_macro_report.json` in `OUT_DIR`, plus native support source and an archive
+when the generated adapters require them. Header paths determine the Rust files:
+`utils/acl.h`, for example, becomes `cmacros/pgN/utils/acl.rs`. Shared Rust
+support is split into fragments under `__pgrx_c_support/`, included in the same
+module scope to preserve private adapter access. Macro definitions receive
+multiline layout before rustfmt, including repetitions and internal token syntax
+that rustfmt leaves untouched. This preserves literal spellings and source comments
+in both library and CLI output. When available, rustfmt formats
+every generated Rust file, including the documentation snapshots.
 The report records the C profile, input dependencies, emitted source and explicit
 skip reasons, along with independently resolved constants and their Rust binding
-paths. The active version's macros are exported from `pgrx-pg-sys`.
-Setting `PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1` also writes `pgN_macros.rs`
-to `pgrx-pg-sys/src/include`, alongside the shipped bindings and OIDs. These
+paths. The active version's macros are exported from `pgrx-pg-sys` and reexported
+at the `pgrx` crate root, so callers can use `pgrx::TYPEALIGN!(...)`.
+Setting `PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1` also writes the module tree
+to `pgrx-pg-sys/src/include/cmacros/pgN/`, alongside the shipped bindings and OIDs. These
 documentation snapshots include the generated adapters. Their target guards
 remain active outside `docsrs`; normal builds regenerate macros for their own C profile.
 Generate release snapshots on Linux with the matching PostgreSQL bindings. The
@@ -252,7 +261,10 @@ The typed expression support also covers:
   field value. Bitfields, array indices, and indirect member paths are rejected.
 - Direct `__builtin_expect` calls with a compiler-verified `long(long, long)`
   prototype and result identity. Both operands are evaluated and converted as
-  in C; the generated expression returns the first and omits the compiler hint.
+  in C, and the generated expression returns the first unchanged. Fixed expected
+  values use stable Rust's `core::hint::cold_path()` to preserve branch direction;
+  enclosing expectations take precedence over nested hints through groups or casts.
+  Dynamic expectations remain unhinted, with a generated comment explaining why.
 - Closed token pastes resolved by Clang, including literal suffixes and fixed
   type, field, function, enum and helper names. Separate compiler probes reject
   pastes that depend on caller operands and discover synthesized dependencies
@@ -284,6 +296,12 @@ Other statements and initialization constructs, variadic arguments, stringificat
 operand-dependent token pasting, unsupported compiler constructs and unmodeled literals remain
 explicit skips. Parser and type limitations are reported as skips. Referenced
 declarations and the final macro environment must match the inspection.
+An application such as `(T)(x)` is ambiguous when `T` is a macro parameter:
+C callers can supply either a type or a function pointer. Translation requires
+independent type evidence, such as `sizeof(T *)`, or an unambiguous expression
+callee, such as `((callback))(x)`. Otherwise analysis reports a type-parameter
+skip. Bare GNU `_Alignof(T)` does not resolve this ambiguity because Clang also
+accepts expression operands there.
 Compatible function pointer types
 with distinct generated signature markers are conservatively rejected in
 operations that would require a proof relating those signatures.
@@ -414,6 +432,59 @@ the archive into that crate. The C source must include the inspected header.
 These access and ABI primitives support field operations and original functions;
 they do not substitute whole C macro bodies for Rust translation.
 
+Support selection follows the successfully emitted macros. Compiler-established
+record owners restrict field and offset adapters to that record; caller-selected
+offset paths retain its reachable by-value records and anonymous members.
+Caller-selected fields retain type families constrained by the C expression's
+operations and member paths. A finite worklist propagates value categories through
+operators, and indexed declaration queries establish possible field and callback
+types. Known function prototypes and assignment destinations also constrain
+nominal records and pointer compatibility, including qualifiers and nested types.
+Declared member, element, and call results restrict downstream owners even when
+the original caller operand is generic.
+Unknown declaration facts retain conservative support. This selection does not
+depend on sampled invocations or a signature list.
+Callback identity bridges and callable implementations are selected separately.
+Nominal callback identities share null and address operations through physical
+families generated only for the selected ABI and arity pairs, without an arity
+limit. Each identity retains its exact binding storage and distinct C prototype;
+equal Rust function-pointer types do not merge C integer ranks or calling rules.
+Caller-selected native function pointers receive an input bridge only when the
+complete binding catalog proves one validated C identity for their Rust storage.
+Unselected, rejected and missing C witnesses participate in that proof. Ambiguous
+storage retains the tagged `FunctionValue` interface.
+An identity-only callback does not retain adapters for its prototype's nested
+callbacks. Function address references likewise do not retain callable wrappers;
+calls inside unevaluated operands still retain the code Rust needs to type-check.
+Complete C/Rust ABI validation still examines every witness, including aliases
+whose code is not emitted. Ordinary fields share a raw projection implementation;
+each descriptor retains its exact storage, offset and qualification proofs,
+including typed Rust checks for promoted fields and transparent storage wrappers.
+Uncalled projection witnesses share a function-pointer type alias while retaining
+each exact native field type, including wrappers and promoted intermediate
+fields. Rust checks these bodies even when unused, while numeric layout checks
+stay in eager top-level constants.
+The shared field trait derives alignment and access metadata from those verified
+storage types and qualifications, avoiding repeated constants in each adapter.
+One qualifier table combines containing-place access with declared member
+constness, so individual fields only record their declared access.
+Complete native records share sealing, type and input conversions through a
+crate-private registration marker. Actual Rust `Copy` bounds permit native record
+values; non-`Copy` records still support raw pointers and field access. Incomplete
+bindings retain their distinct opaque capability.
+Generic scalar and pointer operands can require whole native type families;
+those bridges remain available. An open native enum operand retains distinct
+Rust enum storage; bindgen's integer aliases already use primitive bridges.
+Named C enum casts, fields, variables, and prototypes retain their nominal enum
+identities separately. Private numeric enum registration fixes each identity's
+exact compatible integer kind; primitive storage conversions and enum/integer
+pointer compatibility share bounded tables without widening that pairing.
+Native Rust enum encoders still check every discriminant.
+Equal storage layout assertions are emitted once after every enum has been
+validated; conflicting compiler facts remain errors.
+Unreferenced identities in the hidden generated support module can disappear
+between builds. Rejected macros retain no exclusive adapter dependencies.
+
 Set `BindingCatalog::ffi_boundary` to the defining crate's PostgreSQL FFI guard
 when generating native adapters that can call PostgreSQL. The pgrx bindgen pipeline
 supplies this path. Standalone callers must establish an equivalent boundary if
@@ -421,7 +492,8 @@ their C functions can perform PostgreSQL nonlocal error jumps or callbacks.
 `emit_support_with_bindings` is only suitable when no native C artifact is needed;
 it returns an error otherwise. `emit_batch_with_bindings` remains available for
 callers managing support separately, and propagates value-mismatch failures
-through the shared dependency graph.
+through the shared dependency graph. It returns an error when shared support
+generation or verification fails.
 `frontend.dependencies()` exposes that graph, its direct and reverse edges,
 and affected callers for auditing.
 

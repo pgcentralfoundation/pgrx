@@ -100,7 +100,7 @@ fn statement_blocks_preserve_c_assignment_conversion_order_and_local_storage() {
         "#![deny(unsafe_op_in_unsafe_fn)]\n#![allow(non_snake_case,non_camel_case_types,dead_code,unused_parens)]\n#[path={support:?}] pub mod __pgrx_c_macros;\n{bindings}\n{}",
         artifact.rust
     );
-    for emission in emit_batch_with_bindings(&session, NAMES, &catalog) {
+    for emission in emit_batch_with_bindings(&session, NAMES, &catalog).unwrap() {
         let EmissionStatus::Emitted { rust: definition, .. } = &emission.status else {
             panic!("statement macro must emit: {emission:?}")
         };

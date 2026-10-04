@@ -54,7 +54,7 @@ pub(crate) fn direct_delegation(
     }
     let callee = session.analyze(callee_name);
     if !matches!(callee.status, AnalysisStatus::Candidate) {
-        return Err(format!("{callee_name} has no supported prepared integer expression"));
+        return Err(format!("{callee_name} has no supported prepared macro body"));
     }
     if callee.name == caller.name
         || callee.dependencies.iter().any(|dependency| dependency.name == caller.name)

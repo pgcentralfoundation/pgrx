@@ -8,3 +8,11 @@ PartialRecord partial_record(int value) {
 }
 PartialRecord partial_identity(PartialRecord value) { return value; }
 int partial_take(PartialRecord value) { return value.first + value.inner.value; }
+static int discard_calls;
+PartialDiscardRecord partial_discard_record(int value) {
+    PartialDiscardRecord result;
+    result.first = value;
+    ++discard_calls;
+    return result;
+}
+int partial_discard_count(void) { return discard_calls; }

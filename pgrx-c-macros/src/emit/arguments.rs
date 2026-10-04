@@ -79,7 +79,10 @@ pub(super) fn matcher(analysis: &MacroAnalysis) -> String {
 }
 
 /// Generate linear stages for this macro's compiler-established parameter list.
-pub(super) fn generate(analysis: &MacroAnalysis) -> Result<ArgumentAdapter, SkipReason> {
+pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapter>, SkipReason> {
+    if analysis.parameters.is_empty() {
+        return Ok(None);
+    }
     if analysis.parameters.len() > MAX_ARGUMENTS {
         return Err(skip(
             analysis,
@@ -113,7 +116,6 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<ArgumentAdapter, Skip
         format!("__pgrx_c_args_{}", identifier.strip_prefix("r#").unwrap_or(&identifier));
     let mut rust = format!(
         "#[doc(hidden)]\n#[macro_export]\nmacro_rules! {normalizer} {{\n\
-         (@collect @$mode:ident [$($done:tt)*]; $($raw:tt)*) => {{ $crate::{normalizer}!(@p0 $mode [$($done)*]; $($raw)*) }};\n\
          (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {{ $crate::{normalizer}!(@p0 $mode [$($done)*]; $($raw)*) }};\n\
          (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {{ $crate::{normalizer}!(@$next $mode [$($done)* $descriptor,]; $($rest)*) }};\n"
     );
@@ -240,12 +242,15 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<ArgumentAdapter, Skip
             None,
         ));
     }
-    Ok(ArgumentAdapter { normalizer, rust })
+    Ok(Some(ArgumentAdapter { normalizer, rust }))
 }
 
 /// One export classifier for the entire generated artifact, rather than one per macro.
 /// Names are the actual Rust exports, including mappings for reserved C identifiers.
 pub(super) fn shared(exports: &BTreeSet<String>) -> Result<String, String> {
+    // Only a complete dereference of a named operand gets the qualifier-aware
+    // descriptor. Borrowing that name cannot drop an owner temporary before the
+    // outer projection; arbitrary expressions keep their original Rust scope.
     let mut rust = format!(
         "#[doc(hidden)]\n#[macro_export]\nmacro_rules! __pgrx_c_classify {{\n\
          (@argument [$callback:ident] $state:tt [$($original:tt)*]) => {{ $crate::__pgrx_c_classify!(@walk [$callback] $state [$($original)*] [{}]; [$($original)*]) }};\n\
@@ -253,6 +258,8 @@ pub(super) fn shared(exports: &BTreeSet<String>) -> Result<String, String> {
          (@walk [$callback:ident] $state:tt $original:tt $budget:tt; [@__pgrx_c_native [$expression:expr]]) => {{ $crate::$callback!(@classified $state (@native [$expression])) }};\n\
          (@walk [$callback:ident] $state:tt $original:tt $budget:tt; [- $argument:literal]) => {{ $crate::$callback!(@classified $state (@literal [- $argument])) }};\n\
          (@walk [$callback:ident] $state:tt [$($original:tt)*] $budget:tt; [- $($negative:tt)*]) => {{ $crate::$callback!(@classified $state (@native [$($original)*])) }};\n\
+         (@walk [$callback:ident] $state:tt [$($original:tt)*] $budget:tt; [* $pointer:ident]) => {{ $crate::$callback!(@classified $state (@deref [$($original)*] [$pointer])) }};\n\
+         (@walk [$callback:ident] $state:tt [$($original:tt)*] $budget:tt; [* ($pointer:ident)]) => {{ $crate::$callback!(@classified $state (@deref [$($original)*] [$pointer])) }};\n\
          (@walk [$callback:ident] $state:tt $original:tt $budget:tt; [$argument:literal]) => {{ $crate::$callback!(@classified $state (@literal [$argument])) }};\n\
          (@walk [$callback:ident] $state:tt $original:tt $budget:tt; [$head:ident $(::$tail:ident)* ! $group:tt]) => {{ $crate::__pgrx_c_classify!(@path [$callback] $state $original [$head $(::$tail)*] $group $budget; $head $(::$tail)*) }};\n\
          (@walk [$callback:ident] $state:tt $original:tt $budget:tt; [::$head:ident $(::$tail:ident)* ! $group:tt]) => {{ $crate::__pgrx_c_classify!(@path [$callback] $state $original [::$head $(::$tail)*] $group $budget; $head $(::$tail)*) }};\n\
@@ -287,6 +294,11 @@ pub(super) fn shared(exports: &BTreeSet<String>) -> Result<String, String> {
          (@read_place; (@native [$expression:expr])) => { $crate::__pgrx_c_macros::expression::native_const_place(::core::ptr::addr_of!($expression)) };\n\
          (@size; (@native [$expression:expr])) => { $crate::__pgrx_c_macros::expression::size_of_value_type(if false { Some(unsafe { $crate::__pgrx_c_macros::expression::input($expression) }) } else { None }) };\n\
          (@discard [$floats:tt]; (@native [$expression:expr])) => { { let _ = $crate::__pgrx_c_macros::expression::profile_input::<$floats, _>($expression); } };\n\
+         (@read_place; (@deref [$($original:tt)*] [$pointer:expr])) => { { use $crate::__pgrx_c_macros::expression::NativeDerefRead as _; (&$pointer).__pgrx_c_read_deref_place() } };\n\
+         (@value [$floats:tt]; (@deref [$($original:tt)*] [$pointer:expr])) => { $crate::__pgrx_c_operand!(@value [$floats]; (@native [$($original)*])) };\n\
+         (@place; (@deref [$($original:tt)*] [$pointer:expr])) => { $crate::__pgrx_c_operand!(@place; (@native [$($original)*])) };\n\
+         (@size; (@deref [$($original:tt)*] [$pointer:expr])) => { $crate::__pgrx_c_operand!(@size; (@native [$($original)*])) };\n\
+         (@discard [$floats:tt]; (@deref [$($original:tt)*] [$pointer:expr])) => { $crate::__pgrx_c_operand!(@discard [$floats]; (@native [$($original)*])) };\n\
          (@value [$floats:tt]; (@literal [$argument:expr])) => { $crate::__pgrx_c_macros::expression::profile_value::<$floats, _>($crate::__pgrx_c_macros::expression::literal::value::<{ let __pgrx_c_literal = $argument; (__pgrx_c_literal as u128) == 0 }, _>($argument)) };\n\
          (@place; (@literal [$argument:expr])) => { compile_error!(\"a C literal is not an object place\") };\n\
          (@read_place; (@literal [$argument:expr])) => { compile_error!(\"a C literal is not an object place\") };\n\

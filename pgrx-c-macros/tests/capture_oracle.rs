@@ -66,7 +66,7 @@ fn caller_scope_identifiers_become_explicit_hygienic_context_arguments() {
         "#![deny(unsafe_op_in_unsafe_fn)]\n#![allow(non_snake_case,non_camel_case_types,dead_code,unused_parens)]\n#[path={support:?}]pub mod __pgrx_c_macros;\n{native}\n{}",
         artifact.rust
     );
-    for emission in emit_batch_with_bindings(&session, &names, &catalog) {
+    for emission in emit_batch_with_bindings(&session, &names, &catalog).unwrap() {
         let captures = emission
             .analysis
             .parameters

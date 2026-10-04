@@ -46,6 +46,7 @@ pub(super) struct Renderer<'a> {
     places: Vec<bool>,
     objects: Vec<Option<TypeInfo>>,
     locals: BTreeMap<String, Local>,
+    expectations: Vec<super::expectation::Decision>,
 }
 
 impl<'a> Renderer<'a> {
@@ -123,8 +124,25 @@ impl<'a> Renderer<'a> {
                 _ => false,
             });
         }
-        let objects = declared_objects(frontend, analysis, lowering, &locals);
-        Self { frontend, analysis, bindings, constants, lowering, floats, places, objects, locals }
+        let objects = declared_objects(
+            frontend,
+            analysis,
+            lowering,
+            &locals.iter().map(|(name, local)| (name.clone(), local.ty.clone())).collect(),
+        );
+        let expectations = super::expectation::plan(frontend, analysis);
+        Self {
+            frontend,
+            analysis,
+            bindings,
+            constants,
+            lowering,
+            floats,
+            places,
+            objects,
+            locals,
+            expectations,
+        }
     }
 
     pub(super) fn declare_local(
@@ -182,6 +200,26 @@ impl<'a> Renderer<'a> {
             rust.push_str("] ");
         }
         rust.push_str("), ");
+    }
+
+    /// Argument substitution can make a callee's dynamic expectation fixed.
+    /// Keep that compiler-owned information when recovering a Rust macro call.
+    pub(super) fn preserves_expectations(&self, callee: impl FnOnce() -> MacroAnalysis) -> bool {
+        use super::expectation::Decision;
+        if self.expectations.is_empty() {
+            return true;
+        }
+        if self.expectations.contains(&Decision::Overridden) {
+            return false;
+        }
+        let callee = super::expectation::plan(self.frontend, &callee());
+        !callee.contains(&Decision::Overridden)
+            && self
+                .expectations
+                .iter()
+                .filter(|decision| matches!(decision, Decision::Static))
+                .count()
+                == callee.iter().filter(|decision| matches!(decision, Decision::Static)).count()
     }
 
     pub(super) fn render(
@@ -313,7 +351,9 @@ impl<'a> Renderer<'a> {
                         }
                         continue;
                     }
-                    if matches!(context, Context::Value) {
+                    if matches!(context, Context::Value)
+                        && !matches!(node.kind, ExpressionKind::Group { .. })
+                    {
                         write!(rust, "{EXPRESSION}::profile_value::<{floats}, _>(")
                             .expect("String output");
                         tasks.push(text(")"));
@@ -680,19 +720,45 @@ impl<'a> Renderer<'a> {
                                             lowering.resolve(&parameters[0]).map_err(failure)?;
                                         let expected_type =
                                             lowering.resolve(&parameters[1]).map_err(failure)?;
-                                        // Clang evaluates both converted operands, including the
-                                        // expected value, before returning the first. The hint has
-                                        // no value effect, but its operand can have side effects.
-                                        write!(rust, "{{ let __pgrx_c_expect_result = {EXPRESSION}::implicit::<{}, _>(", first_type.marker).expect("String output");
-                                        tasks.extend([
-                                            text("); __pgrx_c_expect_result }"),
-                                            value(*expected),
-                                            Task::Text(format!(
-                                                "); let _ = {EXPRESSION}::implicit::<{}, _>(",
-                                                expected_type.marker
-                                            )),
-                                            value(*first),
-                                        ]);
+                                        match self.expectations[index] {
+                                            super::expectation::Decision::Static => {
+                                                write!(rust, "{EXPRESSION}::expect({EXPRESSION}::implicit::<{}, _>(", first_type.marker).expect("String output");
+                                                tasks.extend([
+                                                    text("))"),
+                                                    value(*expected),
+                                                    Task::Text(format!(
+                                                        "), {EXPRESSION}::implicit::<{}, _>(",
+                                                        expected_type.marker
+                                                    )),
+                                                    value(*first),
+                                                ]);
+                                            }
+                                            decision => {
+                                                let reason = match decision {
+                                                    super::expectation::Decision::Dynamic => {
+                                                        "its expected value is not established as a compile-time constant"
+                                                    }
+                                                    super::expectation::Decision::Overridden => {
+                                                        "an enclosing expectation takes precedence through grouping or casts"
+                                                    }
+                                                    super::expectation::Decision::Static => {
+                                                        unreachable!(
+                                                            "static expectations use the hinted helper"
+                                                        )
+                                                    }
+                                                };
+                                                write!(rust, "/* PGRX: __builtin_expect retains both operand evaluations without a branch hint because {reason}. */ {{ let __pgrx_c_expect_result = {EXPRESSION}::implicit::<{}, _>(", first_type.marker).expect("String output");
+                                                tasks.extend([
+                                                    text("); __pgrx_c_expect_result }"),
+                                                    value(*expected),
+                                                    Task::Text(format!(
+                                                        "); let _ = {EXPRESSION}::implicit::<{}, _>(",
+                                                        expected_type.marker
+                                                    )),
+                                                    value(*first),
+                                                ]);
+                                            }
+                                        }
                                     }
                                 }
                                 continue;
@@ -940,11 +1006,11 @@ fn volatile_record(ty: &TypeInfo) -> bool {
 /// place/qualifier rules. Unknown caller-supplied type families stay unknown.
 /// Children precede parents, so explicit volatile aggregate accesses can be
 /// rejected once without recursively rescanning each expression subtree.
-fn declared_objects(
+pub(super) fn declared_objects(
     frontend: &FrontendOutput,
     analysis: &MacroAnalysis,
     lowering: &Lowering<'_>,
-    locals: &BTreeMap<String, Local>,
+    locals: &BTreeMap<String, TypeInfo>,
 ) -> Vec<Option<TypeInfo>> {
     let declarations = frontend.declarations();
     let mut objects: Vec<Option<TypeInfo>> = Vec::new();
@@ -957,10 +1023,9 @@ fn declared_objects(
                 declarations,
                 &frontend.profile().target,
             ),
-            ExpressionKind::Identifier { name } => locals
-                .get(name)
-                .map(|local| local.ty.clone())
-                .or_else(|| declarations.variables.get(name).cloned()),
+            ExpressionKind::Identifier { name } => {
+                locals.get(name).cloned().or_else(|| declarations.variables.get(name).cloned())
+            }
             ExpressionKind::Dereference { operand } => objects[*operand]
                 .as_ref()
                 .and_then(|pointer| lowering.pointer_pointee(pointer).ok()),
@@ -988,22 +1053,25 @@ fn declared_objects(
                     is_volatile: false,
                 })
             }
-            ExpressionKind::Index { base, .. } => objects[*base].as_ref().and_then(|base| {
-                if base.category == TypeCategory::Pointer {
-                    lowering.pointer_pointee(base).ok()
-                } else if let Some(crate::TypeShape {
-                    kind: TypeShapeKind::Array { element, .. },
-                    ..
-                }) = declarations.type_shapes.get(&base.canonical_spelling)
-                {
-                    let mut element = element.clone();
-                    element.is_const |= base.is_const;
-                    element.is_volatile |= base.is_volatile;
-                    Some(element)
-                } else {
-                    None
-                }
-            }),
+            ExpressionKind::Index { base, index: offset } => [*base, *offset]
+                .into_iter()
+                .filter_map(|operand| objects[operand].as_ref())
+                .find_map(|base| {
+                    if base.category == TypeCategory::Pointer {
+                        lowering.pointer_pointee(base).ok()
+                    } else if let Some(crate::TypeShape {
+                        kind: TypeShapeKind::Array { element, .. },
+                        ..
+                    }) = declarations.type_shapes.get(&base.canonical_spelling)
+                    {
+                        let mut element = element.clone();
+                        element.is_const |= base.is_const;
+                        element.is_volatile |= base.is_volatile;
+                        Some(element)
+                    } else {
+                        None
+                    }
+                }),
             ExpressionKind::Member { base, field, field_parameter: None, indirect } => {
                 objects[*base].as_ref().and_then(|base| {
                     let parent =
@@ -1088,7 +1156,7 @@ fn declared_common_object(
     Some(result)
 }
 
-fn declared_field(
+pub(super) fn declared_field(
     declarations: &crate::DeclarationCatalog,
     canonical: &str,
     name: &str,

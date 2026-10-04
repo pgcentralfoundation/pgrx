@@ -37,6 +37,9 @@ const NAMES: &[&str] = &[
     "CALLBACK_GLOBAL",
     "CALLBACK_MEMBER",
     "CALLBACK_WRITE_MEMBER",
+    "CALLBACK_LONG_MEMBER",
+    "CALLBACK_WIDE_MEMBER",
+    "CALLBACK_EQUAL",
     "CALLBACK_LAZY",
     "CALLBACK_GET",
     "CALLBACK_GET_CALL",
@@ -111,15 +114,23 @@ fn generated_callback_signatures_preserve_native_types_calls_and_guards() {
         TypeCategory::Integer(IntegerKind::UnsignedInt)
     );
     catalog.integer_storage.insert("CallbackOid".into(), IntegerKind::UnsignedInt);
+    if frontend.profile().target.integers[&IntegerKind::Long].bits
+        == frontend.profile().target.integers[&IntegerKind::LongLong].bits
+    {
+        assert_eq!(
+            catalog.types["CallbackLong"].target, catalog.types["CallbackLongLong"].target,
+            "equal Rust callback storage still needs distinct C rank identities"
+        );
+    }
     catalog.ffi_boundary = Some(vec!["ffi".into(), "boundary".into()]);
     let artifact = emit_support_artifact_with_bindings(&session, NAMES, &catalog)
         .expect("derive callback adapters");
     assert!(artifact.c_source.contains("__pgrx_function_address_"));
     assert!(!artifact.c_source.contains("CALLBACK_"), "adapters must never forward C macros");
-    assert!(artifact.rust.contains("::FunctionSignature for Signature_"));
+    assert!(artifact.rust.contains("::NativeFunctionSignature for Signature_"));
     assert!(artifact.rust.contains("::Call<"));
     assert!(artifact.rust.contains("boundary(move || function("));
-    for emission in emit_batch_with_bindings(&session, &rejected, &catalog) {
+    for emission in emit_batch_with_bindings(&session, &rejected, &catalog).unwrap() {
         assert!(
             matches!(emission.status, EmissionStatus::Skipped { .. }),
             "unproven callback must be skipped: {emission:?}"
@@ -134,7 +145,7 @@ fn generated_callback_signatures_preserve_native_types_calls_and_guards() {
         oid_storage(),
         artifact.rust
     );
-    for emission in emit_batch_with_bindings(&session, NAMES, &catalog) {
+    for emission in emit_batch_with_bindings(&session, NAMES, &catalog).unwrap() {
         let EmissionStatus::Emitted { rust: definition, .. } = emission.status else {
             panic!("callback macro {} must emit: {emission:?}", emission.analysis.name)
         };
@@ -191,6 +202,13 @@ fn generated_callback_signatures_preserve_native_types_calls_and_guards() {
                 "void fixture(void){struct CallbackTable*p=callback_table();int x=17;(void)CALLBACK_STATE(p,&x);}",
             ),
         ),
+        (
+            "different_c_ranks",
+            "unsafe{let p=callback_table();let _=CALLBACK_EQUAL!(CALLBACK_LONG_MEMBER!(p),CALLBACK_WIDE_MEMBER!(p));}",
+            Some(
+                "void fixture(void){struct CallbackTable*p=callback_table();(void)CALLBACK_EQUAL(CALLBACK_LONG_MEMBER(p),CALLBACK_WIDE_MEMBER(p));}",
+            ),
+        ),
     ] {
         let diagnostic = rust_oracle::reject_rust(&format!("{rust}\n{guard}\nfn main(){{{body}}}"));
         assert!(
@@ -230,9 +248,9 @@ fn generated_callback_signatures_preserve_native_types_calls_and_guards() {
     let names = ["CALLBACK_INT", "CALLBACK_GET_ADDRESS"];
     let artifact = emit_support_artifact_with_bindings(&session, &names, &safe_catalog)
         .expect("safe pointer witnesses are rejected locally");
-    assert!(!artifact.rust.contains("::FunctionSignature for Signature_"));
+    assert!(!artifact.rust.contains("::NativeFunctionSignature for Signature_"));
     assert!(!artifact.c_source.contains("__pgrx_function_address_"));
-    for emission in emit_batch_with_bindings(&session, &names, &safe_catalog) {
+    for emission in emit_batch_with_bindings(&session, &names, &safe_catalog).unwrap() {
         assert!(
             matches!(emission.status, EmissionStatus::Skipped { .. }),
             "an unchecked safe native target must have no generated call/address capability: {emission:?}"

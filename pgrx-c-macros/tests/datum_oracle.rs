@@ -81,7 +81,7 @@ pub unsafe fn palloc(_: usize) -> *mut core::ffi::c_void {{ panic!(\"the LP64 or
     );
     rust.push_str(&pg_sys_integer_bridges(&frontend).unwrap());
     rust.push_str(&emit_support_with_bindings(&session, &names, &catalog).unwrap());
-    for emission in emit_batch_with_bindings(&session, &names, &catalog) {
+    for emission in emit_batch_with_bindings(&session, &names, &catalog).unwrap() {
         let EmissionStatus::Emitted { rust: definition, .. } = emission.status else {
             panic!("{}: {:?}", emission.analysis.name, emission.status);
         };

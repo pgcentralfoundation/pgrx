@@ -136,7 +136,7 @@ fn generate_with_arguments(names: &[&str], extra_arguments: &[&str]) -> Generate
         "#![deny(unsafe_op_in_unsafe_fn)]\n#![allow(non_snake_case,non_camel_case_types,dead_code,unused_parens,unreachable_code)]\n#[path={support:?}] pub mod __pgrx_c_macros;\n{bindings}\n{}",
         artifact.rust
     );
-    for emission in emit_batch_with_bindings(&session, names, &catalog) {
+    for emission in emit_batch_with_bindings(&session, names, &catalog).unwrap() {
         let EmissionStatus::Emitted { rust: definition, .. } = &emission.status else {
             panic!("conditional macro must emit: {emission:?}")
         };

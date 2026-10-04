@@ -6,14 +6,133 @@
 
 use super::types::{Lowering, rust_path};
 use crate::{
-    ArrayKind, BindingCatalog, DeclarationCatalog, FieldBinding, FieldInfo, RecordBinding,
-    RustBindingType, TargetFacts, TypeCategory, TypeInfo, TypeShapeKind,
+    ArrayKind, BindingCatalog, DeclarationCatalog, FieldBinding, FieldInfo, TargetFacts,
+    TypeCategory, TypeInfo, TypeShapeKind,
 };
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use std::fmt::Write;
 
-const EXPRESSION: &str = "crate::__pgrx_c_macros::expression";
+const EXPRESSION: &str = "c::expression";
 const MAX_ADAPTER_BYTES: usize = 16 * 1024 * 1024;
+
+#[derive(Clone, Default, PartialEq, Eq)]
+struct RequestedFields {
+    names: BTreeSet<String>,
+    all: bool,
+}
+
+impl RequestedFields {
+    fn contains(&self, name: &str) -> bool {
+        self.all || self.names.contains(name)
+    }
+
+    fn extend(&mut self, other: &Self) {
+        self.all |= other.all;
+        self.names.extend(other.names.iter().cloned());
+    }
+}
+
+/// A concrete owner is a compiler record spelling; None retains capabilities
+/// for a caller whose record identity cannot be established by the planner.
+#[derive(Default, PartialEq, Eq)]
+pub(super) struct FieldRequests {
+    fields: BTreeMap<Option<String>, RequestedFields>,
+    offsets: BTreeMap<Option<String>, RequestedFields>,
+}
+
+impl FieldRequests {
+    pub(super) fn field(&mut self, record: Option<&str>, name: Option<&str>) {
+        Self::insert(&mut self.fields, record, name);
+    }
+
+    pub(super) fn offset(&mut self, record: Option<&str>, name: Option<&str>) {
+        Self::insert(&mut self.offsets, record, name);
+    }
+
+    pub(super) fn required_types(&self, declarations: &DeclarationCatalog) -> Vec<TypeInfo> {
+        let mut types = Vec::new();
+        for (owner, request) in selected_records(&self.fields, declarations, false) {
+            let mut pending = VecDeque::from([(owner.as_str(), 0)]);
+            let mut seen = BTreeSet::new();
+            while let Some((canonical, depth)) = pending.pop_front() {
+                if depth > 64 || !seen.insert(canonical) {
+                    continue;
+                }
+                let Some(record) = declarations.records.get(canonical) else { continue };
+                for field in &record.fields {
+                    if field.name.as_ref().is_some_and(|name| request.contains(name)) {
+                        types.push(field.ty.clone());
+                    } else if field.name.is_none() && field.ty.category == TypeCategory::Record {
+                        pending.push_back((&field.ty.canonical_spelling, depth + 1));
+                    }
+                }
+            }
+        }
+        types
+    }
+
+    fn insert(
+        requests: &mut BTreeMap<Option<String>, RequestedFields>,
+        record: Option<&str>,
+        name: Option<&str>,
+    ) {
+        let request = requests.entry(record.map(str::to_owned)).or_default();
+        if let Some(name) = name {
+            request.names.insert(name.to_owned());
+        } else {
+            request.all = true;
+        }
+    }
+}
+
+fn selected_records(
+    requests: &BTreeMap<Option<String>, RequestedFields>,
+    declarations: &DeclarationCatalog,
+    nested_offsets: bool,
+) -> BTreeMap<String, RequestedFields> {
+    let mut identities = BTreeMap::<&str, RequestedFields>::new();
+    let mut pending = VecDeque::new();
+    for (owner, request) in requests {
+        let Some(owner) = owner else { continue };
+        let Some(record) = declarations.records.get(owner) else { continue };
+        identities.entry(&record.identity).or_default().extend(request);
+        if nested_offsets && request.all {
+            pending.push_back((owner.as_str(), 0));
+        }
+    }
+    // A caller-provided offsetof designator may continue through named records,
+    // unions, or anonymous promotions, but never through a pointer or array.
+    // Breadth-first traversal visits each record once at its shallowest depth.
+    let mut seen = BTreeSet::new();
+    while let Some((canonical, depth)) = pending.pop_front() {
+        if depth >= 64 || !seen.insert(canonical) {
+            continue;
+        }
+        let Some(record) = declarations.records.get(canonical) else { continue };
+        for field in &record.fields {
+            if field.ty.category != TypeCategory::Record {
+                continue;
+            }
+            let Some(child) = declarations.records.get(&field.ty.canonical_spelling) else {
+                continue;
+            };
+            identities.entry(&child.identity).or_default().all = true;
+            pending.push_back((&field.ty.canonical_spelling, depth + 1));
+        }
+    }
+    let wildcard = requests.get(&None).cloned().unwrap_or_default();
+    declarations
+        .records
+        .iter()
+        .filter_map(|(canonical, record)| {
+            let mut request = wildcard.clone();
+            if let Some(specific) = identities.get(record.identity.as_str()) {
+                request.extend(specific);
+            }
+            (request.all || !request.names.is_empty()).then_some((canonical.clone(), request))
+        })
+        .collect()
+}
 
 pub(super) struct FieldAdapters {
     /// Items included once in the defining crate's `__pgrx_c_generated` module.
@@ -30,25 +149,46 @@ pub(super) struct FieldAdapters {
     pub offset_unsupported: BTreeMap<String, String>,
 }
 
-/// Field names can coincide with Rust keywords or generated identifiers. Encoding
-/// all bytes keeps capability names independent of those language namespaces.
-pub(super) fn marker_name(field: &str) -> String {
-    let mut marker = String::from("Field_");
-    for byte in field.bytes() {
-        write!(marker, "{byte:02x}").expect("writing a field marker to String cannot fail");
+/// IDs depend on the complete immutable C catalog, so changing requested roots
+/// or removing rejected macros cannot change an already emitted field identity.
+struct FieldIds<'a> {
+    names: BTreeMap<&'a str, u64>,
+}
+
+impl<'a> FieldIds<'a> {
+    fn new(declarations: &'a DeclarationCatalog) -> Result<Self, String> {
+        let mut names = BTreeMap::new();
+        for record in declarations.records.values() {
+            for field in &record.fields {
+                if let Some(name) = &field.name {
+                    names.entry(name.as_str()).or_insert(0);
+                }
+            }
+        }
+        for (position, id) in names.values_mut().enumerate() {
+            *id = u64::try_from(position)
+                .map_err(|_| "C field identity registry exceeds u64 representation")?;
+        }
+        Ok(Self { names })
     }
-    marker
+
+    fn marker(&self, name: &str) -> Result<String, String> {
+        let id = self.names.get(name).ok_or_else(|| {
+            format!("C field `{name}` has no immutable declaration-catalog identity")
+        })?;
+        Ok(format!("Field{id}"))
+    }
 }
 
 pub(super) fn generate(
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,
-    used_fields: &BTreeSet<String>,
-    used_offsets: &BTreeSet<String>,
+    requests: &FieldRequests,
     target: &TargetFacts,
     required_types: &[TypeInfo],
 ) -> Result<FieldAdapters, String> {
-    let lowering = Lowering::new(declarations, bindings, target);
+    let field_ids = FieldIds::new(declarations)?;
+    let lowering = Lowering::new_native(declarations, bindings, target);
     let records_by_path = bindings
         .records
         .values()
@@ -66,24 +206,25 @@ pub(super) fn generate(
     };
     let mut layout_checks = LayoutChecks::default();
     let mut record_bridges = BTreeSet::new();
+    let mut qualifiers_imported = false;
     let mut projections = BTreeMap::<(String, String), Option<OffsetIdentity>>::new();
     let mut pending_records = required_types.to_vec();
-    let combined_names;
-    let used_names = if used_offsets.is_empty() {
-        used_fields
-    } else if used_fields.is_empty() {
-        used_offsets
-    } else {
-        combined_names = used_fields.union(used_offsets).cloned().collect();
-        &combined_names
-    };
+    let field_records = selected_records(&requests.fields, declarations, false);
+    let offset_records = selected_records(&requests.offsets, declarations, true);
     for (canonical, record) in &declarations.records {
+        let used_fields = field_records.get(canonical).cloned().unwrap_or_default();
+        let used_offsets = offset_records.get(canonical).cloned().unwrap_or_default();
+        let mut used_names = used_fields.clone();
+        used_names.extend(&used_offsets);
+        if !used_names.all && used_names.names.is_empty() {
+            continue;
+        }
         let mut used = Vec::new();
         collect_projections(
             canonical,
             declarations,
             &lowering,
-            used_names,
+            &used_names,
             &mut Vec::new(),
             &mut used,
             0,
@@ -141,13 +282,12 @@ pub(super) fn generate(
                             );
                             continue;
                         }
-                        let field_marker = register_marker(&mut output, name);
+                        let field_marker = register_marker(&mut output, &field_ids, name)?;
                         if record_bridges.insert(storage.clone()) {
                             record_bridge(
                                 &mut output.rust,
                                 &mut layout_checks,
                                 &storage,
-                                binding,
                                 record.size,
                                 record.alignment,
                             );
@@ -186,7 +326,7 @@ pub(super) fn generate(
                     return Err("generated field adapters exceed the 16 MiB source budget".into());
                 }
             }
-            if !first_projection || !used_fields.contains(name) {
+            if !used_fields.contains(name) {
                 continue;
             }
             if field.bit_width.is_some() {
@@ -197,23 +337,29 @@ pub(super) fn generate(
                     );
                     continue;
                 }
+                let field_marker = field_ids.marker(name)?;
                 match super::bitfields::generate(
                     canonical,
                     field,
                     binding,
-                    &storage,
+                    &field_marker,
                     declarations,
                     bindings,
                     &lowering,
                 ) {
                     Ok(adapter) => {
-                        register_marker(&mut output, name);
+                        if let Some((size, alignment)) = record.size.zip(record.alignment) {
+                            layout_checks.object(&mut output.rust, &storage, size, alignment);
+                        }
+                        if !first_projection {
+                            continue;
+                        }
+                        register_marker(&mut output, &field_ids, name)?;
                         if record_bridges.insert(storage.clone()) {
                             record_bridge(
                                 &mut output.rust,
                                 &mut layout_checks,
                                 &storage,
-                                binding,
                                 record.size,
                                 record.alignment,
                             );
@@ -234,32 +380,33 @@ pub(super) fn generate(
             }
             let validated =
                 validate_projection(&projection, record.alignment, &lowering, declarations);
-            let (mut marker, unaligned, field_alignment, projected_storage, flexible) =
-                match validated {
-                    Ok(projection) => projection,
-                    Err(reason) => {
-                        output.unsupported.insert(key, reason);
-                        continue;
-                    }
-                };
-            let field_marker = register_marker(&mut output, name);
+            let ValidatedProjection {
+                mut marker,
+                alignment: field_alignment,
+                storage: projected_storage,
+                flexible,
+                offset,
+            } = match validated {
+                Ok(projection) => projection,
+                Err(reason) => {
+                    output.unsupported.insert(key, reason);
+                    continue;
+                }
+            };
+            let field_marker = register_marker(&mut output, &field_ids, name)?;
+            if let Some((size, alignment)) = record.size.zip(record.alignment) {
+                layout_checks.object(&mut output.rust, &storage, size, alignment);
+            }
             if record_bridges.insert(storage.clone()) {
                 record_bridge(
                     &mut output.rust,
                     &mut layout_checks,
                     &storage,
-                    binding,
                     record.size,
                     record.alignment,
                 );
             }
-            let mut addresses = String::new();
-            let mut previous = "base.pointer().as_mut_address()".to_owned();
-            for (index, step) in projection.steps.iter().enumerate() {
-                let step_storage = lowering
-                    .resolve_with_storage(&step.field.ty, &step.binding.ty)?
-                    .storage
-                    .replace("$crate", "crate");
+            for step in &projection.steps {
                 let parent_storage = lowering
                     .resolve(&declarations.type_shapes[step.canonical].ty)?
                     .storage
@@ -273,16 +420,9 @@ pub(super) fn generate(
                     layout_checks.object(&mut output.rust, &parent_storage, size, alignment);
                 }
                 layout_checks.field(&mut output.rust, &parent_storage, rust_field, offset);
-                let address = format!("address{index}");
-                let cast = if matches!(step.binding.ty, RustBindingType::ManuallyDrop { .. }) {
-                    format!(".cast::<{step_storage}>()")
-                } else {
-                    String::new()
-                };
-                writeln!(addresses, "let {address} = unsafe {{ ::core::ptr::addr_of_mut!((*{previous}).{rust_field}) }}{cast};").expect("String output");
+                let actual = lowering.storage_type(&step.binding.ty, 0)?.replace("$crate", "crate");
+                layout_checks.projection(&mut output.rust, &parent_storage, rust_field, &actual);
                 if let Some(size) = step.field.ty.size {
-                    let actual =
-                        lowering.storage_type(&step.binding.ty, 0)?.replace("$crate", "crate");
                     layout_checks.object(
                         &mut output.rust,
                         &actual,
@@ -293,32 +433,39 @@ pub(super) fn generate(
                             .ok_or("projected field has no compiler alignment")?,
                     );
                 }
-                previous = address;
             }
             if flexible {
                 layout_checks.object(&mut output.rust, &projected_storage, 0, field_alignment);
             }
+            if !first_projection {
+                continue;
+            }
             let qualification = if projection.steps.iter().any(|step| step.field.ty.is_const) {
-                format!("{EXPRESSION}::ReadOnly")
+                "FieldReadOnly"
             } else {
-                "Q".into()
+                "FieldReadWrite"
             };
             let volatile = projection.steps.iter().any(|step| step.field.ty.is_volatile);
             if volatile && !field.ty.is_volatile {
                 marker = format!("{EXPRESSION}::CVolatile<{marker}>");
             }
-            let inherited_alignment =
-                if field_alignment == 1 { "false" } else { "base.access().unaligned" };
+            // Shared access metadata derives from the storage and qualifiers
+            // proved above, including the flexible-array wrapper's alignment.
+            if !qualifiers_imported {
+                writeln!(
+                    output.rust,
+                    "use {EXPRESSION}::{{ReadOnly as FieldReadOnly, ReadWrite as FieldReadWrite}};"
+                )
+                .expect("String output");
+                qualifiers_imported = true;
+            }
             writeln!(output.rust,
                 "// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.\n\
-                 unsafe impl<Q: {EXPRESSION}::Qualifier> {EXPRESSION}::Field<{field_marker}, Q> for {EXPRESSION}::CRecord<{storage}> {{\n\
-                   type Output = {EXPRESSION}::Place<{marker}, {qualification}>;\n\
-                   unsafe fn project(base: {EXPRESSION}::Place<Self, Q>) -> Self::Output {{\n\
-                     // SAFETY: The caller establishes in-bounds projection; no containing record is loaded and no reference is created.\n\
-                     {addresses}\n\
-                     {EXPRESSION}::Place::new(<{qualification} as {EXPRESSION}::Qualifier>::from_mut({previous}), {EXPRESSION}::Access {{ volatile: base.access().volatile || {}, unaligned: {inherited_alignment} || {unaligned} }})\n\
-                   }}\n\
-                 }}", volatile).expect("String output");
+                 unsafe impl {EXPRESSION}::OrdinaryField<{field_marker}> for {EXPRESSION}::CRecord<{storage}> {{\n\
+                   type Member = {marker};\n\
+                   type Declared = {qualification};\n\
+                   const OFFSET: usize = {offset};\n\
+                 }}").expect("String output");
             pending_records.push(field.ty.clone());
             if output.rust.len() > MAX_ADAPTER_BYTES {
                 return Err("generated field adapters exceed the 16 MiB source budget".into());
@@ -346,7 +493,9 @@ pub(super) fn generate(
             let Ok(lowered) = lowering.resolve(&ty) else { continue };
             let storage = lowered.storage.replace("$crate", "crate");
             if record_bridges.insert(storage.clone()) {
-                let Some(binding) = records_by_path.get(&storage).copied() else { continue };
+                if !records_by_path.contains_key(&storage) {
+                    continue;
+                }
                 let Some(record) = declarations.records.get(&ty.canonical_spelling) else {
                     continue;
                 };
@@ -354,7 +503,6 @@ pub(super) fn generate(
                     &mut output.rust,
                     &mut layout_checks,
                     &storage,
-                    binding,
                     record.size,
                     record.alignment,
                 );
@@ -407,6 +555,8 @@ struct OffsetLayout {
 struct LayoutChecks {
     objects: BTreeSet<(String, u64, u64)>,
     fields: BTreeSet<(String, String, u64)>,
+    projections: BTreeSet<(String, String, String)>,
+    projection_imported: bool,
 }
 
 impl LayoutChecks {
@@ -425,18 +575,33 @@ impl LayoutChecks {
             .expect("String output");
         }
     }
+
+    fn projection(&mut self, rust: &mut String, parent: &str, field: &str, storage: &str) {
+        if self.projections.insert((parent.to_owned(), field.to_owned(), storage.to_owned())) {
+            if !self.projection_imported {
+                writeln!(rust, "use {EXPRESSION}::FieldProjection as Projection;")
+                    .expect("String output");
+                self.projection_imported = true;
+            }
+            writeln!(rust, "// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.\nconst _: Projection<{parent}, {storage}> = |base| unsafe {{ ::core::ptr::addr_of_mut!((*base).{field}) }};").expect("String output");
+        }
+    }
 }
 
-fn register_marker(output: &mut FieldAdapters, name: &str) -> String {
-    let marker = marker_name(name);
-    if output
-        .markers
-        .insert(name.to_owned(), format!("$crate::__pgrx_c_generated::{marker}"))
-        .is_none()
+fn register_marker(
+    output: &mut FieldAdapters,
+    ids: &FieldIds<'_>,
+    name: &str,
+) -> Result<String, String> {
+    let marker = ids.marker(name)?;
+    if let std::collections::btree_map::Entry::Vacant(entry) = output.markers.entry(name.to_owned())
     {
+        // Distinct local markers retain separate nominal trait identities and
+        // the locality required by the generated field capability implementations.
+        entry.insert(format!("$crate::__pgrx_c_generated::{marker}"));
         writeln!(output.rust, "#[doc(hidden)] pub struct {marker};").expect("String output");
     }
-    marker
+    Ok(marker)
 }
 
 /// Offsets require the containing layout and actual field path, not a loadable
@@ -529,7 +694,7 @@ fn collect_projections<'a>(
     canonical: &'a str,
     declarations: &'a DeclarationCatalog,
     lowering: &Lowering<'a>,
-    used: &BTreeSet<String>,
+    used: &RequestedFields,
     prefix: &mut Vec<ProjectionStep<'a>>,
     output: &mut Vec<Projection<'a>>,
     depth: usize,
@@ -576,12 +741,20 @@ fn collect_projections<'a>(
     }
 }
 
+struct ValidatedProjection {
+    marker: String,
+    alignment: u64,
+    storage: String,
+    flexible: bool,
+    offset: u64,
+}
+
 fn validate_projection(
     projection: &Projection<'_>,
     record_alignment: Option<u64>,
     lowering: &Lowering<'_>,
     declarations: &DeclarationCatalog,
-) -> Result<(String, bool, u64, String, bool), String> {
+) -> Result<ValidatedProjection, String> {
     if projection.steps.is_empty() {
         return Err("field has no extractable compiler-anchored Rust projection path".into());
     }
@@ -626,59 +799,153 @@ fn validate_projection(
         return Err("unaligned volatile field access has no verified runtime implementation".into());
     }
     let lowered = lowering.resolve_with_storage(&field.ty, &final_step.binding.ty)?;
-    Ok((
-        lowered.marker.replace("$crate", "crate"),
-        unaligned,
+    Ok(ValidatedProjection {
+        marker: lowered.marker.replace("$crate", "crate"),
         alignment,
-        lowered.storage.replace("$crate", "crate"),
+        storage: lowered.storage.replace("$crate", "crate"),
         flexible,
-    ))
+        offset,
+    })
 }
 
 fn record_bridge(
     rust: &mut String,
     checks: &mut LayoutChecks,
     storage: &str,
-    binding: &RecordBinding,
     size: Option<u64>,
     alignment: Option<u64>,
 ) {
     if size.is_none() || alignment.is_none() {
-        writeln!(rust, "impl crate::__pgrx_c_macros::sealed::Sealed for {storage} {{}}\nimpl {EXPRESSION}::NativeType for {storage} {{ type Marker = {EXPRESSION}::COpaque<Self>; }}").expect("String output");
+        writeln!(rust, "impl c::sealed::Sealed for {storage} {{}}\nimpl {EXPRESSION}::NativeType for {storage} {{ type Marker = {EXPRESSION}::COpaque<Self>; }}").expect("String output");
         return;
     }
     let size = size.expect("complete record size");
     let alignment = alignment.expect("complete record alignment");
     checks.object(rust, storage, size, alignment);
-    writeln!(rust,
-        "impl crate::__pgrx_c_macros::sealed::Sealed for {storage} {{}}\n\
-         impl {EXPRESSION}::NativeType for {storage} {{ type Marker = {EXPRESSION}::CRecord<Self>; }}").expect("String output");
-    if binding.copy {
-        writeln!(
-            rust,
-            "impl {EXPRESSION}::IntoExpression for {storage} {{\n\
-               type Value = {EXPRESSION}::RecordValue<Self>;\n\
-               fn into_expression(self) -> Self::Value {{ {EXPRESSION}::RecordValue::new(self) }}\n\
-             }}"
-        )
-        .expect("String output");
-    }
+    writeln!(rust, "impl {EXPRESSION}::NativeRecord for {storage} {{}}").expect("String output");
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{FieldBinding, MacroScanner, RecordKind, RustBindingType, inspect};
+    use crate::SCANNER_LOCK;
+    use crate::{FieldBinding, MacroScanner, RecordBinding, RecordKind, RustBindingType, inspect};
     use std::path::PathBuf;
-    use std::sync::Mutex;
-
-    static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
     mod oracle {
         include!(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/support/oracle.rs"));
     }
     mod rust_oracle {
         include!(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/support/rust_oracle.rs"));
+    }
+
+    fn registry_catalog(records: &[(&str, &[&str])]) -> DeclarationCatalog {
+        let mut catalog = DeclarationCatalog::default();
+        for (record, names) in records {
+            catalog.records.insert(
+                (*record).into(),
+                crate::RecordInfo {
+                    identity: (*record).into(),
+                    name: Some((*record).into()),
+                    kind: RecordKind::Struct,
+                    fields: names
+                        .iter()
+                        .map(|name| FieldInfo {
+                            name: Some((*name).into()),
+                            ty: TypeInfo {
+                                spelling: "unsupported".into(),
+                                canonical_spelling: "unsupported".into(),
+                                category: TypeCategory::Other,
+                                size: None,
+                                alignment: None,
+                                is_const: false,
+                                is_volatile: false,
+                            },
+                            offset_bits: None,
+                            bit_width: None,
+                            is_anonymous: false,
+                        })
+                        .collect(),
+                    size: None,
+                    alignment: None,
+                    is_anonymous: false,
+                },
+            );
+        }
+        catalog
+    }
+
+    fn empty_adapters() -> FieldAdapters {
+        FieldAdapters {
+            rust: String::new(),
+            c_source: String::new(),
+            markers: BTreeMap::new(),
+            unsupported: BTreeMap::new(),
+            offsets: BTreeMap::new(),
+            offset_unsupported: BTreeMap::new(),
+        }
+    }
+
+    fn local_marker<'a>(adapters: &'a FieldAdapters, name: &str) -> &'a str {
+        adapters.markers[name]
+            .strip_prefix("$crate::__pgrx_c_generated::")
+            .expect("generated markers refer to the defining crate's local types")
+    }
+
+    #[test]
+    fn field_ids_are_sorted_unique_and_independent_of_record_order() {
+        let original = registry_catalog(&[
+            ("Second", &["z", "a", "self", "type"]),
+            ("First", &["z", "_", "a_", "a"]),
+        ]);
+        let reordered = registry_catalog(&[
+            ("First", &["a", "a_", "_", "z"]),
+            ("Second", &["type", "self", "a", "z"]),
+        ]);
+        let ids = FieldIds::new(&original).unwrap();
+        let reordered = FieldIds::new(&reordered).unwrap();
+        assert_eq!(ids.names, reordered.names);
+        assert_eq!(
+            ids.names,
+            BTreeMap::from([("_", 0), ("a", 1), ("a_", 2), ("self", 3), ("type", 4), ("z", 5)])
+        );
+        assert_eq!(ids.marker("self").unwrap(), "Field3");
+        assert_ne!(ids.marker("a").unwrap(), ids.marker("a_").unwrap());
+    }
+
+    #[test]
+    fn field_ids_preserve_subset_identity_and_emit_each_local_marker_once() {
+        let catalog = registry_catalog(&[("Owner", &["unrequested", "z", "a", "self"])]);
+        let ids = FieldIds::new(&catalog).unwrap();
+        let mut original = empty_adapters();
+        register_marker(&mut original, &ids, "z").unwrap();
+        register_marker(&mut original, &ids, "self").unwrap();
+        register_marker(&mut original, &ids, "z").unwrap();
+        let mut subset = empty_adapters();
+        register_marker(&mut subset, &FieldIds::new(&catalog).unwrap(), "z").unwrap();
+        assert_eq!(original.markers["z"], subset.markers["z"]);
+        assert_eq!(local_marker(&original, "z"), "Field3");
+        assert_ne!(original.markers["z"], original.markers["self"]);
+        assert_eq!(original.rust.matches("pub struct ").count(), 2);
+        assert_eq!(original.rust.matches("pub struct Field3;").count(), 1);
+        assert_eq!(original.rust.matches("pub struct Field1;").count(), 1);
+        assert_eq!(subset.rust.matches("pub struct Field3;").count(), 1);
+        assert!(!subset.rust.contains("pub struct Field1;"));
+        assert_eq!(original.markers.len(), 2);
+        assert!(!original.markers.contains_key("unrequested"));
+        syn::parse_file(&original.rust).unwrap();
+    }
+
+    #[test]
+    fn empty_and_missing_field_ids_emit_no_markers_or_fabricated_identity() {
+        let catalog = DeclarationCatalog::default();
+        let ids = FieldIds::new(&catalog).unwrap();
+        assert!(ids.names.is_empty());
+        let mut output = empty_adapters();
+        let error = register_marker(&mut output, &ids, "missing").unwrap_err();
+        assert!(error.contains("missing") && error.contains("declaration-catalog identity"));
+        assert!(output.rust.is_empty());
+        assert!(output.markers.is_empty());
     }
 
     #[test]
@@ -688,13 +955,50 @@ mod tests {
         for _ in 0..2 {
             checks.object(&mut rust, "crate::Parent", 16, 8);
             checks.field(&mut rust, "crate::Parent", "member", 8);
+            checks.projection(&mut rust, "crate::Parent", "member", "u32");
         }
         assert_eq!(rust.matches("size_of::<crate::Parent>").count(), 1);
         assert_eq!(rust.matches("offset_of!(crate::Parent, member)").count(), 1);
+        assert_eq!(rust.matches("Projection<crate::Parent, u32>").count(), 1);
         checks.object(&mut rust, "crate::Parent", 24, 8);
         checks.field(&mut rust, "crate::Parent", "member", 16);
+        checks.projection(&mut rust, "crate::Parent", "member", "i32");
         assert_eq!(rust.matches("size_of::<crate::Parent>").count(), 2);
         assert_eq!(rust.matches("offset_of!(crate::Parent, member)").count(), 2);
+        assert_eq!(rust.matches("Projection<crate::Parent, i32>").count(), 1);
+        assert_eq!(rust.matches("use c::expression::FieldProjection").count(), 1);
+    }
+
+    #[test]
+    fn projection_alias_removes_repeated_function_shape_types() {
+        use syn::visit_mut::{self, VisitMut};
+        #[derive(Default)]
+        struct Types {
+            total: usize,
+            functions: usize,
+            pointers: usize,
+        }
+        impl VisitMut for Types {
+            fn visit_type_mut(&mut self, ty: &mut syn::Type) {
+                self.total += 1;
+                self.functions += usize::from(matches!(ty, syn::Type::BareFn(_)));
+                self.pointers += usize::from(matches!(ty, syn::Type::Ptr(_)));
+                visit_mut::visit_type_mut(self, ty);
+            }
+        }
+        let mut old = syn::parse_file("const _: unsafe fn(*mut Parent) -> *mut u32 = |base| unsafe { core::ptr::addr_of_mut!((*base).member) };").unwrap();
+        let mut checks = LayoutChecks::default();
+        let mut rust = String::new();
+        checks.projection(&mut rust, "Parent", "member", "u32");
+        let mut new = syn::parse_file(&rust).unwrap();
+        let (mut before, mut after) = (Types::default(), Types::default());
+        before.visit_file_mut(&mut old);
+        after.visit_file_mut(&mut new);
+        assert_eq!(before.total - after.total, 2);
+        assert_eq!(before.functions, 1);
+        assert_eq!(before.pointers, 2);
+        assert_eq!(after.functions, 0);
+        assert_eq!(after.pointers, 0);
     }
 
     fn fixture() -> PathBuf {
@@ -712,6 +1016,158 @@ mod tests {
             arguments.extend(["-isysroot".into(), sdk.trim().into()]);
         }
         arguments
+    }
+
+    #[test]
+    fn concrete_owner_requests_preserve_equivalent_layout_witnesses() {
+        let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let scanner = MacroScanner::new().unwrap();
+        let arguments = arguments();
+        let frontend = inspect(&scanner, &fixture(), &arguments, None).unwrap();
+        let mut declarations = frontend.declarations().clone();
+        let mut qualified = declarations.records["struct Outer"].clone();
+        let original_size = qualified.size.unwrap();
+        qualified.size = Some(original_size + qualified.alignment.unwrap());
+        declarations.records.insert("const struct Outer".into(), qualified);
+        let mut shape = declarations.type_shapes["struct Outer"].clone();
+        shape.ty.canonical_spelling = "const struct Outer".into();
+        shape.ty.spelling = "const struct Outer".into();
+        shape.ty.is_const = true;
+        declarations.type_shapes.insert("const struct Outer".into(), shape);
+        let mut requests = FieldRequests::default();
+        requests.field(Some("struct Outer"), Some("count"));
+        let generated =
+            generate(&declarations, &bindings(), &requests, &frontend.profile().target, &[])
+                .unwrap();
+        assert!(generated.unsupported.is_empty());
+        assert_eq!(generated.rust.matches("size_of::<crate::Outer>").count(), 2);
+        assert_eq!(
+            generated
+                .rust
+                .matches(&format!("::OrdinaryField<{}", local_marker(&generated, "count")))
+                .count(),
+            1
+        );
+        assert!(!generated.rust.contains("crate::Packed"));
+        let required = requests.required_types(&declarations);
+        assert!(!required.is_empty(), "selected field types must reach dependent capabilities");
+        assert!(required.iter().all(|ty| {
+            ty.canonical_spelling
+                == declarations.records["struct Outer"].fields[2].ty.canonical_spelling
+        }));
+
+        let rust_bindings = bindgen::Builder::default()
+            .header(fixture().to_str().unwrap())
+            .clang_args(&arguments)
+            .allowlist_type("Child|Outer")
+            .layout_tests(false)
+            .generate_comments(false)
+            .generate()
+            .unwrap()
+            .to_string();
+        let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../pgrx-pg-sys/src/c_macros/support.rs")
+            .canonicalize()
+            .unwrap();
+        let diagnostics = rust_oracle::reject_rust(&format!(
+            "#[path = {support:?}] pub mod __pgrx_c_macros;\n{rust_bindings}\npub mod __pgrx_c_generated {{ use crate::__pgrx_c_macros as c; {} }}\nfn main() {{}}",
+            generated.rust
+        ));
+        assert!(
+            diagnostics.contains("E0080") && diagnostics.contains("assertion failed"),
+            "{diagnostics}"
+        );
+    }
+
+    #[test]
+    fn typed_projection_rejects_equal_layout_field_substitution_but_accepts_aliases() {
+        let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let scanner = MacroScanner::new().unwrap();
+        let arguments = arguments();
+        let frontend = inspect(&scanner, &fixture(), &arguments, None).unwrap();
+        let mut requests = FieldRequests::default();
+        requests.field(Some("struct Outer"), Some("count"));
+        let generated = generate(
+            frontend.declarations(),
+            &bindings(),
+            &requests,
+            &frontend.profile().target,
+            &[],
+        )
+        .unwrap();
+        assert!(generated.unsupported.is_empty());
+        let bindings = bindgen::Builder::default()
+            .header(fixture().to_str().unwrap())
+            .clang_args(&arguments)
+            .allowlist_type("Child|Outer")
+            .layout_tests(false)
+            .generate_comments(false)
+            .generate()
+            .unwrap()
+            .to_string();
+        let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../pgrx-pg-sys/src/c_macros/support.rs")
+            .canonicalize()
+            .unwrap();
+        for (ty, accepted) in
+            [(syn::parse_quote!(i32), false), (syn::parse_quote!(CountAlias), true)]
+        {
+            let mut edited = syn::parse_file(&bindings).unwrap();
+            let record = edited
+                .items
+                .iter_mut()
+                .find_map(|item| match item {
+                    syn::Item::Struct(record) if record.ident == "Outer" => Some(record),
+                    _ => None,
+                })
+                .unwrap();
+            record
+                .fields
+                .iter_mut()
+                .find(|field| field.ident.as_ref().unwrap() == "count")
+                .unwrap()
+                .ty = ty;
+            let program = format!(
+                "#[path={support:?}] pub mod __pgrx_c_macros;\ntype CountAlias=u32;\n{}\npub mod __pgrx_c_generated {{ use crate::__pgrx_c_macros as c; {} }}\nfn main() {{ println!(\"ok\"); }}",
+                quote::quote!(#edited),
+                generated.rust,
+            );
+            if accepted {
+                assert_eq!(rust_oracle::run_rust(&program), "ok\n");
+            } else {
+                let error = rust_oracle::reject_rust(&program);
+                assert!(error.contains("E0308"), "exact field type must be checked: {error}");
+                assert!(
+                    !error.contains("E0080"),
+                    "layout agrees; the typed witness must reject it"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn typed_projection_witness_retains_manually_drop_inner_storage() {
+        let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../pgrx-pg-sys/src/c_macros/support.rs")
+            .canonicalize()
+            .unwrap();
+        let mut checks = LayoutChecks::default();
+        let mut rust = String::new();
+        checks.object(&mut rust, "crate::Parent", 4, 4);
+        checks.field(&mut rust, "crate::Parent", "member", 0);
+        checks.projection(&mut rust, "crate::Parent", "member", "core::mem::ManuallyDrop<u32>");
+        for (inner, accepted) in [("u32", true), ("i32", false)] {
+            let program = format!(
+                "#[path={support:?}] pub mod __pgrx_c_macros;\n#[repr(C)]pub struct Parent {{ member:core::mem::ManuallyDrop<{inner}> }}\nuse crate::__pgrx_c_macros as c;\n{rust}\nfn main() {{ println!(\"ok\"); }}"
+            );
+            if accepted {
+                assert_eq!(rust_oracle::run_rust(&program), "ok\n");
+            } else {
+                let error = rust_oracle::reject_rust(&program);
+                assert!(error.contains("E0308"), "the wrapper's inner storage must match: {error}");
+                assert!(!error.contains("E0080"), "equal wrapper layout alone is insufficient");
+            }
+        }
     }
 
     fn bindings() -> BindingCatalog {
@@ -791,21 +1247,20 @@ mod tests {
         let scanner = MacroScanner::new().unwrap();
         let arguments = arguments();
         let frontend = inspect(&scanner, &fixture(), &arguments, None).unwrap();
-        let names = ["count", "value", "child", "next", "frozen", "signal", "array"]
-            .into_iter()
-            .map(str::to_owned)
-            .collect();
+        let mut requests = FieldRequests::default();
+        for name in ["count", "value", "child", "next", "frozen", "signal", "array"] {
+            requests.field(None, Some(name));
+        }
         let generated = generate(
             frontend.declarations(),
             &bindings(),
-            &names,
-            &BTreeSet::new(),
+            &requests,
             &frontend.profile().target,
             &[],
         )
         .unwrap();
         assert!(generated.unsupported.values().any(|reason| reason.contains("unaligned volatile")));
-        assert_eq!(generated.rust.matches("Sealed for crate::Child").count(), 1);
+        assert_eq!(generated.rust.matches("NativeRecord for crate::Child").count(), 1);
         let rust_bindings = bindgen::Builder::default()
             .header(fixture().to_str().unwrap())
             .clang_args(&arguments)
@@ -820,7 +1275,7 @@ mod tests {
             .canonicalize()
             .unwrap();
         let mut rust = format!(
-            "#[path = {support:?}] pub mod __pgrx_c_macros;\n{rust_bindings}\npub mod __pgrx_c_generated {{ {} }}\n",
+            "#[path = {support:?}] pub mod __pgrx_c_macros;\n{rust_bindings}\npub mod __pgrx_c_generated {{ use crate::__pgrx_c_macros as c; {} }}\n",
             generated.rust
         );
         rust.push_str(&format!(r#"
@@ -862,7 +1317,7 @@ fn main() {{
         println!("{{}},{{}},{{}},{{}},{{}},{{}},{{}},{{}}", load(count).get(), load(value).get(), load(indirect).get(), load(packed_count).get(), load(packed_signal).get(), load(signal).get(), load(union_count).get(), load(element).get());
     }}
 }}
-"#, count=marker_name("count"), child=marker_name("child"), value=marker_name("value"), next=marker_name("next"), signal=marker_name("signal"), frozen=marker_name("frozen"), array=marker_name("array")));
+"#, count=local_marker(&generated, "count"), child=local_marker(&generated, "child"), value=local_marker(&generated, "value"), next=local_marker(&generated, "next"), signal=local_marker(&generated, "signal"), frozen=local_marker(&generated, "frozen"), array=local_marker(&generated, "array")));
         let actual = rust_oracle::run_rust(&rust);
         let expected = oracle::run_c(
             &frontend.profile().compiler.executable,
@@ -901,12 +1356,14 @@ int main(void) {
         let mut bindings = bindings();
         bindings.records.get_mut("Outer").unwrap().fields.get_mut("count").unwrap().ty =
             RustBindingType::Integer { signed: true, bits: 32 };
-        let names = ["count", "bits", "array"].into_iter().map(str::to_owned).collect();
+        let mut requests = FieldRequests::default();
+        for name in ["count", "bits", "array"] {
+            requests.field(None, Some(name));
+        }
         let generated = generate(
             frontend.declarations(),
             &bindings,
-            &names,
-            &BTreeSet::new(),
+            &requests,
             &frontend.profile().target,
             &[],
         )
@@ -920,6 +1377,14 @@ int main(void) {
         assert!(!generated.markers.contains_key("bits"));
         assert!(generated.markers.contains_key("array"));
         assert!(!generated.rust.contains("CRecord<crate::Outer>"));
+        let ids = FieldIds::new(frontend.declarations()).unwrap();
+        assert!(ids.marker("bits").is_ok(), "rejected fields retain their immutable IDs");
+        let mut subset = FieldRequests::default();
+        subset.field(None, Some("count"));
+        let subset =
+            generate(frontend.declarations(), &bindings, &subset, &frontend.profile().target, &[])
+                .unwrap();
+        assert_eq!(generated.markers["count"], subset.markers["count"]);
     }
 
     #[test]
@@ -931,15 +1396,14 @@ int main(void) {
         let mut bindings = bindings();
         bindings.records.get_mut("Outer").unwrap().fields.get_mut("count").unwrap().ty =
             RustBindingType::Integer { signed: true, bits: 32 };
-        let names = ["count", "child", "frozen", "signal", "array", "bits"]
-            .into_iter()
-            .map(str::to_owned)
-            .collect();
+        let mut requests = FieldRequests::default();
+        for name in ["count", "child", "frozen", "signal", "array", "bits"] {
+            requests.offset(None, Some(name));
+        }
         let generated = generate(
             frontend.declarations(),
             &bindings,
-            &BTreeSet::new(),
-            &names,
+            &requests,
             &frontend.profile().target,
             &[],
         )
@@ -952,7 +1416,7 @@ int main(void) {
         assert!(generated.unsupported.is_empty());
         assert!(generated.c_source.is_empty());
         assert!(!generated.rust.contains("unsafe"));
-        assert_eq!(generated.rust.matches("Sealed for crate::Outer").count(), 1);
+        assert_eq!(generated.rust.matches("NativeRecord for crate::Outer").count(), 1);
 
         let rust_bindings = bindgen::Builder::default()
             .header(fixture().to_str().unwrap())
@@ -971,7 +1435,7 @@ int main(void) {
             r#"
 #[path = {support:?}] pub mod __pgrx_c_macros;
 {rust_bindings}
-pub mod __pgrx_c_generated {{ {adapters} }}
+pub mod __pgrx_c_generated {{ use crate::__pgrx_c_macros as c; {adapters} }}
 use __pgrx_c_macros::expression::*;
 fn main() {{
     type Frozen = OffsetStep<__pgrx_c_generated::{child}, OffsetStep<__pgrx_c_generated::{frozen}, OffsetEnd>>;
@@ -982,11 +1446,11 @@ fn main() {{
 }}
 "#,
             adapters = generated.rust,
-            child = marker_name("child"),
-            frozen = marker_name("frozen"),
-            count = marker_name("count"),
-            signal = marker_name("signal"),
-            array = marker_name("array"),
+            child = local_marker(&generated, "child"),
+            frozen = local_marker(&generated, "frozen"),
+            count = local_marker(&generated, "count"),
+            signal = local_marker(&generated, "signal"),
+            array = local_marker(&generated, "array"),
         );
         let actual = rust_oracle::run_rust(&rust);
         let expected = oracle::run_c(

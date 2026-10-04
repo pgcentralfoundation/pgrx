@@ -118,7 +118,10 @@ fn render_statements(
 
 /// Inspect stringified tokens before normalization, including forwarded opaque
 /// expression fragments. Field, path and string matches are conservative skips.
-pub(super) fn guard(analysis: &MacroAnalysis, normalizer: &str) -> Result<String, SkipReason> {
+pub(super) fn guard(
+    analysis: &MacroAnalysis,
+    normalizer: Option<&str>,
+) -> Result<Option<String>, SkipReason> {
     let body = analysis
         .expression
         .as_ref()
@@ -139,16 +142,20 @@ pub(super) fn guard(analysis: &MacroAnalysis, normalizer: &str) -> Result<String
             Some(body.tokens),
         ));
     }
+    if names.is_empty() {
+        return Ok(None);
+    }
+    let Some(normalizer) = normalizer else {
+        return Ok(None);
+    };
     let mut rust =
         String::from("(@__pgrx_c_guard_locals $mode:ident [$($done:tt)*]; $($raw:tt)*) => {{ ");
-    if !names.is_empty() {
-        let message = format!(
-            "C macro argument mentions local {}; C substitution and Rust hygiene would resolve it differently, or the 4096-byte scope-check bound was exceeded",
-            names.join(", ")
-        );
-        write!(rust, "const _: () = ::core::assert!({SUPPORT}::statements::local_scope_allowed(::core::stringify!($($raw)*), &{names:?}), {message:?}); ").expect("String output");
-    }
+    let message = format!(
+        "C macro argument mentions local {}; C substitution and Rust hygiene would resolve it differently, or the 4096-byte scope-check bound was exceeded",
+        names.join(", ")
+    );
+    write!(rust, "const _: () = ::core::assert!({SUPPORT}::statements::local_scope_allowed(::core::stringify!($($raw)*), &{names:?}), {message:?}); ").expect("String output");
     writeln!(rust, "$crate::{normalizer}!(@collect $mode [$($done)*]; $($raw)*) }}}};")
         .expect("String output");
-    Ok(rust)
+    Ok(Some(rust))
 }

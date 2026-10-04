@@ -26,6 +26,7 @@ use std::path::{self, Path, PathBuf}; // disambiguate path::Path and syn::Type::
 use std::process::{Command, Output};
 use std::rc::Rc;
 use std::sync::Mutex;
+use std::sync::atomic::{AtomicU64, Ordering};
 use syn::{Item, ItemConst, spanned::Spanned};
 
 const BLOCKLISTED_TYPES: [&str; 4] = ["Datum", "NullableDatum", "Oid", "TransactionId"];
@@ -33,6 +34,7 @@ const BLOCKLISTED_TYPES: [&str; 4] = ["Datum", "NullableDatum", "Oid", "Transact
 // clang's safe wrapper permits one live Clang handle per process. Bindgen's
 // Binding generation shares that inspection's runtime and verified arguments.
 static MACRO_SCANNER: Mutex<()> = Mutex::new(());
+static NEXT_MACRO_FORMATTING_DIRECTORY: AtomicU64 = AtomicU64::new(0);
 
 // These postgres versions were effectively "yanked" by the community, even tho they still exist
 // in the wild.  pgrx will refuse to compile against them
@@ -46,7 +48,9 @@ const YANKED_POSTGRES_VERSIONS: &[PgVersion] = &[
 ];
 
 mod binding_symbols;
+mod macro_files;
 mod macro_support;
+use macro_files::MacroFiles;
 use macro_support::compile_macro_support;
 pub(super) mod clang;
 
@@ -352,15 +356,19 @@ fn generate_bindings(
         })?;
     }
 
-    write_content_stable(
-        &build_paths.out_dir.join(format!("pg{major_version}_macros.rs")),
-        macros.source.as_bytes(),
+    write_macro_files(
+        &macros.files,
+        &build_paths.out_dir.join(format!("cmacros/pg{major_version}")),
+        false,
     )?;
+    remove_legacy_macro_file(&build_paths.out_dir, major_version)?;
     if is_for_release {
-        write_macro_snapshot(
-            &macros.source,
-            &build_paths.src_dir.join(format!("pg{major_version}_macros.rs")),
+        write_macro_files(
+            &macros.files,
+            &build_paths.src_dir.join(format!("cmacros/pg{major_version}")),
+            true,
         )?;
+        remove_legacy_macro_file(&build_paths.src_dir, major_version)?;
     }
     let report = build_paths.out_dir.join(format!("pg{major_version}_macro_report.json"));
     write_content_stable(&report, &macros.report)?;
@@ -418,7 +426,7 @@ impl BuildPaths {
     }
 }
 
-fn write_macro_snapshot(source: &str, file_path: &Path) -> eyre::Result<()> {
+fn macro_snapshot(source: &str) -> eyre::Result<String> {
     let file = syn::parse_file(source).wrap_err("could not parse generated C macros")?;
     let mut guards = BTreeMap::new();
     for item in &file.items {
@@ -434,6 +442,7 @@ fn write_macro_snapshot(source: &str, file_path: &Path) -> eyre::Result<()> {
             );
         } else if let Item::Mod(item) = item
             && item.ident == "__pgrx_c_generated"
+            && !item.attrs.iter().any(|attr| attr.meta == syn::parse_quote!(cfg(not(docsrs))))
         {
             // Native adapters describe the generation installation's types and
             // layout. Documentation builds use shipped bindings and no C shims.
@@ -457,9 +466,123 @@ fn write_macro_snapshot(source: &str, file_path: &Path) -> eyre::Result<()> {
         }
         snapshot.push_str(line);
     }
-    fs::write(file_path, snapshot)?;
-    rust_fmt(file_path, "2024")
-        .wrap_err_with(|| format!("could not write C macro snapshot to {}", file_path.display()))
+    Ok(snapshot)
+}
+
+fn write_macro_files(
+    files: &MacroFiles,
+    directory: &Path,
+    documentation: bool,
+) -> eyre::Result<()> {
+    fs::create_dir_all(directory)?;
+    let staging = MacroFormattingDirectory::new(directory)?;
+    let mut paths = Vec::with_capacity(files.sources.len());
+    for (relative, source) in &files.sources {
+        let path = staging.0.join(relative);
+        if let Some(parent) = path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        if documentation {
+            fs::write(&path, macro_snapshot(source)?)?;
+        } else {
+            fs::write(&path, source)?;
+        }
+        paths.push(path);
+    }
+    let rustfmt = env_tracked("RUSTFMT").unwrap_or_else(|| "rustfmt".into());
+    format_macro_files(&paths, Path::new(&rustfmt))?;
+    for relative in files.sources.keys() {
+        let path = directory.join(relative);
+        if let Some(parent) = path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        // Compare the final representation: formatting after the stable write
+        // would rewrite identical artifacts on every regeneration.
+        let content = fs::read(staging.0.join(relative))?;
+        write_content_stable(&path, &content)?;
+    }
+    // This version directory contains generated Rust only. Retain other files
+    // and versions, and remove empty directories after their stale leaves.
+    for entry in walkdir::WalkDir::new(directory).contents_first(true) {
+        let entry = entry?;
+        let path = entry.path();
+        let relative = path.strip_prefix(directory)?;
+        if entry.file_type().is_file()
+            && path.extension().is_some_and(|extension| extension == "rs")
+            && !files.sources.contains_key(relative)
+        {
+            fs::remove_file(path)?;
+        } else if entry.file_type().is_dir()
+            && path != directory
+            && fs::read_dir(path)?.next().is_none()
+        {
+            fs::remove_dir(path)?;
+        }
+    }
+    Ok(())
+}
+
+/// A sibling keeps the final directory's rustfmt configuration search while
+/// keeping temporary files outside that version's stale-file pruning.
+struct MacroFormattingDirectory(PathBuf);
+
+impl MacroFormattingDirectory {
+    fn new(directory: &Path) -> eyre::Result<Self> {
+        let parent = directory.parent().filter(|parent| !parent.as_os_str().is_empty());
+        let parent = parent.unwrap_or_else(|| Path::new("."));
+        for _ in 0..100 {
+            let number = NEXT_MACRO_FORMATTING_DIRECTORY.fetch_add(1, Ordering::Relaxed);
+            let path = parent.join(format!(".pgrx-c-macros-{}-{number}", std::process::id()));
+            match fs::create_dir(&path) {
+                Ok(()) => return Ok(Self(path)),
+                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+                Err(error) => {
+                    return Err(error).wrap_err("could not stage C macros for formatting");
+                }
+            }
+        }
+        Err(eyre!("could not create a unique C macro formatting directory"))
+    }
+}
+
+impl Drop for MacroFormattingDirectory {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.0);
+    }
+}
+
+fn format_macro_files(paths: &[PathBuf], rustfmt: &Path) -> eyre::Result<()> {
+    if paths.is_empty() {
+        return Ok(());
+    }
+    let mut command = Command::new(rustfmt);
+    command.args(paths).args(["--edition", "2024", "--config", "skip_children=true"]);
+    match run_command(&mut command, "C macro formatting") {
+        Ok(output) if output.status.success() => Ok(()),
+        Ok(output) => Err(eyre!(
+            "could not format generated C macros: {}",
+            String::from_utf8_lossy(&output.stderr)
+        )),
+        Err(error)
+            if error
+                .downcast_ref::<std::io::Error>()
+                .is_some_and(|error| error.kind() == std::io::ErrorKind::NotFound) =>
+        {
+            // Rustfmt is optional for macro generation. The staged original
+            // source remains the output when the executable is unavailable.
+            Ok(())
+        }
+        Err(error) => Err(error).wrap_err("could not start the C macro formatter"),
+    }
+}
+
+fn remove_legacy_macro_file(directory: &Path, major_version: u16) -> eyre::Result<()> {
+    let path = directory.join(format!("pg{major_version}_macros.rs"));
+    match fs::remove_file(&path) {
+        Ok(()) => Ok(()),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(error) => Err(error).wrap_err_with(|| format!("could not remove {}", path.display())),
+    }
 }
 
 fn write_rs_file(
@@ -1022,7 +1145,7 @@ fn run_bindgen(
 }
 
 struct MacroOutput {
-    source: String,
+    files: MacroFiles,
     report: Vec<u8>,
     emitted: usize,
     skipped: usize,
@@ -1036,7 +1159,7 @@ impl MacroOutput {
             "status": "unavailable",
             "reason": reason,
         }))?;
-        Ok(Self { source: String::new(), report, emitted: 0, skipped: 0, inspected: false })
+        Ok(Self { files: MacroFiles::empty(), report, emitted: 0, skipped: 0, inspected: false })
     }
 }
 
@@ -1143,8 +1266,7 @@ fn generate_macros(
     let mut skipped = 0;
     for emission in &emissions {
         match &emission.status {
-            EmissionStatus::Emitted { rust, .. } => {
-                source.push_str(rust);
+            EmissionStatus::Emitted { .. } => {
                 emitted += 1;
                 symbols.macros.insert(emission.analysis.name.clone());
             }
@@ -1159,6 +1281,7 @@ fn generate_macros(
             }
         }
     }
+    let files = MacroFiles::new(source, &emissions, postgres.server_include_dir())?;
     let report = serde_json::to_vec_pretty(&MacroReport {
         postgres_major_version: pg_config.major_version()?,
         status: "generated",
@@ -1170,7 +1293,7 @@ fn generate_macros(
         integer_bindings: &symbols,
         integer_bridge_unavailable,
     })?;
-    Ok((bindings, MacroOutput { source, report, emitted, skipped, inspected: true }))
+    Ok((bindings, MacroOutput { files, report, emitted, skipped, inspected: true }))
 }
 
 fn normalize_bindgen_arguments(
@@ -1747,7 +1870,11 @@ pub mod __pgrx_c_generated {
     pub struct Field;
 }
 pub mod documentation_helpers {}
-#[doc = "C macro EXAMPLE from example.h:1\n\n```text\n#define EXAMPLE(x) NESTED(x)\n```\n"]
+/// C macro EXAMPLE from example.h:1
+///
+/// ```text
+/// #define EXAMPLE(x) NESTED(x)
+/// ```
 #[macro_export]
 macro_rules! EXAMPLE {
     ($argument:expr) => {
@@ -1756,10 +1883,7 @@ macro_rules! EXAMPLE {
     };
 }
 "#;
-        let directory = TemporaryDirectory::new();
-        let path = directory.0.join("pg18_macros.rs");
-        write_macro_snapshot(source, &path).unwrap();
-        let snapshot = fs::read_to_string(&path).unwrap();
+        let snapshot = macro_snapshot(source).unwrap();
         assert!(snapshot.contains("This code is generated for documentation purposes"));
         assert!(
             snapshot.contains(
@@ -1781,8 +1905,6 @@ macro_rules! EXAMPLE {
 
     #[test]
     fn documentation_snapshots_require_guarded_items_on_their_own_lines() {
-        let directory = TemporaryDirectory::new();
-        let path = directory.0.join("pg18_macros.rs");
         for (source, description) in [
             ("const PROFILE: () = (); compile_error!(\"wrong target\");", "C macro target guard"),
             (
@@ -1790,9 +1912,8 @@ macro_rules! EXAMPLE {
                 "C macro native support module",
             ),
         ] {
-            let error = write_macro_snapshot(source, &path).unwrap_err().to_string();
+            let error = macro_snapshot(source).unwrap_err().to_string();
             assert_eq!(error, format!("{description} does not start on its own line"));
-            assert!(!path.exists(), "invalid guard placement must not write a snapshot");
         }
     }
 
@@ -1889,6 +2010,118 @@ macro_rules! EXAMPLE {
         write_content_stable(&path, b"changed").unwrap();
         assert_eq!(fs::read(&path).unwrap(), b"changed");
         assert_ne!(fs::metadata(&path).unwrap().modified().unwrap(), before);
+    }
+
+    #[test]
+    fn macro_tree_updates_preserve_unchanged_leaves_and_remove_stale_rust_only() {
+        let directory = TemporaryDirectory::new();
+        let version = directory.0.join("cmacros/pg18");
+        let files = MacroFiles {
+            sources: BTreeMap::from([
+                (PathBuf::from("mod.rs"), "mod c;\n".into()),
+                (PathBuf::from("c.rs"), "pub const PROFILE: u32 = 18;\n".into()),
+            ]),
+        };
+        write_macro_files(&files, &version, false).unwrap();
+        let leaf = version.join("c.rs");
+        let old = UNIX_EPOCH + Duration::from_secs(1);
+        fs::File::options().write(true).open(&leaf).unwrap().set_modified(old).unwrap();
+        fs::create_dir_all(version.join("obsolete")).unwrap();
+        fs::write(version.join("obsolete/header.rs"), "old generated source").unwrap();
+        fs::write(version.join("notes.txt"), "keep non-Rust files").unwrap();
+        let other_version = directory.0.join("cmacros/pg17/mod.rs");
+        fs::create_dir_all(other_version.parent().unwrap()).unwrap();
+        fs::write(&other_version, "other version").unwrap();
+        write_macro_files(&files, &version, false).unwrap();
+        assert_eq!(fs::metadata(&leaf).unwrap().modified().unwrap(), old);
+        assert!(!version.join("obsolete").exists());
+        assert_eq!(fs::read_to_string(version.join("notes.txt")).unwrap(), "keep non-Rust files");
+        assert_eq!(fs::read_to_string(other_version).unwrap(), "other version");
+        write_macro_files(&MacroFiles::empty(), &version, false).unwrap();
+        assert!(!leaf.exists(), "unavailable generation removes previous macros");
+        assert!(version.join("mod.rs").exists(), "an empty module still loads");
+    }
+
+    #[test]
+    fn macro_trees_are_formatted_before_stable_normal_and_snapshot_writes() {
+        let directory = TemporaryDirectory::new();
+        let original = "/// C macro EXAMPLE from c.h:1\n/// ```text\n/// #define EXAMPLE(x) (x)\n/// ```\npub fn example( value:u32 )->u32{ /* PGRX: preserve this comment */ value+1 }\n";
+        let files = MacroFiles {
+            sources: BTreeMap::from([
+                (PathBuf::from("mod.rs"), "mod c;\n".into()),
+                (PathBuf::from("c.rs"), original.into()),
+            ]),
+        };
+        for documentation in [false, true] {
+            let version = directory.0.join(if documentation { "snapshot" } else { "normal" });
+            write_macro_files(&files, &version, documentation).unwrap();
+            let leaf = fs::read_to_string(version.join("c.rs")).unwrap();
+            assert!(leaf.contains("pub fn example(value: u32) -> u32 {"));
+            assert!(leaf.contains("/// #define EXAMPLE(x) (x)"));
+            assert!(leaf.contains("/* PGRX: preserve this comment */"));
+            let expected =
+                if documentation { macro_snapshot(original).unwrap() } else { original.to_owned() };
+            assert_eq!(syn::parse_file(&leaf).unwrap(), syn::parse_file(&expected).unwrap());
+            let old = UNIX_EPOCH + Duration::from_secs(1);
+            for relative in files.sources.keys() {
+                fs::File::options()
+                    .write(true)
+                    .open(version.join(relative))
+                    .unwrap()
+                    .set_modified(old)
+                    .unwrap();
+            }
+            write_macro_files(&files, &version, documentation).unwrap();
+            for relative in files.sources.keys() {
+                assert_eq!(fs::metadata(version.join(relative)).unwrap().modified().unwrap(), old);
+            }
+        }
+    }
+
+    #[test]
+    fn unavailable_macro_formatter_preserves_original_sources() {
+        let directory = TemporaryDirectory::new();
+        let path = directory.0.join("original.rs");
+        let original = "pub const VALUE:u32=18;\n";
+        fs::write(&path, original).unwrap();
+        format_macro_files(std::slice::from_ref(&path), &directory.0.join("missing-rustfmt"))
+            .unwrap();
+        assert_eq!(fs::read_to_string(path).unwrap(), original);
+    }
+
+    #[test]
+    fn macro_formatting_directories_are_removed_after_use() {
+        let directory = TemporaryDirectory::new();
+        let final_directory = directory.0.join("pg18");
+        let staging = MacroFormattingDirectory::new(&final_directory).unwrap();
+        let staging_path = staging.0.clone();
+        assert_eq!(staging_path.parent(), final_directory.parent());
+        fs::write(staging_path.join("fragment.rs"), "pub const VALUE: u32 = 18;\n").unwrap();
+        drop(staging);
+        assert!(!staging_path.exists());
+        assert!(directory.0.exists(), "cleanup only removes its own directory");
+    }
+
+    #[test]
+    fn macro_snapshots_guard_each_leaf_and_do_not_duplicate_native_guards() {
+        let directory = TemporaryDirectory::new();
+        let files = MacroFiles {
+            sources: BTreeMap::from([
+                (PathBuf::from("mod.rs"), "mod c;\n".into()),
+                (
+                    PathBuf::from("c.rs"),
+                    "#[cfg(not(target_pointer_width = \"64\"))]\ncompile_error!(\"wrong target\");\n/// C macro EXAMPLE from c.h:1\n/// ```text\n/// #define EXAMPLE(x) (x)\n/// ```\n#[macro_export]\nmacro_rules! EXAMPLE { ($x:expr) => { $x }; }\n".into(),
+                ),
+            ]),
+        };
+        write_macro_files(&files, &directory.0, true).unwrap();
+        let leaf = fs::read_to_string(directory.0.join("c.rs")).unwrap();
+        assert!(leaf.contains("#[cfg(not(docsrs))]"));
+        assert!(leaf.contains("/// #define EXAMPLE(x) (x)"));
+        assert!(!leaf.contains("#[doc ="));
+        let guarded = "#[cfg(not(docsrs))]\n#[doc(hidden)]\npub mod __pgrx_c_generated {}\n";
+        let snapshot = macro_snapshot(guarded).unwrap();
+        assert_eq!(snapshot.matches("#[cfg(not(docsrs))]").count(), 1);
     }
 
     #[test]
@@ -1989,7 +2222,8 @@ macro_rules! EXAMPLE {
     #[test]
     fn unavailable_target_metadata_produces_an_empty_macro_file_and_explicit_report() {
         let output = MacroOutput::unavailable(18, "no matching macro target metadata").unwrap();
-        assert!(output.source.is_empty());
+        assert_eq!(output.files.sources.len(), 1);
+        assert!(output.files.sources[Path::new("mod.rs")].is_empty());
         assert!(!output.inspected);
         assert_eq!(output.emitted, 0);
         let report: serde_json::Value = serde_json::from_slice(&output.report).unwrap();

@@ -135,7 +135,7 @@ fn emitted_source(
     let artifact = emit_support_artifact_with_bindings(session, &names, catalog)
         .expect("derive verified binding adapters");
     rust.push_str(&artifact.rust);
-    for emission in emit_batch_with_bindings(session, &names, catalog) {
+    for emission in emit_batch_with_bindings(session, &names, catalog).unwrap() {
         let EmissionStatus::Emitted { rust: definition, .. } = emission.status else {
             panic!("native macro {} must emit: {emission:?}", emission.analysis.name);
         };

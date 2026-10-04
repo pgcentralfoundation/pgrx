@@ -62,6 +62,8 @@ pub enum FrontendError {
     Arguments(String),
     #[error("could not run Clang at {}: {source}", compiler.display())]
     CompilerIo { compiler: PathBuf, source: io::Error },
+    #[error("native support I/O at {}: {source}", path.display())]
+    NativeIo { path: PathBuf, source: io::Error },
     #[error("Clang at {} failed ({status}): {diagnostics}", compiler.display())]
     CompilerFailed { compiler: PathBuf, status: ExitStatus, diagnostics: String },
     #[error("Clang at {} exceeded the {OUTPUT_LIMIT}-byte output limit", .0.display())]
@@ -1434,7 +1436,6 @@ fn semantic_options(
                     | "-fcf-protection=return"
                     | "-fcf-protection=none"
                     | "-fno-lto"
-                    | "-fsyntax-only"
                     | "-funsigned-char"
                     | "-fsigned-char"
                     // Every enum's compatible integer, size and alignment is
@@ -1700,17 +1701,50 @@ pub(crate) fn run_compiler(
 /// The source must include the same inspected header; callers retain the source
 /// and archive alongside their other generated bindings. Both tools have the
 /// frontend's bounded diagnostics and timeout, and failed children are reaped.
+/// Fresh staged outputs are checked before publication; publication errors can
+/// leave the object updated without replacing the archive.
 pub fn compile_native_support(
     profile: &CompilationProfile,
     source: &Path,
     object: &Path,
     archive: &Path,
 ) -> Result<(), FrontendError> {
+    validate_arguments(&profile.arguments)?;
     let path = |path: &Path| {
         path.to_str().map(str::to_owned).ok_or_else(|| {
             FrontendError::Output(format!("native support path is not UTF-8: {}", path.display()))
         })
     };
+    let source_identity = std::fs::canonicalize(source)
+        .map_err(|error| FrontendError::NativeIo { path: source.into(), source: error })?;
+    let object_identity = native_output_identity(object)?;
+    let archive_identity = native_output_identity(archive)?;
+    if source_identity == object_identity
+        || source_identity == archive_identity
+        || object_identity == archive_identity
+    {
+        return Err(FrontendError::Arguments(
+            "native source, object and archive must have distinct paths".into(),
+        ));
+    }
+    let stage = |destination: &Path| {
+        let parent = destination.parent().ok_or_else(|| {
+            FrontendError::Arguments(format!(
+                "native output has no parent directory: {}",
+                destination.display()
+            ))
+        })?;
+        tempfile::Builder::new()
+            .prefix(".pgrx-native-")
+            .tempdir_in(parent)
+            .map_err(|source| FrontendError::NativeIo { path: parent.into(), source })
+    };
+    let object_stage = stage(&object_identity)?;
+    let archive_stage = stage(&archive_identity)?;
+    let staged_object = object_stage
+        .path()
+        .join(object.file_name().expect("native output identity validated its filename"));
+    let staged_archive = archive_stage.path().join("support.a");
     let mut args = profile.arguments.clone();
     args.extend([
         "-x".into(),
@@ -1719,12 +1753,46 @@ pub fn compile_native_support(
         "-fPIC".into(),
         path(source)?,
         "-o".into(),
-        path(object)?,
+        path(&staged_object)?,
     ]);
     run_compiler(&profile.compiler.executable, &args)?;
+    require_native_artifact(&staged_object, "object")?;
     let adjacent = profile.compiler.executable.with_file_name("llvm-ar");
     let archiver = if adjacent.is_file() { adjacent } else { PathBuf::from("ar") };
-    run_compiler(&archiver, &["crs".into(), path(archive)?, path(object)?])?;
+    run_compiler(&archiver, &["crs".into(), path(&staged_archive)?, path(&staged_object)?])?;
+    require_native_artifact(&staged_archive, "archive")?;
+    std::fs::rename(&staged_object, object)
+        .map_err(|source| FrontendError::NativeIo { path: object.into(), source })?;
+    std::fs::rename(&staged_archive, archive)
+        .map_err(|source| FrontendError::NativeIo { path: archive.into(), source })?;
+    Ok(())
+}
+
+fn native_output_identity(path: &Path) -> Result<PathBuf, FrontendError> {
+    let name = path.file_name().ok_or_else(|| {
+        FrontendError::Arguments(format!("native output has no filename: {}", path.display()))
+    })?;
+    std::fs::canonicalize(path)
+        .or_else(|error| {
+            if error.kind() != io::ErrorKind::NotFound {
+                return Err(error);
+            }
+            let parent = path.parent().filter(|parent| !parent.as_os_str().is_empty());
+            std::fs::canonicalize(parent.unwrap_or_else(|| Path::new(".")))
+                .map(|parent| parent.join(name))
+        })
+        .map_err(|source| FrontendError::NativeIo { path: path.into(), source })
+}
+
+fn require_native_artifact(path: &Path, kind: &str) -> Result<(), FrontendError> {
+    let metadata = std::fs::symlink_metadata(path).map_err(|error| {
+        FrontendError::Output(format!("native tool did not produce its {kind}: {error}"))
+    })?;
+    if !metadata.is_file() || metadata.len() == 0 {
+        return Err(FrontendError::Output(format!(
+            "native tool did not produce a nonempty regular {kind}"
+        )));
+    }
     Ok(())
 }
 
@@ -1900,6 +1968,7 @@ fn validate_arguments(arguments: &[String]) -> Result<(), FrontendError> {
             argument.as_str(),
             "-c" | "-S"
                 | "-E"
+                | "-fsyntax-only"
                 | "-M"
                 | "-MM"
                 | "-MD"

@@ -4,12 +4,12 @@
 
 //! Generate original-C access primitives where Rust cannot model initialized bits.
 
-use super::types::Lowering;
+use super::types::{Lowering, rust_path};
 use crate::{BindingCatalog, DeclarationCatalog, FieldInfo, RecordBinding, TypeCategory};
 use sha2::{Digest, Sha256};
 use std::fmt::Write;
 
-const EXPRESSION: &str = "crate::__pgrx_c_macros::expression";
+const EXPRESSION: &str = "c::expression";
 
 pub(super) struct BitfieldAdapter {
     pub rust: String,
@@ -20,13 +20,13 @@ pub(super) fn generate(
     canonical: &str,
     field: &FieldInfo,
     record: &RecordBinding,
-    storage: &str,
+    field_marker: &str,
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,
     lowering: &Lowering<'_>,
 ) -> Result<BitfieldAdapter, String> {
     let name = field.name.as_ref().ok_or("bitfield has no addressable name")?;
-    let field_marker = super::fields::marker_name(name);
+    let storage = rust_path(&record.path)?.replace("$crate", "crate");
     if field.is_anonymous {
         return Err("anonymous bitfields require a verified promoted member path".into());
     }

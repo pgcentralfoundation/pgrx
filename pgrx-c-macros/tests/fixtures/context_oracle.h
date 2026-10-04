@@ -29,6 +29,7 @@ int context_count(void);
 #define CTX_REPEAT(value) ((value) + (value))
 #define CTX_ATOMIC(value) (value + 1)
 #define CTX_TYPE(type, value) ((type)(value))
+#define CTX_TYPE_PROVEN(type, value) ((void) sizeof(type *), ((type)(value)))
 #define CTX_IGNORE(unused)
 
 #endif

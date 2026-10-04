@@ -211,6 +211,7 @@ fn inspection_rejects_arguments_that_change_its_language_or_write_outputs() {
         vec!["-x".into(), "c++".into()],
         vec!["-xc++".into()],
         vec!["-o".into(), "unrequested-output".into()],
+        vec!["-fsyntax-only".into()],
         vec!["@untracked-arguments".into()],
     ] {
         assert!(

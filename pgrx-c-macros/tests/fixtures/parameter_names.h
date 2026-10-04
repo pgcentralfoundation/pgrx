@@ -11,6 +11,7 @@ unsigned int parameter_record(unsigned int value);
 #define NAME_REPEAT(privs) ((privs), (privs))
 #define NAME_UNUSED(privs, unused) ((privs) + 1)
 #define NAME_CAST(type, privs) ((type) (privs))
+#define NAME_CAST_PROVEN(type, privs) ((void) sizeof(type *), ((type) (privs)))
 #define NAME_FIELD(pointer, member) ((pointer)->member)
 #define NAME_KEYWORDS(type, match) ((type) + (match))
 #define NAME_RUST_SPECIAL(self, Self, super, _) ((self) + (Self) + (super) + (_))

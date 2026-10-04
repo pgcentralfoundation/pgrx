@@ -127,7 +127,7 @@ fn compiler_anchored_record_places_match_c_without_reading_uninitialized_fields(
     let isolated = emit_support_artifact_with_bindings(&session, &["RECORD_CAST_ONLY"], &catalog)
         .expect("cast-only record bridge");
     assert!(
-        isolated.rust.contains("NativeType for crate::CastOnlyRecord"),
+        isolated.rust.contains("NativeRecord for crate::CastOnlyRecord"),
         "a record solely behind a typedef pointer cast needs its native adapter: {}",
         isolated.rust
     );
@@ -140,7 +140,7 @@ fn compiler_anchored_record_places_match_c_without_reading_uninitialized_fields(
         artifact.rust
     );
     let mut rust = base.clone();
-    for emission in emit_batch_with_bindings(&session, NAMES, &catalog) {
+    for emission in emit_batch_with_bindings(&session, NAMES, &catalog).unwrap() {
         let EmissionStatus::Emitted { rust: definition, .. } = emission.status else {
             panic!("record macro must emit: {emission:?}");
         };
@@ -187,7 +187,7 @@ fn compiler_anchored_record_places_match_c_without_reading_uninitialized_fields(
             "void valid(void *pointer) { CastOnlyRecord copy=RECORD_VOLATILE_WHOLE_SELECT_MIXED(pointer); (void)copy; }",
         ),
     ] {
-        let emission = emit_batch_with_bindings(&session, &[name], &catalog).remove(0);
+        let emission = emit_batch_with_bindings(&session, &[name], &catalog).unwrap().remove(0);
         let EmissionStatus::Skipped { reason } = emission.status else {
             panic!("unsupported forced volatile aggregate access must skip: {emission:?}");
         };
@@ -250,7 +250,7 @@ fn compiler_anchored_record_places_match_c_without_reading_uninitialized_fields(
             original_invocation,
             &arguments,
         );
-        let emission = emit_batch_with_bindings(&session, &[name], &catalog).remove(0);
+        let emission = emit_batch_with_bindings(&session, &[name], &catalog).unwrap().remove(0);
         if let EmissionStatus::Emitted { rust: definition, .. } = emission.status {
             let invocation = match name {
                 "RECORD_OPAQUE_OFFSET" => {
@@ -278,7 +278,7 @@ fn compiler_anchored_record_places_match_c_without_reading_uninitialized_fields(
             );
         }
     }
-    let read = emit_batch_with_bindings(&session, &["RECORD_HEADER"], &catalog).remove(0);
+    let read = emit_batch_with_bindings(&session, &["RECORD_HEADER"], &catalog).unwrap().remove(0);
     let EmissionStatus::Emitted { rust: definition, .. } = read.status else {
         panic!("field macro")
     };
@@ -287,8 +287,9 @@ fn compiler_anchored_record_places_match_c_without_reading_uninitialized_fields(
     ));
     assert!(error.contains("unsafe"), "field load must require unsafe: {error}");
 
-    let equality =
-        emit_batch_with_bindings(&session, &["RECORD_FLEX_ARRAY_EQUAL"], &catalog).remove(0);
+    let equality = emit_batch_with_bindings(&session, &["RECORD_FLEX_ARRAY_EQUAL"], &catalog)
+        .unwrap()
+        .remove(0);
     let EmissionStatus::Emitted { rust: definition, .. } = equality.status else {
         panic!("incomplete-array equality")
     };
@@ -328,7 +329,7 @@ fn compiler_anchored_record_places_match_c_without_reading_uninitialized_fields(
     let changed_artifact =
         emit_support_artifact_with_bindings(&session, &["RECORD_FLEX"], &changed_catalog).unwrap();
     let changed_emission =
-        emit_batch_with_bindings(&session, &["RECORD_FLEX"], &changed_catalog).remove(0);
+        emit_batch_with_bindings(&session, &["RECORD_FLEX"], &changed_catalog).unwrap().remove(0);
     let EmissionStatus::Emitted { rust: definition, .. } = changed_emission.status else {
         panic!("layout assertions must remain attached to field adapter")
     };
@@ -369,7 +370,9 @@ fn compiler_anchored_record_places_match_c_without_reading_uninitialized_fields(
         &profile.target,
     );
     let changed_emission =
-        emit_batch_with_bindings(&session, &["RECORD_PROMOTED"], &changed_catalog).remove(0);
+        emit_batch_with_bindings(&session, &["RECORD_PROMOTED"], &changed_catalog)
+            .unwrap()
+            .remove(0);
     assert!(
         matches!(changed_emission.status, EmissionStatus::Skipped { .. }),
         "ambiguous compiler-to-binding identity cannot be inferred: {changed_emission:?}"

@@ -50,6 +50,9 @@ const NAMES: &[&str] = &[
     "ENUM_CONSTANT",
     "ENUM_CONSTANT_USE",
     "ENUM_CONSTANT_ZERO",
+    "ENUM_ORDER",
+    "ENUM_DIFFERENCE",
+    "ENUM_QUALIFIED_POINTER",
 ];
 
 #[test]
@@ -129,7 +132,7 @@ fn check_profile(scanner: &MacroScanner, short_enums: bool) {
         ));
         c_types.push_str(&format!("typedef {} {alias};\n_Static_assert(__builtin_types_compatible_p({name},{alias}),\"compiler enum compatibility\");\n", underlying.canonical_spelling));
     }
-    for emission in emit_batch_with_bindings(&session, NAMES, &catalog) {
+    for emission in emit_batch_with_bindings(&session, NAMES, &catalog).unwrap() {
         let EmissionStatus::Emitted { rust, .. } = emission.status else {
             panic!("enum macro must emit: {emission:?}");
         };
@@ -162,6 +165,7 @@ fn check_profile(scanner: &MacroScanner, short_enums: bool) {
         &arguments,
         true,
     );
+    assert_eq!(original.lines().count(), 293, "enum and compatible-pointer corpus completeness");
     assert_eq!(generated, original, "enum semantics for short_enums={short_enums}");
     let rejection = rust_oracle::reject_rust(&format!(
         "{base}\nfn main() {{ let mut object=core::mem::MaybeUninit::<EnumRecord>::uninit(); let mut other=EnumOther::OtherOne; unsafe {{ let _=ENUM_DISTINCT!(object.as_mut_ptr(), &raw mut other); }} }}"
@@ -180,4 +184,90 @@ fn check_profile(scanner: &MacroScanner, short_enums: bool) {
         rejection.contains("distinct pointer types"),
         "original C rejects different enum identities: {rejection}"
     );
+    let mut rejected_arguments = arguments.clone();
+    rejected_arguments.push("-Wpointer-arith");
+    for (name, rust, c, rust_reason, c_reason) in [
+        (
+            "distinct enum ordering",
+            "let _=ENUM_ORDER!(core::ptr::null_mut::<EnumSmall>(),core::ptr::null_mut::<EnumOther>());",
+            "void rejected(EnumSmall *left,EnumOther *right){(void)ENUM_ORDER(left,right);}",
+            "CompatibleIdentity",
+            "distinct pointer types",
+        ),
+        (
+            "distinct enum subtraction",
+            "let _=ENUM_DIFFERENCE!(core::ptr::null_mut::<EnumSmall>(),core::ptr::null_mut::<EnumOther>());",
+            "void rejected(EnumSmall *left,EnumOther *right){(void)ENUM_DIFFERENCE(left,right);}",
+            "CompatibleIdentity",
+            "not pointers to compatible types",
+        ),
+        (
+            "void left ordering",
+            "let _=ENUM_ORDER!(core::ptr::null_mut::<core::ffi::c_void>(),core::ptr::null_mut::<EnumSmall>());",
+            "void rejected(void *left,EnumSmall *right){(void)ENUM_ORDER(left,right);}",
+            "NonVoidIdentity",
+            "distinct pointer types",
+        ),
+        (
+            "void right ordering",
+            "let _=ENUM_ORDER!(core::ptr::null_mut::<EnumSmall>(),core::ptr::null_mut::<core::ffi::c_void>());",
+            "void rejected(EnumSmall *left,void *right){(void)ENUM_ORDER(left,right);}",
+            "NonVoidIdentity",
+            "distinct pointer types",
+        ),
+        (
+            "void subtraction",
+            "let _=ENUM_DIFFERENCE!(core::ptr::null_mut::<core::ffi::c_void>(),core::ptr::null_mut::<core::ffi::c_void>());",
+            "void rejected(void *left,void *right){(void)ENUM_DIFFERENCE(left,right);}",
+            "CompleteObject",
+            "void",
+        ),
+        (
+            "incomplete subtraction",
+            "let pointer=Pointer::<COpaque<()>,ReadWrite>::new(core::ptr::null_mut());let _=ENUM_DIFFERENCE!(pointer,pointer);",
+            "void rejected(EnumOpaque *left,EnumOpaque *right){(void)ENUM_DIFFERENCE(left,right);}",
+            "CompleteObject",
+            "incomplete type",
+        ),
+        (
+            "rank ordering",
+            "let left=Pointer::<CLong,ReadWrite>::new(core::ptr::null_mut());let right=Pointer::<CLongLong,ReadWrite>::new(core::ptr::null_mut());let _=ENUM_ORDER!(left,right);",
+            "void rejected(long *left,long long *right){(void)ENUM_ORDER(left,right);}",
+            "CompatibleIdentity",
+            "distinct pointer types",
+        ),
+        (
+            "rank subtraction",
+            "let left=Pointer::<CLong,ReadWrite>::new(core::ptr::null_mut());let right=Pointer::<CLongLong,ReadWrite>::new(core::ptr::null_mut());let _=ENUM_DIFFERENCE!(left,right);",
+            "void rejected(long *left,long long *right){(void)ENUM_DIFFERENCE(left,right);}",
+            "CompatibleIdentity",
+            "not pointers to compatible types",
+        ),
+        (
+            "signedness ordering",
+            "let _=ENUM_ORDER!(core::ptr::null_mut::<i32>(),core::ptr::null_mut::<u32>());",
+            "void rejected(int *left,unsigned int *right){(void)ENUM_ORDER(left,right);}",
+            "CompatibleIdentity",
+            "distinct pointer types",
+        ),
+        (
+            "signedness subtraction",
+            "let _=ENUM_DIFFERENCE!(core::ptr::null_mut::<i32>(),core::ptr::null_mut::<u32>());",
+            "void rejected(int *left,unsigned int *right){(void)ENUM_DIFFERENCE(left,right);}",
+            "CompatibleIdentity",
+            "not pointers to compatible types",
+        ),
+    ] {
+        let diagnostic = rust_oracle::reject_rust(&format!(
+            "{base}\nfn main(){{use __pgrx_c_macros::expression::{{COpaque,Pointer,ReadWrite}};use __pgrx_c_macros::{{CLong,CLongLong}};{rust}}}"
+        ));
+        assert!(diagnostic.contains(rust_reason), "{name} must reject in Rust: {diagnostic}");
+        let diagnostic = rust_oracle::reject_c_invocation(
+            &profile.compiler.executable,
+            &header,
+            c,
+            &rejected_arguments,
+        );
+        assert!(diagnostic.contains(c_reason), "{name} must reject in original C: {diagnostic}");
+    }
 }

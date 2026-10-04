@@ -233,7 +233,7 @@ fn public_macro_generation_matches_original_c_field_values_and_evaluation() {
     let support = directory.join("../pgrx-pg-sys/src/c_macros/support.rs").canonicalize().unwrap();
     let mut rust = format!("#[path = {support:?}] pub mod __pgrx_c_macros;\n{rust_bindings}\n");
     rust.push_str(&emit_support_with_bindings(&session, NAMES, &bindings).unwrap());
-    for emission in emit_batch_with_bindings(&session, NAMES, &bindings) {
+    for emission in emit_batch_with_bindings(&session, NAMES, &bindings).unwrap() {
         let EmissionStatus::Emitted { rust: definition, .. } = emission.status else {
             panic!("{} must emit: {:?}", emission.analysis.name, emission.status);
         };
@@ -384,7 +384,7 @@ fn generated_bitfield_accessors_match_original_c_with_uninitialized_neighbor_bit
     let c_support = artifact.c_source;
     assert!(!c_support.is_empty(), "bitfields must have original-C access primitives");
     assert!(!c_support.contains("BIT_READ"), "native support must not hand-port macro bodies");
-    for emission in emit_batch_with_bindings(&session, &names, &bindings) {
+    for emission in emit_batch_with_bindings(&session, &names, &bindings).unwrap() {
         let EmissionStatus::Emitted { rust: definition, .. } = emission.status else {
             panic!("{} must emit: {:?}", emission.analysis.name, emission.status);
         };

@@ -26,7 +26,7 @@ pub(super) fn generate(
     target: &TargetFacts,
     profile_identity: &str,
 ) -> Result<AddressAdapters, String> {
-    let lowering = Lowering::new(declarations, bindings, target);
+    let lowering = Lowering::new_native(declarations, bindings, target);
     let mut output = AddressAdapters {
         rust: String::new(),
         c_source: String::new(),
@@ -85,7 +85,7 @@ pub(super) fn generate(
                 target.function_pointer.size, target.function_pointer.alignment
             );
             let mut rust = String::new();
-            writeln!(rust, "unsafe extern \"C\" {{ #[link_name = {symbol:?}] fn {raw}() -> {storage}; }}\n#[inline]\npub fn {getter}() -> crate::__pgrx_c_macros::expression::FunctionValue<{marker}> {{\n// SAFETY: This generated C getter only takes a function address. It accesses no object, makes no callback, and cannot raise PostgreSQL ERROR. Its exact nullable function-pointer ABI was checked against the compiler declaration and binding storage.\ncrate::__pgrx_c_macros::expression::FunctionValue::new(unsafe {{ {raw}() }})\n}}").expect("String output");
+            writeln!(rust, "unsafe extern \"C\" {{ #[link_name = {symbol:?}] fn {raw}() -> {storage}; }}\n#[inline]\npub fn {getter}() -> c::expression::FunctionValue<{marker}> {{\n// SAFETY: This generated C getter only takes a function address. It accesses no object, makes no callback, and cannot raise PostgreSQL ERROR. Its exact nullable function-pointer ABI was checked against the compiler declaration and binding storage.\nc::expression::FunctionValue::new(unsafe {{ {raw}() }})\n}}").expect("String output");
             Ok::<_, String>((
                 rust,
                 c,

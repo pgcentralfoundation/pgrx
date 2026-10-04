@@ -132,7 +132,7 @@ fn original_c_null_constant_contexts_and_boundaries_are_preserved() {
         "#![deny(unsafe_op_in_unsafe_fn)]\n#![allow(non_snake_case,non_camel_case_types,dead_code,unused_parens)]\n#[path={support:?}] pub mod __pgrx_c_macros;\n{bindings}\n{}\n",
         artifact.rust
     );
-    for emission in emit_batch_with_bindings(&session, NAMES, &catalog) {
+    for emission in emit_batch_with_bindings(&session, NAMES, &catalog).unwrap() {
         let EmissionStatus::Emitted { rust: definition, .. } = emission.status else {
             panic!("null macro {} must emit: {emission:?}", emission.analysis.name);
         };

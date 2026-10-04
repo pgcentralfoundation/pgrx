@@ -13,6 +13,28 @@ use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 pub(super) const EXPRESSION: &str = "$crate::__pgrx_c_macros::expression";
 
+#[derive(Clone, Copy)]
+enum RuntimePath {
+    ExportedMacro,
+    Native,
+}
+
+impl RuntimePath {
+    fn support(self) -> &'static str {
+        match self {
+            Self::ExportedMacro => SUPPORT,
+            Self::Native => "c",
+        }
+    }
+
+    fn expression(self) -> &'static str {
+        match self {
+            Self::ExportedMacro => EXPRESSION,
+            Self::Native => "c::expression",
+        }
+    }
+}
+
 pub(super) struct LoweredType {
     pub marker: String,
     pub storage: String,
@@ -28,6 +50,7 @@ pub(super) struct Lowering<'a> {
     declarations: &'a DeclarationCatalog,
     bindings: &'a BindingCatalog,
     target: &'a TargetFacts,
+    runtime: RuntimePath,
     records_by_path: BTreeMap<String, &'a RecordBinding>,
     record_paths: BTreeMap<String, BTreeSet<String>>,
     anonymous_edges: BTreeMap<(String, usize), String>,
@@ -43,6 +66,25 @@ impl<'a> Lowering<'a> {
         bindings: &'a BindingCatalog,
         target: &'a TargetFacts,
     ) -> Self {
+        Self::with_runtime(declarations, bindings, target, RuntimePath::ExportedMacro)
+    }
+
+    /// Native items share one private runtime import in `__pgrx_c_generated`.
+    /// Binding storage and capability identities retain their defining-crate paths.
+    pub fn new_native(
+        declarations: &'a DeclarationCatalog,
+        bindings: &'a BindingCatalog,
+        target: &'a TargetFacts,
+    ) -> Self {
+        Self::with_runtime(declarations, bindings, target, RuntimePath::Native)
+    }
+
+    fn with_runtime(
+        declarations: &'a DeclarationCatalog,
+        bindings: &'a BindingCatalog,
+        target: &'a TargetFacts,
+        runtime: RuntimePath,
+    ) -> Self {
         let records_by_path =
             bindings.records.values().map(|record| (path_key(&record.path), record)).collect();
         let enums_by_path =
@@ -51,6 +93,7 @@ impl<'a> Lowering<'a> {
             declarations,
             bindings,
             target,
+            runtime,
             records_by_path,
             record_paths: BTreeMap::new(),
             anonymous_edges: BTreeMap::new(),
@@ -147,6 +190,7 @@ impl<'a> Lowering<'a> {
         storage: &RustBindingType,
         depth: usize,
     ) -> Result<LoweredType, String> {
+        let expression = self.runtime.expression();
         let underlying = self.enum_underlying(ty)?;
         if ty.size.is_none()
             || ty.alignment.is_none()
@@ -184,10 +228,10 @@ impl<'a> Lowering<'a> {
             );
         }
         let identity = super::enumerations::identity_path(ty);
-        let marker = format!("{EXPRESSION}::CEnumObject<{identity}, {}, {actual}>", numeric.marker);
+        let marker = format!("{expression}::CEnumObject<{identity}, {}, {actual}>", numeric.marker);
         Ok(LoweredType {
             marker: if ty.is_volatile {
-                format!("{EXPRESSION}::CVolatile<{marker}>")
+                format!("{expression}::CVolatile<{marker}>")
             } else {
                 marker
             },
@@ -552,20 +596,23 @@ impl<'a> Lowering<'a> {
     }
 
     fn resolve_at(&self, ty: &TypeInfo, depth: usize) -> Result<LoweredType, String> {
+        let expression = self.runtime.expression();
         if depth > 64 {
             return Err("C type exceeds the bounded lowering depth".into());
         }
         let mut lowered = self.resolve_unqualified_at(ty, depth)?;
         if ty.is_volatile {
-            lowered.marker = format!("{EXPRESSION}::CVolatile<{}>", lowered.marker);
+            lowered.marker = format!("{expression}::CVolatile<{}>", lowered.marker);
         }
         Ok(lowered)
     }
 
     fn resolve_unqualified_at(&self, ty: &TypeInfo, depth: usize) -> Result<LoweredType, String> {
+        let expression = self.runtime.expression();
+        let support = self.runtime.support();
         if let Some(callback) = self.bindings.callback_capabilities.get(&ty.canonical_spelling) {
             return Ok(LoweredType {
-                marker: format!("{EXPRESSION}::CFunction<{}>", callback.marker),
+                marker: format!("{expression}::CFunction<{}>", callback.marker),
                 storage: self.storage_type(&callback.storage, 0)?,
             });
         }
@@ -581,7 +628,7 @@ impl<'a> Lowering<'a> {
         {
             let element = self.resolve_at(element, depth + 1)?;
             return Ok(LoweredType {
-                marker: format!("{EXPRESSION}::CArray<{}, {length}>", element.marker),
+                marker: format!("{expression}::CArray<{}, {length}>", element.marker),
                 storage: format!("[{}; {length}]", element.storage),
             });
         }
@@ -593,7 +640,7 @@ impl<'a> Lowering<'a> {
                     .get(&kind)
                     .ok_or("C integer identity is absent from the target profile")?;
                 Ok(LoweredType {
-                    marker: format!("{SUPPORT}::{}", marker(kind)),
+                    marker: format!("{support}::{}", marker(kind)),
                     storage: if kind == crate::IntegerKind::Bool {
                         "bool".into()
                     } else {
@@ -602,7 +649,7 @@ impl<'a> Lowering<'a> {
                 })
             }
             TypeCategory::Void => Ok(LoweredType {
-                marker: format!("{EXPRESSION}::CVoid"),
+                marker: format!("{expression}::CVoid"),
                 storage: "::core::ffi::c_void".into(),
             }),
             TypeCategory::Pointer => {
@@ -610,7 +657,7 @@ impl<'a> Lowering<'a> {
                 let lowered = self.resolve_at(&pointee, depth + 1)?;
                 Ok(LoweredType {
                     marker: format!(
-                        "{EXPRESSION}::CPointer<{}, {EXPRESSION}::{}>",
+                        "{expression}::CPointer<{}, {expression}::{}>",
                         lowered.marker,
                         if pointee.is_const { "ReadOnly" } else { "ReadWrite" }
                     ),
@@ -637,7 +684,7 @@ impl<'a> Lowering<'a> {
                 } else {
                     "COpaque"
                 };
-                Ok(LoweredType { marker: format!("{EXPRESSION}::{marker}<{storage}>"), storage })
+                Ok(LoweredType { marker: format!("{expression}::{marker}<{storage}>"), storage })
             }
             TypeCategory::Enum => {
                 let storage = if let Some(binding) = self.enum_binding(ty)? {
@@ -669,7 +716,7 @@ impl<'a> Lowering<'a> {
                         );
                     }
                 };
-                Ok(LoweredType { marker: format!("{EXPRESSION}::{name}"), storage: storage.into() })
+                Ok(LoweredType { marker: format!("{expression}::{name}"), storage: storage.into() })
             }
             TypeCategory::Function => {
                 Err("function pointer values require a generated ABI adapter".into())
@@ -692,6 +739,8 @@ impl<'a> Lowering<'a> {
         storage: &RustBindingType,
         depth: usize,
     ) -> Result<LoweredType, String> {
+        let expression = self.runtime.expression();
+        let support = self.runtime.support();
         if depth > 64 {
             return Err("C/Rust storage reconciliation exceeds its bounded depth".into());
         }
@@ -719,10 +768,10 @@ impl<'a> Lowering<'a> {
                 return Err("incomplete record cannot cross a by-value C ABI".into());
             }
             let lowered = self.resolve_with_storage_at(ty, value, depth + 1)?;
-            let marker = format!("{EXPRESSION}::CRawRecord<{}>", lowered.storage);
+            let marker = format!("{expression}::CRawRecord<{}>", lowered.storage);
             return Ok(LoweredType {
                 marker: if ty.is_volatile {
-                    format!("{EXPRESSION}::CVolatile<{marker}>")
+                    format!("{expression}::CVolatile<{marker}>")
                 } else {
                     marker
                 },
@@ -748,10 +797,10 @@ impl<'a> Lowering<'a> {
             };
             let element = self.resolve_with_storage_at(element, actual, depth + 1)?;
             let storage = format!("{}<{}>", rust_path(path)?, element.storage);
-            let marker = format!("{EXPRESSION}::CFlexibleArray<{}, {storage}>", element.marker);
+            let marker = format!("{expression}::CFlexibleArray<{}, {storage}>", element.marker);
             return Ok(LoweredType {
                 marker: if ty.is_volatile {
-                    format!("{EXPRESSION}::CVolatile<{marker}>")
+                    format!("{expression}::CVolatile<{marker}>")
                 } else {
                     marker
                 },
@@ -772,12 +821,12 @@ impl<'a> Lowering<'a> {
             {
                 let storage = rust_path(path)?;
                 let marker = format!(
-                    "{EXPRESSION}::CIntegerStorage<{SUPPORT}::{}, {storage}>",
+                    "{expression}::CIntegerStorage<{support}::{}, {storage}>",
                     marker(kind)
                 );
                 return Ok(LoweredType {
                     marker: if ty.is_volatile {
-                        format!("{EXPRESSION}::CVolatile<{marker}>")
+                        format!("{expression}::CVolatile<{marker}>")
                     } else {
                         marker
                     },
@@ -800,10 +849,10 @@ impl<'a> Lowering<'a> {
                 return Err("bindgen array bound differs from the compiler declaration".into());
             }
             let element = self.resolve_with_storage_at(element, actual, depth + 1)?;
-            let marker = format!("{EXPRESSION}::CArray<{}, {length}>", element.marker);
+            let marker = format!("{expression}::CArray<{}, {length}>", element.marker);
             return Ok(LoweredType {
                 marker: if ty.is_volatile {
-                    format!("{EXPRESSION}::CVolatile<{marker}>")
+                    format!("{expression}::CVolatile<{marker}>")
                 } else {
                     marker
                 },
@@ -824,10 +873,10 @@ impl<'a> Lowering<'a> {
             }
             let storage = if *signed { "isize" } else { "usize" }.to_owned();
             let marker =
-                format!("{EXPRESSION}::CIntegerStorage<{SUPPORT}::{}, {storage}>", marker(kind));
+                format!("{expression}::CIntegerStorage<{support}::{}, {storage}>", marker(kind));
             return Ok(LoweredType {
                 marker: if ty.is_volatile {
-                    format!("{EXPRESSION}::CVolatile<{marker}>")
+                    format!("{expression}::CVolatile<{marker}>")
                 } else {
                     marker
                 },
@@ -843,13 +892,13 @@ impl<'a> Lowering<'a> {
             }
             let pointee_lowered = self.resolve_with_storage_at(&pointee, actual, depth + 1)?;
             let marker = format!(
-                "{EXPRESSION}::CPointer<{}, {EXPRESSION}::{}>",
+                "{expression}::CPointer<{}, {expression}::{}>",
                 pointee_lowered.marker,
                 if *mutable { "ReadWrite" } else { "ReadOnly" }
             );
             return Ok(LoweredType {
                 marker: if ty.is_volatile {
-                    format!("{EXPRESSION}::CVolatile<{marker}>")
+                    format!("{expression}::CVolatile<{marker}>")
                 } else {
                     marker
                 },
@@ -1004,6 +1053,91 @@ pub(super) fn rust_path(path: &[String]) -> Result<String, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn native_runtime_paths_do_not_escape_into_macro_or_storage_paths() {
+        let kind = crate::IntegerKind::UnsignedInt;
+        let target = TargetFacts {
+            triple: "fixture".into(),
+            pointer_bits: 64,
+            function_pointer: crate::PointerLayout { size: 8, alignment: 8 },
+            size_type: kind,
+            offsetof_supported: true,
+            char_bits: 8,
+            char_is_signed: true,
+            ascii_execution_charset: true,
+            byte_order: crate::ByteOrder::Little,
+            c_standard: Some(201710),
+            integers: [(kind, crate::IntegerType { kind, bits: 32, signed: false, rank: 3 })]
+                .into(),
+            floating_point: Default::default(),
+        };
+        let integer = TypeInfo {
+            spelling: "unsigned int".into(),
+            canonical_spelling: "unsigned int".into(),
+            category: TypeCategory::Integer(kind),
+            size: Some(4),
+            alignment: Some(4),
+            is_const: false,
+            is_volatile: false,
+        };
+        let mut declarations = DeclarationCatalog::default();
+        declarations.types.insert("CountAlias".into(), integer.clone());
+        let mut bindings = BindingCatalog::default();
+        bindings.types.insert(
+            "CountAlias".into(),
+            crate::AliasBinding {
+                path: vec!["CountAlias".into()],
+                target: RustBindingType::Integer { signed: false, bits: 32 },
+            },
+        );
+        let signature = "$crate::__pgrx_c_generated::Signature_verified";
+        bindings.callback_capabilities.insert(
+            "callback".into(),
+            crate::CallbackBinding {
+                marker: signature.into(),
+                storage: RustBindingType::Option {
+                    value: Box::new(RustBindingType::Function {
+                        parameters: vec![RustBindingType::Integer { signed: false, bits: 32 }],
+                        result: Box::new(RustBindingType::Unit),
+                        abi: "C-unwind".into(),
+                        unsafe_: true,
+                        variadic: false,
+                    }),
+                },
+            },
+        );
+        let exported = Lowering::new(&declarations, &bindings, &target);
+        let native = Lowering::new_native(&declarations, &bindings, &target);
+        let (_, exported_alias) = exported.cast_alias("CountAlias", &integer).unwrap().unwrap();
+        let (spelling, native_alias) = native.cast_alias("CountAlias", &integer).unwrap().unwrap();
+        assert_eq!(spelling, "$crate::CountAlias");
+        assert_eq!(exported_alias.marker, "$crate::__pgrx_c_macros::CUnsignedInt");
+        assert_eq!(native_alias.marker, "c::CUnsignedInt");
+        assert_eq!(exported_alias.storage, native_alias.storage);
+        let callback = TypeInfo {
+            spelling: "callback".into(),
+            canonical_spelling: "callback".into(),
+            category: TypeCategory::Function,
+            ..integer.clone()
+        };
+        for ty in [integer.clone(), TypeInfo { is_volatile: true, ..integer }, callback] {
+            let macro_type = exported.resolve(&ty).unwrap();
+            let native_type = native.resolve(&ty).unwrap();
+            assert!(macro_type.marker.starts_with("$crate::__pgrx_c_macros::"));
+            assert!(native_type.marker.starts_with("c::"));
+            assert_eq!(macro_type.storage, native_type.storage);
+            assert_eq!(
+                macro_type.marker.contains(signature),
+                native_type.marker.contains(signature),
+            );
+        }
+        // A binding named `c` remains a defining-crate path, not the private import.
+        let storage = RustBindingType::Named { path: vec!["c".into()] };
+        assert_eq!(exported.storage_type(&storage, 0).unwrap(), "$crate::c");
+        assert_eq!(native.storage_type(&storage, 0).unwrap(), "$crate::c");
+        assert_eq!(bindings.callback_capabilities["callback"].marker, signature);
+    }
 
     #[test]
     fn keyword_and_primitive_field_renames_require_unambiguous_compiler_names() {

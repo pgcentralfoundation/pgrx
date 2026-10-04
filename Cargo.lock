@@ -2281,12 +2281,14 @@ dependencies = [
  "eyre",
  "petgraph",
  "pgrx-pg-config",
+ "proc-macro2",
  "quote",
  "serde",
  "serde_json",
  "sha2",
  "shlex 2.0.1",
  "syn",
+ "tempfile",
  "thiserror 2.0.18",
 ]
 
