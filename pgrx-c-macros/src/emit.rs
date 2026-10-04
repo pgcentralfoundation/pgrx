@@ -63,6 +63,8 @@ mod expectation;
 mod fields;
 /// Native C thunks and guarded Rust adapters for callable declarations.
 mod functions;
+/// Generated support identifiers derived from C names.
+mod names;
 /// Lexically ordered statement lowering over the shared expression arena.
 mod statements;
 /// Contextual expression rendering for values, places, size operands, and effects.
@@ -643,17 +645,6 @@ struct GeneratedAdapters {
     enumerations: enumerations::EnumAdapters,
 }
 
-/// Hash compiler-established representations and language modes rather than
-/// installation paths, working directories, environment values or OS versions.
-/// Full input fingerprints still control verification and rebuilds independently.
-fn semantic_target_bytes(target: &crate::TargetFacts) -> Result<Vec<u8>, String> {
-    let mut facts = serde_json::to_value(target).map_err(|error| error.to_string())?;
-    // Calling conventions and layouts are separate compiler witnesses. The
-    // spelling of the target triple adds no representation fact to these IDs.
-    facts.as_object_mut().expect("TargetFacts serializes as an object").remove("triple");
-    serde_json::to_vec(&facts).map_err(|error| error.to_string())
-}
-
 /// Build capability families in dependency order from the planned batch requirements.
 ///
 /// Callback witnesses establish signatures before function thunks are generated;
@@ -664,16 +655,6 @@ fn generated_adapters(
     bindings: &BindingCatalog,
 ) -> Result<GeneratedAdapters, String> {
     let frontend = session.frontend();
-    use sha2::{Digest, Sha256};
-    let target = semantic_target_bytes(&frontend.profile().target)?;
-    let mut hash = Sha256::new();
-    hash.update(target);
-    hash.update(
-        serde_json::to_vec(&frontend.profile().signed_overflow)
-            .map_err(|error| error.to_string())?,
-    );
-    let profile_identity =
-        hash.finalize().iter().map(|byte| format!("{byte:02x}")).collect::<String>();
     let callbacks = callbacks::generate(
         frontend.declarations(),
         bindings,
@@ -690,7 +671,6 @@ fn generated_adapters(
         &requests.functions,
         &requests.called_functions,
         &frontend.profile().target,
-        &profile_identity,
     )?;
     capabilities.functions.extend(functions.bindings.clone());
     let callbacks = callbacks::generate(
@@ -736,7 +716,6 @@ fn generated_adapters(
             &capabilities,
             &requests.addresses,
             &frontend.profile().target,
-            &profile_identity,
         )?,
         functions,
         callbacks,
@@ -1865,23 +1844,6 @@ fn macro_identifier(name: &str) -> Option<String> {
 mod tests {
     use super::{MAX_EMISSION_BYTES, definition_comment, rust_identifier, write_doc_comments};
     use crate::{MacroDefinition, MacroKind, Token, TokenKind};
-
-    /// Helper identities ignore deployment triple spelling while retaining
-    /// actual C layout and language facts; input verification remains separate.
-    #[test]
-    fn semantic_identity_ignores_os_versions_but_retains_layout() {
-        let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
-        let scanner = crate::MacroScanner::new().expect("libclang required");
-        let header = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("tests/fixtures/emit_scalar.h");
-        let frontend = crate::inspect(&scanner, &header, &[], None).unwrap();
-        let mut target = frontend.profile().target.clone();
-        let identity = super::semantic_target_bytes(&target).unwrap();
-        target.triple = "arm64-apple-darwin99.0.0".into();
-        assert_eq!(identity, super::semantic_target_bytes(&target).unwrap());
-        target.pointer_bits = 32;
-        assert_ne!(identity, super::semantic_target_bytes(&target).unwrap());
-    }
 
     /// Check that large retained C definitions account for both source text and documentation fences.
     #[test]

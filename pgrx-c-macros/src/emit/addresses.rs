@@ -13,7 +13,6 @@ use super::types::Lowering;
 use crate::{
     BindingCatalog, DeclarationCatalog, DeclarationLinkage, FunctionAddressBinding, TargetFacts,
 };
-use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write;
 
@@ -31,14 +30,13 @@ pub(super) struct AddressAdapters {
 
 /// Generate requested address getters only after proving linkage, definition availability, and callback ABI.
 ///
-/// The profile and signature salt keeps symbols distinct across installations;
-/// parenthesized C identifiers avoid invoking same-named function-like macros.
+/// Getters are named after their C function; parenthesized C identifiers avoid
+/// invoking same-named function-like macros.
 pub(super) fn generate(
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,
     names: &BTreeSet<String>,
     target: &TargetFacts,
-    profile_identity: &str,
 ) -> Result<AddressAdapters, String> {
     let lowering = Lowering::new_native(declarations, bindings, target);
     let mut output = AddressAdapters {
@@ -81,21 +79,15 @@ pub(super) fn generate(
                 .ok_or("function address has no verified callback ABI")?;
             let storage = lowering.storage_type(&signature.storage, 0)?.replace("$crate", "crate");
             let marker = signature.marker.replace("$crate", "crate");
-            let mut hash = Sha256::new();
-            hash.update(profile_identity);
-            hash.update(name);
-            hash.update(serde_json::to_vec(function).map_err(|error| error.to_string())?);
-            hash.update(serde_json::to_vec(&signature.storage).map_err(|error| error.to_string())?);
-            let suffix =
-                hash.finalize()[..16].iter().map(|byte| format!("{byte:02x}")).collect::<String>();
-            let symbol = format!("__pgrx_function_address_{suffix}");
-            let raw = format!("raw_address_{suffix}");
-            let getter = format!("Address_{suffix}");
+            let symbol = super::names::helper("__pgrx_address", "fn", &[name]);
+            let symbol_type = super::names::helper("__pgrx_address", "type", &[name]);
+            let raw = format!("raw_address_{name}");
+            let getter = format!("Address_{name}");
             // Parentheses keep a same-named function-like macro from expanding.
             // This also returns the original static function, rather than its
             // generated callable thunk or pgrx's Rust guard wrapper.
             let c = format!(
-                "typedef __typeof__(&({name})) {symbol}_type;\n_Static_assert(sizeof({symbol}_type) == {}, \"function pointer size\");\n_Static_assert(_Alignof({symbol}_type) == {}, \"function pointer alignment\");\n{symbol}_type {symbol}(void) {{ return &({name}); }}\n",
+                "typedef __typeof__(&({name})) {symbol_type};\n_Static_assert(sizeof({symbol_type}) == {}, \"function pointer size\");\n_Static_assert(_Alignof({symbol_type}) == {}, \"function pointer alignment\");\n{symbol_type} {symbol}(void) {{ return &({name}); }}\n",
                 target.function_pointer.size, target.function_pointer.alignment
             );
             let mut rust = String::new();

@@ -277,8 +277,7 @@ cannot be inferred from a declaration's name or broad type category:
    does not establish that the included definition is available. Retain physical
    source spans, original formals and bounded definition text from that same
    parse. Header contents are copied once per physical source, rather than once
-   per function; the common input fingerprints identify bodies for native adapter
-   hashes, which serialize only the prototype and linkage.
+   per function.
 2. **Bitfield operations.** For each named bitfield whose containing record has
    a usable C spelling, probe unary-plus promotion, assignment-result type and
    promotion, and postfix-result type and
@@ -1789,11 +1788,26 @@ work; `PGRX_MACRO_DEBUG=1` enables its Cargo diagnostics. Cross builds require
 target PostgreSQL metadata, rather than importing the host's recorded CFLAGS.
 
 Input content fingerprints determine when compiler facts expire. Generated
-helper names instead hash semantic target representations, callable signatures,
-C overflow policy and layout facts. They do not hash PATH, HOME, working
-directories, compiler installation paths or OS deployment versions. Field
-markers use the original member name, retaining polymorphic projection across
-records without renumbering unrelated fields.
+support names come from the C names they adapt, never from hashes, catalog
+positions, or the build environment:
+
+| Item | Name |
+| --- | --- |
+| Field marker | `Field_<member>` |
+| Bitfield place | `Bitfield_<record>__<member>` |
+| Inline call adapter | `Inline_<function>`, native `__pgrx_inline__fn__<function>` |
+| Function address getter | `Address_<function>`, native `__pgrx_address__fn__<function>` |
+| Callback signature | `Signature_<encoded C function type>` |
+| Enum identity | `EnumIdentity_<encoded C enum type>` |
+
+Native helper names put their role before the C names (`__pgrx_inline__arg0__f`),
+and multi-part names join plain C identifiers with `__`. A part that is not a
+plain identifier, or a type token other than an identifier or number, is
+encoded behind a leading digit, so one generated name identifies exactly one
+combination of parts. Anonymous C type locations keep only the path below
+PostgreSQL's `server` include directory, or the filename, so installation
+prefixes do not change names. Unrelated header changes therefore leave every
+other generated name unchanged.
 
 The CLI embeds packaged copies of the canonical wrapper headers. A default
 wrapper is published atomically under PGRX_HOME in a directory keyed by its

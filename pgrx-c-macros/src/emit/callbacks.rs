@@ -16,7 +16,6 @@ use crate::{
     BindingCatalog, CallbackBinding, DeclarationCatalog, FunctionSignature, RustBindingType,
     TargetFacts, TypeCategory, TypeInfo, TypeShapeKind,
 };
-use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use std::fmt::Write;
 
@@ -291,13 +290,12 @@ pub(super) fn generate(
     let mut capabilities = bindings.clone();
     let mut marker_names = BTreeMap::new();
     for (key, candidate) in &candidates {
-        let mut hash = Sha256::new();
-        hash.update(&candidate.function.canonical_spelling);
-        hash.update(serde_json::to_vec(&candidate.storage).map_err(|error| error.to_string())?);
-        hash.update(super::semantic_target_bytes(target)?);
-        let suffix =
-            hash.finalize()[..16].iter().map(|byte| format!("{byte:02x}")).collect::<String>();
-        let name = format!("Signature_{suffix}");
+        // One canonical C function type has exactly one validated ABI witness
+        // above, so its spelling alone names the marker.
+        let name = format!(
+            "Signature_{}",
+            super::names::type_spelling(&candidate.function.canonical_spelling)
+        );
         let binding = CallbackBinding {
             marker: format!("$crate::__pgrx_c_generated::{name}"),
             storage: candidate.storage.clone(),
