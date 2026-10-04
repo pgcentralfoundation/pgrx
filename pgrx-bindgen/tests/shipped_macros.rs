@@ -124,13 +124,93 @@ impl Fixture {
         self.output().ancestors().nth(3).unwrap().to_path_buf()
     }
 
-    /// Require binding/Clang disagreements and their dependency skips to appear in both report
-    /// data and compiler warnings.
-    fn assert_mismatch_skips(&self, phase: &str) {
+    /// Check every macro warning against the current audit report. Quiet builds
+    /// retain that report, while debug builds expose every skip and the summary
+    /// through both build-script directives and Cargo's actual diagnostics.
+    fn assert_macro_warnings(&self, phase: &str, debug: bool) -> serde_json::Value {
         let out_dir = self.out_dir();
         let report: serde_json::Value =
             serde_json::from_slice(&fs::read(out_dir.join("pg18_macro_report.json")).unwrap())
                 .unwrap();
+        let build_output = fs::read_to_string(out_dir.parent().unwrap().join("output")).unwrap();
+        let stderr = fs::read_to_string(self.0.join(format!("{phase}.stderr"))).unwrap();
+        assert!(
+            build_output.lines().any(|line| line == "cargo:rerun-if-env-changed=PGRX_MACRO_DEBUG"),
+            "{phase} tracks the diagnostic switch for Cargo invalidation"
+        );
+        let mut expected = BTreeSet::new();
+        match report["status"].as_str().unwrap() {
+            "generated" => {
+                let macros = report["macros"].as_array().unwrap();
+                let mut emitted = 0;
+                let mut skipped = 0;
+                for emission in macros {
+                    match emission["status"]["status"].as_str().unwrap() {
+                        "emitted" => emitted += 1,
+                        "skipped" => {
+                            skipped += 1;
+                            let name = emission["analysis"]["name"].as_str().unwrap();
+                            let reason = emission["status"]["reason"]["message"].as_str().unwrap();
+                            expected.insert(format!(
+                                "pg18: skipping macro `{name}`: {}",
+                                reason.replace(['\r', '\n'], " ")
+                            ));
+                        }
+                        status => panic!("unexpected macro status {status}"),
+                    }
+                }
+                expected.insert(format!(
+                    "pg18 C macros: {emitted} emitted, {skipped} skipped; report {}",
+                    out_dir.join("pg18_macro_report.json").display()
+                ));
+            }
+            "unavailable" => {
+                expected.insert(format!("pg18: {}", report["reason"].as_str().unwrap()));
+                expected.insert(format!(
+                    "pg18 C macros unavailable; report {}",
+                    out_dir.join("pg18_macro_report.json").display()
+                ));
+            }
+            status => panic!("unexpected report status {status}"),
+        }
+        let actual = build_output
+            .lines()
+            .filter_map(|line| line.strip_prefix("cargo:warning="))
+            .collect::<Vec<_>>();
+        assert_eq!(
+            actual.iter().copied().collect::<BTreeSet<_>>(),
+            if debug { expected.iter().map(String::as_str).collect() } else { BTreeSet::new() },
+            "{phase} emits precisely the requested macro diagnostics"
+        );
+        assert_eq!(
+            actual.len(),
+            if debug { expected.len() } else { 0 },
+            "{phase} duplicates no warning"
+        );
+        for warning in expected {
+            assert_eq!(
+                stderr.contains(&warning),
+                debug,
+                "{phase} Cargo diagnostic visibility for {warning}"
+            );
+        }
+        report
+    }
+
+    /// Require a Cargo rebuild after the only changed input is the tracked debug
+    /// setting, rather than accepting cached output from the previous mode.
+    fn assert_rerun(&self, phase: &str) {
+        let stderr = fs::read_to_string(self.0.join(format!("{phase}.stderr"))).unwrap();
+        assert!(
+            stderr.contains("Compiling shipped-macro-consumer v0.0.0"),
+            "{phase} must rerun the consumer's binding build after the environment changes"
+        );
+    }
+
+    /// Require fresh binding/Clang disagreements and their dependency skips to
+    /// remain in audit data regardless of the diagnostic visibility setting.
+    fn assert_mismatch_skips(&self, phase: &str, debug: bool) -> serde_json::Value {
+        let report = self.assert_macro_warnings(phase, debug);
         assert_eq!(
             report["integer_bindings"]["integer_constants"]["SNAPSHOT_HUGE"]["value"]["value"],
             0
@@ -139,8 +219,6 @@ impl Fixture {
             report["integer_constants"]["SNAPSHOT_HUGE"]["value"]["value"],
             9223372036854775807_u64
         );
-        let build_output = fs::read_to_string(out_dir.parent().unwrap().join("output")).unwrap();
-        let stderr = fs::read_to_string(self.0.join(format!("{phase}.stderr"))).unwrap();
         for (name, code) in [
             ("SNAPSHOT_VALID", "binding_value_mismatch"),
             ("SNAPSHOT_VALID_WRAPPER", "dependency_skipped"),
@@ -169,14 +247,8 @@ impl Fixture {
                     "dependency warning names the skipped callee"
                 );
             }
-            let directive = format!("cargo:warning={reason}");
-            assert_eq!(
-                build_output.lines().filter(|line| *line == directive).count(),
-                1,
-                "{phase} emits exactly one final warning for {name}"
-            );
-            assert!(stderr.contains(reason), "{phase} exposes the warning through Cargo");
         }
+        report
     }
 }
 
@@ -333,7 +405,9 @@ fn docsrs_exports_generated_adapter_modules_and_accepts_support_free_snapshots()
     }
 }
 
-/// Checks that release ships macros and docsrs uses them without PostgreSQL or clang.
+/// Prove diagnostic mode changes rerun Cargo without changing macro semantics,
+/// release snapshots preserve generated definitions, and docs.rs consumes those
+/// snapshots without requiring PostgreSQL or Clang.
 #[test]
 #[ignore = "compiles isolated ordinary, release and docs.rs builds; requires native Clang and cached dependencies"]
 fn release_ships_macros_and_docsrs_uses_them_without_postgres_or_clang() {
@@ -367,6 +441,7 @@ typedef unsigned int TransactionId;
 #define SNAPSHOT_BUFFERALIGN(len) SNAPSHOT_ALIGN(SNAPSHOT_ALIGNMENT, (len))
 #define SNAPSHOT_SPLIT 1 + 2
 #define SNAPSHOT_GROUPING(len) ((len) * SNAPSHOT_SPLIT)
+#define SNAPSHOT_STRINGIFY(value) #value
 "#,
     )
     .unwrap();
@@ -435,15 +510,39 @@ fn main() {
     fs::create_dir_all(&snapshot).unwrap();
     fs::write(snapshot.join("mod.rs"), "// ordinary builds must preserve this snapshot\n").unwrap();
     fixture.run(&mut fixture.command(), "ordinary");
-    fixture.assert_mismatch_skips("ordinary");
+    let ordinary_report = fixture.assert_mismatch_skips("ordinary", false);
     assert_eq!(
         fs::read_to_string(snapshot.join("mod.rs")).unwrap(),
         "// ordinary builds must preserve this snapshot\n"
     );
     let generated_root = fixture.output().parent().unwrap().to_path_buf();
     let generated = rust_tree(&generated_root);
-    fixture.run(fixture.command().env("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE", "1"), "release");
-    fixture.assert_mismatch_skips("release");
+    assert!(
+        ordinary_report["macros"].as_array().unwrap().iter().any(|emission| {
+            emission["analysis"]["name"] == "SNAPSHOT_STRINGIFY"
+                && emission["status"]["status"] == "skipped"
+        }),
+        "debug coverage includes a skip beyond binding mismatch and dependency propagation"
+    );
+    for (value, phase) in [("0", "ordinary-zero"), ("1", "ordinary-debug"), ("0", "ordinary-quiet")]
+    {
+        fixture.run(fixture.command().env("PGRX_MACRO_DEBUG", value), phase);
+        fixture.assert_rerun(phase);
+        assert_eq!(fixture.assert_mismatch_skips(phase, value == "1"), ordinary_report);
+        assert_eq!(
+            rust_tree(&generated_root),
+            generated,
+            "{phase} changes diagnostics without changing generated Rust"
+        );
+    }
+    fixture.run(
+        fixture
+            .command()
+            .env("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE", "1")
+            .env("PGRX_MACRO_DEBUG", "1"),
+        "release",
+    );
+    assert_eq!(fixture.assert_mismatch_skips("release", true), ordinary_report);
     assert_eq!(rust_tree(&generated_root), generated);
     let shipped = rust_tree(&snapshot);
     assert_eq!(shipped.keys().collect::<Vec<_>>(), generated.keys().collect::<Vec<_>>());
@@ -584,6 +683,46 @@ fn main() {
             fs::write(snapshot.join(name), file.into_token_stream().to_string()).unwrap();
         }
     }
+
+    // Precomputed target bindings deliberately lack an inspected macro profile.
+    // Exercise that report/warning path in this existing target directory, then
+    // restore the original consumer for the full docs.rs snapshot assertions.
+    let original_main = fs::read_to_string(fixture.0.join("src/main.rs")).unwrap();
+    let target_info = fixture.0.join("target-info");
+    fs::create_dir(&target_info).unwrap();
+    fs::write(target_info.join("pg18_raw_bindings.rs"), "pub const PRECOMPUTED: u32 = 12;\n")
+        .unwrap();
+    fs::write(
+        fixture.0.join("src/main.rs"),
+        "fn main() { println!(\"{}\", shipped_macro_consumer::PRECOMPUTED); }\n",
+    )
+    .unwrap();
+    fixture.run(
+        fixture
+            .command()
+            .env("PGRX_TARGET_INFO_PATH_PG18", &target_info)
+            .env("PGRX_MACRO_DEBUG", "0"),
+        "unavailable-zero",
+    );
+    let unavailable_report = fixture.assert_macro_warnings("unavailable-zero", false);
+    assert_eq!(unavailable_report["status"], "unavailable");
+    assert!(unavailable_report.get("profile").is_none());
+    assert!(unavailable_report["reason"].as_str().unwrap().contains("precomputed target bindings"));
+    for (value, phase) in [(Some("1"), "unavailable-debug"), (None, "unavailable-unset")] {
+        let mut command = fixture.command();
+        command.env("PGRX_TARGET_INFO_PATH_PG18", &target_info);
+        if let Some(value) = value {
+            command.env("PGRX_MACRO_DEBUG", value);
+        }
+        fixture.run(&mut command, phase);
+        fixture.assert_rerun(phase);
+        assert_eq!(
+            fixture.assert_macro_warnings(phase, value == Some("1")),
+            unavailable_report,
+            "{phase} retains the same unavailability audit data"
+        );
+    }
+    fs::write(fixture.0.join("src/main.rs"), original_main).unwrap();
     fs::remove_file(pg_config).unwrap();
     fs::remove_dir_all(fixture.0.join("server")).unwrap();
     fs::remove_dir_all(fixture.out_dir()).unwrap();

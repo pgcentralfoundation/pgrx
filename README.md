@@ -39,6 +39,10 @@
    + [Automatic mapping for many Rust types into PostgreSQL](#mapping-of-postgres-types-to-rust)
    + SQL schemas generated automatically (or manually via `cargo pgrx schema`)
    + Include custom SQL with `extension_sql!` & `extension_sql_file!`
+- **Automatic PostgreSQL C Macro Translation**
+   + On supported Linux and macOS targets, pgrx automatically transpiles nearly all of PostgreSQL's function-style C `#define` macros into Rust `macro_rules!` macros during binding generation
+   + Use them through `pgrx::`, with C semantics determined by the selected PostgreSQL installation, compiler flags, and target
+   + See [Using PostgreSQL C macros](docs/src/extension/c-macros.md) for extension examples and the [transpiler architecture](pgrx-c-macros/ARCHITECTURE.md) for implementation details
 - **Safety First**
    + Translates Rust `panic!`s into Postgres `ERROR`s that abort the transaction, not the process
    + Memory Management follows Rust's drop semantics, even in the face of `panic!` and `elog(ERROR)`
@@ -81,7 +85,7 @@ It is currently expected to work on other "Unix" OS with possible small changes,
    - RHEL-likes: `yum install clang`
    - Windows: download installers from https://github.com/llvm/llvm-project/releases
 - C compiler
-   - Linux and MacOS: GCC or Clang if `cshim` feature is enabled, and no need if the `cshim` feature is disabled
+   - Linux and macOS: a Clang executable compatible with the loaded `libclang` for C macro generation and its generated native adapters; the `cshim` feature also needs a C compiler
    - Windows: MSVC or Clang
 - [PostgreSQL's build dependencies](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code) ‡
    - Debian-likes: `sudo apt-get install build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config`

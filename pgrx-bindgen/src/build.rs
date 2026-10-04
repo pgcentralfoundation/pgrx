@@ -13,8 +13,8 @@ use bindgen::callbacks::{DeriveTrait, EnumVariantValue, ImplementsTrait, MacroPa
 use eyre::{WrapErr, eyre};
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, BuildInputs, CompilationProfile, Diagnostic, EmissionStatus,
-    IntegerConstant, MacroEmission, MacroScanner, PostgresConfig, SkipReasonCode,
-    generate_with_bindings, pg_sys_integer_bridges, postgres_function_macro_names,
+    IntegerConstant, MacroEmission, MacroScanner, PostgresConfig, generate_with_bindings,
+    pg_sys_integer_bridges, postgres_function_macro_names,
 };
 use pgrx_pg_config::{PgConfig, PgMinorVersion, PgVersion, Pgrx, SUPPORTED_VERSIONS};
 use quote::{ToTokens, quote};
@@ -400,18 +400,20 @@ fn generate_bindings(
     }
     let report = build_paths.out_dir.join(format!("pg{major_version}_macro_report.json"));
     write_content_stable(&report, &macros.report)?;
-    if macros.inspected {
-        println!(
-            "cargo:warning=pg{major_version} C macros: {} emitted, {} skipped; report {}",
-            macros.emitted,
-            macros.skipped,
-            report.display()
-        );
-    } else {
-        println!(
-            "cargo:warning=pg{major_version} C macros unavailable; report {}",
-            report.display()
-        );
+    if macro_debug_enabled() {
+        if macros.inspected {
+            println!(
+                "cargo:warning=pg{major_version} C macros: {} emitted, {} skipped; report {}",
+                macros.emitted,
+                macros.skipped,
+                report.display()
+            );
+        } else {
+            println!(
+                "cargo:warning=pg{major_version} C macros unavailable; report {}",
+                report.display()
+            );
+        }
     }
     if macros.emitted != 0 && env_tracked(&format!("CARGO_FEATURE_PG{major_version}")).is_some() {
         println!("cargo:rustc-cfg=pgrx_c_macros");
@@ -423,6 +425,20 @@ fn generate_bindings(
         lib_dir.to_str().ok_or_else(|| eyre!("{lib_dir:?} is not valid UTF-8 string"))?
     );
     Ok(macros.integrated_cshim)
+}
+
+/// Keep normal binding builds quiet while allowing developers to inspect macro
+/// skip diagnostics. Tracking the switch makes Cargo rerun generation when its
+/// value changes; reports are written independently of this output policy.
+fn macro_debug_enabled() -> bool {
+    env_tracked("PGRX_MACRO_DEBUG").as_deref() == Some("1")
+}
+
+/// Keep a skip diagnostic within one Cargo warning line. Compiler rejection
+/// messages can contain newlines; they must not become additional build-script
+/// directives. The full unmodified reason remains in the JSON report.
+fn macro_skip_warning(major_version: u16, name: &str, message: &str) -> String {
+    format!("pg{major_version}: skipping macro `{name}`: {}", message.replace(['\r', '\n'], " "))
 }
 
 #[derive(Debug, Clone)]
@@ -1113,7 +1129,9 @@ fn get_bindings(
         let bindings = std::fs::read_to_string(&bindings_file)
             .wrap_err_with(|| format!("failed to read raw bindings from {bindings_file}"))?;
         let reason = "precomputed target bindings do not include an inspected C macro profile; macro generation is unavailable without matching target headers and metadata";
-        println!("cargo:warning=pg{major_version}: {reason}");
+        if macro_debug_enabled() {
+            println!("cargo:warning=pg{major_version}: {reason}");
+        }
         (bindings, MacroOutput::unavailable(major_version, reason)?)
     } else {
         let (bindings, macros) =
@@ -1205,7 +1223,9 @@ fn run_bindgen(
     };
     if windows {
         let reason = "C macro generation is unavailable for Windows/MSVC profiles; existing binding generation is unchanged";
-        println!("cargo:warning=pg{major_version}: {reason}");
+        if macro_debug_enabled() {
+            println!("cargo:warning=pg{major_version}: {reason}");
+        }
         Ok((generate(arguments)?, MacroOutput::unavailable(major_version, reason)?))
     } else {
         generate_macros(
@@ -1298,6 +1318,7 @@ fn generate_macros(
     let _lock = MACRO_SCANNER.lock().map_err(|_| eyre!("C macro scanner lock was poisoned"))?;
     let scanner = MacroScanner::new().wrap_err("could not initialize C macro discovery")?;
     let postgres = PostgresConfig::from_pg_config(pg_config.clone())?;
+    let major_version = pg_config.major_version()?;
     let mut effective_arguments = binder_arguments.clone();
     effective_arguments.extend_from_slice(environment_arguments);
     let mut frontend = postgres
@@ -1362,12 +1383,7 @@ fn generate_macros(
         generate_with_bindings(&session, &names, &symbols).map_err(|message| eyre!(message))?;
     source.push_str(&support.rust);
     let integrated_cshim = if native.active && !support.c_source.is_empty() {
-        compile_macro_support(
-            pg_config.major_version()?,
-            frontend.profile(),
-            &support.c_source,
-            &native,
-        )?
+        compile_macro_support(major_version, frontend.profile(), &support.c_source, &native)?
     } else {
         false
     };
@@ -1376,6 +1392,7 @@ fn generate_macros(
     session.verify_inputs().wrap_err("C inputs changed during macro support generation")?;
     let mut emitted = 0;
     let mut skipped = 0;
+    let macro_debug = macro_debug_enabled();
     for emission in &emissions {
         match &emission.status {
             EmissionStatus::Emitted { .. } => {
@@ -1384,18 +1401,18 @@ fn generate_macros(
             }
             EmissionStatus::Skipped { reason } => {
                 skipped += 1;
-                if matches!(
-                    reason.code,
-                    SkipReasonCode::BindingValueMismatch | SkipReasonCode::DependencySkipped
-                ) {
-                    println!("cargo:warning={}", reason.message);
+                if macro_debug {
+                    println!(
+                        "cargo:warning={}",
+                        macro_skip_warning(major_version, &emission.analysis.name, &reason.message)
+                    );
                 }
             }
         }
     }
     let files = MacroFiles::new(source, &emissions, postgres.server_include_dir())?;
     let report = serde_json::to_vec_pretty(&MacroReport {
-        postgres_major_version: pg_config.major_version()?,
+        postgres_major_version: major_version,
         status: "generated",
         profile: frontend.profile(),
         inputs: session.inputs(),
@@ -2015,6 +2032,20 @@ mod macro_build_tests {
 
     /// Allocate process-local unique directory suffixes for concurrent isolated oracle runs.
     static NEXT_DIRECTORY: AtomicU64 = AtomicU64::new(0);
+
+    /// Prove multiline compiler diagnostics remain one warning rather than
+    /// injecting Cargo directives, without changing the original report text.
+    #[test]
+    fn macro_skip_warnings_keep_compiler_diagnostics_within_one_directive() {
+        let message = "rejected C witness\r\ncargo:rustc-cfg=forged\nsee source:12";
+        let warning = macro_skip_warning(18, "REJECTED", message);
+        assert_eq!(warning.lines().count(), 1);
+        assert!(!warning.contains('\r'));
+        assert_eq!(
+            warning,
+            "pg18: skipping macro `REJECTED`: rejected C witness  cargo:rustc-cfg=forged see source:12"
+        );
+    }
 
     /// Checks that documentation snapshots guard native support and preserve macro templates.
     #[test]

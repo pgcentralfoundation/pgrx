@@ -165,6 +165,46 @@ fn emitted_macros_keep_provenance_occurrences_names_and_structured_skips() {
     assert!(source(&pointer).contains("::pointee("));
 }
 
+/// Check actual emitted Rustdoc uses one argument for a capture and plural arguments for a formal plus capture.
+#[test]
+fn captured_operand_documentation_uses_singular_and_plural_argument_counts() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = TemporaryDirectory::new();
+    let header = directory.0.join("argument_docs.h");
+    fs::write(
+        &header,
+        "#define DOC_ONE() (captured)\n#define DOC_TWO(value) ((value) + (captured))\n",
+    )
+    .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let session = AnalysisSession::prepare(&scanner, &frontend, &["DOC_ONE", "DOC_TWO"]).unwrap();
+    for (name, count, expected) in [
+        ("DOC_ONE", 1, "Rust callers supply 1 argument: the 0 original C parameters,"),
+        ("DOC_TWO", 2, "Rust callers supply 2 arguments: the 1 original C parameter,"),
+    ] {
+        let emission = emit(&session, name);
+        assert_eq!(emission.analysis.parameters.len(), count);
+        let parsed = syn::parse_file(source(&emission)).unwrap();
+        let public = parsed
+            .items
+            .iter()
+            .find_map(|item| match item {
+                syn::Item::Macro(item)
+                    if item.ident.as_ref().is_some_and(|ident| ident == name) =>
+                {
+                    Some(item)
+                }
+                _ => None,
+            })
+            .unwrap();
+        let doc = documentation(public);
+        assert!(doc.contains(expected), "{name}: {doc}");
+        assert!(!doc.contains("Rust callers supply 1 arguments:"), "{name}: {doc}");
+        assert!(!doc.contains("the 1 original C parameters,"), "{name}: {doc}");
+    }
+}
+
 /// Checks that doc commented definition keeps unexpanded calls parameters and fenced comments.
 #[test]
 fn doc_commented_definition_keeps_unexpanded_calls_parameters_and_fenced_comments() {

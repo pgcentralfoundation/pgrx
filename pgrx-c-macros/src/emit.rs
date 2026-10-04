@@ -887,7 +887,10 @@ fn render(
         .filter(|parameter| parameter.origin == crate::ParameterOrigin::FreeIdentifier)
         .collect::<Vec<_>>();
     if !captures.is_empty() {
-        write!(comment, "\n\nRust callers supply {} arguments: the {} original C parameters, followed by explicit caller-scope operands in this order: ", analysis.parameters.len(), analysis.parameters.len() - captures.len()).expect("String output");
+        let argument_word = if analysis.parameters.len() == 1 { "argument" } else { "arguments" };
+        let formal_count = analysis.parameters.len() - captures.len();
+        let parameter_word = if formal_count == 1 { "parameter" } else { "parameters" };
+        write!(comment, "\n\nRust callers supply {} {argument_word}: the {formal_count} original C {parameter_word}, followed by explicit caller-scope operands in this order: ", analysis.parameters.len()).expect("String output");
         for (index, parameter) in captures.iter().enumerate() {
             if index != 0 {
                 comment.push_str(", ");

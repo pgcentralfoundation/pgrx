@@ -6,6 +6,9 @@ definitions separately as conversion context. Analysis and translation into Rust
 `macro_rules!` cover supported C expressions, with generated type and storage
 adapters derived from Clang declarations and the corresponding Rust bindings.
 
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the end-to-end implementation, phase
+contracts, C semantics, generated native adapters, and validation strategy.
+
 ## Command-line use
 
 The tool requires libclang, as pgrx's bindgen generator does. Set
@@ -202,6 +205,28 @@ PostgreSQL or Clang. Native adapter implementations are excluded from documentat
 builds because they belong to the inspected installation's platform and layouts.
 Existing handwritten ports remain available while migration proceeds.
 
+### Build diagnostics
+
+Macro-generation Cargo warnings are quiet by default. Set `PGRX_MACRO_DEBUG=1`
+to print the generation summary, unavailable-profile notices, and a warning for
+each skipped macro, including bindgen/Clang value disagreements and their
+dependent skips:
+
+```sh
+PGRX_MACRO_DEBUG=1 cargo build
+```
+
+Unset the variable or set `PGRX_MACRO_DEBUG=0` for normal quiet builds; only the
+exact value `1` enables these warnings. Cargo tracks the variable, so changing it
+reruns the binding build. Every completed generation writes
+`pgN_macro_report.json` in `OUT_DIR`, retaining skip reasons and available
+compiler facts regardless of the switch. Compiler invocations and generation
+errors still fail the build. This switch
+controls the binding build's diagnostics; explicit CLI `analyze` and `emit`
+commands continue to print their requested output and skip reasons.
+
+### Translation behavior
+
 The runtime models C integer promotions, conversions, casts, comparisons, shifts,
 and lazy logical and conditional operators on checked signed-char LP64 targets.
 Emitted literals keep their radix and digit spelling. C suffixes, octal notation
@@ -218,13 +243,14 @@ Binding-aware emission preserves verified names such as `$crate::MaxAllocHugeSiz
 and enum constants in their generated modules. The Rust binding supplies the
 referenced value; Clang supplies its original C integer type and independently
 verifies its value. Bindgen's values
-and types remain unchanged. A disagreement skips the entire macro and produces
-a build warning naming the constant, both values and the skipped macro.
+and types remain unchanged. A disagreement skips the entire macro and records
+the constant, both values, and the skipped macro in the report; with
+`PGRX_MACRO_DEBUG=1`, it also emits a build warning.
 A shared petgraph graph records conservative dependencies among all final active
 macros, including object macros and external context. Reverse graph traversal
-also skips dependent macros and explains their skipped dependencies in build
-warnings. Historical definitions and shadowed formal parameter names do not
-create active dependency edges. A second preprocessing pass proves that preserving
+also skips dependent macros and records their skipped dependencies, with build
+warnings enabled by `PGRX_MACRO_DEBUG=1`. Historical definitions and shadowed
+formal parameter names do not create active dependency edges. A second preprocessing pass proves that preserving
 an object name reproduces the original expansion, and requires atomic or fully
 parenthesized object expressions. Otherwise expansion remains, with a
 `/* PGRX: ... */` explanation. Literal fallbacks retain their original spelling.

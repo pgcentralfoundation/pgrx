@@ -1375,7 +1375,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERYSIGN {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_TSQUERYSIGN {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {

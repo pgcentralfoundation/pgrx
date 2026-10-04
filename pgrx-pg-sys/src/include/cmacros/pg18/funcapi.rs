@@ -123,7 +123,7 @@ macro_rules! __pgrx_c_args_SRF_FIRSTCALL_INIT {
 /// ```
 ///
 ///
-/// Rust callers supply 1 arguments: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 1 argument: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! SRF_FIRSTCALL_INIT {
     (@__pgrx_emit_public; $fcinfo:tt $(,)?) => {
@@ -399,7 +399,7 @@ macro_rules! __pgrx_c_args_SRF_IS_FIRSTCALL {
 /// ```
 ///
 ///
-/// Rust callers supply 1 arguments: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 1 argument: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! SRF_IS_FIRSTCALL {
     (@__pgrx_emit_public; $fcinfo:tt $(,)?) => {
@@ -755,7 +755,7 @@ macro_rules! __pgrx_c_args_SRF_PERCALL_SETUP {
 /// ```
 ///
 ///
-/// Rust callers supply 1 arguments: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 1 argument: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! SRF_PERCALL_SETUP {
     (@__pgrx_emit_public; $fcinfo:tt $(,)?) => {
@@ -1087,7 +1087,7 @@ macro_rules! __pgrx_c_args_SRF_RETURN_DONE {
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations. Caller argument tokens must not mention the macro's C local names, even inside groups: those invocations are rejected because C substitution can capture locals that Rust hygiene would resolve differently. The scope check also inspects forwarded expression fragments and is bounded to 4096 stringified bytes. Matches in fields, paths or strings are conservatively rejected.
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! SRF_RETURN_DONE {
     (@__pgrx_emit_public; $_funcctx:tt, $fcinfo:tt $(,)?) => {
@@ -2168,7 +2168,7 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT_NULL {
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations. Caller argument tokens must not mention the macro's C local names, even inside groups: those invocations are rejected because C substitution can capture locals that Rust hygiene would resolve differently. The scope check also inspects forwarded expression fragments and is bounded to 4096 stringified bytes. Matches in fields, paths or strings are conservatively rejected.
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! SRF_RETURN_NEXT_NULL {
     (@__pgrx_emit_public; $_funcctx:tt, $fcinfo:tt $(,)?) => {

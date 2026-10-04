@@ -35207,7 +35207,7 @@ macro_rules! __pgrx_c_args_PG_ARGISNULL {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_ARGISNULL {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -37730,7 +37730,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_BOOL {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_BOOL {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -38723,7 +38723,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_BPCHAR_P {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_BPCHAR_P {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -39339,7 +39339,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_BPCHAR_PP {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_BPCHAR_PP {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -39970,7 +39970,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_BPCHAR_P_COPY {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_BPCHAR_P_COPY {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -41494,7 +41494,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_BYTEA_P {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_BYTEA_P {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -42110,7 +42110,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_BYTEA_PP {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_BYTEA_PP {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -42735,7 +42735,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_BYTEA_P_COPY {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_BYTEA_P_COPY {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -44256,7 +44256,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_CHAR {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_CHAR {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -45244,7 +45244,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_CSTRING {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_CSTRING {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -45698,7 +45698,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_DATUM {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_DATUM {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -46065,7 +46065,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_FLOAT4 {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_FLOAT4 {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -46495,7 +46495,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_FLOAT8 {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_FLOAT8 {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -46940,7 +46940,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_HEAPTUPLEHEADER {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_HEAPTUPLEHEADER {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -47579,7 +47579,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_HEAPTUPLEHEADER_COPY {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -48215,7 +48215,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_INT16 {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_INT16 {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -49203,7 +49203,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_INT32 {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_INT32 {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -50191,7 +50191,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_INT64 {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_INT64 {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -51179,7 +51179,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_NAME {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_NAME {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -51636,7 +51636,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_OID {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_OID {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -52624,7 +52624,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_POINTER {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_POINTER {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -53039,7 +53039,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_RAW_VARLENA_P {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_RAW_VARLENA_P {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -53496,7 +53496,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TEXT_P {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_TEXT_P {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -54112,7 +54112,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TEXT_PP {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_TEXT_PP {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -54733,7 +54733,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TEXT_P_COPY {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_TEXT_P_COPY {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -56263,7 +56263,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TRANSACTIONID {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_TRANSACTIONID {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -57251,7 +57251,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_UINT16 {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_UINT16 {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -58239,7 +58239,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_UINT32 {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_UINT32 {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -59227,7 +59227,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_VARCHAR_P {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_VARCHAR_P {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -59848,7 +59848,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_VARCHAR_PP {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_VARCHAR_PP {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -60479,7 +60479,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_VARCHAR_P_COPY {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_VARCHAR_P_COPY {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -62006,7 +62006,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_VARLENA_P {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_VARLENA_P {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -62572,7 +62572,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_VARLENA_PP {
 /// ```
 ///
 ///
-/// Rust callers supply 2 arguments: the 1 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GETARG_VARLENA_PP {
     (@__pgrx_emit_public; $n:tt, $fcinfo:tt $(,)?) => {
@@ -63082,7 +63082,7 @@ macro_rules! __pgrx_c_args_PG_GET_COLLATION {
 /// ```
 ///
 ///
-/// Rust callers supply 1 arguments: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 1 argument: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GET_COLLATION {
     (@__pgrx_emit_public; $fcinfo:tt $(,)?) => {
@@ -63329,7 +63329,7 @@ macro_rules! __pgrx_c_args_PG_GET_OPCLASS_OPTIONS {
 /// ```
 ///
 ///
-/// Rust callers supply 1 arguments: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 1 argument: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_GET_OPCLASS_OPTIONS {
     (@__pgrx_emit_public; $fcinfo:tt $(,)?) => {
@@ -63650,7 +63650,7 @@ macro_rules! __pgrx_c_args_PG_HAS_OPCLASS_OPTIONS {
 /// ```
 ///
 ///
-/// Rust callers supply 1 arguments: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 1 argument: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_HAS_OPCLASS_OPTIONS {
     (@__pgrx_emit_public; $fcinfo:tt $(,)?) => {
@@ -63932,7 +63932,7 @@ macro_rules! __pgrx_c_args_PG_NARGS {
 /// ```
 ///
 ///
-/// Rust callers supply 1 arguments: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 1 argument: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_NARGS {
     (@__pgrx_emit_public; $fcinfo:tt $(,)?) => {
@@ -66688,7 +66688,7 @@ macro_rules! __pgrx_c_args_PG_RETURN_NULL {
 ///
 /// C return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.
 ///
-/// Rust callers supply 1 arguments: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+/// Rust callers supply 1 argument: the 0 original C parameters, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
 #[macro_export]
 macro_rules! PG_RETURN_NULL {
     (@__pgrx_emit_public; $fcinfo:tt $(,)?) => {
