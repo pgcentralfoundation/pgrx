@@ -36,7 +36,7 @@ pub(crate) struct Schema {
     test: bool,
     /// Positional arguments.
     ///
-    /// The first may be a PostgreSQL version label (`pg13`..`pg19`); every
+    /// The first may be a PostgreSQL version label (`pg15`..`pg19`); every
     /// remaining value is an SQL item name to emit (functions, types,
     /// enums, operators, aggregates, triggers, schemas, extension_sql
     /// blocks). Only those items and their transitive dependencies are
@@ -93,7 +93,7 @@ impl CommandExecute for Schema {
             }
         };
 
-        let (pg_version, items) = split_positional_args(&self.args);
+        let (pg_version, items) = split_positional_args(&self.args)?;
 
         let pgrx = Pgrx::from_config()?;
         let (package_manifest, package_manifest_path, target_dir) = get_package_manifest(
@@ -145,7 +145,8 @@ impl CommandExecute for Schema {
 /// is consumed as `pg_version`; everything after it (or everything, if
 /// there is no version) flows through as item names. `None` items means
 /// the caller supplied no names at all — as distinct from an empty slice.
-fn split_positional_args(args: &[String]) -> (Option<String>, Option<&[String]>) {
+fn split_positional_args(args: &[String]) -> eyre::Result<(Option<String>, Option<&[String]>)> {
+    super::reject_removed_pg_version(args.first().map(String::as_str))?;
     let (pg_version, rest) = if let Some((first, rest)) = args.split_first()
         && let Some(major) = first.strip_prefix("pg")
         && let Ok(major) = major.parse::<u16>()
@@ -155,7 +156,7 @@ fn split_positional_args(args: &[String]) -> (Option<String>, Option<&[String]>)
     } else {
         (None, args)
     };
-    (pg_version, (!rest.is_empty()).then_some(rest))
+    Ok((pg_version, (!rest.is_empty()).then_some(rest)))
 }
 
 #[tracing::instrument(level = "error", skip_all, fields(
@@ -475,7 +476,7 @@ mod tests {
     #[test]
     fn empty_args_yield_no_version_and_no_items() {
         let args = strs(&[]);
-        let (pg, items) = split_positional_args(&args);
+        let (pg, items) = split_positional_args(&args).unwrap();
         assert!(pg.is_none());
         assert!(items.is_none());
     }
@@ -483,7 +484,7 @@ mod tests {
     #[test]
     fn version_alone_is_captured() {
         let args = strs(&["pg18"]);
-        let (pg, items) = split_positional_args(&args);
+        let (pg, items) = split_positional_args(&args).unwrap();
         assert_eq!(pg.as_deref(), Some("pg18"));
         assert!(items.is_none());
     }
@@ -491,7 +492,7 @@ mod tests {
     #[test]
     fn version_followed_by_items() {
         let args = strs(&["pg18", "sum_vec", "MyType", "==="]);
-        let (pg, items) = split_positional_args(&args);
+        let (pg, items) = split_positional_args(&args).unwrap();
         assert_eq!(pg.as_deref(), Some("pg18"));
         assert_eq!(items, Some(&["sum_vec".to_owned(), "MyType".to_owned(), "===".to_owned()][..]));
     }
@@ -499,7 +500,7 @@ mod tests {
     #[test]
     fn items_only_without_version() {
         let args = strs(&["sum_vec", "MyType", "==="]);
-        let (pg, items) = split_positional_args(&args);
+        let (pg, items) = split_positional_args(&args).unwrap();
         assert!(pg.is_none());
         assert_eq!(items, Some(&["sum_vec".to_owned(), "MyType".to_owned(), "===".to_owned()][..]));
     }
@@ -507,8 +508,18 @@ mod tests {
     #[test]
     fn first_arg_that_looks_like_version_but_isnt_is_an_item() {
         let args = strs(&["pgfoo", "sum_vec"]);
-        let (pg, items) = split_positional_args(&args);
+        let (pg, items) = split_positional_args(&args).unwrap();
         assert!(pg.is_none());
         assert_eq!(items, Some(&["pgfoo".to_owned(), "sum_vec".to_owned()][..]));
+    }
+
+    #[test]
+    fn removed_versions_do_not_become_schema_items() {
+        for label in ["pg13", "pg14"] {
+            let args = strs(&[label, "sum_vec"]);
+            let err = split_positional_args(&args)
+                .expect_err("removed versions must not become SQL item names");
+            assert!(err.to_string().contains("no longer supported"));
+        }
     }
 }

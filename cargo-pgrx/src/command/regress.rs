@@ -507,6 +507,8 @@ impl Regress {
     }
 
     fn parse_args(args: &[String]) -> Result<(Option<String>, Option<String>), String> {
+        super::reject_removed_pg_version(args.first().map(String::as_str))
+            .map_err(|err| err.to_string())?;
         fn is_supported_pg_version_label(label: &str) -> bool {
             label
                 .strip_prefix("pg")
@@ -1058,5 +1060,14 @@ mod tests {
 
         assert_eq!(pg_version, None);
         assert_eq!(test_filter.as_deref(), Some("pg99"));
+    }
+
+    #[test]
+    fn parse_args_rejects_removed_versions_before_test_filter_fallback() {
+        for label in ["pg13", "pg14"] {
+            let err = Regress::parse_args(&strings(&[label]))
+                .expect_err("removed versions must not become test filters");
+            assert!(err.contains("no longer supported"));
+        }
     }
 }

@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-PG_VER="${PG_VER:-14}"
+PG_VER="${PG_VER:-15}"
 PG_FEATURE="pg${PG_VER#pg}"
 TOOLCHAIN="${DOCSRS_TOOLCHAIN:-nightly}"
 PACKAGE_DIR="${CARGO_TARGET_DIR:-target}/package"

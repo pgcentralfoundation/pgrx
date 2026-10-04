@@ -241,10 +241,7 @@ pub mod pg_magic_func_support {
 // that we're trying to be built against some other kind of "postgres" that has its own ABI name.
 //
 // Unless the compiling user explicitly told us that they're aware of this via `--features unsafe-postgres`.
-#[cfg(all(
-    any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"),
-    not(feature = "unsafe-postgres")
-))]
+#[cfg(not(feature = "unsafe-postgres"))]
 const _: () = {
     use core::ffi::CStr;
     // to appease `const`
